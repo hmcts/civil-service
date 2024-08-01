@@ -12,8 +12,8 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
@@ -28,8 +28,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState.ISSUED;
 import static uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection.PAY_IN_INSTALMENTS;
 import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
@@ -240,8 +238,11 @@ public class DashboardNotificationsParamsMapper {
                        DateUtils.formatDateInWelsh(caseData.getRequestForReconsiderationDeadline().toLocalDate()));
         }
 
-        params.put("bundleRestitchedDateEn", DateUtils.formatDate(LocalDate.now()));
-        params.put("bundleRestitchedDateCy", DateUtils.formatDateInWelsh(LocalDate.now()));
+        Optional<LocalDateTime> latestBundleCreatedOn = caseData.getLatestBundleCreatedOn();
+        latestBundleCreatedOn.ifPresent(date -> {
+            params.put("bundleRestitchedDateEn", DateUtils.formatDate(date));
+            params.put("bundleRestitchedDateCy", DateUtils.formatDateInWelsh(date.toLocalDate()));
+        });
 
         return params;
     }

@@ -29,9 +29,9 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Optional;
-
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static java.math.BigDecimal.ZERO;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,11 +40,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENCE_TRANSLATED_DOCUMENT;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -1178,6 +1178,63 @@ public class CaseDataTest {
             boolean isPaidLessThanClaimAmount = caseData.isPaidLessThanClaimAmount();
             //Then
             assertFalse(isPaidLessThanClaimAmount);
+        }
+    }
+
+    @Nested
+    class getLatestBundleCreatedOn {
+        @Test
+        void getLatestBundleCreatedOn_shouldReturnLatestDate_whenBundlesArePresent() {
+            LocalDateTime now = LocalDateTime.now();
+            List<IdValue<Bundle>> bundles = List.of(
+                new IdValue<>("1", Bundle.builder().createdOn(Optional.of(now.minusDays(1))).build()),
+                new IdValue<>("2", Bundle.builder().createdOn(Optional.of(now)).build()),
+                new IdValue<>("3", Bundle.builder().createdOn(Optional.of(now.minusDays(2))).build())
+            );
+            CaseData caseData = CaseData.builder().caseBundles(bundles).build();
+
+            Optional<LocalDateTime> result = caseData.getLatestBundleCreatedOn();
+
+            assertThat(result).isPresent();
+            assertThat(result.get()).isEqualTo(now);
+        }
+
+        @Test
+        void getLatestBundleCreatedOn_shouldReturnEmpty_whenNoBundlesArePresent() {
+            CaseData caseData = CaseData.builder().caseBundles(new ArrayList<>()).build();
+
+            Optional<LocalDateTime> result = caseData.getLatestBundleCreatedOn();
+
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        void getLatestBundleCreatedOn_shouldReturnEmpty_whenBundlesHaveNoDates() {
+            List<IdValue<Bundle>> bundles = List.of(
+                new IdValue<>("1", Bundle.builder().createdOn(null).build()),
+                new IdValue<>("2", Bundle.builder().createdOn(null).build())
+            );
+            CaseData caseData = CaseData.builder().caseBundles(bundles).build();
+
+            Optional<LocalDateTime> result = caseData.getLatestBundleCreatedOn();
+
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        void getLatestBundleCreatedOn_shouldReturnLatestDate_whenSomeBundlesHaveNoDates() {
+            LocalDateTime now = LocalDateTime.now();
+            List<IdValue<Bundle>> bundles = List.of(
+                new IdValue<>("1", Bundle.builder().createdOn(Optional.empty()).build()),
+                new IdValue<>("2", Bundle.builder().createdOn(Optional.of(now.minusDays(1))).build()),
+                new IdValue<>("3", Bundle.builder().createdOn(Optional.of(now)).build())
+            );
+            CaseData caseData = CaseData.builder().caseBundles(bundles).build();
+
+            Optional<LocalDateTime> result = caseData.getLatestBundleCreatedOn();
+
+            assertThat(result).isPresent();
+            assertThat(result.get()).isEqualTo(now);
         }
     }
 }

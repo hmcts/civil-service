@@ -17,8 +17,10 @@ import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
+import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
@@ -44,6 +46,7 @@ import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -90,6 +93,12 @@ public class DashboardNotificationsParamsMapperTest {
     public void shouldMapAllParameters_WhenIsRequested() {
 
         LocalDate date = LocalDate.of(2024, Month.FEBRUARY, 22);
+        LocalDateTime now = LocalDateTime.now();
+        List<IdValue<Bundle>> bundles = List.of(
+            new IdValue<>("1", Bundle.builder().createdOn(Optional.of(now.minusDays(1))).build()),
+            new IdValue<>("2", Bundle.builder().createdOn(Optional.of(now)).build()),
+            new IdValue<>("3", Bundle.builder().createdOn(Optional.of(now.minusDays(2))).build())
+        );
 
         LocalDateTime applicant1ResponseDeadline = LocalDateTime.of(2024, 3, 21, 16, 0);
         caseData = caseData.toBuilder()
@@ -108,6 +117,7 @@ public class DashboardNotificationsParamsMapperTest {
             .hearingLocationCourtName("County Court")
             .applicant1Represented(NO)
             .requestForReconsiderationDeadline(LocalDateTime.of(2024, 4, 1, 10, 20))
+            .caseBundles(bundles)
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
@@ -212,7 +222,7 @@ public class DashboardNotificationsParamsMapperTest {
             .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IN_INSTALMENTS).build())
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
             .joIsRegisteredWithRTL(YES)
-            .build();;
+            .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 

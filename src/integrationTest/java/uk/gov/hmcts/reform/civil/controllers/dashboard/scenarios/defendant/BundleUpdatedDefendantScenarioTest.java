@@ -7,11 +7,15 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.BundleUpdatedDefendantNotificationHandler;
+import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -38,6 +42,11 @@ public class BundleUpdatedDefendantScenarioTest extends CaseEventsDashboardBaseI
     }
 
     private CaseData createCaseData(YesOrNo respondentRepresented) {
+        List<IdValue<Bundle>> bundles = List.of(
+            new IdValue<>("1", Bundle.builder().createdOn(Optional.of(LocalDateTime.of(2024, 3, 1, 0, 0))).build()),
+            new IdValue<>("2", Bundle.builder().createdOn(Optional.of(LocalDateTime.of(2024, 4, 1, 0, 0))).build())
+        );
+
         return CaseDataBuilder.builder().atStateTrialReadyCheck().build()
             .toBuilder()
             .legacyCaseReference("reference")
@@ -47,6 +56,7 @@ public class BundleUpdatedDefendantScenarioTest extends CaseEventsDashboardBaseI
             .drawDirectionsOrderSmallClaims(YesOrNo.NO)
             .claimsTrack(ClaimsTrack.fastTrack)
             .orderType(OrderType.DECIDE_DAMAGES)
+            .caseBundles(bundles)
             .build();
     }
 
@@ -59,12 +69,12 @@ public class BundleUpdatedDefendantScenarioTest extends CaseEventsDashboardBaseI
                 jsonPath("$[0].titleEn").value("The case bundle has been updated"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">The case bundle was changed and re-uploaded on " +
-                        DateUtils.formatDate(LocalDate.now()) +
+                        DateUtils.formatDate(LocalDateTime.of(2024, 4, 1, 0, 0)) +
                         ". <a href=\"{VIEW_BUNDLE_REDIRECT}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">Review the new bundle</a>.</p>"),
                 jsonPath("$[0].titleCy").value("The case bundle has been updated"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">The case bundle was changed and re-uploaded on " +
-                        DateUtils.formatDateInWelsh(LocalDate.now()) +
+                        DateUtils.formatDateInWelsh(LocalDateTime.of(2024, 4, 1, 0, 0).toLocalDate()) +
                         ". <a href=\"{VIEW_BUNDLE_REDIRECT}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">Review the new bundle</a>.</p>")
             );
         } else {
