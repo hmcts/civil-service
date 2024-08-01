@@ -958,8 +958,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
                 respondent2Represented,
                 specRespondent2Represented
             )
-                             .filter(Objects::nonNull)
-                             .findFirst().orElse(null));
+            .filter(Objects::nonNull)
+            .findFirst().orElse(null));
     }
 
     @JsonIgnore
@@ -1034,8 +1034,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isPartAdmitImmediatePaymentClaimSettled() {
         return (isPartAdmitClaimSpec()
-            && (Objects.nonNull(getApplicant1AcceptAdmitAmountPaidSpec())
-            && YesOrNo.YES.equals(getApplicant1AcceptAdmitAmountPaidSpec()))
+                && (Objects.nonNull(getApplicant1AcceptAdmitAmountPaidSpec())
+                && YesOrNo.YES.equals(getApplicant1AcceptAdmitAmountPaidSpec()))
             && (Objects.isNull(getApplicant1AcceptPartAdmitPaymentPlanSpec())));
     }
 
