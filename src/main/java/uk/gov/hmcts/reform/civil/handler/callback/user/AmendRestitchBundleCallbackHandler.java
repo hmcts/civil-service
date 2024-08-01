@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.bundle.BundleCreationService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -68,7 +69,7 @@ public class AmendRestitchBundleCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         BundleCreateResponse bundleCreateResponse = bundleCreationService.createBundle(caseData.getCcdCaseReference());
 
-        List<IdValue<Bundle>> caseBundles = caseData.getCaseBundles();
+        List<IdValue<Bundle>> caseBundles = new ArrayList<>(caseData.getCaseBundles());
         caseBundles.removeIf(bundle -> bundle.getValue().getBundleHearingDate().isPresent()
                                  && bundle.getValue().getBundleHearingDate().get().equals(
                                  caseData.getHearingDate()));
