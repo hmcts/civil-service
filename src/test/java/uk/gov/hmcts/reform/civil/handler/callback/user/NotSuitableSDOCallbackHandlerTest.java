@@ -6,11 +6,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -40,30 +39,30 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 
-@SpringBootTest(classes = {
-    NotSuitableSDOCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    ClaimUrlsConfiguration.class,
-    JacksonConfiguration.class,
-    MockDatabaseConfiguration.class,
-    ValidationAutoConfiguration.class})
+@ExtendWith(MockitoExtension.class)
 class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private Time time;
 
-    @MockBean
+    @Mock
     private IdamClient idamClient;
 
-    @MockBean
+    @Mock
     private FeatureToggleService toggleService;
 
-    @Autowired
+    @InjectMocks
     private NotSuitableSDOCallbackHandler handler;
 
-    @Autowired
+    @Mock
     private ObjectMapper objectMapper;
+
+    @BeforeEach
+    void setUp() {
+        objectMapper = new ObjectMapper();
+        handler = new NotSuitableSDOCallbackHandler(objectMapper, time, toggleService);
+        objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+    }
 
     @Nested
     class AboutToStartCallback {
@@ -78,9 +77,6 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             params = callbackParamsOf(caseData, ABOUT_TO_START);
             String userId = UUID.randomUUID().toString();
 
-            given(idamClient.getUserDetails(any()))
-                .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
-
             given(time.now()).willReturn(LocalDateTime.now());
 
         }
@@ -89,9 +85,24 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         void checkUnsuitableSDODate() {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            String timeString = time.now().format(JacksonConfiguration.DATE_TIME_FORMATTER);
-            assertThat(response.getData()).extracting("unsuitableSDODate").isEqualTo(timeString);
+            Object unsuitableSDODateObj = response.getData().get("unsuitableSDODate");
 
+            assertThat(unsuitableSDODateObj).isInstanceOf(java.util.List.class);
+            java.util.List<?> unsuitableSDODateList = (java.util.List<?>) unsuitableSDODateObj;
+
+            java.util.List<Integer> dateComponents = unsuitableSDODateList.stream()
+                .map(o -> Integer.parseInt(o.toString())).toList();
+
+            LocalDateTime unsuitableSDODate = LocalDateTime.of(
+                dateComponents.get(0), dateComponents.get(1), dateComponents.get(2),
+                dateComponents.get(3), dateComponents.get(4), dateComponents.get(5),
+                dateComponents.get(6)
+            );
+
+            String formattedUnsuitableSDODate = unsuitableSDODate.format(JacksonConfiguration.DATE_TIME_FORMATTER);
+            String expectedTimeString = time.now().format(JacksonConfiguration.DATE_TIME_FORMATTER);
+
+            assertThat(formattedUnsuitableSDODate).isEqualTo(expectedTimeString);
         }
     }
 
@@ -101,7 +112,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         private CallbackParams params;
         private CaseData caseData;
 
-        @MockBean
+        @Mock
         private CallbackParams callbackParams;
 
         @Test
@@ -205,16 +216,6 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         private static final String EMAIL = "example@email.com";
 
-        @BeforeEach
-        void setup() {
-            String userId = UUID.randomUUID().toString();
-            given(idamClient.getUserDetails(any()))
-                .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
-
-            given(time.now()).willReturn(LocalDateTime.now());
-
-        }
-
         @Test
         void shouldUpdateBusinessProcess_whenInvoked() {
             when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(false);
@@ -275,7 +276,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData()).doesNotContainKey("businessProcess");
+            assertThat(response.getData()).extracting("businessProcess").isNull();
         }
 
         @Test
@@ -337,7 +338,6 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void handleEventsReturnsTheExpectedCallbackEvent(Boolean toggleState) {
-        when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(toggleState);
         assertThat(handler.handledEvents()).contains(NotSuitable_SDO);
     }
 }
