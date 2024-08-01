@@ -89,12 +89,12 @@ public class AmendRestitchBundleCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse amendRestitchBundle(CallbackParams callbackParams) {
-            CaseData caseData = callbackParams.getCaseData();
-            CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
 
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(dataBuilder.build().toMap(mapper))
-                .build();
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(dataBuilder.build().toMap(mapper))
+            .build();
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {

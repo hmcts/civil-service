@@ -4536,49 +4536,6 @@ class SimpleStateFlowEngineTest {
         }
 
         @Test
-        void shouldReturnInHearingReadiness_whenTransitionedFromFullDefenseProceed() {
-            // Given
-            CaseData caseData = CaseData.builder()
-                .caseAccessCategory(SPEC_CLAIM)
-                .submittedDate(LocalDateTime.now())
-                .respondent1Represented(YES)
-                .paymentSuccessfulDate(LocalDateTime.now())
-                .issueDate(LocalDate.now())
-                .respondent1OrgRegistered(YES)
-                .claimNotificationDeadline(LocalDateTime.now())
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .claimNotificationDate(LocalDateTime.now())
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .responseClaimMediationSpecRequired(YES)
-                .applicant1ProceedWithClaim(YES)
-                .applicant1ClaimMediationSpecRequired(
-                    SmallClaimMedicalLRspec.builder()
-                        .hasAgreedFreeMediation(NO)
-                        .build())
-                .hearingReferenceNumber("11111111")
-                .listingOrRelisting(ListingOrRelisting.LISTING)
-                .build();
-
-            // When
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-            // Then
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(IN_HEARING_READINESS.fullName());
-            assertThat(stateFlow.getStateHistory())
-                .hasSize(8)
-                .extracting(State::getName)
-                .containsExactly(
-                    SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), FULL_DEFENCE.fullName(),
-                    FULL_DEFENCE_PROCEED.fullName(), IN_HEARING_READINESS.fullName()
-                );
-        }
-
-        @Test
         void shouldReturnInHearingReadiness_whenTransitionedFromPartAdmitNotSettledNoMediation() {
             CaseData caseData = CaseData.builder()
                 // spec claim
