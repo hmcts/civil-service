@@ -193,7 +193,7 @@ core_case_data:
     url: ${CORE_CASE_DATA_API_URL:http://localhost:4452}
 role-assignment-service:
   api:
-    url: http://localhost:4096
+    url: ${ROLE_ASSIGNMENT_URL:http://localhost:4096}
 case_document_am:
   url: ${CASE_DOCUMENT_AM_URL:http://localhost:4455}
 reference:
@@ -257,7 +257,7 @@ notifications:
   sdoOrderedSpecEA: "7224780e-416c-4c0b-a718-056cd93abe06"
   sdoOrderedSpecBilingual: "0ae860e7-80b5-46f8-95b7-8f19d6f974cf"
   claimantSolicitorConfirmsNotToProceedSpec: "156b71f5-30ac-4398-aad2-72dfd424c6f2"
-  claimantSolicitorConfirmsNotToProceedSpecLip: "25988b85-dafc-40be-970f-45fbb7d0f860"
+  claimantSolicitorConfirmsNotToProceedSpecLip: "57fa7156-3af0-4c78-8677-ee1cf6aaed43"
   notifyRespondentLipPartAdmitPayImmediatelyAcceptedSpec: "98ca0ea8-ee90-46b4-a361-dcca12a2ff47"
   notifyRespondentSolicitorPartAdmitPayImmediatelyAcceptedSpec: "5047af9d-bf50-4476-b41b-24fc96b8a7d8"
   respondentSolicitorNotifyNotToProceedSpec: "4dc0b5bb-674f-401e-8a39-05686dc0302e"
@@ -442,6 +442,7 @@ notifications:
   notifyDefendantLIPJudgmentByAdmissionTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
   notifyLiPOrderTranslatedTemplate: "d81749f7-cef5-4159-8d99-146eb572a690"
   notifyClaimDiscontinuedLRTemplate: "9a7cc57b-38ab-4c0b-b63a-f5927241f18e"
+  notifyClaimDiscontinuedLipTemplate: "7081688e-9736-4fc5-8f0b-b69c43fa659c"
 
   notifyClaimantLrValidationDiscontinuanceFailureTemplate: "25398d9e-bb5f-4778-b76f-625c355f7c06"
 
@@ -480,6 +481,9 @@ court-location:
   unspecified-claim:
     region-id: "4"
     epimms-id: "192280"
+
+role-initialisation:
+  enabled: ${ASSIGN_ROLES_ON_STARTUP:false}
 
 launchdarkly:
   sdk-key: ${LAUNCH_DARKLY_SDK_KEY:}
