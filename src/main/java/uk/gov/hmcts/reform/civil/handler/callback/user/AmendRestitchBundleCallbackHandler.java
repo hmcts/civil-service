@@ -62,17 +62,21 @@ public class AmendRestitchBundleCallbackHandler extends CallbackHandler {
     private CallbackResponse amendRestitchBundle(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        BundleCreateResponse bundleCreateResponse = bundleCreationService.createBundle(caseData.getCcdCaseReference());
+        try {
+            BundleCreateResponse bundleCreateResponse = bundleCreationService.createBundle(caseData.getCcdCaseReference());
 
-        List<IdValue<Bundle>> caseBundles = caseData.getCaseBundles();
-        caseBundles.removeIf(bundle -> bundle.getValue().getBundleHearingDate().isPresent()
-                                 && bundle.getValue().getBundleHearingDate().get().equals(
-                                 caseData.getHearingDate()));
+            List<IdValue<Bundle>> caseBundles = caseData.getCaseBundles();
+            caseBundles.removeIf(bundle -> bundle.getValue().getBundleHearingDate().isPresent()
+                && bundle.getValue().getBundleHearingDate().get().equals(
+                caseData.getHearingDate()));
 
-        caseBundles.addAll(bundleCreateResponse.getData().getCaseBundles()
-                               .stream().map(bundle -> bundleCreationEventHandler.prepareNewBundle(bundle, caseData)
-            ).toList());
-        caseDataBuilder.caseBundles(caseBundles);
+            caseBundles.addAll(bundleCreateResponse.getData().getCaseBundles()
+                                   .stream().map(bundle -> bundleCreationEventHandler.prepareNewBundle(bundle, caseData)
+                ).toList());
+            caseDataBuilder.caseBundles(caseBundles);
+        } catch (Exception e) {
+            //TESTING
+        }
 
         caseDataBuilder.businessProcess(BusinessProcess.ready(AMEND_RESTITCH_BUNDLE));
 
