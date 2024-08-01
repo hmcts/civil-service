@@ -63,7 +63,7 @@ public class FullDefenceProceedTransitionBuilderTest {
             .applicant1ProceedWithClaim(YES)
             .responseClaimTrack(SMALL_CLAIM.name())
             .build().toBuilder()
-            .submittedDate(LocalDateTime.of(2024, 8, 1, 1, 0))
+            .submittedDate(LocalDateTime.of(2024, 12, 1, 1, 0))
             .build();
         assertTrue(specSmallClaimCarm.test(caseData));
     }
