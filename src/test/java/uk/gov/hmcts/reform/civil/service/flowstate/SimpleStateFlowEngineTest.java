@@ -4263,7 +4263,7 @@ class SimpleStateFlowEngineTest {
                                                               )
                                                               .build());
 
-            assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
+            assertEquals(newState.getState().getName(),IN_MEDIATION.fullName());
             assertNull(newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
         }
 
@@ -4309,7 +4309,7 @@ class SimpleStateFlowEngineTest {
                                                               )
                                                               .build());
 
-            assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
+            assertEquals(newState.getState().getName(), IN_MEDIATION.fullName());
             assertEquals(Boolean.TRUE, newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
         }
     }
