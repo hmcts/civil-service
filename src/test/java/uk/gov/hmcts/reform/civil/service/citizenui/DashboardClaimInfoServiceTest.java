@@ -21,11 +21,14 @@ import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -268,7 +271,7 @@ public class DashboardClaimInfoServiceTest {
                                              .individualLastName("Bond")
                                              .type(Party.Type.INDIVIDUAL)
                                              .build())
-                            .activeJudgment(JudgmentDetails.builder()
+                            .activeJudgment(JudgmentDetails.builder().type(JudgmentType.DEFAULT_JUDGMENT)
                                             .createdTimestamp(DATE_IN_2025)
                                             .build())
                             .build());
@@ -446,5 +449,21 @@ public class DashboardClaimInfoServiceTest {
         );
         assertThat(claimsForDefendant.getClaims().size()).isEqualTo(3);
         assertThat(claimsForDefendant.getClaims().get(0).getCreatedDate()).isEqualTo(now);
+    }
+
+    @Test
+    void shouldIncludeDefaultJudgementIssuedDate() {
+        given(caseDetailsConverter.toCaseData(CASE_DETAILS))
+            .willReturn(CaseData.builder().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1)).activeJudgment(
+                    JudgmentDetails.builder().issueDate(LocalDate.now()).state(JudgmentState.ISSUED)
+                        .type(JudgmentType.DEFAULT_JUDGMENT).build())
+                            .build());
+        DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
+            "authorisation",
+            "123",
+            CURRENT_PAGE_NO
+        );
+        assertThat(claimsForDefendant.getClaims().size()).isEqualTo(3);
+        assertThat(claimsForDefendant.getClaims().get(0).getDefaultJudgementIssuedDate()).isEqualTo(LocalDate.now());
     }
 }

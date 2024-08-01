@@ -624,5 +624,8 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String notifyLRBundleRestitched;
+    
+  @NotEmpty
+    private String notifyClaimDiscontinuedLipTemplate;
 
 }
