@@ -1633,6 +1633,7 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
+                ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
