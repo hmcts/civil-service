@@ -73,11 +73,11 @@ public class BundleUpdatedClaimantScenarioTest extends CaseEventsDashboardBaseIn
                     "<p class=\"govuk-body\">The case bundle was changed and re-uploaded on " +
                         DateUtils.formatDate(april) +
                         ". <a href=\"{VIEW_BUNDLE_REDIRECT}\" class=\"govuk-link\">Review the new bundle</a>.</p>"),
-                jsonPath("$[0].titleCy").value("The case bundle has been updated"),
+                jsonPath("$[0].titleCy").value("Mae bwndel yr achos wedi'i ddiweddaru"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">The case bundle was changed and re-uploaded on " +
+                    "<p class=\"govuk-body\">Cafodd bwndel yr achos ei newid a'i ail-uwchlwytho ar " +
                         DateUtils.formatDateInWelsh(april.toLocalDate()) +
-                        ". <a href=\"{VIEW_BUNDLE_REDIRECT}\" class=\"govuk-link\">Review the new bundle</a>.</p>")
+                        ". <a href=\"{VIEW_BUNDLE_REDIRECT}\" class=\"govuk-link\">Adolygu’r bwndel newydd</a>.</p>")
             );
         } else {
             resultActions.andExpect(jsonPath("$").isEmpty());

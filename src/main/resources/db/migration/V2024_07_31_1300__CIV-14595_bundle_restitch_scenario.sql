@@ -16,13 +16,13 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
                                                   , notification_role, time_to_live)
 VALUES ('Notice.AAA6.CP.Bundle.Updated.Claimant',
         'The case bundle has been updated',
-        'The case bundle has been updated',
+        'Mae bwndel yr achos wedi''i ddiweddaru',
         '<p class="govuk-body">The case bundle was changed and re-uploaded on ${bundleRestitchedDateEn}. <a href="{VIEW_BUNDLE_REDIRECT}" class="govuk-link">Review the new bundle</a>.</p>',
-        '<p class="govuk-body">The case bundle was changed and re-uploaded on ${bundleRestitchedDateCy}. <a href="{VIEW_BUNDLE_REDIRECT}" class="govuk-link">Review the new bundle</a>.</p>',
+        '<p class="govuk-body">Cafodd bwndel yr achos ei newid a''i ail-uwchlwytho ar ${bundleRestitchedDateCy}. <a href="{VIEW_BUNDLE_REDIRECT}" class="govuk-link">Adolygu’r bwndel newydd</a>.</p>',
         'CLAIMANT', 'Session'),
        ('Notice.AAA6.CP.Bundle.Updated.Defendant',
         'The case bundle has been updated',
-        'The case bundle has been updated',
+        'Mae bwndel yr achos wedi''i ddiweddaru',
         '<p class="govuk-body">The case bundle was changed and re-uploaded on ${bundleRestitchedDateEn}. <a href="{VIEW_BUNDLE_REDIRECT}" class="govuk-link">Review the new bundle</a>.</p>',
-        '<p class="govuk-body">The case bundle was changed and re-uploaded on ${bundleRestitchedDateCy}. <a href="{VIEW_BUNDLE_REDIRECT}" class="govuk-link">Review the new bundle</a>.</p>',
+        '<p class="govuk-body">Cafodd bwndel yr achos ei newid a''i ail-uwchlwytho ar ${bundleRestitchedDateCy}. <a href="{VIEW_BUNDLE_REDIRECT}" class="govuk-link">Adolygu’r bwndel newydd</a>.</p>',
         'DEFENDANT', 'Session');
