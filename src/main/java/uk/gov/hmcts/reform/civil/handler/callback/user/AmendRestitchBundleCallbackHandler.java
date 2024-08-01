@@ -48,13 +48,13 @@ public class AmendRestitchBundleCallbackHandler extends CallbackHandler {
             ? Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(MID, "create-bundle"), this::startBundleCreation,
-            callbackKey(ABOUT_TO_SUBMIT), this::submitCaseData,
+            callbackKey(ABOUT_TO_SUBMIT), this::amendRestitchBundle,
             callbackKey(SUBMITTED), this::buildConfirmation
             )
             : Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(MID, "create-bundle"), this::emptyCallbackResponse,
-            callbackKey(ABOUT_TO_SUBMIT), this::amendRestitchBundle,
+            callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
             callbackKey(SUBMITTED), this::emptyCallbackResponse
         );
     }
