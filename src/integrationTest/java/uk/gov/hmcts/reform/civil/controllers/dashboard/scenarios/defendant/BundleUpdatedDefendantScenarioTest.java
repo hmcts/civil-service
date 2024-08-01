@@ -70,12 +70,12 @@ public class BundleUpdatedDefendantScenarioTest extends CaseEventsDashboardBaseI
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">The case bundle was changed and re-uploaded on " +
                         DateUtils.formatDate(LocalDateTime.of(2024, 4, 1, 0, 0)) +
-                        ". <a href=\"{VIEW_BUNDLE_REDIRECT}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">Review the new bundle</a>.</p>"),
+                        ". <a href=\"{VIEW_BUNDLE_REDIRECT}\" class=\"govuk-link\">Review the new bundle</a>.</p>"),
                 jsonPath("$[0].titleCy").value("The case bundle has been updated"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">The case bundle was changed and re-uploaded on " +
                         DateUtils.formatDateInWelsh(LocalDateTime.of(2024, 4, 1, 0, 0).toLocalDate()) +
-                        ". <a href=\"{VIEW_BUNDLE_REDIRECT}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">Review the new bundle</a>.</p>")
+                        ". <a href=\"{VIEW_BUNDLE_REDIRECT}\" class=\"govuk-link\">Review the new bundle</a>.</p>")
             );
         } else {
             resultActions.andExpect(jsonPath("$").isEmpty());
