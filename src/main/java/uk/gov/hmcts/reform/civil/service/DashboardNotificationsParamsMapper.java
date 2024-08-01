@@ -250,17 +250,6 @@ public class DashboardNotificationsParamsMapper {
         return params;
     }
 
-    public Optional<LocalDateTime> getLatestBundleCreatedOn(CaseData caseData) {
-        return Optional.ofNullable(caseData.getCaseBundles())
-            .map(bundles -> bundles.stream()
-                .map(IdValue::getValue)
-                .map(Bundle::getCreatedOn)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .max(Comparator.naturalOrder()))
-            .orElse(Optional.empty());
-    }
-
     public Map<String, Object> mapCaseDataToParams(CaseData caseData, CaseEvent caseEvent) {
 
         Map<String, Object> params = mapCaseDataToParams(caseData);
@@ -269,6 +258,17 @@ public class DashboardNotificationsParamsMapper {
             params.put(ORDER_DOCUMENT, orderDocumentUrl);
         }
         return params;
+    }
+
+    private Optional<LocalDateTime> getLatestBundleCreatedOn(CaseData caseData) {
+        return Optional.ofNullable(caseData.getCaseBundles())
+            .map(bundles -> bundles.stream()
+                .map(IdValue::getValue)
+                .map(Bundle::getCreatedOn)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .max(Comparator.naturalOrder()))
+            .orElse(Optional.empty());
     }
 
     private static String getStringPaymentFrequency(PaymentFrequency paymentFrequency) {
