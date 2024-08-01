@@ -199,7 +199,10 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.businessProcess(BusinessProcess.ready(DISCONTINUE_CLAIM_CLAIMANT));
-
+        if (MultiPartyScenario.isTwoVOne(caseData)) {
+            caseDataBuilder.selectedClaimantForDiscontinuance(caseData.getClaimantWhoIsDiscontinuing()
+                                                                  .getValue().getLabel());
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .state(updateCaseState(caseData))
                 .data(caseDataBuilder.build().toMap(objectMapper))

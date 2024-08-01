@@ -120,9 +120,14 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
             caseDataBuilder.locationName(newCourtLocation.getSiteName());
         }
 
-        if (nonNull(newCourtLocation) && featureToggleService.isNationalRolloutEnabled()) {
+        if (nonNull(newCourtLocation)) {
             if (featureToggleService.isPartOfNationalRollout(newCourtLocation.getEpimmsId())) {
                 caseDataBuilder.eaCourtLocation(YesOrNo.YES);
+                if (featureToggleService.isHmcEnabled()) {
+                    caseDataBuilder.hmcEaCourtLocation(
+                        featureToggleService.isLocationWhiteListedForCaseProgression(newCourtLocation.getEpimmsId())
+                            ? YesOrNo.YES : YesOrNo.NO);
+                }
             } else {
                 caseDataBuilder.eaCourtLocation(YesOrNo.NO);
             }
