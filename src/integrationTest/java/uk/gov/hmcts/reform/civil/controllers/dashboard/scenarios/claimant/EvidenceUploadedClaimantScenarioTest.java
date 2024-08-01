@@ -53,9 +53,9 @@ public class EvidenceUploadedClaimantScenarioTest extends DashboardBaseIntegrati
                 jsonPath("$[0].categoryEn").value("Hearing"),
                 jsonPath("$[0].role").value("CLAIMANT"),
                 jsonPath("$[0].taskOrder").value("11"),
-                jsonPath("$[0].taskNameCy").value("<a href=\"{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}\" class=\"govuk-link\">View documents</a>"),
+                jsonPath("$[0].taskNameCy").value("<a href=\"{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}\" class=\"govuk-link\">Gweld y dogfennau</a>"),
                 jsonPath("$[0].currentStatusCy").value("Ar gael"),
-                jsonPath("$[0].categoryCy").value("Hearing")
+                jsonPath("$[0].categoryCy").value("Gwrandawiad")
             );
     }
 
@@ -88,9 +88,9 @@ public class EvidenceUploadedClaimantScenarioTest extends DashboardBaseIntegrati
                 jsonPath("$[0].categoryEn").value("Hearing"),
                 jsonPath("$[0].role").value("CLAIMANT"),
                 jsonPath("$[0].taskOrder").value("11"),
-                jsonPath("$[0].taskNameCy").value("<a href=\"{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}\" class=\"govuk-link\">View documents</a>"),
+                jsonPath("$[0].taskNameCy").value("<a href=\"{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}\" class=\"govuk-link\">Gweld y dogfennau</a>"),
                 jsonPath("$[0].currentStatusCy").value("Ar gael"),
-                jsonPath("$[0].categoryCy").value("Hearing")
+                jsonPath("$[0].categoryCy").value("Gwrandawiad")
             );
     }
 
