@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
@@ -28,7 +29,7 @@ public class CmcClaimTest {
     @Test
     void shouldReturnClaimantNameWhenClaimantExists() {
         CmcClaim cmcClaim = CmcClaim.builder()
-            .claimData(ClaimData.builder().claimants(Arrays.asList(CmcParty.builder()
+            .claimData(ClaimData.builder().claimants(List.of(CmcParty.builder()
                                                                        .name(NAME)
                                                                        .build()))
                            .build())
@@ -43,7 +44,7 @@ public class CmcClaimTest {
             .claimData(ClaimData.builder().claimants(Collections.emptyList()).build())
             .build();
         String claimantName = cmcClaim.getClaimantName();
-        assert (claimantName).equals("");
+        assert (claimantName).isEmpty();
     }
 
     @Test
@@ -129,6 +130,8 @@ public class CmcClaimTest {
             .build();
 
         assertTrue(claim.hasClaimantRejectOffer());
+        assertNull(claim.getResponse().getPaymentIntention());
+
     }
 
     @Test
