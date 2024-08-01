@@ -62,8 +62,6 @@ class AmendRestitchBundleCallbackHandlerTest extends BaseCallbackHandlerTest {
     private static final String TEST_URL = "url";
     private static final String TEST_FILE_NAME = "testFileName.pdf";
 
-    private static final String MID_PAGE_ID = "create-bundle";
-
     @BeforeEach
     public void setup() {
         mapper.registerModules(new JavaTimeModule(), new Jdk8Module());
