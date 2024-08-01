@@ -1,0 +1,174 @@
+{
+  "consumer": {
+    "name": "civil-service"
+  },
+  "interactions": [
+    {
+      "description": "A Request to get user roles",
+      "providerStates": [
+        {
+          "name": "A User Role exists for a Case"
+        }
+      ],
+      "request": {
+        "headers": {
+          "Authorization": "Bearer some-access-token",
+          "ServiceAuthorization": "someServiceAuthToken"
+        },
+        "matchingRules": {
+          "query": {
+            "case_ids": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "1583841721773828"
+                }
+              ]
+            }
+          }
+        },
+        "method": "GET",
+        "path": "/case-users",
+        "query": {
+          "case_ids": [
+            "1583841721773828"
+          ]
+        }
+      },
+      "response": {
+        "body": {
+          "case_users": [
+            {
+              "case_id": "1583841721773828",
+              "case_role": "caseRole123",
+              "user_id": "userId123"
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$.case_users": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ]
+            },
+            "$.case_users[*].case_id": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.case_users[*].case_role": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.case_users[*].user_id": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          },
+          "header": {
+            "Content-Type": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "application/json"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      }
+    },
+    {
+      "description": "A Request to remove a User Role",
+      "providerStates": [
+        {
+          "name": "A User Role exists for a Case"
+        }
+      ],
+      "request": {
+        "body": {
+          "case_users": [
+            {
+              "case_id": "caseDataIdTest",
+              "case_role": "caseRoleTest",
+              "organisation_id": "organisationIdTest",
+              "user_id": "userIdTest"
+            }
+          ]
+        },
+        "headers": {
+          "Authorization": "Bearer some-access-token",
+          "ServiceAuthorization": "someServiceAuthToken"
+        },
+        "method": "DELETE",
+        "path": "/case-users"
+      },
+      "response": {
+        "body": {
+          "status_message": "REMOVED"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$.status_message": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "REMOVED"
+                }
+              ]
+            }
+          },
+          "header": {
+            "Content-Type": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "application/json"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      }
+    }
+  ],
+  "metadata": {
+    "pact-jvm": {
+      "version": "4.6.5"
+    },
+    "pactSpecification": {
+      "version": "3.0.0"
+    }
+  },
+  "provider": {
+    "name": "ccdDataStoreAPI_caseAssignedUserRoles"
+  }
+}

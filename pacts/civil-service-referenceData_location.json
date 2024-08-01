@@ -1,0 +1,257 @@
+{
+  "consumer": {
+    "name": "civil-service"
+  },
+  "interactions": [
+    {
+      "description": "a location request",
+      "providerStates": [
+        {
+          "name": "There are court locations to be returned"
+        }
+      ],
+      "request": {
+        "headers": {
+          "Authorization": "Bearer some-access-token",
+          "ServiceAuthorization": "someServiceAuthToken"
+        },
+        "matchingRules": {
+          "query": {
+            "court_type_id": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "courtTypeId"
+                }
+              ]
+            },
+            "is_case_management_location": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "isCaseManagementLocation"
+                }
+              ]
+            },
+            "is_hearing_location": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "isHearingLocation"
+                }
+              ]
+            },
+            "location_type": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "locationType"
+                }
+              ]
+            }
+          }
+        },
+        "method": "GET",
+        "path": "/refdata/location/court-venues",
+        "query": {
+          "court_type_id": [
+            "courtTypeId"
+          ],
+          "is_case_management_location": [
+            "isCaseManagementLocation"
+          ],
+          "is_hearing_location": [
+            "isHearingLocation"
+          ],
+          "location_type": [
+            "locationType"
+          ]
+        }
+      },
+      "response": {
+        "body": [
+          {
+            "courtAddress": "courtAddressTest123",
+            "courtLocationCode": "courtLocationCodeTest123",
+            "courtName": "courtNameTest123",
+            "courtStatus": "courtStatusTest123",
+            "courtType": "courtTypeTest123",
+            "courtTypeId": "courtTypeIdTest123",
+            "courtVenueId": "courtVenueId123",
+            "epimmsId": "epimmsIdTest123",
+            "locationType": "locationTypeTest123",
+            "parentLocation": "parentLocationTest123",
+            "phoneNumber": "phoneNumberTest123",
+            "postcode": "postcodeTest123",
+            "region": "regionTest123",
+            "regionId": "regionIdTest123",
+            "siteName": "siteNameTest123",
+            "venueName": "venueNameTest123"
+          }
+        ],
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$[0].courtAddress": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].courtLocationCode": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].courtName": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].courtStatus": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].courtType": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].courtTypeId": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].courtVenueId": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].epimmsId": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].locationType": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].parentLocation": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].phoneNumber": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].postcode": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].region": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].regionId": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].siteName": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].venueName": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          },
+          "header": {
+            "Content-Type": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "application/json"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      }
+    }
+  ],
+  "metadata": {
+    "pact-jvm": {
+      "version": "4.6.5"
+    },
+    "pactSpecification": {
+      "version": "3.0.0"
+    }
+  },
+  "provider": {
+    "name": "referenceData_location"
+  }
+}

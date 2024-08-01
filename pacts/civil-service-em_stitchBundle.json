@@ -1,0 +1,215 @@
+{
+  "consumer": {
+    "name": "civil-service"
+  },
+  "interactions": [
+    {
+      "description": "a stitch bundle request",
+      "request": {
+        "body": {
+          "case_details": {
+            "callback_response_status": null,
+            "caseTypeId": null,
+            "case_data": {
+
+            },
+            "created_date": null,
+            "id": 666,
+            "jurisdictionId": null,
+            "last_modified": null,
+            "locked_by_user_id": null,
+            "security_classification": null,
+            "security_level": null,
+            "state": null
+          }
+        },
+        "headers": {
+          "Authorization": "Bearer some-access-token",
+          "ServiceAuthorization": "someServiceAuthToken"
+        },
+        "method": "POST",
+        "path": "/api/stitch-ccd-bundles"
+      },
+      "response": {
+        "body": {
+          "data": {
+            "caseBundles": [
+              {
+                "value": {
+                  "bundleHearingDate": "2000-01-31",
+                  "createdOn": "2020-10-06T18:54:48.785000",
+                  "description": "description",
+                  "fileName": "fileName",
+                  "id": "id",
+                  "stitchStatus": "stitchStatus",
+                  "stitchedDocument": {
+                    "category_id": "categoryID",
+                    "document_binary_url": "documentBinaryUrl",
+                    "document_filename": "documentFileName",
+                    "document_hash": "documentHash",
+                    "document_url": "documentStitchedUrl"
+                  },
+                  "title": "title"
+                }
+              }
+            ]
+          },
+          "documentTaskId": 123
+        },
+        "generators": {
+          "body": {
+            "$.data.caseBundles[*].value.bundleHearingDate": {
+              "format": "yyyy-MM-dd",
+              "type": "Date"
+            }
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json; charset=UTF-8"
+        },
+        "matchingRules": {
+          "body": {
+            "$.data.caseBundles": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ]
+            },
+            "$.data.caseBundles[*].value.bundleHearingDate": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "format": "yyyy-MM-dd",
+                  "match": "date"
+                }
+              ]
+            },
+            "$.data.caseBundles[*].value.createdOn": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$"
+                }
+              ]
+            },
+            "$.data.caseBundles[*].value.description": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.data.caseBundles[*].value.fileName": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.data.caseBundles[*].value.id": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.data.caseBundles[*].value.stitchStatus": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.data.caseBundles[*].value.stitchedDocument.category_id": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.data.caseBundles[*].value.stitchedDocument.document_binary_url": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.data.caseBundles[*].value.stitchedDocument.document_filename": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.data.caseBundles[*].value.stitchedDocument.document_hash": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.data.caseBundles[*].value.stitchedDocument.document_url": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.data.caseBundles[*].value.title": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.documentTaskId": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "number"
+                }
+              ]
+            }
+          },
+          "header": {
+            "Content-Type": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "application/json(;\\s?charset=[\\w\\-]+)?"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      }
+    }
+  ],
+  "metadata": {
+    "pact-jvm": {
+      "version": "4.6.5"
+    },
+    "pactSpecification": {
+      "version": "3.0.0"
+    }
+  },
+  "provider": {
+    "name": "em_stitchBundle"
+  }
+}

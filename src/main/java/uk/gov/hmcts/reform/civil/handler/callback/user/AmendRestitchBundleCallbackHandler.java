@@ -48,13 +48,13 @@ public class AmendRestitchBundleCallbackHandler extends CallbackHandler {
             ? Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(MID, "create-bundle"), this::startBundleCreation,
-            callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
+            callbackKey(ABOUT_TO_SUBMIT), this::submitCaseData,
             callbackKey(SUBMITTED), this::buildConfirmation
             )
             : Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(MID, "create-bundle"), this::emptyCallbackResponse,
-            callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
+            callbackKey(ABOUT_TO_SUBMIT), this::amendRestitchBundle,
             callbackKey(SUBMITTED), this::emptyCallbackResponse
         );
     }
@@ -86,6 +86,15 @@ public class AmendRestitchBundleCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(mapper))
             .build();
+    }
+
+    private CallbackResponse amendRestitchBundle(CallbackParams callbackParams) {
+            CaseData caseData = callbackParams.getCaseData();
+            CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
+
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(dataBuilder.build().toMap(mapper))
+                .build();
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {

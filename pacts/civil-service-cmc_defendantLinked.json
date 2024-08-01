@@ -1,0 +1,69 @@
+{
+  "consumer": {
+    "name": "civil-service"
+  },
+  "interactions": [
+    {
+      "description": "a request for claimant linked cases status for a case reference",
+      "providerStates": [
+        {
+          "name": "Get claimant linked cases status"
+        }
+      ],
+      "request": {
+        "generators": {
+          "path": {
+            "dataType": "STRING",
+            "expression": "/claims/${caseReference}/defendant-link-status",
+            "type": "ProviderState"
+          }
+        },
+        "method": "GET",
+        "path": "/claims/100/defendant-link-status"
+      },
+      "response": {
+        "body": {
+          "linked": true
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$.linked": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          },
+          "header": {
+            "Content-Type": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "application/json"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      }
+    }
+  ],
+  "metadata": {
+    "pact-jvm": {
+      "version": "4.6.5"
+    },
+    "pactSpecification": {
+      "version": "3.0.0"
+    }
+  },
+  "provider": {
+    "name": "cmc_defendantLinked"
+  }
+}

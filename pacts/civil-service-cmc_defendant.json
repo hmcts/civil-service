@@ -1,0 +1,752 @@
+{
+  "consumer": {
+    "name": "civil-service"
+  },
+  "interactions": [
+    {
+      "description": "a request for claims for a defendant",
+      "providerStates": [
+        {
+          "name": "Get defendant cases"
+        }
+      ],
+      "request": {
+        "generators": {
+          "path": {
+            "dataType": "STRING",
+            "expression": "/claims/defendant/${submitterId}",
+            "type": "ProviderState"
+          }
+        },
+        "headers": {
+          "Authorization": "Bearer some-access-token"
+        },
+        "method": "GET",
+        "path": "/claims/defendant/100"
+      },
+      "response": {
+        "body": [
+          {
+            "claim": {
+              "amount": {
+                "rows": [
+                  {
+                    "amount": 20.0,
+                    "reason": "No reason"
+                  }
+                ]
+              },
+              "breathingSpace": {
+                "bs_entered_date": "2000-01-31",
+                "bs_entered_date_by_insolvency_team": "2000-01-31",
+                "bs_expected_end_date": "2000-01-31",
+                "bs_lifted_date": "2000-01-31",
+                "bs_lifted_date_by_insolvency_team": "2000-01-31",
+                "bs_lifted_flag": "bsLiftedFlag",
+                "bs_reference_number": "bsReferenceNumber"
+              },
+              "claimants": [
+                {
+                  "address": {
+                    "city": "city",
+                    "county": "county",
+                    "line1": "line1",
+                    "line2": "line2",
+                    "line3": "line3",
+                    "postcode": "postcode"
+                  },
+                  "correspondenceAddress": {
+                    "city": "city",
+                    "county": "county",
+                    "line1": "line1",
+                    "line2": "line2",
+                    "line3": "line3",
+                    "postcode": "postcode"
+                  },
+                  "name": "name"
+                }
+              ]
+            },
+            "claimantRespondedAt": "2020-10-06T18:54:48.785000",
+            "claimantResponse": {
+              "amountPaid": 50.0,
+              "courtDetermination": {
+                "courtDecision": {
+                  "paymentDate": "2000-01-31",
+                  "paymentOption": "IMMEDIATELY"
+                },
+                "courtPaymentIntention": {
+                  "paymentDate": "2000-01-31",
+                  "paymentOption": "IMMEDIATELY"
+                },
+                "disposableIncome": 30.0,
+                "rejectionReason": "rejectionReason"
+              },
+              "formaliseOption": "SETTLEMENT",
+              "paymentReceived": "paymentReceived",
+              "settleForAmount": "settleForAmount"
+            },
+            "countyCourtJudgmentRequestedAt": "2020-10-06T18:54:48.785000",
+            "createdAt": "2020-10-06T18:54:48.785000",
+            "defendantId": "defendantId",
+            "externalId": "externalId",
+            "intentionToProceedDeadline": "2000-01-31",
+            "letterHolderId": "letterHolderId",
+            "moneyReceivedOn": "2000-01-31",
+            "moreTimeRequested": true,
+            "proceedOfflineReason": "OTHER",
+            "reDeterminationRequestedAt": "2020-10-06T18:54:48.785000",
+            "referenceNumber": "referenceNumber",
+            "response": {
+              "paymentDeclaration": {
+                "paidAmount": 10.0,
+                "paidDate": "2000-01-31"
+              },
+              "paymentIntention": {
+                "paymentDate": "2000-01-31",
+                "paymentOption": "IMMEDIATELY"
+              },
+              "responseMethod": "OFFLINE",
+              "responseType": "FULL_DEFENCE"
+            },
+            "responseDeadline": "2000-01-31",
+            "settlement": {
+              "partyStatements": [
+                {
+                  "madeBy": "CLAIMANT",
+                  "offer": {
+                    "completionDate": "2000-01-31",
+                    "content": "content",
+                    "paymentIntention": {
+                      "paymentDate": "2000-01-31",
+                      "paymentOption": "IMMEDIATELY"
+                    }
+                  },
+                  "type": "OFFER"
+                }
+              ]
+            },
+            "state": "OPEN",
+            "submitterEmail": "submitterEmail",
+            "submitterId": "123"
+          }
+        ],
+        "generators": {
+          "body": {
+            "$[0].claim.breathingSpace.bs_entered_date": {
+              "format": "yyyy-MM-dd",
+              "type": "Date"
+            },
+            "$[0].claim.breathingSpace.bs_entered_date_by_insolvency_team": {
+              "format": "yyyy-MM-dd",
+              "type": "Date"
+            },
+            "$[0].claim.breathingSpace.bs_expected_end_date": {
+              "format": "yyyy-MM-dd",
+              "type": "Date"
+            },
+            "$[0].claim.breathingSpace.bs_lifted_date": {
+              "format": "yyyy-MM-dd",
+              "type": "Date"
+            },
+            "$[0].claim.breathingSpace.bs_lifted_date_by_insolvency_team": {
+              "format": "yyyy-MM-dd",
+              "type": "Date"
+            },
+            "$[0].claimantResponse.courtDetermination.courtDecision.paymentDate": {
+              "format": "yyyy-MM-dd",
+              "type": "Date"
+            },
+            "$[0].claimantResponse.courtDetermination.courtPaymentIntention.paymentDate": {
+              "format": "yyyy-MM-dd",
+              "type": "Date"
+            },
+            "$[0].intentionToProceedDeadline": {
+              "format": "yyyy-MM-dd",
+              "type": "Date"
+            },
+            "$[0].moneyReceivedOn": {
+              "format": "yyyy-MM-dd",
+              "type": "Date"
+            },
+            "$[0].response.paymentDeclaration.paidDate": {
+              "format": "yyyy-MM-dd",
+              "type": "Date"
+            },
+            "$[0].response.paymentIntention.paymentDate": {
+              "format": "yyyy-MM-dd",
+              "type": "Date"
+            },
+            "$[0].responseDeadline": {
+              "format": "yyyy-MM-dd",
+              "type": "Date"
+            },
+            "$[0].settlement.partyStatements[*].offer.completionDate": {
+              "format": "yyyy-MM-dd",
+              "type": "Date"
+            },
+            "$[0].settlement.partyStatements[*].offer.paymentIntention.paymentDate": {
+              "format": "yyyy-MM-dd",
+              "type": "Date"
+            }
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$[0].claim.amount.rows": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ]
+            },
+            "$[0].claim.amount.rows[*].amount": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "number"
+                }
+              ]
+            },
+            "$[0].claim.amount.rows[*].reason": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].claim.breathingSpace.bs_entered_date": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "format": "yyyy-MM-dd",
+                  "match": "date"
+                }
+              ]
+            },
+            "$[0].claim.breathingSpace.bs_entered_date_by_insolvency_team": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "format": "yyyy-MM-dd",
+                  "match": "date"
+                }
+              ]
+            },
+            "$[0].claim.breathingSpace.bs_expected_end_date": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "format": "yyyy-MM-dd",
+                  "match": "date"
+                }
+              ]
+            },
+            "$[0].claim.breathingSpace.bs_lifted_date": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "format": "yyyy-MM-dd",
+                  "match": "date"
+                }
+              ]
+            },
+            "$[0].claim.breathingSpace.bs_lifted_date_by_insolvency_team": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "format": "yyyy-MM-dd",
+                  "match": "date"
+                }
+              ]
+            },
+            "$[0].claim.breathingSpace.bs_lifted_flag": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].claim.breathingSpace.bs_reference_number": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].claim.claimants": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ]
+            },
+            "$[0].claim.claimants[*].address.city": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].claim.claimants[*].address.county": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].claim.claimants[*].address.line1": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].claim.claimants[*].address.line2": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].claim.claimants[*].address.line3": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].claim.claimants[*].address.postcode": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].claim.claimants[*].correspondenceAddress.city": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].claim.claimants[*].correspondenceAddress.county": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].claim.claimants[*].correspondenceAddress.line1": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].claim.claimants[*].correspondenceAddress.line2": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].claim.claimants[*].correspondenceAddress.line3": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].claim.claimants[*].correspondenceAddress.postcode": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].claim.claimants[*].name": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].claimantRespondedAt": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$"
+                }
+              ]
+            },
+            "$[0].claimantResponse.amountPaid": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "number"
+                }
+              ]
+            },
+            "$[0].claimantResponse.courtDetermination.courtDecision.paymentDate": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "format": "yyyy-MM-dd",
+                  "match": "date"
+                }
+              ]
+            },
+            "$[0].claimantResponse.courtDetermination.courtDecision.paymentOption": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].claimantResponse.courtDetermination.courtPaymentIntention.paymentDate": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "format": "yyyy-MM-dd",
+                  "match": "date"
+                }
+              ]
+            },
+            "$[0].claimantResponse.courtDetermination.courtPaymentIntention.paymentOption": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].claimantResponse.courtDetermination.disposableIncome": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "number"
+                }
+              ]
+            },
+            "$[0].claimantResponse.courtDetermination.rejectionReason": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].claimantResponse.formaliseOption": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].claimantResponse.paymentReceived": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].claimantResponse.settleForAmount": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].countyCourtJudgmentRequestedAt": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$"
+                }
+              ]
+            },
+            "$[0].createdAt": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$"
+                }
+              ]
+            },
+            "$[0].defendantId": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].externalId": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].intentionToProceedDeadline": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "format": "yyyy-MM-dd",
+                  "match": "date"
+                }
+              ]
+            },
+            "$[0].letterHolderId": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].moneyReceivedOn": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "format": "yyyy-MM-dd",
+                  "match": "date"
+                }
+              ]
+            },
+            "$[0].moreTimeRequested": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].proceedOfflineReason": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].reDeterminationRequestedAt": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$"
+                }
+              ]
+            },
+            "$[0].referenceNumber": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].response.paymentDeclaration.paidAmount": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "number"
+                }
+              ]
+            },
+            "$[0].response.paymentDeclaration.paidDate": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "format": "yyyy-MM-dd",
+                  "match": "date"
+                }
+              ]
+            },
+            "$[0].response.paymentIntention.paymentDate": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "format": "yyyy-MM-dd",
+                  "match": "date"
+                }
+              ]
+            },
+            "$[0].response.paymentIntention.paymentOption": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].response.responseMethod": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].response.responseType": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].responseDeadline": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "format": "yyyy-MM-dd",
+                  "match": "date"
+                }
+              ]
+            },
+            "$[0].settlement.partyStatements": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ]
+            },
+            "$[0].settlement.partyStatements[*].madeBy": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].settlement.partyStatements[*].offer.completionDate": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "format": "yyyy-MM-dd",
+                  "match": "date"
+                }
+              ]
+            },
+            "$[0].settlement.partyStatements[*].offer.content": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].settlement.partyStatements[*].offer.paymentIntention.paymentDate": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "format": "yyyy-MM-dd",
+                  "match": "date"
+                }
+              ]
+            },
+            "$[0].settlement.partyStatements[*].offer.paymentIntention.paymentOption": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].settlement.partyStatements[*].type": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].state": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].submitterEmail": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[0].submitterId": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          },
+          "header": {
+            "Content-Type": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "application/json"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      }
+    }
+  ],
+  "metadata": {
+    "pact-jvm": {
+      "version": "4.6.5"
+    },
+    "pactSpecification": {
+      "version": "3.0.0"
+    }
+  },
+  "provider": {
+    "name": "cmc_defendant"
+  }
+}

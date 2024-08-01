@@ -1,0 +1,1074 @@
+{
+  "consumer": {
+    "name": "civil-service"
+  },
+  "interactions": [
+    {
+      "description": "A request for civil-service fast track hearing fees",
+      "request": {
+        "matchingRules": {
+          "query": {
+            "amount_or_volume": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "1000"
+                }
+              ]
+            },
+            "channel": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "default"
+                }
+              ]
+            },
+            "event": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "hearing"
+                }
+              ]
+            },
+            "jurisdiction1": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "civil"
+                }
+              ]
+            },
+            "jurisdiction2": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "civil"
+                }
+              ]
+            },
+            "keyword": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "FastTrackHrg"
+                }
+              ]
+            },
+            "service": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "civil money claims"
+                }
+              ]
+            }
+          }
+        },
+        "method": "GET",
+        "path": "/fees-register/fees/lookup",
+        "query": {
+          "amount_or_volume": [
+            "1000"
+          ],
+          "channel": [
+            "default"
+          ],
+          "event": [
+            "hearing"
+          ],
+          "jurisdiction1": [
+            "civil"
+          ],
+          "jurisdiction2": [
+            "civil"
+          ],
+          "keyword": [
+            "FastTrackHrg"
+          ],
+          "service": [
+            "civil money claims"
+          ]
+        }
+      },
+      "response": {
+        "body": {
+          "code": "FEE0441",
+          "description": "Fee Description",
+          "fee_amount": 60,
+          "version": 1
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$.code": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.description": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.fee_amount": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "decimal"
+                }
+              ]
+            },
+            "$.version": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "number"
+                }
+              ]
+            }
+          },
+          "header": {
+            "Content-Type": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "application/json"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      }
+    },
+    {
+      "description": "A request for civil-service money claims fees",
+      "request": {
+        "matchingRules": {
+          "query": {
+            "amount_or_volume": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "1000.00"
+                }
+              ]
+            },
+            "channel": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "default"
+                }
+              ]
+            },
+            "event": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "issue"
+                }
+              ]
+            },
+            "jurisdiction1": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "civil"
+                }
+              ]
+            },
+            "jurisdiction2": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "county court"
+                }
+              ]
+            },
+            "keyword": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "MoneyClaim"
+                }
+              ]
+            },
+            "service": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "civil money claims"
+                }
+              ]
+            }
+          }
+        },
+        "method": "GET",
+        "path": "/fees-register/fees/lookup",
+        "query": {
+          "amount_or_volume": [
+            "1000.00"
+          ],
+          "channel": [
+            "default"
+          ],
+          "event": [
+            "issue"
+          ],
+          "jurisdiction1": [
+            "civil"
+          ],
+          "jurisdiction2": [
+            "county court"
+          ],
+          "keyword": [
+            "MoneyClaim"
+          ],
+          "service": [
+            "civil money claims"
+          ]
+        }
+      },
+      "response": {
+        "body": {
+          "code": "FEE0443",
+          "description": "Fee Description",
+          "fee_amount": 80,
+          "version": 1
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$.code": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.description": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.fee_amount": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "decimal"
+                }
+              ]
+            },
+            "$.version": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "number"
+                }
+              ]
+            }
+          },
+          "header": {
+            "Content-Type": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "application/json"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      }
+    },
+    {
+      "description": "A request for civil-service money claims fees without the keyword feature",
+      "request": {
+        "matchingRules": {
+          "query": {
+            "amount_or_volume": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "1000.00"
+                }
+              ]
+            },
+            "channel": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "default"
+                }
+              ]
+            },
+            "event": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "issue"
+                }
+              ]
+            },
+            "jurisdiction1": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "civil"
+                }
+              ]
+            },
+            "jurisdiction2": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "county court"
+                }
+              ]
+            },
+            "service": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "civil money claims"
+                }
+              ]
+            }
+          }
+        },
+        "method": "GET",
+        "path": "/fees-register/fees/lookup",
+        "query": {
+          "amount_or_volume": [
+            "1000.00"
+          ],
+          "channel": [
+            "default"
+          ],
+          "event": [
+            "issue"
+          ],
+          "jurisdiction1": [
+            "civil"
+          ],
+          "jurisdiction2": [
+            "county court"
+          ],
+          "service": [
+            "civil money claims"
+          ]
+        }
+      },
+      "response": {
+        "body": {
+          "code": "FEE0444",
+          "description": "Fee Description",
+          "fee_amount": 90,
+          "version": 1
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$.code": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.description": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.fee_amount": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "decimal"
+                }
+              ]
+            },
+            "$.version": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "number"
+                }
+              ]
+            }
+          },
+          "header": {
+            "Content-Type": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "application/json"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      }
+    },
+    {
+      "description": "A request for civil-service multi track hearing fees",
+      "request": {
+        "matchingRules": {
+          "query": {
+            "amount_or_volume": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "1000"
+                }
+              ]
+            },
+            "channel": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "default"
+                }
+              ]
+            },
+            "event": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "hearing"
+                }
+              ]
+            },
+            "jurisdiction1": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "civil"
+                }
+              ]
+            },
+            "jurisdiction2": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "civil"
+                }
+              ]
+            },
+            "keyword": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "MultiTrackHrg"
+                }
+              ]
+            },
+            "service": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "civil money claims"
+                }
+              ]
+            }
+          }
+        },
+        "method": "GET",
+        "path": "/fees-register/fees/lookup",
+        "query": {
+          "amount_or_volume": [
+            "1000"
+          ],
+          "channel": [
+            "default"
+          ],
+          "event": [
+            "hearing"
+          ],
+          "jurisdiction1": [
+            "civil"
+          ],
+          "jurisdiction2": [
+            "civil"
+          ],
+          "keyword": [
+            "MultiTrackHrg"
+          ],
+          "service": [
+            "civil money claims"
+          ]
+        }
+      },
+      "response": {
+        "body": {
+          "code": "FEE0442",
+          "description": "Fee Description",
+          "fee_amount": 70,
+          "version": 1
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$.code": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.description": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.fee_amount": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "decimal"
+                }
+              ]
+            },
+            "$.version": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "number"
+                }
+              ]
+            }
+          },
+          "header": {
+            "Content-Type": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "application/json"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      }
+    },
+    {
+      "description": "A request for civil-service small claims hearing fees",
+      "request": {
+        "matchingRules": {
+          "query": {
+            "amount_or_volume": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "1000"
+                }
+              ]
+            },
+            "channel": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "default"
+                }
+              ]
+            },
+            "event": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "hearing"
+                }
+              ]
+            },
+            "jurisdiction1": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "civil"
+                }
+              ]
+            },
+            "jurisdiction2": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "county court"
+                }
+              ]
+            },
+            "keyword": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "HearingSmallClaims"
+                }
+              ]
+            },
+            "service": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "civil money claims"
+                }
+              ]
+            }
+          }
+        },
+        "method": "GET",
+        "path": "/fees-register/fees/lookup",
+        "query": {
+          "amount_or_volume": [
+            "1000"
+          ],
+          "channel": [
+            "default"
+          ],
+          "event": [
+            "hearing"
+          ],
+          "jurisdiction1": [
+            "civil"
+          ],
+          "jurisdiction2": [
+            "county court"
+          ],
+          "keyword": [
+            "HearingSmallClaims"
+          ],
+          "service": [
+            "civil money claims"
+          ]
+        }
+      },
+      "response": {
+        "body": {
+          "code": "FEE0440",
+          "description": "Fee Description",
+          "fee_amount": 50,
+          "version": 1
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$.code": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.description": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.fee_amount": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "decimal"
+                }
+              ]
+            },
+            "$.version": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "number"
+                }
+              ]
+            }
+          },
+          "header": {
+            "Content-Type": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "application/json"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      }
+    },
+    {
+      "description": "A request for general application consent with or without notice fee",
+      "request": {
+        "matchingRules": {
+          "query": {
+            "channel": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "default"
+                }
+              ]
+            },
+            "event": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "miscellaneous"
+                }
+              ]
+            },
+            "jurisdiction1": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "civil"
+                }
+              ]
+            },
+            "jurisdiction2": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "civil"
+                }
+              ]
+            },
+            "keyword": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "AppnToVaryOrSuspend"
+                }
+              ]
+            },
+            "service": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "other"
+                }
+              ]
+            }
+          }
+        },
+        "method": "GET",
+        "path": "/fees-register/fees/lookup",
+        "query": {
+          "channel": [
+            "default"
+          ],
+          "event": [
+            "miscellaneous"
+          ],
+          "jurisdiction1": [
+            "civil"
+          ],
+          "jurisdiction2": [
+            "civil"
+          ],
+          "keyword": [
+            "AppnToVaryOrSuspend"
+          ],
+          "service": [
+            "other"
+          ]
+        }
+      },
+      "response": {
+        "body": {
+          "code": "FEE0447",
+          "description": "Fee Description",
+          "fee_amount": 120,
+          "version": 1
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$.code": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.description": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.fee_amount": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "decimal"
+                }
+              ]
+            },
+            "$.version": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "number"
+                }
+              ]
+            }
+          },
+          "header": {
+            "Content-Type": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "application/json"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      }
+    },
+    {
+      "description": "A request for general application with notice fee",
+      "request": {
+        "matchingRules": {
+          "query": {
+            "channel": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "default"
+                }
+              ]
+            },
+            "event": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "general application"
+                }
+              ]
+            },
+            "jurisdiction1": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "civil"
+                }
+              ]
+            },
+            "jurisdiction2": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "civil"
+                }
+              ]
+            },
+            "keyword": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "GAOnNotice"
+                }
+              ]
+            },
+            "service": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "general"
+                }
+              ]
+            }
+          }
+        },
+        "method": "GET",
+        "path": "/fees-register/fees/lookup",
+        "query": {
+          "channel": [
+            "default"
+          ],
+          "event": [
+            "general application"
+          ],
+          "jurisdiction1": [
+            "civil"
+          ],
+          "jurisdiction2": [
+            "civil"
+          ],
+          "keyword": [
+            "GAOnNotice"
+          ],
+          "service": [
+            "general"
+          ]
+        }
+      },
+      "response": {
+        "body": {
+          "code": "FEE0445",
+          "description": "Fee Description",
+          "fee_amount": 100,
+          "version": 1
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$.code": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.description": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.fee_amount": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "decimal"
+                }
+              ]
+            },
+            "$.version": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "number"
+                }
+              ]
+            }
+          },
+          "header": {
+            "Content-Type": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "application/json"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      }
+    }
+  ],
+  "metadata": {
+    "pact-jvm": {
+      "version": "4.6.5"
+    },
+    "pactSpecification": {
+      "version": "3.0.0"
+    }
+  },
+  "provider": {
+    "name": "feeRegister_lookUp"
+  }
+}

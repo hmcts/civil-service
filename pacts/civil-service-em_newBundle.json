@@ -1,0 +1,728 @@
+{
+  "consumer": {
+    "name": "civil-service"
+  },
+  "interactions": [
+    {
+      "description": "a new bundle request",
+      "request": {
+        "body": {
+          "caseTypeId": "caseTypeId",
+          "case_details": {
+            "case_data": {
+              "applicant1": {
+                "bulkClaimPartyName": "bulk",
+                "companyName": "company",
+                "flags": {
+                  "details": null,
+                  "partyName": null,
+                  "roleOnCase": null
+                },
+                "individualDateOfBirth": "2019-01-01",
+                "individualFirstName": "applicant1",
+                "individualLastName": "Silvassauro",
+                "individualTitle": "Mr",
+                "legalRepHeading": "legalRep",
+                "organisationName": "org",
+                "partyEmail": "is@is.is",
+                "partyID": "partyID",
+                "partyName": "company",
+                "partyPhone": "07070006066",
+                "partyTypeDisplayValue": "Company",
+                "primaryAddress": {
+                  "AddressLine1": "rua1",
+                  "AddressLine2": "rua1",
+                  "AddressLine3": "rua1",
+                  "Country": "UK",
+                  "County": "Shire",
+                  "PostCode": "KT1 3ER",
+                  "PostTown": "town"
+                },
+                "soleTraderDateOfBirth": "2019-01-01",
+                "soleTraderFirstName": "soleTrFN",
+                "soleTraderLastName": "soleTrLN",
+                "soleTraderTitle": "soleTr",
+                "type": "COMPANY",
+                "unavailableDates": [
+                  {
+                    "id": "00e5384f-03b3-4634-8b67-6acb665e83ba",
+                    "value": {
+                      "date": "2020-01-01",
+                      "dateAdded": "2020-01-01",
+                      "eventAdded": "eventAdd",
+                      "fromDate": "2020-01-01",
+                      "toDate": "2020-01-01",
+                      "unavailableDateType": "DATE_RANGE",
+                      "who": "who"
+                    }
+                  }
+                ]
+              },
+              "applicant2": {
+                "bulkClaimPartyName": "bulk",
+                "companyName": "company",
+                "flags": {
+                  "details": null,
+                  "partyName": null,
+                  "roleOnCase": null
+                },
+                "individualDateOfBirth": "2019-01-01",
+                "individualFirstName": "applicant2",
+                "individualLastName": "Silvassauro",
+                "individualTitle": "Mr",
+                "legalRepHeading": "legalRep",
+                "organisationName": "org",
+                "partyEmail": "is@is.is",
+                "partyID": "partyID",
+                "partyName": "company",
+                "partyPhone": "07070006066",
+                "partyTypeDisplayValue": "Company",
+                "primaryAddress": {
+                  "AddressLine1": "rua1",
+                  "AddressLine2": "rua1",
+                  "AddressLine3": "rua1",
+                  "Country": "UK",
+                  "County": "Shire",
+                  "PostCode": "KT1 3ER",
+                  "PostTown": "town"
+                },
+                "soleTraderDateOfBirth": "2019-01-01",
+                "soleTraderFirstName": "soleTrFN",
+                "soleTraderLastName": "soleTrLN",
+                "soleTraderTitle": "soleTr",
+                "type": "COMPANY",
+                "unavailableDates": [
+                  {
+                    "id": "00e5384f-03b3-4634-8b67-6acb665e83ba",
+                    "value": {
+                      "date": "2020-01-01",
+                      "dateAdded": "2020-01-01",
+                      "eventAdded": "eventAdd",
+                      "fromDate": "2020-01-01",
+                      "toDate": "2020-01-01",
+                      "unavailableDateType": "DATE_RANGE",
+                      "who": "who"
+                    }
+                  }
+                ]
+              },
+              "bundleConfiguration": "bundleConfiguration",
+              "ccdCaseReference": 66666,
+              "claimant1CostsBudgets": [
+                {
+                  "id": "00e5384f-03b3-4634-8b67-6acb665e83ba",
+                  "value": {
+                    "documentFileName": "docFileName",
+                    "documentLink": {
+                      "document_binary_url": "binaryUrl",
+                      "document_filename": "docFileName",
+                      "document_url": "docURL"
+                    },
+                    "documentType": "testDocType"
+                  }
+                }
+              ],
+              "claimant1DisclosedDocuments": [
+                {
+                  "id": "00e5384f-03b3-4634-8b67-6acb665e83ba",
+                  "value": {
+                    "documentFileName": "docFileName",
+                    "documentLink": {
+                      "document_binary_url": "binaryUrl",
+                      "document_filename": "docFileName",
+                      "document_url": "docURL"
+                    },
+                    "documentType": "testDocType"
+                  }
+                }
+              ],
+              "claimant1ExpertEvidence": [
+                {
+                  "id": "00e5384f-03b3-4634-8b67-6acb665e83ba",
+                  "value": {
+                    "documentFileName": "docFileName",
+                    "documentLink": {
+                      "document_binary_url": "binaryUrl",
+                      "document_filename": "docFileName",
+                      "document_url": "docURL"
+                    },
+                    "documentType": "testDocType"
+                  }
+                }
+              ],
+              "claimant1WitnessStatements": [
+                {
+                  "id": "00e5384f-03b3-4634-8b67-6acb665e83ba",
+                  "value": {
+                    "documentFileName": "docFileName",
+                    "documentLink": {
+                      "document_binary_url": "binaryUrl",
+                      "document_filename": "docFileName",
+                      "document_url": "docURL"
+                    },
+                    "documentType": "testDocType"
+                  }
+                }
+              ],
+              "claimant2CostsBudgets": [
+                {
+                  "id": "00e5384f-03b3-4634-8b67-6acb665e83ba",
+                  "value": {
+                    "documentFileName": "docFileName",
+                    "documentLink": {
+                      "document_binary_url": "binaryUrl",
+                      "document_filename": "docFileName",
+                      "document_url": "docURL"
+                    },
+                    "documentType": "testDocType"
+                  }
+                }
+              ],
+              "claimant2DisclosedDocuments": [
+                {
+                  "id": "00e5384f-03b3-4634-8b67-6acb665e83ba",
+                  "value": {
+                    "documentFileName": "docFileName",
+                    "documentLink": {
+                      "document_binary_url": "binaryUrl",
+                      "document_filename": "docFileName",
+                      "document_url": "docURL"
+                    },
+                    "documentType": "testDocType"
+                  }
+                }
+              ],
+              "claimant2ExpertEvidence": [
+                {
+                  "id": "00e5384f-03b3-4634-8b67-6acb665e83ba",
+                  "value": {
+                    "documentFileName": "docFileName",
+                    "documentLink": {
+                      "document_binary_url": "binaryUrl",
+                      "document_filename": "docFileName",
+                      "document_url": "docURL"
+                    },
+                    "documentType": "testDocType"
+                  }
+                }
+              ],
+              "claimant2WitnessStatements": [
+                {
+                  "id": "00e5384f-03b3-4634-8b67-6acb665e83ba",
+                  "value": {
+                    "documentFileName": "docFileName",
+                    "documentLink": {
+                      "document_binary_url": "binaryUrl",
+                      "document_filename": "docFileName",
+                      "document_url": "docURL"
+                    },
+                    "documentType": "testDocType"
+                  }
+                }
+              ],
+              "defendant1CostsBudgets": [
+                {
+                  "id": "00e5384f-03b3-4634-8b67-6acb665e83ba",
+                  "value": {
+                    "documentFileName": "docFileName",
+                    "documentLink": {
+                      "document_binary_url": "binaryUrl",
+                      "document_filename": "docFileName",
+                      "document_url": "docURL"
+                    },
+                    "documentType": "testDocType"
+                  }
+                }
+              ],
+              "defendant1DisclosedDocuments": [
+                {
+                  "id": "00e5384f-03b3-4634-8b67-6acb665e83ba",
+                  "value": {
+                    "documentFileName": "docFileName",
+                    "documentLink": {
+                      "document_binary_url": "binaryUrl",
+                      "document_filename": "docFileName",
+                      "document_url": "docURL"
+                    },
+                    "documentType": "testDocType"
+                  }
+                }
+              ],
+              "defendant1ExpertEvidence": [
+                {
+                  "id": "00e5384f-03b3-4634-8b67-6acb665e83ba",
+                  "value": {
+                    "documentFileName": "docFileName",
+                    "documentLink": {
+                      "document_binary_url": "binaryUrl",
+                      "document_filename": "docFileName",
+                      "document_url": "docURL"
+                    },
+                    "documentType": "testDocType"
+                  }
+                }
+              ],
+              "defendant1WitnessStatements": [
+                {
+                  "id": "00e5384f-03b3-4634-8b67-6acb665e83ba",
+                  "value": {
+                    "documentFileName": "docFileName",
+                    "documentLink": {
+                      "document_binary_url": "binaryUrl",
+                      "document_filename": "docFileName",
+                      "document_url": "docURL"
+                    },
+                    "documentType": "testDocType"
+                  }
+                }
+              ],
+              "defendant2CostsBudgets": [
+                {
+                  "id": "00e5384f-03b3-4634-8b67-6acb665e83ba",
+                  "value": {
+                    "documentFileName": "docFileName",
+                    "documentLink": {
+                      "document_binary_url": "binaryUrl",
+                      "document_filename": "docFileName",
+                      "document_url": "docURL"
+                    },
+                    "documentType": "testDocType"
+                  }
+                }
+              ],
+              "defendant2DisclosedDocuments": [
+                {
+                  "id": "00e5384f-03b3-4634-8b67-6acb665e83ba",
+                  "value": {
+                    "documentFileName": "docFileName",
+                    "documentLink": {
+                      "document_binary_url": "binaryUrl",
+                      "document_filename": "docFileName",
+                      "document_url": "docURL"
+                    },
+                    "documentType": "testDocType"
+                  }
+                }
+              ],
+              "defendant2ExpertEvidence": [
+                {
+                  "id": "00e5384f-03b3-4634-8b67-6acb665e83ba",
+                  "value": {
+                    "documentFileName": "docFileName",
+                    "documentLink": {
+                      "document_binary_url": "binaryUrl",
+                      "document_filename": "docFileName",
+                      "document_url": "docURL"
+                    },
+                    "documentType": "testDocType"
+                  }
+                }
+              ],
+              "defendant2WitnessStatements": [
+                {
+                  "id": "00e5384f-03b3-4634-8b67-6acb665e83ba",
+                  "value": {
+                    "documentFileName": "docFileName",
+                    "documentLink": {
+                      "document_binary_url": "binaryUrl",
+                      "document_filename": "docFileName",
+                      "document_url": "docURL"
+                    },
+                    "documentType": "testDocType"
+                  }
+                }
+              ],
+              "directionsQuestionnaires": [
+                {
+                  "id": "00e5384f-03b3-4634-8b67-6acb665e83ba",
+                  "value": {
+                    "documentFileName": "docFileName",
+                    "documentLink": {
+                      "document_binary_url": "binaryUrl",
+                      "document_filename": "docFileName",
+                      "document_url": "docURL"
+                    },
+                    "documentType": "testDocType"
+                  }
+                }
+              ],
+              "hasApplicant2": true,
+              "hasRespondant2": true,
+              "hearingDate": "2002-01-01",
+              "id": 666,
+              "jointStatementOfExperts": [
+                {
+                  "id": "00e5384f-03b3-4634-8b67-6acb665e83ba",
+                  "value": {
+                    "documentFileName": "docFileName",
+                    "documentLink": {
+                      "document_binary_url": "binaryUrl",
+                      "document_filename": "docFileName",
+                      "document_url": "docURL"
+                    },
+                    "documentType": "testDocType"
+                  }
+                }
+              ],
+              "ordersDocuments": [
+                {
+                  "id": "00e5384f-03b3-4634-8b67-6acb665e83ba",
+                  "value": {
+                    "documentFileName": "docFileName",
+                    "documentLink": {
+                      "document_binary_url": "binaryUrl",
+                      "document_filename": "docFileName",
+                      "document_url": "docURL"
+                    },
+                    "documentType": "testDocType"
+                  }
+                }
+              ],
+              "particularsOfClaim": [
+                {
+                  "id": "00e5384f-03b3-4634-8b67-6acb665e83ba",
+                  "value": {
+                    "documentFileName": "docFileName",
+                    "documentLink": {
+                      "document_binary_url": "binaryUrl",
+                      "document_filename": "docFileName",
+                      "document_url": "docURL"
+                    },
+                    "documentType": "testDocType"
+                  }
+                }
+              ],
+              "respondant1": {
+                "bulkClaimPartyName": "bulk",
+                "companyName": "company",
+                "flags": {
+                  "details": null,
+                  "partyName": null,
+                  "roleOnCase": null
+                },
+                "individualDateOfBirth": "2019-01-01",
+                "individualFirstName": "respondent1",
+                "individualLastName": "Silvassauro",
+                "individualTitle": "Mr",
+                "legalRepHeading": "legalRep",
+                "organisationName": "org",
+                "partyEmail": "is@is.is",
+                "partyID": "partyID",
+                "partyName": "company",
+                "partyPhone": "07070006066",
+                "partyTypeDisplayValue": "Company",
+                "primaryAddress": {
+                  "AddressLine1": "rua1",
+                  "AddressLine2": "rua1",
+                  "AddressLine3": "rua1",
+                  "Country": "UK",
+                  "County": "Shire",
+                  "PostCode": "KT1 3ER",
+                  "PostTown": "town"
+                },
+                "soleTraderDateOfBirth": "2019-01-01",
+                "soleTraderFirstName": "soleTrFN",
+                "soleTraderLastName": "soleTrLN",
+                "soleTraderTitle": "soleTr",
+                "type": "COMPANY",
+                "unavailableDates": [
+                  {
+                    "id": "00e5384f-03b3-4634-8b67-6acb665e83ba",
+                    "value": {
+                      "date": "2020-01-01",
+                      "dateAdded": "2020-01-01",
+                      "eventAdded": "eventAdd",
+                      "fromDate": "2020-01-01",
+                      "toDate": "2020-01-01",
+                      "unavailableDateType": "DATE_RANGE",
+                      "who": "who"
+                    }
+                  }
+                ]
+              },
+              "respondant2": {
+                "bulkClaimPartyName": "bulk",
+                "companyName": "company",
+                "flags": {
+                  "details": null,
+                  "partyName": null,
+                  "roleOnCase": null
+                },
+                "individualDateOfBirth": "2019-01-01",
+                "individualFirstName": "respondent2",
+                "individualLastName": "Silvassauro",
+                "individualTitle": "Mr",
+                "legalRepHeading": "legalRep",
+                "organisationName": "org",
+                "partyEmail": "is@is.is",
+                "partyID": "partyID",
+                "partyName": "company",
+                "partyPhone": "07070006066",
+                "partyTypeDisplayValue": "Company",
+                "primaryAddress": {
+                  "AddressLine1": "rua1",
+                  "AddressLine2": "rua1",
+                  "AddressLine3": "rua1",
+                  "Country": "UK",
+                  "County": "Shire",
+                  "PostCode": "KT1 3ER",
+                  "PostTown": "town"
+                },
+                "soleTraderDateOfBirth": "2019-01-01",
+                "soleTraderFirstName": "soleTrFN",
+                "soleTraderLastName": "soleTrLN",
+                "soleTraderTitle": "soleTr",
+                "type": "COMPANY",
+                "unavailableDates": [
+                  {
+                    "id": "00e5384f-03b3-4634-8b67-6acb665e83ba",
+                    "value": {
+                      "date": "2020-01-01",
+                      "dateAdded": "2020-01-01",
+                      "eventAdded": "eventAdd",
+                      "fromDate": "2020-01-01",
+                      "toDate": "2020-01-01",
+                      "unavailableDateType": "DATE_RANGE",
+                      "who": "who"
+                    }
+                  }
+                ]
+              },
+              "statementsOfCaseDocuments": [
+                {
+                  "id": "00e5384f-03b3-4634-8b67-6acb665e83ba",
+                  "value": {
+                    "documentFileName": "docFileName",
+                    "documentLink": {
+                      "document_binary_url": "binaryUrl",
+                      "document_filename": "docFileName",
+                      "document_url": "docURL"
+                    },
+                    "documentType": "testDocType"
+                  }
+                }
+              ],
+              "systemGeneratedCaseDocuments": [
+                {
+                  "id": "00e5384f-03b3-4634-8b67-6acb665e83ba",
+                  "value": {
+                    "documentFileName": "docFileName",
+                    "documentLink": {
+                      "document_binary_url": "binaryUrl",
+                      "document_filename": "docFileName",
+                      "document_url": "docURL"
+                    },
+                    "documentType": "testDocType"
+                  }
+                }
+              ],
+              "trialDocuments": [
+                {
+                  "id": "00e5384f-03b3-4634-8b67-6acb665e83ba",
+                  "value": {
+                    "documentFileName": "docFileName",
+                    "documentLink": {
+                      "document_binary_url": "binaryUrl",
+                      "document_filename": "docFileName",
+                      "document_url": "docURL"
+                    },
+                    "documentType": "testDocType"
+                  }
+                }
+              ]
+            },
+            "filename_identifier": "filenamePrefix"
+          },
+          "event_id": "eventId",
+          "jurisdictionId": "jurisdictionId"
+        },
+        "headers": {
+          "Authorization": "Bearer some-access-token",
+          "ServiceAuthorization": "someServiceAuthToken"
+        },
+        "method": "POST",
+        "path": "/api/new-bundle"
+      },
+      "response": {
+        "body": {
+          "data": {
+            "caseBundles": [
+              {
+                "value": {
+                  "bundleHearingDate": "2000-01-31",
+                  "createdOn": "2020-10-06T18:54:48.785000",
+                  "description": "description",
+                  "fileName": "fileName",
+                  "id": "id",
+                  "stitchStatus": "stitchStatus",
+                  "stitchedDocument": {
+                    "category_id": "categoryID",
+                    "document_binary_url": "documentBinaryUrl",
+                    "document_filename": "documentFileName",
+                    "document_hash": "documentHash",
+                    "document_url": "documentStitchedUrl"
+                  },
+                  "title": "title"
+                }
+              }
+            ]
+          },
+          "documentTaskId": 123
+        },
+        "generators": {
+          "body": {
+            "$.data.caseBundles[*].value.bundleHearingDate": {
+              "format": "yyyy-MM-dd",
+              "type": "Date"
+            }
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json; charset=UTF-8"
+        },
+        "matchingRules": {
+          "body": {
+            "$.data.caseBundles": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ]
+            },
+            "$.data.caseBundles[*].value.bundleHearingDate": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "format": "yyyy-MM-dd",
+                  "match": "date"
+                }
+              ]
+            },
+            "$.data.caseBundles[*].value.createdOn": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$"
+                }
+              ]
+            },
+            "$.data.caseBundles[*].value.description": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.data.caseBundles[*].value.fileName": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.data.caseBundles[*].value.id": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.data.caseBundles[*].value.stitchStatus": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.data.caseBundles[*].value.stitchedDocument.category_id": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.data.caseBundles[*].value.stitchedDocument.document_binary_url": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.data.caseBundles[*].value.stitchedDocument.document_filename": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.data.caseBundles[*].value.stitchedDocument.document_hash": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.data.caseBundles[*].value.stitchedDocument.document_url": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.data.caseBundles[*].value.title": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.documentTaskId": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "number"
+                }
+              ]
+            }
+          },
+          "header": {
+            "Content-Type": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "application/json(;\\s?charset=[\\w\\-]+)?"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      }
+    }
+  ],
+  "metadata": {
+    "pact-jvm": {
+      "version": "4.6.5"
+    },
+    "pactSpecification": {
+      "version": "3.0.0"
+    }
+  },
+  "provider": {
+    "name": "em_newBundle"
+  }
+}
