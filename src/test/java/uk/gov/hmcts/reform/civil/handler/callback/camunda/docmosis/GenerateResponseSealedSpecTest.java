@@ -209,6 +209,7 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         ReflectionTestUtils.setField(handler, "stitchEnabled", false);
         CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
         when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
+        when(toggleService.isPinInPostEnabled()).thenReturn(true);
 
         // When: handler is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -219,6 +220,7 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
                        .filter(caseDocumentElement -> caseDocumentElement.getValue()
                            .getDocumentName().equals(SEALED_FORM.getDocumentName())).count()).isEqualTo(2);
         verify(sealedClaimResponseFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
+        assertThat(toggleService.isPinInPostEnabled()).isTrue();
     }
 
     @Test
@@ -245,6 +247,7 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         // version V1
         ReflectionTestUtils.setField(handler, "stitchEnabled", false);
         CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+        when(toggleService.isPinInPostEnabled()).thenReturn(false);
         when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
 
         // When: handler is called
@@ -256,6 +259,7 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
                        .filter(caseDocumentElement -> caseDocumentElement.getValue()
                            .getDocumentName().equals(SEALED_FORM.getDocumentName())).count()).isEqualTo(2);
         verify(sealedClaimResponseFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
+        assertThat(toggleService.isPinInPostEnabled()).isFalse();
     }
 
     @Test
