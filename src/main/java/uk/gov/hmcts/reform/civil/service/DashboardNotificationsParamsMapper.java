@@ -39,6 +39,8 @@ import static uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils.getDefendant
 @RequiredArgsConstructor
 public class DashboardNotificationsParamsMapper {
 
+    public static final String EN = "EN";
+    public static final String WELSH = "WELSH";
     public static final String CLAIMANT1_ACCEPTED_REPAYMENT_PLAN = "accepted";
     public static final String CLAIMANT1_REJECTED_REPAYMENT_PLAN = "rejected";
     public static final String CLAIMANT1_ACCEPTED_REPAYMENT_PLAN_WELSH = "derbyn";
@@ -57,14 +59,19 @@ public class DashboardNotificationsParamsMapper {
 
         if (featureToggleService.isGeneralApplicationsEnabled()) {
             params.put("djClaimantNotificationMessage", "<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to vary the judgment</a>");
+            params.put("djClaimantNotificationMessageCy", "<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">wneud cais i amrywio’r dyfarniad</a>");
             params.put("djDefendantNotificationMessage", "<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to set aside (remove) or vary the judgment</a>");
+            params.put("djDefendantNotificationMessageCy", "<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">wneud cais i roi’r dyfarniad o’r naill du (ei ddileu) neu amrywio’r dyfarniad</a>");
         } else {
             params.put("djClaimantNotificationMessage", "<u>make an application to vary the judgment</u>");
+            params.put("djClaimantNotificationMessageCy", "<u>wneud cais i amrywio’r dyfarniad</u>");
             params.put("djDefendantNotificationMessage", "<u>make an application to set aside (remove) or vary the judgment</u>");
+            params.put("djDefendantNotificationMessageCy", "<u>wneud cais i roi’r dyfarniad o’r naill du (ei ddileu) neu amrywio’r dyfarniad</u>");
         }
 
         if (caseData.getJoJudgmentRecordReason() != null && caseData.getJoJudgmentRecordReason().equals(JudgmentRecordedReason.DETERMINATION_OF_MEANS)) {
-            params.put("paymentFrequencyMessage", getPaymentFrequencyMessage(caseData).toString());
+            params.put("paymentFrequencyMessage", getPaymentFrequencyMessage(caseData, EN).toString());
+            params.put("paymentFrequencyMessageCy", getPaymentFrequencyMessage(caseData, WELSH).toString());
         }
 
         if (nonNull(caseData.getApplicant1ResponseDeadline())) {
@@ -87,6 +94,7 @@ public class DashboardNotificationsParamsMapper {
             params.put("ccjPaymentFrequency", getStringPaymentFrequency(instalmentDetails.getPaymentFrequency()));
             params.put("ccjInstallmentAmount", MonetaryConversions.penniesToPounds(new BigDecimal(instalmentDetails.getAmount())));
             params.put("ccjFirstRepaymentDateEn", DateUtils.formatDate(instalmentDetails.getStartDate()));
+            params.put("ccjFirstRepaymentDateCy", DateUtils.formatDateInWelsh(instalmentDetails.getStartDate()));
         }
 
         if (nonNull(getDefendantAdmittedAmount(caseData))) {
@@ -378,7 +386,7 @@ public class DashboardNotificationsParamsMapper {
         return null;
     }
 
-    private static StringBuilder getPaymentFrequencyMessage(CaseData caseData) {
+    private static StringBuilder getPaymentFrequencyMessage(CaseData caseData, String language) {
         PaymentPlanSelection paymentPlanType = caseData.getJoPaymentPlan().getType();
         StringBuilder paymentFrequencyMessage = new StringBuilder();
         BigDecimal totalAmount = new BigDecimal(caseData.getJoAmountOrdered());
@@ -391,7 +399,7 @@ public class DashboardNotificationsParamsMapper {
         JudgmentInstalmentDetails instalmentDetails = caseData.getJoInstalmentDetails();
         String paymentFrecuencyString = getStringPaymentFrequency(instalmentDetails.getPaymentFrequency());
 
-        if (PaymentPlanSelection.PAY_IN_INSTALMENTS.equals(paymentPlanType)) {
+        if (PaymentPlanSelection.PAY_IN_INSTALMENTS.equals(paymentPlanType) && EN.equals(language)) {
             paymentFrequencyMessage.append("You must pay the claim amount of £ ")
                 .append(MonetaryConversions.penniesToPounds(totalAmount).toString())
                 .append(" in ")
@@ -399,6 +407,16 @@ public class DashboardNotificationsParamsMapper {
                 .append(" instalments of £ ")
                 .append(MonetaryConversions.penniesToPounds((new BigDecimal(instalmentDetails.getAmount()))).toString())
                 .append(". The first payment is due on ")
+                .append(instalmentDetails.getStartDate())
+                .append(".");
+        } else {
+            paymentFrequencyMessage.append("Rhaid i chi dalu swm yr hawliad, sef £ ")
+                .append(MonetaryConversions.penniesToPounds(totalAmount).toString())
+                .append(" in ")
+                .append(paymentFrecuencyString)
+                .append(" instalments of £ ")
+                .append(MonetaryConversions.penniesToPounds((new BigDecimal(instalmentDetails.getAmount()))).toString())
+                .append(". Bydd y taliad cyntaf yn ddyledus ar ")
                 .append(instalmentDetails.getStartDate())
                 .append(".");
         }

@@ -7,7 +7,7 @@ VALUES ('Scenario.AAA6.JudgmentsOnline.IssuedCCJ.Defendant',
           "Notice.AAA6.ClaimantIntent.RequestedCCJ.ClaimantAcceptedDefendantPlan.Defendant",
           "Notice.AAA6.ClaimantIntent.RequestCCJ.ClaimantAcceptOrRejectPlan.SettlementRequested.NoDefResponse.Defendant",
           "Notice.AAA6.ClaimantIntent.RequestCCJ.ClaimantAcceptOrRejectPlan.SettlementRequested.DefPaymentMissed.Defendant"}',
-        '{"Notice.AAA6.JudgmentsOnline.IssuedCCJ.Defendant": ["ccjDefendantAdmittedAmount", "ccjPaymentFrequency", "ccjInstallmentAmount", "ccjFirstRepaymentDateEn"]}');
+        '{"Notice.AAA6.JudgmentsOnline.IssuedCCJ.Defendant": ["ccjDefendantAdmittedAmount", "ccjPaymentFrequency", "ccjInstallmentAmount", "ccjFirstRepaymentDateEn", "ccjFirstRepaymentDateCy"]}');
 
 /**
  * Add notification template
@@ -16,9 +16,9 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
                                                   , notification_role)
 VALUES ('Notice.AAA6.JudgmentsOnline.IssuedCCJ.Defendant',
         'A judgment has been made against you',
-        'A judgment has been made against you',
+        'Mae Dyfarniad wedi’i wneud yn eich erbyn',
         '<p class="govuk-body">The judgment formalises the payment plan you’ve agreed with the claimant.<br>You’ve agreed to pay the claim amount of £${ccjDefendantAdmittedAmount} in ${ccjPaymentFrequency} instalments of £${ccjInstallmentAmount}. The first payment is due on ${ccjFirstRepaymentDateEn}.<br>The claimant’s details for payment and the full payment plan can be found on the judgment.<br>If you can no longer afford the repayments you’ve agreed with the claimant, you can <u>make an application to vary the judgment</u>.</p>',
-        '<p class="govuk-body">The judgment formalises the payment plan you’ve agreed with the claimant.<br>You’ve agreed to pay the claim amount of £${ccjDefendantAdmittedAmount} in ${ccjPaymentFrequency} instalments of £${ccjInstallmentAmount}. The first payment is due on ${ccjFirstRepaymentDateEn}.<br>The claimant’s details for payment and the full payment plan can be found on the judgment.<br>If you can no longer afford the repayments you’ve agreed with the claimant, you can <u>make an application to vary the judgment</u>.</p>',
+        '<p class="govuk-body">Mae’r dyfarniad yn ffurfioli’r cynllun taliadau yr ydych wedi cytuno arno gyda’r hawlydd.<br>Rydych wedi cytuno i dalu’ swm yr hawliad, sef £${ccjDefendantAdmittedAmount} in ${ccjPaymentFrequency} instalments of £${ccjInstallmentAmount}. Bydd y taliad cyntaf yn ddyledus ar ${ccjFirstRepaymentDateCy}.<br>Gellir dod o hyd i fanylion yr hawlydd ar gyfer talu a’r cynllun talu llawn ar y dyfarniad.<br>Os na allwch fforddio i dalu’r rhandaliadau rydych wedi cytuno arnynt gyda’r hawlydd, gallwch <u>wneud cais i amrywio’r dyfarniad</u>.</p>',
         'DEFENDANT');
 
 /**
