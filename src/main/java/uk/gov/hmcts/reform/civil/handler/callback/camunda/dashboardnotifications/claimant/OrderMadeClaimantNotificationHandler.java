@@ -70,8 +70,7 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
 
         if (isNull(caseData.getRequestForReconsiderationDeadline())
             && isSDOEvent(callbackParams)
-            && isEligibleForReconsideration(caseData)
-            && featureToggleService.isLipVLipEnabled()) {
+            && isEligibleForReconsideration(caseData)) {
             caseDataBuilder.requestForReconsiderationDeadline(getDateWithoutBankHolidays());
         }
         HashMap<String, Object> paramsMap = (HashMap<String, Object>) mapper.mapCaseDataToParams(caseDataBuilder.build(), caseEvent);
