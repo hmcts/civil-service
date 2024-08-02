@@ -57,8 +57,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
-import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -372,24 +370,25 @@ public class InitiateGeneralApplicationService {
 
     public Pair<CaseLocationCivil, Boolean> getWorkAllocationLocation(CaseData caseData, String authToken) {
         if (hasSDOBeenMade(caseData.getCcdState())) {
-            if (!(MultiPartyScenario.isMultiPartyScenario(caseData))) {
-                if (INDIVIDUAL.equals(caseData.getRespondent1().getType())
-                    || SOLE_TRADER.equals(caseData.getRespondent1().getType())) {
-                    return Pair.of(getDefendant1PreferredLocation(caseData), false);
-                } else {
-                    return Pair.of(getClaimant1PreferredLocation(caseData), false);
-                }
+            LocationRefData caseManagementLocationDetails;
+            List<LocationRefData>  locationRefDataList = locationRefDataService.getHearingCourtLocations(authToken);
+            var foundLocations = locationRefDataList.stream()
+                .filter(location -> location.getEpimmsId().equals(caseData.getCaseManagementLocation().getBaseLocation())).toList();
+            if (!foundLocations.isEmpty()) {
+                caseManagementLocationDetails = foundLocations.get(0);
             } else {
-                if (INDIVIDUAL.equals(caseData.getRespondent1().getType())
-                    || SOLE_TRADER.equals(caseData.getRespondent1().getType())
-                    || INDIVIDUAL.equals(caseData.getRespondent2().getType())
-                    || SOLE_TRADER.equals(caseData.getRespondent2().getType())) {
-
-                    return Pair.of(getDefendantPreferredLocation(caseData), false);
-                } else {
-                    return Pair.of(getClaimant1PreferredLocation(caseData), false);
-                }
+                throw new IllegalArgumentException("Base Court Location got General applications not found, in location data");
             }
+            CaseLocationCivil courtLocation;
+            courtLocation = CaseLocationCivil.builder()
+                .region(caseManagementLocationDetails.getRegionId())
+                .baseLocation(caseManagementLocationDetails.getEpimmsId())
+                .siteName(caseManagementLocationDetails.getSiteName())
+                .address(caseManagementLocationDetails.getCourtAddress())
+                .postcode(caseManagementLocationDetails.getPostcode())
+                .build();
+            return Pair.of(courtLocation, true);
+
         } else {
             return getWorkAllocationLocationBeforeSdo(caseData, authToken);
         }
@@ -423,23 +422,6 @@ public class InitiateGeneralApplicationService {
         return !statesBeforeSDO.contains(state);
     }
 
-    private CaseLocationCivil getClaimant1PreferredLocation(CaseData caseData) {
-        if (caseData.getApplicant1DQ() == null
-                || caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() == null
-                || caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode() == null) {
-            return CaseLocationCivil.builder()
-                .region(caseData.getCourtLocation().getCaseLocation().getRegion())
-                .baseLocation(caseData.getCourtLocation().getCaseLocation().getBaseLocation())
-                .build();
-        }
-        return CaseLocationCivil.builder()
-            .region(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt()
-                        .getCaseLocation().getRegion())
-            .baseLocation(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt()
-                              .getCaseLocation().getBaseLocation())
-            .build();
-    }
-
     public LocationRefData getWorkAllocationLocationDetails(String baseLocation, String authToken) {
         List<LocationRefData> locationDetails = locationRefDataService.getCourtLocationsByEpimmsId(authToken, baseLocation);
         if (locationDetails != null && !locationDetails.isEmpty()) {
@@ -449,46 +431,4 @@ public class InitiateGeneralApplicationService {
         }
     }
 
-    private boolean isDefendant1RespondedFirst(CaseData caseData) {
-        return caseData.getRespondent2ResponseDate() == null
-                || (caseData.getRespondent1ResponseDate() != null
-                && !caseData.getRespondent1ResponseDate().isAfter(caseData.getRespondent2ResponseDate()));
-    }
-
-    private CaseLocationCivil getDefendant1PreferredLocation(CaseData caseData) {
-        if (caseData.getRespondent1DQ() == null
-                || caseData.getRespondent1DQ().getRespondent1DQRequestedCourt() == null
-                || caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtCode() == null) {
-            return CaseLocationCivil.builder().build();
-        }
-        return CaseLocationCivil.builder()
-            .region(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
-                        .getCaseLocation().getRegion())
-            .baseLocation(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
-                              .getCaseLocation().getBaseLocation())
-            .build();
-    }
-
-    private CaseLocationCivil getDefendantPreferredLocation(CaseData caseData) {
-        if (isDefendant1RespondedFirst(caseData) && !(caseData.getRespondent1DQ() == null
-            || caseData.getRespondent1DQ().getRespondent1DQRequestedCourt() == null)) {
-
-            return CaseLocationCivil.builder()
-                .region(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
-                            .getCaseLocation().getRegion())
-                .baseLocation(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
-                                  .getCaseLocation().getBaseLocation())
-                .build();
-        } else if (!(isDefendant1RespondedFirst(caseData)) || !(caseData.getRespondent2DQ() == null
-            || caseData.getRespondent2DQ().getRespondent2DQRequestedCourt() == null)) {
-            return CaseLocationCivil.builder()
-                .region(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt()
-                            .getCaseLocation().getRegion())
-                .baseLocation(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt()
-                                  .getCaseLocation().getBaseLocation())
-                .build();
-        } else {
-            return CaseLocationCivil.builder().build();
-        }
-    }
 }
