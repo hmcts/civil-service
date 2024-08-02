@@ -133,7 +133,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         CaseData caseData = callbackParams.getCaseData();
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(setUpHeader(caseData))
-            .confirmationBody(setUpBody())
+            .confirmationBody(setUpBody(caseData))
             .build();
     }
 
@@ -145,7 +145,14 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         );
     }
 
-    private String setUpBody() {
+    private String setUpBody(CaseData caseData) {
+        if (CaseState.All_FINAL_ORDERS_ISSUED == caseData.getCcdState()) {
+            return format(
+                "<br />%n%n<a href=\"%s\" target=\"_blank\">Download county court judgment</a>"
+                    + "<br><br>The defendant will be served the county court judgment<br><br>",
+                format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+            );
+        }
         return format(
             "<br /><h2 class=\"govuk-heading-m\"><u>What happens next</u></h2>"
                 + "<br>This case will now proceed offline. Any updates will be sent by post.<br><br>"
