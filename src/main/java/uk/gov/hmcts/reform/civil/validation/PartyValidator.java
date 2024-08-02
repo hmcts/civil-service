@@ -14,7 +14,11 @@ public class PartyValidator {
 
     public static final int NAME_MAX_LENGTH_ALLOWED = 70;
 
+    public static final int POST_CODE_MAX_LENGTH = 8;
+
     public static final String ADDRESS_LENGTH_ERROR = "exceeds maximum length 35";
+
+    public static final String POST_CODE_LENGTH_ERROR = "exceeds maximum length 8";
 
     public static final String NAME_LENGTH_ERROR = "Name exceeds maximum length 70";
 
@@ -39,8 +43,8 @@ public class PartyValidator {
         if (exceedsLength(primaryAddress.getCounty(), ADDRESS_MAX_LENGTH_ALLOWED)) {
             errors.add("County " + ADDRESS_LENGTH_ERROR);
         }
-        if (exceedsLength(primaryAddress.getPostCode(), ADDRESS_MAX_LENGTH_ALLOWED)) {
-            errors.add("Postcode " + ADDRESS_LENGTH_ERROR);
+        if (exceedsLength(primaryAddress.getPostCode(), POST_CODE_MAX_LENGTH)) {
+            errors.add("Postcode " + POST_CODE_LENGTH_ERROR);
         }
 
         if (hasWelshChars(primaryAddress.getAddressLine1()) || hasWelshChars(primaryAddress.getAddressLine2())
