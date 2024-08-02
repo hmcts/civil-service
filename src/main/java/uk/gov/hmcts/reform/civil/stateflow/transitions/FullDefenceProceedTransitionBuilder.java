@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.stateflow.transitions;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -24,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SDO_NOT_DRAWN;
 
 @Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class FullDefenceProceedTransitionBuilder extends MidTransitionBuilder {
 
     public FullDefenceProceedTransitionBuilder(FeatureToggleService featureToggleService) {
@@ -52,8 +55,8 @@ public class FullDefenceProceedTransitionBuilder extends MidTransitionBuilder {
     }
 
     private static boolean getCarmEnabledForDate(CaseData caseData) {
-        // Date of go live is 1st August, as we use "isAfter" we compare with 31st July
-        return caseData.getSubmittedDate().toLocalDate().isAfter(LocalDate.of(2024, 7, 31));
+        // Date of go live is  5th november , as we use "isAfter" we compare with 4th november
+        return caseData.getSubmittedDate().toLocalDate().isAfter(LocalDate.of(2024, 8, 8));
     }
 
     public static final Predicate<CaseData> takenOfflineByStaffAfterClaimantResponseBeforeSDO = caseData ->
