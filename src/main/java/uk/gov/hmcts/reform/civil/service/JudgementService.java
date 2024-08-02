@@ -20,6 +20,8 @@ public class JudgementService {
 
     private static final String JUDGEMENT_BY_COURT = "The Judgement request will be reviewed by the court,"
         + " this case will proceed offline, you will receive any further updates by post.";
+    private static final String JUDGEMENT_BY_COURT_NOT_OFFLINE = "The judgment request will be processed and a County"
+        + " Court Judgment (CCJ) will be issued, you will receive any further updates by email.";
     private static final String JUDGEMENT_ORDER = "The judgment will order the defendant to pay £%s , including the claim fee and interest, if applicable, as shown:";
     private final FeatureToggleService featureToggleService;
 
@@ -95,6 +97,10 @@ public class JudgementService {
     private String ccjJudgmentStatement(CaseData caseData) {
         if (caseData.isLRvLipOneVOne()
             && featureToggleService.isPinInPostEnabled()) {
+            if (featureToggleService.isJudgmentOnlineLive()
+                && (caseData.isPayImmediately() || caseData.isPayByInstallment() || caseData.isPayBySetDate())) {
+                return JUDGEMENT_BY_COURT_NOT_OFFLINE;
+            }
             return JUDGEMENT_BY_COURT;
         } else {
             return String.format(JUDGEMENT_ORDER, ccjJudgementSubTotal(caseData));
