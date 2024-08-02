@@ -213,16 +213,25 @@ public class DashboardNotificationsParamsMapperTest {
 
         if (paymentFrequency.equals(PaymentFrequency.WEEKLY)) {
             assertThat(result).extracting("paymentFrequencyMessage").isEqualTo("You must pay the " +
-                                                                                   "claim amount of £ 23.00 in weekly instalments of £ 1.20. " +
+                                                                                   "claim amount of £ 23.00 in weekly instalments of £1.20. " +
                                                                                    "The first payment is due on 2022-12-12.");
+            assertThat(result).extracting("paymentFrequencyMessageCy").isEqualTo("Rhaid i chi dalu swm yr hawliad," +
+                                                                                     " sef £ 23.00 mewn rhandaliadau wythnosol o £1.20." +
+                                                                                     " Bydd y taliad cyntaf yn ddyledus ar 2022-12-12.");
         } else if (paymentFrequency.equals(PaymentFrequency.EVERY_TWO_WEEKS)) {
             assertThat(result).extracting("paymentFrequencyMessage").isEqualTo("You must pay the " +
-                                                                                   "claim amount of £ 23.00 in biweekly instalments of £ 1.20. " +
+                                                                                   "claim amount of £ 23.00 in biweekly instalments of £1.20. " +
                                                                                    "The first payment is due on 2022-12-12.");
+            assertThat(result).extracting("paymentFrequencyMessageCy").isEqualTo("Rhaid i chi dalu swm yr hawliad," +
+                                                                                     " sef £ 23.00 mewn rhandaliadau bob pythefnos o £1.20." +
+                                                                                     " Bydd y taliad cyntaf yn ddyledus ar 2022-12-12.");
         } else {
             assertThat(result).extracting("paymentFrequencyMessage").isEqualTo("You must pay the " +
-                                                                                   "claim amount of £ 23.00 in monthly instalments of £ 1.20. " +
+                                                                                   "claim amount of £ 23.00 in monthly instalments of £1.20. " +
                                                                                    "The first payment is due on 2022-12-12.");
+            assertThat(result).extracting("paymentFrequencyMessageCy").isEqualTo("Rhaid i chi dalu swm yr hawliad, " +
+                                                                                     "sef £ 23.00 mewn rhandaliadau misol o £1.20." +
+                                                                                     " Bydd y taliad cyntaf yn ddyledus ar 2022-12-12.");
         }
     }
 
@@ -265,15 +274,17 @@ public class DashboardNotificationsParamsMapperTest {
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
         assertThat(result).extracting("ccjDefendantAdmittedAmount").isEqualTo(BigDecimal.valueOf(1500.01));
-        assertThat(result).extracting("ccjInstallmentAmount").isEqualTo(BigDecimal.valueOf(200.01));
         assertThat(result).extracting("ccjFirstRepaymentDateEn").isEqualTo(DateUtils.formatDate(LocalDate.now()));
 
         if (paymentFrequency.equals(PaymentFrequency.WEEKLY)) {
-            assertThat(result).extracting("ccjPaymentFrequency").isEqualTo("weekly");
+            assertThat(result).extracting("ccjPaymentMessageEn").isEqualTo("in weekly instalments of £200.01");
+            assertThat(result).extracting("ccjPaymentMessageCy").isEqualTo("mewn rhandaliadau wythnosol o £200.01");
         } else if (paymentFrequency.equals(PaymentFrequency.EVERY_TWO_WEEKS)) {
-            assertThat(result).extracting("ccjPaymentFrequency").isEqualTo("biweekly");
+            assertThat(result).extracting("ccjPaymentMessageEn").isEqualTo("in biweekly instalments of £200.01");
+            assertThat(result).extracting("ccjPaymentMessageCy").isEqualTo("mewn rhandaliadau bob pythefnos o £200.01");
         } else {
-            assertThat(result).extracting("ccjPaymentFrequency").isEqualTo("monthly");
+            assertThat(result).extracting("ccjPaymentMessageEn").isEqualTo("in monthly instalments of £200.01");
+            assertThat(result).extracting("ccjPaymentMessageCy").isEqualTo("mewn rhandaliadau misol o £200.01");
         }
     }
 

@@ -28,8 +28,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState.ISSUED;
 import static uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection.PAY_IN_INSTALMENTS;
 import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
@@ -91,8 +89,8 @@ public class DashboardNotificationsParamsMapper {
             JudgmentInstalmentDetails instalmentDetails = judgmentDetails.getInstalmentDetails();
 
             params.put("ccjDefendantAdmittedAmount", MonetaryConversions.penniesToPounds(new BigDecimal(judgmentDetails.getOrderedAmount())));
-            params.put("ccjPaymentFrequency", getStringPaymentFrequency(instalmentDetails.getPaymentFrequency()));
-            params.put("ccjInstallmentAmount", MonetaryConversions.penniesToPounds(new BigDecimal(instalmentDetails.getAmount())));
+            params.put("ccjPaymentMessageEn", getStringPaymentMessage(instalmentDetails.getPaymentFrequency(), instalmentDetails.getAmount()));
+            params.put("ccjPaymentMessageCy", getStringPaymentMessageInWelsh(instalmentDetails.getPaymentFrequency(), instalmentDetails.getAmount()));
             params.put("ccjFirstRepaymentDateEn", DateUtils.formatDate(instalmentDetails.getStartDate()));
             params.put("ccjFirstRepaymentDateCy", DateUtils.formatDateInWelsh(instalmentDetails.getStartDate()));
         }
@@ -251,6 +249,21 @@ public class DashboardNotificationsParamsMapper {
         return params;
     }
 
+    private static String getStringPaymentMessageInWelsh(PaymentFrequency paymentFrequency, String amount) {
+        BigDecimal convertedAmount = MonetaryConversions.penniesToPounds(new BigDecimal(amount));
+
+        return switch (paymentFrequency) {
+            case WEEKLY -> "mewn rhandaliadau wythnosol o £" + convertedAmount;
+            case EVERY_TWO_WEEKS -> "mewn rhandaliadau bob pythefnos o £" + convertedAmount;
+            case MONTHLY -> "mewn rhandaliadau misol o £" + convertedAmount;
+        };
+    }
+
+    private static String getStringPaymentMessage(PaymentFrequency paymentFrequency, String amount) {
+        return "in " + getStringPaymentFrequency(paymentFrequency) + " instalments of £"
+            + MonetaryConversions.penniesToPounds(new BigDecimal(amount));
+    }
+
     public Map<String, Object> mapCaseDataToParams(CaseData caseData, CaseEvent caseEvent) {
 
         Map<String, Object> params = mapCaseDataToParams(caseData);
@@ -402,20 +415,16 @@ public class DashboardNotificationsParamsMapper {
         if (PaymentPlanSelection.PAY_IN_INSTALMENTS.equals(paymentPlanType) && EN.equals(language)) {
             paymentFrequencyMessage.append("You must pay the claim amount of £ ")
                 .append(MonetaryConversions.penniesToPounds(totalAmount).toString())
-                .append(" in ")
-                .append(paymentFrecuencyString)
-                .append(" instalments of £ ")
-                .append(MonetaryConversions.penniesToPounds((new BigDecimal(instalmentDetails.getAmount()))).toString())
+                .append(" ")
+                .append(getStringPaymentMessage(instalmentDetails.getPaymentFrequency(), instalmentDetails.getAmount()))
                 .append(". The first payment is due on ")
                 .append(instalmentDetails.getStartDate())
                 .append(".");
         } else {
             paymentFrequencyMessage.append("Rhaid i chi dalu swm yr hawliad, sef £ ")
                 .append(MonetaryConversions.penniesToPounds(totalAmount).toString())
-                .append(" in ")
-                .append(paymentFrecuencyString)
-                .append(" instalments of £ ")
-                .append(MonetaryConversions.penniesToPounds((new BigDecimal(instalmentDetails.getAmount()))).toString())
+                .append(" ")
+                .append(getStringPaymentMessageInWelsh(instalmentDetails.getPaymentFrequency(), instalmentDetails.getAmount()))
                 .append(". Bydd y taliad cyntaf yn ddyledus ar ")
                 .append(instalmentDetails.getStartDate())
                 .append(".");
