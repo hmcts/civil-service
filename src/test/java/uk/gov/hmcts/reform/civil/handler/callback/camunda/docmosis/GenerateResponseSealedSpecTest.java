@@ -162,6 +162,7 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
     void shouldGenerateClaimForm_V1VersionAndIsPinInPostEnabled() {
         // Given: Case data with docs to stitch, stitching is enabled and isPinInPostEnabled is true
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
+        when(toggleService.isPinInPostEnabled()).thenReturn(true);
         CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
         when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
         when(civilDocumentStitchingService.bundle(ArgumentMatchers.anyList(), anyString(), anyString(), anyString(),
@@ -176,6 +177,7 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
                        .filter(caseDocumentElement -> caseDocumentElement.getValue()
                            .getDocumentName().equals(STITCHED_DOC.getDocumentName())).count()).isEqualTo(1);
         verify(sealedClaimResponseFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
+        assertThat(toggleService.isPinInPostEnabled()).isTrue();
     }
 
     @Test
@@ -183,6 +185,7 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         // Given: Case data with docs to stitch, stitching is enabled,isPinInPostEnabled is false and callback
         // version V1
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
+        when(toggleService.isPinInPostEnabled()).thenReturn(false);
         CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
         when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
         when(civilDocumentStitchingService.bundle(ArgumentMatchers.anyList(), anyString(), anyString(), anyString(),
@@ -197,6 +200,7 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
                        .filter(caseDocumentElement -> caseDocumentElement.getValue()
                            .getDocumentName().equals(STITCHED_DOC.getDocumentName())).count()).isEqualTo(1);
         verify(sealedClaimResponseFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
+        assertThat(toggleService.isPinInPostEnabled()).isFalse();
     }
 
     @Test
