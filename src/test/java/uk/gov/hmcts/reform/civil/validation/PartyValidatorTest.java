@@ -32,10 +32,11 @@ class PartyValidatorTest {
 
             validator.validateName(name, errors);
             assertThat(errors).isNotEmpty();
+            assertThat(errors).contains("Name exceeds maximum length 70");
         }
 
         @Test
-        void shouldNotReturn_error_when_length_exceeds() {
+        void shouldNotReturn_error_when_length_is_in_limit() {
             String name = "Mr ABC TEST";
             List<String> errors = new ArrayList<>();
 
@@ -44,7 +45,7 @@ class PartyValidatorTest {
         }
 
         @Test
-        public void should_not_return_Special_character_error_name() {
+        public void should_return_Special_character_error_name() {
             Address primaryAddress = Address.builder()
                 .addressLine1("Proper address")
                 .county(" ¨Proper address")
@@ -53,6 +54,7 @@ class PartyValidatorTest {
             List<String> errors = new ArrayList<>();
             validator.validateAddress(primaryAddress, errors);
             assertThat(errors).isNotEmpty();
+            assertThat(errors).contains("Special characters are not allowed");
         }
     }
 
@@ -74,6 +76,7 @@ class PartyValidatorTest {
 
             assertThat(errors).isNotEmpty();
             assertThat(errors).hasSize(6);
+            assertThat(errors).contains("Building and Street exceeds maximum length 35");
         }
 
         @Test
@@ -83,7 +86,7 @@ class PartyValidatorTest {
                 .addressLine2("Proper address")
                 .addressLine3("Proper address")
                 .county("Proper address")
-                .postCode("Proper address")
+                .postCode("Proper")
                 .postTown("Proper address")
                 .build();
 
@@ -94,7 +97,7 @@ class PartyValidatorTest {
         }
 
         @Test
-        void should_not_return_Special_character_error_address_line1() {
+        void should_return_Special_character_error_address_line1() {
             Address primaryAddress = Address.builder()
                 .addressLine1("ˆProper address")
                 .build();
@@ -102,10 +105,11 @@ class PartyValidatorTest {
             List<String> errors = new ArrayList<>();
             validator.validateAddress(primaryAddress, errors);
             assertThat(errors).isNotEmpty();
+            assertThat(errors).contains("Special characters are not allowed");
         }
 
         @Test
-        void should_not_return_Special_character_error_address_line2() {
+        void should_return_Special_character_error_address_line2() {
             Address primaryAddress = Address.builder()
                 .addressLine1("Proper address")
                 .addressLine2("`Proper address")
@@ -114,10 +118,11 @@ class PartyValidatorTest {
             List<String> errors = new ArrayList<>();
             validator.validateAddress(primaryAddress, errors);
             assertThat(errors).isNotEmpty();
+            assertThat(errors).contains("Special characters are not allowed");
         }
 
         @Test
-        void should_not_return_Special_character_error_address_line3() {
+        void should_return_Special_character_error_address_line3() {
             Address primaryAddress = Address.builder()
                 .addressLine1("Proper address")
                 .addressLine3("´Proper address")
@@ -126,10 +131,11 @@ class PartyValidatorTest {
             List<String> errors = new ArrayList<>();
             validator.validateAddress(primaryAddress, errors);
             assertThat(errors).isNotEmpty();
+            assertThat(errors).contains("Special characters are not allowed");
         }
 
         @Test
-        void should_not_return_Special_character_error_address_posttown() {
+        void should_return_Special_character_error_address_posttown() {
             Address primaryAddress = Address.builder()
                 .addressLine1("Proper address")
                 .postTown(" ¨Proper address")
@@ -138,10 +144,11 @@ class PartyValidatorTest {
             List<String> errors = new ArrayList<>();
             validator.validateAddress(primaryAddress, errors);
             assertThat(errors).isNotEmpty();
+            assertThat(errors).contains("Special characters are not allowed");
         }
 
         @Test
-        void should_not_return_Special_character_error_address_postcode() {
+        void should_return_Special_character_error_address_postcode() {
             Address primaryAddress = Address.builder()
                 .addressLine1("Proper address")
                 .postCode(" ¨Proper address")
@@ -149,11 +156,11 @@ class PartyValidatorTest {
 
             List<String> errors = new ArrayList<>();
             validator.validateAddress(primaryAddress, errors);
-            assertThat(errors).isNotEmpty();
+            assertThat(errors).contains("Special characters are not allowed");
         }
 
         @Test
-        void should_not_return_Special_character_error_address_county() {
+        void should_return_Special_character_error_address_county() {
             Address primaryAddress = Address.builder()
                 .addressLine1("Proper address")
                 .county(" ¨Proper address")
@@ -162,6 +169,7 @@ class PartyValidatorTest {
             List<String> errors = new ArrayList<>();
             validator.validateAddress(primaryAddress, errors);
             assertThat(errors).isNotEmpty();
+            assertThat(errors).contains("Special characters are not allowed");
         }
     }
 }
