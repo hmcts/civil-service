@@ -48,6 +48,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -309,6 +310,48 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             String judgementStatement = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentStatement();
 
             assertThat(judgementStatement).isNotEqualTo(expected);
+        }
+
+        @Test
+        void shouldShowSummaryForAllFinalOrdersIssued() {
+            String expected = "The judgment request will be processed and a County"
+                + " Court Judgment (CCJ) will be issued, you will receive any further updates by email.";
+
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+            Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
+                .ccjPaymentPaidSomeOption(YesOrNo.YES)
+                .ccjJudgmentFixedCostOption(YES)
+                .build();
+
+            BigDecimal interestAmount = BigDecimal.valueOf(100);
+
+            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+                .respondent1Represented(NO)
+                .specRespondent1Represented(NO)
+                .applicant1Represented(YES)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("John Doe")
+                                                     .build())
+                                          .build())
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .claimFee(fee)
+                .totalInterest(interestAmount)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            String judgementStatement = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentStatement();
+
+            assertThat(judgementStatement).isEqualTo(expected);
         }
     }
 
@@ -621,6 +664,41 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                          response.getConfirmationHeader());
             assertEquals("<br /><h2 class=\"govuk-heading-m\"><u>What happens next</u></h2>"
                               + "<br>This case will now proceed offline. Any updates will be sent by post.<br><br>", response.getConfirmationBody());
+        }
+
+        @Test
+        void shouldSetUpBusinessProcessAndCaseStateAll_Final_Ordered_Issued() {
+
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeOption(YesOrNo.YES)
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0))
+                .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
+                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
+                .build();
+            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+                .respondent1Represented(NO)
+                .specRespondent1Represented(NO)
+                .applicant1Represented(YES)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("John Doe")
+                                                     .build())
+                                          .build())
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+                .ccdState(All_FINAL_ORDERS_ISSUED)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler
+                .handle(params);
+            assertEquals(format("# Judgment Submitted %n## A county court judgment(ccj) has been submitted for case %s",
+                                caseData.getLegacyCaseReference()), response.getConfirmationHeader());
+            assertThat(response.getConfirmationBody()).contains("Download county court judgment");
         }
     }
 
