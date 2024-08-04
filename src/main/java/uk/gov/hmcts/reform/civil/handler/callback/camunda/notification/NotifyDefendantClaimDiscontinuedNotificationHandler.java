@@ -19,7 +19,6 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DISCONTINUANCE_DEFENDANT1;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @Service
 @RequiredArgsConstructor
@@ -80,7 +79,7 @@ public class NotifyDefendantClaimDiscontinuedNotificationHandler extends Callbac
     }
 
     private String getLIPTemplate() {
-        return notificationsProperties.getNotifyLipUpdateTemplate();
+        return notificationsProperties.getNotifyClaimDiscontinuedLipTemplate();
     }
 
     private String getReferenceTemplate(CaseData caseData) {
@@ -99,9 +98,8 @@ public class NotifyDefendantClaimDiscontinuedNotificationHandler extends Callbac
 
     public Map<String, String> addPropertiesLip(CaseData caseData) {
         return Map.of(
-            CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            PARTY_NAME, caseData.getRespondent1().getPartyName()
+            RESPONDENT_NAME, caseData.getRespondent1().getPartyName()
         );
     }
 }

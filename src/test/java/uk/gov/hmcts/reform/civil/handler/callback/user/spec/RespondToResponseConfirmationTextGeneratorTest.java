@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.AdmitProceedConfText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.DefendNotProceedConfText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.DefendProceedConfText;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.JudgmentByAdmissionConfText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.JudgmentSubmittedConfText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.PayImmediatelyConfText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.ProposePaymentPlanConfText;
@@ -29,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResp
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildCaseDefendantWithOutMediationData;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildCaseWithOutMediationFastTrackData;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildCaseClaimantWithOutMediationData;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildJudgmentSubmitProceedCaseDataAllFoi;
 
 public class RespondToResponseConfirmationTextGeneratorTest implements CaseDataToTextGeneratorTest
     .CaseDataToTextGeneratorIntentionConfig<RespondToResponseConfirmationTextGenerator> {
@@ -56,7 +58,8 @@ public class RespondToResponseConfirmationTextGeneratorTest implements CaseDataT
             Pair.of(buildAcceptPartAdmitAndPaidCaseData(), AcceptPartAdmitAndPaidConfText.class),
             Pair.of(buildCaseDefendantWithOutMediationData(), RejectWithoutMediationConfText.class),
             Pair.of(buildCaseWithOutMediationFastTrackData(), RejectWithoutMediationConfText.class),
-            Pair.of(buildCaseClaimantWithOutMediationData(), RejectWithoutMediationConfText.class)
+            Pair.of(buildCaseClaimantWithOutMediationData(), RejectWithoutMediationConfText.class),
+            Pair.of(buildJudgmentSubmitProceedCaseDataAllFoi(), JudgmentByAdmissionConfText.class)
         );
     }
 }

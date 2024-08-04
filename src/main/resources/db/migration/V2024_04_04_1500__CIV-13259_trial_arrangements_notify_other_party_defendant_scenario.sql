@@ -3,7 +3,7 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Defendant',
-        '{"Notice.AAA6.CP.Trial.Arrangements.Required.BothParties"}',
+        '{"Notice.AAA6.CP.Trial.Arrangements.Required.Claimant"}',
         '{"Notice.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Defendant" : []}');
 
 /**
