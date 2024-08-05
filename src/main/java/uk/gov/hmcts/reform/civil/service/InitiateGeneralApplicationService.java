@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CaseAssignmentApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
+import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
@@ -48,6 +49,7 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRANSFER_ONLINE_CASE;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
@@ -74,6 +76,7 @@ public class InitiateGeneralApplicationService {
     private final UserService userService;
     private final FeatureToggleService featureToggleService;
     private final CrossAccessUserConfiguration crossAccessUserConfiguration;
+    private final CoreCaseEventDataService coreCaseEventDataService;
 
     private static final int NUMBER_OF_DEADLINE_DAYS = 5;
     public static final String GA_DOC_CATEGORY_ID = "applications";
@@ -370,33 +373,20 @@ public class InitiateGeneralApplicationService {
 
     public Pair<CaseLocationCivil, Boolean> getWorkAllocationLocation(CaseData caseData, String authToken) {
         if (hasSDOBeenMade(caseData.getCcdState())) {
-            LocationRefData caseManagementLocationDetails;
-            List<LocationRefData>  locationRefDataList = locationRefDataService.getHearingCourtLocations(authToken);
-            var foundLocations = locationRefDataList.stream()
-                .filter(location -> location.getEpimmsId().equals(caseData.getCaseManagementLocation().getBaseLocation())).toList();
-            if (!foundLocations.isEmpty()) {
-                caseManagementLocationDetails = foundLocations.get(0);
-            } else {
-                throw new IllegalArgumentException("Base Court Location got General applications not found, in location data");
-            }
-            CaseLocationCivil courtLocation;
-            courtLocation = CaseLocationCivil.builder()
-                .region(caseManagementLocationDetails.getRegionId())
-                .baseLocation(caseManagementLocationDetails.getEpimmsId())
-                .siteName(caseManagementLocationDetails.getSiteName())
-                .address(caseManagementLocationDetails.getCourtAddress())
-                .postcode(caseManagementLocationDetails.getPostcode())
-                .build();
-            return Pair.of(courtLocation, true);
-
+            return Pair.of(assignCaseManagementLocationToMainCaseLocation(caseData, authToken), true);
         } else {
             return getWorkAllocationLocationBeforeSdo(caseData, authToken);
         }
     }
 
     private Pair<CaseLocationCivil, Boolean> getWorkAllocationLocationBeforeSdo(CaseData caseData, String authToken) {
+        List<CaseEventDetail> caseEventDetails = coreCaseEventDataService.getEventsForCase(caseData.getCcdCaseReference().toString());
+        List <String> currentEvents = caseEventDetails.stream().map(CaseEventDetail::getId).toList();
         CaseLocationCivil courtLocation;
-        if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
+        if (currentEvents.contains(TRANSFER_ONLINE_CASE.name())) {
+            courtLocation = assignCaseManagementLocationToMainCaseLocation(caseData, authToken);
+            return Pair.of(courtLocation, true);
+        } else {
             LocationRefData cnbcLocation = locationRefDataService.getCnbcLocation(authToken);
             courtLocation = CaseLocationCivil.builder()
                 .region(cnbcLocation.getRegionId())
@@ -404,15 +394,6 @@ public class InitiateGeneralApplicationService {
                 .siteName(cnbcLocation.getSiteName())
                 .address(cnbcLocation.getCourtAddress())
                 .postcode(cnbcLocation.getPostcode())
-                .build();
-        } else {
-            LocationRefData ccmccLocation = locationRefDataService.getCcmccLocation(authToken);
-            courtLocation = CaseLocationCivil.builder()
-                .region(ccmccLocation.getRegionId())
-                .baseLocation(ccmccLocation.getEpimmsId())
-                .siteName(ccmccLocation.getSiteName())
-                .address(ccmccLocation.getCourtAddress())
-                .postcode(ccmccLocation.getPostcode())
                 .build();
         }
         return Pair.of(courtLocation, true);
@@ -431,4 +412,25 @@ public class InitiateGeneralApplicationService {
         }
     }
 
+    private CaseLocationCivil assignCaseManagementLocationToMainCaseLocation (CaseData caseData, String authToken) {
+        LocationRefData caseManagementLocationDetails;
+        List<LocationRefData>  locationRefDataList = locationRefDataService.getHearingCourtLocations(authToken);
+        var foundLocations = locationRefDataList.stream()
+            .filter(location -> location.getEpimmsId().equals(caseData.getCaseManagementLocation().getBaseLocation())).toList();
+        if (!foundLocations.isEmpty()) {
+            System.out.println("FOUND LOCATIONS " + foundLocations.get(0) );
+            caseManagementLocationDetails = foundLocations.get(0);
+        } else {
+            throw new IllegalArgumentException("Base Court Location for General applications not found, in location data");
+        }
+        CaseLocationCivil courtLocation;
+        courtLocation = CaseLocationCivil.builder()
+            .region(caseManagementLocationDetails.getRegionId())
+            .baseLocation(caseManagementLocationDetails.getEpimmsId())
+            .siteName(caseManagementLocationDetails.getSiteName())
+            .address(caseManagementLocationDetails.getCourtAddress())
+            .postcode(caseManagementLocationDetails.getPostcode())
+            .build();
+        return courtLocation;
+    }
 }
