@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.stateflow.transitions;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -27,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SDO_NOT_DRAWN;
 
 @Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class NotificationAcknowledgedTransitionBuilder extends MidTransitionBuilder {
 
     public NotificationAcknowledgedTransitionBuilder(FeatureToggleService featureToggleService) {
