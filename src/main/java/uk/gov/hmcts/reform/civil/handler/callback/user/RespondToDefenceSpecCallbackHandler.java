@@ -110,6 +110,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     implements ExpertsValidator, WitnessesValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CLAIMANT_RESPONSE_SPEC);
+    public static final String DOWNLOAD_URL_CLAIM_DOCUMENTS = "/cases/case-details/%s#Claim documents";
     private final ObjectMapper objectMapper;
     private final Time time;
     private final UnavailableDateValidator unavailableDateValidator;
@@ -662,14 +663,20 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 + "We'll review the case and contact you about what to do next.<br>"
                 + format(
                 "%n%n<a href=\"%s\" target=\"_blank\">View Directions questionnaire</a>",
-                format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+                format(DOWNLOAD_URL_CLAIM_DOCUMENTS, caseData.getCcdCaseReference())
+            );
+        }  else if (CaseState.All_FINAL_ORDERS_ISSUED == caseData.getCcdState()) {
+            return format(
+                "<br />%n%n<a href=\"%s\" target=\"_blank\">Download county court judgment</a>"
+                    + "<br><br>The defendant will be served the county court judgment<br><br>",
+                format(DOWNLOAD_URL_CLAIM_DOCUMENTS, caseData.getCcdCaseReference())
             );
         } else {
             return "<h2 class=\"govuk-heading-m\">What happens next</h2>"
                 + "You've decided not to proceed and the case will end.<br>"
                 + format(
                 "%n%n<a href=\"%s\" target=\"_blank\">View Directions questionnaire</a>",
-                format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+                format(DOWNLOAD_URL_CLAIM_DOCUMENTS, caseData.getCcdCaseReference())
             );
         }
     }
@@ -685,6 +692,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             return format(
                 "# You have rejected their response %n## Your Claim Number : %s",
                 caseData.getLegacyCaseReference()
+            );
+        } else if (CaseState.All_FINAL_ORDERS_ISSUED == caseData.getCcdState()) {
+            return format(
+                "# Judgment Submitted %n## A county court judgment(ccj) has been submitted for case %s",
+                claimNumber
             );
         } else {
             return format(
