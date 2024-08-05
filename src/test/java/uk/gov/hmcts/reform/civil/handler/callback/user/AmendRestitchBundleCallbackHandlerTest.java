@@ -43,6 +43,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_RESTITCH_BUNDLE;
 
 @ExtendWith(MockitoExtension.class)
 class AmendRestitchBundleCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -150,6 +151,11 @@ class AmendRestitchBundleCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             List<IdValue<Bundle>> actualData = mapper.convertValue(response.getData().get("caseBundles"), new TypeReference<List<IdValue<Bundle>>>() {});
             assertThat(actualData.get(1).getValue()).isEqualTo(packedBundle.getValue());
+        }
+
+        @Test
+        void handleEventsReturnsTheExpectedCallbackEvent() {
+            assertThat(handler.handledEvents()).contains(AMEND_RESTITCH_BUNDLE);
         }
     }
 
