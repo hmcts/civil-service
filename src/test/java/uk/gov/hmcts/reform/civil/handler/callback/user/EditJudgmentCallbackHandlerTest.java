@@ -28,8 +28,10 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -47,6 +49,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EDIT_JUDGMENT;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(SpringExtension.class)
@@ -167,6 +170,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData().get("activeJudgment")).isNotNull();
             assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("MODIFIED");
+            assertThat(response.getData().get("activeJudgment")).extracting("rtlState").isEqualTo(JudgmentRTLStatus.MODIFIED_EXISTING.getRtlState());
             assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo(
                 "JUDGMENT_FOLLOWING_HEARING");
             assertThat(response.getData().get("activeJudgment")).extracting("judgmentId").isEqualTo(1);
@@ -190,9 +194,10 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            caseData.setJoShowRegisteredWithRTLOption(YesOrNo.YES);
+            caseData.setJoShowRegisteredWithRTLOption(YES);
             RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper();
-            caseData.setActiveJudgment(recordMapper.addUpdateActiveJudgment(caseData));
+            JudgmentDetails activeJudgment = recordMapper.addUpdateActiveJudgment(caseData);
+            caseData.setActiveJudgment(activeJudgment.toBuilder().isRegisterWithRTL(NO).build());
 
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -212,6 +217,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData().get("activeJudgment")).isNotNull();
             assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("MODIFIED");
+            assertThat(response.getData().get("activeJudgment")).extracting("rtlState").isEqualTo(JudgmentRTLStatus.MODIFIED_RTL_STATE.getRtlState());
             assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo(
                 "JUDGMENT_FOLLOWING_HEARING");
             assertThat(response.getData().get("activeJudgment")).extracting("judgmentId").isEqualTo(1);
@@ -252,6 +258,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("joJudgmentPaidInFull")).isNull();
             assertThat(response.getData().get("activeJudgment")).isNotNull();
             assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("MODIFIED");
+            assertThat(response.getData().get("activeJudgment")).extracting("rtlState").isEqualTo(null);
             assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo(
                 "JUDGMENT_FOLLOWING_HEARING");
             assertThat(response.getData().get("activeJudgment")).extracting("judgmentId").isEqualTo(1);

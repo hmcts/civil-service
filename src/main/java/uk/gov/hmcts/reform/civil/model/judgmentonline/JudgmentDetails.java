@@ -26,13 +26,11 @@ public class JudgmentDetails {
     private Address defendant2Address;
     private LocalDate defendant1Dob;
     private LocalDate defendant2Dob;
-
-
-    private List<Element<Party>> defendants;
     private LocalDateTime lastUpdateTimeStamp;
     private LocalDateTime createdTimestamp;
     private LocalDateTime cancelledTimeStamp;
     private JudgmentState state;
+    private String rtlState;
     private YesOrNo isRegisterWithRTL;
     private LocalDate requestDate;
     private LocalDate issueDate;

@@ -7,11 +7,10 @@ import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
@@ -22,10 +21,6 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Slf4j
 @Service
@@ -37,23 +32,24 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
 
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
-        List<Element<Party>> defendants = new ArrayList<>();
-        defendants.add(element(caseData.getRespondent1()));
-        if (caseData.isMultiPartyDefendant()) {
-            defendants.add(element(caseData.getRespondent2()));
-        }
+
         BigInteger orderAmount = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getDebtAmount(caseData, interestCalculator));
         BigInteger costs = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getCostOfJudgmentForDJ(caseData));
         isNonDivergent =  JudgmentsOnlineHelper.isNonDivergentForDJ(caseData);
         JudgmentDetails activeJudgment = super.addUpdateActiveJudgment(caseData);
+        activeJudgment = super.updateDefendantDetails(activeJudgment, caseData);
+        JudgmentState judgmentState = getJudgmentState(caseData);
+        YesOrNo isRegisterWithRTL = isNonDivergent ? YesOrNo.YES : YesOrNo.NO;
         return activeJudgment.toBuilder()
+            .defendant1Name(caseData.getRespondent1().getPartyName())
             .createdTimestamp(LocalDateTime.now())
-            .state(getJudgmentState(caseData))
+            .state(judgmentState)
+            .rtlState(getRtlState(isRegisterWithRTL, judgmentState))
             .type(JudgmentType.DEFAULT_JUDGMENT)
             .instalmentDetails(DJPaymentTypeSelection.REPAYMENT_PLAN.equals(caseData.getPaymentTypeSelection())
                                    ? getInstalmentDetails(caseData) : null)
             .paymentPlan(getPaymentPlan(caseData))
-            .isRegisterWithRTL(isNonDivergent ? YesOrNo.YES : YesOrNo.NO)
+            .isRegisterWithRTL(isRegisterWithRTL)
             .issueDate(LocalDate.now())
             .orderedAmount(orderAmount.toString())
             .costs(costs.toString())
@@ -64,6 +60,10 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
     @Override
     protected JudgmentState getJudgmentState(CaseData caseData) {
         return isNonDivergent ? JudgmentState.ISSUED : JudgmentState.REQUESTED;
+    }
+
+    protected String getRtlState(YesOrNo isRegisterWithRTL, JudgmentState state) {
+        return isRegisterWithRTL == YesOrNo.YES && state == JudgmentState.ISSUED ? JudgmentRTLStatus.ISSUED.getRtlState() : null;
     }
 
     private JudgmentInstalmentDetails getInstalmentDetails(CaseData caseData) {

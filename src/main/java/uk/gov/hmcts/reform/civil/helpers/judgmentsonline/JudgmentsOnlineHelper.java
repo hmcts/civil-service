@@ -28,10 +28,10 @@ public class JudgmentsOnlineHelper {
 
     public static String getRTLStatusBasedOnJudgementStatus(JudgmentStatusType judgmentStatus) {
         switch (judgmentStatus) {
-            case ISSUED : return JudgmentRTLStatus.REGISTRATION.getRtlState();
-            case MODIFIED: return JudgmentRTLStatus.MODIFIED.getRtlState();
-            case CANCELLED, SET_ASIDE: return JudgmentRTLStatus.CANCELLATION.getRtlState();
-            case SATISFIED: return JudgmentRTLStatus.SATISFACTION.getRtlState();
+            case ISSUED : return JudgmentRTLStatus.ISSUED.getRtlState();
+            case MODIFIED: return JudgmentRTLStatus.MODIFIED_EXISTING.getRtlState();
+            case CANCELLED, SET_ASIDE: return JudgmentRTLStatus.CANCELLED.getRtlState();
+            case SATISFIED: return JudgmentRTLStatus.SATISFIED.getRtlState();
             default: return "";
         }
     }

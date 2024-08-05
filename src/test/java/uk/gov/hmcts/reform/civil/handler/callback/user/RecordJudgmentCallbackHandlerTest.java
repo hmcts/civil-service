@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.RecordJudgmentOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -127,6 +128,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Check Active Judgment
             assertThat(response.getData().get("activeJudgment")).isNotNull();
             assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("ISSUED");
+            assertThat(response.getData().get("activeJudgment")).extracting("rtlState").isEqualTo(JudgmentRTLStatus.ISSUED.getRtlState());
             assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo("JUDGMENT_FOLLOWING_HEARING");
             assertThat(response.getData().get("activeJudgment")).extracting("judgmentId").isEqualTo(1);
             assertThat(response.getData().get("activeJudgment")).extracting("isRegisterWithRTL").isEqualTo("Yes");
@@ -162,6 +164,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData().get("activeJudgment")).isNotNull();
             assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("ISSUED");
+            assertThat(response.getData().get("activeJudgment")).extracting("rtlState").isEqualTo(JudgmentRTLStatus.ISSUED.getRtlState());
             assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo("JUDGMENT_FOLLOWING_HEARING");
             assertThat(response.getData().get("activeJudgment")).extracting("judgmentId").isEqualTo(1);
             assertThat(response.getData().get("activeJudgment")).extracting("isRegisterWithRTL").isEqualTo("Yes");
@@ -196,6 +199,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData().get("activeJudgment")).isNotNull();
             assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("ISSUED");
+            assertThat(response.getData().get("activeJudgment")).extracting("rtlState").isEqualTo(JudgmentRTLStatus.ISSUED.getRtlState());
             assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo("JUDGMENT_FOLLOWING_HEARING");
             assertThat(response.getData().get("activeJudgment")).extracting("judgmentId").isEqualTo(1);
             assertThat(response.getData().get("activeJudgment")).extracting("isRegisterWithRTL").isEqualTo("Yes");
@@ -218,6 +222,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData().get("joIssuedDate")).isNull();
+            assertThat(response.getData().get("activeJudgment")).extracting("rtlState").isEqualTo(null);
         }
     }
 
