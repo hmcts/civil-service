@@ -249,6 +249,16 @@ public class DashboardNotificationsParamsMapper {
         return params;
     }
 
+    public Map<String, Object> mapCaseDataToParams(CaseData caseData, CaseEvent caseEvent) {
+
+        Map<String, Object> params = mapCaseDataToParams(caseData);
+        String orderDocumentUrl = addToMapDocumentInfo(caseData, caseEvent);
+        if (nonNull(orderDocumentUrl)) {
+            params.put(ORDER_DOCUMENT, orderDocumentUrl);
+        }
+        return params;
+    }
+
     private static String getStringPaymentMessageInWelsh(PaymentFrequency paymentFrequency, String amount) {
         BigDecimal convertedAmount = MonetaryConversions.penniesToPounds(new BigDecimal(amount));
 
@@ -262,16 +272,6 @@ public class DashboardNotificationsParamsMapper {
     private static String getStringPaymentMessage(PaymentFrequency paymentFrequency, String amount) {
         return "in " + getStringPaymentFrequency(paymentFrequency) + " instalments of £"
             + MonetaryConversions.penniesToPounds(new BigDecimal(amount));
-    }
-
-    public Map<String, Object> mapCaseDataToParams(CaseData caseData, CaseEvent caseEvent) {
-
-        Map<String, Object> params = mapCaseDataToParams(caseData);
-        String orderDocumentUrl = addToMapDocumentInfo(caseData, caseEvent);
-        if (nonNull(orderDocumentUrl)) {
-            params.put(ORDER_DOCUMENT, orderDocumentUrl);
-        }
-        return params;
     }
 
     private static String getStringPaymentFrequency(PaymentFrequency paymentFrequency) {
@@ -410,7 +410,6 @@ public class DashboardNotificationsParamsMapper {
         }
 
         JudgmentInstalmentDetails instalmentDetails = caseData.getJoInstalmentDetails();
-        String paymentFrecuencyString = getStringPaymentFrequency(instalmentDetails.getPaymentFrequency());
 
         if (PaymentPlanSelection.PAY_IN_INSTALMENTS.equals(paymentPlanType) && EN.equals(language)) {
             paymentFrequencyMessage.append("You must pay the claim amount of £")
