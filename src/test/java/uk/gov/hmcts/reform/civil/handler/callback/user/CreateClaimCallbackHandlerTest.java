@@ -213,6 +213,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     class MidEventApplicantCallback {
 
         private static final String PAGE_ID = "applicant";
+
         @BeforeEach
         void setUp() {
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
@@ -275,7 +276,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Nested
-        class applicant1DetailsValidation {
+        class Applicant1DetailsValidation {
+
             @Test
             void shouldReturnError_whenAddressLongerThanMaxLength() {
                 // Given
@@ -468,7 +470,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Nested
-        class applicant2DetailsValidation {
+        class Applicant2DetailsValidation {
+
             @Test
             void shouldReturnError_whenAddressLongerThanMaxLength() {
                 // Given
