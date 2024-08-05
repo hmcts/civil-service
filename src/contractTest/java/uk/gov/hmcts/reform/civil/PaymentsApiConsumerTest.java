@@ -26,7 +26,7 @@ import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonBody;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-@PactTestFor(providerName = "payments_api")
+@PactTestFor(providerName = "payment_api")
 @MockServerConfig(hostInterface = "localhost", port = "6670")
 @TestPropertySource(properties = "payments.api.url=http://localhost:6670")
 public class PaymentsApiConsumerTest extends BaseContractTest {
