@@ -47,15 +47,16 @@ public class ClaimantDefaultJudgementScenarioTest extends DashboardBaseIntegrati
                                "of the judgment. <br> Once they do, you should <a href=\"{CONFIRM_YOU_HAVE_BEEN_PAID_URL}\" class=\"govuk-link\">" +
                                "confirm that they’ve paid you the full amount that you’re owed</a>.<br>If they do not pay you by the date on the judgment, " +
                                "you can <u>ask for enforcement action to be taken against them</u>. <br>If you need to change the terms of payment within the judgment, " +
-                               "such as the instalments you had previously agreed, you can <a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to vary the judgment</a>.</p>"),
-                jsonPath("$[0].titleCy").value("Cais am Ddyfarniad Llys Sirol (CCJ) wedi’i wneud"),
+                               "such as the instalments you had previously agreed, you can <a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">" +
+                               "make an application to vary the judgment</a>.</p>"),
+                jsonPath("$[0].titleCy").value("Mae dyfarniad wedi’i wneud yn erbyn y diffynnydd"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Byddwn yn prosesu eich cais ac yn anfon copi o’r dyfarniad drwy’r post atoch chi a "
-                        + ". Fe ymdrechwn at wneud hyn cyn gynted â phosibl.</p>"
-                        + "<p class=\"govuk-body\">Ni fydd eich cyfrif ar-lein yn cael ei ddiweddaru, ac ni fydd "
-                        + " yn gallu ymateb i’ch hawliad ar-lein mwyach. Byddwch yn cael eich hysbysu drwy’r post am unrhyw ddiweddariadau pellach.</p>"
-                        + "<p class=\"govuk-body\">Os derbynnir ymateb drwy’r post cyn cyhoeddi’r dyfarniad, bydd eich cais yn cael ei wrthod.</p>"
-                        + "<p class=\"govuk-body\"><a href=\"{enforceJudgementUrl}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gwybodaeth am y camau y gallwch eu cymryd yn dilyn cyhoeddi CCJ (yn agor mewn tab newydd)</a>.</p>")
+                    "<p class=\"govuk-body\">Dylai’r diffynnydd eich talu yn unol â thelerau’r dyfarniad. " +
+                        "<br> Unwaith y byddant yn gwneud hynny, dylech <a href=\"{CONFIRM_YOU_HAVE_BEEN_PAID_URL}\" class=\"govuk-link\">" +
+                        "gadarnhau eu bod wedi talu’r swm llawn sy’n ddyledus i chi</a>.<br>Os na fyddant yn eich talu erbyn y dyddiad ar y dyfarniad, gallwch " +
+                        "<u>ofyn am gymryd camau  gorfodi yn eu herbyn</u>." +
+                        " <br>Os oes arnoch angen newid y telerau talu o fewn y dyfarniad, fel y rhandaliadau roeddech wedi cytuno arnynt yn flaenorol, gallwch " +
+                        "<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">wneud cais i amrywio’r dyfarniad</a>.</p>")
             );
     }
 }
