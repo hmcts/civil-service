@@ -39,6 +39,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.DEFENDANT;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseName;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 
@@ -127,7 +130,27 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
                                                   .build());
         }
 
-        OrgPolicyUtils.addMissingOrgPolicies(caseDataBuilder);
+        if (caseData.getRespondent1OrganisationPolicy() == null) {
+            caseDataBuilder
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE.getFormattedName())
+                                                   .build());
+        }
+        if (caseData.getRespondent2OrganisationPolicy() == null) {
+            caseDataBuilder
+                .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName())
+                                                   .build());
+        }
+
+        if(featureToggleService.isLipVLipEnabled() && caseData.isLipvLipOneVOne()){
+            caseDataBuilder
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .orgPolicyCaseAssignedRole(DEFENDANT.getFormattedName())
+                                                   .build());
+        }
+
+
     }
 
     private void setUpHelpWithFees(CaseData.CaseDataBuilder caseDataBuilder) {
