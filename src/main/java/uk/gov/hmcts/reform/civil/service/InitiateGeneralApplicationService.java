@@ -381,7 +381,7 @@ public class InitiateGeneralApplicationService {
 
     private Pair<CaseLocationCivil, Boolean> getWorkAllocationLocationBeforeSdo(CaseData caseData, String authToken) {
         List<CaseEventDetail> caseEventDetails = coreCaseEventDataService.getEventsForCase(caseData.getCcdCaseReference().toString());
-        List <String> currentEvents = caseEventDetails.stream().map(CaseEventDetail::getId).toList();
+        List<String> currentEvents = caseEventDetails.stream().map(CaseEventDetail::getId).toList();
         CaseLocationCivil courtLocation;
         if (currentEvents.contains(TRANSFER_ONLINE_CASE.name())) {
             courtLocation = assignCaseManagementLocationToMainCaseLocation(caseData, authToken);
@@ -412,13 +412,12 @@ public class InitiateGeneralApplicationService {
         }
     }
 
-    private CaseLocationCivil assignCaseManagementLocationToMainCaseLocation (CaseData caseData, String authToken) {
+    private CaseLocationCivil assignCaseManagementLocationToMainCaseLocation(CaseData caseData, String authToken) {
         LocationRefData caseManagementLocationDetails;
         List<LocationRefData>  locationRefDataList = locationRefDataService.getHearingCourtLocations(authToken);
         var foundLocations = locationRefDataList.stream()
             .filter(location -> location.getEpimmsId().equals(caseData.getCaseManagementLocation().getBaseLocation())).toList();
         if (!foundLocations.isEmpty()) {
-            System.out.println("FOUND LOCATIONS " + foundLocations.get(0) );
             caseManagementLocationDetails = foundLocations.get(0);
         } else {
             throw new IllegalArgumentException("Base Court Location for General applications not found, in location data");
