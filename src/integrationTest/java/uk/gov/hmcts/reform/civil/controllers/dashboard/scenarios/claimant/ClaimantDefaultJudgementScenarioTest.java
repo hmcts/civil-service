@@ -52,8 +52,10 @@ public class ClaimantDefaultJudgementScenarioTest extends DashboardBaseIntegrati
                 jsonPath("$[0].descriptionCy")
                     .value("<p class=\"govuk-body\">Dylai’r diffynnydd eich talu yn unol â thelerau’r dyfarniad. " +
                                "<br> Unwaith y byddant yn gwneud hynny, dylech <a href=\"{CONFIRM_YOU_HAVE_BEEN_PAID_URL}\" class=\"govuk-link\">" +
-                               "gadarnhau eu bod wedi talu’r swm llawn sy’n ddyledus i chi</a>.<br>Os na fyddant yn eich talu erbyn y dyddiad ar y dyfarniad, gallwch <u>ofyn am gymryd camau  gorfodi yn eu herbyn</u>." +
-                               " <br>Os oes arnoch angen newid y telerau talu o fewn y dyfarniad, fel y rhandaliadau roeddech wedi cytuno arnynt yn flaenorol, gallwch" +
+                               "gadarnhau eu bod wedi talu’r swm llawn sy’n ddyledus i chi</a>." +
+                               "<br>Os na fyddant yn eich talu erbyn y dyddiad ar y dyfarniad, gallwch <u>ofyn am gymryd camau  gorfodi yn eu herbyn</u>." +
+                               " <br>Os oes arnoch angen newid y telerau talu o fewn y dyfarniad," +
+                               " fel y rhandaliadau roeddech wedi cytuno arnynt yn flaenorol, gallwch" +
                                " <a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">wneud cais i amrywio’r dyfarniad</a>.</p>")
             );
     }
