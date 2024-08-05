@@ -34,11 +34,6 @@ values ('<a href={VIEW_MEDIATION_SETTLEMENT_AGREEMENT} class="govuk-link">View m
   '<a>Ychwanegu trefniadau''r treial</a>',
   'Gwrandawiad', 'Hearing.Arrangements.Add', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 10),
 
-('<a>Pay the hearing fee</a>',
-  'Hearing',
-  '<a>Talu ffi''r gwrandawiad</a>',
-  'Gwrandawiad', 'Hearing.Fee.Pay', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 11),
-
 ('<a>View the bundle</a>',
   'Hearing',
   '<a>Gweld y bwndel</a>',
