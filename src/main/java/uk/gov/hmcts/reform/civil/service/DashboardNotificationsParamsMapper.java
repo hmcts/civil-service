@@ -413,7 +413,7 @@ public class DashboardNotificationsParamsMapper {
         String paymentFrecuencyString = getStringPaymentFrequency(instalmentDetails.getPaymentFrequency());
 
         if (PaymentPlanSelection.PAY_IN_INSTALMENTS.equals(paymentPlanType) && EN.equals(language)) {
-            paymentFrequencyMessage.append("You must pay the claim amount of £ ")
+            paymentFrequencyMessage.append("You must pay the claim amount of £")
                 .append(MonetaryConversions.penniesToPounds(totalAmount).toString())
                 .append(" ")
                 .append(getStringPaymentMessage(instalmentDetails.getPaymentFrequency(), instalmentDetails.getAmount()))
@@ -421,7 +421,7 @@ public class DashboardNotificationsParamsMapper {
                 .append(instalmentDetails.getStartDate())
                 .append(".");
         } else {
-            paymentFrequencyMessage.append("Rhaid i chi dalu swm yr hawliad, sef £ ")
+            paymentFrequencyMessage.append("Rhaid i chi dalu swm yr hawliad, sef £")
                 .append(MonetaryConversions.penniesToPounds(totalAmount).toString())
                 .append(" ")
                 .append(getStringPaymentMessageInWelsh(instalmentDetails.getPaymentFrequency(), instalmentDetails.getAmount()))
