@@ -40,8 +40,6 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
 
         JudgmentDetails activeJudgment = super.addUpdateActiveJudgment(caseData);
         activeJudgment = super.updateDefendantDetails(activeJudgment, caseData);
-        JudgmentState judgmentState = getJudgmentState(caseData);
-        YesOrNo isRegisterWithRTL = isNonDivergent ? YesOrNo.YES : YesOrNo.NO;
         return activeJudgment.toBuilder()
             .createdTimestamp(LocalDateTime.now())
             .state(getJudgmentState(caseData))
@@ -52,7 +50,7 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
                              .build())
             .instalmentDetails(paymentPlan.equals(PaymentPlanSelection.PAY_IN_INSTALMENTS)
                                    ? getInstalmentDetails(caseData) : null)
-            .isRegisterWithRTL(isRegisterWithRTL)
+            .isRegisterWithRTL(isNonDivergent ? YesOrNo.YES : YesOrNo.NO)
             .issueDate(LocalDate.now())
             .orderedAmount(orderAmount.toString())
             .costs(costs.toString())

@@ -37,10 +37,7 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
         isNonDivergent =  JudgmentsOnlineHelper.isNonDivergentForDJ(caseData);
         JudgmentDetails activeJudgment = super.addUpdateActiveJudgment(caseData);
         activeJudgment = super.updateDefendantDetails(activeJudgment, caseData);
-        JudgmentState judgmentState = getJudgmentState(caseData);
-        YesOrNo isRegisterWithRTL = isNonDivergent ? YesOrNo.YES : YesOrNo.NO;
         return activeJudgment.toBuilder()
-            .defendant1Name(caseData.getRespondent1().getPartyName())
             .createdTimestamp(LocalDateTime.now())
             .state(getJudgmentState(caseData))
             .type(JudgmentType.DEFAULT_JUDGMENT)

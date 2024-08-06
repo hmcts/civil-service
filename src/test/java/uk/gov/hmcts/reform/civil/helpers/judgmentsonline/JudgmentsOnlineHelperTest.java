@@ -31,19 +31,6 @@ public class JudgmentsOnlineHelperTest {
         + " already paid \n£100.00\n ## Total still owed \n £1072.00";
 
     @Test
-    void test_getRTLStatusBasedOnJudgementStatus() {
-        assertThat(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.ISSUED)).isEqualTo("R");
-        assertThat(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.MODIFIED)).isEqualTo(
-            "M");
-        assertThat(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.CANCELLED)).isEqualTo(
-            "C");
-        assertThat(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.SET_ASIDE)).isEqualTo(
-            "C");
-        assertThat(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.SATISFIED)).isEqualTo(
-            "S");
-    }
-
-    @Test
     void test_validateIfFutureDate() {
         assertThat(JudgmentsOnlineHelper.validateIfFutureDate(LocalDate.now())).isFalse();
         assertThat(JudgmentsOnlineHelper.validateIfFutureDate(LocalDate.now().minusDays(3))).isFalse();

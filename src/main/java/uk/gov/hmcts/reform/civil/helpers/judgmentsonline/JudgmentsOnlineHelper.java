@@ -26,16 +26,6 @@ public class JudgmentsOnlineHelper {
     private JudgmentsOnlineHelper() {
     }
 
-    public static String getRTLStatusBasedOnJudgementStatus(JudgmentStatusType judgmentStatus) {
-        switch (judgmentStatus) {
-            case ISSUED : return JudgmentRTLStatus.ISSUED.getRtlState();
-            case MODIFIED: return JudgmentRTLStatus.MODIFIED_EXISTING.getRtlState();
-            case CANCELLED, SET_ASIDE: return JudgmentRTLStatus.CANCELLED.getRtlState();
-            case SATISFIED: return JudgmentRTLStatus.SATISFIED.getRtlState();
-            default: return "";
-        }
-    }
-
     public static boolean validateIfFutureDate(LocalDate date) {
         LocalDate today = LocalDate.now();
         return date.isAfter(today);
