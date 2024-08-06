@@ -21,7 +21,6 @@ public class NotificationService {
         String reference
     ) {
         try {
-            System.out.println("*****" + emailTemplate + "*******");
             notificationClient.sendEmail(emailTemplate, targetEmail, parameters, reference);
         } catch (NotificationClientException e) {
             log.info("Notification Service error {}", e.getMessage());
