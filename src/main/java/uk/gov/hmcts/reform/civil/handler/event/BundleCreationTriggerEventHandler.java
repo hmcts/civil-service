@@ -61,7 +61,7 @@ public class BundleCreationTriggerEventHandler {
         coreCaseDataService.triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION);
     }
 
-    IdValue<Bundle> prepareNewBundle(uk.gov.hmcts.reform.civil.model.bundle.Bundle bundle, CaseData caseData) {
+    public IdValue<Bundle> prepareNewBundle(uk.gov.hmcts.reform.civil.model.bundle.Bundle bundle, CaseData caseData) {
         Bundle result = Bundle.builder()
             .bundleHearingDate(Optional.of(caseData.getHearingDate()))
             .stitchedDocument(Optional.ofNullable(bundle.getValue().getStitchedDocument()))
