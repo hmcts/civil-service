@@ -250,7 +250,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private CallbackResponse validateRespondent2Details(CallbackParams callbackParams) {
         Party respondent2 = callbackParams.getCaseData().getRespondent2();
         List<String> errors = new ArrayList<>();
-        if(respondent2 != null) {
+        if (respondent2 != null) {
             validatePartyDetails(respondent2, errors);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
