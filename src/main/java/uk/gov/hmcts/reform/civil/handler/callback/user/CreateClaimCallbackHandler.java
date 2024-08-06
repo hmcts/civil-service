@@ -145,8 +145,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final AssignCategoryId assignCategoryId;
     private final CaseFlagsInitialiser caseFlagInitialiser;
     private final ToggleConfiguration toggleConfiguration;
-    private final String caseDocLocation = "/cases/case-details/%s#CaseDocuments";
     private final PartyValidator partyValidator;
+    private final String caseDocLocation = "/cases/case-details/%s#CaseDocuments";
 
     @Value("${court-location.unspecified-claim.region-id}")
     private String regionId;
@@ -244,11 +244,14 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     private CallbackResponse validateRespondent2Details(CallbackParams callbackParams) {
-        Party respondent = callbackParams.getCaseData().getRespondent2();
+        Party respondent2 = callbackParams.getCaseData().getRespondent2();
         List<String> errors = new ArrayList<>();
-        validatePartyDetails(respondent, errors);
-
-        return AboutToStartOrSubmitCallbackResponse.builder().errors(errors).build();
+        if (respondent2 != null) {
+            validatePartyDetails(respondent2, errors);
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
     }
 
     private List<String> validatePartyDetails(Party party, List<String> errors) {
