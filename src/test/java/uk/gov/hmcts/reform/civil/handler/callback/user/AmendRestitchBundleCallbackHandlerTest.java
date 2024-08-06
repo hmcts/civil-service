@@ -30,10 +30,10 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.bundle.BundleCreationService;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,8 +42,8 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_RESTITCH_BUNDLE;
 
 @ExtendWith(MockitoExtension.class)
 class AmendRestitchBundleCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -109,13 +109,13 @@ class AmendRestitchBundleCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class Mid {
+    class AboutToSubmit {
 
         @Test
         void shouldReturnNoError_WhenMidIsInvoked() {
             when(featureToggleService.isCaseEventsEnabled()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build();
-            CallbackParams params = callbackParamsOf(caseData, MID, MID_PAGE_ID);
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -147,26 +147,15 @@ class AmendRestitchBundleCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(bundleCreationService.createBundle(anyLong())).thenReturn(bundleCreateResponse);
             when(bundleCreationTriggerEventHandler.prepareNewBundle(any(), any())).thenAnswer(x -> packedBundle);
 
-            CallbackParams params = callbackParamsOf(caseData, MID, MID_PAGE_ID);
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             List<IdValue<Bundle>> actualData = mapper.convertValue(response.getData().get("caseBundles"), new TypeReference<List<IdValue<Bundle>>>() {});
             assertThat(actualData.get(1).getValue()).isEqualTo(packedBundle.getValue());
         }
 
-    }
-
-    @Nested
-    class AboutToSubmit {
-
         @Test
-        void shouldReturnNoError_WhenAboutToSubmitIsInvoked() {
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateDecisionOutcome().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseDetails).build();
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response.getErrors()).isNull();
+        void handleEventsReturnsTheExpectedCallbackEvent() {
+            assertThat(handler.handledEvents()).contains(AMEND_RESTITCH_BUNDLE);
         }
     }
 
