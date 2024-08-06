@@ -7,8 +7,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -55,6 +57,13 @@ class JudgmentByAdmissionMapperTest {
                                       .build())
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
             .ccjPaymentDetails(ccjPaymentDetails)
+            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL)
+                             .individualTitle("Mr")
+                             .individualFirstName("James")
+                             .individualLastName("Carver")
+                             .individualDateOfBirth(LocalDate.of(1988, 12, 12))
+                             .primaryAddress(Address.builder().addressLine1("Test address here").build())
+                             .build())
             .build();
         JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
 
@@ -97,6 +106,13 @@ class JudgmentByAdmissionMapperTest {
                                           .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
                                           .build())
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL)
+                             .individualTitle("Mr")
+                             .individualFirstName("James")
+                             .individualLastName("Carver")
+                             .individualDateOfBirth(LocalDate.of(1988, 12, 12))
+                             .primaryAddress(Address.builder().addressLine1("Test address here").build())
+                             .build())
             .ccjPaymentDetails(ccjPaymentDetails)
             .build();
         JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
