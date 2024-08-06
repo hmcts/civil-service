@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-public class MediationCSVLrvLrServiceTest {
+class MediationCSVLrvLrServiceTest {
 
     @InjectMocks
     private MediationCSVLrvLrService service;
@@ -97,6 +97,7 @@ public class MediationCSVLrvLrServiceTest {
             .totalClaimAmount(new BigDecimal(TOTAL_AMOUNT))
             .applicant1(applicantParty)
             .respondent1(respondentParty)
+            .caseNamePublic(applicantParty.getPartyName().concat(" v ").concat(respondentParty.getPartyName()))
             .applicant1OrganisationPolicy(OrganisationPolicy.builder()
                                               .organisation(Organisation.builder().organisationID(APP_LR_ORG_ID).build())
                                               .build())
@@ -124,7 +125,10 @@ public class MediationCSVLrvLrServiceTest {
         String result = service.generateCSVContent(caseData);
 
         // Then
-        assertContainsDetails(result, LR_APPLICANT_COMPANY_NAME, LR_APPLICANT_COMPANY_EMAIL, LR_APPLICANT_COMPANY_NUMBER);
+        assertContainsDetails(result, LR_APPLICANT_COMPANY_NAME,
+                              LR_APPLICANT_COMPANY_EMAIL,
+                              LR_APPLICANT_COMPANY_NUMBER,
+                              APPLICANT_COMPANY_NAME.concat(" v ").concat(RESPONDENT_COMPANY_NAME));
     }
 
     @Test
