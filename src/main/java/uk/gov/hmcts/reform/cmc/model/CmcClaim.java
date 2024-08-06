@@ -472,7 +472,8 @@ public class CmcClaim implements Claim {
     public boolean isPaymentPlanRejected() {
 
         return (hasResponse() && (response.isPartAdmit() || response.isFullAdmit())
-            && (response.getPaymentIntention().isPayByDate() || response.getPaymentIntention().isPayByInstallments()));
+            && (response.getPaymentIntention() != null
+            && (response.getPaymentIntention().isPayByDate() || response.getPaymentIntention().isPayByInstallments())));
     }
 
     @Override
@@ -558,7 +559,12 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public boolean isCaseStruckOut() { 
-        return false; 
+    public boolean isCaseStruckOut() {
+        return false;
+    }
+
+    @Override
+    public boolean isDefaultJudgementIssued() {
+        return false;
     }
 }

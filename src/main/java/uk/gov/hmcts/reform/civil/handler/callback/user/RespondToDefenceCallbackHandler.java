@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
-import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -195,11 +194,6 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             .build();
     }
 
-    private boolean bothApplicantDecidesToProceedWithClaim2v1(CaseData caseData) {
-        return YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
-            && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
-    }
-
     private boolean anyApplicantDecidesToProceedWithClaim(CaseData caseData) {
         return YES.equals(caseData.getApplicant1ProceedWithClaim())
             || YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
@@ -258,36 +252,13 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         );
 
         // When a case has been transferred, we do not update the location using claimant/defendant preferred location logic
-        if (featureToggleService.isNationalRolloutEnabled()) {
-            if (notTransferredOnline(caseData)) {
-                updateCaseManagementLocation(callbackParams, builder);
-            }
-        } else {
+        if (notTransferredOnline(caseData)) {
             updateCaseManagementLocation(callbackParams, builder);
         }
 
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         if (multiPartyScenario == TWO_V_ONE) {
             builder.applicant2ResponseDate(currentTime);
-            if (bothApplicantDecidesToProceedWithClaim2v1(caseData)
-                && caseData.getApplicant1DQ() != null
-                && caseData.getApplicant1DQ().getApplicant1DQFixedRecoverableCostsIntermediate() != null) {
-
-                if (caseData.getApplicant2DQ() == null
-                    || caseData.getApplicant2DQ().getApplicant2DQFixedRecoverableCostsIntermediate() == null) {
-                    FixedRecoverableCosts app1Frc = caseData.getApplicant1DQ().getApplicant1DQFixedRecoverableCostsIntermediate();
-
-                    builder.applicant2DQ(Applicant2DQ.builder().applicant2DQFixedRecoverableCostsIntermediate(
-                            FixedRecoverableCosts.builder()
-                                .isSubjectToFixedRecoverableCostRegime(app1Frc.getIsSubjectToFixedRecoverableCostRegime())
-                                .complexityBandingAgreed(app1Frc.getComplexityBandingAgreed())
-                                .band(app1Frc.getBand())
-                                .reasons(app1Frc.getReasons())
-                                .frcSupportingDocument(app1Frc.getFrcSupportingDocument())
-                                .build())
-                             .build());
-                }
-            }
         }
 
         if (anyApplicantDecidesToProceedWithClaim(caseData)) {

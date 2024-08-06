@@ -12,9 +12,10 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.helpers.settlediscontinue.DiscontinueClaimHelper;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
+import uk.gov.hmcts.reform.civil.helpers.settlediscontinue.DiscontinueClaimHelper;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 
@@ -196,8 +197,15 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.businessProcess(BusinessProcess.ready(DISCONTINUE_CLAIM_CLAIMANT));
+        if (MultiPartyScenario.isTwoVOne(caseData)) {
+            caseDataBuilder.selectedClaimantForDiscontinuance(caseData.getClaimantWhoIsDiscontinuing()
+                                                                  .getValue().getLabel());
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .state(updateCaseState(caseData))
+                .data(caseDataBuilder.build().toMap(objectMapper))
                 .build();
     }
 
@@ -220,4 +228,5 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
     public List<CaseEvent> handledEvents() {
         return EVENTS;
     }
+
 }

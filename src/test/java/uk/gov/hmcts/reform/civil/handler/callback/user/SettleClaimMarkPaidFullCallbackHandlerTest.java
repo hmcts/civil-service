@@ -2,11 +2,11 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -27,17 +27,19 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARKED_PAID_IN_FULL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARK_PAID_FULL;
 
-@SpringBootTest(classes = {
-    SettleClaimMarkPaidFullCallbackHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
     private SettleClaimMarkPaidFullCallbackHandler handler;
 
-    @Autowired
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper;
+
+    @BeforeEach
+    void setup() {
+        objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        handler = new SettleClaimMarkPaidFullCallbackHandler(objectMapper);
+    }
+
     public static final String REQUEST_BEING_REVIEWED_NEXT_STEPS = """
             ### Next step
 
