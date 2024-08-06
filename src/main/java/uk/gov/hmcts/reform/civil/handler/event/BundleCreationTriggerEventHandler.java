@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Bundle;
@@ -47,18 +48,28 @@ public class BundleCreationTriggerEventHandler {
     @EventListener
     public void sendBundleCreationTrigger(BundleCreationTriggerEvent event) {
         BundleCreateResponse bundleCreateResponse = bundleCreationService.createBundle(event);
-
         String caseId = event.getCaseId().toString();
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, CREATE_BUNDLE);
         CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails().getData());
 
-        List<IdValue<Bundle>> caseBundles = caseData.getCaseBundles();
-        caseBundles.addAll(bundleCreateResponse.getData().getCaseBundles()
-                               .stream().map(bundle -> prepareNewBundle(bundle, caseData)
-            ).toList());
-        CaseDataContent caseContent = prepareCaseContent(caseBundles, startEventResponse);
-        coreCaseDataService.submitUpdate(caseId, caseContent);
-        coreCaseDataService.triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION);
+        YesOrNo hasBundleErrors = (bundleCreateResponse.getErrors() != null && !bundleCreateResponse.getErrors().isEmpty())
+            ? YesOrNo.YES : YesOrNo.NO;
+        caseData = caseData.toBuilder().bundleError(YesOrNo.YES).build();
+
+        CaseDataContent caseContent;
+        if (hasBundleErrors == YesOrNo.NO) {
+            List<IdValue<Bundle>> caseBundles = new ArrayList<>(caseData.getCaseBundles());
+            CaseData finalCaseData = caseData;
+            caseBundles.addAll(bundleCreateResponse.getData().getCaseBundles()
+                                   .stream().map(bundle -> prepareNewBundle(bundle, finalCaseData)).toList());
+
+            caseContent = prepareCaseContent(caseBundles, startEventResponse);
+            coreCaseDataService.submitUpdate(caseId, caseContent);
+            coreCaseDataService.triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION);
+        } else {
+            caseContent = prepareCaseContent(caseData.getCaseBundles(), startEventResponse);
+            coreCaseDataService.submitUpdate(caseId, caseContent);
+        }
     }
 
     public IdValue<Bundle> prepareNewBundle(uk.gov.hmcts.reform.civil.model.bundle.Bundle bundle, CaseData caseData) {
