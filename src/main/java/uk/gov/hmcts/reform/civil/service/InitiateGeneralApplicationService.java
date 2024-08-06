@@ -387,7 +387,7 @@ public class InitiateGeneralApplicationService {
                 .address(caseManagementLocationDetails.getCourtAddress())
                 .postcode(caseManagementLocationDetails.getPostcode())
                 .build();
-            return Pair.of(courtLocation, true);
+            return Pair.of(courtLocation, false);
 
         } else {
             return getWorkAllocationLocationBeforeSdo(caseData, authToken);
