@@ -373,7 +373,7 @@ public class InitiateGeneralApplicationService {
 
     public Pair<CaseLocationCivil, Boolean> getWorkAllocationLocation(CaseData caseData, String authToken) {
         if (hasSDOBeenMade(caseData.getCcdState())) {
-            return Pair.of(assignCaseManagementLocationToMainCaseLocation(caseData, authToken), true);
+            return Pair.of(assignCaseManagementLocationToMainCaseLocation(caseData, authToken), false);
         } else {
             return getWorkAllocationLocationBeforeSdo(caseData, authToken);
         }
