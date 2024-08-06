@@ -142,13 +142,12 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
                                                    .build());
         }
 
-        if(featureToggleService.isLipVLipEnabled() && caseData.isLipvLipOneVOne()){
+        if (featureToggleService.isLipVLipEnabled() && caseData.isLipvLipOneVOne()) {
             caseDataBuilder
                 .respondent1OrganisationPolicy(OrganisationPolicy.builder()
                                                    .orgPolicyCaseAssignedRole(DEFENDANT.getFormattedName())
                                                    .build());
         }
-
 
     }
 
