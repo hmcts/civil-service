@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
@@ -43,13 +42,12 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
         return activeJudgment.toBuilder()
             .defendant1Name(caseData.getRespondent1().getPartyName())
             .createdTimestamp(LocalDateTime.now())
-            .state(judgmentState)
-            .rtlState(getRtlState(isRegisterWithRTL, judgmentState))
+            .state(getJudgmentState(caseData))
             .type(JudgmentType.DEFAULT_JUDGMENT)
             .instalmentDetails(DJPaymentTypeSelection.REPAYMENT_PLAN.equals(caseData.getPaymentTypeSelection())
                                    ? getInstalmentDetails(caseData) : null)
             .paymentPlan(getPaymentPlan(caseData))
-            .isRegisterWithRTL(isRegisterWithRTL)
+            .isRegisterWithRTL(isNonDivergent ? YesOrNo.YES : YesOrNo.NO)
             .issueDate(LocalDate.now())
             .orderedAmount(orderAmount.toString())
             .costs(costs.toString())
@@ -60,10 +58,6 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
     @Override
     protected JudgmentState getJudgmentState(CaseData caseData) {
         return isNonDivergent ? JudgmentState.ISSUED : JudgmentState.REQUESTED;
-    }
-
-    protected String getRtlState(YesOrNo isRegisterWithRTL, JudgmentState state) {
-        return isRegisterWithRTL == YesOrNo.YES && state == JudgmentState.ISSUED ? JudgmentRTLStatus.ISSUED.getRtlState() : null;
     }
 
     private JudgmentInstalmentDetails getInstalmentDetails(CaseData caseData) {

@@ -14,12 +14,10 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentPaidInFullOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -68,10 +66,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPopulateDate() {
             //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
-            caseData.setActiveJudgment(JudgmentDetails.builder()
-                                           .issueDate(LocalDate.now())
-                                           .isRegisterWithRTL(YesOrNo.YES)
-                                           .build());
+            caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now()).build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -83,7 +78,6 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData().get("activeJudgment")).isNotNull();
             assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("SATISFIED");
-            assertThat(response.getData().get("activeJudgment")).extracting("rtlState").isEqualTo(JudgmentRTLStatus.SATISFIED.getRtlState());
             assertThat(response.getData().get("activeJudgment")).extracting("fullyPaymentMadeDate").isEqualTo(LocalDate.now().plusDays(35).toString());
         }
 
@@ -99,7 +93,6 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Then: judgmentOnline fields should be set correctly
 
             assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("dateOfFullPaymentMade").isEqualTo(LocalDate.now().plusDays(35).toString());
-            assertThat(response.getData().get("activeJudgment")).extracting("rtlState").isEqualTo(null);
             assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("confirmFullPaymentMade").isEqualTo(List.of("CONFIRMED"));
             assertThat(response.getData().get("joIsLiveJudgmentExists")).isEqualTo("No");
 

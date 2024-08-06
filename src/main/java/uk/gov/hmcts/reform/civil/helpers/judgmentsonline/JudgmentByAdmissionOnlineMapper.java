@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
@@ -45,8 +44,7 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
         YesOrNo isRegisterWithRTL = isNonDivergent ? YesOrNo.YES : YesOrNo.NO;
         return activeJudgment.toBuilder()
             .createdTimestamp(LocalDateTime.now())
-            .state(judgmentState)
-            .rtlState(getRtlState(isRegisterWithRTL, judgmentState))
+            .state(getJudgmentState(caseData))
             .type(JudgmentType.JUDGMENT_BY_ADMISSION)
             .paymentPlan(JudgmentPaymentPlan.builder()
                              .type(paymentPlan)
@@ -77,9 +75,6 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
     @Override
     protected JudgmentState getJudgmentState(CaseData caseData) {
         return isNonDivergent ? JudgmentState.ISSUED : JudgmentState.REQUESTED;
-    }
-    protected String getRtlState(YesOrNo isRegisterWithRTL, JudgmentState state) {
-        return isRegisterWithRTL == YesOrNo.YES && state == JudgmentState.ISSUED ? JudgmentRTLStatus.ISSUED.getRtlState() : null;
     }
 
     private BigDecimal getValue(BigDecimal value) {

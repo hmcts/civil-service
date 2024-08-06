@@ -3,10 +3,8 @@ package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
@@ -23,10 +21,8 @@ public class SetAsideJudgmentOnlineMapper extends JudgmentOnlineMapper {
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
 
         JudgmentDetails activeJudgment = caseData.getActiveJudgment();
-        YesOrNo isRegisteredWithRTL = activeJudgment.getIsRegisterWithRTL();
         return activeJudgment.toBuilder()
             .state(getJudgmentState(caseData))
-            .rtlState(getRtlState(isRegisteredWithRTL))
             .setAsideDate(getSetAsideDate(caseData))
             .lastUpdateTimeStamp(LocalDateTime.now())
             .cancelledTimeStamp(LocalDateTime.now())
@@ -36,10 +32,6 @@ public class SetAsideJudgmentOnlineMapper extends JudgmentOnlineMapper {
     protected JudgmentState getJudgmentState(CaseData caseData) {
         return JudgmentSetAsideReason.JUDGE_ORDER
             .equals(caseData.getJoSetAsideReason()) ? JudgmentState.SET_ASIDE : JudgmentState.SET_ASIDE_ERROR;
-    }
-
-    protected String getRtlState(YesOrNo isRegisterWithRTL) {
-        return isRegisterWithRTL == YesOrNo.YES ? JudgmentRTLStatus.SET_ASIDE.getRtlState() : null;
     }
 
     private LocalDate getSetAsideDate(CaseData caseData) {

@@ -106,7 +106,7 @@ public class EditJudgmentsOnlineMapperTest {
         caseData.setJoJudgmentRecordReason(null);
         caseData.setJoAmountOrdered(caseData.getActiveJudgment().getOrderedAmount());
         caseData.setJoAmountCostOrdered(caseData.getActiveJudgment().getCosts());
-        caseData.setJoIsRegisteredWithRTL(caseData.getActiveJudgment().getIsRegisterWithRTL());
+        caseData.setJoIsRegisteredWithRTL(YesOrNo.YES);
         caseData.setJoIssuedDate(caseData.getActiveJudgment().getIssueDate());
 
         JudgmentDetails activeJudgment = editJudgmentOnlineMapper.addUpdateActiveJudgment(caseData);
