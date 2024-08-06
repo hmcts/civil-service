@@ -578,6 +578,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length() {
             // Given
+            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant2(Party.builder().type(Party.Type.INDIVIDUAL)
                                 .primaryAddress(Address.builder()
@@ -603,6 +605,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length_in_Company_name() {
             // Given
+            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant2(Party.builder()
                                 .type(Party.Type.COMPANY)
@@ -622,6 +626,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length_in_Individual_name() {
             // Given
+            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant2(Party.builder()
                                 .type(Party.Type.INDIVIDUAL)
@@ -642,6 +648,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length_in_sole_trader_name() {
             // Given
+            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant2(Party.builder()
                                 .type(Party.Type.SOLE_TRADER)
@@ -662,6 +670,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length_in_org_name() {
             // Given
+            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant2(Party.builder()
                                 .type(Party.Type.ORGANISATION)
