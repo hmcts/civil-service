@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASH
 import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -99,7 +100,7 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
             return SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT.getScenario();
         } else if (isLrvLipFullDefenceNotProceed(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario();
-        } else if (caseData.getCcdState() == CASE_DISMISSED) {
+        } else if (caseData.getCcdState() == CASE_STAYED && caseData.hasApplicantNotProceededWithClaim() && isRespondentResponseFullDefenceFullDispute(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_DEFENDANT.getScenario();
         }
         return null;
@@ -209,5 +210,10 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
             && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
             && NO.equals(caseData.getApplicant1ProceedWithClaim())
             && HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired());
+    }
+
+    private boolean isRespondentResponseFullDefenceFullDispute(CaseData caseData) {
+        return caseData.isRespondentResponseFullDefence()
+            && caseData.isClaimBeingDisputed();
     }
 }

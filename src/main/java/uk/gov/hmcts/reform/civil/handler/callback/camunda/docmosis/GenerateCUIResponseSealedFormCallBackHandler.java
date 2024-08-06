@@ -76,7 +76,7 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                 ));
         assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, DocCategory.DEF1_DEFENSE_DQ.getValue());
 
-        if (stitchEnabled && caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
+        if (false && caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
             if (documentMetaDataList.size() > 1) {
                 CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(

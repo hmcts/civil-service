@@ -51,6 +51,8 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_CLAIMANT_CARM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_CLAIMANT;
@@ -342,7 +344,7 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void configureDashboardNotificationsForFullDisputeFullDefenceCaseDismissed() {
+    void configureDashboardNotificationsForFullDisputeFullDefenceCaseStayed() {
 
         HashMap<String, Object> params = new HashMap<>();
         when(mapper.mapCaseDataToParams(any())).thenReturn(params);
@@ -350,9 +352,10 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
-            .ccdState(CaseState.CASE_DISMISSED)
-            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
-            .specRespondent1Represented(YesOrNo.NO)
+            .ccdState(CaseState.CASE_STAYED)
+            .applicant1ProceedWithClaim(YesOrNo.NO)
+            .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
+            .defenceRouteRequired(DISPUTES_THE_CLAIM)
             .respondent1Represented(YesOrNo.NO)
             .build();
 

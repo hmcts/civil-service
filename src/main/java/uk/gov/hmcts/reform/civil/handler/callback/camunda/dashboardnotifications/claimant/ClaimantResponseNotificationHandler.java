@@ -17,6 +17,7 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_CLAIMANT;
@@ -67,7 +68,7 @@ public class ClaimantResponseNotificationHandler extends DashboardCallbackHandle
             return SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT.getScenario();
         } else if (hasClaimantRejectedCourtDecision(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_JUDGE_PLAN_REQUESTED_CCJ_CLAIMANT.getScenario();
-        } else if (caseData.getCcdState() == CASE_DISMISSED) {
+        } else if (caseData.getCcdState() == CASE_STAYED && caseData.hasApplicantNotProceededWithClaim() && isRespondentResponseFullDefenceFullDispute(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_CLAIMANT.getScenario();
         }
 
@@ -95,4 +96,10 @@ public class ClaimantResponseNotificationHandler extends DashboardCallbackHandle
     private boolean isCarmApplicableForMediation(CaseData caseData) {
         return getFeatureToggleService().isCarmEnabledForCase(caseData);
     }
+
+    private boolean isRespondentResponseFullDefenceFullDispute(CaseData caseData) {
+        return caseData.isRespondentResponseFullDefence()
+            && caseData.isClaimBeingDisputed();
+    }
+
 }

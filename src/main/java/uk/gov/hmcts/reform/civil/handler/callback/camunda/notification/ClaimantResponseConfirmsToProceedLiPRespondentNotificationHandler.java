@@ -53,7 +53,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
             notificationService.sendMail(
                 shouldSendEmailToDefendantLR ? caseData.getRespondentSolicitor1EmailAddress() : caseData.getRespondent1().getPartyEmail(),
                 shouldSendEmailToDefendantLR ? notificationsProperties.getNotifyDefendantLRForMediation()
-                    : notificationsProperties.getRespondent1LipClaimUpdatedTemplate(),
+                    : getRespondent1LipEmailTemplate(caseData),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
@@ -65,6 +65,10 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
         return Objects.nonNull(caseData.getRespondent1().getPartyEmail())
             && (!caseData.isClaimantBilingual()
             || NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC.name().equals(eventId));
+    }
+
+    private String getRespondent1LipEmailTemplate(CaseData caseData) {
+        return caseData.isRespondentResponseBilingual() ? notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded() : notificationsProperties.getRespondent1LipClaimUpdatedTemplate();
     }
 
     @Override

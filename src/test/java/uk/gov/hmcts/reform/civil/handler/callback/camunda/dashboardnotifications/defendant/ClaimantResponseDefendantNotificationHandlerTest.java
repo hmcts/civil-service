@@ -866,7 +866,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    void configureDashboardNotificationsForFullDisputeFullDefenceCaseDismissed() {
+    void configureDashboardNotificationsForFullDisputeFullDefenceCaseStayed() {
 
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
@@ -874,9 +874,11 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
-            .ccdState(CaseState.CASE_DISMISSED)
-            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
+            .ccdState(CaseState.CASE_STAYED)
+            .applicant1ProceedWithClaim(YesOrNo.NO)
             .specRespondent1Represented(YesOrNo.NO)
+            .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
+            .defenceRouteRequired(DISPUTES_THE_CLAIM)
             .respondent1Represented(YesOrNo.NO)
             .build();
 

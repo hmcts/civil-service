@@ -2,7 +2,7 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA6.ClaimantIntent.ClaimantEndsClaim.Defendant', '{"Notice.AAA6.DefResponse.FullDefence.FullDispute.RefusedMediation.Defendant","Notice.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Defendant","Notice.AAA6.DefResponse.FullDefence.FullDispute.FastTrack.Defendant"}',
+VALUES ('Scenario.AAA6.ClaimantIntent.ClaimantEndsClaim.Defendant', '{"Notice.AAA6.DefResponse.FullDefence.FullDispute.RefusedMediation.Defendant","Notice.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Defendant","Notice.AAA6.DefResponse.FullDefence.FullDispute.FastTrack.Defendant","Notice.AAA6.DefResponse.FullDefence.FullDispute.Multi.Int.Fast.Defendant"}',
         '{"Notice.AAA6.ClaimantIntent.ClaimantEndsClaim.Defendant" : ["applicant1PartyName"]}');
 
 /**
