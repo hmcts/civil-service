@@ -54,6 +54,7 @@ import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.OrgPolicyValidator;
+import uk.gov.hmcts.reform.civil.validation.PartyValidator;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ParticularsOfClaimValidator;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -145,6 +146,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final CaseFlagsInitialiser caseFlagInitialiser;
     private final ToggleConfiguration toggleConfiguration;
     private final String caseDocLocation = "/cases/case-details/%s#CaseDocuments";
+    private final PartyValidator partyValidator;
 
     @Value("${court-location.unspecified-claim.region-id}")
     private String regionId;
@@ -156,13 +158,15 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(MID, "start-claim"), this::startClaim)
-            .put(callbackKey(MID, "applicant"), this::validateApplicant1DateOfBirth)
-            .put(callbackKey(MID, "applicant2"), this::validateApplicant2DateOfBirth)
+            .put(callbackKey(MID, "applicant"), this::validateApplicant1Details)
+            .put(callbackKey(MID, "applicant2"), this::validateApplicant2Details)
             .put(callbackKey(MID, "fee"), this::calculateFee)
             .put(callbackKey(MID, "idam-email"), this::getIdamEmail)
             .put(callbackKey(MID, "setRespondent2SameLegalRepresentativeToNo"), this::setRespondent2SameLegalRepToNo)
             .put(callbackKey(MID, "validate-defendant-legal-rep-email"), this::validateRespondentRepEmail)
             .put(callbackKey(MID, "validate-claimant-legal-rep-email"), this::validateClaimantRepEmail)
+            .put(callbackKey(MID, "respondent1"), this::validateRespondent1Details)
+            .put(callbackKey(MID, "respondent2"), this::validateRespondent2Details)
             .put(callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaim)
             .put(callbackKey(MID, "appOrgPolicy"), this::validateApplicantSolicitorOrgPolicy)
             .put(callbackKey(MID, "repOrgPolicy"), this::validateRespondentSolicitorOrgPolicy)
@@ -215,22 +219,47 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }
 
-    private CallbackResponse validateApplicant1DateOfBirth(CallbackParams callbackParams) {
+    private CallbackResponse validateApplicant1Details(CallbackParams callbackParams) {
         Party applicant = callbackParams.getCaseData().getApplicant1();
         List<String> errors = dateOfBirthValidator.validate(applicant);
-
+        validatePartyDetails(applicant, errors);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
     }
 
-    private CallbackResponse validateApplicant2DateOfBirth(CallbackParams callbackParams) {
+    private CallbackResponse validateApplicant2Details(CallbackParams callbackParams) {
         Party applicant = callbackParams.getCaseData().getApplicant2();
         List<String> errors = dateOfBirthValidator.validate(applicant);
+        validatePartyDetails(applicant, errors);
+        return AboutToStartOrSubmitCallbackResponse.builder().errors(errors).build();
+    }
 
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
+    private CallbackResponse validateRespondent1Details(CallbackParams callbackParams) {
+        Party respondent = callbackParams.getCaseData().getRespondent1();
+        List<String> errors = new ArrayList<>();
+        validatePartyDetails(respondent, errors);
+
+        return AboutToStartOrSubmitCallbackResponse.builder().errors(errors).build();
+    }
+
+    private CallbackResponse validateRespondent2Details(CallbackParams callbackParams) {
+        Party respondent = callbackParams.getCaseData().getRespondent2();
+        List<String> errors = new ArrayList<>();
+        validatePartyDetails(respondent, errors);
+
+        return AboutToStartOrSubmitCallbackResponse.builder().errors(errors).build();
+    }
+
+    private List<String> validatePartyDetails(Party party, List<String> errors) {
+        if (toggleService.isJudgmentOnlineLive()) {
+            if (party.getPrimaryAddress() != null) {
+                partyValidator.validateAddress(party.getPrimaryAddress(), errors);
+            }
+            partyValidator.validateName(party.getPartyName(), errors);
+        }
+
+        return errors;
     }
 
     private CallbackResponse validateApplicantSolicitorOrgPolicy(CallbackParams callbackParams) {
