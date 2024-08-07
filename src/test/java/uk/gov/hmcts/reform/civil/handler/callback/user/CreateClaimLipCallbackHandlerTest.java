@@ -216,5 +216,28 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("claimType")
                 .isEqualTo(ClaimType.FLIGHT_DELAY.name());
         }
+
+        @Test
+        void shouldSetOrganisationPolicies_whenLiPvsLiPInvoked() {
+            //Given
+            given(toggleService.isLipVLipEnabled()).willReturn(true);
+            caseData = CaseDataBuilder.builder()
+                .respondent1(Party.builder()
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .partyName(DEFENDANT_PARTY_NAME)
+                                 .partyEmail(DEFENDANT_EMAIL_ADDRESS).build())
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .build();
+            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
+                .build();
+            //When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
+            //Then
+            assertThat(response.getData())
+                .extracting("respondent1OrganisationPolicy.OrgPolicyCaseAssignedRole")
+                .isEqualTo("[DEFENDANT]");
+        }
     }
 }
