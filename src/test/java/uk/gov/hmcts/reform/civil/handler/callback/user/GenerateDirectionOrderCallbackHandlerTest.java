@@ -30,11 +30,14 @@ import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingNotes;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.finalorders.AppealChoiceSecondDropdown;
 import uk.gov.hmcts.reform.civil.model.finalorders.AppealGrantedRefused;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderReasons;
+import uk.gov.hmcts.reform.civil.model.finalorders.CaseHearingLengthElement;
 import uk.gov.hmcts.reform.civil.model.finalorders.ClaimantAndDefendantHeard;
 import uk.gov.hmcts.reform.civil.model.finalorders.DatesFinalOrders;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderAppeal;
@@ -80,6 +83,7 @@ import static uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersDefendantRe
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.BODY_1_V_1;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.BODY_1_V_2;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.BODY_2_V_1;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.FURTHER_HEARING_OTHER_ALT_LOCATION;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.HEADER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -736,7 +740,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, MID, PAGE_ID));
             // Then
-            assertThat(response.getErrors().get(0)).isEqualTo(expectedErrorMessage);;
+            assertThat(response.getErrors().get(0)).isEqualTo(expectedErrorMessage);
         }
 
         static Stream<Arguments> invalidJudgeHeardFrom() {
@@ -809,6 +813,29 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     "Judge Heard from: 'Claimant(s) and defendant(s)' section for second claimant, requires a selection to be made"
                 )
             );
+        }
+
+        @Test
+        void shouldReturnErrorNoAlternateCourtSelected_onMidEventCallback() {
+            // Given
+            DynamicList hearingLocation = DynamicList.builder().value(DynamicListElement.builder().code("OTHER_LOCATION").build()).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW))
+                .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder()
+                                                     .lengthList(HearingLengthFinalOrderList.OTHER)
+                                                     .lengthListOther(CaseHearingLengthElement.builder().lengthListOtherDays("one").build())
+                                                     .hearingLocationList(hearingLocation)
+                                                     .alternativeHearingList(null)
+                                                     .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When
+            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, MID, PAGE_ID));
+            // Then
+            assertThat(response.getErrors().get(0)).isEqualTo(FURTHER_HEARING_OTHER_ALT_LOCATION);
         }
     }
 
