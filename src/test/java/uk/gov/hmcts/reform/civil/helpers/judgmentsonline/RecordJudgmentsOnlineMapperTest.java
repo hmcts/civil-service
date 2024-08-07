@@ -62,7 +62,6 @@ public class RecordJudgmentsOnlineMapperTest {
         assertNotNull(activeJudgment.getDefendant1Address());
         assertNotNull(activeJudgment.getDefendant1Dob());
 
-
     }
 
     @Test
