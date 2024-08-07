@@ -11,8 +11,8 @@ plugins {
   id 'org.sonarqube' version '5.1.0.4882'
   id 'au.com.dius.pact' version '4.2.14'
   id "io.freefair.lombok" version "8.6"
-  id 'com.github.hmcts.rse-cft-lib' version '0.19.1334'
-  id "org.flywaydb.flyway" version "10.16.0"
+  id 'com.github.hmcts.rse-cft-lib' version '0.19.1335'
+  id "org.flywaydb.flyway" version "10.17.0"
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -27,7 +27,7 @@ def versions = [
   springSecurity    : '5.8.13',
   camunda           : '7.20.0',
   jackson           : '2.17.2',
-  testcontainers    : '1.20.0'
+  testcontainers    : '1.20.1'
 ]
 
 allprojects {
@@ -121,7 +121,7 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.765'
+        version: '1.12.767'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
@@ -296,7 +296,7 @@ sonarqube {
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
     property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/request/servlet/** , **/controllers/**, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**, **/service/PaymentsService.java, **/DashboardWithParamsCallbackHandler.java, **/advice/**"
     property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java, **/*CcdDashboardClaimantClaimMatcher.java, **/*CcdDashboardDefendantClaimMatcher.java"
-    property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**"
+    property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**, **/notification/NotifyClaimantAmendRestitchBundleHandler.java, **/notification/NotifyDefendantAmendRestitchBundleHandler.java"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
     property "sonar.web.javaOpts", "-Xmx2G"
   }
@@ -359,7 +359,7 @@ dependencies {
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.3'
   implementation group: 'javax.persistence', name: 'javax.persistence-api'
 
-  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.45.2'
+  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.45.3'
   implementation group: 'org.jdbi', name: 'jdbi3-spring4', version: '3.19.0'
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
@@ -385,7 +385,7 @@ dependencies {
     exclude group: 'java-logging', module: ' java-logging'
   }
   implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
-  implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.1.0-RELEASE'
+  implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.2.0-RELEASE'
   implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.1'
   implementation group: 'com.sendgrid', name: 'sendgrid-java', version: '4.10.2'
 
@@ -411,7 +411,7 @@ dependencies {
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.91'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.23'
-  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.22'
+  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.23'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.1'
 
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: versions.jackson
