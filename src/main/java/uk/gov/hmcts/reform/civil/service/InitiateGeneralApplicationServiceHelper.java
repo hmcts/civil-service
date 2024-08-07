@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRole;
 import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAParties;
@@ -27,6 +26,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static org.apache.logging.log4j.util.Strings.EMPTY;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -122,7 +122,7 @@ public class InitiateGeneralApplicationServiceHelper {
         applicationBuilder
             .parentClaimantIsApplicant(isGAApplicantSameAsParentCaseClaimant
                                            ? YES
-                                           : YesOrNo.NO).build();
+                                           : NO).build();
         checkLipUrgency(isGaAppSameAsParentCaseClLip, applicationBuilder, caseData);
         return applicationBuilder.build();
     }
@@ -139,6 +139,12 @@ public class InitiateGeneralApplicationServiceHelper {
                             .generalAppUrgency(YES)
                             .urgentAppConsiderationDate(caseData.getHearingDate())
                             .reasonsForUrgency(LIP_URGENT_REASON).build());
+        } else if (caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented()) {
+            applicationBuilder.generalAppUrgencyRequirement(
+                GAUrgencyRequirement
+                    .builder()
+                    .generalAppUrgency(NO)
+                    .build());
         }
     }
 
