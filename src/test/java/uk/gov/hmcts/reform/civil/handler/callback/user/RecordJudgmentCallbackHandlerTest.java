@@ -270,7 +270,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData().get("joIssuedDate")).isNull();
-            assertThat(response.getData().get("activeJudgment")).extracting("rtlState").isEqualTo(null);
+            assertThat(response.getData().get("activeJudgment")).extracting("rtlState").isNull();
         }
     }
 

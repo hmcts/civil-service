@@ -88,11 +88,11 @@ class DefaultJudgmentsOnlineMapperTest {
         assertEquals(YesOrNo.YES, activeJudgment.getIsJointJudgment());
         assertEquals(1, activeJudgment.getJudgmentId());
         assertEquals("Mr. John Rambo", activeJudgment.getDefendant1Name());
-        assertEquals(activeJudgment.getDefendant2Name(), "Mr. John Rambo");
-        assertEquals(activeJudgment.getDefendant1Name(), "Mr. John Rambo");
+        assertEquals("Mr. John Rambo", activeJudgment.getDefendant2Name());
         assertNotNull(activeJudgment.getDefendant1Address());
         assertNotNull(activeJudgment.getDefendant2Address());
         assertNotNull(activeJudgment.getDefendant1Dob());
+        assertNotNull(activeJudgment.getDefendant2Dob());
 
     }
 
