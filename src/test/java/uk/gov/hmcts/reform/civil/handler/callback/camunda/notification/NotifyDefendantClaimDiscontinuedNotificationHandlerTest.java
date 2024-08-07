@@ -30,11 +30,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DISCONTINUANCE_DEFENDANT1;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 
 @SpringBootTest(classes = {
     NotifyDefendantClaimDiscontinuedNotificationHandler.class,
@@ -66,7 +64,7 @@ class NotifyDefendantClaimDiscontinuedNotificationHandlerTest extends BaseCallba
         void setup() {
             when(notificationsProperties.getNotifyClaimDiscontinuedLRTemplate()).thenReturn(
                 TEMPLATE_ID);
-            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(
+            when(notificationsProperties.getNotifyClaimDiscontinuedLipTemplate()).thenReturn(
                 TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
@@ -129,9 +127,8 @@ class NotifyDefendantClaimDiscontinuedNotificationHandlerTest extends BaseCallba
 
     private Map<String, String> getNotificationLipDataMap(CaseData caseData) {
         return Map.of(
-            CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            PARTY_NAME, caseData.getRespondent1().getPartyName()
+            RESPONDENT_NAME, caseData.getRespondent1().getPartyName()
         );
     }
 
