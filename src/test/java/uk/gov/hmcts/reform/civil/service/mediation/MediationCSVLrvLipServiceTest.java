@@ -22,7 +22,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-public class MediationCSVLrvLipServiceTest {
+class MediationCSVLrvLipServiceTest {
 
     @InjectMocks
     private MediationCSVLrvLipService service;
@@ -49,8 +49,10 @@ public class MediationCSVLrvLipServiceTest {
     private static final String RESPONDENT = "2";
     private static final String APPLICANT = "1";
 
+    private static final String CASE_TITLE = "Applicant company name".concat(" v ").concat(RESPONDENT_INDIVIDUAL_FIRST_NAME);
+
     private void assertCSVContent(String result, String partyId, String partyName, String partyPhoneNumber, String partyEmailAddress) {
-        assertThat(result).contains(ID, partyId, partyName, partyPhoneNumber, partyEmailAddress, TOTAL_AMOUNT);
+        assertThat(result).contains(ID, partyId, partyName, partyPhoneNumber, partyEmailAddress, TOTAL_AMOUNT, CASE_TITLE);
     }
 
     private Party buildParty(Party.Type partyType, String companyName, String phoneNumber, String emailAddress,
@@ -82,6 +84,7 @@ public class MediationCSVLrvLipServiceTest {
                                               .build())
             .applicantSolicitor1ClaimStatementOfTruth(StatementOfTruth.builder().name(LR_COMPANY_NAME).build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(LR_COMPANY_EMAIL).build())
+            .caseNamePublic(CASE_TITLE)
             .build();
     }
 
