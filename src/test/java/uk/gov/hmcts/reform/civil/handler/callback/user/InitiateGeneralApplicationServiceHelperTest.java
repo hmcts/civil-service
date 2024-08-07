@@ -836,6 +836,47 @@ public class InitiateGeneralApplicationServiceHelperTest {
         }
 
         @Test
+        void should_Non_Urgency_Lip_Vs_Lip_At_25th() {
+            CaseData.CaseDataBuilder caseDataBuilder =
+                getTestCaseData(CaseData.builder().build(), false, 25).toBuilder();
+            caseDataBuilder.addRespondent2(YesOrNo.NO)
+                .addApplicant2(YesOrNo.NO)
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                                                  .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
+                                                  .build())
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE
+                                                                                  .getFormattedName())
+                                                   .build())
+                .ccdCaseReference(12L)
+                .respondent1(Party.builder()
+                                 .partyID("party")
+                                 .partyEmail("party@gmail.com")
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .individualFirstName("defF").build())
+                .claimantUserDetails(IdamUserDetails.builder().id(CL_LIP_USER_ID).email("partyemail@gmail.com").build())
+                .defendantUserDetails(IdamUserDetails.builder().id(DEF_LIP_USER_ID).email("partyemail@gmail.com")
+                                          .build())
+                .applicant1Represented(NO);
+            when(caseAssignmentApi.getUserRoles(any(), any(), eq(List.of("12"))))
+                .thenReturn(CaseAssignmentUserRolesResource.builder()
+                                .caseAssignmentUserRoles(getCaseUsersForLipVLip()).build());
+
+            CaseData caseData = caseDataBuilder.build();
+            GeneralApplication result = helper
+                .setRespondentDetailsIfPresent(
+                    GeneralApplication.builder().build(),
+                    caseData,
+                    getUserDetails(CL_LIP_USER_ID, APPLICANT_EMAIL_ID_CONSTANT)
+                );
+
+            assertThat(result).isNotNull();
+            assertThat(result.getGeneralAppUrgencyRequirement()).isNotNull();
+            assertThat(result.getGeneralAppUrgencyRequirement().getGeneralAppUrgency())
+                .isEqualTo(NO);
+        }
+
+        @Test
         void shouldNotUrgency_Lip_Vs_Lip_at_11thDay() {
             CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, 11).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
@@ -867,7 +908,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                     );
 
             assertThat(result).isNotNull();
-            assertThat(result.getGeneralAppUrgencyRequirement()).isNull();
+            assertThat(result.getGeneralAppUrgencyRequirement()).isNotNull();
         }
 
     }
