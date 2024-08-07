@@ -82,11 +82,9 @@ public class AmendRestitchBundleCallbackHandler extends CallbackHandler {
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader("Placeholder")
-            .confirmationBody("Placeholder")
-            .build();
+            .confirmationHeader("# The bundle has been restitched\n\n## All parties have been notified")
+            // without this, there is no space between the return button and the green title
+            .confirmationBody("&nbsp;").build();
     }
 }
