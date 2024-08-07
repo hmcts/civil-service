@@ -216,8 +216,8 @@ class JudgmentByAdmissionMapperTest {
         assertEquals(PaymentPlanSelection.PAY_BY_DATE, activeJudgment.getPaymentPlan().getType());
         assertEquals(activeJudgment.getPaymentPlan().getPaymentDeadlineDate(), LocalDate.now().plusDays(5));
         assertEquals(null, activeJudgment.getInstalmentDetails());
-        assertEquals(activeJudgment.getDefendant1Name(), "Mr. John Rambo");
-        assertEquals(activeJudgment.getDefendant2Name(), "Mr. Sole Trader");
+        assertEquals("Mr. John Rambo", activeJudgment.getDefendant1Name());
+        assertEquals("Mr. Sole Trader", activeJudgment.getDefendant2Name());
         assertNotNull(activeJudgment.getDefendant1Address());
         assertNotNull(activeJudgment.getDefendant2Address());
         assertNotNull(activeJudgment.getDefendant1Dob());
