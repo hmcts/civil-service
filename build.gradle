@@ -143,7 +143,7 @@ allprojects {
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.9'
-      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.14.0"
+      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.15.0"
     }
   }
 
