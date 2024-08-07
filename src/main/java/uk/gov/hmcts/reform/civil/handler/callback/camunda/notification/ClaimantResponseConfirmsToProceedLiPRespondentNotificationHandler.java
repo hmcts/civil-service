@@ -68,8 +68,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
     }
 
     private String getRespondent1LipEmailTemplate(CaseData caseData) {
-        return caseData.isRespondentResponseBilingual()
-            ? notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()
+        return caseData.isRespondentResponseBilingual() ? notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()
             : notificationsProperties.getRespondent1LipClaimUpdatedTemplate();
     }
 
@@ -90,10 +89,15 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        if (shouldSendMediationNotificationDefendant1LRCarm(caseData, featureToggleService.isCarmEnabledForCase(caseData))) {
+        if (shouldSendMediationNotificationDefendant1LRCarm(
+            caseData,
+            featureToggleService.isCarmEnabledForCase(caseData)
+        )) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-                CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService)
+                CLAIM_REFERENCE_NUMBER,
+                caseData.getCcdCaseReference().toString(),
+                CLAIM_LEGAL_ORG_NAME_SPEC,
+                getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService)
             );
         }
         return Map.of(
