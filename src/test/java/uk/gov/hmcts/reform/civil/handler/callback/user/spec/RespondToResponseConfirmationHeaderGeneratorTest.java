@@ -1,12 +1,14 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.spec;
 
 import org.apache.commons.lang3.tuple.Pair;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.AcceptPartAdmitAndPaidConfHeader;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.AdmitNotProceedConfHeader;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.JudgmentByAdmissionConfHeader;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.PayImmediatelyHeader;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.AdmitProceedConfHeader;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.DefendNotProceedConfHeader;
@@ -57,7 +59,8 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             Pair.of(buildAcceptPartAdmitAndPaidCaseData(), AcceptPartAdmitAndPaidConfHeader.class),
             Pair.of(buildCaseDefendantWithOutMediationData(), RejectWithoutMediationConfHeader.class),
             Pair.of(buildCaseWithOutMediationFastTrackData(), RejectWithoutMediationConfHeader.class),
-            Pair.of(buildCaseClaimantWithOutMediationData(), RejectWithoutMediationConfHeader.class)
+            Pair.of(buildCaseClaimantWithOutMediationData(), RejectWithoutMediationConfHeader.class),
+            Pair.of(buildJudgmentSubmitProceedCaseDataAllFoi(), JudgmentByAdmissionConfHeader.class)
         );
     }
 
@@ -140,6 +143,14 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+            .build();
+    }
+
+    public static CaseData buildJudgmentSubmitProceedCaseDataAllFoi() {
+        return CaseData.builder()
+            .caseAccessCategory(SPEC_CLAIM)
+            .legacyCaseReference("claimNumber")
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .build();
     }
 

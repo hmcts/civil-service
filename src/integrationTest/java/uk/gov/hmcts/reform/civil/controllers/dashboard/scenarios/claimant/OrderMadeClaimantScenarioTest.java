@@ -132,12 +132,12 @@ public class OrderMadeClaimantScenarioTest extends DashboardBaseIntegrationTest 
             .andExpect(status().isOk())
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].titleEn").value("An order has been issued by the court."),
+                jsonPath("$[0].titleEn").value("An order has been issued by the court"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">Please follow instructions in the order and comply with the deadlines. " +
                         "Please send any documents to the court named in the order if required. " +
                         "The claim will now proceed offline, you will receive further updates by post.</p>"),
-                jsonPath("$[0].titleCy").value("Mae gorchymyn wedi’i gyhoeddi gan y llys."),
+                jsonPath("$[0].titleCy").value("Mae gorchymyn wedi’i gyhoeddi gan y llys"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Dilynwch y cyfarwyddiadau sydd yn y gorchymyn a chydymffurfiwch " +
                         "â’r dyddiadau terfyn. Anfonwch unrhyw ddogfennau i’r llys a enwir yn y gorchymyn os oes angen. " +
