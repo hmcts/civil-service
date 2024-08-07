@@ -162,8 +162,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmitCallback {
 
-        //private final LocalDateTime submittedDate = LocalDateTime.now();
-
         @BeforeEach
         void before() {
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
