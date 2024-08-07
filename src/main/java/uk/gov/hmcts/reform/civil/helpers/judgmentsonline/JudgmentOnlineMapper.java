@@ -53,11 +53,10 @@ public abstract class JudgmentOnlineMapper {
         activeJudgment.setDefendant1Name(caseData.getRespondent1().getPartyName());
         activeJudgment.setDefendant1Address(caseData.getRespondent1().getPrimaryAddress());
         activeJudgment.setDefendant1Dob(caseData.getRespondent1().getDateOfBirth());
-        if (caseData.isMultiPartyDefendant()) {
+        if (YesOrNo.YES == caseData.getAddRespondent2()) {
             activeJudgment.setDefendant2Name(caseData.getRespondent2().getPartyName());
             activeJudgment.setDefendant2Address(caseData.getRespondent2().getPrimaryAddress());
             activeJudgment.setDefendant2Dob(caseData.getRespondent2().getDateOfBirth());
-
         }
         return activeJudgment;
     }
