@@ -280,8 +280,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnError_whenIndividualDateOfBirthIsInTheFuture() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant2(PartyBuilder.builder().individual()
-                                .individualDateOfBirth(now().plusDays(1))
-                                .build())
+                    .individualDateOfBirth(now().plusDays(1))
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -294,8 +294,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnError_whenSoleTraderDateOfBirthIsInTheFuture() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant2(PartyBuilder.builder().individual()
-                                .soleTraderDateOfBirth(now().plusDays(1))
-                                .build())
+                    .soleTraderDateOfBirth(now().plusDays(1))
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -308,8 +308,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnNoError_whenIndividualDateOfBirthIsInThePast() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant2(PartyBuilder.builder().individual()
-                                .individualDateOfBirth(now().minusDays(1))
-                                .build())
+                    .individualDateOfBirth(now().minusDays(1))
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -322,8 +322,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnNoError_whenSoleTraderDateOfBirthIsInThePast() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant2(PartyBuilder.builder().individual()
-                                .soleTraderDateOfBirth(now().minusDays(1))
-                                .build())
+                    .soleTraderDateOfBirth(now().minusDays(1))
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
