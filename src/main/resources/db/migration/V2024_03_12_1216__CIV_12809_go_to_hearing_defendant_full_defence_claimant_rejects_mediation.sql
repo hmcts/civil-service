@@ -3,7 +3,7 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.NoMediation.Defendant',
-        '{"Notice.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Defendant"}',
+        '{"Notice.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Defendant", "Notice.AAA6.DefResponse.FullDefenceOrPartAdmin.AlreadyPaid.Defendant"}',
         '{"Notice.AAA6.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.NoMediation.Defendant":["applicant1PartyName"]}');
 
 /**
