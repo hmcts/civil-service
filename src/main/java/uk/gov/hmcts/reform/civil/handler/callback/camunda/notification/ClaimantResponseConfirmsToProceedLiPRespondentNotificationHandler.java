@@ -68,7 +68,9 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
     }
 
     private String getRespondent1LipEmailTemplate(CaseData caseData) {
-        return caseData.isRespondentResponseBilingual() ? notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded() : notificationsProperties.getRespondent1LipClaimUpdatedTemplate();
+        return caseData.isRespondentResponseBilingual()
+            ? notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()
+            : notificationsProperties.getRespondent1LipClaimUpdatedTemplate();
     }
 
     @Override
