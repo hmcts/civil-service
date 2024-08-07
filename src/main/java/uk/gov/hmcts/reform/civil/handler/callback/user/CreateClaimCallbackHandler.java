@@ -237,27 +237,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .build();
     }
 
-    private CallbackResponse validateRespondent1Details(CallbackParams callbackParams) {
-        Party respondent = callbackParams.getCaseData().getRespondent1();
-        List<String> errors = new ArrayList<>();
-        validatePartyDetails(respondent, errors);
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
-    }
-
-    private CallbackResponse validateRespondent2Details(CallbackParams callbackParams) {
-        Party respondent2 = callbackParams.getCaseData().getRespondent2();
-        List<String> errors = new ArrayList<>();
-        if (respondent2 != null) {
-            validatePartyDetails(respondent2, errors);
-        }
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
-    }
-
     private List<String> validatePartyDetails(Party party, List<String> errors) {
         if (toggleService.isJudgmentOnlineLive()) {
             if (party.getPrimaryAddress() != null) {
