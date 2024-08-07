@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-public class MediationCSVLipVLipServiceTest {
+class MediationCSVLipVLipServiceTest {
 
     @InjectMocks
     private MediationCSVLipVLipService service;
@@ -37,9 +37,10 @@ public class MediationCSVLipVLipServiceTest {
     private static final String ID = "123456789";
     private static final String RESPONDENT = "2";
     private static final String APPLICANT = "1";
+    private static final String CASE_TITLE = APPLICANT_INDIVIDUAL_FIRST_NAME.concat(" v ").concat(RESPONDENT_INDIVIDUAL_FIRST_NAME);
 
     private void assertCSVContent(String result, String partyId, String partyName, String partyPhoneNumber, String partyEmailAddress) {
-        assertThat(result).contains(ID, partyId, partyName, partyPhoneNumber, partyEmailAddress, TOTAL_AMOUNT);
+        assertThat(result).contains(ID, partyId, partyName, partyPhoneNumber, partyEmailAddress, TOTAL_AMOUNT, CASE_TITLE);
     }
 
     private Party buildParty(Party.Type partyType, String companyName, String phoneNumber, String emailAddress,
@@ -68,6 +69,7 @@ public class MediationCSVLipVLipServiceTest {
             .respondent1(buildParty(partyType, RESPONDENT_COMPANY_NAME, RESPONDENT_PHONE_NUMBER, RESPONDENT_EMAIL_ADDRESS,
                                     RESPONDENT_INDIVIDUAL_FIRST_NAME, RESPONDENT_INDIVIDUAL_LAST_NAME,
                                     RESPONDENT_SOLE_TRADER_FIRST_NAME, RESPONDENT_SOLE_TRADER_LAST_NAME, RESPONDENT_ORGANISATION_NAME))
+            .caseNamePublic(CASE_TITLE)
             .build();
     }
 
