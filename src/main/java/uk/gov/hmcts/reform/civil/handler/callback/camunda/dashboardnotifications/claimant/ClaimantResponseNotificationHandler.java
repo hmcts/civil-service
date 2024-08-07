@@ -67,7 +67,7 @@ public class ClaimantResponseNotificationHandler extends DashboardCallbackHandle
             return SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT.getScenario();
         } else if (hasClaimantRejectedCourtDecision(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_JUDGE_PLAN_REQUESTED_CCJ_CLAIMANT.getScenario();
-        } else if (caseData.getCcdState() == CASE_STAYED && caseData.hasApplicantNotProceededWithClaim() && isRespondentResponseFullDefenceFullDispute(caseData)) {
+        } else if (caseData.getCcdState() == CASE_STAYED && caseData.isClaimantDontWantToProceedWithFulLDefenceFD()) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_CLAIMANT.getScenario();
         }
 
@@ -95,10 +95,4 @@ public class ClaimantResponseNotificationHandler extends DashboardCallbackHandle
     private boolean isCarmApplicableForMediation(CaseData caseData) {
         return getFeatureToggleService().isCarmEnabledForCase(caseData);
     }
-
-    private boolean isRespondentResponseFullDefenceFullDispute(CaseData caseData) {
-        return caseData.isRespondentResponseFullDefence()
-            && caseData.isClaimBeingDisputed();
-    }
-
 }
