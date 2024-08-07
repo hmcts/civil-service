@@ -94,7 +94,7 @@ class NotifyApplicant1GenericTemplateHandlerTest {
 
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_NAME, "John Doe",
             CLAIMANT_V_DEFENDANT, "John Doe V Jack Jackson"
         );
