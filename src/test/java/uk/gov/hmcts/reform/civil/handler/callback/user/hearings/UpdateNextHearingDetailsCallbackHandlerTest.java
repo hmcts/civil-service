@@ -76,7 +76,6 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
             when(userConfig.getPassword()).thenReturn(mockSystemUserPassword);
             when(userService.getAccessToken(mockSystemUsername, mockSystemUserPassword))
                 .thenReturn("mock-token");
-            //when(datetime.now()).thenReturn(TODAY);
         }
 
         @Nested
