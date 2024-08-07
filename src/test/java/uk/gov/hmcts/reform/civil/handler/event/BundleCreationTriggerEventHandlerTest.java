@@ -235,7 +235,8 @@ class BundleCreationTriggerEventHandlerTest {
                                           .stitchStatus(Optional.of("NEW")).build()));
         // When: I call the prepareCaseContent method
         CaseDataContent caseDataContent = bundleCreationTriggerEventHandler.prepareCaseContent(caseBundles,
-                                                                                               startEventResponse);
+                                                                                               startEventResponse,YesOrNo.NO
+        );
         // Then: all fields are populated correctly
         Assertions.assertEquals("event1", caseDataContent.getEvent().getId());
         Assertions.assertEquals("123", caseDataContent.getEventToken());

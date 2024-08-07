@@ -58,16 +58,18 @@ public class BundleCreationTriggerEventHandler {
 
         CaseDataContent caseContent;
         if (hasBundleErrors == YesOrNo.NO) {
+            log.info("inside NO");
             List<IdValue<Bundle>> caseBundles = new ArrayList<>(caseData.getCaseBundles());
             CaseData finalCaseData = caseData;
             caseBundles.addAll(bundleCreateResponse.getData().getCaseBundles()
                                    .stream().map(bundle -> prepareNewBundle(bundle, finalCaseData)).toList());
 
-            caseContent = prepareCaseContent(caseBundles, startEventResponse);
+            caseContent = prepareCaseContent(caseBundles, startEventResponse, hasBundleErrors);
             coreCaseDataService.submitUpdate(caseId, caseContent);
             coreCaseDataService.triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION);
         } else {
-            caseContent = prepareCaseContent(caseData.getCaseBundles(), startEventResponse);
+            log.info("inside YES");
+            caseContent = prepareCaseContent(caseData.getCaseBundles(), startEventResponse, hasBundleErrors);
             coreCaseDataService.submitUpdate(caseId, caseContent);
         }
     }
@@ -86,13 +88,14 @@ public class BundleCreationTriggerEventHandler {
         return new IdValue<>(result.getId(), result);
     }
 
-    CaseDataContent prepareCaseContent(List<IdValue<Bundle>> caseBundles, StartEventResponse startEventResponse) {
+    CaseDataContent prepareCaseContent(List<IdValue<Bundle>> caseBundles, StartEventResponse startEventResponse, YesOrNo bundleError) {
         Map<String, Object> data = startEventResponse.getCaseDetails().getData();
         List<Element<UploadEvidenceDocumentType>> evidenceUploadedAfterBundle = new ArrayList<>();
         evidenceUploadedAfterBundle.add(ElementUtils.element(UploadEvidenceDocumentType.builder().build()));
         data.put("caseBundles", caseBundles);
         data.put("applicantDocsUploadedAfterBundle", evidenceUploadedAfterBundle);
         data.put("respondentDocsUploadedAfterBundle", evidenceUploadedAfterBundle);
+        data.put("bundleError", bundleError);
         return CaseDataContent.builder()
             .eventToken(startEventResponse.getToken())
             .event(Event.builder()
