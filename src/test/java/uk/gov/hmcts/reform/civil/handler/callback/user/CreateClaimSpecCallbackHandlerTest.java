@@ -1493,8 +1493,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                         .county("Line 1 test again for more than 35 characters")
                                                         .postCode("PostCode test more than 8 characters")
                                                         .postTown("Line 1 test again for more than 35 characters").build())
-                                    .build())
-                    .build();
+                                    .build()).build();
+
                 CallbackParams params = callbackParamsOf(caseData, MID, "respondent1" );
 
                 // When
@@ -1826,8 +1826,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .respondent1(Party.builder().type(Party.Type.ORGANISATION).organisationName("Line 1 test again for more than 70 characters on the company party name")
                                  .primaryAddress(AddressBuilder.defaults().build())
-                                 .build())
-                .build();
+                                 .build()).build();
+
             CallbackParams params = callbackParamsOf(caseData, MID, "respondent1" );
 
             // When
