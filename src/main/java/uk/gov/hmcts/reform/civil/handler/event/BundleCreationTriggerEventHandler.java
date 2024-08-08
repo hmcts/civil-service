@@ -57,6 +57,7 @@ public class BundleCreationTriggerEventHandler {
         caseData = caseData.toBuilder().bundleError(YesOrNo.YES).build();
 
         if (hasBundleErrors == YesOrNo.NO) {
+            log.info("inside if");
             List<IdValue<Bundle>> caseBundles = new ArrayList<>(caseData.getCaseBundles());
             CaseData finalCaseData = caseData;
             caseBundles.addAll(bundleCreateResponse.getData().getCaseBundles()
@@ -66,6 +67,7 @@ public class BundleCreationTriggerEventHandler {
             coreCaseDataService.submitUpdate(caseId, caseContent);
             coreCaseDataService.triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION);
         } else {
+            log.info("inside else");
             Map<String, Object> data = startEventResponse.getCaseDetails().getData();
             data.put("bundleError", hasBundleErrors);
             CaseDataContent caseDataContent = CaseDataContent.builder()
