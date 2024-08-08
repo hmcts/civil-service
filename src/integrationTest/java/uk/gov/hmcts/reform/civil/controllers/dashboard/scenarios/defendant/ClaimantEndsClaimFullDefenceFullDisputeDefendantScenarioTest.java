@@ -26,9 +26,9 @@ public class ClaimantEndsClaimFullDefenceFullDisputeDefendantScenarioTest extend
 
         String caseId = "12346789121";
 
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimantFullDefence().build()
+        CaseData caseData = CaseDataBuilder.builder().build()
             .toBuilder()
-            .applicant1(Party.builder().partyName("Mr Claimant person").type(Party.Type.INDIVIDUAL).build())
+            .applicant1(Party.builder().companyName("Test Company").type(Party.Type.COMPANY).build())
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(NO)
@@ -47,10 +47,10 @@ public class ClaimantEndsClaimFullDefenceFullDisputeDefendantScenarioTest extend
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("The claim has now ended"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">Mr Claimant person has decided not to proceed with the claim.</p>"),
+                    "<p class=\"govuk-body\">Test Company has decided not to proceed with the claim.</p>"),
                 jsonPath("$[0].titleCy").value("Mae’r hawliad wedi dod i ben"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Mae Mr Claimant person wedi penderfynu peidio â bwrw ymlaen gyda’r hawliad.</p>")
+                    "<p class=\"govuk-body\">Mae Test Company wedi penderfynu peidio â bwrw ymlaen gyda’r hawliad.</p>")
             );
     }
 }
