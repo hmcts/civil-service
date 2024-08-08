@@ -53,7 +53,7 @@ public class BundleCreationTriggerEventHandler {
         CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails().getData());
 
         /*YesOrNo hasBundleErrors = (bundleCreateResponse.getErrors() != null && !bundleCreateResponse.getErrors().isEmpty())
-            ? YesOrNo.YES : YesOrNo.NO;*/
+            ? YesOrNo.YES : null;*/
         YesOrNo hasBundleErrors = YesOrNo.YES;
         caseData = caseData.toBuilder().bundleError(hasBundleErrors).build();
 
@@ -69,15 +69,13 @@ public class BundleCreationTriggerEventHandler {
             coreCaseDataService.triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION);
         } else {
             log.info("inside else");
-            Map<String, Object> data = startEventResponse.getCaseDetails().getData();
-            data.put("bundleError", hasBundleErrors);
             CaseDataContent caseDataContent = CaseDataContent.builder()
                 .eventToken(startEventResponse.getToken())
                 .event(Event.builder()
                            .id(startEventResponse.getEventId())
                            .summary("bundle failed")
                            .build())
-                .data(data)
+                .data(caseData)
                 .build();
             coreCaseDataService.submitUpdate(caseId, caseDataContent);
         }
@@ -104,6 +102,7 @@ public class BundleCreationTriggerEventHandler {
         data.put("caseBundles", caseBundles);
         data.put("applicantDocsUploadedAfterBundle", evidenceUploadedAfterBundle);
         data.put("respondentDocsUploadedAfterBundle", evidenceUploadedAfterBundle);
+        data.put("bundleError", null);
         return CaseDataContent.builder()
             .eventToken(startEventResponse.getToken())
             .event(Event.builder()
