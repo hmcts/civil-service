@@ -754,7 +754,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .build();
     }
 
-
     private CallbackResponse validateCorrespondenceRespondentAddress(CallbackParams callbackParams,
                                                                      Function<CaseData, YesOrNo> required,
                                                                      Function<CaseData, Address> address) {
