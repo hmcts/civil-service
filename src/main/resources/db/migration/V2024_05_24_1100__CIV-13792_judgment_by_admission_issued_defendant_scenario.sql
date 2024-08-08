@@ -7,7 +7,7 @@ VALUES ('Scenario.AAA6.JudgmentsOnline.IssuedCCJ.Defendant',
           "Notice.AAA6.ClaimantIntent.RequestedCCJ.ClaimantAcceptedDefendantPlan.Defendant",
           "Notice.AAA6.ClaimantIntent.RequestCCJ.ClaimantAcceptOrRejectPlan.SettlementRequested.NoDefResponse.Defendant",
           "Notice.AAA6.ClaimantIntent.RequestCCJ.ClaimantAcceptOrRejectPlan.SettlementRequested.DefPaymentMissed.Defendant"}',
-        '{"Notice.AAA6.JudgmentsOnline.IssuedCCJ.Defendant": ["ccjDefendantAdmittedAmount", "ccjFirstRepaymentDateEn", "ccjFirstRepaymentDateCy", "ccjPaymentMessageEn", "ccjPaymentMessageCy"]}');
+        '{"Notice.AAA6.JudgmentsOnline.IssuedCCJ.Defendant": ["ccjDefendantAdmittedAmount", "ccjPaymentMessageEn", "ccjPaymentMessageCy"]}');
 
 /**
  * Add notification template

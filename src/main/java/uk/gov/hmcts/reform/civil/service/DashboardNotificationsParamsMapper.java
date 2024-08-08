@@ -450,18 +450,12 @@ public class DashboardNotificationsParamsMapper {
             paymentFrequencyMessage.append("You must pay the claim amount of £")
                 .append(MonetaryConversions.penniesToPounds(totalAmount).toString())
                 .append(" ")
-                .append(getStringPaymentMessage(instalmentDetails))
-                .append(". The first payment is due on ")
-                .append(DateUtils.formatDate(instalmentDetails.getStartDate()))
-                .append(".");
+                .append(getStringPaymentMessage(instalmentDetails));
         } else {
             paymentFrequencyMessage.append("Rhaid i chi dalu swm yr hawliad, sef £")
                 .append(MonetaryConversions.penniesToPounds(totalAmount).toString())
                 .append(" ")
-                .append(getStringPaymentMessageInWelsh(instalmentDetails))
-                .append(". Bydd y taliad cyntaf yn ddyledus ar ")
-                .append(DateUtils.formatDateInWelsh(instalmentDetails.getStartDate()))
-                .append(".");
+                .append(getStringPaymentMessageInWelsh(instalmentDetails));
         }
         return paymentFrequencyMessage;
     }
