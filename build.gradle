@@ -128,7 +128,7 @@ allprojects {
         entry 'aws-java-sdk-s3'
       }
 
-      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.26') {
+      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.28') {
         entry 'tomcat-embed-core'
         entry 'tomcat-embed-el'
         entry 'tomcat-embed-websocket'
@@ -143,7 +143,7 @@ allprojects {
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.9'
-      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.14.0"
+      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.15.0"
     }
   }
 
