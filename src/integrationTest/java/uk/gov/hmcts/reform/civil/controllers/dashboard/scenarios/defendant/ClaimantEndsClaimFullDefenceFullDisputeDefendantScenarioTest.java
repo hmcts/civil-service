@@ -31,6 +31,7 @@ public class ClaimantEndsClaimFullDefenceFullDisputeDefendantScenarioTest extend
             .applicant1(Party.builder().partyName("Mr Claimant person").type(Party.Type.INDIVIDUAL).build())
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
+            .respondent1Represented(NO)
             .applicant1ProceedWithClaim(NO)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .defenceRouteRequired(SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM)
