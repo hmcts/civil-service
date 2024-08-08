@@ -1480,6 +1480,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnErrors_whenRespondent1AddressNotValid() {
                 // Given
+                when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
+
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                     .respondent1(Party.builder().type(Party.Type.ORGANISATION)
                                     .primaryAddress(Address.builder()
