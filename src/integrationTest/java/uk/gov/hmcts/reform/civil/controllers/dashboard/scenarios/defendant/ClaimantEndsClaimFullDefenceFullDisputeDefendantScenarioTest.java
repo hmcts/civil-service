@@ -26,9 +26,10 @@ public class ClaimantEndsClaimFullDefenceFullDisputeDefendantScenarioTest extend
 
         String caseId = "12346789121";
 
-        CaseData caseData = CaseDataBuilder.builder().build()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
             .toBuilder()
             .applicant1(Party.builder().companyName("Test Company").type(Party.Type.COMPANY).build())
+            .respondent1(Party.builder().companyName("Respondent Company").type(Party.Type.COMPANY).build())
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(NO)
