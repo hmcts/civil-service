@@ -104,6 +104,6 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
 
     private String[] getCSVHeaders() {
         return new String[] {"SITE_ID", "CASE_TYPE", "CHECK_LIST", "PARTY_STATUS", "CASE_NUMBER", "AMOUNT", "PARTY_TYPE",
-            "COMPANY_NAME", "CONTACT_NAME", "CONTACT_NUMBER", "CONTACT_EMAIL", "PILOT"};
+            "COMPANY_NAME", "CONTACT_NAME", "CONTACT_NUMBER", "CONTACT_EMAIL", "PILOT", "CASE_TITLE"};
     }
 }
