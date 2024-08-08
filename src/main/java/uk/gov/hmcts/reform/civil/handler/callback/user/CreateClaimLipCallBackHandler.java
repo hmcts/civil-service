@@ -127,12 +127,11 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
                                                   .build());
         }
 
-        if (caseData.getRespondent1OrganisationPolicy() == null) {
-            caseDataBuilder
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                                   .orgPolicyCaseAssignedRole(DEFENDANT.getFormattedName())
-                                                   .build());
-        }
+        caseDataBuilder
+            .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                               .orgPolicyCaseAssignedRole(DEFENDANT.getFormattedName())
+                                               .build());
+
 
 
     }
