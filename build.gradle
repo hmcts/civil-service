@@ -109,7 +109,7 @@ allprojects {
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: versions.jackson
 
       // To prevent other libraries using conflicting versions
-      dependency group: 'org.slf4j', name: 'slf4j-nop', version: '2.0.13'
+      dependency group: 'org.slf4j', name: 'slf4j-nop', version: '2.0.14'
 
       // solves CVE-2022-25857
       dependencySet(
@@ -128,7 +128,7 @@ allprojects {
         entry 'aws-java-sdk-s3'
       }
 
-      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.26') {
+      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.28') {
         entry 'tomcat-embed-core'
         entry 'tomcat-embed-el'
         entry 'tomcat-embed-websocket'
@@ -143,7 +143,7 @@ allprojects {
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.9'
-      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.14.0"
+      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.15.0"
     }
   }
 
@@ -296,7 +296,7 @@ sonarqube {
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
     property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/request/servlet/** , **/controllers/**, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**, **/service/PaymentsService.java, **/DashboardWithParamsCallbackHandler.java, **/advice/**"
     property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java, **/*CcdDashboardClaimantClaimMatcher.java, **/*CcdDashboardDefendantClaimMatcher.java"
-    property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**"
+    property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**, **/notification/NotifyClaimantAmendRestitchBundleHandler.java, **/notification/NotifyDefendantAmendRestitchBundleHandler.java"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
     property "sonar.web.javaOpts", "-Xmx2G"
   }
@@ -409,7 +409,7 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.23.1'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.23.1'
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.91'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.93'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.23'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.23'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.1'
@@ -430,7 +430,7 @@ dependencies {
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
-  implementation group: 'com.azure', name: 'azure-core', version: '1.50.0'
+  implementation group: 'com.azure', name: 'azure-core', version: '1.51.0'
   implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.2'
   implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
 
