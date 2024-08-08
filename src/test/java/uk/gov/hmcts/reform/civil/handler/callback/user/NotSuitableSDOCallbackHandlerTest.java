@@ -1,37 +1,30 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.config.JacksonConfiguration;
-import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -40,48 +33,40 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 
-@SpringBootTest(classes = {
-    NotSuitableSDOCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    ClaimUrlsConfiguration.class,
-    JacksonConfiguration.class,
-    MockDatabaseConfiguration.class,
-    ValidationAutoConfiguration.class})
+@ExtendWith(MockitoExtension.class)
 class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private Time time;
 
-    @MockBean
-    private IdamClient idamClient;
-
-    @MockBean
+    @Mock
     private FeatureToggleService toggleService;
 
-    @Autowired
     private NotSuitableSDOCallbackHandler handler;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @BeforeEach
+    void setup() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        handler = new NotSuitableSDOCallbackHandler(
+            objectMapper,
+            time,
+            toggleService
+        );
+    }
 
     @Nested
     class AboutToStartCallback {
 
         private CallbackParams params;
 
-        private static final String EMAIL = "example@email.com";
-
         @BeforeEach
         void setup() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             params = callbackParamsOf(caseData, ABOUT_TO_START);
-            String userId = UUID.randomUUID().toString();
 
-            given(idamClient.getUserDetails(any()))
-                .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
-
-            given(time.now()).willReturn(LocalDateTime.now());
+            given(time.now()).willReturn(LocalDateTime.now().withNano(0));
 
         }
 
@@ -100,9 +85,6 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         private CallbackParams params;
         private CaseData caseData;
-
-        @MockBean
-        private CallbackParams callbackParams;
 
         @Test
         void shouldValidateReasonLessThan150_whenInvoked() {
@@ -203,18 +185,6 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         private CaseData caseData;
         private CallbackParams params;
 
-        private static final String EMAIL = "example@email.com";
-
-        @BeforeEach
-        void setup() {
-            String userId = UUID.randomUUID().toString();
-            given(idamClient.getUserDetails(any()))
-                .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
-
-            given(time.now()).willReturn(LocalDateTime.now());
-
-        }
-
         @Test
         void shouldUpdateBusinessProcess_whenInvoked() {
             when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(false);
@@ -275,7 +245,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData()).doesNotContainKey("businessProcess");
+            assertThat(response.getData()).extracting("businessProcess").isNull();
         }
 
         @Test
@@ -323,8 +293,8 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             String header = format("# Your request was successful%n## This claim will be transferred to a different location");
-            String body = format("<br />A notification will be sent to the listing officer to look at this case and " +
-                                     "process the transfer of case.");
+            String body = "<br />A notification will be sent to the listing officer to look at this case and " +
+                                     "process the transfer of case.";
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
@@ -336,8 +306,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void handleEventsReturnsTheExpectedCallbackEvent(Boolean toggleState) {
-        when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(toggleState);
+    void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(NotSuitable_SDO);
     }
 }

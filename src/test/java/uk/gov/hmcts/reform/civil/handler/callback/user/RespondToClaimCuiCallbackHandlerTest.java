@@ -1,16 +1,14 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -55,28 +53,32 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.ONE_DAY;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    RespondToClaimCuiCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseFlagsInitialiser.class
-})
+@ExtendWith(MockitoExtension.class)
 class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private Time time;
-    @MockBean
+
+    @Mock
     private DeadlinesCalculator deadlinesCalculator;
-    @MockBean
-    FeatureToggleService featureToggleService;
-    @MockBean
-    OrganisationService organisationService;
-    @Autowired
+
+    @Mock
+    private FeatureToggleService featureToggleService;
+
+    @Mock
+    private OrganisationService organisationService;
+
     private RespondToClaimCuiCallbackHandler handler;
-    @Autowired
-    CaseFlagsInitialiser caseFlagsInitialiser;
-    @Autowired
-    private final ObjectMapper mapper = new ObjectMapper();
+
+    private ObjectMapper mapper;
+
+    @BeforeEach
+    void setup() {
+        mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        CaseFlagsInitialiser caseFlagsInitialiser = new CaseFlagsInitialiser(featureToggleService, organisationService);
+        handler = new RespondToClaimCuiCallbackHandler(mapper, deadlinesCalculator, time, featureToggleService, caseFlagsInitialiser);
+    }
 
     @Nested
     class AboutToStartCallback {
@@ -109,7 +111,6 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             now = LocalDateTime.now();
             given(time.now()).willReturn(now);
             given(deadlinesCalculator.calculateApplicantResponseDeadline(any(), any())).willReturn(respondToDeadline);
-            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
             when(featureToggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
         }
 
@@ -133,7 +134,6 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("status")
                 .isEqualTo("READY");
             assertThat(response.getState()).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         }
 
         @Test

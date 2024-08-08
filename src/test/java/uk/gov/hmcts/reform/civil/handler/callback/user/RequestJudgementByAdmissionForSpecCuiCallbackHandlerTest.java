@@ -1,14 +1,13 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -52,30 +51,30 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    RequestJudgementByAdmissionForSpecCuiCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    JudgementService.class,
-    JudgmentByAdmissionOnlineMapper.class
-})
+@ExtendWith(MockitoExtension.class)
 public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
     private RequestJudgementByAdmissionForSpecCuiCallbackHandler handler;
 
-    @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
 
-    @Autowired
-    private JudgementService judgementService;
-
-    @MockBean
+    @Mock
     private CaseDetailsConverter caseDetailsConverter;
+
+    @BeforeEach
+    void setup() {
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        JudgementService judgementService = new JudgementService(featureToggleService);
+        JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper = new JudgmentByAdmissionOnlineMapper();
+        handler = new RequestJudgementByAdmissionForSpecCuiCallbackHandler(objectMapper, judgementService,
+                                                                           caseDetailsConverter, featureToggleService,
+                                                                           judgmentByAdmissionOnlineMapper
+        );
+    }
 
     @Nested
     class AboutToStartCallback {
@@ -691,8 +690,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler
                 .handle(params);

@@ -1,16 +1,14 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -30,21 +28,23 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION_DEADLINE_CHECK;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    RequestForReconsiderationNotificationDeadlineCallbackHandler.class,
-    DashboardApiClient.class,
-    JacksonAutoConfiguration.class,
-    ValidationAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 public class RequestForReconsiderationNotificationDeadlineCallbackHandlerTest {
 
-    @Autowired
     private RequestForReconsiderationNotificationDeadlineCallbackHandler handler;
-    @MockBean
+
+    @Mock
     private DashboardNotificationsParamsMapper mapper;
-    @MockBean
+
+    @Mock
     private DashboardApiClient dashboardApiClient;
+
+    @BeforeEach
+    void setup() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        handler = new RequestForReconsiderationNotificationDeadlineCallbackHandler(objectMapper, dashboardApiClient, mapper);
+    }
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
