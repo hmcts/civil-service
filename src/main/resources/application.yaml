@@ -446,6 +446,8 @@ notifications:
 
   notifyClaimantLrValidationDiscontinuanceFailureTemplate: "25398d9e-bb5f-4778-b76f-625c355f7c06"
 
+  notifyLRBundleRestitched: "f42c83ed-03ce-4b1c-95b7-958045293793"
+
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
@@ -689,7 +691,7 @@ bundle:
 
 payments:
   api:
-    url: ${PAYMENTS_API_URL:http://fake-payment-register-api}
+    url: ${PAYMENTS_API_URL:http://localhost:8765}
 
 idam:
   web:
