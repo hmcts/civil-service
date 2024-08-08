@@ -76,14 +76,10 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLi
     private String getTemplate(CaseData caseData) {
         if (caseData.isPartAdmitPayImmediatelyAccepted()) {
             return notificationsProperties.getNotifyRespondentLipPartAdmitPayImmediatelyAcceptedSpec();
-        } else if (featureToggleService.isLipVLipEnabled()) {
-            if (caseData.isClaimantDontWantToProceedWithFulLDefenceFD()) {
-                return caseData.isRespondentResponseBilingual()
-                    ? notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()
-                    : notificationsProperties.getRespondent1LipClaimUpdatedTemplate();
-            } else {
-                return notificationsProperties.getClaimantSolicitorConfirmsNotToProceed();
-            }
+        } else if (featureToggleService.isLipVLipEnabled() && caseData.isClaimantDontWantToProceedWithFulLDefenceFD()) {
+            return caseData.isRespondentResponseBilingual()
+                ? notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()
+                : notificationsProperties.getRespondent1LipClaimUpdatedTemplate();
         } else {
             return notificationsProperties.getClaimantSolicitorConfirmsNotToProceed();
         }
