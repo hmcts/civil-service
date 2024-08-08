@@ -10,7 +10,7 @@ VALUES ('Scenario.AAA6.ClaimantIntent.ClaimantEndsClaim.Defendant', '{"Notice.AA
  */
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
-VALUES ('Notice.AAA6.ClaimantIntent.ClaimantEndsClaim.Defendant', 'The claim has now ended.' , 'Mae’r hawliad wedi dod i ben.',
+VALUES ('Notice.AAA6.ClaimantIntent.ClaimantEndsClaim.Defendant', 'The claim has now ended' , 'Mae’r hawliad wedi dod i ben',
         '<p class="govuk-body">${applicant1PartyName} has decided not to proceed with the claim.</p>',
         '<p class="govuk-body">Mae ${applicant1PartyName} wedi penderfynu peidio â bwrw ymlaen gyda’r hawliad.</p>',
         'DEFENDANT');

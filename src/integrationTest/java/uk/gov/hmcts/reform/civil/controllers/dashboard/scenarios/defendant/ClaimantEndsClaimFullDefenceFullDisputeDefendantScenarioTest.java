@@ -46,10 +46,10 @@ public class ClaimantEndsClaimFullDefenceFullDisputeDefendantScenarioTest extend
             .andExpect(status().isOk())
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].titleEn").value("The claim has now ended."),
+                jsonPath("$[0].titleEn").value("The claim has now ended"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">Mr Claimant person has decided not to proceed with the claim.</p>"),
-                jsonPath("$[0].titleCy").value("Mae’r hawliad wedi dod i ben."),
+                jsonPath("$[0].titleCy").value("Mae’r hawliad wedi dod i ben"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae Mr Claimant person wedi penderfynu peidio â bwrw ymlaen gyda’r hawliad.</p>")
             );
