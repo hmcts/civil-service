@@ -1819,6 +1819,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnErrors_whenRespondent1PartyNameNotValid() {
             // Given
+            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .respondent1(Party.builder().type(Party.Type.ORGANISATION).organisationName("Line 1 test again for more than 70 characters on the company party name")
                                  .primaryAddress(AddressBuilder.defaults().build())

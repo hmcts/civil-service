@@ -720,11 +720,12 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         CaseData caseData = callbackParams.getCaseData();
         Party respondent = getRespondent.apply(caseData);
         List<String> errors = postcodeValidator.validate(respondent.getPrimaryAddress().getPostCode());
-        if (respondent.getPrimaryAddress() != null) {
-            partyValidator.validateAddress(respondent.getPrimaryAddress(), errors);
+        if (featureToggleService.isJudgmentOnlineLive()) {
+            if (respondent.getPrimaryAddress() != null) {
+                partyValidator.validateAddress(respondent.getPrimaryAddress(), errors);
+            }
+            partyValidator.validateName(respondent.getPartyName(), errors);
         }
-        partyValidator.validateName(respondent.getPartyName(), errors);
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(errors.isEmpty()
