@@ -29,6 +29,7 @@ import java.util.Optional;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState.ISSUED;
+import static uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection.PAY_IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection.PAY_IN_INSTALMENTS;
 import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
 import static uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils.getDefendantAdmittedAmount;
@@ -82,17 +83,8 @@ public class DashboardNotificationsParamsMapper {
         if (featureToggleService.isJudgmentOnlineLive()
             && nonNull(caseData.getActiveJudgment())
             && caseData.getActiveJudgment().getState().equals(ISSUED)
-            && nonNull(caseData.getActiveJudgment().getPaymentPlan())
-            && caseData.getActiveJudgment().getPaymentPlan().getType().equals(PAY_IN_INSTALMENTS)) {
-
-            JudgmentDetails judgmentDetails = caseData.getActiveJudgment();
-            JudgmentInstalmentDetails instalmentDetails = judgmentDetails.getInstalmentDetails();
-
-            params.put("ccjDefendantAdmittedAmount", MonetaryConversions.penniesToPounds(new BigDecimal(judgmentDetails.getOrderedAmount())));
-            params.put("ccjPaymentMessageEn", getStringPaymentMessage(instalmentDetails.getPaymentFrequency(), instalmentDetails.getAmount()));
-            params.put("ccjPaymentMessageCy", getStringPaymentMessageInWelsh(instalmentDetails.getPaymentFrequency(), instalmentDetails.getAmount()));
-            params.put("ccjFirstRepaymentDateEn", DateUtils.formatDate(instalmentDetails.getStartDate()));
-            params.put("ccjFirstRepaymentDateCy", DateUtils.formatDateInWelsh(instalmentDetails.getStartDate()));
+            && nonNull(caseData.getActiveJudgment().getPaymentPlan())) {
+            updateCCJParams(caseData, params);
         }
 
         if (nonNull(getDefendantAdmittedAmount(caseData))) {
@@ -249,6 +241,41 @@ public class DashboardNotificationsParamsMapper {
         return params;
     }
 
+    private static void updateCCJParams(CaseData caseData, HashMap<String, Object> params) {
+        JudgmentDetails judgmentDetails = caseData.getActiveJudgment();
+        String orderedAmount = judgmentDetails.getOrderedAmount();
+
+        if (caseData.getActiveJudgment().getPaymentPlan().getType().equals(PAY_IN_INSTALMENTS)) {
+            JudgmentInstalmentDetails instalmentDetails = judgmentDetails.getInstalmentDetails();
+            params.put(
+                "ccjDefendantAdmittedAmount",
+                MonetaryConversions.penniesToPounds(new BigDecimal(orderedAmount))
+            );
+            params.put("ccjPaymentMessageEn", getStringPaymentMessage(instalmentDetails));
+            params.put("ccjPaymentMessageCy", getStringPaymentMessageInWelsh(instalmentDetails));
+        } else if (caseData.getActiveJudgment().getPaymentPlan().getType().equals(PAY_IMMEDIATELY)) {
+            params.put(
+                "ccjDefendantAdmittedAmount",
+                MonetaryConversions.penniesToPounds(new BigDecimal(orderedAmount))
+            );
+            params.put("ccjPaymentMessageEn", "immediately");
+            params.put("ccjPaymentMessageCy", "ar unwaith");
+        } else {
+            params.put(
+                "ccjDefendantAdmittedAmount",
+                MonetaryConversions.penniesToPounds(new BigDecimal(orderedAmount))
+            );
+            params.put(
+                "ccjPaymentMessageEn",
+                "by " + DateUtils.formatDate(judgmentDetails.getPaymentPlan().getPaymentDeadlineDate())
+            );
+            params.put(
+                "ccjPaymentMessageCy",
+                "erbyn " + DateUtils.formatDateInWelsh(judgmentDetails.getPaymentPlan().getPaymentDeadlineDate())
+            );
+        }
+    }
+
     public Map<String, Object> mapCaseDataToParams(CaseData caseData, CaseEvent caseEvent) {
 
         Map<String, Object> params = mapCaseDataToParams(caseData);
@@ -259,19 +286,27 @@ public class DashboardNotificationsParamsMapper {
         return params;
     }
 
-    private static String getStringPaymentMessageInWelsh(PaymentFrequency paymentFrequency, String amount) {
+    private static String getStringPaymentMessageInWelsh(JudgmentInstalmentDetails instalmentDetails) {
+        PaymentFrequency paymentFrequency = instalmentDetails.getPaymentFrequency();
+        String amount = instalmentDetails.getAmount();
         BigDecimal convertedAmount = MonetaryConversions.penniesToPounds(new BigDecimal(amount));
 
-        return switch (paymentFrequency) {
+        String message = switch (paymentFrequency) {
             case WEEKLY -> "mewn rhandaliadau wythnosol o £" + convertedAmount;
             case EVERY_TWO_WEEKS -> "mewn rhandaliadau bob pythefnos o £" + convertedAmount;
             case MONTHLY -> "mewn rhandaliadau misol o £" + convertedAmount;
         };
+
+        return message + ". Bydd y taliad cyntaf yn ddyledus ar " + DateUtils.formatDateInWelsh(instalmentDetails.getStartDate());
     }
 
-    private static String getStringPaymentMessage(PaymentFrequency paymentFrequency, String amount) {
+    private static String getStringPaymentMessage(JudgmentInstalmentDetails instalmentDetails) {
+        PaymentFrequency paymentFrequency = instalmentDetails.getPaymentFrequency();
+        String amount = instalmentDetails.getAmount();
+
         return "in " + getStringPaymentFrequency(paymentFrequency) + " instalments of £"
-            + MonetaryConversions.penniesToPounds(new BigDecimal(amount));
+            + MonetaryConversions.penniesToPounds(new BigDecimal(amount))
+            + ". The first payment is due on " + DateUtils.formatDate(instalmentDetails.getStartDate());
     }
 
     private static String getStringPaymentFrequency(PaymentFrequency paymentFrequency) {
@@ -415,17 +450,17 @@ public class DashboardNotificationsParamsMapper {
             paymentFrequencyMessage.append("You must pay the claim amount of £")
                 .append(MonetaryConversions.penniesToPounds(totalAmount).toString())
                 .append(" ")
-                .append(getStringPaymentMessage(instalmentDetails.getPaymentFrequency(), instalmentDetails.getAmount()))
+                .append(getStringPaymentMessage(instalmentDetails))
                 .append(". The first payment is due on ")
-                .append(instalmentDetails.getStartDate())
+                .append(DateUtils.formatDate(instalmentDetails.getStartDate()))
                 .append(".");
         } else {
             paymentFrequencyMessage.append("Rhaid i chi dalu swm yr hawliad, sef £")
                 .append(MonetaryConversions.penniesToPounds(totalAmount).toString())
                 .append(" ")
-                .append(getStringPaymentMessageInWelsh(instalmentDetails.getPaymentFrequency(), instalmentDetails.getAmount()))
+                .append(getStringPaymentMessageInWelsh(instalmentDetails))
                 .append(". Bydd y taliad cyntaf yn ddyledus ar ")
-                .append(instalmentDetails.getStartDate())
+                .append(DateUtils.formatDateInWelsh(instalmentDetails.getStartDate()))
                 .append(".");
         }
         return paymentFrequencyMessage;
