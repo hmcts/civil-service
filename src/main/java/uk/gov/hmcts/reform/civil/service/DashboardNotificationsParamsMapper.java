@@ -6,14 +6,16 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
+import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
@@ -23,6 +25,7 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -238,6 +241,12 @@ public class DashboardNotificationsParamsMapper {
                        DateUtils.formatDateInWelsh(caseData.getRequestForReconsiderationDeadline().toLocalDate()));
         }
 
+        Optional<LocalDateTime> latestBundleCreatedOn = getLatestBundleCreatedOn(caseData);
+        latestBundleCreatedOn.ifPresent(date -> {
+            params.put("bundleRestitchedDateEn", DateUtils.formatDate(date));
+            params.put("bundleRestitchedDateCy", DateUtils.formatDateInWelsh(date.toLocalDate()));
+        });
+
         return params;
     }
 
@@ -284,6 +293,17 @@ public class DashboardNotificationsParamsMapper {
             params.put(ORDER_DOCUMENT, orderDocumentUrl);
         }
         return params;
+    }
+
+    private Optional<LocalDateTime> getLatestBundleCreatedOn(CaseData caseData) {
+        return Optional.ofNullable(caseData.getCaseBundles())
+            .map(bundles -> bundles.stream()
+                .map(IdValue::getValue)
+                .map(Bundle::getCreatedOn)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .max(Comparator.naturalOrder()))
+            .orElse(Optional.empty());
     }
 
     private static String getStringPaymentMessageInWelsh(JudgmentInstalmentDetails instalmentDetails) {
@@ -459,5 +479,4 @@ public class DashboardNotificationsParamsMapper {
         }
         return paymentFrequencyMessage;
     }
-
 }
