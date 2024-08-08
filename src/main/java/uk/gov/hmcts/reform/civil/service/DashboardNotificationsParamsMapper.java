@@ -250,6 +250,16 @@ public class DashboardNotificationsParamsMapper {
         return params;
     }
 
+    public Map<String, Object> mapCaseDataToParams(CaseData caseData, CaseEvent caseEvent) {
+
+        Map<String, Object> params = mapCaseDataToParams(caseData);
+        String orderDocumentUrl = addToMapDocumentInfo(caseData, caseEvent);
+        if (nonNull(orderDocumentUrl)) {
+            params.put(ORDER_DOCUMENT, orderDocumentUrl);
+        }
+        return params;
+    }
+
     private static void updateCCJParams(CaseData caseData, HashMap<String, Object> params) {
         JudgmentDetails judgmentDetails = caseData.getActiveJudgment();
         String orderedAmount = judgmentDetails.getOrderedAmount();
@@ -283,16 +293,6 @@ public class DashboardNotificationsParamsMapper {
                 "erbyn " + DateUtils.formatDateInWelsh(judgmentDetails.getPaymentPlan().getPaymentDeadlineDate())
             );
         }
-    }
-
-    public Map<String, Object> mapCaseDataToParams(CaseData caseData, CaseEvent caseEvent) {
-
-        Map<String, Object> params = mapCaseDataToParams(caseData);
-        String orderDocumentUrl = addToMapDocumentInfo(caseData, caseEvent);
-        if (nonNull(orderDocumentUrl)) {
-            params.put(ORDER_DOCUMENT, orderDocumentUrl);
-        }
-        return params;
     }
 
     private Optional<LocalDateTime> getLatestBundleCreatedOn(CaseData caseData) {
