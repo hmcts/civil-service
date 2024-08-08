@@ -353,7 +353,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                      .addressLine2("Line 1 test again for more than 35 characters")
                                                      .addressLine3("Line 1 test again for more than 35 characters")
                                                      .county("Line 1 test again for more than 35 characters")
-                                                     .postCode("Line 1 test again for more than 35 characters")
+                                                     .postCode("postcode test for more than 8 characters")
                                                      .postTown("Line 1 test again for more than 35 characters").build())
                                  .build())
                 .build();
@@ -487,7 +487,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                      .addressLine2("Line 1 test again for more than 35 characters")
                                                      .addressLine3("Line 1 test again for more than 35 characters")
                                                      .county("Line 1 test again for more than 35 characters")
-                                                     .postCode("Line 1 test again for more than 35 characters")
+                                                     .postCode("postcode test for more than 8 characters")
                                                      .postTown("Line 1 test again for more than 35 characters").build())
                                  .build())
                 .build();
