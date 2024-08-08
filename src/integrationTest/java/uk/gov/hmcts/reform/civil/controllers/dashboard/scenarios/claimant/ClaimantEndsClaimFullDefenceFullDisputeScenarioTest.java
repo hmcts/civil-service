@@ -10,8 +10,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
-import java.time.LocalDateTime;
-
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -25,7 +23,6 @@ public class ClaimantEndsClaimFullDefenceFullDisputeScenarioTest extends Dashboa
     void should_create_claimant_Ends_claim_full_defence_full_dispute_scenario() throws Exception {
 
         String caseId = "1234678912";
-        LocalDateTime respondent1SettlementDeadline = LocalDateTime.now().plusDays(7);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimantFullDefence().build()
             .toBuilder()
@@ -34,7 +31,7 @@ public class ClaimantEndsClaimFullDefenceFullDisputeScenarioTest extends Dashboa
             .applicant1ProceedWithClaim(NO)
             .respondent1ClaimResponseTestForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .defenceRouteRequired("DISPUTES_THE_CLAIM")
-            .ccdState(CaseState.CASE_DISMISSED)
+            .ccdState(CaseState.CASE_STAYED)
               .build();
 
         handler.handle(callbackParams(caseData));
