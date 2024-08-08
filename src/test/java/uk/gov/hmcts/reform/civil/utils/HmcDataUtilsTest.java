@@ -1242,7 +1242,7 @@ class HmcDataUtilsTest {
             "DRH, SMALL_CLAIM, dispute resolution hearing",
             "DIS, SMALL_CLAIM, disposal hearing",
         })
-        void shouldReturnExpectedTitle_unspecClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
+        void shouldReturnExpectedTitle(String hearingType, AllocatedTrack allocatedTrack, String expected) {
             HearingGetResponse hearing = buildHearing(hearingType);
             CaseData caseData = CaseData.builder().allocatedTrack(allocatedTrack).build();
 
