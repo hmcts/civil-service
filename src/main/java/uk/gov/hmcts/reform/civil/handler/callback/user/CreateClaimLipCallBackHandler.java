@@ -131,9 +131,6 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
             .respondent1OrganisationPolicy(OrganisationPolicy.builder()
                                                .orgPolicyCaseAssignedRole(DEFENDANT.getFormattedName())
                                                .build());
-
-
-
     }
 
     private void setUpHelpWithFees(CaseData.CaseDataBuilder caseDataBuilder) {
