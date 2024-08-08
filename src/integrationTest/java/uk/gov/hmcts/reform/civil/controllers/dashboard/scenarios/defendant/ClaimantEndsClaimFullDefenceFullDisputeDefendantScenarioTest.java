@@ -25,8 +25,7 @@ public class ClaimantEndsClaimFullDefenceFullDisputeDefendantScenarioTest extend
     @Test
     void should_create_claimant_settled_claim_scenario() throws Exception {
 
-        String caseId = "1234678912";
-        LocalDateTime respondent1SettlementDeadline = LocalDateTime.now().plusDays(7);
+        String caseId = "12346789121";
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimantFullDefence().build()
             .toBuilder()
@@ -36,7 +35,7 @@ public class ClaimantEndsClaimFullDefenceFullDisputeDefendantScenarioTest extend
             .applicant1ProceedWithClaim(NO)
             .respondent1ClaimResponseTestForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .defenceRouteRequired("DISPUTES_THE_CLAIM")
-            .ccdState(CaseState.CASE_DISMISSED)
+            .ccdState(CaseState.CASE_STAYED)
             .build();
 
         handler.handle(callbackParams(caseData));
