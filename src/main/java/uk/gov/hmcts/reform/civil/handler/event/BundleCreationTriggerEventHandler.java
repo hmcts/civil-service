@@ -52,9 +52,10 @@ public class BundleCreationTriggerEventHandler {
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, CREATE_BUNDLE);
         CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails().getData());
 
-        YesOrNo hasBundleErrors = (bundleCreateResponse.getErrors() != null && !bundleCreateResponse.getErrors().isEmpty())
-            ? YesOrNo.YES : YesOrNo.NO;
-        caseData = caseData.toBuilder().bundleError(YesOrNo.YES).build();
+        /*YesOrNo hasBundleErrors = (bundleCreateResponse.getErrors() != null && !bundleCreateResponse.getErrors().isEmpty())
+            ? YesOrNo.YES : YesOrNo.NO;*/
+        YesOrNo hasBundleErrors = YesOrNo.YES;
+        caseData = caseData.toBuilder().bundleError(hasBundleErrors).build();
 
         if (hasBundleErrors == YesOrNo.NO) {
             log.info("inside if");

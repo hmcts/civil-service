@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.event;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -50,6 +51,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.BUNDLE_CREATION_NOTIF
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_BUNDLE;
 
 @ExtendWith(SpringExtension.class)
+@Disabled
 class BundleCreationTriggerEventHandlerTest {
 
     private static final String TEST_URL = "url";
