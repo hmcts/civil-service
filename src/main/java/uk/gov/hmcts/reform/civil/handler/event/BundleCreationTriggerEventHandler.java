@@ -52,13 +52,10 @@ public class BundleCreationTriggerEventHandler {
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, CREATE_BUNDLE);
         CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails().getData());
 
-        /*YesOrNo hasBundleErrors = (bundleCreateResponse.getErrors() != null && !bundleCreateResponse.getErrors().isEmpty())
-            ? YesOrNo.YES : null;*/
-        YesOrNo hasBundleErrors = YesOrNo.YES;
-        caseData = caseData.toBuilder().bundleError(hasBundleErrors).build();
+        YesOrNo hasBundleErrors = (bundleCreateResponse.getErrors() != null && !bundleCreateResponse.getErrors().isEmpty())
+            ? YesOrNo.YES : null;
 
-        if (hasBundleErrors == YesOrNo.NO) {
-            log.info("inside if");
+        if (hasBundleErrors == null) {
             List<IdValue<Bundle>> caseBundles = new ArrayList<>(caseData.getCaseBundles());
             CaseData finalCaseData = caseData;
             caseBundles.addAll(bundleCreateResponse.getData().getCaseBundles()
@@ -68,7 +65,7 @@ public class BundleCreationTriggerEventHandler {
             coreCaseDataService.submitUpdate(caseId, caseContent);
             coreCaseDataService.triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION);
         } else {
-            log.info("inside else");
+            caseData = caseData.toBuilder().bundleError(hasBundleErrors).build();
             CaseDataContent caseDataContent = CaseDataContent.builder()
                 .eventToken(startEventResponse.getToken())
                 .event(Event.builder()
