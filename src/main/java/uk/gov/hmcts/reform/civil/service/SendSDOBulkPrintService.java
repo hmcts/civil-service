@@ -23,7 +23,7 @@ public class SendSDOBulkPrintService {
     private final DocumentDownloadService documentDownloadService;
     private static final String SDO_ORDER_PACK_LETTER_TYPE = "sdo-order-pack";
 
-    public void sendSDOToDefendantLIP(String authorisation, CaseData caseData, String taskId) {
+    public void sendSDOOrderToLIP(String authorisation, CaseData caseData, String taskId) {
         if (caseData.getSystemGeneratedCaseDocuments() != null && !caseData.getSystemGeneratedCaseDocuments().isEmpty()) {
             Optional<Element<CaseDocument>> caseDocument = caseData.getSDODocument();
 

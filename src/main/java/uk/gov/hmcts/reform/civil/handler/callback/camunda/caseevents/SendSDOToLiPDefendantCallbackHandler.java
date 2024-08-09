@@ -53,7 +53,7 @@ public class SendSDOToLiPDefendantCallbackHandler extends CallbackHandler {
 
     private CallbackResponse sendSDOLetter(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        sendSDOBulkPrintService.sendSDOToDefendantLIP(callbackParams.getParams().get(BEARER_TOKEN).toString(), caseData, camundaActivityId(callbackParams));
+        sendSDOBulkPrintService.sendSDOOrderToLIP(callbackParams.getParams().get(BEARER_TOKEN).toString(), caseData, camundaActivityId(callbackParams));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();

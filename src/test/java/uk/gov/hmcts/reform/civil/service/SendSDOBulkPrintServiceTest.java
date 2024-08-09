@@ -44,6 +44,7 @@ class SendSDOBulkPrintServiceTest {
     private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
     public static final String TASK_ID_DEFENDANT = "SendSDOToDefendantLIP";
+    public static final String TASK_ID_CLAIMANT = "SendSDOToClaimantLIP";
 
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfullyForDefendantLIP() {
@@ -52,7 +53,7 @@ class SendSDOBulkPrintServiceTest {
 
         givenDocumentDownloadWillReturn();
 
-        sendSDOBulkPrintService.sendSDOToDefendantLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
+        sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
         verifyPrintLetter(caseData, respondent1);
     }
@@ -64,7 +65,7 @@ class SendSDOBulkPrintServiceTest {
 
         givenDocumentDownloadWillReturn();
 
-        sendSDOBulkPrintService.sendSDOToDefendantLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
+        sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
 
         verifyPrintLetter(caseData, applicant1);
     }
@@ -74,7 +75,7 @@ class SendSDOBulkPrintServiceTest {
         CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(null).build();
 
-        sendSDOBulkPrintService.sendSDOToDefendantLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
+        sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
         verifyNoInteractions(bulkPrintService);
     }
@@ -83,7 +84,7 @@ class SendSDOBulkPrintServiceTest {
     void shouldNotDownloadDocument_whenSDOOrderAbsent() {
         CaseData caseData = createCaseDataWithSealedClaim();
 
-        sendSDOBulkPrintService.sendSDOToDefendantLIP(BEARER_TOKEN, caseData,TASK_ID_DEFENDANT);
+        sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
         verifyNoInteractions(bulkPrintService);
     }

@@ -62,13 +62,14 @@ public class SendSDOToLiPDefendantCallbackHandlerTest extends BaseCallbackHandle
         CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SDO_ORDER).build())).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        params.getRequest().setEventId(SEND_SDO_ORDER_TO_LIP_DEFENDANT.name());
 
         // when
         var response = (AboutToStartOrSubmitCallbackResponse)handler.handle(params);
 
         // then
         assertThat(response.getErrors()).isNull();
-        verify(sendSDOBulkPrintService).sendSDOToDefendantLIP(any(), any(), TASK_ID_DEFENDANT);
+        verify(sendSDOBulkPrintService).sendSDOOrderToLIP(any(), any(), TASK_ID_DEFENDANT);
     }
 
     @Test
@@ -77,12 +78,13 @@ public class SendSDOToLiPDefendantCallbackHandlerTest extends BaseCallbackHandle
         CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SDO_ORDER).build())).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        params.getRequest().setEventId(SEND_SDO_ORDER_TO_LIP_CLAIMANT.name());
 
         // when
         var response = (AboutToStartOrSubmitCallbackResponse)handler.handle(params);
 
         // then
         assertThat(response.getErrors()).isNull();
-        verify(sendSDOBulkPrintService).sendSDOToDefendantLIP(any(), any(), TASK_ID_CLAIMANT);
+        verify(sendSDOBulkPrintService).sendSDOOrderToLIP(any(), any(), TASK_ID_CLAIMANT);
     }
 }
