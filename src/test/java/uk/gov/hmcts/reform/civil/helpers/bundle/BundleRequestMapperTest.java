@@ -173,6 +173,123 @@ class BundleRequestMapperTest {
     }
 
     @Test
+    void testBundleRequestMapperWithAllDocsAndCaseEvenEnable() {
+        // Given
+        //Add all type of documents and other request details in case data
+        CaseData caseData = getCaseData();
+        given(featureToggleService.isCaseEventsEnabled()).willReturn(true);
+
+        // When
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +
+            ".yaml", "test", "test"
+        );
+
+        // Then
+        assertNotNull(bundleCreateRequest);
+        assertEquals("CL 1 Case summary 12/12/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getTrialDocuments().get(0).getValue().getDocumentFileName());
+        assertEquals("CL 2 Case summary 12/12/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getTrialDocuments().get(1).getValue().getDocumentFileName());
+        assertEquals("DF 1 Case summary 12/12/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getTrialDocuments().get(2).getValue().getDocumentFileName());
+        assertEquals("DF 2 Case summary 12/12/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getTrialDocuments().get(3).getValue().getDocumentFileName());
+        assertEquals("CL 1 Chronology 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getTrialDocuments().get(4).getValue().getDocumentFileName());
+        assertEquals("CL 2 Chronology 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getTrialDocuments().get(5).getValue().getDocumentFileName());
+        assertEquals("DF 1 Chronology 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getTrialDocuments().get(6).getValue().getDocumentFileName());
+        assertEquals("DF 2 Chronology 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getTrialDocuments().get(7).getValue().getDocumentFileName());
+        assertEquals("CL 1 Trial Timetable 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getTrialDocuments().get(8).getValue().getDocumentFileName());
+        assertEquals("CL 2 Trial Timetable 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getTrialDocuments().get(9).getValue().getDocumentFileName());
+        assertEquals("DF 1 Trial Timetable 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getTrialDocuments().get(10).getValue().getDocumentFileName());
+        assertEquals("DF 2 Trial Timetable 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getTrialDocuments().get(11).getValue().getDocumentFileName());
+        assertEquals("Claim Form 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(0).getValue().getDocumentFileName());
+        assertEquals("Particulars Of Claim 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(1).getValue().getDocumentFileName());
+        assertEquals("DF 1 Defence 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(2).getValue().getDocumentFileName());
+        assertEquals("CL's reply 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(3).getValue().getDocumentFileName());
+        assertEquals("CL 1 reply to part 18 request 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(4).getValue().getDocumentFileName());
+        assertEquals("CL 2 reply to part 18 request 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(5).getValue().getDocumentFileName());
+        assertEquals("DF 1 reply to part 18 request 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(6).getValue().getDocumentFileName());
+        assertEquals("DF 2 reply to part 18 request 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(7).getValue().getDocumentFileName());
+        assertEquals("CL 1 Directions Questionnaire 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(0).getValue().getDocumentFileName());
+        assertEquals("DF 1 Directions Questionnaire 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(1).getValue().getDocumentFileName());
+        assertEquals("DF 2 Directions Questionnaire 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(2).getValue().getDocumentFileName());
+        assertEquals("DF 2 Directions Questionnaire 11/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(3).getValue().getDocumentFileName());
+        assertEquals("DF 2 Directions Questionnaire 10/03/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(4).getValue().getDocumentFileName());
+        assertEquals("Directions Questionnaire 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(5).getValue().getDocumentFileName());
+        assertEquals("Directions Order 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getOrdersDocuments().get(0).getValue().getDocumentFileName());
+        assertEquals("Order 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getOrdersDocuments().get(1).getValue().getDocumentFileName());
+        assertEquals("Order 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getOrdersDocuments().get(2).getValue().getDocumentFileName());
+        assertEquals("Email referred to in the statement of witness 12/12/2022",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1WitnessStatements().get(0).getValue().getDocumentFileName());
+        assertEquals("Email referred to in the statement of witness 12/12/2022",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant2WitnessStatements().get(0).getValue().getDocumentFileName());
+        assertEquals("Email referred to in the statement of witness 12/12/2022",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDefendant1WitnessStatements().get(0).getValue().getDocumentFileName());
+        assertEquals("Email referred to in the statement of witness 12/12/2022",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDefendant2WitnessStatements().get(0).getValue().getDocumentFileName());
+        assertEquals("Notice to admit facts CL 1 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1WitnessStatements().get(1).getValue().getDocumentFileName());
+        assertEquals("Expert Evidence expert1 Test 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1ExpertEvidence().get(0).getValue().getDocumentFileName());
+        assertEquals("Questions to expert1 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1ExpertEvidence().get(1).getValue().getDocumentFileName());
+        assertEquals("Replies from expert1 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1ExpertEvidence().get(2).getValue().getDocumentFileName());
+        assertEquals("Questions to Other expert 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1ExpertEvidence().get(3).getValue().getDocumentFileName());
+        assertEquals("Expert Evidence expert2 Test 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant2ExpertEvidence().get(0).getValue().getDocumentFileName());
+        assertEquals("Expert Evidence expert3 Test 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDefendant1ExpertEvidence().get(0).getValue().getDocumentFileName());
+        assertEquals("Expert Evidence expert4 Test 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDefendant2ExpertEvidence().get(0).getValue().getDocumentFileName());
+        assertEquals("Joint statement of experts expert5 Test1 Test2 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getJointStatementOfExperts().get(0).getValue().getDocumentFileName());
+        assertEquals("testFileName",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1DisclosedDocuments().get(0).getValue().getDocumentFileName());
+        assertEquals("testFileName",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant2DisclosedDocuments().get(0).getValue().getDocumentFileName());
+        assertEquals("testFileName",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDefendant1DisclosedDocuments().get(0).getValue().getDocumentFileName());
+        assertEquals("testFileName",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDefendant2DisclosedDocuments().get(0).getValue().getDocumentFileName());
+        assertEquals("testFileName 12/12/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1CostsBudgets().get(0).getValue().getDocumentFileName());
+        assertEquals("testFileName 12/12/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant2CostsBudgets().get(0).getValue().getDocumentFileName());
+        assertEquals("testFileName 12/12/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDefendant1CostsBudgets().get(0).getValue().getDocumentFileName());
+        assertEquals("testFileName 12/12/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDefendant2CostsBudgets().get(0).getValue().getDocumentFileName());
+
+    }
+
+    @Test
     void testBundleRequestMapperWhenDirectionsHaveNoCategoryId() {
         // Case file view was add on 16th nov 2023, cases before that will not have categoryId, and cannot be sorted into bundles using CL1, DF1, DF2 prefix
         // Given
