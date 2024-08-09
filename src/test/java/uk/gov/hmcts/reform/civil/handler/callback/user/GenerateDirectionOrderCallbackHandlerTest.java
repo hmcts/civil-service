@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -85,6 +86,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 @ExtendWith(MockitoExtension.class)
 public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandlerTest {
 
+    @InjectMocks
     private GenerateDirectionOrderCallbackHandler handler;
 
     @Mock
@@ -132,7 +134,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         handler = new GenerateDirectionOrderCallbackHandler(locationRefDataService, mapper, judgeFinalOrderGenerator,
-                                                            locationHelper, workingDayIndicator);
+                                                            locationHelper, userService, workingDayIndicator);
     }
 
     @Nested
@@ -829,7 +831,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldAddDocumentToCollection_onAboutToSubmit() {
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+            when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                         .forename("Judge")
                                                                         .surname("Judy")
                                                                         .roles(Collections.emptyList()).build());
@@ -858,7 +860,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldChangeStateToFinalOrder_onAboutToSubmitAndFreeFormOrder() {
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+            when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                         .forename("Judge")
                                                                         .surname("Judy")
                                                                         .roles(Collections.emptyList()).build());
@@ -879,7 +881,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldChangeStateToFinalOrder_onAboutToSubmitAndAssistedOrderAndNoFurtherHearing() {
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+            when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                         .forename("Judge")
                                                                         .surname("Judy")
                                                                         .roles(Collections.emptyList()).build());
@@ -901,7 +903,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldChangeStateToCaseProgression_onAboutToSubmitAndAssistedOrderWithFurtherHearing() {
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+            when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                         .forename("Judge")
                                                                         .surname("Judy")
                                                                         .roles(Collections.emptyList()).build());
@@ -925,7 +927,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldRePopulateHearingNotes_whenAssistedHearingNotesExist() {
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+            when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                         .forename("Judge")
                                                                         .surname("Judy")
                                                                         .roles(Collections.emptyList()).build());
@@ -948,7 +950,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldRePopulateHearingNotes_whenFreeFormHearingNotesExist() {
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+            when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                         .forename("Judge")
                                                                         .surname("Judy")
                                                                         .roles(Collections.emptyList()).build());
@@ -969,7 +971,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotRePopulateHearingNotes_whenAssistedHearingNotesDoNotExist() {
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+            when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                         .forename("Judge")
                                                                         .surname("Judy")
                                                                         .roles(Collections.emptyList()).build());
@@ -991,7 +993,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotRePopulateHearingNotes_whenFreeFormHearingNotesDoNotExist() {
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+            when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                         .forename("Judge")
                                                                         .surname("Judy")
                                                                         .roles(Collections.emptyList()).build());
