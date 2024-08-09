@@ -1,19 +1,17 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -33,7 +31,6 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
@@ -49,27 +46,25 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EDIT_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    EditJudgmentOnlineMapper.class,
-    EditJudgmentCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    DefaultJudgmentOnlineMapper.class,
-    InterestCalculator.class
-})
+@ExtendWith(MockitoExtension.class)
 class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
     private EditJudgmentCallbackHandler handler;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-    @MockBean
-    private Time time;
     @Mock
     private InterestCalculator interestCalculator;
-    @InjectMocks
+
     private DefaultJudgmentOnlineMapper defaultJudgmentOnlineMapper;
+
+    @BeforeEach
+    void setUp() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        defaultJudgmentOnlineMapper = new DefaultJudgmentOnlineMapper(interestCalculator);
+        EditJudgmentOnlineMapper editJudgmentOnlineMapper = new EditJudgmentOnlineMapper();
+        handler = new EditJudgmentCallbackHandler(objectMapper, editJudgmentOnlineMapper);
+    }
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvents() {
@@ -103,7 +98,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @ParameterizedTest
         @EnumSource(value = YesOrNo.class, names = {"YES", "NO"})
-        void shouldPopulateIfRTLRadioDisplayForDJ(YesOrNo value) {
+        void shouldPopulateIfRTLRadioDisplayForDJ() {
             //Given: Casedata in All_FINAL_ORDERS_ISSUED State
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(0)
