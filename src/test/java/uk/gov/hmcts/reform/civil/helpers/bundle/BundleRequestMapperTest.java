@@ -196,6 +196,30 @@ class BundleRequestMapperTest {
                      bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(4).getValue().getDocumentFileName());
     }
 
+    @Test
+    void testBundleRequestMapperWhenDirectionsHaveNoCategoryIdAndIsCaseEventEnable() {
+        // Case file view was add on 16th nov 2023, cases before that will not have categoryId, and cannot be sorted into bundles using CL1, DF1, DF2 prefix
+        // Given
+        CaseData caseData = getCaseDataWithNoId();
+        given(featureToggleService.isCaseEventsEnabled()).willReturn(true);
+        // When
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +
+            ".yaml", "test", "test"
+        );
+        // Then
+        assertNotNull(bundleCreateRequest);
+        assertEquals("Directions Questionnaire 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(0).getValue().getDocumentFileName());
+        assertEquals("Directions Questionnaire 10/03/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(1).getValue().getDocumentFileName());
+        assertEquals("Directions Questionnaire 11/04/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(2).getValue().getDocumentFileName());
+        assertEquals("Directions Questionnaire 10/05/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(3).getValue().getDocumentFileName());
+        assertEquals("Directions Questionnaire 10/06/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(4).getValue().getDocumentFileName());
+    }
+
     private CaseData getCaseDataWithNoId() {
         return CaseData.builder().ccdCaseReference(1L)
             .systemGeneratedCaseDocuments(setupSystemGeneratedCaseDocsNoId())
