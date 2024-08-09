@@ -131,4 +131,6 @@ public interface Claim {
     boolean isCaseStruckOut();
 
     boolean isDefaultJudgementIssued();
+
+    boolean isStateDecisionOutcome();
 }

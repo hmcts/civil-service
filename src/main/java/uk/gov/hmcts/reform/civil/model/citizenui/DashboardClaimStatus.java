@@ -6,6 +6,7 @@ import java.util.function.Predicate;
 
 public enum DashboardClaimStatus {
 
+    DECISION_OUTCOME(Claim::isStateDecisionOutcome),
     DEFENDANT_APPLY_NOC(
         Claim::isNocForDefendant
     ),
