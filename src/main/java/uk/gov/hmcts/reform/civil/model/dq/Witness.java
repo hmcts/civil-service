@@ -11,6 +11,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder (toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class Witness {
 
     private String partyID;
