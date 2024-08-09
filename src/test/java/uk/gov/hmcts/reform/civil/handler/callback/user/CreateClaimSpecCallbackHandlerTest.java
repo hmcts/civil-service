@@ -1510,6 +1510,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnNoErrors_whenRespondent2AddressValid() {
                 // Given
+                when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
+
                 Party respondent2 = PartyBuilder.builder().company().build();
 
                 CaseData caseData = CaseData.builder().respondent2(respondent2).build();
@@ -1524,33 +1526,35 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 // Then
                 assertThat(response).isNotNull();
-                assertThat(response.getData()).isNull();
-                assertThat(response.getErrors()).isNotNull();
+                assertThat(response.getData()).isNotNull();
                 assertEquals(0, response.getErrors().size());
             }
 
             @Test
             void shouldReturnErrors_whenRespondent2AddressNotValid() {
                 // Given
-                Party respondent2 = Party.builder().primaryAddress(Address.builder().postCode(null).build()).build();
+                when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
-                CaseData caseData = CaseData.builder().respondent2(respondent2).build();
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                    .respondent2(Party.builder().type(Party.Type.ORGANISATION)
+                                     .primaryAddress(Address.builder()
+                                                         .addressLine1("Line 1 test again for more than 35 characters")
+                                                         .addressLine2("Line 1 test again for more than 35 characters")
+                                                         .addressLine3("Line 1 test again for more than 35 characters")
+                                                         .county("Line 1 test again for more than 35 characters")
+                                                         .postCode("PostCode test more than 8 characters")
+                                                         .postTown("Line 1 test again for more than 35 characters").build())
+                                     .build()).build();
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "respondent2");
-
-                given(postcodeValidator.validate(any()))
-                    .willReturn(List.of("Please enter Postcode"));
 
                 // When
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
 
                 // Then
-                assertThat(response).isNotNull();
-                assertThat(response.getData()).isNull();
-                assertThat(response.getErrors()).isNotNull();
-                assertEquals(1, response.getErrors().size());
-                assertEquals("Please enter Postcode", response.getErrors().get(0));
+                assertThat(response.getErrors()).isNotEmpty();
+                assertThat(response.getErrors()).hasSize(6);
             }
         }
 
@@ -1829,6 +1833,29 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                  .build()).build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, "respondent1");
+
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isNotEmpty();
+            assertThat(response.getErrors()).hasSize(1);
+        }
+
+        @Test
+        void shouldReturnErrors_whenRespondent2PartyNameNotValid() {
+            // Given
+            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .respondent2(Party.builder().type(Party.Type.INDIVIDUAL)
+                                 .individualTitle("Title test again for more than 70 characters on the company party name")
+                                 .individualFirstName("Line 1 test again for more than 70 characters on the company party name")
+                                 .individualLastName("Line 1 test again for more than 70 characters on the company party name")
+                                 .primaryAddress(AddressBuilder.defaults().build())
+                                 .build()).build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "respondent2");
 
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
