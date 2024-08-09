@@ -6,6 +6,9 @@ import java.util.function.Predicate;
 
 public enum DashboardClaimStatus {
 
+    All_FINAL_ORDERS_ISSUED(
+        Claim::isAllFinalOrdersIssued
+    ),
     DEFENDANT_APPLY_NOC(
         Claim::isNocForDefendant
     ),

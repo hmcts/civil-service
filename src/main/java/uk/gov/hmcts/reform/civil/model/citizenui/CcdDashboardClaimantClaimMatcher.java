@@ -458,4 +458,9 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     public boolean isDefaultJudgementIssued() {
         return false;
     }
+
+    @Override
+    public boolean isAllFinalOrdersIssued() {
+        return caseData.getCcdState() == CaseState.All_FINAL_ORDERS_ISSUED;
+    }
 }
