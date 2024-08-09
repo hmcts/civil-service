@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -8,11 +10,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
@@ -48,18 +47,16 @@ import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeFinalOrderGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
@@ -78,7 +75,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantRepresentationList.CLAIMANT_NOT_ATTENDING;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersDefendantRepresentationList.DEFENDANT_NOT_ATTENDING;
-
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.BODY_1_V_1;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.BODY_1_V_2;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.BODY_2_V_1;
@@ -86,30 +82,22 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionO
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.HEADER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    GenerateDirectionOrderCallbackHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
     private GenerateDirectionOrderCallbackHandler handler;
 
-    @MockBean
-    private DocumentGeneratorService documentGeneratorService;
-
-    @MockBean
+    @Mock
     private JudgeFinalOrderGenerator judgeFinalOrderGenerator;
 
-    @MockBean
+    @Mock
     private DocumentHearingLocationHelper locationHelper;
 
-    @MockBean
+    @Mock
     private WorkingDayIndicator workingDayIndicator;
 
-    @Autowired
-    private final ObjectMapper mapper = new ObjectMapper();
+    private ObjectMapper mapper;
+
     private static final String ON_INITIATIVE_SELECTION_TEXT = "As this order was made on the court's own initiative "
         + "any party affected by the order may apply to set aside, vary or stay the order. Any such application must "
         + "be made by 4pm on";
@@ -117,7 +105,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         + "this order was made, you may apply to set aside, vary or stay the order. Any such application must be made "
         + "by 4pm on";
 
-    @MockBean
+    @Mock
     private LocationReferenceDataService locationRefDataService;
     public static final CaseDocument finalOrder = CaseDocument.builder()
         .createdBy("Test")
@@ -140,10 +128,11 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
     @BeforeEach
     void setUp() {
-        when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
-                                                                    .forename("Judge")
-                                                                    .surname("Judy")
-                                                                    .roles(Collections.emptyList()).build());
+        mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        handler = new GenerateDirectionOrderCallbackHandler(locationRefDataService, mapper, judgeFinalOrderGenerator,
+                                                            locationHelper, workingDayIndicator);
     }
 
     @Nested
@@ -840,6 +829,10 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldAddDocumentToCollection_onAboutToSubmit() {
+            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                        .forename("Judge")
+                                                                        .surname("Judy")
+                                                                        .roles(Collections.emptyList()).build());
             // Given
             List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
             finalCaseDocuments.add(element(finalOrder));
@@ -865,6 +858,10 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldChangeStateToFinalOrder_onAboutToSubmitAndFreeFormOrder() {
+            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                        .forename("Judge")
+                                                                        .surname("Judy")
+                                                                        .roles(Collections.emptyList()).build());
             // Given
             List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
             finalCaseDocuments.add(element(finalOrder));
@@ -882,6 +879,10 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldChangeStateToFinalOrder_onAboutToSubmitAndAssistedOrderAndNoFurtherHearing() {
+            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                        .forename("Judge")
+                                                                        .surname("Judy")
+                                                                        .roles(Collections.emptyList()).build());
             // Given
             List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
             finalCaseDocuments.add(element(finalOrder));
@@ -900,6 +901,10 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldChangeStateToCaseProgression_onAboutToSubmitAndAssistedOrderWithFurtherHearing() {
+            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                        .forename("Judge")
+                                                                        .surname("Judy")
+                                                                        .roles(Collections.emptyList()).build());
             // Given
             List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
             finalCaseDocuments.add(element(finalOrder));
@@ -920,6 +925,10 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldRePopulateHearingNotes_whenAssistedHearingNotesExist() {
+            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                        .forename("Judge")
+                                                                        .surname("Judy")
+                                                                        .roles(Collections.emptyList()).build());
             // Given
             List<FinalOrderToggle> toggle = new ArrayList<>();
             toggle.add(FinalOrderToggle.SHOW);
@@ -939,6 +948,10 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldRePopulateHearingNotes_whenFreeFormHearingNotesExist() {
+            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                        .forename("Judge")
+                                                                        .surname("Judy")
+                                                                        .roles(Collections.emptyList()).build());
             // Given
             List<FinalOrderToggle> toggle = new ArrayList<>();
             toggle.add(FinalOrderToggle.SHOW);
@@ -956,6 +969,10 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotRePopulateHearingNotes_whenAssistedHearingNotesDoNotExist() {
+            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                        .forename("Judge")
+                                                                        .surname("Judy")
+                                                                        .roles(Collections.emptyList()).build());
             // Given
             List<FinalOrderToggle> toggle = new ArrayList<>();
             toggle.add(FinalOrderToggle.SHOW);
@@ -974,6 +991,10 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotRePopulateHearingNotes_whenFreeFormHearingNotesDoNotExist() {
+            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                        .forename("Judge")
+                                                                        .surname("Judy")
+                                                                        .roles(Collections.emptyList()).build());
             // Given
             List<FinalOrderToggle> toggle = new ArrayList<>();
             toggle.add(FinalOrderToggle.SHOW);
