@@ -1,13 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
@@ -47,21 +46,18 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-@SpringBootTest(classes = {
-    MediationSuccessfulRespondentNotificationHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+    @Mock
     private NotificationsProperties notificationsProperties;
-    @MockBean
+    @Mock
     private OrganisationDetailsService organisationDetailsService;
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
-    @Autowired
+    @InjectMocks
     private MediationSuccessfulRespondentNotificationHandler handler;
 
     public static final String TEMPLATE_ID = "template-id";
@@ -76,19 +72,6 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
     @Nested
     class AboutToSubmitCallback {
         private static final String ORGANISATION_NAME = "Org Name";
-
-        @BeforeEach
-        void setup() {
-            given(notificationsProperties.getNotifyRespondentLiPMediationSuccessfulTemplate()).willReturn(TEMPLATE_ID);
-            given(notificationsProperties.getNotifyRespondentLiPMediationSuccessfulTemplateWelsh()).willReturn("template-id-welsh");
-            when(notificationsProperties.getNotifyLipSuccessfulMediation()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getNotifyLipSuccessfulMediationWelsh()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getNotifyTwoVOneDefendantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getNotifyLrDefendantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
-            when(organisationDetailsService.getRespondent1LegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
-            when(organisationDetailsService.getRespondent2LegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
-            when(notificationsProperties.getNotifyLrDefendantSuccessfulMediationForLipVLrClaim()).thenReturn(TEMPLATE_ID_LIP_LR);
-        }
 
         @Test
         void shouldNotifyRespondent_whenInvoked() {
@@ -108,6 +91,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL")
                     .build()).build();
             //When
+            given(notificationsProperties.getNotifyRespondentLiPMediationSuccessfulTemplate()).willReturn(TEMPLATE_ID);
             handler.handle(params);
             //Then
             verify(notificationService).sendMail(
@@ -136,6 +120,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL")
                     .build()).build();
             //When
+            given(notificationsProperties.getNotifyRespondentLiPMediationSuccessfulTemplateWelsh()).willReturn("template-id-welsh");
             handler.handle(params);
             //Then
             verify(notificationService).sendMail(
@@ -213,6 +198,8 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                     .build())
                 .build();
             //When
+            when(notificationsProperties.getNotifyLrDefendantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            when(organisationDetailsService.getRespondent1LegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
             handler.handle(params);
             //Then
             verify(notificationService).sendMail(
@@ -235,6 +222,8 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL.name())
                     .build()).build();
             //When
+            when(notificationsProperties.getNotifyLrDefendantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            when(organisationDetailsService.getRespondent1LegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
             handler.handle(params);
             //Then
             verify(notificationService).sendMail(
@@ -257,6 +246,8 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL.name())
                     .build()).build();
             //When
+            when(notificationsProperties.getNotifyLrDefendantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            when(organisationDetailsService.getRespondent1LegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
             handler.handle(params);
             //Then
             verify(notificationService).sendMail(
@@ -279,6 +270,8 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 CallbackRequest.builder().eventId(NOTIFY_MEDIATION_SUCCESSFUL_DEFENDANT_2_LR.name())
                     .build()).build();
             //When
+            when(notificationsProperties.getNotifyLrDefendantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            when(organisationDetailsService.getRespondent1LegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
             handler.handle(params);
             //Then
             verify(notificationService).sendMail(
@@ -302,6 +295,8 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 CallbackRequest.builder().eventId(NOTIFY_APPLICANT_MEDIATION_SUCCESSFUL)
                     .build()).build();
             //When
+            when(notificationsProperties.getNotifyTwoVOneDefendantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            when(organisationDetailsService.getRespondent1LegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
             handler.handle(params);
             //Then
             verify(notificationService).sendMail(
@@ -324,6 +319,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 CallbackRequest.builder().eventId(NOTIFY_MEDIATION_SUCCESSFUL_DEFENDANT_2_LR.name())
                     .build()).build();
             //When
+            when(notificationsProperties.getNotifyLipSuccessfulMediation()).thenReturn(TEMPLATE_ID);
             handler.handle(params);
             //Then
             verify(notificationService).sendMail(
@@ -347,6 +343,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 CallbackRequest.builder().eventId(NOTIFY_MEDIATION_SUCCESSFUL_DEFENDANT_LIP.name())
                     .build()).build();
             //When
+            when(notificationsProperties.getNotifyLipSuccessfulMediation()).thenReturn(TEMPLATE_ID);
             handler.handle(params);
             //Then
             verify(notificationService).sendMail(
@@ -368,6 +365,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 CallbackRequest.builder().eventId(NOTIFY_MEDIATION_SUCCESSFUL_DEFENDANT_LIP.name())
                     .build()).build();
             //When
+            when(notificationsProperties.getNotifyLipSuccessfulMediationWelsh()).thenReturn(TEMPLATE_ID);
             handler.handle(params);
             //Then
             verify(notificationService).sendMail(
@@ -397,6 +395,8 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                         .build())
                 .build();
             //When
+            when(organisationDetailsService.getRespondent1LegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
+            when(notificationsProperties.getNotifyLrDefendantSuccessfulMediationForLipVLrClaim()).thenReturn(TEMPLATE_ID_LIP_LR);
             handler.handle(params);
             //Then
             verify(notificationService).sendMail(
@@ -427,6 +427,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL.name())
                     .build()).build();
             //When
+            given(notificationsProperties.getNotifyRespondentLiPMediationSuccessfulTemplate()).willReturn(TEMPLATE_ID);
             handler.handle(params);
             //Then
             verify(notificationService).sendMail(
@@ -457,6 +458,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL.name())
                     .build()).build();
             //When
+            given(notificationsProperties.getNotifyRespondentLiPMediationSuccessfulTemplate()).willReturn(TEMPLATE_ID);
             handler.handle(params);
             //Then
             verify(notificationService).sendMail(
