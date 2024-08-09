@@ -215,7 +215,7 @@ public class StateFlowEngine implements IStateFlowEngine {
                 .set((c, flags) -> {
                     flags.put(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true);
                     flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
-                    flags.put(DASHBOARD_SERVICE_ENABLED.name(), (featureToggleService.isDashboardEnabledForCase(c) && caseContainsLiP.test(c)) );
+                    flags.put(DASHBOARD_SERVICE_ENABLED.name(), (featureToggleService.isDashboardEnabledForCase(c) && caseContainsLiP.test(c)));
                     flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
                     flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
                 })
