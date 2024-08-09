@@ -9,9 +9,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
@@ -59,6 +61,8 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
     class AboutToSubmitCallback {
 
         private static final String RESPONDENT_EMAIL_TEMPLATE = "template-id-respondent";
+        private static final String BILINGUAL_RESPONDENT_EMAIL_TEMPLATE = "bilingual-id-respondent";
+
         private static final String RESPONDENT_MEDIATION_EMAIL_TEMPLATE = "template-mediation-id-respondent";
         private static final String RESPONDENT_EMAIL_ID = "sole.trader@email.com";
         private static final String REFERENCE_NUMBER = "claimant-confirms-to-proceed-respondent-notification-000DC001";
@@ -132,7 +136,8 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
         @Test
         void shouldNotNotifyLRRespondent_whenApplicantProceeds() {
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-            when(notificationsProperties.getNotifyDefendantLRForMediation()).thenReturn(RESPONDENT_MEDIATION_EMAIL_TEMPLATE);
+            when(notificationsProperties.getNotifyDefendantLRForMediation()).thenReturn(
+                RESPONDENT_MEDIATION_EMAIL_TEMPLATE);
             when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
                                                                                              .name("org name")
                                                                                              .build()));
@@ -152,6 +157,32 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
                 "respondentsolicitor@example.com",
                 RESPONDENT_MEDIATION_EMAIL_TEMPLATE,
                 getNotificationDataMapCarm(),
+                REFERENCE_NUMBER
+            );
+        }
+
+        @Test
+        void shouldNotifyLipRespondentWithBilingualTemplateWhenRespondentIsBilingual() {
+            when(notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()).thenReturn(
+                BILINGUAL_RESPONDENT_EMAIL_TEMPLATE);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .build().toBuilder()
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                             .respondent1ResponseLanguage(Language.BOTH.toString())
+                                                             .build()).build())
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED.name())
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                RESPONDENT_EMAIL_ID,
+                BILINGUAL_RESPONDENT_EMAIL_TEMPLATE,
+                getNotificationDataMap(),
                 REFERENCE_NUMBER
             );
         }
