@@ -176,7 +176,7 @@ class BundleRequestMapperTest {
     void testBundleRequestMapperWithAllDocsAndCaseEvenEnable() {
         // Given
         //Add all type of documents and other request details in case data
-        CaseData caseData = getCaseData();
+        CaseData caseData = getCaseDataNoCategoryId();
         given(featureToggleService.isCaseEventsEnabled()).willReturn(true);
 
         // When
@@ -444,6 +444,75 @@ class BundleRequestMapperTest {
             .build();
     }
 
+    private CaseData getCaseDataNoCategoryId() {
+        return CaseData.builder().ccdCaseReference(1L)
+            .documentWitnessStatement(getWitnessDocsCategoryId())
+            .documentWitnessStatementApp2(getWitnessDocsCategoryId())
+            .documentWitnessStatementRes(getWitnessDocsCategoryId())
+            .documentWitnessStatementRes2(getWitnessDocsCategoryId())
+            .documentWitnessSummary(getWitnessDocsCategoryId())
+            .documentWitnessSummaryApp2(getWitnessDocsCategoryId())
+            .documentWitnessSummaryRes(getWitnessDocsCategoryId())
+            .documentWitnessSummaryRes2(getWitnessDocsCategoryId())
+            .documentHearsayNotice(getWitnessDocsCategoryId())
+            .documentHearsayNoticeApp2(getWitnessDocsCategoryId())
+            .documentHearsayNoticeRes(getWitnessDocsCategoryId())
+            .documentHearsayNoticeRes2(getWitnessDocsCategoryId())
+            .documentReferredInStatement(setupOtherEvidenceDocs("witness"))
+            .documentReferredInStatementApp2(setupOtherEvidenceDocs("witness"))
+            .documentReferredInStatementRes(setupOtherEvidenceDocs("witness"))
+            .documentReferredInStatementRes2(setupOtherEvidenceDocs("witness"))
+            .documentExpertReport(getExpertDocs("expert1"))
+            .documentExpertReportApp2(getExpertDocs("expert2"))
+            .documentExpertReportRes(getExpertDocs("expert3"))
+            .documentExpertReportRes2(getExpertDocs("expert4"))
+            .documentJointStatement(getExpertDocs("expert5"))
+            .documentJointStatementApp2(getExpertDocs("expert6"))
+            .documentJointStatementRes(getExpertDocs("expert7"))
+            .documentJointStatementRes2(getExpertDocs("expert8"))
+            .documentAnswers(getExpertDocs("expert1"))
+            .documentAnswersApp2(getExpertDocs("expert2"))
+            .documentAnswersRes(getExpertDocs("expert3"))
+            .documentAnswersRes2(getExpertDocs("expert4"))
+            .documentQuestions(getExpertOtherPartyQuestionDocs("cl1Fname"))
+            .documentQuestionsApp2(getExpertOtherPartyQuestionDocs("cl2Fname"))
+            .documentQuestionsRes(getExpertOtherPartyQuestionDocs("df1Fname"))
+            .documentQuestionsRes2(getExpertOtherPartyQuestionDocs("df2Fname"))
+            .documentEvidenceForTrial(getDocumentEvidenceForTrial())
+            .documentEvidenceForTrialApp2(getDocumentEvidenceForTrial())
+            .documentEvidenceForTrialRes(getDocumentEvidenceForTrial())
+            .documentEvidenceForTrialRes2(getDocumentEvidenceForTrial())
+            .documentCaseSummary(setupOtherEvidenceDocs(null))
+            .documentCaseSummaryApp2(setupOtherEvidenceDocs(null))
+            .documentCaseSummaryRes(setupOtherEvidenceDocs(null))
+            .documentCaseSummaryRes2(setupOtherEvidenceDocs(null))
+            .documentForDisclosure(setupOtherEvidenceDocs(null))
+            .defendantResponseDocuments(getDefendantResponseDocs())
+            .claimantResponseDocuments(getClaimantResponseDocs())
+            .dismissalOrderDocStaff(getOrderDoc(DocumentType.DISMISSAL_ORDER))
+            .generalOrderDocStaff(getOrderDoc(DocumentType.GENERAL_ORDER))
+            .documentCosts(setupOtherEvidenceDocs(null))
+            .documentCostsApp2(setupOtherEvidenceDocs(null))
+            .documentCostsRes(setupOtherEvidenceDocs(null))
+            .documentCostsRes2(setupOtherEvidenceDocs(null))
+            .systemGeneratedCaseDocuments(setupSystemGeneratedCaseDocs())
+            .applicant1(Party.builder().individualLastName("lastname").individualFirstName("cl1Fname").partyName(
+                "applicant1").type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().individualLastName("lastname").individualFirstName("df1Fname").partyName(
+                "respondent1").type(Party.Type.INDIVIDUAL).build())
+            .addApplicant2(YesOrNo.YES)
+            .addRespondent2(YesOrNo.YES)
+            .applicant2(Party.builder().individualLastName("lastname").individualFirstName("cl2Fname").partyName(
+                "applicant2").type(Party.Type.INDIVIDUAL).build())
+            .respondent2(Party.builder().individualLastName("lastname").individualFirstName("df2Fname").partyName(
+                "respondent2").type(Party.Type.INDIVIDUAL).build())
+            .hearingDate(LocalDate.now())
+            .submittedDate(LocalDateTime.of(2023, 2, 10, 2,
+                                            2, 2))
+            .servedDocumentFiles(setupParticularsOfClaimDocs())
+            .build();
+    }
+
     private ServedDocumentFiles setupParticularsOfClaimDocs() {
         List<Element<Document>> particularsOfClaim = new ArrayList<>();
         Document document = Document.builder().documentFileName(TEST_FILE_NAME).documentUrl(TEST_URL).build();
@@ -586,6 +655,23 @@ class BundleRequestMapperTest {
                                                              .witnessOptionDocument(Document.builder().documentBinaryUrl(
                                                                      TEST_URL)
                                                                                         .documentFileName(TEST_FILE_NAME).build())
+                                                             .witnessOptionName(witnessName)
+                                                             .witnessOptionUploadDate(LocalDate.of(2023, 2, 10).plusDays(witnessNames.indexOf(witnessName)))
+                                                             .createdDatetime(LocalDateTime.of(2023, 12, 12, 8, 8, 5)).build()));
+        });
+        return witnessEvidenceDocs;
+    }
+
+    private List<Element<UploadEvidenceWitness>> getWitnessDocsCategoryId() {
+        List<String> witnessNames = new ArrayList<>(Arrays.asList("cl1Fname", "df1Fname", "cl2Fname", "df2Fname", "FirstName LastName"));
+        List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
+        LocalDateTime createdDateTime = LocalDateTime.of(2023, 12, 12, 8, 8, 5);
+        witnessNames.forEach(witnessName -> {
+            witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
+                                                             .builder()
+                                                             .witnessOptionDocument(Document.builder().documentBinaryUrl(
+                                                                     TEST_URL)
+                                                                                        .documentFileName(TEST_FILE_NAME).categoryID("").build())
                                                              .witnessOptionName(witnessName)
                                                              .witnessOptionUploadDate(LocalDate.of(2023, 2, 10).plusDays(witnessNames.indexOf(witnessName)))
                                                              .createdDatetime(LocalDateTime.of(2023, 12, 12, 8, 8, 5)).build()));
