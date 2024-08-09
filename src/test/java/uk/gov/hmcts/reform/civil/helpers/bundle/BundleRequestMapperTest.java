@@ -244,15 +244,15 @@ class BundleRequestMapperTest {
                      bundleCreateRequest.getCaseDetails().getCaseData().getOrdersDocuments().get(1).getValue().getDocumentFileName());
         assertEquals("Order 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getOrdersDocuments().get(2).getValue().getDocumentFileName());
-        assertEquals("Email referred to in the statement of witness 12/12/2022",
+        assertEquals("CL 1 - Statement 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1WitnessStatements().get(0).getValue().getDocumentFileName());
-        assertEquals("Email referred to in the statement of witness 12/12/2022",
+        assertEquals("CL 2 - Statement 12/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getClaimant2WitnessStatements().get(0).getValue().getDocumentFileName());
-        assertEquals("Email referred to in the statement of witness 12/12/2022",
+        assertEquals("DF 1 - Statement 11/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getDefendant1WitnessStatements().get(0).getValue().getDocumentFileName());
-        assertEquals("Email referred to in the statement of witness 12/12/2022",
+        assertEquals("DF 2 - Statement 13/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getDefendant2WitnessStatements().get(0).getValue().getDocumentFileName());
-        assertEquals("Notice to admit facts CL 1 12/01/2023",
+        assertEquals("Witness Statement cl2Fname 1 12/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1WitnessStatements().get(1).getValue().getDocumentFileName());
         assertEquals("Expert Evidence expert1 Test 12/01/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1ExpertEvidence().get(0).getValue().getDocumentFileName());
