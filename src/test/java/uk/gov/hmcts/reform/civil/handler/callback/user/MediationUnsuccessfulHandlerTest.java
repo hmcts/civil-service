@@ -1,13 +1,13 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -23,18 +23,20 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    MediationUnsuccessfulHandler.class,
-    JacksonAutoConfiguration.class,
-})
+@ExtendWith(MockitoExtension.class)
 class MediationUnsuccessfulHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
     private MediationUnsuccessfulHandler handler;
 
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
+
+    @BeforeEach
+    void setUp() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        handler = new MediationUnsuccessfulHandler(objectMapper, featureToggleService);
+    }
 
     @Nested
     class AboutToStartCallback {

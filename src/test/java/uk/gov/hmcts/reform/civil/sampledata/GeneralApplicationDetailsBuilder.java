@@ -479,6 +479,7 @@ public class GeneralApplicationDetailsBuilder {
     }
 
     public CaseData getTestCaseDataWithEmptyCollectionOfApps(CaseData caseData) {
+        CaseLocationCivil caseManagementLoc = CaseLocationCivil.builder().region("1").baseLocation("22222").build();
         return caseData.toBuilder()
             .ccdCaseReference(1234L)
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
@@ -577,7 +578,8 @@ public class GeneralApplicationDetailsBuilder {
                         .unavailableTrialRequiredYesOrNo(YES)
                         .supportRequirementLanguageInterpreter(STRING_CONSTANT)
                         .build())
-                .build();
+            .caseManagementLocation(caseManagementLoc)
+            .build();
     }
 
     public CaseData getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement respondentOrderAgreement) {
@@ -894,6 +896,7 @@ public class GeneralApplicationDetailsBuilder {
     }
 
     public CaseData getTestCaseDataSPEC(CaseCategory claimType) {
+        CaseLocationCivil caseManagementLoc = CaseLocationCivil.builder().region("1").baseLocation("22222").build();
         return CaseData.builder()
             .ccdCaseReference(1234L)
             .caseAccessCategory(claimType)
@@ -987,6 +990,7 @@ public class GeneralApplicationDetailsBuilder {
                                                                               .getFormattedName())
                                                .orgPolicyReference(STRING_CONSTANT).build())
             .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
+            .caseManagementLocation(caseManagementLoc)
             .build();
     }
 
@@ -1746,6 +1750,7 @@ public class GeneralApplicationDetailsBuilder {
     }
 
     public CaseData getVaryJudgmentWithN245TestData() {
+        CaseLocationCivil caseManagementLoc = CaseLocationCivil.builder().region("1").baseLocation("22222").build();
         return CaseData
                 .builder()
                 .ccdCaseReference(1L)
@@ -1828,6 +1833,7 @@ public class GeneralApplicationDetailsBuilder {
                         .unavailableTrialRequiredYesOrNo(YES)
                         .supportRequirementLanguageInterpreter(STRING_CONSTANT)
                         .build())
+            .caseManagementLocation(caseManagementLoc)
                 .build();
     }
 
