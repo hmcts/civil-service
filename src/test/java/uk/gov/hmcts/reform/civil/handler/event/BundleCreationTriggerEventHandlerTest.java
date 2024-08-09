@@ -42,7 +42,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -61,7 +63,9 @@ class BundleCreationTriggerEventHandlerTest {
     CoreCaseDataService coreCaseDataService;
     @Mock
     CaseDetailsConverter caseDetailsConverter;
-    private BundleCreateResponse bundleCreateResponse;
+    BundleCreateResponse bundleCreateResponse;
+    @Mock
+    BundleCreateResponse mockBundleCreateResponse;
     @InjectMocks
     private BundleCreationTriggerEventHandler bundleCreationTriggerEventHandler;
     private CaseData caseData;
@@ -309,4 +313,24 @@ class BundleCreationTriggerEventHandlerTest {
         // Then: BUNDLE_CREATION_NOTIFICATION Event should not be triggered
         verify(coreCaseDataService, times(0)).triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION);
     }
+
+    @Test
+    void sendBundleCreationTriggerShouldNotTriggerNotificationEventWhenErrorsExist() {
+        // Given: Case details with all type of documents required for bundles
+        BundleCreationTriggerEvent event = new BundleCreationTriggerEvent(1L);
+        when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
+        StartEventResponse response = StartEventResponse.builder()
+            .caseDetails(CaseDetailsBuilder.builder().data(caseData).build()).eventId("event1").token("test").build();
+        when(coreCaseDataService.startUpdate(event.getCaseId().toString(), CREATE_BUNDLE)).thenReturn(response);
+        when(bundleCreationService.createBundle(event)).thenReturn(mockBundleCreateResponse);
+        when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
+        when(mockBundleCreateResponse.getErrors()).thenReturn(List.of("Error"));
+
+        // When: Bundle creation trigger is called
+        // Then: BUNDLE_CREATION_NOTIFICATION Event should not be triggered
+        Assertions.assertDoesNotThrow(() -> bundleCreationTriggerEventHandler.sendBundleCreationTrigger(event));
+        verify(coreCaseDataService, times(0)).triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION);
+        verify(coreCaseDataService).submitUpdate(eq(event.getCaseId().toString()), any());
+    }
+
 }
