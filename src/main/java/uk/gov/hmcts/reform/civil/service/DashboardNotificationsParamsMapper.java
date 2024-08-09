@@ -263,27 +263,19 @@ public class DashboardNotificationsParamsMapper {
     private static void updateCCJParams(CaseData caseData, HashMap<String, Object> params) {
         JudgmentDetails judgmentDetails = caseData.getActiveJudgment();
         String orderedAmount = judgmentDetails.getOrderedAmount();
+        params.put(
+            "ccjDefendantAdmittedAmount",
+            MonetaryConversions.penniesToPounds(new BigDecimal(orderedAmount))
+        );
 
         if (caseData.getActiveJudgment().getPaymentPlan().getType().equals(PAY_IN_INSTALMENTS)) {
             JudgmentInstalmentDetails instalmentDetails = judgmentDetails.getInstalmentDetails();
-            params.put(
-                "ccjDefendantAdmittedAmount",
-                MonetaryConversions.penniesToPounds(new BigDecimal(orderedAmount))
-            );
             params.put("ccjPaymentMessageEn", getStringPaymentMessage(instalmentDetails));
             params.put("ccjPaymentMessageCy", getStringPaymentMessageInWelsh(instalmentDetails));
         } else if (caseData.getActiveJudgment().getPaymentPlan().getType().equals(PAY_IMMEDIATELY)) {
-            params.put(
-                "ccjDefendantAdmittedAmount",
-                MonetaryConversions.penniesToPounds(new BigDecimal(orderedAmount))
-            );
             params.put("ccjPaymentMessageEn", "immediately");
             params.put("ccjPaymentMessageCy", "ar unwaith");
         } else {
-            params.put(
-                "ccjDefendantAdmittedAmount",
-                MonetaryConversions.penniesToPounds(new BigDecimal(orderedAmount))
-            );
             params.put(
                 "ccjPaymentMessageEn",
                 "by " + DateUtils.formatDate(judgmentDetails.getPaymentPlan().getPaymentDeadlineDate())
