@@ -5,18 +5,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
@@ -46,32 +43,33 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    GenerateResponseSealedSpec.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    AssignCategoryId.class
-})
+@ExtendWith(MockitoExtension.class)
 class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
 
-    @Autowired
+    @InjectMocks
     private GenerateResponseSealedSpec handler;
 
-    @MockBean
+    @Mock
     private SealedClaimResponseFormGeneratorForSpec sealedClaimResponseFormGeneratorForSpec;
 
-    @Autowired
+    @Mock
     private ObjectMapper mapper;
 
-    @Autowired
-    private AssignCategoryId assignCategoryId;
+    private AssignCategoryId assignCategoryId = new uk.gov.hmcts.reform.civil.utils.AssignCategoryId();
 
-    @MockBean
+    @Mock
     private CivilDocumentStitchingService civilDocumentStitchingService;
 
-    @MockBean
+    @Mock
     private FeatureToggleService toggleService;
+
+    @BeforeEach
+    void setUp() {
+        mapper = new ObjectMapper();
+        handler = new GenerateResponseSealedSpec(mapper, sealedClaimResponseFormGeneratorForSpec, civilDocumentStitchingService,
+                                                                   toggleService, assignCategoryId);
+        mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+    }
 
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
     private CaseData caseData;
@@ -119,9 +117,6 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
 
     @BeforeEach
     void setup() {
-        when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
-        when(civilDocumentStitchingService.bundle(ArgumentMatchers.anyList(), anyString(), anyString(), anyString(),
-                                                  any(CaseData.class))).thenReturn(STITCHED_DOC);
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         systemGeneratedCaseDocuments.add(element(DIRECTIONS_QUESTIONNAIRE_DOC));
         caseData = CaseDataBuilder.builder()
@@ -147,7 +142,9 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         // Given: Case data with docs to stitch, stitching is enabled and isPinInPostEnabled is false
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(toggleService.isPinInPostEnabled()).thenReturn(false);
+        when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
+        when(civilDocumentStitchingService.bundle(ArgumentMatchers.anyList(), anyString(), anyString(), anyString(),
+                                                  any(CaseData.class))).thenReturn(STITCHED_DOC);
 
         // When: handler is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -165,8 +162,11 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
     void shouldGenerateClaimForm_V1VersionAndIsPinInPostEnabled() {
         // Given: Case data with docs to stitch, stitching is enabled and isPinInPostEnabled is true
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
-        CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
         when(toggleService.isPinInPostEnabled()).thenReturn(true);
+        CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+        when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
+        when(civilDocumentStitchingService.bundle(ArgumentMatchers.anyList(), anyString(), anyString(), anyString(),
+                                                  any(CaseData.class))).thenReturn(STITCHED_DOC);
 
         // When: handler is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -177,6 +177,7 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
                        .filter(caseDocumentElement -> caseDocumentElement.getValue()
                            .getDocumentName().equals(STITCHED_DOC.getDocumentName())).count()).isEqualTo(1);
         verify(sealedClaimResponseFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
+        assertThat(toggleService.isPinInPostEnabled()).isTrue();
     }
 
     @Test
@@ -184,8 +185,11 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         // Given: Case data with docs to stitch, stitching is enabled,isPinInPostEnabled is false and callback
         // version V1
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
-        CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
         when(toggleService.isPinInPostEnabled()).thenReturn(false);
+        CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+        when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
+        when(civilDocumentStitchingService.bundle(ArgumentMatchers.anyList(), anyString(), anyString(), anyString(),
+                                                  any(CaseData.class))).thenReturn(STITCHED_DOC);
 
         // When: handler is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -196,6 +200,7 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
                        .filter(caseDocumentElement -> caseDocumentElement.getValue()
                            .getDocumentName().equals(STITCHED_DOC.getDocumentName())).count()).isEqualTo(1);
         verify(sealedClaimResponseFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
+        assertThat(toggleService.isPinInPostEnabled()).isFalse();
     }
 
     @Test
@@ -203,6 +208,7 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         // Given: Case data with docs to stitch, stitching is disabled and callback version V1
         ReflectionTestUtils.setField(handler, "stitchEnabled", false);
         CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+        when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
         when(toggleService.isPinInPostEnabled()).thenReturn(true);
 
         // When: handler is called
@@ -214,6 +220,7 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
                        .filter(caseDocumentElement -> caseDocumentElement.getValue()
                            .getDocumentName().equals(SEALED_FORM.getDocumentName())).count()).isEqualTo(2);
         verify(sealedClaimResponseFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
+        assertThat(toggleService.isPinInPostEnabled()).isTrue();
     }
 
     @Test
@@ -221,7 +228,7 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         // Given : Case data with docs to stitch and stitching is disabled and callback version not V1
         ReflectionTestUtils.setField(handler, "stitchEnabled", false);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(toggleService.isPinInPostEnabled()).thenReturn(false);
+        when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
 
         // When: handler is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -241,6 +248,7 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         ReflectionTestUtils.setField(handler, "stitchEnabled", false);
         CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
         when(toggleService.isPinInPostEnabled()).thenReturn(false);
+        when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
 
         // When: handler is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -251,6 +259,7 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
                        .filter(caseDocumentElement -> caseDocumentElement.getValue()
                            .getDocumentName().equals(SEALED_FORM.getDocumentName())).count()).isEqualTo(2);
         verify(sealedClaimResponseFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
+        assertThat(toggleService.isPinInPostEnabled()).isFalse();
     }
 
     @Test
@@ -263,7 +272,9 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
             .systemGeneratedCaseDocuments(new ArrayList<>()).build();
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
         CallbackParams params = callbackParamsOf(CallbackVersion.V_1, localCaseData, ABOUT_TO_SUBMIT);
-        when(toggleService.isPinInPostEnabled()).thenReturn(false);
+        when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
+        when(civilDocumentStitchingService.bundle(ArgumentMatchers.anyList(), anyString(), anyString(), anyString(),
+                                                  any(CaseData.class))).thenReturn(STITCHED_DOC);
 
         // When: handler is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -311,6 +322,8 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
             .build();
         CallbackParams params = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
+        when(civilDocumentStitchingService.bundle(ArgumentMatchers.anyList(), anyString(), anyString(), anyString(),
+                                                  any(CaseData.class))).thenReturn(STITCHED_DOC);
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -356,6 +369,9 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
             .build();
         CallbackParams params = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
         // When
+        when(civilDocumentStitchingService.bundle(ArgumentMatchers.anyList(), anyString(), anyString(), anyString(),
+                                                  any(CaseData.class))).thenReturn(STITCHED_DOC);
+
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then
