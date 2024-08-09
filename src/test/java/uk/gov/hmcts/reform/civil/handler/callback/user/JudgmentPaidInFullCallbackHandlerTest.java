@@ -1,15 +1,14 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -20,40 +19,29 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_PAID_IN_FULL;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    JacksonAutoConfiguration.class,
-    JudgmentPaidInFullOnlineMapper.class,
-    JudgmentPaidInFullCallbackHandler.class,
-    InterestCalculator.class
-})
+@ExtendWith(MockitoExtension.class)
 class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
     private JudgmentPaidInFullCallbackHandler handler;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockBean
-    private InterestCalculator interestCalculator;
-
-    @MockBean
-    private Time time;
+    @BeforeEach
+    void setup() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        JudgmentPaidInFullOnlineMapper paidInFullJudgmentOnlineMapper = new JudgmentPaidInFullOnlineMapper();
+        handler = new JudgmentPaidInFullCallbackHandler(objectMapper, paidInFullJudgmentOnlineMapper);
+    }
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvents() {
@@ -123,10 +111,6 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateJudgementStatusAsCancelledForDefaultJudgment() {
-
-            when(interestCalculator.calculateInterest(any()))
-                .thenReturn(BigDecimal.valueOf(0)
-                );
             //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
             CaseData caseData = CaseDataBuilder.builder()
                 .getDefaultJudgment1v1CaseJudgmentPaid();
