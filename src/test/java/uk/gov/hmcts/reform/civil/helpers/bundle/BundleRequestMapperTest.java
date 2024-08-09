@@ -753,8 +753,29 @@ class BundleRequestMapperTest {
     }
 
     @Test
+    void testBundleCreateRequestMapperForEmptyDetailsAndCaseEventEnable() {
+        // Given
+        given(featureToggleService.isCaseEventsEnabled()).willReturn(true);
+        CaseData caseData = CaseData.builder().ccdCaseReference(1L)
+            .applicant1(Party.builder().individualLastName("lastname").partyName("applicant1").type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().individualLastName("lastname").partyName("respondent1").type(Party.Type.INDIVIDUAL).build())
+            .hearingDate(LocalDate.now())
+            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
+            .build();
+
+        // When
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +
+                                                                                                           ".yaml",
+                                                                                                       "test", "test"
+        );
+        // Then
+        assertNotNull(bundleCreateRequest);
+    }
+
+    @Test
     void testBundleCreateRequestMapperForEmptyDetails() {
         // Given
+        given(featureToggleService.isCaseEventsEnabled()).willReturn(false);
         CaseData caseData = CaseData.builder().ccdCaseReference(1L)
             .applicant1(Party.builder().individualLastName("lastname").partyName("applicant1").type(Party.Type.INDIVIDUAL).build())
             .respondent1(Party.builder().individualLastName("lastname").partyName("respondent1").type(Party.Type.INDIVIDUAL).build())
@@ -774,6 +795,30 @@ class BundleRequestMapperTest {
     @Test
     void testBundleCreateRequestMapperForOneRespondentAndOneApplicant() {
         // Given: Casedata with Applicant2 and Respondent2 as NO
+        given(featureToggleService.isCaseEventsEnabled()).willReturn(false);
+        CaseData caseData = CaseData.builder().ccdCaseReference(1L)
+            .hearingDate(LocalDate.now())
+            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
+            .addApplicant2(YesOrNo.NO)
+            .addRespondent2(YesOrNo.NO)
+            .applicant1(Party.builder().individualLastName("lastname").partyName("applicant1").type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().individualLastName("lastname").partyName("respondent1").type(Party.Type.INDIVIDUAL).build())
+            .build();
+
+        // When: mapCaseDataToBundleCreateRequest is called
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +
+                                                                                                           ".yaml",
+                                                                                                       "test", "test"
+        );
+        // Then: hasApplicant2 and hasRespondant2 should return false
+        assertEquals(false, bundleCreateRequest.getCaseDetails().getCaseData().isHasApplicant2());
+        assertEquals(false, bundleCreateRequest.getCaseDetails().getCaseData().isHasRespondant2());
+    }
+
+    @Test
+    void testBundleCreateRequestMapperForOneRespondentAndOneApplicantAndCaseEventEnable() {
+        // Given: Casedata with Applicant2 and Respondent2 as NO
+        given(featureToggleService.isCaseEventsEnabled()).willReturn(true);
         CaseData caseData = CaseData.builder().ccdCaseReference(1L)
             .hearingDate(LocalDate.now())
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
@@ -795,6 +840,16 @@ class BundleRequestMapperTest {
 
     @Test
     void shouldFilterEvidenceForTrial() {
+        given(featureToggleService.isCaseEventsEnabled()).willReturn(false);
+        List<Element<UploadEvidenceDocumentType>> list =
+            bundleRequestMapper.filterDocumentaryEvidenceForTrialDocs(getDocumentEvidenceForTrial(),
+                                                                      TypeOfDocDocumentaryEvidenceOfTrial.getAllDocsDisplayNames(), true);
+        assertEquals(1, list.size());
+    }
+
+    @Test
+    void shouldFilterEvidenceForTrialAndCaseEventEnable() {
+        given(featureToggleService.isCaseEventsEnabled()).willReturn(true);
         List<Element<UploadEvidenceDocumentType>> list =
             bundleRequestMapper.filterDocumentaryEvidenceForTrialDocs(getDocumentEvidenceForTrial(),
                                                                       TypeOfDocDocumentaryEvidenceOfTrial.getAllDocsDisplayNames(), true);
