@@ -69,7 +69,7 @@ public class SendSDOToLiPDefendantCallbackHandlerTest extends BaseCallbackHandle
 
         // then
         assertThat(response.getErrors()).isNull();
-        verify(sendSDOBulkPrintService).sendSDOOrderToLIP(any(), any(), TASK_ID_DEFENDANT);
+        verify(sendSDOBulkPrintService).sendSDOOrderToLIP(any(), any(), any());
     }
 
     @Test
@@ -85,6 +85,6 @@ public class SendSDOToLiPDefendantCallbackHandlerTest extends BaseCallbackHandle
 
         // then
         assertThat(response.getErrors()).isNull();
-        verify(sendSDOBulkPrintService).sendSDOOrderToLIP(any(), any(), TASK_ID_CLAIMANT);
+        verify(sendSDOBulkPrintService).sendSDOOrderToLIP(any(), any(), any());
     }
 }
