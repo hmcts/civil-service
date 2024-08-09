@@ -13,7 +13,10 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -28,6 +31,7 @@ public class NotifyClaimantAmendRestitchBundleHandler extends CallbackHandler im
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIMANT_AMEND_RESTITCH_BUNDLE);
+    private static final String DATE_FORMAT = "dd-MM-yyyy";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -44,26 +48,27 @@ public class NotifyClaimantAmendRestitchBundleHandler extends CallbackHandler im
         return EVENTS;
     }
 
-    // Todo Remove this class from sonar exclusions once LR notification is implemented
-
     public CallbackResponse sendNotification(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (caseData.isApplicantLiP()) {
-            notificationService.sendMail(
-                caseData.getClaimantUserDetails().getEmail(),
-                getNotificationTemplate(caseData),
-                addProperties(caseData),
-                String.format(REFERENCE_TEMPLATE, caseData.getCcdCaseReference())
-            );
-        }
+        notificationService.sendMail(
+            getRecipientEmail(caseData),
+            getNotificationTemplate(caseData),
+            addProperties(caseData),
+            String.format(REFERENCE_TEMPLATE, caseData.getCcdCaseReference())
+        );
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
     private String getNotificationTemplate(CaseData caseData) {
-        return caseData.isClaimantBilingual()
-            ? notificationsProperties.getNotifyLipUpdateTemplateBilingual()
-            : notificationsProperties.getNotifyLipUpdateTemplate();
+        if (caseData.isApplicantLiP()) {
+            return caseData.isClaimantBilingual()
+                ? notificationsProperties.getNotifyLipUpdateTemplateBilingual()
+                : notificationsProperties.getNotifyLipUpdateTemplate();
+        } else {
+            return notificationsProperties.getNotifyLRBundleRestitched();
+        }
+
     }
 
     @Override
@@ -71,7 +76,14 @@ public class NotifyClaimantAmendRestitchBundleHandler extends CallbackHandler im
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_NAME, caseData.getApplicant1().getPartyName(),
-            CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
+            CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData),
+            BUNDLE_RESTITCH_DATE, LocalDate.now().format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK))
         );
+    }
+
+    private String getRecipientEmail(CaseData caseData) {
+        return caseData.isApplicantLiP()
+            ? caseData.getClaimantUserDetails().getEmail()
+            : caseData.getApplicantSolicitor1UserDetails().getEmail();
     }
 }
