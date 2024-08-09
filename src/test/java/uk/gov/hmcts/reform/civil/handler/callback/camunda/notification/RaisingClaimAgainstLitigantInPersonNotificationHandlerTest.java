@@ -3,10 +3,10 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -24,22 +24,18 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 
-@SpringBootTest(classes = {
-    RaisingClaimAgainstLitigantInPersonNotificationHandler.class,
-    NotificationsProperties.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class RaisingClaimAgainstLitigantInPersonNotificationHandlerTest {
 
     public static final String TEMPLATE_ID = "template-id";
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
 
-    @MockBean
+    @Mock
     private NotificationsProperties notificationsProperties;
 
-    @Autowired
+    @InjectMocks
     private RaisingClaimAgainstLitigantInPersonNotificationHandler handler;
 
     @Nested
