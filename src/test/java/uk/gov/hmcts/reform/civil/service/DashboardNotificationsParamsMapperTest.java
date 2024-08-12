@@ -342,7 +342,7 @@ public class DashboardNotificationsParamsMapperTest {
                                 .state(ISSUED)
                                 .paymentPlan(JudgmentPaymentPlan.builder()
                                                  .type(PAY_BY_DATE)
-                                                 .paymentDeadlineDate(LocalDate.now().plusDays(10))
+                                                 .paymentDeadlineDate(LocalDate.of(2050, Month.AUGUST, 19))
                                                  .build())
                                 .orderedAmount("150001")
                                 .build())
@@ -351,8 +351,8 @@ public class DashboardNotificationsParamsMapperTest {
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
         assertThat(result).extracting("ccjDefendantAdmittedAmount").isEqualTo(BigDecimal.valueOf(1500.01));
-        assertThat(result).extracting("ccjPaymentMessageEn").isEqualTo("by 19 August 2024");
-        assertThat(result).extracting("ccjPaymentMessageCy").isEqualTo("erbyn 19 Awst 2024");
+        assertThat(result).extracting("ccjPaymentMessageEn").isEqualTo("by 19 August 2050");
+        assertThat(result).extracting("ccjPaymentMessageCy").isEqualTo("erbyn 19 Awst 2050");
     }
 
     @Test
