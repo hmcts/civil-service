@@ -181,7 +181,11 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_UPDATE_DASHBOARD_CLAIMANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS("Scenario.AAA6.Update.Claimant.TaskList.UploadDocuments.FinalOrders"),
     SCENARIO_AAA6_DECISION_REQUEST_FOR_RECONSIDERATION_CLAIMANT("Scenario.AAA6.CP.ReconDecisionMade.Claimant"),
     SCENARIO_AAA6_DECISION_REQUEST_FOR_RECONSIDERATION_DEFENDANT("Scenario.AAA6.CP.ReconDecisionMade.Defendant"),
-    SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_LR_CLAIMANT("Scenario.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Lr.Claimant");
+    SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_LR_CLAIMANT("Scenario.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Lr.Claimant"),
+    SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_CLAIMANT("Scenario.AAA6.ClaimantIntent.ClaimantEndsClaim.Claimant"),
+    SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_DEFENDANT("Scenario.AAA6.ClaimantIntent.ClaimantEndsClaim.Defendant"),
+    SCENARIO_AAA6_CP_BUNDLE_UPDATED_CLAIMANT("Scenario.AAA6.CP.Bundle.Updated.Claimant"),
+    SCENARIO_AAA6_CP_BUNDLE_UPDATED_DEFENDANT("Scenario.AAA6.CP.Bundle.Updated.Defendant");
 
     private final String scenario;
 
