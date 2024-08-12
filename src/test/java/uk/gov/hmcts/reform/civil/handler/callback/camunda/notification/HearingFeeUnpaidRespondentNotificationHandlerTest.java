@@ -28,6 +28,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CASE_ID;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 @ExtendWith(MockitoExtension.class)
@@ -110,7 +111,7 @@ class HearingFeeUnpaidRespondentNotificationHandlerTest {
     @NotNull
     private Map<String, String> getNotificationLipDataMap() {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+            CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
             CLAIMANT_V_DEFENDANT, "Rambo v Trader",
             PARTY_NAME, "Mr. Sole Trader"
         );
