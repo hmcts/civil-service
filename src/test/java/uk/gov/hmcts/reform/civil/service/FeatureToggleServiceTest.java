@@ -256,12 +256,8 @@ class FeatureToggleServiceTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsPartOfNationalRollout(Boolean toggleStat) {
-        final String feature = "national-rollout-whitelist";
         String location = "000000";
-        when(featureToggleApi.isFeatureEnabledForLocation(eq(feature), eq(location), eq(false)))
-            .thenReturn(toggleStat);
-
-        assertThat(featureToggleService.isPartOfNationalRollout(location)).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isPartOfNationalRollout(location)).isEqualTo(true);
     }
 
     private void givenToggle(String feature, boolean state) {
