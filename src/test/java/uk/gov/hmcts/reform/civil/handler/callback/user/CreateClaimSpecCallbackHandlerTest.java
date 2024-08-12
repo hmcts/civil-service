@@ -1459,7 +1459,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
             }
 
-
             @Test
             void shouldReturnNoErrors_whenRespondent1AddressValid() {
                 // Given
