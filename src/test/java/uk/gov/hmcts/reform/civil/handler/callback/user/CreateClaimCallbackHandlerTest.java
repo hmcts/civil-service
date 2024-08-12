@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.civil.model.DocumentWithRegex;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -65,6 +66,7 @@ import uk.gov.hmcts.reform.civil.validation.OrgPolicyValidator;
 import uk.gov.hmcts.reform.civil.validation.PartyValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
+import uk.gov.hmcts.reform.civil.validation.PartyValidator;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -214,6 +216,11 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         private static final String PAGE_ID = "applicant";
 
+        @BeforeEach
+        void setup() {
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
+        }
+
         @Test
         void shouldReturnError_whenIndividualDateOfBirthIsInTheFuture() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
@@ -269,6 +276,72 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isEmpty();
         }
+
+        @Test
+        void shouldReturnError_whenIndividualAddressLengthGreaterThanMaxLimit() {
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant1(Party.builder()
+                                .partyName("Party").type(Party.Type.INDIVIDUAL)
+                                .individualDateOfBirth(now().minusDays(1))
+                                .primaryAddress(Address.builder()
+                                                    .addressLine1("Line 1 test again for more than 35 characters")
+                                                    .addressLine2("Line 2 test again for more than 35 characters")
+                                                    .addressLine3("Line 3 test again for more than 35 characters")
+                                                    .county("Line 4 test again for more than 35 characters")
+                                                    .postCode("Line 5 test again for more than 8 characters")
+                                                    .postTown("Line 6 test again for more than 35 characters").build())
+                                .build()).build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNotEmpty();
+            assertThat(response.getErrors()).hasSize(6);
+        }
+
+        @Test
+        void shouldReturnError_whenOrgNameExceedsMaxLength() {
+            // Given
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant1(Party.builder()
+                                .type(Party.Type.ORGANISATION)
+                                .organisationName("This is very long name exceeds 70 characters "
+                                                      + " to throw error for max length allowed")
+                                .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isNotEmpty();
+            assertThat(response.getErrors()).hasSize(1);
+        }
+
+        @Test
+        void shouldNotReturnError_whenOrgNameExceedsMaxlength_And_flagOff() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant1(Party.builder()
+                                .type(Party.Type.ORGANISATION)
+                                .organisationName("This is very long name exceeds 70 characters "
+                                                      + " to throw error for max length allowed")
+                                .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isEmpty();
+        }
+
     }
 
     @Nested
@@ -276,6 +349,11 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         private static final String PAGE_ID = "applicant2";
 
+        @BeforeEach
+        void setup() {
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
+        }
+
         @Test
         void shouldReturnError_whenIndividualDateOfBirthIsInTheFuture() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
@@ -329,6 +407,72 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnError_whenSoleTraderPostCodeLengthExceedsMaxLimit() {
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant2(Party.builder()
+                                .soleTraderTitle("Mr")
+                                .soleTraderFirstName("Jacob")
+                                .soleTraderLastName("Martin").type(Party.Type.SOLE_TRADER)
+                                .soleTraderDateOfBirth(now().minusDays(1))
+                                .primaryAddress(Address.builder()
+                                                    .addressLine1("Triple street")
+                                                    .postCode("00000PCode")
+                                                    .build())
+                                .build()).build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNotEmpty();
+            assertThat(response.getErrors()).hasSize(1);
+        }
+
+        @Test
+        void shouldReturnError_whenCompanyAddressExceedsMaxLength() {
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant2(Party.builder()
+                                .companyName("MR companyName is very long nam exceeds 70 characters to throw" +
+                                                 " error for max length allowed").type(Party.Type.COMPANY)
+                                .primaryAddress(Address.builder()
+                                                    .addressLine1("Line 1 test again for more than 35 characters")
+                                                    .addressLine2("Line 2 test again for more than 35 characters")
+                                                    .addressLine3("Line 3 test again for more than 35 characters")
+                                                    .county("Line 4 test again for more than 35 characters")
+                                                    .postCode("Line 5 test again for more than 8 characters")
+                                                    .postTown("Line 6 test again for more than 35 characters").build())
+                                .build()).build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNotEmpty();
+            assertThat(response.getErrors()).hasSize(7);
+        }
+
+        @Test
+        void shouldNotReturnError_whenOrgNameExceedsMaxlength_And_flagOff() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant2(Party.builder()
+                                .type(Party.Type.ORGANISATION)
+                                .organisationName("This is very long name exceeds 70 characters "
+                                                      + " to throw error for max length allowed")
+                                .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
             assertThat(response.getErrors()).isEmpty();
         }
     }

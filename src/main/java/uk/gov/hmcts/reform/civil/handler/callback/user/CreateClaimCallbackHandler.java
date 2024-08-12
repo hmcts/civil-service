@@ -158,8 +158,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(MID, "start-claim"), this::startClaim)
-            .put(callbackKey(MID, "applicant"), this::validateApplicant1DateOfBirth)
-            .put(callbackKey(MID, "applicant2"), this::validateApplicant2DateOfBirth)
+            .put(callbackKey(MID, "applicant"), this::validateApplicant1Details)
+            .put(callbackKey(MID, "applicant2"), this::validateApplicant2Details)
             .put(callbackKey(MID, "fee"), this::calculateFee)
             .put(callbackKey(MID, "idam-email"), this::getIdamEmail)
             .put(callbackKey(MID, "setRespondent2SameLegalRepresentativeToNo"), this::setRespondent2SameLegalRepToNo)
@@ -219,18 +219,20 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }
 
-    private CallbackResponse validateApplicant1DateOfBirth(CallbackParams callbackParams) {
+    private CallbackResponse validateApplicant1Details(CallbackParams callbackParams) {
         Party applicant = callbackParams.getCaseData().getApplicant1();
         List<String> errors = dateOfBirthValidator.validate(applicant);
+        validatePartyDetails(applicant, errors);;
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
     }
 
-    private CallbackResponse validateApplicant2DateOfBirth(CallbackParams callbackParams) {
-        Party applicant = callbackParams.getCaseData().getApplicant2();
-        List<String> errors = dateOfBirthValidator.validate(applicant);
+    private CallbackResponse validateApplicant2Details(CallbackParams callbackParams) {
+        Party applicant2 = callbackParams.getCaseData().getApplicant2();
+        List<String> errors = dateOfBirthValidator.validate(applicant2);
+        validatePartyDetails(applicant2, errors);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -263,7 +265,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             }
             partyValidator.validateName(party.getPartyName(), errors);
         }
-
         return errors;
     }
 
