@@ -1,22 +1,26 @@
 package uk.gov.hmcts.reform.civil.model.dq;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Data
 @Builder (toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class Witness {
 
-    private final String partyID;
+    private String partyID;
     @Deprecated
-    private final String name;
-    private final String firstName;
-    private final String lastName;
-    private final String emailAddress;
-    private final String phoneNumber;
-    private final String reasonForWitness;
-    private final String eventAdded;
-    private final LocalDate dateAdded;
+    private String name;
+    private String firstName;
+    private String lastName;
+    private String emailAddress;
+    private String phoneNumber;
+    private String reasonForWitness;
+    private String eventAdded;
+    private LocalDate dateAdded;
 }

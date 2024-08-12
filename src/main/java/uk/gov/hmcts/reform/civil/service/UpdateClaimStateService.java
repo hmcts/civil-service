@@ -32,7 +32,7 @@ public class UpdateClaimStateService {
         } else if (isCaseSettledAllowed(updatedData)) {
             return CaseState.CASE_SETTLED.name();
         } else if (updatedData.hasApplicantNotProceededWithClaim()) {
-            return CaseState.CASE_DISMISSED.name();
+            return CaseState.CASE_STAYED.name();
         } else if (isProceedsInHeritageSystemAllowed(updatedData)) {
             return CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
         } else {
