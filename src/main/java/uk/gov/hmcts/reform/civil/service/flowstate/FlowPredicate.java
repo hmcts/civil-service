@@ -1064,4 +1064,9 @@ public class FlowPredicate {
         caseData.getTakenOfflineByStaffDate() != null
         && (Objects.isNull(caseData.getMediation().getUnsuccessfulMediationReason())
             && Objects.isNull(caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect()));
+
+    public static final Predicate<CaseData> caseContainsLiP = caseData ->
+        caseData.isRespondent1LiP()
+            || caseData.isRespondent2LiP()
+            || caseData.isApplicantNotRepresented();
 }
