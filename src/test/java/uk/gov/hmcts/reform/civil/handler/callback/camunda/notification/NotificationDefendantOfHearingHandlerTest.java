@@ -1,15 +1,14 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -27,11 +26,8 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
-import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,17 +44,14 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationDefendantOfHearingHandler.TASK_ID_DEFENDANT1_HMC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationDefendantOfHearingHandler.TASK_ID_DEFENDANT2_HMC;
 
-@SpringBootTest(classes = {
-    NotificationDefendantOfHearingHandler.class,
-    JacksonAutoConfiguration.class,
-})
+@ExtendWith(MockitoExtension.class)
 public class NotificationDefendantOfHearingHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+    @Mock
     NotificationsProperties notificationsProperties;
-    @MockBean
+    @Mock
     HearingNoticeCamundaService hearingNoticeCamundaService;
 
     @Captor
@@ -73,32 +66,11 @@ public class NotificationDefendantOfHearingHandlerTest {
     @Captor
     private ArgumentCaptor<String> reference;
 
-    @Autowired
+    @InjectMocks
     private NotificationDefendantOfHearingHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
-
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getHearingListedNoFeeDefendantLrTemplate())
-                .thenReturn("test-template-no-fee-defendant-id");
-            when(notificationsProperties.getHearingNotificationLipDefendantTemplate())
-                .thenReturn("test-template-defendant-lip-id");
-            when(notificationsProperties.getHearingNotificationLipDefendantTemplateWelsh())
-                .thenReturn("test-template-defendant-lip-welsh-id");
-            when(hearingNoticeCamundaService.getProcessVariables(any()))
-                .thenReturn(HearingNoticeVariables.builder()
-                                .hearingStartDateTime(LocalDateTime.of(
-                                    LocalDate.of(2022, 10, 7),
-                                    LocalTime.of(15, 30)
-                                ))
-                                .hearingId("123456")
-                                .build());
-
-            when(notificationsProperties.getHearingListedNoFeeDefendantLrTemplateHMC())
-                .thenReturn("test-template-no-fee-defendant-id-hmc");
-        }
 
         @Test
         void shouldNotifyRespondentSolicitor_whenInvokedNoFeeAnd1v1() {
@@ -115,6 +87,8 @@ public class NotificationDefendantOfHearingHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT1_HEARING").build()).build();
             // When
+            when(notificationsProperties.getHearingListedNoFeeDefendantLrTemplate())
+                .thenReturn("test-template-no-fee-defendant-id");
             handler.handle(params);
             // Then
             verify(notificationService).sendMail(
@@ -141,6 +115,8 @@ public class NotificationDefendantOfHearingHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT1_HEARING").build()).build();
             // When
+            when(notificationsProperties.getHearingListedNoFeeDefendantLrTemplate())
+                .thenReturn("test-template-no-fee-defendant-id");
             handler.handle(params);
             // Then
             verify(notificationService).sendMail(
@@ -167,6 +143,8 @@ public class NotificationDefendantOfHearingHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT1_HEARING").build()).build();
             // When
+            when(notificationsProperties.getHearingListedNoFeeDefendantLrTemplate())
+                .thenReturn("test-template-no-fee-defendant-id");
             handler.handle(params);
             // Then
             verify(notificationService).sendMail(
@@ -196,6 +174,8 @@ public class NotificationDefendantOfHearingHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT2_HEARING").build()).build();
             // When
+            when(notificationsProperties.getHearingListedNoFeeDefendantLrTemplate())
+                .thenReturn("test-template-no-fee-defendant-id");
             handler.handle(params);
             // Then
             verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -226,6 +206,8 @@ public class NotificationDefendantOfHearingHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT2_HEARING").build()).build();
             // When
+            when(notificationsProperties.getHearingListedNoFeeDefendantLrTemplate())
+                .thenReturn("test-template-no-fee-defendant-id");
             handler.handle(params);
             // Then
             verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -254,6 +236,8 @@ public class NotificationDefendantOfHearingHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT1_HEARING").build()).build();
             // When
+            when(notificationsProperties.getHearingListedNoFeeDefendantLrTemplate())
+                .thenReturn("test-template-no-fee-defendant-id");
             handler.handle(params);
             // Then
             verify(notificationService).sendMail(
@@ -281,6 +265,8 @@ public class NotificationDefendantOfHearingHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT1_HEARING").build()).build();
             // When
+            when(notificationsProperties.getHearingNotificationLipDefendantTemplate())
+                .thenReturn("test-template-defendant-lip-id");
             handler.handle(params);
             // Then
             verify(notificationService).sendMail(
@@ -315,6 +301,8 @@ public class NotificationDefendantOfHearingHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT1_HEARING").build()).build();
             // When
+            when(notificationsProperties.getHearingNotificationLipDefendantTemplateWelsh())
+                .thenReturn("test-template-defendant-lip-welsh-id");
             handler.handle(params);
             // Then
             verify(notificationService).sendMail(
@@ -343,6 +331,8 @@ public class NotificationDefendantOfHearingHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT1_HEARING").build()).build();
             // When
+            when(notificationsProperties.getHearingNotificationLipDefendantTemplate())
+                .thenReturn("test-template-defendant-lip-id");
             handler.handle(params);
             // Then
             verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -373,6 +363,8 @@ public class NotificationDefendantOfHearingHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT2_HEARING").build()).build();
             // When
+            when(notificationsProperties.getHearingNotificationLipDefendantTemplate())
+                .thenReturn("test-template-defendant-lip-id");
             handler.handle(params);
             // Then
             verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -403,6 +395,8 @@ public class NotificationDefendantOfHearingHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT2_HEARING").build()).build();
             // When
+            when(notificationsProperties.getHearingNotificationLipDefendantTemplate())
+                .thenReturn("test-template-defendant-lip-id");
             handler.handle(params);
             // Then
             verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -428,6 +422,16 @@ public class NotificationDefendantOfHearingHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT1_HEARING_HMC").build()).build();
             // When
+            when(hearingNoticeCamundaService.getProcessVariables(any()))
+                .thenReturn(uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables.builder()
+                                .hearingStartDateTime(java.time.LocalDateTime.of(
+                                    LocalDate.of(2022, 10, 7),
+                                    java.time.LocalTime.of(15, 30)
+                                ))
+                                .hearingId("123456")
+                                .build());
+            when(notificationsProperties.getHearingListedNoFeeDefendantLrTemplateHMC())
+                .thenReturn("test-template-no-fee-defendant-id-hmc");
             handler.handle(params);
             // Then
             verify(notificationService).sendMail(
@@ -454,6 +458,16 @@ public class NotificationDefendantOfHearingHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT2_HEARING_HMC").build()).build();
             // When
+            when(hearingNoticeCamundaService.getProcessVariables(any()))
+                .thenReturn(uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables.builder()
+                                .hearingStartDateTime(java.time.LocalDateTime.of(
+                                    LocalDate.of(2022, 10, 7),
+                                    java.time.LocalTime.of(15, 30)
+                                ))
+                                .hearingId("123456")
+                                .build());
+            when(notificationsProperties.getHearingListedNoFeeDefendantLrTemplateHMC())
+                .thenReturn("test-template-no-fee-defendant-id-hmc");
             handler.handle(params);
             // Then
             verify(notificationService).sendMail(
