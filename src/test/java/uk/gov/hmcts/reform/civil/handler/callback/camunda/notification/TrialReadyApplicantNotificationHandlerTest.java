@@ -105,7 +105,7 @@ class TrialReadyApplicantNotificationHandlerTest {
         private Map<String, String> getNotificationDataMapLiPvLiP(CaseData caseData) {
 
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 PARTY_NAME, caseData.getApplicant1().getPartyName(),
                 CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
             );
