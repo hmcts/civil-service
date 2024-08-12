@@ -154,20 +154,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     }
 
     private CallbackResponse validateRespondentWitnesses(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        if (!ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
-            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
-                return validateWitnesses(callbackParams.getCaseData().getRespondent1DQ());
-            } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
-                return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
-            } else if (respondent2HasSameLegalRep(caseData)
-                && (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO)
-                && (caseData.getRespondent2DQ() != null
-                && caseData.getRespondent2DQ().getRespondent2DQWitnesses() != null)) {
-                return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
-            }
-        }
-        return validateWitnesses(callbackParams.getCaseData().getRespondent1DQ());
+        return validateRespondentWitnesses.execute(callbackParams);
     }
 
     private CallbackResponse validateRespondentExperts(CallbackParams callbackParams) {
