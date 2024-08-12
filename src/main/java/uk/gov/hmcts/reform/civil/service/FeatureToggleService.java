@@ -140,8 +140,7 @@ public class FeatureToggleService {
     }
 
     public boolean isPartOfNationalRollout(String locationEpimms) {
-        return locationEpimms != null && featureToggleApi
-            .isFeatureEnabledForLocation("national-rollout-whitelist", locationEpimms, false);
+        return true;
     }
 
     public boolean isCaseEventsEnabled() {
