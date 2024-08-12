@@ -140,7 +140,7 @@ public class FeatureToggleService {
     }
 
     public boolean isPartOfNationalRollout(String locationEpimms) {
-        return true;
+        return locationEpimms != null;
     }
 
     public boolean isCaseEventsEnabled() {
