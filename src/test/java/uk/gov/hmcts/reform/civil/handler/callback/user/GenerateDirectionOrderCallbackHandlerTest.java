@@ -48,6 +48,7 @@ import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeFinalOrderGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -93,6 +94,9 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
     private JudgeFinalOrderGenerator judgeFinalOrderGenerator;
 
     @Mock
+    private UserService theUserService;
+
+    @Mock
     private DocumentHearingLocationHelper locationHelper;
 
     @Mock
@@ -134,7 +138,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         handler = new GenerateDirectionOrderCallbackHandler(locationRefDataService, mapper, judgeFinalOrderGenerator,
-                                                            locationHelper, userService, workingDayIndicator);
+                                                            locationHelper, theUserService, workingDayIndicator);
     }
 
     @Nested
@@ -831,7 +835,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldAddDocumentToCollection_onAboutToSubmit() {
-            when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                         .forename("Judge")
                                                                         .surname("Judy")
                                                                         .roles(Collections.emptyList()).build());
@@ -860,7 +864,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldChangeStateToFinalOrder_onAboutToSubmitAndFreeFormOrder() {
-            when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                         .forename("Judge")
                                                                         .surname("Judy")
                                                                         .roles(Collections.emptyList()).build());
@@ -881,7 +885,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldChangeStateToFinalOrder_onAboutToSubmitAndAssistedOrderAndNoFurtherHearing() {
-            when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                         .forename("Judge")
                                                                         .surname("Judy")
                                                                         .roles(Collections.emptyList()).build());
@@ -903,7 +907,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldChangeStateToCaseProgression_onAboutToSubmitAndAssistedOrderWithFurtherHearing() {
-            when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                         .forename("Judge")
                                                                         .surname("Judy")
                                                                         .roles(Collections.emptyList()).build());
@@ -927,7 +931,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldRePopulateHearingNotes_whenAssistedHearingNotesExist() {
-            when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                         .forename("Judge")
                                                                         .surname("Judy")
                                                                         .roles(Collections.emptyList()).build());
@@ -950,7 +954,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldRePopulateHearingNotes_whenFreeFormHearingNotesExist() {
-            when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                         .forename("Judge")
                                                                         .surname("Judy")
                                                                         .roles(Collections.emptyList()).build());
@@ -971,7 +975,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotRePopulateHearingNotes_whenAssistedHearingNotesDoNotExist() {
-            when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                         .forename("Judge")
                                                                         .surname("Judy")
                                                                         .roles(Collections.emptyList()).build());
@@ -993,7 +997,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotRePopulateHearingNotes_whenFreeFormHearingNotesDoNotExist() {
-            when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                         .forename("Judge")
                                                                         .surname("Judy")
                                                                         .roles(Collections.emptyList()).build());
