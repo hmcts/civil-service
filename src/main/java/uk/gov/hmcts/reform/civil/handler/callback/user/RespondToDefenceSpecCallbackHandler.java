@@ -474,6 +474,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 nextState = CaseState.JUDICIAL_REFERRAL.name();
             } else if (caseData.isPartAdmitClaimSettled()) {
                 nextState = CaseState.CASE_SETTLED.name();
+            } else if (featureToggleService.isLipVLipEnabled()
+                && caseData.isLRvLipOneVOne()
+                && caseData.isClaimantDontWantToProceedWithFulLDefenceFD()) {
+                nextState = CaseState.CASE_STAYED.name();
             }
         }
 
