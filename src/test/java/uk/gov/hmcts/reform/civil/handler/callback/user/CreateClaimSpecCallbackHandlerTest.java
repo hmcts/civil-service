@@ -1454,11 +1454,15 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Nested
         class Respondent1Address {
 
+            @BeforeEach
+            void setup() {
+                when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
+            }
+
+
             @Test
             void shouldReturnNoErrors_whenRespondent1AddressValid() {
                 // Given
-                when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
-
                 Party respondent1 = PartyBuilder.builder().company().build();
 
                 CaseData caseData = CaseData.builder().respondent1(respondent1).build();
@@ -1480,8 +1484,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnErrors_whenRespondent1AddressNotValid() {
                 // Given
-                when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
-
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                     .respondent1(Party.builder().type(Party.Type.ORGANISATION)
                                     .primaryAddress(Address.builder()
@@ -1507,11 +1509,14 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Nested
         class Respondent2Address {
 
+            @BeforeEach
+            void setup() {
+                when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
+            }
+
             @Test
             void shouldReturnNoErrors_whenRespondent2AddressValid() {
                 // Given
-                when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
-
                 Party respondent2 = PartyBuilder.builder().company().build();
 
                 CaseData caseData = CaseData.builder().respondent2(respondent2).build();
@@ -1533,8 +1538,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnErrors_whenRespondent2AddressNotValid() {
                 // Given
-                when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
-
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                     .respondent2(Party.builder().type(Party.Type.ORGANISATION)
                                      .primaryAddress(Address.builder()
