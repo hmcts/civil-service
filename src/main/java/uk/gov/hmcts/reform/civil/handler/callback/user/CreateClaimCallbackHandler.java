@@ -145,8 +145,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final AssignCategoryId assignCategoryId;
     private final CaseFlagsInitialiser caseFlagInitialiser;
     private final ToggleConfiguration toggleConfiguration;
-    private final PartyValidator partyValidator;
     private final String caseDocLocation = "/cases/case-details/%s#CaseDocuments";
+    private final PartyValidator partyValidator;
 
     @Value("${court-location.unspecified-claim.region-id}")
     private String regionId;
@@ -165,6 +165,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "setRespondent2SameLegalRepresentativeToNo"), this::setRespondent2SameLegalRepToNo)
             .put(callbackKey(MID, "validate-defendant-legal-rep-email"), this::validateRespondentRepEmail)
             .put(callbackKey(MID, "validate-claimant-legal-rep-email"), this::validateClaimantRepEmail)
+            .put(callbackKey(MID, "respondent1"), this::validateRespondent1Details)
+            .put(callbackKey(MID, "respondent2"), this::validateRespondent2Details)
             .put(callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaim)
             .put(callbackKey(MID, "appOrgPolicy"), this::validateApplicantSolicitorOrgPolicy)
             .put(callbackKey(MID, "repOrgPolicy"), this::validateRespondentSolicitorOrgPolicy)
@@ -232,6 +234,25 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         List<String> errors = dateOfBirthValidator.validate(applicant2);
         validatePartyDetails(applicant2, errors);
 
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse validateRespondent1Details(CallbackParams callbackParams) {
+        Party respondent = callbackParams.getCaseData().getRespondent1();
+        List<String> errors = new ArrayList<>();
+        validatePartyDetails(respondent, errors);
+
+        return AboutToStartOrSubmitCallbackResponse.builder().errors(errors).build();
+    }
+
+    private CallbackResponse validateRespondent2Details(CallbackParams callbackParams) {
+        Party respondent2 = callbackParams.getCaseData().getRespondent2();
+        List<String> errors = new ArrayList<>();
+        if (respondent2 != null) {
+            validatePartyDetails(respondent2, errors);
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
