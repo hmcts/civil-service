@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.LocationReferenceDataApiClient;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataException;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -16,6 +17,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.apache.logging.log4j.util.Strings.concat;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 
 @Slf4j
 @Service
@@ -25,6 +27,7 @@ public class LocationReferenceDataService {
     public static final String CIVIL_NATIONAL_BUSINESS_CENTRE = "Civil National Business Centre";
     public static final String COUNTY_COURT_MONEY_CLAIMS_CENTRE = "County Court Money Claims Centre";
     private final LocationReferenceDataApiClient locationReferenceDataApiClient;
+    private final LocationReferenceDataService locationRefDataService;
     private final AuthTokenGenerator authTokenGenerator;
 
     public LocationRefData getCnbcLocation(String authToken) {
@@ -226,5 +229,10 @@ public class LocationReferenceDataService {
 
         return filteredLocations.get(0);
 
+    }
+
+    public List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }
 }
