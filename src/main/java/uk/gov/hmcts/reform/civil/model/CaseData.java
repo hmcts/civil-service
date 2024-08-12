@@ -1541,4 +1541,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isJudgeOrderVerificationRequired() {
         return (this.getCourtPermissionNeeded() != null && SettleDiscontinueYesOrNoList.YES.equals(this.getCourtPermissionNeeded()));
     }
+
+    @JsonIgnore
+    public boolean isClaimantDontWantToProceedWithFulLDefenceFD() {
+        return this.isClaimBeingDisputed()
+            && this.hasApplicantNotProceededWithClaim();
+    }
 }
