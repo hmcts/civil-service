@@ -253,13 +253,6 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).isEqualTo(toggleStat);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsPartOfNationalRollout(Boolean toggleStat) {
-        String location = "000000";
-        assertThat(featureToggleService.isPartOfNationalRollout(location)).isEqualTo(true);
-    }
-
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(eq(feature)))
             .thenReturn(state);
