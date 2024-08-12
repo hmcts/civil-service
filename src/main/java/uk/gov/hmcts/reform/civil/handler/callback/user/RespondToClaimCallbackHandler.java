@@ -20,10 +20,12 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondToClaimCallbackHandlerTasks.PopulateRespondentCopyObjects;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondToClaimCallbackHandlerTasks.ValidateRespondentExperts;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondToClaimCallbackHandlerTasks.ValidateRespondentWitnesses;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
@@ -116,6 +118,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final AssignCategoryId assignCategoryId;
     private final FrcDocumentsUtils frcDocumentsUtils;
+    private final PopulateRespondentCopyObjects populateRespondentCopyObjects;
+    private final ValidateRespondentWitnesses validateRespondentWitnesses;
+    private final ValidateRespondentExperts validateExperts;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -158,20 +163,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     }
 
     private CallbackResponse validateRespondentExperts(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        if (!ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
-            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
-                return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
-            } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
-                return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
-            } else if (respondent2HasSameLegalRep(caseData)
-                && (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO)
-                && (caseData.getRespondent2DQ() != null
-                && caseData.getRespondent2DQ().getRespondent2DQExperts() != null)) {
-                return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
-            }
-        }
-        return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
+        return validateExperts.execute(callbackParams);
     }
 
     private CallbackResponse validateUnavailableDates(CallbackParams callbackParams) {
@@ -675,7 +667,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private boolean is2v1AndRespondent1ResponseIsMatchingTypeToAnyApplicant(CaseData caseData,
                                                                             RespondentResponseType type) {
         return TWO_V_ONE.equals(getMultiPartyScenario(caseData))
-            && (type.equals(caseData.getRespondent1ClaimResponseType())
+&& (type.equals(caseData.getRespondent1ClaimResponseType())
             || type.equals(caseData.getRespondent1ClaimResponseTypeToApplicant2()));
     }
 
@@ -700,7 +692,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             && isRespondent1.equals(YES);
     }
 
-    private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
+private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }
