@@ -94,7 +94,7 @@ public class HearingFeeUnpaidRespondentNotificationHandler extends CallbackHandl
 
     public Map<String, String> addPropertiesRespondentLip(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIMANT_V_DEFENDANT, getClaimantVDefendant(caseData),
             PARTY_NAME, caseData.getRespondent1().getPartyName()
         );
