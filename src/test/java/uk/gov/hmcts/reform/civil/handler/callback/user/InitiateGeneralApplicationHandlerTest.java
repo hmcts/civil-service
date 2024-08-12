@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -89,13 +90,13 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     private InitiateGeneralApplicationService initiateGeneralAppService;
 
     @Mock
-    protected IdamClient idamClient;
-
-    @Mock
     protected GeneralAppFeesService feesService;
 
     @Mock
     protected LocationReferenceDataService locationRefDataService;
+
+    @Mock
+    private UserService theUserService;
 
     @Mock
     protected UserRoleCaching userRoleCaching;
@@ -116,7 +117,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     void setup() {
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        handler = new InitiateGeneralApplicationHandler(initiateGeneralAppService, objectMapper, idamClient,
+        handler = new InitiateGeneralApplicationHandler(initiateGeneralAppService, objectMapper, theUserService,
                                                         userRoleCaching, feesService, locationRefDataService,
                                                         featureToggleService);
     }
@@ -866,7 +867,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getTestCaseData(CaseData.builder().build());
 
-            when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                                                                       .email(APPLICANT_EMAIL_ID_CONSTANT)
                                                                       .build());
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
@@ -886,7 +887,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                     .getTestCaseData(CaseData.builder().build());
             when(feesService.getFeeForGA(any())).thenReturn(feeFromFeeService);
-            when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                     .email(APPLICANT_EMAIL_ID_CONSTANT)
                     .build());
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
@@ -949,7 +950,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getTestCaseDataWithEmptyPreferredLocation(CaseData.builder().build());
             when(feesService.getFeeForGA(any())).thenReturn(feeFromFeeService);
-            when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                                                                         .email(APPLICANT_EMAIL_ID_CONSTANT)
                                                                         .build());
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
@@ -977,7 +978,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                     .generalAppHearingDetails(GAHearingDetails.builder().build())
                     .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                     .build();
-            when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                     .email(APPLICANT_EMAIL_ID_CONSTANT)
                     .build());
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
