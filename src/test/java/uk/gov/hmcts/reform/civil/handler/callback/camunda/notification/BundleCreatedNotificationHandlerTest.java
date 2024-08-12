@@ -39,7 +39,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.Bu
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
-import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 @ExtendWith(MockitoExtension.class)
 class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -245,7 +244,7 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
         @NotNull
         private Map<String, String> getNotificationLipDataMap(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData),
                 PARTY_NAME, "John Doe"
             );
@@ -263,7 +262,7 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
 
         Map<String, String> properties = handler.addPropertiesLip(caseData, TASK_ID_APPLICANT);
 
-        assertThat(properties).containsEntry("claimReferenceNumber", "000DC001");
+        assertThat(properties).containsEntry("claimReferenceNumber", "1594901956117591");
         assertThat(properties).containsEntry("claimantvdefendant", "John Doe V Jack Jackson");
         assertThat(properties).containsEntry("name", "John Doe");
     }
@@ -279,7 +278,7 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
 
         Map<String, String> properties = handler.addPropertiesLip(caseData, TASK_ID_DEFENDANT1);
 
-        assertThat(properties).containsEntry("claimReferenceNumber", "000DC001");
+        assertThat(properties).containsEntry("claimReferenceNumber", "1594901956117591");
         assertThat(properties).containsEntry("claimantvdefendant", "John Doe V Jack Jackson");
         assertThat(properties).containsEntry("name", "Jack Jackson");
     }
