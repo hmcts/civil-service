@@ -179,8 +179,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private AssignCategoryId assignCategoryId;
-    @Autowired
-    private PartyValidator partyValidator;
 
     @Autowired
     private PartyValidator partyValidator;
