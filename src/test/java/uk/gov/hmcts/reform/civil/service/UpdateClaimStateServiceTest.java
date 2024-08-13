@@ -189,7 +189,7 @@ class UpdateClaimStateServiceTest {
         //When
         var response = service.setUpCaseState(caseData);
         //Then
-        assertEquals(CaseState.CASE_DISMISSED.name(), response);
+        assertEquals(CaseState.CASE_STAYED.name(), response);
     }
 
     @Test

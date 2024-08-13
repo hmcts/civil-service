@@ -144,7 +144,7 @@ public class BundleCreatedNotificationHandler extends CallbackHandler implements
     public Map<String, String> addPropertiesLip(CaseData caseData, String taskId) {
         String partyName = taskId.equals(TASK_ID_APPLICANT) ? caseData.getApplicant1().getPartyName() : caseData.getRespondent1().getPartyName();
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData),
             PARTY_NAME, partyName
         );
