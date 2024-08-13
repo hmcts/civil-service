@@ -84,7 +84,7 @@ public class HearingFeeUnpaidApplicantNotificationHandler extends CallbackHandle
 
     private Map<String, String> addPropertiesApplicantLip(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIMANT_V_DEFENDANT, getClaimantVDefendant(caseData),
             PARTY_NAME, caseData.getApplicant1().getPartyName()
         );
