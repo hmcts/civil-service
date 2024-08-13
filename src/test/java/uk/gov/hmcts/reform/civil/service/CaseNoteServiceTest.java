@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.model.CaseNote;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentAndNote;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentWithName;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDateTime;
@@ -34,7 +33,7 @@ class CaseNoteServiceTest {
     private CaseNoteService caseNoteService;
 
     @Mock
-    private IdamClient idamClient;
+    private UserService userService;
 
     @Mock
     private Time time;
@@ -53,14 +52,14 @@ class CaseNoteServiceTest {
         @Test
         void shouldBuildNote_whenInvoked() {
             when(time.now()).thenReturn(timeNow);
-            given(idamClient.getUserDetails(BEARER_TOKEN)).willReturn(USER_DETAILS);
+            given(userService.getUserDetails(BEARER_TOKEN)).willReturn(USER_DETAILS);
 
             String note = "new note";
             CaseNote caseNote = caseNoteService.buildCaseNote(BEARER_TOKEN, note);
             CaseNote expectedNote = caseNoteForToday(note);
 
             assertCaseNoteEquals(caseNote, expectedNote);
-            verify(idamClient).getUserDetails(BEARER_TOKEN);
+            verify(userService).getUserDetails(BEARER_TOKEN);
         }
 
         @Test
@@ -94,7 +93,7 @@ class CaseNoteServiceTest {
 
         @Test
         void shouldBuildJudgeNote_whenInvokedAndDocumentAndNote() {
-            given(idamClient.getUserDetails(BEARER_TOKEN)).willReturn(USER_DETAILS);
+            given(userService.getUserDetails(BEARER_TOKEN)).willReturn(USER_DETAILS);
 
             Document document = Document.builder().documentFileName("fileName").build();
             DocumentAndNote testDocument = DocumentAndNote.builder().documentName("testDocument").document(document).documentNote("Note").build();
@@ -106,7 +105,7 @@ class CaseNoteServiceTest {
 
         @Test
         void shouldBuildJudgeNote_whenInvokedAndDocumentAndName() {
-            given(idamClient.getUserDetails(BEARER_TOKEN)).willReturn(USER_DETAILS);
+            given(userService.getUserDetails(BEARER_TOKEN)).willReturn(USER_DETAILS);
 
             Document document = Document.builder().documentFileName("fileName").build();
             DocumentWithName testDocument = DocumentWithName.builder().documentName("testDocument").document(document).build();
