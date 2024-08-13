@@ -297,7 +297,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
         @NotNull
         private Map<String, String> getRespondentNotificationDataMapLip(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 PARTY_NAME, caseData.getRespondent1().getPartyName(),
                 CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
             );
@@ -306,7 +306,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
         @NotNull
         private Map<String, String> getRespondent2NotificationDataMapLip(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER,  caseData.getCcdCaseReference().toString(),
                 PARTY_NAME, caseData.getRespondent2().getPartyName(),
                 CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
             );
@@ -315,7 +315,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
         @NotNull
         private Map<String, String> getApplicantNotificationDataMapLip(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 PARTY_NAME, caseData.getApplicant1().getPartyName(),
                 CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
             );

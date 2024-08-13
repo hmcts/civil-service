@@ -118,7 +118,7 @@ public class TrialReadyRespondentNotificationHandler extends CallbackHandler imp
     private Map<String, String> addPropertiesLRvLip(CaseData caseData) {
 
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_NAME, caseData.getRespondent1().getPartyName(),
             CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
         );

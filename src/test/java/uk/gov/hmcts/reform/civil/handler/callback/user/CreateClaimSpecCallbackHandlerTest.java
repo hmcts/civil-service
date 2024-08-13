@@ -574,6 +574,119 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Then
             assertThat(response.getErrors()).isEmpty();
         }
+
+        @Test
+        void shouldReturnError_when_address_exceeds_max_length() {
+            // Given
+            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant2(Party.builder().type(Party.Type.INDIVIDUAL)
+                                .primaryAddress(Address.builder()
+                                                    .addressLine1("Line 1 test again for more than 35 characters")
+                                                    .addressLine2("Line 1 test again for more than 35 characters")
+                                                    .addressLine3("Line 1 test again for more than 35 characters")
+                                                    .county("Line 1 test again for more than 35 characters")
+                                                    .postCode("Line 1 test again for more than 35 characters")
+                                                    .postTown("Line 1 test again for more than 35 characters").build())
+                                .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isNotEmpty();
+            assertThat(response.getErrors()).hasSize(6);
+
+        }
+
+        @Test
+        void shouldReturnError_when_address_exceeds_max_length_in_Company_name() {
+            // Given
+            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant2(Party.builder()
+                                .type(Party.Type.COMPANY)
+                                .primaryAddress(Address.builder().addressLine1("TEST").build())
+                                .companyName("MR This is very long nam exceeds 70 characters to throw"
+                                                 + " error for max length allowed").build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isNotEmpty();
+        }
+
+        @Test
+        void shouldReturnError_when_address_exceeds_max_length_in_Individual_name() {
+            // Given
+            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant2(Party.builder()
+                                .type(Party.Type.INDIVIDUAL)
+                                .individualFirstName("This is very long name")
+                                .individualTitle("MR")
+                                .individualLastName("exceeds 70 characters to throw error for max length allowed")
+                                .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isNotEmpty();
+        }
+
+        @Test
+        void shouldReturnError_when_address_exceeds_max_length_in_sole_trader_name() {
+            // Given
+            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant2(Party.builder()
+                                .type(Party.Type.SOLE_TRADER)
+                                .soleTraderFirstName("This is very long name")
+                                .soleTraderTitle("MR")
+                                .soleTraderLastName("exceeds 70 characters to throw error for max length allowed")
+                                .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isNotEmpty();
+        }
+
+        @Test
+        void shouldReturnError_when_address_exceeds_max_length_in_org_name() {
+            // Given
+            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant2(Party.builder()
+                                .type(Party.Type.ORGANISATION)
+                                .organisationName("This is very long name exceeds 70 characters "
+                                                      + " to throw error for max length allowed")
+                                .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isNotEmpty();
+        }
     }
 
     @Nested
@@ -1454,6 +1567,11 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Nested
         class Respondent1Address {
 
+            @BeforeEach
+            void setup() {
+                when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
+            }
+
             @Test
             void shouldReturnNoErrors_whenRespondent1AddressValid() {
                 // Given
@@ -1471,38 +1589,42 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 // Then
                 assertThat(response).isNotNull();
-                assertThat(response.getData()).isNull();
-                assertThat(response.getErrors()).isNotNull();
+                assertThat(response.getData()).isNotNull();
                 assertEquals(0, response.getErrors().size());
             }
 
             @Test
             void shouldReturnErrors_whenRespondent1AddressNotValid() {
                 // Given
-                Party respondent1 = Party.builder().primaryAddress(Address.builder().postCode(null).build()).build();
-
-                CaseData caseData = CaseData.builder().respondent1(respondent1).build();
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                    .respondent1(Party.builder().type(Party.Type.ORGANISATION)
+                                    .primaryAddress(Address.builder()
+                                                        .addressLine1("Line 1 test again for more than 35 characters")
+                                                        .addressLine2("Line 1 test again for more than 35 characters")
+                                                        .addressLine3("Line 1 test again for more than 35 characters")
+                                                        .county("Line 1 test again for more than 35 characters")
+                                                        .postCode("PostCode test more than 8 characters")
+                                                        .postTown("Line 1 test again for more than 35 characters").build())
+                                    .build()).build();
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "respondent1");
 
-                given(postcodeValidator.validate(any()))
-                    .willReturn(List.of("Please enter Postcode"));
-
                 // When
-                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                    .handle(params);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 // Then
-                assertThat(response).isNotNull();
-                assertThat(response.getData()).isNull();
-                assertThat(response.getErrors()).isNotNull();
-                assertEquals(1, response.getErrors().size());
-                assertEquals("Please enter Postcode", response.getErrors().get(0));
+                assertThat(response.getErrors()).isNotEmpty();
+                assertThat(response.getErrors()).hasSize(6);
             }
         }
 
         @Nested
         class Respondent2Address {
+
+            @BeforeEach
+            void setup() {
+                when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
+            }
 
             @Test
             void shouldReturnNoErrors_whenRespondent2AddressValid() {
@@ -1521,33 +1643,33 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 // Then
                 assertThat(response).isNotNull();
-                assertThat(response.getData()).isNull();
-                assertThat(response.getErrors()).isNotNull();
+                assertThat(response.getData()).isNotNull();
                 assertEquals(0, response.getErrors().size());
             }
 
             @Test
             void shouldReturnErrors_whenRespondent2AddressNotValid() {
                 // Given
-                Party respondent2 = Party.builder().primaryAddress(Address.builder().postCode(null).build()).build();
-
-                CaseData caseData = CaseData.builder().respondent2(respondent2).build();
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                    .respondent2(Party.builder().type(Party.Type.ORGANISATION)
+                                     .primaryAddress(Address.builder()
+                                                         .addressLine1("Line 1 test again for more than 35 characters")
+                                                         .addressLine2("Line 1 test again for more than 35 characters")
+                                                         .addressLine3("Line 1 test again for more than 35 characters")
+                                                         .county("Line 1 test again for more than 35 characters")
+                                                         .postCode("PostCode test more than 8 characters")
+                                                         .postTown("Line 1 test again for more than 35 characters").build())
+                                     .build()).build();
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "respondent2");
-
-                given(postcodeValidator.validate(any()))
-                    .willReturn(List.of("Please enter Postcode"));
 
                 // When
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
 
                 // Then
-                assertThat(response).isNotNull();
-                assertThat(response.getData()).isNull();
-                assertThat(response.getErrors()).isNotNull();
-                assertEquals(1, response.getErrors().size());
-                assertEquals("Please enter Postcode", response.getErrors().get(0));
+                assertThat(response.getErrors()).isNotEmpty();
+                assertThat(response.getErrors()).hasSize(6);
             }
         }
 
@@ -1809,6 +1931,53 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 assertEquals(1, response.getErrors().size());
                 assertEquals("Please enter Postcode", response.getErrors().get(0));
             }
+        }
+    }
+
+    @Nested
+    class ValidatePartyName {
+
+        @Test
+        void shouldReturnErrors_whenRespondent1PartyNameNotValid() {
+            // Given
+            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .respondent1(Party.builder().type(Party.Type.ORGANISATION).organisationName("Line 1 test again for more than 70 characters on the company party name")
+                                 .primaryAddress(AddressBuilder.defaults().build())
+                                 .build()).build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "respondent1");
+
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isNotEmpty();
+            assertThat(response.getErrors()).hasSize(1);
+        }
+
+        @Test
+        void shouldReturnErrors_whenRespondent2PartyNameNotValid() {
+            // Given
+            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .respondent2(Party.builder().type(Party.Type.INDIVIDUAL)
+                                 .individualTitle("Title test again for more than 70 characters on the company party name")
+                                 .individualFirstName("Line 1 test again for more than 70 characters on the company party name")
+                                 .individualLastName("Line 1 test again for more than 70 characters on the company party name")
+                                 .primaryAddress(AddressBuilder.defaults().build())
+                                 .build()).build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "respondent2");
+
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isNotEmpty();
+            assertThat(response.getErrors()).hasSize(1);
         }
     }
 
