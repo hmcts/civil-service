@@ -45,7 +45,7 @@ public class SendSDOBulkPrintService {
     }
 
     private List<String> getRecipientsList(CaseData caseData, String taskId) {
-        return taskId.equals(TASK_ID_DEFENDANT) ? List.of(caseData.getRespondent1().getPartyName())
+        return TASK_ID_DEFENDANT.equals(taskId) ? List.of(caseData.getRespondent1().getPartyName())
             : List.of(caseData.getApplicant1().getPartyName());
     }
 }

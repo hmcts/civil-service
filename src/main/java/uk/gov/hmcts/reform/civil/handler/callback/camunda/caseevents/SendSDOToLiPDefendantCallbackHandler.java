@@ -39,11 +39,10 @@ public class SendSDOToLiPDefendantCallbackHandler extends CallbackHandler {
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-        if (SEND_SDO_ORDER_TO_LIP_DEFENDANT.equals(caseEvent)) {
+        if (caseEvent == SEND_SDO_ORDER_TO_LIP_DEFENDANT) {
             return TASK_ID_DEFENDANT;
-        } else {
-            return TASK_ID_CLAIMANT;
         }
+        return TASK_ID_CLAIMANT;
     }
 
     @Override
