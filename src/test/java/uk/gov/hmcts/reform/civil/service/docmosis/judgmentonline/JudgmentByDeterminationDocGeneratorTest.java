@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -75,6 +76,9 @@ class JudgmentByDeterminationDocGeneratorTest {
 
     @MockBean
     private OrganisationService organisationService;
+
+    @MockBean
+    private AssignCategoryId assignCategoryId;
 
     @Test
     void shouldDefaultJudgmentFormGeneratorOneFormClaimant() {
