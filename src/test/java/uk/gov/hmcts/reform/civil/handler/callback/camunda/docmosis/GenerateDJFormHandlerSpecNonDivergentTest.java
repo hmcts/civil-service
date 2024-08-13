@@ -51,8 +51,6 @@ class GenerateDJFormHandlerSpecNonDivergentTest extends BaseCallbackHandlerTest 
     private ObjectMapper mapper;
     @InjectMocks
     private GenerateDJFormHandlerSpecNonDivergent handler;
-    @InjectMocks
-    private AssignCategoryId assignCategoryId;
     @Mock
     private DefaultJudgmentFormGenerator defaultJudgmentFormGenerator;
     @Mock
@@ -61,7 +59,7 @@ class GenerateDJFormHandlerSpecNonDivergentTest extends BaseCallbackHandlerTest 
     @BeforeEach
     void setUp() {
         mapper = new ObjectMapper();
-        handler = new GenerateDJFormHandlerSpecNonDivergent(assignCategoryId, defaultJudgmentFormGenerator, mapper);
+        handler = new GenerateDJFormHandlerSpecNonDivergent(defaultJudgmentFormGenerator, mapper);
         mapper.registerModule(new JavaTimeModule());
     }
 
