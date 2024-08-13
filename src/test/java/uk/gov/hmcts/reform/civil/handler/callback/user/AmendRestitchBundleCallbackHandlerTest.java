@@ -30,10 +30,10 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.bundle.BundleCreationService;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,8 +61,6 @@ class AmendRestitchBundleCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private static final String TEST_URL = "url";
     private static final String TEST_FILE_NAME = "testFileName.pdf";
-
-    private static final String MID_PAGE_ID = "create-bundle";
 
     @BeforeEach
     public void setup() {
@@ -183,8 +181,8 @@ class AmendRestitchBundleCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader("Placeholder")
-                    .confirmationBody("Placeholder")
+                    .confirmationHeader("# The bundle has been restitched\n\n## All parties have been notified")
+                    .confirmationBody("&nbsp;")
                     .build());
         }
     }

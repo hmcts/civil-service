@@ -60,6 +60,7 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.OrgPolicyValidator;
+import uk.gov.hmcts.reform.civil.validation.PartyValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ParticularsOfClaimValidator;
@@ -190,6 +191,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private static final String CASE_DOC_LOCATION = "/cases/case-details/%s#CaseDocuments";
     private final AirlineEpimsDataLoader airlineEpimsDataLoader;
     private final AirlineEpimsService airlineEpimsService;
+    private final PartyValidator partyValidator;
 
     @Value("${court-location.specified-claim.region-id}")
     private String regionId;
@@ -214,8 +216,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
-            .put(callbackKey(MID, "respondent1"), this::validateRespondent1Address)
-            .put(callbackKey(MID, "respondent2"), this::validateRespondent2Address)
+            .put(callbackKey(MID, "respondent1"), this::validateRespondent1Details)
+            .put(callbackKey(MID, "respondent2"), this::validateRespondent2Details)
             .put(callbackKey(MID, "amount-breakup"), this::calculateTotalClaimAmount)
             .put(callbackKey(MID, "respondentSolicitor1"), this::validateRespondentSolicitorAddress)
             .put(callbackKey(MID, "respondentSolicitor2"), this::validateRespondentSolicitor2Address)
@@ -272,9 +274,16 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse validateClaimantDetails(CallbackParams callbackParams,
                                                      Function<CaseData, Party> getApplicant) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         Party applicant = getApplicant.apply(caseData);
         List<String> errors = dateOfBirthValidator.validate(applicant);
+        if (featureToggleService.isJudgmentOnlineLive()) {
+            if (applicant.getPrimaryAddress() != null) {
+                partyValidator.validateAddress(applicant.getPrimaryAddress(), errors);
+            }
+            partyValidator.validateName(applicant.getPartyName(), errors);
+        }
+
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         if (errors.isEmpty() && callbackParams.getRequest().getEventId() != null) {
             errors = postcodeValidator.validate(
                 applicant.getPrimaryAddress().getPostCode());
@@ -693,17 +702,30 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         }
     }
 
-    private CallbackResponse validateRespondentAddress(CallbackParams params, Function<CaseData, Party> getRespondent) {
-        CaseData caseData = params.getCaseData();
-        return validatePostCode(getRespondent.apply(caseData).getPrimaryAddress().getPostCode());
+    private CallbackResponse validateRespondent1Details(CallbackParams callbackParams) {
+        return validateRespondentDetails(callbackParams, CaseData::getRespondent1);
     }
 
-    private CallbackResponse validateRespondent1Address(CallbackParams callbackParams) {
-        return validateRespondentAddress(callbackParams, CaseData::getRespondent1);
+    private CallbackResponse validateRespondent2Details(CallbackParams callbackParams) {
+        return validateRespondentDetails(callbackParams, CaseData::getRespondent2);
     }
 
-    private CallbackResponse validateRespondent2Address(CallbackParams callbackParams) {
-        return validateRespondentAddress(callbackParams, CaseData::getRespondent2);
+    private CallbackResponse validateRespondentDetails(CallbackParams callbackParams,
+                                                     Function<CaseData, Party> getRespondent) {
+        CaseData caseData = callbackParams.getCaseData();
+        Party respondent = getRespondent.apply(caseData);
+        List<String> errors = postcodeValidator.validate(respondent.getPrimaryAddress().getPostCode());
+        if (featureToggleService.isJudgmentOnlineLive()) {
+            if (respondent.getPrimaryAddress() != null) {
+                partyValidator.validateAddress(respondent.getPrimaryAddress(), errors);
+            }
+            partyValidator.validateName(respondent.getPartyName(), errors);
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .data(errors.isEmpty()
+                      ? caseData.toBuilder().build().toMap(objectMapper) : null)
+            .build();
     }
 
     private CallbackResponse validateRespondentSolicitorAddress(CallbackParams callbackParams) {
