@@ -1017,6 +1017,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo("DEFAULT_JUDGMENT");
             assertThat(response.getData().get("activeJudgment")).extracting("judgmentId").isEqualTo(1);
             assertThat(response.getData().get("activeJudgment")).extracting("isRegisterWithRTL").isEqualTo("Yes");
+            assertThat(response.getData().get("activeJudgment")).extracting("defendant1Name").isEqualTo("Mr. Sole Trader");
+            assertThat(response.getData().get("activeJudgment")).extracting("defendant1Address").isNotNull();
 
         }
 
@@ -1056,6 +1058,11 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo("DEFAULT_JUDGMENT");
             assertThat(response.getData().get("activeJudgment")).extracting("judgmentId").isEqualTo(1);
             assertThat(response.getData().get("activeJudgment")).extracting("isRegisterWithRTL").isEqualTo("Yes");
+            assertThat(response.getData().get("activeJudgment")).extracting("defendant1Name").isEqualTo("Mr. John Rambo");
+            assertThat(response.getData().get("activeJudgment")).extracting("defendant1Address").isNotNull();
+            assertThat(response.getData().get("activeJudgment")).extracting("defendant2Name").isEqualTo("Mr. John Rambo");
+            assertThat(response.getData().get("activeJudgment")).extracting("defendant2Address").isNotNull();
+            assertThat(response.getData().get("activeJudgment")).extracting("defendant2Dob").isNotNull();
 
         }
 
@@ -1095,6 +1102,11 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo("DEFAULT_JUDGMENT");
             assertThat(response.getData().get("activeJudgment")).extracting("judgmentId").isEqualTo(1);
             assertThat(response.getData().get("activeJudgment")).extracting("isRegisterWithRTL").isEqualTo("No");
+            assertThat(response.getData().get("activeJudgment")).extracting("defendant1Name").isEqualTo("Mr. John Rambo");
+            assertThat(response.getData().get("activeJudgment")).extracting("defendant1Address").isNotNull();
+            assertThat(response.getData().get("activeJudgment")).extracting("defendant2Name").isEqualTo("Mr. John Rambo");
+            assertThat(response.getData().get("activeJudgment")).extracting("defendant2Address").isNotNull();
+            assertThat(response.getData().get("activeJudgment")).extracting("defendant2Dob").isNotNull();
 
         }
 
