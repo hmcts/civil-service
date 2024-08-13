@@ -466,7 +466,7 @@ dependencies {
 
   testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
   testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
-  testImplementation group: 'com.h2database', name: 'h2', version: '2.3.230'
+  testImplementation group: 'com.h2database', name: 'h2', version: '2.3.232'
   // dashboard specific changes ends
 
 
