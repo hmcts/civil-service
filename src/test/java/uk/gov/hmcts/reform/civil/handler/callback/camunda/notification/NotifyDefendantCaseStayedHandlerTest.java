@@ -64,7 +64,8 @@ class NotifyDefendantCaseStayedHandlerTest {
     void sendNotificationShouldSendEmail(boolean isRespondentLiP, boolean isRespondentBilingual, String template, String email) {
         caseData = caseData.toBuilder()
             .respondent1Represented(isRespondentLiP ? YesOrNo.NO : YesOrNo.YES)
-            .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(isRespondentBilingual ? Language.BOTH.toString() : Language.ENGLISH.toString()).build()).build())
+            .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(
+                isRespondentBilingual ? Language.BOTH.toString() : Language.ENGLISH.toString()).build()).build())
             .respondentSolicitor1EmailAddress(email)
             .build();
         CallbackParams params = CallbackParams.builder().caseData(caseData).build();
