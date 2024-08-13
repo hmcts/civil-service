@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
@@ -74,6 +75,9 @@ public class DefaultJudgmentFormGeneratorTest {
 
     @Autowired
     private DefaultJudgmentFormGenerator generator;
+
+    @MockBean
+    private AssignCategoryId assignCategoryId;
 
     @MockBean
     private OrganisationService organisationService;
