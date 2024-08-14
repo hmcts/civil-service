@@ -1,15 +1,13 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -43,25 +41,15 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DE
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    JudgeDecisionOnReconsiderationRequestCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    AssignCategoryId.class
-})
+@ExtendWith(MockitoExtension.class)
 class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
     private JudgeDecisionOnReconsiderationRequestCallbackHandler handler;
-    @Autowired
-    private final ObjectMapper mapper = new ObjectMapper();
-    @MockBean
-    private RequestReconsiderationGeneratorService requestReconsiderationGeneratorService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
-    private AssignCategoryId assignCategoryId;
+    private ObjectMapper mapper;
+
+    @Mock
+    private RequestReconsiderationGeneratorService requestReconsiderationGeneratorService;
 
     private static final String CONFIRMATION_HEADER = "# Response has been submitted";
     private static final String CONFIRMATION_BODY_YES = "### Upholding previous order \n" +
@@ -99,6 +87,12 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
 
     @BeforeEach
     void setUp() {
+        mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        AssignCategoryId assignCategoryId = new AssignCategoryId();
+        handler = new JudgeDecisionOnReconsiderationRequestCallbackHandler(mapper, requestReconsiderationGeneratorService,
+                                                                           assignCategoryId
+        );
         sdoDocList = new ArrayList<>();
         CaseDocument sdoDoc =
             CaseDocument.builder().documentType(DocumentType.SDO_ORDER).documentLink(Document.builder().documentUrl(

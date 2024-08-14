@@ -158,7 +158,7 @@ class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHandlerTest
         private Map<String, String> getNotificationDataMapLip() {
             return Map.of(
                 PARTY_NAME, "Mr. John Rambo",
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 CLAIMANT_V_DEFENDANT, "Mr. John Rambo V Mr. Sole Trader"
             );
         }

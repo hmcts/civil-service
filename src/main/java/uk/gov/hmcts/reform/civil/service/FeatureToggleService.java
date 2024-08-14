@@ -143,4 +143,13 @@ public class FeatureToggleService {
         return locationEpimms != null && featureToggleApi
             .isFeatureEnabledForLocation("national-rollout-whitelist", locationEpimms, false);
     }
+
+    public boolean isCaseEventsEnabled() {
+        return featureToggleApi.isFeatureEnabled("cui-case-events-enabled");
+    }
+
+    public boolean isGenAppsAllowedPreSdo() {
+        return featureToggleApi.isFeatureEnabled("ga-allowed-pre-sdo");
+    }
+
 }
