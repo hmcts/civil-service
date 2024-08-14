@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -69,9 +68,6 @@ class CoreCaseDataServiceTest {
 
     @Mock
     private FeatureToggleService featureToggleService;
-
-    @Mock
-    private IdamClient idamClient;
 
     @Mock
     private ObjectMapper objectMapper;
@@ -280,7 +276,7 @@ class CoreCaseDataServiceTest {
             SearchResult searchResult = SearchResult.builder().cases(cases).build();
             UserDetails userDetails = UserDetails.builder().email("someemail@email.com").build();
             given(featureToggleService.isLipVLipEnabled()).willReturn(true);
-            given(idamClient.getUserDetails(anyString())).willReturn(userDetails);
+            given(userService.getUserDetails(anyString())).willReturn(userDetails);
             String query = new SearchSourceBuilder()
                 .query(QueryBuilders.boolQuery()
                            .must(QueryBuilders.termQuery("data.claimantUserDetails.email", userDetails.getEmail())))
@@ -300,7 +296,7 @@ class CoreCaseDataServiceTest {
             SearchResult searchResult = SearchResult.builder().cases(cases).build();
             UserDetails userDetails = UserDetails.builder().email("someemail@email.com").build();
             given(featureToggleService.isLipVLipEnabled()).willReturn(true);
-            given(idamClient.getUserDetails(anyString())).willReturn(userDetails);
+            given(userService.getUserDetails(anyString())).willReturn(userDetails);
             String query = new SearchSourceBuilder()
                 .query(QueryBuilders.boolQuery()
                            .must(QueryBuilders.termQuery("data.defendantUserDetails.email", userDetails.getEmail())))
@@ -318,7 +314,7 @@ class CoreCaseDataServiceTest {
         void shouldSearchCasesByDefendantUser_whenLipVLipEnabled() {
             UserDetails userDetails = UserDetails.builder().email("someemail@email.com").build();
             given(featureToggleService.isLipVLipEnabled()).willReturn(true);
-            given(idamClient.getUserDetails(anyString())).willReturn(userDetails);
+            given(userService.getUserDetails(anyString())).willReturn(userDetails);
             String query = new SearchSourceBuilder()
                 .query(QueryBuilders.boolQuery()
                            .must(QueryBuilders.termQuery("data.defendantUserDetails.email", userDetails.getEmail())))
@@ -333,7 +329,7 @@ class CoreCaseDataServiceTest {
         void shouldSearchCasesByClaimantUser_whenLipVLipEnabled() {
             UserDetails userDetails = UserDetails.builder().email("someemail@email.com").build();
             given(featureToggleService.isLipVLipEnabled()).willReturn(true);
-            given(idamClient.getUserDetails(anyString())).willReturn(userDetails);
+            given(userService.getUserDetails(anyString())).willReturn(userDetails);
             String query = new SearchSourceBuilder()
                 .query(QueryBuilders.boolQuery()
                            .must(QueryBuilders.termQuery("data.claimantUserDetails.email", userDetails.getEmail())))
@@ -354,7 +350,7 @@ class CoreCaseDataServiceTest {
                 .size(RETURNED_NUMBER_OF_CASES).toString();
             service.getCCDDataBasedOnIndex(USER_AUTH_TOKEN, 0, "data.defendantUserDetails.email");
             verify(coreCaseDataApi).searchCases(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, CASE_TYPE, query);
-            verify(idamClient, never()).getUserDetails(USER_AUTH_TOKEN);
+            verify(userService, never()).getUserDetails(USER_AUTH_TOKEN);
         }
     }
 
