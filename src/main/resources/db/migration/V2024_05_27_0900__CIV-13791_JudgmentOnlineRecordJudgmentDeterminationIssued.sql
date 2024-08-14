@@ -4,7 +4,7 @@
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.JudgmentsOnline.JudgmentDeterminationIssued.Defendant',
         '{"Notice.AAA6.ClaimantIntent.RequestCCJ.ClaimantRejectsDefPlan.CourtAgreesWithDef.Defendant ", "Notice.AAA6.ClaimantIntent.ClaimantRejectsPlan.DefendantOrgLtdCo.Defendant", "Notice.AAA6.ClaimantIntent.RequestCCJ.ClaimantRejectsDefPlan.CourtAgreesWithClaimant.Defendant"}',
-        '{"Notice.AAA6.JudgmentsOnline.JudgmentDeterminationIssued.Defendant": ["paymentFrequencyMessage", "djDefendantNotificationMessage", "djDefendantNotificationMessageCy"]}');
+        '{"Notice.AAA6.JudgmentsOnline.JudgmentDeterminationIssued.Defendant": ["paymentFrequencyMessage", "paymentFrequencyMessageCy", "djDefendantNotificationMessage", "djDefendantNotificationMessageCy"]}');
 
 /**
  * Add notification template
