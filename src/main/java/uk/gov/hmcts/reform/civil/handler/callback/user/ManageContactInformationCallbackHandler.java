@@ -15,7 +15,14 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.model.*;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ContactDetailsUpdatedEvent;
+import uk.gov.hmcts.reform.civil.model.LitigationFriend;
+import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
+import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
+import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -353,6 +360,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             }
         }
     }
+
     private CallbackResponse showWarning(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String partyChosen = caseData.getUpdateDetailsForm().getPartyChosen().getValue().getCode();
