@@ -96,7 +96,7 @@ public class InitiateGeneralApplicationService {
     public static final String INVALID_SETTLE_BY_CONSENT = "Settle by consent " +
             "must have been agreed with the respondent " +
             "before raising the application";
-    public static final String DEFENDANT = "[DEFENDANT]";
+    public static final List<String> lipCaseRole = Arrays.asList("[DEFENDANT]", "[CLAIMANT]");
 
     private static final List<CaseState> statesBeforeSDO = Arrays.asList(PENDING_CASE_ISSUED, CASE_ISSUED,
             AWAITING_CASE_DETAILS_NOTIFICATION, AWAITING_RESPONDENT_ACKNOWLEDGEMENT, IN_MEDIATION,
@@ -336,9 +336,14 @@ public class InitiateGeneralApplicationService {
         if (featureToggleService.isGaForLipsEnabled() && (caseData.isRespondent1LiP() || caseData.isRespondent2LiP()
             || caseData.isApplicantNotRepresented())) {
 
-            return userRoles.getCaseAssignmentUserRoles() != null && userRoles.getCaseAssignmentUserRoles().size() > 1
-                || userRoles.getCaseAssignmentUserRoles().stream()
-                .anyMatch(role -> role.getCaseRole().equals(DEFENDANT));
+            for (String lipRole : lipCaseRole) {
+                if (userRoles.getCaseAssignmentUserRoles() != null && userRoles.getCaseAssignmentUserRoles().size() > 1
+                    || userRoles.getCaseAssignmentUserRoles().stream()
+                    .anyMatch(role -> role.getCaseRole().equals(lipRole))) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         for (String respondentCaseRole : respondentCaseRoles) {
