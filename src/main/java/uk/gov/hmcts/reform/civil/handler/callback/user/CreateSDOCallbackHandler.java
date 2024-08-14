@@ -806,7 +806,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.smallClaimsCreditHire(tempSmallClaimsCreditHire).build();
 
         SmallClaimsRoadTrafficAccident tempSmallClaimsRoadTrafficAccident = SmallClaimsRoadTrafficAccident.builder()
-            .input("Photographs and/or a place of the accident location shall be prepared and agreed by the parties"
+            .input("Photographs and/or a plan of the accident location shall be prepared and agreed by the parties"
                        + " and uploaded to the Digital Portal no later than 21 days before the hearing.")
             .build();
 

@@ -2312,7 +2312,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("This witness statement is limited to 10 pages per party, including any appendices.");
 
             assertThat(response.getData()).extracting("smallClaimsRoadTrafficAccident").extracting("input")
-                .isEqualTo("Photographs and/or a place of the accident location shall be prepared and agreed by the "
+                .isEqualTo("Photographs and/or a plan of the accident location shall be prepared and agreed by the "
                                + "parties and uploaded to the Digital Portal no later than 21 days before the "
                                + "hearing.");
             assertThat(response.getData()).extracting("disposalHearingHearingTime").extracting("input")
