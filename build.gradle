@@ -12,7 +12,7 @@ plugins {
   id 'au.com.dius.pact' version '4.2.14'
   id "io.freefair.lombok" version "8.7.1"
   id 'com.github.hmcts.rse-cft-lib' version '0.19.1335'
-  id "org.flywaydb.flyway" version "10.17.0"
+  id "org.flywaydb.flyway" version "10.17.1"
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -340,7 +340,7 @@ configurations.all {
 }
 
 dependencies {
-  implementation 'com.github.hmcts:civil-commons:1.1.2'
+  implementation 'com.github.hmcts:civil-commons:v1.1.3'
   implementation project(':dashboard-notifications')
   implementation group: 'org.springframework.data', name: 'spring-data-jpa'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
@@ -372,7 +372,7 @@ dependencies {
   implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.3'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
-  implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.1.5'
+  implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.1.6'
 
   implementation group: 'com.github.hmcts', name: 'ccd-client', version: '4.9.5-SPRING2'
   implementation group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
@@ -450,7 +450,7 @@ dependencies {
   testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.26.3'
 
   testImplementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
-  testImplementation 'com.github.hmcts:fortify-client:1.4.3:all'
+  testImplementation 'com.github.hmcts:fortify-client:1.4.4:all'
   //pact contract testing
   contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.5'
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
@@ -466,7 +466,7 @@ dependencies {
 
   testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
   testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
-  testImplementation group: 'com.h2database', name: 'h2', version: '2.3.230'
+  testImplementation group: 'com.h2database', name: 'h2', version: '2.3.232'
   // dashboard specific changes ends
 
 
