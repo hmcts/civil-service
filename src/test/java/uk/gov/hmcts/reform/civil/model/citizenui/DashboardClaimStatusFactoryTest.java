@@ -12,7 +12,7 @@ class DashboardClaimStatusFactoryTest {
     private final DashboardClaimStatusFactory factory = new DashboardClaimStatusFactory();
 
     @Test
-    void decisionOutcomeCcdClaimant() {
+    void allFinalOrdersIssuedCcdClaimant() {
         CaseData caseData = CaseData.builder().ccdState(CaseState.All_FINAL_ORDERS_ISSUED).build();
         FeatureToggleService featureToggleService = Mockito.mock(FeatureToggleService.class);
         Claim claim = new CcdDashboardClaimantClaimMatcher(caseData, featureToggleService);
@@ -23,7 +23,7 @@ class DashboardClaimStatusFactoryTest {
     }
 
     @Test
-    void decisionOutcomeCcdDefendant() {
+    void allFinalOrdersIssuedCcdDefendant() {
         CaseData caseData = CaseData.builder().ccdState(CaseState.All_FINAL_ORDERS_ISSUED).build();
         FeatureToggleService featureToggleService = Mockito.mock(FeatureToggleService.class);
         Claim claim = new CcdDashboardDefendantClaimMatcher(caseData, featureToggleService);
