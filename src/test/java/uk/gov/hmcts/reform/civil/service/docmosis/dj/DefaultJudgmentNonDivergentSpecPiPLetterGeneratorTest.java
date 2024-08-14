@@ -25,17 +25,13 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -94,9 +90,6 @@ public class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
 
-    @MockBean
-    private IdamClient idamClient;
-
     @Autowired
     private DefaultJudgmentNonDivergentSpecPiPLetterGenerator generator;
 
@@ -112,11 +105,6 @@ public class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
     @BeforeEach
     void setUp() {
         fileNameTrial = LocalDate.now() + "_Judge Dredd" + ".pdf";
-
-        when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
-                                                                    .forename("Judge")
-                                                                    .surname("Dredd")
-                                                                    .roles(Collections.emptyList()).build());
     }
 
     @Test

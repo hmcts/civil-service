@@ -146,7 +146,7 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
     private Map<String, String> addPropertiesLiP(boolean isApplicant, CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER,
-            caseData.getLegacyCaseReference(),
+            caseData.getCcdCaseReference().toString(),
             PARTY_NAME,
             isApplicant ? caseData.getApplicant1().getPartyName() : caseData.getRespondent1().getPartyName(),
             CLAIMANT_V_DEFENDANT,
