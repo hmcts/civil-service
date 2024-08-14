@@ -61,6 +61,8 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
 
 @Service
 @RequiredArgsConstructor
@@ -331,6 +333,13 @@ public class InitiateGeneralApplicationService {
         String caseId = caseData.getCcdCaseReference().toString();
         CaseAssignmentUserRolesResource userRoles = getUserRolesOnCase(caseId);
         List<String> respondentCaseRoles = getRespondentCaseRoles(caseData);
+
+        if (featureToggleService.isGaForLipsEnabled() && (caseData.isRespondent1LiP() || caseData.isRespondent2LiP()
+            || caseData.isApplicantNotRepresented())) {
+            return !(!isLIPDefendant(respondentCaseRoles)
+                || !isRespondentSolicitorOne(respondentCaseRoles) || userRoles.getCaseAssignmentUserRoles() == null);
+        }
+
         for (String respondentCaseRole : respondentCaseRoles) {
             if (userRoles.getCaseAssignmentUserRoles() == null
                 || userRoles.getCaseAssignmentUserRoles().stream()
