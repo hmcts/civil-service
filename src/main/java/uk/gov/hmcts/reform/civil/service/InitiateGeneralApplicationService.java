@@ -61,8 +61,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
-import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
-import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
 
 @Service
 @RequiredArgsConstructor
@@ -98,6 +96,7 @@ public class InitiateGeneralApplicationService {
     public static final String INVALID_SETTLE_BY_CONSENT = "Settle by consent " +
             "must have been agreed with the respondent " +
             "before raising the application";
+    public static final String DEFENDANT = "[DEFENDANT]";
 
     private static final List<CaseState> statesBeforeSDO = Arrays.asList(PENDING_CASE_ISSUED, CASE_ISSUED,
             AWAITING_CASE_DETAILS_NOTIFICATION, AWAITING_RESPONDENT_ACKNOWLEDGEMENT, IN_MEDIATION,
@@ -336,8 +335,10 @@ public class InitiateGeneralApplicationService {
 
         if (featureToggleService.isGaForLipsEnabled() && (caseData.isRespondent1LiP() || caseData.isRespondent2LiP()
             || caseData.isApplicantNotRepresented())) {
-            return !(!isLIPDefendant(respondentCaseRoles)
-                || !isRespondentSolicitorOne(respondentCaseRoles) || userRoles.getCaseAssignmentUserRoles() == null);
+
+            return userRoles.getCaseAssignmentUserRoles() != null && userRoles.getCaseAssignmentUserRoles().size() > 1
+                || userRoles.getCaseAssignmentUserRoles().stream()
+                .anyMatch(role -> role.getCaseRole().equals(DEFENDANT));
         }
 
         for (String respondentCaseRole : respondentCaseRoles) {
