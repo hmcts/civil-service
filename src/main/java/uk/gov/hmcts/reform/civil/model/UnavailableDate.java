@@ -12,8 +12,6 @@ import java.time.LocalDate;
 
 @Data
 @Builder(toBuilder = true)
-@NoArgsConstructor
-@AllArgsConstructor
 @IsPresentOrEqualToOrLessThanOneYearInTheFuture(groups = UnavailableDateGroup.class)
 @NoArgsConstructor
 @AllArgsConstructor
