@@ -106,7 +106,7 @@ public class StayCaseCallbackHandlerTest {
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader("# Stay added to the case \n\n ## All parties have been notified")
+                    .confirmationHeader("# Stay added to the case \n\n ## All parties have been notified and any upcoming hearings must be cancelled")
                     .confirmationBody("&nbsp;")
                     .build());
         }

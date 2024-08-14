@@ -25,7 +25,7 @@ public class StayCaseCallbackHandler extends CallbackHandler {
 
     private final FeatureToggleService featureToggleService;
 
-    private static final String HEADER_CONFIRMATION = "# Stay added to the case \n\n ## All parties have been notified";
+    private static final String HEADER_CONFIRMATION = "# Stay added to the case \n\n ## All parties have been notified and any upcoming hearings must be cancelled";
     private static final String BODY_CONFIRMATION = "&nbsp;";
 
     @Override
