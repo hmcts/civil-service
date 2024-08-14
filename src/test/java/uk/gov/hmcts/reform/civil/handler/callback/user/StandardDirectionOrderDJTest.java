@@ -42,7 +42,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
@@ -91,8 +90,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     private DefaultJudgmentOrderFormGenerator defaultJudgmentOrderFormGenerator;
     @MockBean
     private LocationReferenceDataService locationRefDataService;
-    @MockBean
-    private IdamClient idamClient;
     @MockBean
     private UserDetails userDetails;
     @MockBean
@@ -161,7 +158,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             nextWorkingDayDate = LocalDate.of(2023, 12, 15);
             when(deadlinesCalculator.plusWorkingDays(any(), anyInt())).thenReturn(date);
             when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(nextWorkingDayDate);
-            given(idamClient.getUserDetails(any()))
+            given(userService.getUserDetails(any()))
                 .willReturn(UserDetails.builder().forename("test").surname("judge").build());
         }
 

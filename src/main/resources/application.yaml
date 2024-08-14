@@ -691,7 +691,7 @@ bundle:
 
 payments:
   api:
-    url: ${PAYMENTS_API_URL:http://fake-payment-register-api}
+    url: ${PAYMENTS_API_URL:http://localhost:8765}
 
 idam:
   web:

@@ -64,11 +64,11 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
@@ -117,7 +117,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     public static final String ORDER_2_DEF = "%n%n ## Defendant 2 %n%n %s";
     public static final String ORDER_ISSUED = "# Your order has been issued %n%n ## Claim number %n%n # %s";
 
-    private final IdamClient idamClient;
+    private final UserService userService;
     private final AssignCategoryId assignCategoryId;
     private final CategoryService categoryService;
     private final LocationHelper locationHelper;
@@ -228,7 +228,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             caseDataBuilder.hearingMethodValuesTrialHearingDJ(hearingMethodList);
         }
 
-        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
         String judgeNameTitle = userDetails.getFullName();
 
         //populates the disposal screen
