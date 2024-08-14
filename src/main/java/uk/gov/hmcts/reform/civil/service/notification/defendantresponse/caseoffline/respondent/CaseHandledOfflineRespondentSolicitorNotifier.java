@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.notification.defendantresponse.caseoffline.respondent;
 
-import org.jetbrains.annotations.Nullable;
+
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -16,7 +16,6 @@ public abstract class CaseHandledOfflineRespondentSolicitorNotifier implements N
     protected static final String REFERENCE_TEMPLATE =
         "defendant-response-case-handed-offline-respondent-notification-%s";
 
-    @Nullable
     protected String getRecipientEmailAddress(CaseData caseData,
                                               CaseHandledOfflineRecipient recipientType) {
         String recipientEmailAddress;

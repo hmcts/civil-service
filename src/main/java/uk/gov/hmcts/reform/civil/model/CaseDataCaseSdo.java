@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
@@ -107,7 +106,6 @@ import java.util.List;
 
 @SuperBuilder(toBuilder = true)
 @Data
-@AllArgsConstructor
 public class CaseDataCaseSdo implements MappableObject {
 
     //default judgement SDO fields for trial/fast track
@@ -174,21 +172,21 @@ public class CaseDataCaseSdo implements MappableObject {
     private DisposalHearingNotes disposalHearingNotes;
     private String disposalHearingHearingNotes;
     private DisposalOrderWithoutHearing disposalOrderWithoutHearing;
-    private DisposalHearingMethod disposalHearingMethod;
-    private DisposalHearingMethodTelephoneHearing disposalHearingMethodTelephoneHearing;
-    private DisposalHearingMethodVideoConferenceHearing disposalHearingMethodVideoConferenceHearing;
-    private List<Element<DisposalHearingAddNewDirections>> disposalHearingAddNewDirections;
-    private DynamicList disposalHearingMethodInPerson;
-    private DynamicList fastTrackMethodInPerson;
-    private DynamicList hearingMethodValuesFastTrack;
-    private DynamicList hearingMethodValuesDisposalHearing;
-    private DynamicList hearingMethodValuesSmallClaims;
-    private DynamicList smallClaimsMethodInPerson;
-    private DynamicList hearingMethod;
-    private YesOrNo drawDirectionsOrderRequired;
-    private YesOrNo drawDirectionsOrderSmallClaims;
-    private ClaimsTrack claimsTrack;
-    private OrderType orderType;
+    private final DisposalHearingMethod disposalHearingMethod;
+    private final DisposalHearingMethodTelephoneHearing disposalHearingMethodTelephoneHearing;
+    private final DisposalHearingMethodVideoConferenceHearing disposalHearingMethodVideoConferenceHearing;
+    private final List<Element<DisposalHearingAddNewDirections>> disposalHearingAddNewDirections;
+    private final DynamicList disposalHearingMethodInPerson;
+    private final DynamicList fastTrackMethodInPerson;
+    private final DynamicList hearingMethodValuesFastTrack;
+    private final DynamicList hearingMethodValuesDisposalHearing;
+    private final DynamicList hearingMethodValuesSmallClaims;
+    private final DynamicList smallClaimsMethodInPerson;
+    private final DynamicList hearingMethod;
+    private final YesOrNo drawDirectionsOrderRequired;
+    private final YesOrNo drawDirectionsOrderSmallClaims;
+    private final ClaimsTrack claimsTrack;
+    private final OrderType orderType;
     private FastTrackBuildingDispute fastTrackBuildingDispute;
     private FastTrackClinicalNegligence fastTrackClinicalNegligence;
     private FastTrackCreditHire fastTrackCreditHire;
@@ -205,12 +203,12 @@ public class CaseDataCaseSdo implements MappableObject {
     private FastTrackNotes fastTrackNotes;
     private FastTrackHearingNotes fastTrackHearingNotes;
     private FastTrackOrderWithoutJudgement fastTrackOrderWithoutJudgement;
-    private List<FastTrack> fastClaims;
-    private List<FastTrack> trialAdditionalDirectionsForFastTrack;
-    private FastTrackMethod fastTrackMethod;
-    private FastTrackMethodTelephoneHearing fastTrackMethodTelephoneHearing;
-    private FastTrackMethodVideoConferenceHearing fastTrackMethodVideoConferenceHearing;
-    private List<Element<FastTrackAddNewDirections>> fastTrackAddNewDirections;
+    private final List<FastTrack> fastClaims;
+    private final List<FastTrack> trialAdditionalDirectionsForFastTrack;
+    private final FastTrackMethod fastTrackMethod;
+    private final FastTrackMethodTelephoneHearing fastTrackMethodTelephoneHearing;
+    private final FastTrackMethodVideoConferenceHearing fastTrackMethodVideoConferenceHearing;
+    private final List<Element<FastTrackAddNewDirections>> fastTrackAddNewDirections;
     private SmallClaimsCreditHire smallClaimsCreditHire;
     private SmallClaimsRoadTrafficAccident smallClaimsRoadTrafficAccident;
     private SmallClaimsDocuments smallClaimsDocuments;
@@ -222,12 +220,12 @@ public class CaseDataCaseSdo implements MappableObject {
     private SmallClaimsFlightDelay smallClaimsFlightDelay;
     private SDOHearingNotes sdoHearingNotes;
     private ReasonNotSuitableSDO reasonNotSuitableSDO;
-    private List<SmallTrack> smallClaims;
-    private List<SmallTrack> drawDirectionsOrderSmallClaimsAdditionalDirections;
-    private SmallClaimsMethod smallClaimsMethod;
-    private SmallClaimsMethodTelephoneHearing smallClaimsMethodTelephoneHearing;
-    private SmallClaimsMethodVideoConferenceHearing smallClaimsMethodVideoConferenceHearing;
-    private List<Element<SmallClaimsAddNewDirections>> smallClaimsAddNewDirections;
+    private final List<SmallTrack> smallClaims;
+    private final List<SmallTrack> drawDirectionsOrderSmallClaimsAdditionalDirections;
+    private final SmallClaimsMethod smallClaimsMethod;
+    private final SmallClaimsMethodTelephoneHearing smallClaimsMethodTelephoneHearing;
+    private final SmallClaimsMethodVideoConferenceHearing smallClaimsMethodVideoConferenceHearing;
+    private final List<Element<SmallClaimsAddNewDirections>> smallClaimsAddNewDirections;
     private List<OrderDetailsPagesSectionsToggle> fastTrackAltDisputeResolutionToggle;
     private List<OrderDetailsPagesSectionsToggle> fastTrackVariationOfDirectionsToggle;
     private List<OrderDetailsPagesSectionsToggle> fastTrackSettlementToggle;
@@ -253,10 +251,10 @@ public class CaseDataCaseSdo implements MappableObject {
     private final YesOrNo hmcEaCourtLocation;
 
     // sdo ui flags
-    private YesOrNo setSmallClaimsFlag;
-    private YesOrNo setFastTrackFlag;
-    private String eventDescriptionRTJ;
-    private String additionalInformationRTJ;
+    private final YesOrNo setSmallClaimsFlag;
+    private final YesOrNo setFastTrackFlag;
+    private final String eventDescriptionRTJ;
+    private final String additionalInformationRTJ;
 
     //default judgement SDO R2 fields for trial
     private SdoDJR2TrialCreditHire sdoDJR2TrialCreditHire;
