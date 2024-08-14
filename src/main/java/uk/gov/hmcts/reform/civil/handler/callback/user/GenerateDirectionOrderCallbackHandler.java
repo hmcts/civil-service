@@ -38,10 +38,10 @@ import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetailsOrderWithoutNotice;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeFinalOrderGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
@@ -129,7 +129,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private final JudgeFinalOrderGenerator judgeFinalOrderGenerator;
     private final DocumentHearingLocationHelper locationHelper;
     private String ext = "";
-    private final IdamClient idamClient;
+    private final UserService userService;
     private final WorkingDayIndicator workingDayIndicator;
 
     @Override
@@ -465,7 +465,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
     private CallbackResponse addGeneratedDocumentToCollection(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
         CaseDocument finalDocument = caseData.getFinalOrderDocument();
         List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
         finalCaseDocuments.add(element(finalDocument));
