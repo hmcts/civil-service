@@ -20,7 +20,8 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 
 @ExtendWith(MockitoExtension.class)
@@ -57,7 +58,7 @@ public class StayCaseCallbackHandlerTest {
     class AboutToSubmit {
 
         @Test
-        void shouldReturnNoError_WhenMidIsInvoked() {
+        void shouldReturnNoError_WhenAboutToSubmitIsInvokedToggleFalse() {
             when(featureToggleService.isCaseEventsEnabled()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -69,7 +70,7 @@ public class StayCaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldReturnBundle_AndOverwriteExistingBundleForHearingDate() {
+        void shouldReturnNoError_WhenAboutToSubmitIsInvokedToggleTrue() {
             when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
