@@ -144,19 +144,19 @@ public class CaseDataCaseSdo implements MappableObject {
     private DisposalHearingMethodDJ disposalHearingMethodDJ;
     private DynamicList trialHearingMethodInPersonDJ;
     private DynamicList disposalHearingMethodInPersonDJ;
-    private DynamicList hearingMethodValuesDisposalHearingDJ;
-    private DynamicList hearingMethodValuesTrialHearingDJ;
+    private final DynamicList hearingMethodValuesDisposalHearingDJ;
+    private final DynamicList hearingMethodValuesTrialHearingDJ;
     private List<Element<DisposalHearingAddNewDirectionsDJ>> disposalHearingAddNewDirectionsDJ;
     private List<Element<TrialHearingAddNewDirectionsDJ>> trialHearingAddNewDirectionsDJ;
     private HearingMethodTelephoneHearingDJ disposalHearingMethodTelephoneHearingDJ;
     private HearingMethodVideoConferenceDJ disposalHearingMethodVideoConferenceHearingDJ;
     @Builder.Default
-    private List<Element<CaseDocument>> orderSDODocumentDJCollection = new ArrayList<>();
+    private final List<Element<CaseDocument>> orderSDODocumentDJCollection = new ArrayList<>();
     private String caseManagementOrderSelection;
     private Document orderSDODocumentDJ;
 
     // CreateSdo fields
-    private JudgementSum drawDirectionsOrder;
+    private final JudgementSum drawDirectionsOrder;
     private DisposalHearingJudgesRecital disposalHearingJudgesRecital;
     private DisposalHearingJudgementDeductionValue disposalHearingJudgementDeductionValue;
     private DisposalHearingDisclosureOfDocuments disposalHearingDisclosureOfDocuments;
