@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.notification.defendantresponse.caseoffline.respondent;
 
-
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
