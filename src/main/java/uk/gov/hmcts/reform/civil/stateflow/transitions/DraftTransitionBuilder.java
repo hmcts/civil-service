@@ -33,7 +33,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                 Map.of(
                     FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true,
                     GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
-                    DASHBOARD_SERVICE_ENABLED.name(), (featureToggleService.isDashboardEnabledForCase(c) && caseContainsLiP.test(c)),
+                    DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c),
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                 )))
@@ -48,7 +48,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false,
                     FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true,
                     GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
-                    DASHBOARD_SERVICE_ENABLED.name(), (featureToggleService.isDashboardEnabledForCase(c) && caseContainsLiP.test(c)),
+                    DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c),
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                 )))
@@ -59,7 +59,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                 Map.of(
                     FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
                     GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
-                    DASHBOARD_SERVICE_ENABLED.name(), (featureToggleService.isDashboardEnabledForCase(c) && caseContainsLiP.test(c)),
+                    DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c),
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                 )))
@@ -73,7 +73,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
                     FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false,
                     GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
-                    DASHBOARD_SERVICE_ENABLED.name(), (featureToggleService.isDashboardEnabledForCase(c) && caseContainsLiP.test(c)),
+                    DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c),
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                 )))
@@ -86,7 +86,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false,
                     FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
                     GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
-                    DASHBOARD_SERVICE_ENABLED.name(), (featureToggleService.isDashboardEnabledForCase(c) && caseContainsLiP.test(c)),
+                    DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c),
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                 )))
@@ -99,7 +99,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
                     FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
                     GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
-                    DASHBOARD_SERVICE_ENABLED.name(), (featureToggleService.isDashboardEnabledForCase(c) && caseContainsLiP.test(c)),
+                    DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c),
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                 )));
@@ -157,4 +157,8 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
             && caseData.getRespondent2OrgRegistered() == NO
             && (caseData.getRespondent2SameLegalRepresentative() == NO
             || caseData.getRespondent2SameLegalRepresentative() == null);
+
+    public boolean isDashBoardEnabledForCase(CaseData caseData) {
+        return featureToggleService.isDashboardEnabledForCase(caseData) && caseContainsLiP.test(caseData);
+    }
 }
