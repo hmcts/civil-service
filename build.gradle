@@ -315,7 +315,7 @@ jacocoTestReport {
   }
 }
 
-task skipSonarQube {
+skipSonarQube {
   doLast {
     logger.quiet("Skipping SonarQube analysis due to server being down.")
   }
