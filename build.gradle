@@ -303,9 +303,7 @@ jacocoTestReport {
 }
 
 sonarqube {
-  doLast {
-    logger.quiet("Skipping SonarQube analysis due to server being down.")
-  }
+  logger.quiet("Skipping SonarQube analysis due to server being down.")
 }
 
 jacocoTestReport.dependsOn {
