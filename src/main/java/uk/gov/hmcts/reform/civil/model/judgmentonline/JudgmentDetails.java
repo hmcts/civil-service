@@ -5,12 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.Address;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @Builder(toBuilder = true)
@@ -19,11 +17,17 @@ import java.util.List;
 public class JudgmentDetails {
 
     private Integer judgmentId;
-    private List<Element<Party>> defendants;
+    private String defendant1Name;
+    private String defendant2Name;
+    private Address defendant1Address;
+    private Address defendant2Address;
+    private LocalDate defendant1Dob;
+    private LocalDate defendant2Dob;
     private LocalDateTime lastUpdateTimeStamp;
     private LocalDateTime createdTimestamp;
     private LocalDateTime cancelledTimeStamp;
     private JudgmentState state;
+    private String rtlState;
     private YesOrNo isRegisterWithRTL;
     private LocalDate requestDate;
     private LocalDate issueDate;

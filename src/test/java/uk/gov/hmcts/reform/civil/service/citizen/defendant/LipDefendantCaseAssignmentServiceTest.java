@@ -19,10 +19,10 @@ import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
@@ -50,7 +50,7 @@ class LipDefendantCaseAssignmentServiceTest {
     @Mock
     private FeatureToggleService featureToggleService;
     @Mock
-    private IdamClient idamClient;
+    private UserService userService;
     @Mock
     private CaseEventService caseEventService;
     @Mock
@@ -63,14 +63,14 @@ class LipDefendantCaseAssignmentServiceTest {
     @BeforeEach
     public void setUp() {
         lipDefendantCaseAssignmentService =
-            new LipDefendantCaseAssignmentService(idamClient, caseEventService, defendantPinToPostLRspecService, caseDetailsConverter, false);
+            new LipDefendantCaseAssignmentService(userService, caseEventService, defendantPinToPostLRspecService, caseDetailsConverter, false);
     }
 
     @Test
     void shouldAddDefendantDetails_whenLipVLipFlagIsEnabled() {
         //Given
         given(featureToggleService.isLipVLipEnabled()).willReturn(true);
-        given(idamClient.getUserDetails(anyString())).willReturn(UserDetails.builder().id(USER_ID).email(EMAIL).build());
+        given(userService.getUserDetails(anyString())).willReturn(UserDetails.builder().id(USER_ID).email(EMAIL).build());
         IdamUserDetails defendantUserDetails = IdamUserDetails.builder()
             .id(USER_ID)
             .email(EMAIL)
@@ -91,7 +91,7 @@ class LipDefendantCaseAssignmentServiceTest {
             Optional.empty()
         );
         //Then
-        verify(idamClient).getUserDetails(AUTHORIZATION);
+        verify(userService).getUserDetails(AUTHORIZATION);
         verify(caseEventService).submitEventForClaim(refEq(params));
     }
 
@@ -104,7 +104,7 @@ class LipDefendantCaseAssignmentServiceTest {
         Map<String, Object> data = new HashMap<>();
         data.put("respondent1PinToPostLRspec", pinInPostData);
         given(featureToggleService.isLipVLipEnabled()).willReturn(true);
-        given(idamClient.getUserDetails(anyString())).willReturn(UserDetails.builder().id(USER_ID).email(EMAIL)
+        given(userService.getUserDetails(anyString())).willReturn(UserDetails.builder().id(USER_ID).email(EMAIL)
                                                                      .build());
         given(defendantPinToPostLRspecService.removePinInPostData(any())).willReturn(data);
 
@@ -145,7 +145,7 @@ class LipDefendantCaseAssignmentServiceTest {
             caseDetails
         );
         //Then
-        verify(idamClient).getUserDetails(AUTHORIZATION);
+        verify(userService).getUserDetails(AUTHORIZATION);
         verify(caseEventService).submitEventForClaim(refEq(params));
     }
 }
