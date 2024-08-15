@@ -61,7 +61,6 @@ public class BundleCreationTriggerEventHandler {
             .map(bundle -> "FAILED".equalsIgnoreCase(bundle.getValue().getStitchStatus()) ? YesOrNo.YES : null)
             .orElse(null);
 
-
         if (hasBundleErrors == null) {
             List<IdValue<Bundle>> caseBundles = new ArrayList<>(caseData.getCaseBundles());
             CaseData finalCaseData = caseData;
