@@ -46,8 +46,9 @@ public class NotifySetAsideJudgementErrorScenarioTest extends DashboardBaseInteg
                 jsonPath("$[0].titleEn").value("The judgment made against you has been set aside (removed)"),
                 jsonPath("$[0].descriptionEn")
                     .value("<p class=\"govuk-body\">You’ll receive an update with information about next steps.</p>"),
+                jsonPath("$[0].titleCy").value("Mae’r dyfarniad yn eich erbyn wedi cael ei roi o’r naill du (wedi’i ddileu)"),
                 jsonPath("$[0].descriptionCy")
-                    .value("<p class=\"govuk-body\">You’ll receive an update with information about next steps.</p>")
+                    .value("<p class=\"govuk-body\">Byddwch yn cael diweddariad gyda gwybodaeth am y camau nesaf.</p>")
             );
     }
 }
