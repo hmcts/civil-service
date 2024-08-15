@@ -16,8 +16,8 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,7 +55,7 @@ class RequestReconsiderationGeneratorServiceTest {
     private DocumentGeneratorService documentGeneratorService;
 
     @MockBean
-    protected IdamClient idamClient;
+    protected UserService userService;
 
     @Test
     void shouldGenerateReconsiderationUpheldDocument() {
@@ -63,7 +63,7 @@ class RequestReconsiderationGeneratorServiceTest {
             .thenReturn(new DocmosisDocument(RECONSIDERATION_UPHELD_DECISION_OUTPUT_PDF.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DECISION_MADE_ON_APPLICATIONS)))
             .thenReturn(CASE_DOCUMENT);
-        when(idamClient.getUserDetails(any()))
+        when(userService.getUserDetails(any()))
             .thenReturn(new UserDetails("1", "test@email.com", "Test", "User", null));
 
         CaseData caseData = CaseDataBuilder.builder()

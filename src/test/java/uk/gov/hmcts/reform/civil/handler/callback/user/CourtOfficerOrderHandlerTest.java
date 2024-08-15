@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.CourtOfficerOrderGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
@@ -57,8 +56,6 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
     private CourtOfficerOrderHandler handler;
     @MockBean
     private DocumentHearingLocationHelper locationHelper;
-    @MockBean
-    private IdamClient idamClient;
     @MockBean
     private WorkingDayIndicator workingDayIndicator;
     @MockBean
@@ -124,7 +121,7 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setUp() {
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+            when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                         .forename("Court")
                                                                         .surname("OfficerName")
                                                                         .roles(Collections.emptyList()).build());

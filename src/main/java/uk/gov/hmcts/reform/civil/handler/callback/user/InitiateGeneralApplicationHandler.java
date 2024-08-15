@@ -26,9 +26,9 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
@@ -80,7 +80,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private static final String LR_VS_LIP = "Sorry this service is not available, please raise an application manually.";
     private final InitiateGeneralApplicationService initiateGeneralApplicationService;
     private final ObjectMapper objectMapper;
-    private final IdamClient idamClient;
+    private final UserService userService;
     private final UserRoleCaching userRoleCaching;
     private final GeneralAppFeesService feesService;
     private final LocationReferenceDataService locationRefDataService;
@@ -277,7 +277,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CallbackResponse submitApplication(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         caseData = setWithNoticeByType(caseData);
-        final UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        final UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
         final CaseData.CaseDataBuilder<?, ?> dataBuilder = getSharedData(callbackParams);
