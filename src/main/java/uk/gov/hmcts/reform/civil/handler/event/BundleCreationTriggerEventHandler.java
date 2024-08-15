@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -52,8 +53,14 @@ public class BundleCreationTriggerEventHandler {
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, CREATE_BUNDLE);
         CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails().getData());
 
-        YesOrNo hasBundleErrors = (bundleCreateResponse.getErrors() != null && !bundleCreateResponse.getErrors().isEmpty())
-            ? YesOrNo.YES : null;
+        List<uk.gov.hmcts.reform.civil.model.bundle.Bundle> bundles = bundleCreateResponse.getData().getCaseBundles();
+        Optional<uk.gov.hmcts.reform.civil.model.bundle.Bundle> lastCreatedBundle = bundles.stream()
+            .max(Comparator.comparing(bundle -> bundle.getValue().getCreatedOn()));
+
+        YesOrNo hasBundleErrors = lastCreatedBundle
+            .map(bundle -> "FAILED".equalsIgnoreCase(bundle.getValue().getStitchStatus()) ? YesOrNo.YES : null)
+            .orElse(null);
+
 
         if (hasBundleErrors == null) {
             List<IdValue<Bundle>> caseBundles = new ArrayList<>(caseData.getCaseBundles());

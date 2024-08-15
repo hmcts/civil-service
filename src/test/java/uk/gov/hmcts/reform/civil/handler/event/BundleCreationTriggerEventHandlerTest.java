@@ -4,6 +4,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -41,6 +44,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -297,40 +301,57 @@ class BundleCreationTriggerEventHandlerTest {
         verify(coreCaseDataService, times(1)).triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION);
     }
 
-    @Test
-    void verifyNoBundleNotificationEventTriggeredWhenBundleNotCreated() {
-        // Given: Case details with all type of documents require for bundles and throws exception from
-        // createBundle service
+    @ParameterizedTest
+    @MethodSource("provideBundlesForNotificationTest")
+    void sendBundleCreationTriggerShouldTriggerNotificationEvent(List<Bundle> bundles, int expectedNotificationCount) {
         BundleCreationTriggerEvent event = new BundleCreationTriggerEvent(1L);
         when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
         StartEventResponse response = StartEventResponse.builder()
-            .caseDetails(CaseDetailsBuilder.builder().data(caseData).build()).eventId("event1").token("test").build();
-        when(coreCaseDataService.startUpdate(event.getCaseId().toString(), CREATE_BUNDLE)).thenReturn(response);
-        when(bundleCreationService.createBundle(event)).thenThrow(new RuntimeException("Runtime Exception"));
-        when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
-
-        // When: Bundle creation trigger is called
-        // Then: BUNDLE_CREATION_NOTIFICATION Event should not be triggered
-        verify(coreCaseDataService, times(0)).triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION);
-    }
-
-    @Test
-    void sendBundleCreationTriggerShouldNotTriggerNotificationEventWhenErrorsExist() {
-        // Given: Case details with all type of documents required for bundles
-        BundleCreationTriggerEvent event = new BundleCreationTriggerEvent(1L);
-        when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
-        StartEventResponse response = StartEventResponse.builder()
-            .caseDetails(CaseDetailsBuilder.builder().data(caseData).build()).eventId("event1").token("test").build();
+            .caseDetails(CaseDetailsBuilder.builder().data(caseData).build())
+            .eventId("event1")
+            .token("test")
+            .build();
         when(coreCaseDataService.startUpdate(event.getCaseId().toString(), CREATE_BUNDLE)).thenReturn(response);
         when(bundleCreationService.createBundle(event)).thenReturn(mockBundleCreateResponse);
         when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
-        when(mockBundleCreateResponse.getErrors()).thenReturn(List.of("Error"));
 
-        // When: Bundle creation trigger is called
-        // Then: BUNDLE_CREATION_NOTIFICATION Event should not be triggered
+        BundleData bundleData = BundleData.builder()
+            .caseBundles(bundles)
+            .build();
+
+        when(mockBundleCreateResponse.getData()).thenReturn(bundleData);
+
         Assertions.assertDoesNotThrow(() -> bundleCreationTriggerEventHandler.sendBundleCreationTrigger(event));
-        verify(coreCaseDataService, times(0)).triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION);
+        verify(coreCaseDataService, times(expectedNotificationCount)).triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION);
         verify(coreCaseDataService).submitUpdate(eq(event.getCaseId().toString()), any());
     }
 
+    private static Stream<Arguments> provideBundlesForNotificationTest() {
+        return Stream.of(
+            Arguments.of(List.of(
+                createBundle("1", "Bundle 1", "bundle1.pdf", "SUCCESS", 1),
+                createBundle("2", "Bundle 2", "bundle2.pdf", "FAILED", 2),
+                createBundle("3", "Bundle 3", "bundle3.pdf", "FAILED", 3)
+            ), 1),
+            Arguments.of(List.of(
+                createBundle("1", "Bundle 1", "bundle1.pdf", "SUCCESS", 1),
+                createBundle("2", "Bundle 2", "bundle2.pdf", "FAILED", 2),
+                createBundle("3", "Bundle 3", "bundle3.pdf", "FAILED", 3),
+                createBundle("3", "Bundle 3", "bundle3.pdf", "FAILED", 0)
+            ), 0)
+        );
+    }
+
+    private static Bundle createBundle(String id, String title, String fileName, String stitchStatus, int daysAgo) {
+        return Bundle.builder()
+            .value(BundleDetails.builder()
+                       .id(id)
+                       .title(title)
+                       .fileName(fileName)
+                       .stitchStatus(stitchStatus)
+                       .createdOn(LocalDateTime.now().minusDays(daysAgo))
+                       .build())
+            .build();
+    }
 }
+
