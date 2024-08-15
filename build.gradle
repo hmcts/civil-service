@@ -284,7 +284,7 @@ task functional(description: 'Runs the functional tests.') {
     runProdApiTests, runNonProdApiTestsByGroups, runNightlyApiTests))
 }
 
-project.tasks['sonarqube'].dependsOn test, jacocoTestReport
+project.tasks['skipSonarQube'].dependsOn test, jacocoTestReport
 
 // excluding controllers from Sonar due to https://tools.hmcts.net/jira/browse/DTSCCI-254
 // https://tools.hmcts.net/jira/browse/DTSCCI-311 ticket to write unit test for each controller
@@ -312,6 +312,12 @@ jacocoTestReport {
     xml.enabled = true
     csv.enabled = false
     xml.destination file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
+  }
+}
+
+task skipSonarQube {
+  doLast {
+    logger.quiet("Skipping SonarQube analysis due to server being down.")
   }
 }
 

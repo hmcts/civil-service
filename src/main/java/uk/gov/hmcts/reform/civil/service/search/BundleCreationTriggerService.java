@@ -36,8 +36,8 @@ public class BundleCreationTriggerService extends ElasticSearchService {
                 .mustNot(matchQuery("data.allocatedTrack", "MULTI_CLAIM"))
                 .mustNot(matchQuery("data.allocatedTrack", "INTERMEDIATE_CLAIM"))
                 .mustNot(matchQuery("data.responseClaimTrack", "MULTI_CLAIM"))
-                .mustNot(matchQuery("data.responseClaimTrack", "INTERMEDIATE_CLAIM"))
-            , List.of("reference"), startIndex
+                .mustNot(matchQuery("data.responseClaimTrack", "INTERMEDIATE_CLAIM")),
+            List.of("reference"), startIndex
         );
     }
 
