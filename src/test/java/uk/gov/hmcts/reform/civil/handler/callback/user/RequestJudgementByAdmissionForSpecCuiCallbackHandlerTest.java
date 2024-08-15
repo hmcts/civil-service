@@ -466,6 +466,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                                                      .label("John Doe")
                                                      .build())
                                           .build())
+                .respondent1(PartyBuilder.builder().individual().build())
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
                 .build();
 
@@ -502,6 +503,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                                                      .build())
                                           .build())
                 .ccjPaymentDetails(ccjPaymentDetails)
+                .respondent1(PartyBuilder.builder().individual().build())
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
                 .build();
 
@@ -522,6 +524,9 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo("JUDGMENT_BY_ADMISSION");
             assertThat(response.getData().get("activeJudgment")).extracting("judgmentId").isEqualTo(1);
             assertThat(response.getData().get("activeJudgment")).extracting("isRegisterWithRTL").isEqualTo("Yes");
+            assertThat(response.getData().get("activeJudgment")).extracting("defendant1Name").isEqualTo("Mr. John Rambo");
+            assertThat(response.getData().get("activeJudgment")).extracting("defendant1Address").isNotNull();
+            assertThat(response.getData().get("activeJudgment")).extracting("defendant1Dob").isNotNull();
         }
 
         @Test
@@ -586,6 +591,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                                                      .build())
                                           .build())
                 .ccjPaymentDetails(ccjPaymentDetails)
+                .respondent1(PartyBuilder.builder().individual().build())
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
                 .build();
 
