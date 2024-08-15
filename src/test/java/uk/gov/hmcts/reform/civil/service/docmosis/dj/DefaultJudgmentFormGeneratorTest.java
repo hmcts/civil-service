@@ -38,6 +38,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DJ_FORM_SPEC;
@@ -262,6 +263,8 @@ public class DefaultJudgmentFormGeneratorTest {
         List<CaseDocument> caseDocuments = generator.generateNonDivergentDocs(caseData, BEARER_TOKEN,
                                                                               GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT.name());
 
+        verify(assignCategoryId, times(2))
+            .assignCategoryIdToCaseDocument(CASE_DOCUMENT, "judgments");
         assertThat(caseDocuments).hasSize(2);
     }
 
@@ -291,6 +294,8 @@ public class DefaultJudgmentFormGeneratorTest {
         List<CaseDocument> caseDocuments = generator.generateNonDivergentDocs(caseData, BEARER_TOKEN,
                                                                               GEN_DJ_FORM_NON_DIVERGENT_SPEC_DEFENDANT.name());
 
+        verify(assignCategoryId, times(2))
+            .assignCategoryIdToCaseDocument(CASE_DOCUMENT, "judgments");
         assertThat(caseDocuments).hasSize(2);
     }
 
@@ -318,6 +323,8 @@ public class DefaultJudgmentFormGeneratorTest {
         List<CaseDocument> caseDocuments = generator.generateNonDivergentDocs(caseData, BEARER_TOKEN,
                                                                               GEN_DJ_FORM_NON_DIVERGENT_SPEC_DEFENDANT.name());
 
+        verify(assignCategoryId)
+            .assignCategoryIdToCaseDocument(CASE_DOCUMENT, "judgments");
         assertThat(caseDocuments).hasSize(1);
     }
 
@@ -349,7 +356,8 @@ public class DefaultJudgmentFormGeneratorTest {
             .build();
         List<CaseDocument> caseDocuments = generator.generateNonDivergentDocs(caseData, BEARER_TOKEN,
                                                                               GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT.name());
-
+        verify(assignCategoryId)
+            .assignCategoryIdToCaseDocument(CASE_DOCUMENT, "judgments");
         assertThat(caseDocuments).hasSize(1);
     }
 
@@ -383,6 +391,8 @@ public class DefaultJudgmentFormGeneratorTest {
         List<CaseDocument> caseDocuments = generator.generateNonDivergentDocs(caseData, BEARER_TOKEN,
                                                                               GEN_DJ_FORM_NON_DIVERGENT_SPEC_DEFENDANT.name());
 
+        verify(assignCategoryId, times(2))
+            .assignCategoryIdToCaseDocument(CASE_DOCUMENT, "judgments");
         assertThat(caseDocuments).hasSize(2);
     }
 }

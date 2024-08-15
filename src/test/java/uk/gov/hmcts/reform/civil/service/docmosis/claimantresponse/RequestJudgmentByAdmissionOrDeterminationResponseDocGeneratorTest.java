@@ -51,6 +51,7 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGeneratorTest {
 
     @Mock
     private DocumentGeneratorService documentGeneratorService;
+
     @Mock
     private AssignCategoryId assignCategoryId;
 
@@ -164,6 +165,8 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGeneratorTest {
         // Then
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DocumentType.JUDGMENT_BY_ADMISSION_CLAIMANT));
+        verify(assignCategoryId)
+            .assignCategoryIdToCaseDocument(caseDocument, "judgments");
         assertThat(actual).contains(caseDocument);
     }
 
