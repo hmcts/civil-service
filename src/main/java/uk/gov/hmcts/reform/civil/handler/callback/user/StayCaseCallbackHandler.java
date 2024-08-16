@@ -37,12 +37,18 @@ public class StayCaseCallbackHandler extends CallbackHandler {
 
     @Override
     protected Map<String, Callback> callbacks() {
-        Map<String, Callback> commonCallbacks = Map.of(
-            callbackKey(ABOUT_TO_START), params -> emptyCallbackResponse(params),
-            callbackKey(ABOUT_TO_SUBMIT), featureToggleService.isCaseEventsEnabled() ? params -> stayCase(params) : params -> emptyCallbackResponse(params),
-            callbackKey(SUBMITTED), featureToggleService.isCaseEventsEnabled() ? params -> addConfirmationScreen(params) : params -> emptyCallbackResponse(params)
+        return Map.of(
+            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+            callbackKey(ABOUT_TO_SUBMIT), this::handleAboutToSubmit,
+            callbackKey(SUBMITTED), this::handleSubmitted
         );
-        return commonCallbacks;
+    }
+
+    private CallbackResponse handleAboutToSubmit(CallbackParams params) {
+        return featureToggleService.isCaseEventsEnabled() ? stayCase(params) : emptyCallbackResponse(params);
+    }
+    private CallbackResponse handleSubmitted(CallbackParams params) {
+        return featureToggleService.isCaseEventsEnabled() ? addConfirmationScreen(params) : emptyCallbackResponse(params);
     }
 
     private CallbackResponse stayCase(CallbackParams callbackParams) {

@@ -1,17 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
-import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -20,17 +15,45 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_STAY_CASE;
 
 @Service
-@RequiredArgsConstructor
-public class NotifyClaimantCaseStayedHandler extends CallbackHandler implements NotificationData {
+public class NotifyClaimantCaseStayedHandler extends AbstractNotifyCaseStayedHandler {
 
     private static final String TASK_ID = "NotifyClaimantStayCase";
     private static final String REFERENCE_TEMPLATE = "case-stayed-claimant-notification-%s";
-    private final NotificationService notificationService;
-    private final NotificationsProperties notificationsProperties;
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIMANT_STAY_CASE);
 
+    public NotifyClaimantCaseStayedHandler(NotificationService notificationService, NotificationsProperties notificationsProperties) {
+        super(notificationService, notificationsProperties);
+    }
+
     @Override
-    protected Map<String, Callback> callbacks() {
+    protected String getReferenceTemplate() {
+        return REFERENCE_TEMPLATE;
+    }
+
+    @Override
+    protected String getRecipient(CaseData caseData) {
+        return caseData.isApplicantLiP()
+            ? caseData.getClaimantUserDetails().getEmail()
+            : caseData.getApplicantSolicitor1UserDetails().getEmail();
+    }
+
+    @Override
+    protected boolean isLiP(CaseData caseData) {
+        return caseData.isApplicantLiP();
+    }
+
+    @Override
+    protected boolean isBilingual(CaseData caseData) {
+        return caseData.isClaimantBilingual();
+    }
+
+    @Override
+    protected String getPartyName(CaseData caseData) {
+        return caseData.getApplicant1().getPartyName();
+    }
+
+    @Override
+    public Map<String, Callback> callbacks() {
         return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::sendNotification);
     }
 
@@ -42,43 +65,5 @@ public class NotifyClaimantCaseStayedHandler extends CallbackHandler implements 
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
-    }
-
-    public CallbackResponse sendNotification(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-
-        notificationService.sendMail(
-            getRecipientEmail(caseData),
-            getNotificationTemplate(caseData),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getCcdCaseReference())
-        );
-        return AboutToStartOrSubmitCallbackResponse.builder().build();
-    }
-
-    private String getNotificationTemplate(CaseData caseData) {
-        if (caseData.isApplicantLiP()) {
-            return caseData.isClaimantBilingual()
-                ? notificationsProperties.getNotifyLipUpdateTemplateBilingual()
-                : notificationsProperties.getNotifyLipUpdateTemplate();
-        } else {
-            return notificationsProperties.getNotifyLRCaseStayed();
-        }
-
-    }
-
-    @Override
-    public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            PARTY_NAME, caseData.getApplicant1().getPartyName(),
-            CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
-        );
-    }
-
-    private String getRecipientEmail(CaseData caseData) {
-        return caseData.isApplicantLiP()
-            ? caseData.getClaimantUserDetails().getEmail()
-            : caseData.getApplicantSolicitor1UserDetails().getEmail();
     }
 }
