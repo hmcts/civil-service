@@ -372,13 +372,11 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             errors = postcodeValidator.validate(getPostCode(partyChosen, caseData));
             if (featureToggleService.isJudgmentOnlineLive()) {
                 Party partyDetails = getPartyDetails(partyChosen, caseData);
-                if (partyDetails != null) {
-                    if (partyDetails.getPrimaryAddress() != null) {
-                        errors = partyValidator.validateAddress(partyDetails.getPrimaryAddress(), errors);
-                    }
-                    if (partyDetails.getPartyName() != null) {
-                        errors = partyValidator.validateName(partyDetails.getPartyName(), errors);
-                    }
+                if (partyDetails != null  && partyDetails.getPrimaryAddress() != null) {
+                    errors = partyValidator.validateAddress(partyDetails.getPrimaryAddress(), errors);
+                }
+                if (partyDetails != null && partyDetails.getPartyName() != null) {
+                    errors = partyValidator.validateName(partyDetails.getPartyName(), errors);
                 }
             }
         }

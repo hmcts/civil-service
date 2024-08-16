@@ -2141,7 +2141,15 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             }
 
             @ParameterizedTest
-            @ValueSource(strings = {CLAIMANT_ONE_ID, CLAIMANT_TWO_ID, DEFENDANT_ONE_ID, DEFENDANT_TWO_ID, DEFENDANT_ONE_LITIGATION_FRIEND_ID, DEFENDANT_TWO_LITIGATION_FRIEND_ID})
+            @ValueSource(strings = {
+                CLAIMANT_ONE_ID,
+                CLAIMANT_TWO_ID,
+                DEFENDANT_ONE_ID,
+                DEFENDANT_TWO_ID,
+                CLAIMANT_ONE_LITIGATION_FRIEND_ID,
+                CLAIMANT_TWO_LITIGATION_FRIEND_ID,
+                DEFENDANT_ONE_LITIGATION_FRIEND_ID,
+                DEFENDANT_TWO_LITIGATION_FRIEND_ID})
             void shouldReturnPostcodeErrorForPartyChosen(String partyChosenId) {
                 when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
                 given(postcodeValidator.validate(any())).willReturn(List.of("Please enter Postcode"));
