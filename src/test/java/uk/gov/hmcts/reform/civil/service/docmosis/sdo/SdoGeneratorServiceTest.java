@@ -71,11 +71,11 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
@@ -145,7 +145,7 @@ public class SdoGeneratorServiceTest {
     private FeatureToggleService featureToggleService;
 
     @MockBean
-    protected IdamClient idamClient;
+    protected UserService userService;
 
     @MockBean
     private DocumentHearingLocationHelper documentHearingLocationHelper;
@@ -165,7 +165,7 @@ public class SdoGeneratorServiceTest {
 
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
 
-        when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+        when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                     .forename("Judgey")
                                                                     .surname("McJudge")
                                                                     .roles(Collections.emptyList()).build());

@@ -763,5 +763,5 @@ caseFlags:
 stateflow:
   engine:
     simplification:
-      enabled: ${SIMPLE_STATE_FLOW_ENGINE_ENABLED:false}
+      enabled: ${SIMPLE_STATE_FLOW_ENGINE_ENABLED:true}
 
