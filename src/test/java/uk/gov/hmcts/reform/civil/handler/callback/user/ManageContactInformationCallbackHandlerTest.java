@@ -2141,6 +2141,70 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             }
 
             @ParameterizedTest
+            @ValueSource(strings = {CLAIMANT_ONE_ID, CLAIMANT_TWO_ID, DEFENDANT_ONE_ID, DEFENDANT_TWO_ID, DEFENDANT_ONE_LITIGATION_FRIEND_ID, DEFENDANT_TWO_LITIGATION_FRIEND_ID})
+            void shouldReturnPostcodeErrorForPartyChosen(String partyChosenId) {
+                when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
+                given(postcodeValidator.validate(any())).willReturn(List.of("Please enter Postcode"));
+
+                CaseData caseDataBefore = CaseDataBuilder.builder()
+                    .applicant1(Party.builder().type(INDIVIDUAL).build())
+                    .applicant2(Party.builder().type(INDIVIDUAL).build())
+                    .respondent1(Party.builder().type(INDIVIDUAL).build())
+                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .buildClaimIssuedPaymentCaseData();
+                given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                    .updateDetailsForm(UpdateDetailsForm.builder()
+                                           .partyChosen(DynamicList.builder()
+                                                            .value(DynamicListElement.builder()
+                                                                       .code(partyChosenId)
+                                                                       .build())
+                                                            .build())
+                                           .build())
+                    .applicant1(Party.builder()
+                                    .type(INDIVIDUAL)
+                                    .primaryAddress(Address.builder()
+                                                        .postCode(null)
+                                                        .build())
+                                    .build())
+                    .applicant2(Party.builder()
+                                    .type(INDIVIDUAL)
+                                    .primaryAddress(Address.builder()
+                                                        .postCode(null)
+                                                        .build())
+                                    .build())
+                    .respondent1(Party.builder()
+                                    .type(INDIVIDUAL)
+                                    .primaryAddress(Address.builder()
+                                                        .postCode(null)
+                                                        .build())
+                                    .build())
+                    .respondent2(Party.builder()
+                                    .type(INDIVIDUAL)
+                                    .primaryAddress(Address.builder()
+                                                        .postCode(null)
+                                                        .build())
+                                    .build())
+                    .addApplicant1LitigationFriend()
+                    .addApplicant2LitigationFriend()
+                    .addRespondent1LitigationFriend()
+                    .addRespondent2LitigationFriend()
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertThat(response.getErrors()).isNotNull();
+                assertEquals(1, response.getErrors().size());
+                assertEquals("Please enter Postcode", response.getErrors().get(0));
+            }
+
+
+            @ParameterizedTest
             @ValueSource(strings = {DEFENDANT_ONE_LITIGATION_FRIEND_ID, DEFENDANT_TWO_LITIGATION_FRIEND_ID})
             void shouldReturnLitigationFriendWarning_sameDefendantLegalRep_twoDefendantLitigationFriends(String partyChosenId) {
                 CaseData caseDataBefore = CaseDataBuilder.builder()
