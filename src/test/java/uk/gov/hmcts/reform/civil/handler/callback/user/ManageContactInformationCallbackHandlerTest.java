@@ -2203,7 +2203,6 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 assertEquals("Please enter Postcode", response.getErrors().get(0));
             }
 
-
             @ParameterizedTest
             @ValueSource(strings = {DEFENDANT_ONE_LITIGATION_FRIEND_ID, DEFENDANT_TWO_LITIGATION_FRIEND_ID})
             void shouldReturnLitigationFriendWarning_sameDefendantLegalRep_twoDefendantLitigationFriends(String partyChosenId) {
