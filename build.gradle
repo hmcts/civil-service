@@ -12,15 +12,15 @@ plugins {
   id 'au.com.dius.pact' version '4.2.14'
   id "io.freefair.lombok" version "8.7.1"
   id 'com.github.hmcts.rse-cft-lib' version '0.19.1335'
-  id "org.flywaydb.flyway" version "10.17.0"
+  id "org.flywaydb.flyway" version "10.17.1"
 }
 
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
 
 def versions = [
-  junit             : '5.10.3',
-  junitPlatform     : '1.10.3',
+  junit             : '5.11.0',
+  junitPlatform     : '1.11.0',
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.0',
   lombok            : '1.18.34',
@@ -121,7 +121,7 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.767'
+        version: '1.12.768'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
@@ -454,13 +454,13 @@ dependencies {
   //pact contract testing
   contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.5'
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.3')
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.3')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.11.0')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.11.0')
   contractTestImplementation sourceSets.main.runtimeClasspath
   contractTestImplementation sourceSets.test.runtimeClasspath
 
-  integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.3')
-  integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.3')
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.11.0')
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.11.0')
 
   // dashboard specific changes
 
