@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
@@ -894,6 +895,11 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .respondent2(Party.builder().type(INDIVIDUAL).build())
                 .buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+        }
+
+        @Test
+        void handleEventsReturnsTheExpectedCallbackEvent() {
+            assertThat(handler.handledEvents()).contains(MANAGE_CONTACT_INFORMATION);
         }
 
         @Test
