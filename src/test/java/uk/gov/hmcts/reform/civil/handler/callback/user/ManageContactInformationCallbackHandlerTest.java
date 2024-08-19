@@ -2563,6 +2563,74 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 assertThat(response.getErrors()).isEmpty();
             }
 
+            @ParameterizedTest
+            @ValueSource(strings = {DEFENDANT_ONE_ID, DEFENDANT_TWO_ID})
+            void shouldReturnErrorForDefendantManageInformation(String partyChosenId) {
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                    .updateDetailsForm(UpdateDetailsForm.builder()
+                                           .partyChosen(DynamicList.builder()
+                                                            .value(DynamicListElement.builder()
+                                                                       .code(partyChosenId)
+                                                                       .build())
+                                                            .build())
+                                           .build())
+                    .respondent1(Party.builder().type(Party.Type.INDIVIDUAL)
+                                    .primaryAddress(Address.builder()
+                                                        .addressLine1("Line 1 test again for more than 35 characters")
+                                                        .addressLine2("Line 1 test again for more than 35 characters")
+                                                        .addressLine3("Line 1 test again for more than 35 characters")
+                                                        .county("Line 1 test again for more than 35 characters")
+                                                        .postCode("Line 1 test again for more than 35 characters")
+                                                        .postTown("Line 1 test again for more than 35 characters").build())
+                                    .build())
+                    .respondent2(Party.builder().type(Party.Type.INDIVIDUAL)
+                                    .primaryAddress(Address.builder()
+                                                        .addressLine1("Line 1 test again for more than 35 characters")
+                                                        .addressLine2("Line 1 test again for more than 35 characters")
+                                                        .addressLine3("Line 1 test again for more than 35 characters")
+                                                        .county("Line 1 test again for more than 35 characters")
+                                                        .postCode("Line 1 test again for more than 35 characters")
+                                                        .postTown("Line 1 test again for more than 35 characters").build())
+                                    .build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                assertThat(response.getErrors()).isNotEmpty();
+                assertThat(response.getErrors()).hasSize(6);
+            }
+
+            @ParameterizedTest
+            @ValueSource(strings = {DEFENDANT_ONE_ID, DEFENDANT_TWO_ID})
+            void shouldNotErrorForDefendantManageInformation(String partyChosenId) {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .updateDetailsForm(UpdateDetailsForm.builder()
+                                           .partyChosen(DynamicList.builder()
+                                                            .value(DynamicListElement.builder()
+                                                                       .code(partyChosenId)
+                                                                       .build())
+                                                            .build())
+                                           .build())
+                    .build();
+
+                CaseData caseDataBefore = CaseDataBuilder.builder()
+                    .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                    .applicant1(Party.builder().type(INDIVIDUAL).build())
+                    .applicant2(Party.builder().type(INDIVIDUAL).build())
+                    .respondent1(Party.builder().type(INDIVIDUAL).build())
+                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .buildClaimIssuedPaymentCaseData();
+                given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                assertThat(response.getErrors()).isEmpty();
+            }
         }
 
         @Nested

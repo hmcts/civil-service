@@ -349,6 +349,12 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             case CLAIMANT_TWO_ID: {
                 return caseData.getApplicant2();
             }
+            case DEFENDANT_ONE_ID: {
+                return caseData.getRespondent1();
+            }
+            case DEFENDANT_TWO_ID: {
+                return caseData.getRespondent2();
+            }
             default: {
                 return null;
             }
