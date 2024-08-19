@@ -1,24 +1,24 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.hearings;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.NextHearingDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearings.CaseHearing;
 import uk.gov.hmcts.reform.hmc.model.hearings.HearingsResponse;
@@ -38,27 +38,31 @@ import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.ADJOURNED;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.CANCELLED;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.LISTED;
 
-@SpringBootTest(classes = {
-    UpdateNextHearingDetailsCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
-})
+@ExtendWith(MockitoExtension.class)
 class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
-    SystemUpdateUserConfiguration userConfig;
+    @Mock
+    private SystemUpdateUserConfiguration userConfig;
 
-    @MockBean
-    HearingsService hearingService;
+    @Mock
+    private HearingsService hearingService;
 
-    @MockBean
-    Time datetime;
+    @Mock
+    private Time datetime;
 
-    @Autowired
+    @Mock
+    private UserService userService;
+
     private UpdateNextHearingDetailsCallbackHandler handler;
 
-    @Autowired
     private ObjectMapper mapper;
+
+    @BeforeEach
+    void setup() {
+        mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        handler = new UpdateNextHearingDetailsCallbackHandler(userConfig, userService, hearingService, datetime,  mapper);
+    }
 
     @Nested
     class AboutToStart {
@@ -72,7 +76,6 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
             when(userConfig.getPassword()).thenReturn(mockSystemUserPassword);
             when(userService.getAccessToken(mockSystemUsername, mockSystemUserPassword))
                 .thenReturn("mock-token");
-            when(datetime.now()).thenReturn(TODAY);
         }
 
         @Nested
@@ -83,6 +86,8 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 value = HmcStatus.class,
                 names = {"LISTED", "AWAITING_ACTUALS"})
             void shouldSetNextHearingDetails_whenANextHearingDateExistsForToday(HmcStatus hmcstatus) {
+                when(datetime.now()).thenReturn(TODAY);
+
                 LocalDateTime hearingStartTime = TODAY.plusHours(10);
                 LocalDateTime requestedDateTime = TODAY.plusHours(9);
 
@@ -112,7 +117,7 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
                 NextHearingDetails expected = NextHearingDetails.builder()
-                    .hearingID(hearingId.toString())
+                    .hearingID(hearingId)
                     .hearingDateTime(hearingStartTime).build();
 
                 assertEquals(expected, updatedData.getNextHearingDetails());
@@ -123,6 +128,8 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 value = HmcStatus.class,
                 names = {"LISTED", "AWAITING_ACTUALS"})
             void shouldSetNextHearingDetails_whenAFutureNextHearingDateExists(HmcStatus hmcstatus) {
+                when(datetime.now()).thenReturn(TODAY);
+
                 LocalDateTime hearingStartTime = TODAY.plusDays(1).plusHours(10);
                 LocalDateTime requestedDateTime = TODAY.plusHours(9);
 
@@ -152,7 +159,7 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
                 NextHearingDetails expected = NextHearingDetails.builder()
-                    .hearingID(hearingId.toString())
+                    .hearingID(hearingId)
                     .hearingDateTime(hearingStartTime).build();
 
                 assertEquals(expected, updatedData.getNextHearingDetails());
@@ -163,6 +170,8 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 value = HmcStatus.class,
                 names = {"LISTED", "AWAITING_ACTUALS"})
             void shouldSetNextHearingDetails_whenNextHearingDateForTodayAndNextHearingDateForTheFutureExists(HmcStatus hmcstatus) {
+                when(datetime.now()).thenReturn(TODAY);
+
                 LocalDateTime hearingStartTime = TODAY.plusHours(10);
                 LocalDateTime requestedDateTime = TODAY.plusHours(9);
 
@@ -197,7 +206,7 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
                 NextHearingDetails expected = NextHearingDetails.builder()
-                    .hearingID(hearingId.toString())
+                    .hearingID(hearingId)
                     .hearingDateTime(hearingStartTime).build();
 
                 assertEquals(expected, updatedData.getNextHearingDetails());
@@ -208,6 +217,8 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 value = HmcStatus.class,
                 names = {"LISTED", "AWAITING_ACTUALS"})
             void shouldClearNextHearingDetails_whenOnlyElapsedNextHearingDatesExist(HmcStatus hmcstatus) {
+                when(datetime.now()).thenReturn(TODAY);
+
                 LocalDateTime requestedDateTime = TODAY.plusHours(9);
 
                 CaseData caseData = CaseDataBuilder.builder().build();
@@ -284,6 +295,8 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 value = HmcStatus.class,
                 names = {"LISTED", "AWAITING_ACTUALS"})
             void shouldSetNextHearingDetails_whenANextHearingDateExistsForToday(HmcStatus hmcstatus) {
+                when(datetime.now()).thenReturn(TODAY);
+
                 LocalDateTime hearingStartTime = TODAY.plusHours(10);
                 LocalDateTime requestedDateTime = TODAY.plusHours(9);
 
@@ -313,7 +326,7 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
                 NextHearingDetails expected = NextHearingDetails.builder()
-                    .hearingID(hearingId.toString())
+                    .hearingID(hearingId)
                     .hearingDateTime(hearingStartTime).build();
 
                 assertEquals(expected, updatedData.getNextHearingDetails());
@@ -324,6 +337,8 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 value = HmcStatus.class,
                 names = {"LISTED", "AWAITING_ACTUALS"})
             void shouldSetNextHearingDetails_whenAFutureNextHearingDateExists(HmcStatus hmcstatus) {
+                when(datetime.now()).thenReturn(TODAY);
+
                 LocalDateTime hearingStartTime = TODAY.plusDays(1).plusHours(10);
                 LocalDateTime requestedDateTime = TODAY.plusHours(9);
 
@@ -353,7 +368,7 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
                 NextHearingDetails expected = NextHearingDetails.builder()
-                    .hearingID(hearingId.toString())
+                    .hearingID(hearingId)
                     .hearingDateTime(hearingStartTime).build();
 
                 assertEquals(expected, updatedData.getNextHearingDetails());
@@ -364,6 +379,8 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 value = HmcStatus.class,
                 names = {"LISTED", "AWAITING_ACTUALS"})
             void shouldSetNextHearingDetails_whenNextHearingDateForTodayAndNextHearingDateFortheFutureExists(HmcStatus hmcstatus) {
+                when(datetime.now()).thenReturn(TODAY);
+
                 LocalDateTime hearingStartTime = TODAY.plusHours(10);
                 LocalDateTime requestedDateTime = TODAY.plusHours(9);
 
@@ -398,7 +415,7 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
                 NextHearingDetails expected = NextHearingDetails.builder()
-                    .hearingID(hearingId.toString())
+                    .hearingID(hearingId)
                     .hearingDateTime(hearingStartTime).build();
 
                 assertEquals(expected, updatedData.getNextHearingDetails());
@@ -409,6 +426,8 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 value = HmcStatus.class,
                 names = {"LISTED", "AWAITING_ACTUALS"})
             void shouldClearNextHearingDetails_whenOnlyElapsedNextHearingDatesExist(HmcStatus hmcstatus) {
+                when(datetime.now()).thenReturn(TODAY);
+
                 LocalDateTime requestedDateTime = TODAY.plusHours(9);
 
                 CaseData caseData = CaseDataBuilder.builder().build();

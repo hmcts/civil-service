@@ -68,7 +68,9 @@ public class ClaimReconsiderationUpheldClaimantNotificationHandler extends Callb
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.isApplicantLiP()
+                ? caseData.getCcdCaseReference().toString()
+                : caseData.getLegacyCaseReference(),
                 CLAIMANT_V_DEFENDANT, getClaimantVDefendant(caseData),
                 PARTY_NAME, caseData.getApplicant1().getPartyName()
             );

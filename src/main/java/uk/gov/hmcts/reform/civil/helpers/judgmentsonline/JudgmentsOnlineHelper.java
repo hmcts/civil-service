@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -24,16 +22,6 @@ public class JudgmentsOnlineHelper {
     private static final String ERROR_MESSAGE_DATE_ORDER_MUST_BE_IN_PAST = "Date judge made the order must be in the past";
 
     private JudgmentsOnlineHelper() {
-    }
-
-    public static String getRTLStatusBasedOnJudgementStatus(JudgmentStatusType judgmentStatus) {
-        switch (judgmentStatus) {
-            case ISSUED : return JudgmentRTLStatus.REGISTRATION.getRtlState();
-            case MODIFIED: return JudgmentRTLStatus.MODIFIED.getRtlState();
-            case CANCELLED, SET_ASIDE: return JudgmentRTLStatus.CANCELLATION.getRtlState();
-            case SATISFIED: return JudgmentRTLStatus.SATISFACTION.getRtlState();
-            default: return "";
-        }
     }
 
     public static boolean validateIfFutureDate(LocalDate date) {

@@ -691,7 +691,7 @@ bundle:
 
 payments:
   api:
-    url: ${PAYMENTS_API_URL:http://fake-payment-register-api}
+    url: ${PAYMENTS_API_URL:http://localhost:8765}
 
 idam:
   web:
@@ -762,5 +762,5 @@ caseFlags:
 stateflow:
   engine:
     simplification:
-      enabled: ${SIMPLE_STATE_FLOW_ENGINE_ENABLED:false}
+      enabled: ${SIMPLE_STATE_FLOW_ENGINE_ENABLED:true}
 

@@ -4,10 +4,10 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -31,25 +31,21 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 
-@SpringBootTest(classes = {
-    NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandler.class,
-    NotificationsProperties.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String TEMPLATE_ID = "template-id";
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
 
-    @MockBean
+    @Mock
     private NotificationsProperties notificationsProperties;
 
-    @MockBean
+    @Mock
     private OrganisationService organisationService;
 
-    @Autowired
+    @InjectMocks
     private NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandler handler;
 
     @Nested

@@ -65,6 +65,15 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsCaseEventsEnabledInvoked(Boolean toggleStat) {
+        var caseFlagsKey = "cui-case-events-enabled";
+        givenToggle(caseFlagsKey, toggleStat);
+
+        assertThat(featureToggleService.isCaseEventsEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsBulkClaimInvoked(Boolean toggleStat) {
         var bulkClaimKey = "bulk_claim_enabled";
         givenToggle(bulkClaimKey, toggleStat);
