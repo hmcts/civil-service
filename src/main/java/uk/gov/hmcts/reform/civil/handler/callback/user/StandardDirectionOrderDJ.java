@@ -421,7 +421,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             .trialHearingSchedulesOfLossDJ(TrialHearingSchedulesOfLoss
                                                .builder()
                                                .input1("The claimant must upload to the Digital Portal an "
-                                                           + "up-to-date schedule of loss to the defendant by 4pm on")
+                                                           + "up-to-date schedule of loss by 4pm on")
                                                .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
                                                .input2("If the defendant wants to challenge this claim, "
                                                            + "upload to the Digital Portal counter-schedule"
@@ -671,7 +671,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
         caseDataBuilder.trialRoadTrafficAccident(TrialRoadTrafficAccident
                                                      .builder()
-                                                     .input("Photographs and/or a place of the accident location "
+                                                     .input("Photographs and/or a plan of the accident location "
                                                                 + "shall be prepared "
                                                                 + "and agreed by the parties and uploaded to the"
                                                                 + " Digital Portal by 4pm on")
