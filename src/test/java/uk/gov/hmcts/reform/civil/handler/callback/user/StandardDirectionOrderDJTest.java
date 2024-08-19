@@ -328,7 +328,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             //trialHearingSchedulesOfLossDJ
             assertThat(response.getData()).extracting("trialHearingSchedulesOfLossDJ").extracting("input1")
                 .isEqualTo("The claimant must upload to the Digital Portal "
-                               + "an up-to-date schedule of loss to the defendant by 4pm on");
+                               + "an up-to-date schedule of loss by 4pm on");
             assertThat(response.getData()).extracting("trialHearingSchedulesOfLossDJ").extracting("input2")
                 .isEqualTo("If the defendant wants to challenge this claim, "
                                + "upload to the Digital Portal counter-schedule"
@@ -567,7 +567,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo(nextWorkingDayDate.toString());
 
             assertThat(response.getData()).extracting("trialRoadTrafficAccident").extracting("input")
-                .isEqualTo("Photographs and/or a place of the accident location shall be prepared "
+                .isEqualTo("Photographs and/or a plan of the accident location shall be prepared "
                                + "and agreed by the parties and uploaded to the Digital Portal by 4pm on");
             assertThat(response.getData()).extracting("trialRoadTrafficAccident").extracting("date1")
                 .isEqualTo(nextWorkingDayDate.toString());
