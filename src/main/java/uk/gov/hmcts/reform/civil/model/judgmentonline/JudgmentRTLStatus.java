@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.civil.model.judgmentonline;
 
 public enum JudgmentRTLStatus {
-    REGISTRATION("R"),
-    CANCELLATION("C"),
-    SATISFACTION("S"),
-    MODIFIED("M");
+    ISSUED("R"),
+    CANCELLED("C"),
+    SET_ASIDE("C"),
+    SATISFIED("S"),
+    MODIFIED_EXISTING("M"),
+    MODIFIED_RTL_STATE("R");
 
     private String rtlState;
 

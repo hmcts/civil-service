@@ -47,6 +47,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaiting
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesNonFullDefenceReceived;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesNonFullDefenceReceivedSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.bothDefSameLegalRep;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseContainsLiP;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledgedExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotified;
@@ -1752,7 +1753,7 @@ class FlowPredicateTest {
                 .applicant1ProceedWithClaim(YES)
                 .responseClaimTrack(SMALL_CLAIM.name())
                 .build().toBuilder()
-                .submittedDate(LocalDateTime.of(2024, 8, 1, 1, 0))
+                .submittedDate(LocalDateTime.of(2024, 11, 5, 1, 0))
                 .build();
             assertTrue(specSmallClaimCarm.test(caseData));
         }
@@ -3458,5 +3459,12 @@ class FlowPredicateTest {
             .build();
 
         assertFalse(reasonNotSuitableForSdo.test(caseData));
+    }
+
+    @Test
+    void caseContainsLiP() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+
+        assertFalse(caseContainsLiP.test(caseData));
     }
 }

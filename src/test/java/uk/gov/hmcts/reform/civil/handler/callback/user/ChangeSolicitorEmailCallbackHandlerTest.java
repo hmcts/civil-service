@@ -1,13 +1,14 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -40,31 +41,29 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 
-@SpringBootTest(classes = {
-    JacksonAutoConfiguration.class,
-    ChangeSolicitorEmailCallbackHandler.class,
-    ValidateEmailService.class
-})
+@ExtendWith(MockitoExtension.class)
 class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
     private ChangeSolicitorEmailCallbackHandler handler;
 
-    @Autowired
+    @Mock
     private UserService userService;
 
-    @MockBean
+    @Mock
     private ValidateEmailService validateEmailService;
 
-    @MockBean
+    @Mock
     private CoreCaseUserService coreCaseUserService;
 
-    @MockBean
+    @Mock
     private PostcodeValidator postcodeValidator;
 
     @BeforeEach
     void setupTest() {
-        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        handler = new ChangeSolicitorEmailCallbackHandler(validateEmailService, userService, coreCaseUserService,
+                                                          objectMapper, postcodeValidator);
     }
 
     @Nested
@@ -81,6 +80,8 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAmendSolicitorEmail_WhenInvokedByUserWith_Applicant1Roles() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
             List<String> caseRoles = new ArrayList<>();
             caseRoles.add("[APPLICANTSOLICITORONE]");
 
@@ -96,6 +97,8 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetPartyFlags_WhenInvokedByUserWith_Respondent1Roles() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
             List<String> caseRoles = new ArrayList<>();
             caseRoles.add("[RESPONDENTSOLICITORONE]");
 
@@ -111,6 +114,8 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetServiceAddress_whenSpec() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
@@ -137,6 +142,8 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetPartyFlags_WhenInvokedByUserWith_Respondent2Roles() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
             List<String> caseRoles = new ArrayList<>();
             caseRoles.add("[RESPONDENTSOLICITORTWO]");
 
@@ -153,6 +160,8 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetPartyFlags_WhenInvokedByUserWith_Respondent1And2Roles() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
             List<String> caseRoles = new ArrayList<>();
             caseRoles.add("[RESPONDENTSOLICITORONE]");
             caseRoles.add("[RESPONDENTSOLICITORTWO]");
@@ -174,6 +183,8 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnResponse_WithApplicant1SolicitorEmail() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build()
@@ -183,12 +194,14 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            var actual = ((HashMap)response.getData().get("applicantSolicitor1UserDetails")).get("email");
+            var actual = ((HashMap<?, ?>)response.getData().get("applicantSolicitor1UserDetails")).get("email");
             assertEquals("applicant1solicitor@gmail.com", actual, "applicant1SolicitorEmail");
         }
 
         @Test
         void shouldReturnResponse_WithRespondent1SolicitorEmail() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
                 .respondentSolicitor1EmailAddress("respondent1solicitor@gmail.com")
@@ -205,6 +218,8 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnResponse1and2_when1v2ss() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
                 .respondentSolicitor1EmailAddress("respondent1solicitor@gmail.com")
@@ -227,6 +242,8 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnResponse_WithRespondent2SolicitorEmail() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
                 .respondentSolicitor2EmailAddress("respondent2solicitor@gmail.com")
@@ -243,6 +260,8 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldClearPartyFlags() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -256,6 +275,8 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldCopyBack_whenSpecApp1() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
             List<String> caseRoles = new ArrayList<>();
             caseRoles.add("[APPLICANTSOLICITORONE]");
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
@@ -285,6 +306,8 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldCopyBack_whenSpecDef1() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
             List<String> caseRoles = new ArrayList<>();
             caseRoles.add("[RESPONDENTSOLICITORONE]");
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
@@ -314,6 +337,8 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldCopyBack_whenSpecDef2() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
             List<String> caseRoles = new ArrayList<>();
             caseRoles.add("[RESPONDENTSOLICITORTWO]");
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
@@ -343,6 +368,8 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldBackUp_whenNewRequiredIsNo() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
             List<String> caseRoles = new ArrayList<>();
             caseRoles.add("[RESPONDENTSOLICITORTWO]");
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
@@ -372,6 +399,8 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldBackUp_whenNewRequiredIsNo1v2ss() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
             List<String> caseRoles = new ArrayList<>();
             caseRoles.add("[RESPONDENTSOLICITORONE]");
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
@@ -406,6 +435,8 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateReferenceApplicant1() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
             List<String> caseRoles = new ArrayList<>();
             caseRoles.add("[APPLICANTSOLICITORONE]");
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
@@ -422,7 +453,6 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            //noinspection unchecked
             Assertions.assertThat(response.getData().get("solicitorReferences"))
                     .extracting("applicantSolicitor1Reference")
                         .isEqualTo("new reference");
@@ -430,6 +460,8 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateReferenceRespondent1() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
             List<String> caseRoles = new ArrayList<>();
             caseRoles.add("[RESPONDENTSOLICITORONE]");
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
@@ -446,7 +478,6 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            //noinspection unchecked
             Assertions.assertThat(response.getData().get("solicitorReferences"))
                     .extracting("respondentSolicitor1Reference")
                         .isEqualTo("new reference");
@@ -454,6 +485,8 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateReferenceRespondent2() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
             List<String> caseRoles = new ArrayList<>();
             caseRoles.add("[RESPONDENTSOLICITORTWO]");
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
@@ -470,7 +503,6 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            //noinspection unchecked
             Assertions.assertThat(response.getData().get("solicitorReferences"))
                     .extracting("respondentSolicitor2Reference")
                         .isEqualTo("new reference");
@@ -557,6 +589,8 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_WhenInvokedByUserWith_Applicant1Role() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
             List<String> caseRoles = new ArrayList<>();
             caseRoles.add("[APPLICANTSOLICITORONE]");
 
@@ -572,6 +606,8 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_WhenInvokedByUserWith_Respondent1Role() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
             List<String> caseRoles = new ArrayList<>();
             caseRoles.add("[RESPONDENTSOLICITORONE]");
 
@@ -587,6 +623,8 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_WhenInvokedByUserWith_Respondent2Role() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
             List<String> caseRoles = new ArrayList<>();
             caseRoles.add("[RESPONDENTSOLICITORTWO]");
 
@@ -602,6 +640,8 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_WhenInvokedByUserWith_Respondent1And2Roles() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
             List<String> caseRoles = new ArrayList<>();
             caseRoles.add("[RESPONDENTSOLICITORONE]");
             caseRoles.add("[RESPONDENTSOLICITORTWO]");
