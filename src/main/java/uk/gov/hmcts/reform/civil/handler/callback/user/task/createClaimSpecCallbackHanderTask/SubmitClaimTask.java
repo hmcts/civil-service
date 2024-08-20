@@ -115,7 +115,7 @@ public class SubmitClaimTask {
     public CallbackResponse submitClaim(CaseData caseData, String eventId, String authorisationToken, YesOrNo isFlightDelayClaim,
                                         FlightDelayDetails flightDelayDetails) {
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        CaseData.CaseDataBuilder<?, ?> dataBuilder = getSharedData(callbackParams);
+        CaseData.CaseDataBuilder<?, ?> dataBuilder = getSharedData(caseData, authorisationToken, eventId);
 
         // moving statement of truth value to correct field, this was not possible in mid event.
         // resetting statement of truth to make sure it's empty the next time it appears in the UI.
@@ -248,7 +248,7 @@ public class SubmitClaimTask {
                                         .nameOfAirline(flightDelayDetails.getNameOfAirline())
                                         .flightNumber(flightDelayDetails.getFlightNumber())
                                         .scheduledDate(flightDelayDetails.getScheduledDate())
-                                        .flightCourtLocation(getAirlineCaseLocation(selectedAirlineCode, callbackParams))
+                                        .flightCourtLocation(getAirlineCaseLocation(selectedAirlineCode, authorisationToken))
                                         .build());
         }
 
@@ -258,10 +258,9 @@ public class SubmitClaimTask {
             .build();
     }
 
-    private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+    private CaseData.CaseDataBuilder getSharedData(CaseData caseData, String authToken, String eventId) {
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        UserDetails userDetails = idamClient.getUserDetails(authToken);
         IdamUserDetails.IdamUserDetailsBuilder idam = IdamUserDetails.builder().id(userDetails.getId());
         CorrectEmail applicantSolicitor1CheckEmail = caseData.getApplicantSolicitor1CheckEmail();
         CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
@@ -275,7 +274,7 @@ public class SubmitClaimTask {
 
         dataBuilder.submittedDate(time.now());
 
-        if (null != callbackParams.getRequest().getEventId()) {
+        if (null != eventId) {
             dataBuilder.legacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
             if (!featureToggleService.isPbaV3Enabled()) {
                 dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC));
@@ -317,12 +316,12 @@ public class SubmitClaimTask {
             .orElse(emptyList());
     }
 
-    private CaseLocationCivil getAirlineCaseLocation(String airline, CallbackParams callbackParams) {
+    private CaseLocationCivil getAirlineCaseLocation(String airline, String authToken) {
         if (airline.equals("OTHER")) {
             return null;
         }
         String locationEpimmsId = airlineEpimsService.getEpimsIdForAirline(airline);
-        List<LocationRefData> locations = fetchLocationData(callbackParams);
+        List<LocationRefData> locations = fetchLocationData(authToken);
         var matchedLocations =  locations.stream().filter(loc -> loc.getEpimmsId().equals(locationEpimmsId)).toList();
         if (matchedLocations.isEmpty()) {
             throw new CallbackException(String.format(LOCATION_NOT_FOUND_MESSAGE, locationEpimmsId));
@@ -333,8 +332,7 @@ public class SubmitClaimTask {
         }
     }
 
-    private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+    private List<LocationRefData> fetchLocationData(String authToken) {
         return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }
 }
