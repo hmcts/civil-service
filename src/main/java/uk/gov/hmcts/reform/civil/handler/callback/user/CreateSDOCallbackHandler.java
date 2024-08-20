@@ -165,6 +165,21 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle.SHOW;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicListElement.dynamicElementFromCode;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CLAIMANT_EVIDENCE;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_HEADER_SDO;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_1v1;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_1v2;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_2v1;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.FEEDBACK_LINK;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.HEARING_CHANNEL_SDO;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.HEARING_TIME_TEXT_AFTER;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.LATER_THAN_FOUR_PM;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.SPEC_SERVICE_ID;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.UNSPEC_SERVICE_ID;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.UPON_CONSIDERING;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.WITNESS_STATEMENT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 
@@ -173,45 +188,9 @@ import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 @RequiredArgsConstructor
 public class CreateSDOCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(CREATE_SDO);
-    private static final String HEARING_CHANNEL = "HearingChannel";
-    private static final String SPEC_SERVICE_ID = "AAA6";
-    private static final String UNSPEC_SERVICE_ID = "AAA7";
-    public static final String CONFIRMATION_HEADER = "# Your order has been issued"
-        + "%n## Claim number: %s";
-    public static final String CONFIRMATION_SUMMARY_1v1 = "<br/>The Directions Order has been sent to:"
-        + "<br/>%n%n<strong>Claimant 1</strong>%n"
-        + "<br/>%s"
-        + "<br/>%n%n<strong>Defendant 1</strong>%n"
-        + "<br/>%s";
-    public static final String CONFIRMATION_SUMMARY_2v1 = "<br/>The Directions Order has been sent to:"
-        + "<br/>%n%n<strong>Claimant 1</strong>%n"
-        + "<br/>%s"
-        + "<br/>%n%n<strong>Claimant 2</strong>%n"
-        + "<br/>%s"
-        + "<br/>%n%n<strong>Defendant 1</strong>%n"
-        + "<br/>%s";
-    public static final String CONFIRMATION_SUMMARY_1v2 = "<br/>The Directions Order has been sent to:"
-        + "<br/>%n%n<strong>Claimant 1</strong>%n"
-        + "<br/>%s"
-        + "<br/>%n%n<strong>Defendant 1</strong>%n"
-        + "<br/>%s"
-        + "<br/>%n%n<strong>Defendant 2</strong>%n"
-        + "<br/>%s";
-    private static final String UPON_CONSIDERING =
-        "Upon considering the claim form, particulars of claim, statements of case and Directions questionnaires";
-    public static final String HEARING_TIME_TEXT_AFTER =
-        "The claimant must by no later than 4 weeks before the hearing date, pay the court the "
-            + "required hearing fee or submit a fully completed application for Help with Fees. \nIf the "
-            + "claimant fails to pay the fee or obtain a fee exemption by that time the claim will be "
-            + "struck without further order.";
-
-    public static final String FEEDBACK_LINK = "<p>%s"
-        + " <a href='https://www.smartsurvey.co.uk/s/QKJTVU//' target=_blank>here</a></p>";
-
-    public static final String ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE = "Date must be in the future";
-    public static final String ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO = "The number entered cannot be less than zero";
-
+    public static final String PARTIES_SERVE_COPIES = "The parties shall serve on each other copies of the documents upon which reliance is to be"
+        + " placed at the disposal hearing by 4pm on";
+    private final List<CaseEvent> handlerEvents = Collections.singletonList(CREATE_SDO);
     private final ObjectMapper objectMapper;
     private final LocationReferenceDataService locationRefDataService;
     private final WorkingDayIndicator workingDayIndicator;
@@ -223,9 +202,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final CategoryService categoryService;
     private final  List<DateToShowToggle> dateToShowTrue = List.of(DateToShowToggle.SHOW);
     private final  List<IncludeInOrderToggle> includeInOrderToggle = List.of(IncludeInOrderToggle.INCLUDE);
-    static final String witnessStatementString = "This witness statement is limited to 10 pages per party, including any appendices.";
-    static final String laterThanFourPmString = "later than 4pm on";
-    static final String claimantEvidenceString = "and the claimant's evidence in reply if so advised to be uploaded by 4pm on";
+
     @Value("${genApp.lrd.ccmcc.amountPounds}") BigDecimal ccmccAmount;
     @Value("${court-location.unspecified-claim.epimms-id}") String ccmccEpimsId;
 
@@ -244,17 +221,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     @Override
     public List<CaseEvent> handledEvents() {
-        return EVENTS;
+        return handlerEvents;
     }
 
-    // This is currently a mid event but once pre states are defined it should be moved to an about to start event.
-    // Once it has been moved to an about to start event the following file will need to be updated:
-    //  FlowStateAllowedEventService.java.
-    // This way pressing previous on the ccd page won't end up calling this method again and thus
-    // repopulating the fields if they have been changed.
-    // There is no reason to add conditionals to avoid this here since having it as an about to start event will mean
-    // it is only ever called once.
-    // Then any changes to fields in ccd will persist in ccd regardless of backwards or forwards page navigation.
     private CallbackResponse prePopulateOrderDetailsPages(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
@@ -304,8 +273,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         DisposalHearingDisclosureOfDocuments tempDisposalHearingDisclosureOfDocuments =
             DisposalHearingDisclosureOfDocuments.builder()
-                .input1("The parties shall serve on each other copies of the documents upon which reliance is to be"
-                            + " placed at the disposal hearing by 4pm on")
+                .input1(PARTIES_SERVE_COPIES)
                 .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
                 .input2("The parties must upload to the Digital Portal copies of those documents which they wish the "
                             + "court to consider when deciding the amount of damages, by 4pm on")
@@ -541,7 +509,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 .input3("A failure to comply with the paragraph above will result in the claimant being debarred from "
                             + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
                             + "save with permission of the Trial Judge.")
-                .input4(partiesLiaseString + laterThanFourPmString)
+                .input4(partiesLiaseString + LATER_THAN_FOUR_PM)
                 .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
                 .build();
 
@@ -564,9 +532,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                             + "is available.")
                 .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
                 .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-                .input7(claimantEvidenceString)
+                .input7(CLAIMANT_EVIDENCE)
                 .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
-                .input8(witnessStatementString)
+                .input8(WITNESS_STATEMENT)
                 .detailsShowToggle(addOrRemoveToggleList)
                 .sdoR2FastTrackCreditHireDetails(tempSdoR2FastTrackCreditHireDetails)
                 .build();
@@ -592,7 +560,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input3("A failure to comply with the paragraph above will result in the claimant being debarred from "
                         + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
                         + "save with permission of the Trial Judge.")
-            .input4(partiesLiaseString + laterThanFourPmString)
+            .input4(partiesLiaseString + LATER_THAN_FOUR_PM)
             .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
             .input5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
                         + "paragraph above, each party may rely upon written evidence by way of witness statement of "
@@ -601,9 +569,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                         + "is available.")
             .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
             .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-            .input7(claimantEvidenceString)
+            .input7(CLAIMANT_EVIDENCE)
             .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
-            .input8(witnessStatementString)
+            .input8(WITNESS_STATEMENT)
             .build();
 
         updatedData.fastTrackCreditHire(tempFastTrackCreditHire).build();
@@ -790,7 +758,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input3("A failure to comply with the paragraph above will result in the claimant being debarred from "
                         + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
                         + "save with permission of the Trial Judge.")
-            .input4(partiesLiaseString + laterThanFourPmString)
+            .input4(partiesLiaseString + LATER_THAN_FOUR_PM)
             .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
             .input5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
                         + "paragraph above, each party may rely upon written evidence by way of witness statement of "
@@ -799,9 +767,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                         + "is available.")
             .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
             .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-            .input7(claimantEvidenceString)
+            .input7(CLAIMANT_EVIDENCE)
             .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
-            .input11(witnessStatementString)
+            .input11(WITNESS_STATEMENT)
             .build();
 
         updatedData.smallClaimsCreditHire(tempSmallClaimsCreditHire).build();
@@ -865,7 +833,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         String serviceId = caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
             ? SPEC_SERVICE_ID : UNSPEC_SERVICE_ID;
         Optional<CategorySearchResult> categorySearchResult = categoryService.findCategoryByCategoryIdAndServiceId(
-            authToken, HEARING_CHANNEL, serviceId
+            authToken, HEARING_CHANNEL_SDO, serviceId
         );
         DynamicList hearingMethodList = HearingMethodUtils.getHearingMethodList(categorySearchResult.orElse(null));
         List<DynamicListElement> hearingMethodListWithoutNotInAttendance = hearingMethodList
@@ -1677,7 +1645,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private String getHeader(CaseData caseData) {
         return format(
-            CONFIRMATION_HEADER,
+            CONFIRMATION_HEADER_SDO,
             caseData.getLegacyCaseReference()
         );
     }
