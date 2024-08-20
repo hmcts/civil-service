@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.pininpost;
 
-import feign.FeignException;
 import feign.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +10,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
@@ -45,21 +45,16 @@ public class DefendantPinToPostLRspecService {
     }
 
     public Map<String, Object> removePinInPostData(CaseDetails caseDetails) {
-        try {
-            CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
-            DefendantPinToPostLRspec pinInPostData = caseData.getRespondent1PinToPostLRspec();
-            DefendantPinToPostLRspec updatePinInPostData = DefendantPinToPostLRspec.builder()
-                .citizenCaseRole(pinInPostData.getCitizenCaseRole())
-                .respondentCaseRole(pinInPostData.getRespondentCaseRole())
-                .expiryDate(pinInPostData.getExpiryDate()).build();
+        CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
+        DefendantPinToPostLRspec pinInPostData = caseData.getRespondent1PinToPostLRspec();
+        DefendantPinToPostLRspec updatePinInPostData = DefendantPinToPostLRspec.builder()
+            .citizenCaseRole(pinInPostData.getCitizenCaseRole())
+            .respondentCaseRole(pinInPostData.getRespondentCaseRole())
+            .expiryDate(pinInPostData.getExpiryDate()).build();
 
-            Map<String, Object> data = new HashMap<>();
-            data.put("respondent1PinToPostLRspec", updatePinInPostData);
-            return data;
-        } catch (FeignException e) {
-            log.error(String.format("Updating case data failed: %s", e.contentUTF8()));
-            throw e;
-        }
+        Map<String, Object> data = new HashMap<>();
+        data.put("respondent1PinToPostLRspec", updatePinInPostData);
+        return data;
     }
 
     public DefendantPinToPostLRspec buildDefendantPinToPost() {
@@ -99,5 +94,11 @@ public class DefendantPinToPostLRspecService {
         DefendantLinkStatus status = claimStoreService.isOcmcDefendantLinked(caseReference);
         log.info("ocmc case reference {} defendent status is {}", caseReference, status.isLinked());
         return status.isLinked();
+    }
+
+    public boolean isDefendantLinked(CaseDetails caseDetails) {
+        CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
+        IdamUserDetails defendantUserDetails = caseData.getDefendantUserDetails();
+        return defendantUserDetails != null && defendantUserDetails.getId() != null && defendantUserDetails.getEmail() != null;
     }
 }

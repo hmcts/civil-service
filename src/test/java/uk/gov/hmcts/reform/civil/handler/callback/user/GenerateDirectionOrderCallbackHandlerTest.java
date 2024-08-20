@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -47,10 +48,10 @@ import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeFinalOrderGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
@@ -86,16 +87,17 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 @ExtendWith(MockitoExtension.class)
 public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandlerTest {
 
+    @InjectMocks
     private GenerateDirectionOrderCallbackHandler handler;
 
     @Mock
     private JudgeFinalOrderGenerator judgeFinalOrderGenerator;
 
     @Mock
-    private DocumentHearingLocationHelper locationHelper;
+    private UserService theUserService;
 
     @Mock
-    private IdamClient idamClient;
+    private DocumentHearingLocationHelper locationHelper;
 
     @Mock
     private WorkingDayIndicator workingDayIndicator;
@@ -136,7 +138,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         handler = new GenerateDirectionOrderCallbackHandler(locationRefDataService, mapper, judgeFinalOrderGenerator,
-                                                            locationHelper, idamClient, workingDayIndicator);
+                                                            locationHelper, theUserService, workingDayIndicator);
     }
 
     @Nested
@@ -833,7 +835,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldAddDocumentToCollection_onAboutToSubmit() {
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                         .forename("Judge")
                                                                         .surname("Judy")
                                                                         .roles(Collections.emptyList()).build());
@@ -862,7 +864,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldChangeStateToFinalOrder_onAboutToSubmitAndFreeFormOrder() {
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                         .forename("Judge")
                                                                         .surname("Judy")
                                                                         .roles(Collections.emptyList()).build());
@@ -883,7 +885,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldChangeStateToFinalOrder_onAboutToSubmitAndAssistedOrderAndNoFurtherHearing() {
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                         .forename("Judge")
                                                                         .surname("Judy")
                                                                         .roles(Collections.emptyList()).build());
@@ -905,7 +907,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldChangeStateToCaseProgression_onAboutToSubmitAndAssistedOrderWithFurtherHearing() {
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                         .forename("Judge")
                                                                         .surname("Judy")
                                                                         .roles(Collections.emptyList()).build());
@@ -929,7 +931,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldRePopulateHearingNotes_whenAssistedHearingNotesExist() {
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                         .forename("Judge")
                                                                         .surname("Judy")
                                                                         .roles(Collections.emptyList()).build());
@@ -952,7 +954,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldRePopulateHearingNotes_whenFreeFormHearingNotesExist() {
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                         .forename("Judge")
                                                                         .surname("Judy")
                                                                         .roles(Collections.emptyList()).build());
@@ -973,7 +975,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotRePopulateHearingNotes_whenAssistedHearingNotesDoNotExist() {
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                         .forename("Judge")
                                                                         .surname("Judy")
                                                                         .roles(Collections.emptyList()).build());
@@ -995,7 +997,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotRePopulateHearingNotes_whenFreeFormHearingNotesDoNotExist() {
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                         .forename("Judge")
                                                                         .surname("Judy")
                                                                         .roles(Collections.emptyList()).build());

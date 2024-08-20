@@ -55,11 +55,11 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.math.BigDecimal;
@@ -118,7 +118,7 @@ public class JudgeFinalOrderGeneratorTest {
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
     @MockBean
-    private IdamClient idamClient;
+    private UserService userService;
     @MockBean
     private LocationReferenceDataService locationRefDataService;
     @MockBean
@@ -138,9 +138,9 @@ public class JudgeFinalOrderGeneratorTest {
     @BeforeEach
     public void setUp() throws JsonProcessingException {
 
-        when(idamClient.getUserDetails(any()))
+        when(userService.getUserDetails(any()))
             .thenReturn(new UserDetails("1", "test@email.com", "Test", "User", null));
-        when(idamClient.getUserDetails(any()))
+        when(userService.getUserDetails(any()))
             .thenReturn(new UserDetails("1", "test@email.com", "Test", "User", null));
 
         when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(locationRefData);
