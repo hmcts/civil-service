@@ -2759,10 +2759,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             @ValueSource(strings = {CLAIMANT_ONE_EXPERTS_ID, DEFENDANT_ONE_EXPERTS_ID, DEFENDANT_TWO_EXPERTS_ID})
             void shouldNotPopulateExperts(String partyChosenId) {
                 when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
-                Expert expert = Expert.builder().firstName("First").lastName("Name").partyID("id").build();
                 UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name")
                     .partyId("id").build();
-                List<Element<UpdatePartyDetailsForm>> form = wrapElements(party);
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .applicant1DQ(Applicant1DQ.builder().build())
@@ -2781,8 +2779,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
                 assertThat(updatedData.getUpdateDetailsForm().getPartyChosenId()).isEqualTo(partyChosenId);
-                assertThat(updatedData.getUpdateDetailsForm().getPartyChosenType()).isEqualTo(null);
-                assertThat(updatedData.getUpdateDetailsForm().getUpdateExpertsDetailsForm().size()).isEqualTo(0);
+                assertThat(updatedData.getUpdateDetailsForm().getPartyChosenType()).isNullOrEmpty();
+                assertEquals(updatedData.getUpdateDetailsForm().getUpdateExpertsDetailsForm().size(), 0);
             }
 
             @ParameterizedTest
