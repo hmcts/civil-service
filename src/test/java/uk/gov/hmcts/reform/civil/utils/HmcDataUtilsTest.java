@@ -3,9 +3,14 @@ package uk.gov.hmcts.reform.civil.utils;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.sampledata.HearingIndividual;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.hmc.model.hearing.Attendees;
 import uk.gov.hmcts.reform.hmc.model.hearing.CaseDetailsHearing;
@@ -221,6 +226,10 @@ class HmcDataUtilsTest {
         assertEquals(result, "23 December 2023 at 10:00 for 3 hours\n" +
             "24 December 2023 at 14:00 for 2 hours\n" +
             "25 December 2023 at 10:00 for 5 hours");
+    }
+
+    @Test
+    void getTitle() {
     }
 
     @Nested
@@ -1221,6 +1230,226 @@ class HmcDataUtilsTest {
             CaseHearing expected = hearing(hearingId, requestedDateTime, List.of(hearingStartTime));
             assertEquals(expected, actual);
         }
+    }
+
+    @Nested
+    class GetHearingTypeTitleText {
+
+        @ParameterizedTest
+        @CsvSource({
+            "TRI, SMALL_CLAIM, hearing",
+            "TRI, FAST_CLAIM, trial",
+            "DRH, SMALL_CLAIM, dispute resolution hearing",
+            "DIS, SMALL_CLAIM, disposal hearing",
+        })
+        void shouldReturnExpectedTitle(String hearingType, AllocatedTrack allocatedTrack, String expected) {
+            HearingGetResponse hearing = buildHearing(hearingType);
+            CaseData caseData = CaseData.builder().allocatedTrack(allocatedTrack).build();
+
+            String actual = HmcDataUtils.getHearingTypeTitleText(caseData, hearing);
+
+            assertEquals(expected, actual);
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+            "TRI, SMALL_CLAIM, hearing",
+            "TRI, FAST_CLAIM, trial",
+            "DRH, SMALL_CLAIM, dispute resolution hearing",
+            "DIS, SMALL_CLAIM, disposal hearing",
+        })
+        void shouldReturnExpectedTitle_specClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
+            HearingGetResponse hearing = buildHearing(hearingType);
+            CaseData caseData = CaseData.builder().responseClaimTrack(allocatedTrack.name()).build();
+
+            String actual = HmcDataUtils.getHearingTypeTitleText(caseData, hearing);
+
+            assertEquals(expected, actual);
+        }
+    }
+
+    @Nested
+    class GetHearingTypeContentText {
+
+        @ParameterizedTest
+        @CsvSource({
+            "TRI, SMALL_CLAIM, hearing",
+            "TRI, FAST_CLAIM, trial",
+            "DRH, SMALL_CLAIM, hearing",
+            "DIS, SMALL_CLAIM, hearing",
+        })
+        void shouldReturnExpectedText_unspecClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
+            HearingGetResponse hearing = buildHearing(hearingType);
+            CaseData caseData = CaseData.builder().allocatedTrack(allocatedTrack).build();
+
+            String actual = HmcDataUtils.getHearingTypeContentText(caseData, hearing);
+
+            assertEquals(expected, actual);
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+            "TRI, SMALL_CLAIM, hearing",
+            "TRI, FAST_CLAIM, trial",
+            "DRH, SMALL_CLAIM, hearing",
+            "DIS, SMALL_CLAIM, hearing",
+        })
+        void shouldReturnExpectedText_specClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
+            HearingGetResponse hearing = buildHearing(hearingType);
+            CaseData caseData = CaseData.builder().responseClaimTrack(allocatedTrack.name()).build();
+
+            String actual = HmcDataUtils.getHearingTypeContentText(caseData, hearing);
+
+            assertEquals(expected, actual);
+        }
+    }
+
+    @Nested
+    class GetInPersonAttendees {
+
+        @Test
+        void shouldReturnOneAttendee() {
+            HearingGetResponse hearing = buildHearing(
+                    List.of(HearingIndividual.attendingHearingInPerson("Jason", "Wells"),
+                            HearingIndividual.attendingHearingByPhone("Chloe", "Landale"),
+                            HearingIndividual.attendingHearingByVideo("Jenny", "Harper")));
+
+            String actual = HmcDataUtils.getInPersonAttendeeNames(hearing);
+
+            assertEquals("Jason Wells", actual);
+        }
+
+        @Test
+        void shouldReturnMultipleAttendees() {
+            HearingGetResponse hearing = buildHearing(
+                    List.of(HearingIndividual.attendingHearingInPerson("Jason", "Wells"),
+                            HearingIndividual.attendingHearingByPhone("Chloe", "Landale"),
+                            HearingIndividual.attendingHearingInPerson("Michael", "Carver"),
+                            HearingIndividual.attendingHearingByVideo("Jenny", "Harper"),
+                            HearingIndividual.attendingHearingInPerson("Jack", "Crawley")
+                    ));
+
+            String actual = HmcDataUtils.getInPersonAttendeeNames(hearing);
+
+            assertEquals("Jason Wells\nMichael Carver\nJack Crawley", actual);
+        }
+
+        @Test
+        void shouldReturnNullForZeroAttendees() {
+            HearingGetResponse hearing = buildHearing(
+                    List.of(HearingIndividual.attendingHearingByPhone("Chloe", "Landale"),
+                            HearingIndividual.attendingHearingByVideo("Jenny", "Harper")
+                    ));
+
+            String actual = HmcDataUtils.getInPersonAttendeeNames(hearing);
+
+            assertNull(actual);
+        }
+
+    }
+
+    @Nested
+    class GetPhoneAttendees {
+
+        @Test
+        void shouldReturnOneAttendee() {
+            HearingGetResponse hearing = buildHearing(
+                    List.of(HearingIndividual.attendingHearingByPhone("Jason", "Wells"),
+                            HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
+                            HearingIndividual.attendingHearingByVideo("Jenny", "Harper")));
+
+            String actual = HmcDataUtils.getPhoneAttendeeNames(hearing);
+
+            assertEquals("Jason Wells", actual);
+        }
+
+        @Test
+        void shouldReturnMultipleAttendees() {
+            HearingGetResponse hearing = buildHearing(
+                    List.of(HearingIndividual.attendingHearingByPhone("Jason", "Wells"),
+                            HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
+                            HearingIndividual.attendingHearingByPhone("Michael", "Carver"),
+                            HearingIndividual.attendingHearingByVideo("Jenny", "Harper"),
+                            HearingIndividual.attendingHearingByPhone("Jack", "Crawley")
+                    ));
+
+            String actual = HmcDataUtils.getPhoneAttendeeNames(hearing);
+
+            assertEquals("Jason Wells\nMichael Carver\nJack Crawley", actual);
+        }
+
+        @Test
+        void shouldReturnNull() {
+            HearingGetResponse hearing = buildHearing(
+                    List.of(HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
+                            HearingIndividual.attendingHearingByVideo("Jenny", "Harper")
+                    ));
+
+            String actual = HmcDataUtils.getPhoneAttendeeNames(hearing);
+
+            assertNull(actual);
+        }
+
+    }
+
+    @Nested
+    class GetVideoAttendees {
+
+        @Test
+        void shouldReturnOneAttendee() {
+            HearingGetResponse hearing = buildHearing(
+                    List.of(HearingIndividual.attendingHearingByVideo("Jason", "Wells"),
+                            HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
+                            HearingIndividual.attendingHearingByPhone("Jenny", "Harper")));
+
+            String actual = HmcDataUtils.getVideoAttendeesNames(hearing);
+
+            assertEquals("Jason Wells", actual);
+        }
+
+        @Test
+        void shouldReturnMultipleAttendees() {
+            HearingGetResponse hearing = buildHearing(
+                    List.of(HearingIndividual.attendingHearingByVideo("Jason", "Wells"),
+                            HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
+                            HearingIndividual.attendingHearingByVideo("Michael", "Carver"),
+                            HearingIndividual.attendingHearingByPhone("Jenny", "Harper"),
+                            HearingIndividual.attendingHearingByVideo("Jack", "Crawley")
+                    ));
+
+            String actual = HmcDataUtils.getVideoAttendeesNames(hearing);
+
+            assertEquals("Jason Wells\nMichael Carver\nJack Crawley", actual);
+        }
+
+        @Test
+        void shouldReturnNullForZeroAttendees() {
+            HearingGetResponse hearing = buildHearing(
+                    List.of(HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
+                            HearingIndividual.attendingHearingByPhone("Jenny", "Harper")
+                    ));
+
+            String actual = HmcDataUtils.getVideoAttendeesNames(hearing);
+
+            assertNull(actual);
+        }
+
+    }
+
+    private HearingGetResponse buildHearing(List<HearingIndividual> testIndividuals) {
+        return HearingGetResponse.builder()
+                .partyDetails(testIndividuals.stream().map(HearingIndividual::buildPartyDetails).toList())
+                .hearingResponse(HearingResponse.builder().hearingDaySchedule(List.of(
+                        HearingDaySchedule.builder()
+                                .attendees(testIndividuals.stream().map(HearingIndividual::buildAttendee).toList())
+                                .build())).build())
+                .build();
+    }
+
+    private HearingGetResponse buildHearing(String hearingType) {
+        return HearingGetResponse.builder()
+            .hearingDetails(HearingDetails.builder().hearingType(hearingType).build())
+            .build();
     }
 
     private CaseHearing hearing(String hearingId, LocalDateTime hearingRequestTime, List<LocalDateTime> startTimes) {
