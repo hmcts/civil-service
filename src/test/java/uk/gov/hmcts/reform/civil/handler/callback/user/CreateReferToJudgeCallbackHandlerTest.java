@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
 import java.util.Optional;
@@ -41,6 +42,9 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
 
     @Mock
     private LocationHelper helper;
+
+    @Mock
+    private Time time;
 
     @InjectMocks
     private CreateReferToJudgeCallbackHandler handler;

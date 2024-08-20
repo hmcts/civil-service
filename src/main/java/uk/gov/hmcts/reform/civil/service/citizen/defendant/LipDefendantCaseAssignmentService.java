@@ -8,10 +8,10 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.HashMap;
@@ -24,20 +24,20 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_LIP_DEFENDANT;
 @Slf4j
 public class LipDefendantCaseAssignmentService {
 
-    private final IdamClient idamClient;
+    private final UserService userService;
     private final CaseEventService caseEventService;
     private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
     private final CaseDetailsConverter caseDetailsConverter;
     private boolean caseFlagsLoggingEnabled;
 
     public LipDefendantCaseAssignmentService(
-        IdamClient idamClient,
+        UserService userService,
         CaseEventService caseEventService,
         DefendantPinToPostLRspecService defendantPinToPostLRspecService,
         CaseDetailsConverter caseDetailsConverter,
         @Value("${case-flags.logging.enabled:false}") boolean caseFlagsLoggingEnabled
     ) {
-        this.idamClient = idamClient;
+        this.userService = userService;
         this.caseEventService = caseEventService;
         this.defendantPinToPostLRspecService = defendantPinToPostLRspecService;
         this.caseDetailsConverter = caseDetailsConverter;
@@ -47,7 +47,7 @@ public class LipDefendantCaseAssignmentService {
     public void addLipDefendantToCaseDefendantUserDetails(String authorisation, String caseId,
                                                           Optional<CaseRole> caseRole,
                                                           Optional<CaseDetails> caseDetails) {
-        UserDetails defendantIdamUserDetails = idamClient.getUserDetails(authorisation);
+        UserDetails defendantIdamUserDetails = userService.getUserDetails(authorisation);
         IdamUserDetails defendantUserDetails = IdamUserDetails.builder()
                 .id(defendantIdamUserDetails.getId())
                 .email(defendantIdamUserDetails.getEmail())

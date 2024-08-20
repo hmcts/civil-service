@@ -42,7 +42,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
@@ -91,8 +90,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     private DefaultJudgmentOrderFormGenerator defaultJudgmentOrderFormGenerator;
     @MockBean
     private LocationReferenceDataService locationRefDataService;
-    @MockBean
-    private IdamClient idamClient;
     @MockBean
     private UserDetails userDetails;
     @MockBean
@@ -161,7 +158,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             nextWorkingDayDate = LocalDate.of(2023, 12, 15);
             when(deadlinesCalculator.plusWorkingDays(any(), anyInt())).thenReturn(date);
             when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(nextWorkingDayDate);
-            given(idamClient.getUserDetails(any()))
+            given(userService.getUserDetails(any()))
                 .willReturn(UserDetails.builder().forename("test").surname("judge").build());
         }
 
@@ -331,7 +328,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             //trialHearingSchedulesOfLossDJ
             assertThat(response.getData()).extracting("trialHearingSchedulesOfLossDJ").extracting("input1")
                 .isEqualTo("The claimant must upload to the Digital Portal "
-                               + "an up-to-date schedule of loss to the defendant by 4pm on");
+                               + "an up-to-date schedule of loss by 4pm on");
             assertThat(response.getData()).extracting("trialHearingSchedulesOfLossDJ").extracting("input2")
                 .isEqualTo("If the defendant wants to challenge this claim, "
                                + "upload to the Digital Portal counter-schedule"
@@ -570,7 +567,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo(nextWorkingDayDate.toString());
 
             assertThat(response.getData()).extracting("trialRoadTrafficAccident").extracting("input")
-                .isEqualTo("Photographs and/or a place of the accident location shall be prepared "
+                .isEqualTo("Photographs and/or a plan of the accident location shall be prepared "
                                + "and agreed by the parties and uploaded to the Digital Portal by 4pm on");
             assertThat(response.getData()).extracting("trialRoadTrafficAccident").extracting("date1")
                 .isEqualTo(nextWorkingDayDate.toString());
