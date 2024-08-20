@@ -7,8 +7,6 @@ import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
@@ -22,10 +20,6 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Slf4j
 @Service
@@ -37,15 +31,12 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
 
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
-        List<Element<Party>> defendants = new ArrayList<>();
-        defendants.add(element(caseData.getRespondent1()));
-        if (caseData.isMultiPartyDefendant()) {
-            defendants.add(element(caseData.getRespondent2()));
-        }
+
         BigInteger orderAmount = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getDebtAmount(caseData, interestCalculator));
         BigInteger costs = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getCostOfJudgmentForDJ(caseData));
         isNonDivergent =  JudgmentsOnlineHelper.isNonDivergentForDJ(caseData);
         JudgmentDetails activeJudgment = super.addUpdateActiveJudgment(caseData);
+        activeJudgment = super.updateDefendantDetails(activeJudgment, caseData);
         return activeJudgment.toBuilder()
             .createdTimestamp(LocalDateTime.now())
             .state(getJudgmentState(caseData))
