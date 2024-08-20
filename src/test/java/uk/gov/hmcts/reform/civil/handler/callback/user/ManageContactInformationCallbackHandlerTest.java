@@ -2473,7 +2473,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                                         .addressLine2("Line 1 test again for more than 35 characters")
                                                         .addressLine3("Line 1 test again for more than 35 characters")
                                                         .county("Line 1 test again for more than 35 characters")
-                                                        .postCode("Line 1 test again for more than 35 characters")
+                                                        .postCode("PostCode more than 8 characters")
                                                         .postTown("Line 1 test again for more than 35 characters").build())
                                     .build())
                     .respondent2(Party.builder().type(Party.Type.INDIVIDUAL)
@@ -2482,7 +2482,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                                         .addressLine2("Line 1 test again for more than 35 characters")
                                                         .addressLine3("Line 1 test again for more than 35 characters")
                                                         .county("Line 1 test again for more than 35 characters")
-                                                        .postCode("Line 1 test again for more than 35 characters")
+                                                        .postCode("PostCode more than 8 characters")
                                                         .postTown("Line 1 test again for more than 35 characters").build())
                                     .build())
                     .build();
