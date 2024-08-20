@@ -2779,7 +2779,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
                 assertThat(updatedData.getUpdateDetailsForm().getPartyChosenId()).isEqualTo(partyChosenId);
                 assertThat(updatedData.getUpdateDetailsForm().getPartyChosenType()).isNullOrEmpty();
-                assertEquals(updatedData.getUpdateDetailsForm().getUpdateExpertsDetailsForm().size(), 0);
+                assertEquals(0, updatedData.getUpdateDetailsForm().getUpdateExpertsDetailsForm().size());
             }
 
             @ParameterizedTest
