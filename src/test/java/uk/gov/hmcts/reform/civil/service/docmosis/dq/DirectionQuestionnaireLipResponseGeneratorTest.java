@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
@@ -46,7 +46,7 @@ class DirectionQuestionnaireLipResponseGeneratorTest {
     private DirectionQuestionnaireLipResponseGenerator generator;
 
     @Mock
-    private StateFlowEngine stateFlowEngine;
+    private SimpleStateFlowEngine stateFlowEngine;
     @Mock
     private StateFlow stateFlow;
     @Mock
