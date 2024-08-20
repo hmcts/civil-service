@@ -2538,23 +2538,15 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             @Test
             void shouldNotErrorForDefaultPartyChosenSelectedManageInformation() {
                 CaseData caseData = CaseDataBuilder.builder()
+                    .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                     .updateDetailsForm(UpdateDetailsForm.builder()
                                            .partyChosen(DynamicList.builder()
                                                             .value(DynamicListElement.builder()
-                                                                       .code("default")
+                                                                       .code("")
                                                                        .build())
                                                             .build())
                                            .build())
                     .build();
-
-                CaseData caseDataBefore = CaseDataBuilder.builder()
-                    .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                    .applicant1(Party.builder().type(INDIVIDUAL).build())
-                    .applicant2(Party.builder().type(INDIVIDUAL).build())
-                    .respondent1(Party.builder().type(INDIVIDUAL).build())
-                    .respondent2(Party.builder().type(INDIVIDUAL).build())
-                    .buildClaimIssuedPaymentCaseData();
-                given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
