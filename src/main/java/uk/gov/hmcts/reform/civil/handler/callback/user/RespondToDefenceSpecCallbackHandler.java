@@ -14,12 +14,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -101,7 +98,6 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDetails;
 import static uk.gov.hmcts.reform.civil.utils.CaseStateUtils.shouldMoveToInMediationState;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
@@ -877,24 +873,5 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (nonNull(applicant1DQ)) {
             builder.applicant1DQ(builder.build().getApplicant1DQ().toBuilder().applicant1DQDraftDirections(null).build());
         }
-    }
-
-    private List<Element<CaseDocument>> buildResponseDocuments(CaseData caseData) {
-        String claimant = "Claimant";
-        List<Element<CaseDocument>> claimantUploads = new ArrayList<>();
-        Optional.ofNullable(caseData.getApplicant1DQ().getApplicant1DQDraftDirections())
-            .ifPresent(claimDocument -> claimantUploads.add(
-                buildElemCaseDocument(caseData.getApplicant1DQ().getApplicant1DQDraftDirections(), claimant,
-                                      caseData.getApplicant1ResponseDate(), DocumentType.CLAIMANT_DRAFT_DIRECTIONS
-                )));
-
-        if (!claimantUploads.isEmpty()) {
-            assignCategoryId.assignCategoryIdToCollection(
-                claimantUploads,
-                document -> document.getValue().getDocumentLink(),
-                DocCategory.DQ_APP1.getValue()
-            );
-        }
-        return claimantUploads;
     }
 }
