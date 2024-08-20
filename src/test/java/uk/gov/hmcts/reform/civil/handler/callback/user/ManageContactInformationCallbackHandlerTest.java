@@ -2632,33 +2632,6 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 assertThat(response.getErrors()).isEmpty();
             }
 
-            @Test
-            void shouldHaveNoErrorForDefaultManageInformation() {
-                CaseData caseData = CaseDataBuilder.builder()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
-                                           .partyChosen(DynamicList.builder()
-                                                            .value(DynamicListElement.builder()
-                                                                       .code("default")
-                                                                       .build())
-                                                            .build())
-                                           .build())
-                    .build();
-
-                CaseData caseDataBefore = CaseDataBuilder.builder()
-                    .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                    .applicant1(Party.builder().type(INDIVIDUAL).build())
-                    .applicant2(Party.builder().type(INDIVIDUAL).build())
-                    .respondent1(Party.builder().type(INDIVIDUAL).build())
-                    .respondent2(Party.builder().type(INDIVIDUAL).build())
-                    .buildClaimIssuedPaymentCaseData();
-                given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
-
-                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-                when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
-
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-                assertThat(response.getErrors()).isEmpty();
-            }
         }
 
         @Nested
@@ -2780,6 +2753,36 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 assertThat(updatedData.getUpdateDetailsForm().getPartyChosenType()).isEqualTo(null);
                 assertThat(updatedData.getUpdateDetailsForm().getUpdateExpertsDetailsForm()).isEqualTo(form);
                 assertThat(updatedData.getUpdateDetailsForm().getUpdateWitnessesDetailsForm()).isEmpty();
+            }
+
+            @ParameterizedTest
+            @ValueSource(strings = {CLAIMANT_ONE_EXPERTS_ID, DEFENDANT_ONE_EXPERTS_ID, DEFENDANT_TWO_EXPERTS_ID})
+            void shouldNotPopulateExperts(String partyChosenId) {
+                when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
+                Expert expert = Expert.builder().firstName("First").lastName("Name").partyID("id").build();
+                UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name")
+                    .partyId("id").build();
+                List<Element<UpdatePartyDetailsForm>> form = wrapElements(party);
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .applicant1DQ(Applicant1DQ.builder().build())
+                    .respondent1DQ(Respondent1DQ.builder().build())
+                    .respondent2DQ(Respondent2DQ.builder().build())
+                    .updateDetailsForm(UpdateDetailsForm.builder()
+                                           .partyChosen(DynamicList.builder()
+                                                            .value(DynamicListElement.builder()
+                                                                       .code(partyChosenId)
+                                                                       .build())
+                                                            .build())
+                                           .build())
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                assertThat(updatedData.getUpdateDetailsForm().getPartyChosenId()).isEqualTo(partyChosenId);
+                assertThat(updatedData.getUpdateDetailsForm().getPartyChosenType()).isEqualTo(null);
+                assertThat(updatedData.getUpdateDetailsForm().getUpdateExpertsDetailsForm().size()).isEqualTo(0);
             }
 
             @ParameterizedTest
