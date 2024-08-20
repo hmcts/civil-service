@@ -2758,9 +2758,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             @ParameterizedTest
             @ValueSource(strings = {CLAIMANT_ONE_EXPERTS_ID, DEFENDANT_ONE_EXPERTS_ID, DEFENDANT_TWO_EXPERTS_ID})
             void shouldNotPopulateExperts(String partyChosenId) {
+
                 when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
-                UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name")
-                    .partyId("id").build();
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .applicant1DQ(Applicant1DQ.builder().build())
