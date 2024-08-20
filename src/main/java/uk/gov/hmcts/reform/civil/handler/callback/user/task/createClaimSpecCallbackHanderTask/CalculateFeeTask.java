@@ -1,0 +1,66 @@
+package uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeesService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+
+import java.util.List;
+import java.util.Optional;
+
+import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+
+public class CalculateFeeTask {
+
+    private final FeatureToggleService featureToggleService;
+    private final FeesService feesService;
+    private final ObjectMapper objectMapper;
+    private final OrganisationService organisationService;
+
+    public CalculateFeeTask(FeatureToggleService featureToggleService, FeesService feesService, ObjectMapper objectMapper, OrganisationService organisationService) {
+        this.featureToggleService = featureToggleService;
+        this.feesService = feesService;
+        this.objectMapper = objectMapper;
+        this.organisationService = organisationService;
+    }
+
+    public CallbackResponse calculateFees(CaseData caseData, String authorizationToken) {
+        Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
+        String reference = references.map(SolicitorReferences::getApplicantSolicitor1Reference).orElse("");
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
+        Optional<PaymentDetails> paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails());
+        String customerReference = paymentDetails.map(PaymentDetails::getCustomerReference).orElse(reference);
+        PaymentDetails updatedDetails = PaymentDetails.builder().customerReference(customerReference).build();
+        caseDataBuilder.claimIssuedPaymentDetails(updatedDetails);
+        if (featureToggleService.isPbaV3Enabled()) {
+            caseDataBuilder.paymentTypePBASpec("PBAv3");
+        }
+        List<String> pbaNumbers = getPbaAccounts(authorizationToken);
+
+        caseDataBuilder.claimFee(feesService
+                                     .getFeeDataByClaimValue(caseData.getClaimValue()))
+            .applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
+            .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private List<String> getPbaAccounts(String authToken) {
+        return organisationService.findOrganisation(authToken)
+            .map(Organisation::getPaymentAccount)
+            .orElse(emptyList());
+    }
+}
