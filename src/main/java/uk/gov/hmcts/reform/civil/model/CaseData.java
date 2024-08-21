@@ -1448,6 +1448,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public AllocatedTrack getAssignedTrackType() {
+        return AllocatedTrack.valueOf(getAssignedTrack());
+    }
+
+    @JsonIgnore
     public boolean hasApplicant1AcceptedCourtDecision() {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1LiPResponse)
@@ -1540,5 +1545,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isJudgeOrderVerificationRequired() {
         return (this.getCourtPermissionNeeded() != null && SettleDiscontinueYesOrNoList.YES.equals(this.getCourtPermissionNeeded()));
+    }
+
+    @JsonIgnore
+    public boolean isClaimantDontWantToProceedWithFulLDefenceFD() {
+        return this.isClaimBeingDisputed()
+            && this.hasApplicantNotProceededWithClaim();
     }
 }

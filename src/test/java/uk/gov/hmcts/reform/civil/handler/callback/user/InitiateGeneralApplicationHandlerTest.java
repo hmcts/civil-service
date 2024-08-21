@@ -1,14 +1,14 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.invocation.InvocationOnMock;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -26,24 +26,20 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
-import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceHelper;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -83,43 +79,32 @@ import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServic
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@SpringBootTest(classes = {
-    InitiateGeneralApplicationHandler.class,
-    JacksonAutoConfiguration.class,
-})
+@ExtendWith(MockitoExtension.class)
 class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
     private InitiateGeneralApplicationHandler handler;
 
-    @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @Mock
     private InitiateGeneralApplicationService initiateGeneralAppService;
 
-    @MockBean
-    private InitiateGeneralApplicationServiceHelper helper;
-
-    @MockBean
-    private OrganisationService organisationService;
-
-    @MockBean
-    protected IdamClient idamClient;
-
-    @MockBean
+    @Mock
     protected GeneralAppFeesService feesService;
 
-    @MockBean
+    @Mock
     protected LocationReferenceDataService locationRefDataService;
 
-    @MockBean
+    @Mock
+    private UserService theUserService;
+
+    @Mock
     protected UserRoleCaching userRoleCaching;
-    @MockBean
+
+    @Mock
     protected FeatureToggleService featureToggleService;
 
     public static final String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
-    public static final String RESPONDENT_EMAIL_ID_CONSTANT = "respondent@gmail.com";
 
     private static final String SET_FEES_AND_PBA = "ga-fees-and-pba";
     private final BigDecimal fee108 = new BigDecimal("10800");
@@ -127,6 +112,15 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     private final BigDecimal fee275 = new BigDecimal("27500");
     private static final String FEE_CODE = "test_fee_code";
     private static final String FEE_VERSION = "1";
+
+    @BeforeEach
+    void setup() {
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        handler = new InitiateGeneralApplicationHandler(initiateGeneralAppService, objectMapper, theUserService,
+                                                        userRoleCaching, feesService, locationRefDataService,
+                                                        featureToggleService);
+    }
 
     @Test
     void shouldThrowError_whenLRVsLiP() {
@@ -138,8 +132,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                         .region("4").build())
                 .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-        when(featureToggleService.isLocationWhiteListedForCaseProgression(any())).thenReturn(true);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -155,7 +147,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                         .baseLocation("45678")
                                         .region("4").build()).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-        when(featureToggleService.isPartOfNationalRollout(any())).thenReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -202,7 +193,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotCauseAnyErrors_whenApplicationDetailsNotProvided() {
             CaseData caseData = CaseDataBuilder.builder().build();
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
-            when(initiateGeneralAppService.validateUrgencyDates(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -495,7 +485,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotReturnErrors_whenHearingDataIsNotPresent() {
             CaseData caseData = CaseDataBuilder.builder().build();
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -694,13 +683,8 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class MidEventForSettingFeeAndPBA extends LocationRefSampleDataBuilder {
 
-        private final Organisation organisation = Organisation.builder()
-                .paymentAccount(List.of("12345", "98765"))
-                .build();
-
         @Test
         void shouldSetAddPbaNumbers_whenCalledAndOrgExistsInPrd() {
-            given(organisationService.findOrganisation(any())).willReturn(Optional.of(organisation));
             given(feesService.getFeeForGA(any()))
                     .willReturn(Fee.builder().code(FEE_CODE).calculatedAmountInPence(fee108)
                             .version(FEE_VERSION).build());
@@ -714,7 +698,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotResultInErrors_whenCalledAndOrgDoesNotExistInPrd() {
-            given(organisationService.findOrganisation(any())).willReturn(Optional.empty());
             given(feesService.getFeeForGA(any()))
                     .willReturn(Fee.builder()
                             .code(FEE_CODE)
@@ -832,7 +815,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                 .build());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
                 CaseDataBuilder.builder().build(), false, false);
-            CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
             caseDataBuilder.generalAppType(GAApplicationType.builder()
                                                .types(singletonList(VARY_ORDER))
                                                .build());
@@ -853,7 +836,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                 .calculatedAmountInPence(fee14).build());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
                 CaseDataBuilder.builder().build(), false, false);
-            CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
             List<GeneralApplicationTypes> types = List.of(VARY_ORDER, STAY_THE_CLAIM);
             caseDataBuilder.generalAppType(GAApplicationType.builder()
                                                .types(types)
@@ -884,16 +867,12 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getTestCaseData(CaseData.builder().build());
 
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                                                                       .email(APPLICANT_EMAIL_ID_CONSTANT)
                                                                       .build());
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
                                                          any(CaseData.class), any(UserDetails.class), anyString()))
                 .thenReturn(caseData);
-
-            when(helper.setRespondentDetailsIfPresent(any(GeneralApplication.class),
-                                                                any(CaseData.class), any(UserDetails.class)))
-                .thenReturn(GeneralApplicationDetailsBuilder.builder().getGeneralApplication());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -908,16 +887,12 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                     .getTestCaseData(CaseData.builder().build());
             when(feesService.getFeeForGA(any())).thenReturn(feeFromFeeService);
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                     .email(APPLICANT_EMAIL_ID_CONSTANT)
                     .build());
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
                     any(CaseData.class), any(UserDetails.class), anyString()))
                     .thenReturn(getMockServiceData(caseData));
-
-            when(helper.setRespondentDetailsIfPresent(any(GeneralApplication.class),
-                    any(CaseData.class), any(UserDetails.class)))
-                    .thenReturn(GeneralApplicationDetailsBuilder.builder().getGeneralApplication());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -975,7 +950,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getTestCaseDataWithEmptyPreferredLocation(CaseData.builder().build());
             when(feesService.getFeeForGA(any())).thenReturn(feeFromFeeService);
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                                                                         .email(APPLICANT_EMAIL_ID_CONSTANT)
                                                                         .build());
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
@@ -1003,20 +978,13 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                     .generalAppHearingDetails(GAHearingDetails.builder().build())
                     .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                     .build();
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                     .email(APPLICANT_EMAIL_ID_CONSTANT)
                     .build());
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
-                    any(CaseData.class), any(UserDetails.class), anyString())).thenAnswer(new Answer() {
-                        public Object answer(InvocationOnMock invocation) {
-                            return invocation.getArguments()[1];
-                        }
-                    }
+                    any(CaseData.class), any(UserDetails.class), anyString())).thenAnswer((Answer) invocation -> invocation.getArguments()[1]
             );
 
-            when(helper.setRespondentDetailsIfPresent(any(GeneralApplication.class),
-                    any(CaseData.class), any(UserDetails.class)))
-                    .thenReturn(GeneralApplicationDetailsBuilder.builder().getGeneralApplication());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

@@ -46,6 +46,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
@@ -54,9 +55,9 @@ import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.OrgPolicyValidator;
+import uk.gov.hmcts.reform.civil.validation.PartyValidator;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ParticularsOfClaimValidator;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.ArrayList;
@@ -132,7 +133,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final DateOfBirthValidator dateOfBirthValidator;
     private final FeesService feesService;
     private final OrganisationService organisationService;
-    private final IdamClient idamClient;
+    private final UserService userService;
     private final OrgPolicyValidator orgPolicyValidator;
     private final ObjectMapper objectMapper;
     private final Time time;
@@ -145,6 +146,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final CaseFlagsInitialiser caseFlagInitialiser;
     private final ToggleConfiguration toggleConfiguration;
     private final String caseDocLocation = "/cases/case-details/%s#CaseDocuments";
+    private final PartyValidator partyValidator;
 
     @Value("${court-location.unspecified-claim.region-id}")
     private String regionId;
@@ -156,13 +158,15 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(MID, "start-claim"), this::startClaim)
-            .put(callbackKey(MID, "applicant"), this::validateApplicant1DateOfBirth)
-            .put(callbackKey(MID, "applicant2"), this::validateApplicant2DateOfBirth)
+            .put(callbackKey(MID, "applicant"), this::validateApplicant1Details)
+            .put(callbackKey(MID, "applicant2"), this::validateApplicant2Details)
             .put(callbackKey(MID, "fee"), this::calculateFee)
             .put(callbackKey(MID, "idam-email"), this::getIdamEmail)
             .put(callbackKey(MID, "setRespondent2SameLegalRepresentativeToNo"), this::setRespondent2SameLegalRepToNo)
             .put(callbackKey(MID, "validate-defendant-legal-rep-email"), this::validateRespondentRepEmail)
             .put(callbackKey(MID, "validate-claimant-legal-rep-email"), this::validateClaimantRepEmail)
+            .put(callbackKey(MID, "respondent1"), this::validateRespondent1Details)
+            .put(callbackKey(MID, "respondent2"), this::validateRespondent2Details)
             .put(callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaim)
             .put(callbackKey(MID, "appOrgPolicy"), this::validateApplicantSolicitorOrgPolicy)
             .put(callbackKey(MID, "repOrgPolicy"), this::validateRespondentSolicitorOrgPolicy)
@@ -215,22 +219,53 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }
 
-    private CallbackResponse validateApplicant1DateOfBirth(CallbackParams callbackParams) {
+    private CallbackResponse validateApplicant1Details(CallbackParams callbackParams) {
         Party applicant = callbackParams.getCaseData().getApplicant1();
         List<String> errors = dateOfBirthValidator.validate(applicant);
+        validatePartyDetails(applicant, errors);;
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
     }
 
-    private CallbackResponse validateApplicant2DateOfBirth(CallbackParams callbackParams) {
-        Party applicant = callbackParams.getCaseData().getApplicant2();
-        List<String> errors = dateOfBirthValidator.validate(applicant);
+    private CallbackResponse validateApplicant2Details(CallbackParams callbackParams) {
+        Party applicant2 = callbackParams.getCaseData().getApplicant2();
+        List<String> errors = dateOfBirthValidator.validate(applicant2);
+        validatePartyDetails(applicant2, errors);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
+    }
+
+    private CallbackResponse validateRespondent1Details(CallbackParams callbackParams) {
+        Party respondent = callbackParams.getCaseData().getRespondent1();
+        List<String> errors = new ArrayList<>();
+        validatePartyDetails(respondent, errors);
+
+        return AboutToStartOrSubmitCallbackResponse.builder().errors(errors).build();
+    }
+
+    private CallbackResponse validateRespondent2Details(CallbackParams callbackParams) {
+        Party respondent2 = callbackParams.getCaseData().getRespondent2();
+        List<String> errors = new ArrayList<>();
+        if (respondent2 != null) {
+            validatePartyDetails(respondent2, errors);
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
+    private List<String> validatePartyDetails(Party party, List<String> errors) {
+        if (toggleService.isJudgmentOnlineLive()) {
+            if (party.getPrimaryAddress() != null) {
+                partyValidator.validateAddress(party.getPrimaryAddress(), errors);
+            }
+            partyValidator.validateName(party.getPartyName(), errors);
+        }
+        return errors;
     }
 
     private CallbackResponse validateApplicantSolicitorOrgPolicy(CallbackParams callbackParams) {
@@ -295,7 +330,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     private CallbackResponse getIdamEmail(CallbackParams callbackParams) {
-        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder()
             .applicantSolicitor1CheckEmail(CorrectEmail.builder().email(userDetails.getEmail()).build())
@@ -544,7 +579,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
         //second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
         IdamUserDetails.IdamUserDetailsBuilder idam = IdamUserDetails.builder().id(userDetails.getId());
 
         CaseData caseData = callbackParams.getCaseData();

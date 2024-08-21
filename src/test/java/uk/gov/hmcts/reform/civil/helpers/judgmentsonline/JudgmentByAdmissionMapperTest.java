@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -55,6 +56,7 @@ class JudgmentByAdmissionMapperTest {
                                       .build())
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
             .ccjPaymentDetails(ccjPaymentDetails)
+            .respondent1(PartyBuilder.builder().individual().build())
             .build();
         JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
 
@@ -69,6 +71,9 @@ class JudgmentByAdmissionMapperTest {
         assertEquals(JudgmentType.JUDGMENT_BY_ADMISSION, activeJudgment.getType());
         assertEquals(YesOrNo.YES, activeJudgment.getIsJointJudgment());
         assertEquals(1, activeJudgment.getJudgmentId());
+        assertEquals("Mr. John Rambo", activeJudgment.getDefendant1Name());
+        assertNotNull(activeJudgment.getDefendant1Address());
+        assertNotNull(activeJudgment.getDefendant1Dob());
 
     }
 
@@ -97,6 +102,7 @@ class JudgmentByAdmissionMapperTest {
                                           .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
                                           .build())
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .respondent1(PartyBuilder.builder().individual().build())
             .ccjPaymentDetails(ccjPaymentDetails)
             .build();
         JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
@@ -116,6 +122,9 @@ class JudgmentByAdmissionMapperTest {
         assertEquals("1000", activeJudgment.getInstalmentDetails().getAmount());
         assertEquals(PaymentFrequency.WEEKLY, activeJudgment.getInstalmentDetails().getPaymentFrequency());
         assertEquals(LocalDate.now().plusDays(10), activeJudgment.getInstalmentDetails().getStartDate());
+        assertEquals("Mr. John Rambo", activeJudgment.getDefendant1Name());
+        assertNotNull(activeJudgment.getDefendant1Address());
+        assertNotNull(activeJudgment.getDefendant1Dob());
 
     }
 
@@ -142,6 +151,7 @@ class JudgmentByAdmissionMapperTest {
                                                .whenWillThisAmountBePaid(LocalDate.now().plusDays(5)).build())
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
             .ccjPaymentDetails(ccjPaymentDetails)
+            .respondent1(PartyBuilder.builder().organisation().build())
             .build();
         JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
 
@@ -159,5 +169,59 @@ class JudgmentByAdmissionMapperTest {
         assertEquals(PaymentPlanSelection.PAY_BY_DATE, activeJudgment.getPaymentPlan().getType());
         assertEquals(activeJudgment.getPaymentPlan().getPaymentDeadlineDate(), LocalDate.now().plusDays(5));
         assertEquals(null, activeJudgment.getInstalmentDetails());
+        assertEquals("The Organisation", activeJudgment.getDefendant1Name());
+        assertNotNull(activeJudgment.getDefendant1Address());
+    }
+
+    @Test
+    void testIfJudgmentByAdmission_scenario4_multi_party() {
+
+        CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+            .ccjPaymentPaidSomeOption(YesOrNo.YES)
+            .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(10))
+            .ccjJudgmentTotalStillOwed(BigDecimal.valueOf(150))
+            .build();
+
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .respondent1Represented(YES)
+            .specRespondent1Represented(YES)
+            .applicant1Represented(YES)
+            .defendantDetailsSpec(DynamicList.builder()
+                                      .value(DynamicListElement.builder()
+                                                 .label("John Doe")
+                                                 .build())
+                                      .build())
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                               .whenWillThisAmountBePaid(LocalDate.now().plusDays(5)).build())
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .ccjPaymentDetails(ccjPaymentDetails)
+            .respondent1(PartyBuilder.builder().individual().build())
+            .addRespondent2(YES)
+            .respondent2(PartyBuilder.builder().soleTrader().build())
+            .build();
+        JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
+
+        assertNotNull(activeJudgment);
+        assertEquals(JudgmentState.REQUESTED, activeJudgment.getState());
+        assertEquals("14000", activeJudgment.getOrderedAmount());
+        assertEquals("1000", activeJudgment.getCosts());
+        assertEquals("15000", activeJudgment.getTotalAmount());
+        assertEquals(YesOrNo.NO, activeJudgment.getIsRegisterWithRTL());
+        assertEquals(LocalDate.now(), activeJudgment.getIssueDate());
+        assertEquals("0123", activeJudgment.getCourtLocation());
+        assertEquals(JudgmentType.JUDGMENT_BY_ADMISSION, activeJudgment.getType());
+        assertEquals(YesOrNo.YES, activeJudgment.getIsJointJudgment());
+        assertEquals(1, activeJudgment.getJudgmentId());
+        assertEquals(PaymentPlanSelection.PAY_BY_DATE, activeJudgment.getPaymentPlan().getType());
+        assertEquals(activeJudgment.getPaymentPlan().getPaymentDeadlineDate(), LocalDate.now().plusDays(5));
+        assertEquals(null, activeJudgment.getInstalmentDetails());
+        assertEquals("Mr. John Rambo", activeJudgment.getDefendant1Name());
+        assertEquals("Mr. Sole Trader", activeJudgment.getDefendant2Name());
+        assertNotNull(activeJudgment.getDefendant1Address());
+        assertNotNull(activeJudgment.getDefendant2Address());
+        assertNotNull(activeJudgment.getDefendant1Dob());
+        assertNotNull(activeJudgment.getDefendant2Dob());
+
     }
 }

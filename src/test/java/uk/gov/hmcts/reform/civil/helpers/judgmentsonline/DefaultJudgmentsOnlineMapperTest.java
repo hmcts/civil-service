@@ -64,6 +64,10 @@ class DefaultJudgmentsOnlineMapperTest {
         assertEquals(JudgmentType.DEFAULT_JUDGMENT, activeJudgment.getType());
         assertEquals(YesOrNo.YES, activeJudgment.getIsJointJudgment());
         assertEquals(1, activeJudgment.getJudgmentId());
+        assertEquals("Mr. Sole Trader", activeJudgment.getDefendant1Name());
+        assertNotNull(activeJudgment.getDefendant1Address());
+        assertNotNull(activeJudgment.getDefendant1Dob());
+
     }
 
     @Test
@@ -83,6 +87,13 @@ class DefaultJudgmentsOnlineMapperTest {
         assertEquals(JudgmentType.DEFAULT_JUDGMENT, activeJudgment.getType());
         assertEquals(YesOrNo.YES, activeJudgment.getIsJointJudgment());
         assertEquals(1, activeJudgment.getJudgmentId());
+        assertEquals("Mr. John Rambo", activeJudgment.getDefendant1Name());
+        assertEquals("Mr. John Rambo", activeJudgment.getDefendant2Name());
+        assertNotNull(activeJudgment.getDefendant1Address());
+        assertNotNull(activeJudgment.getDefendant2Address());
+        assertNotNull(activeJudgment.getDefendant1Dob());
+        assertNotNull(activeJudgment.getDefendant2Dob());
+
     }
 
     @Test
@@ -122,6 +133,9 @@ class DefaultJudgmentsOnlineMapperTest {
         assertEquals("100", activeJudgment.getInstalmentDetails().getAmount());
         assertEquals(YesOrNo.YES, activeJudgment.getIsJointJudgment());
         assertEquals(1, activeJudgment.getJudgmentId());
+        assertEquals(activeJudgment.getDefendant1Name(), "Mr. Sole Trader");
+        assertNotNull(activeJudgment.getDefendant1Address());
+        assertNotNull(activeJudgment.getDefendant1Dob());
     }
 
     @Test
@@ -158,5 +172,8 @@ class DefaultJudgmentsOnlineMapperTest {
         assertEquals(LocalDate.now().plusDays(10), activeJudgment.getPaymentPlan().getPaymentDeadlineDate());
         assertEquals(YesOrNo.YES, activeJudgment.getIsJointJudgment());
         assertEquals(1, activeJudgment.getJudgmentId());
+        assertEquals(activeJudgment.getDefendant1Name(), "Mr. Sole Trader");
+        assertNotNull(activeJudgment.getDefendant1Address());
+        assertNotNull(activeJudgment.getDefendant1Dob());
     }
 }
