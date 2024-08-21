@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -48,15 +49,20 @@ public class BundleCreationTriggerEventHandler {
      * @param event BundleCreationTriggerEvent.
      */
     @EventListener
-    public void sendBundleCreationTrigger(BundleCreationTriggerEvent event) {
+    public void sendBundleCreationTrigger(BundleCreationTriggerEvent event) throws InterruptedException {
         BundleCreateResponse bundleCreateResponse = bundleCreationService.createBundle(event);
         String caseId = event.getCaseId().toString();
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, CREATE_BUNDLE);
         CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails().getData());
 
-        List<uk.gov.hmcts.reform.civil.model.bundle.Bundle> bundles = bundleCreateResponse.getData().getCaseBundles();
+        Thread.sleep(120000);
+
+        CaseDetails caseDetails =  coreCaseDataService.getCase(event.getCaseId());
+
+        List<uk.gov.hmcts.reform.civil.model.bundle.Bundle> bundles = (List<uk.gov.hmcts.reform.civil.model.bundle.Bundle>) caseDetails.getData().get("caseBundles");;
         Optional<uk.gov.hmcts.reform.civil.model.bundle.Bundle> lastCreatedBundle = bundles.stream()
             .max(Comparator.comparing(bundle -> bundle.getValue().getCreatedOn()));
+
         if (lastCreatedBundle.isPresent()) {
             log.info("inside if");
             BundleDetails bundle = lastCreatedBundle.get().getValue();
