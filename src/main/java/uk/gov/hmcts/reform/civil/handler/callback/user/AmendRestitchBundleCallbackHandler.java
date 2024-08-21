@@ -86,6 +86,6 @@ public class AmendRestitchBundleCallbackHandler extends CallbackHandler {
             .confirmationHeader("# The bundle is being restitched")
             .confirmationBody("### What happens next\nCheck the Bundles tab to see if the restitch has been successful. "
                                   + "\nRestitching can take up to 5 minutes. "
-                                  + "\nAll parties will be notified when the new bundle is ready to view.").build();
+                                  + "\n\nAll parties will be notified when the new bundle is ready to view.").build();
     }
 }
