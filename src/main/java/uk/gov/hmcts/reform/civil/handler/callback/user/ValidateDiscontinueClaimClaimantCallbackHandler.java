@@ -11,10 +11,12 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.ConfirmOrderGivesPermission;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.helpers.settlediscontinue.DiscontinueClaimHelper;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.List;
@@ -39,6 +41,7 @@ public class ValidateDiscontinueClaimClaimantCallbackHandler extends CallbackHan
             No further action required.""";
 
     private final ObjectMapper objectMapper;
+    private static final String BOTH = "Both";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -72,9 +75,10 @@ public class ValidateDiscontinueClaimClaimantCallbackHandler extends CallbackHan
         if (caseData.getTypeOfDiscontinuance() != null
             && ConfirmOrderGivesPermission.YES.equals(caseData.getConfirmOrderGivesPermission())) {
             if (DiscontinuanceTypeList.FULL_DISCONTINUANCE.equals(caseData.getTypeOfDiscontinuance())) {
-                if (!DiscontinueClaimHelper.is1v2LrVLrCase(caseData)
-                    || DiscontinueClaimHelper.is1v2LrVLrCase(caseData)
-                    && SettleDiscontinueYesOrNoList.YES.equals(caseData.getIsDiscontinuingAgainstBothDefendants())) {
+                if (MultiPartyScenario.isOneVOne(caseData)
+                    || (BOTH.equals(caseData.getSelectedClaimantForDiscontinuance()))
+                    || (DiscontinueClaimHelper.is1v2LrVLrCase(caseData)
+                    && SettleDiscontinueYesOrNoList.YES.equals(caseData.getIsDiscontinuingAgainstBothDefendants()))) {
                     aboutToStartOrSubmitCallbackResponseBuilder.state(CaseState.CASE_DISCONTINUED.name());
                 } else {
                     caseData.setConfirmOrderGivesPermission(caseData.getConfirmOrderGivesPermission());
@@ -83,6 +87,8 @@ public class ValidateDiscontinueClaimClaimantCallbackHandler extends CallbackHan
                 caseData.setConfirmOrderGivesPermission(caseData.getConfirmOrderGivesPermission());
             }
         }
+
+        caseDataBuilder.businessProcess(BusinessProcess.ready(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT));
 
         return aboutToStartOrSubmitCallbackResponseBuilder.data(caseDataBuilder.build().toMap(objectMapper)).build();
     }
@@ -107,4 +113,5 @@ public class ValidateDiscontinueClaimClaimantCallbackHandler extends CallbackHan
     public List<CaseEvent> handledEvents() {
         return EVENTS;
     }
+
 }

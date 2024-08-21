@@ -13,9 +13,9 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
                                                   , notification_role)
 VALUES ('Notice.AAA6.JudgmentsOnline.SetAsideError.Defendant',
         'The judgment made against you has been set aside (removed)',
-        'The judgment made against you has been set aside (removed)',
+        'Mae’r dyfarniad yn eich erbyn wedi cael ei roi o’r naill du (wedi’i ddileu)',
         '<p class="govuk-body">You’ll receive an update with information about next steps.</p>',
-        '<p class="govuk-body">You’ll receive an update with information about next steps.</p>',
+        '<p class="govuk-body">Byddwch yn cael diweddariad gyda gwybodaeth am y camau nesaf.</p>',
         'DEFENDANT');
 
 /**

@@ -38,7 +38,7 @@ public class DefendantMediationSuccessfulDashboardNotificationScenarioTest exten
             .respondent1Represented(YesOrNo.NO)
             .build();
 
-        final List<TaskList> taskListExpected = MockTaskList.getMediationTaskListMock(DEFENDANT, caseId);
+        final List<TaskList> taskListExpected = MockTaskList.getMediationTaskListMockWithoutPayHearing(DEFENDANT, caseId);
 
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 

@@ -1,27 +1,26 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.Map;
 import java.util.Optional;
@@ -30,8 +29,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -41,45 +40,39 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_NUMBER_INTERIM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_EMAIL;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME_INTERIM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME_INTERIM;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-@SpringBootTest(classes = {
-    DJRespondentReceivedNotificationHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class DJRespondentReceivedNotificationHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
-    NotificationsProperties notificationsProperties;
-    @MockBean
+
+    @Mock
+    private NotificationsProperties notificationsProperties;
+
+    @Mock
     private OrganisationService organisationService;
-    @MockBean
+
+    @Mock
     private FeatureToggleService featureToggleService;
-    @Autowired
+
+    @InjectMocks
     private DJRespondentReceivedNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceived())
-                .thenReturn("test-template-received-id");
-            when(notificationsProperties.getRespondentSolicitor1DefaultJudgmentRequested())
-                .thenReturn("test-template-requested-id");
-            when(notificationsProperties.getRespondent1DefaultJudgmentRequestedTemplate())
-                .thenReturn("test-template-requested-id");
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
-        }
-
         @Test
         void shouldNotifyRespondentSolicitor_whenInvokedAnd1v1() {
+            when(notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceived())
+                .thenReturn("test-template-received-id");
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+
             //send Received email
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .addRespondent2(YesOrNo.NO)
@@ -98,6 +91,11 @@ class DJRespondentReceivedNotificationHandlerTest {
 
         @Test
         void shouldNotifyRespondentSolicitor_whenInvokedAnd1v2AndBothSelected() {
+            when(notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceived())
+                .thenReturn("test-template-received-id");
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+
             //send Received email
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
@@ -123,6 +121,11 @@ class DJRespondentReceivedNotificationHandlerTest {
 
         @Test
         void shouldNotifyRespondentSolicitor_whenInvokedAnd1v2AndNotBothNotSelected() {
+            when(notificationsProperties.getRespondentSolicitor1DefaultJudgmentRequested())
+                .thenReturn("test-template-requested-id");
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+
             //send Requested email
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
@@ -165,6 +168,9 @@ class DJRespondentReceivedNotificationHandlerTest {
 
         @Test
         void shouldGenerateEmail_whenInvokedAnd1v1AndLRvLiP() {
+            when(notificationsProperties.getRespondent1DefaultJudgmentRequestedTemplate())
+                .thenReturn("test-template-requested-id");
+
             //send Received email
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
@@ -180,13 +186,13 @@ class DJRespondentReceivedNotificationHandlerTest {
             verify(notificationService).sendMail(
                 "company@email.com",
                 "test-template-requested-id",
-                getNotificationDataMapLRvLip(caseData),
+                getNotificationDataMapLRvLip(),
                 "default-judgment-respondent-requested-notification-000DC001"
             );
         }
 
         @NotNull
-        private Map<String, String> getNotificationDataMapLRvLip(CaseData caseData) {
+        private Map<String, String> getNotificationDataMapLRvLip() {
             return Map.of(
                 CLAIM_NUMBER_INTERIM, LEGACY_CASE_REFERENCE,
                 DEFENDANT_NAME_INTERIM, "Company ltd",

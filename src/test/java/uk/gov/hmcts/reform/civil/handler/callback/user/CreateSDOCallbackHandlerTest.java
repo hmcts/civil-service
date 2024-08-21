@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -102,8 +101,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -118,7 +115,6 @@ import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -212,9 +208,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     private Time time;
 
     @MockBean
-    private IdamClient idamClient;
-
-    @MockBean
     private FeatureToggleService featureToggleService;
 
     @Autowired
@@ -259,7 +252,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateLocationListsWithPreselectedCourt() {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
             CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
             String preSelectedCourt = "214320";
@@ -305,7 +297,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGenerateDynamicListsCorrectly() {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
             CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
@@ -345,7 +336,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldClearDataIfStateIsCaseProgression() {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             List<FastTrack> directions = List.of(FastTrack.fastClaimBuildingDispute);
             List<SmallTrack> smallDirections = List.of(SmallTrack.smallClaimCreditHire);
@@ -418,7 +408,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateHearingCourtLocationForNihl() {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
 
             String preSelectedCourt = "214320";
@@ -471,7 +460,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateDefaultFieldsForNihl() {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
 
             List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
@@ -682,7 +670,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPrePopulateUpdatedWitnessSectionsForSDOR2() {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
 
@@ -731,7 +718,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @ParameterizedTest
         @ValueSource(booleans = {true, false})
         void shouldPopulateWelshSectionForSDOR2(boolean valid) {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .build()
@@ -766,7 +752,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateCaseManagementLocation_whenUnder1000SpecCcmcc() {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
                 .caseAccessCategory(SPEC_CLAIM)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.ccmccEpimsId).region("ccmcRegion").build())
@@ -810,7 +795,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotUpdateCaseManagementLocation_whenNotUnder1000SpecCcmcc() {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
                 .caseAccessCategory(SPEC_CLAIM)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("1010101").region("orange").build())
@@ -879,9 +863,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             userId = UUID.randomUUID().toString();
 
-            given(idamClient.getUserDetails(any()))
-                .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
-
             given(time.now()).willReturn(submittedDate);
 
             given(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).willReturn(true);
@@ -918,9 +899,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             userId = UUID.randomUUID().toString();
-
-            given(idamClient.getUserDetails(any()))
-                .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             given(time.now()).willReturn(submittedDate);
         }
@@ -973,6 +951,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
         when(featureToggleService.isLocationWhiteListedForCaseProgression(selectedCourt.getCode())).thenReturn(isLocationWhiteListed);
+        when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())).thenReturn(isLocationWhiteListed);
         when(locationRefDataService.getLocationMatchingLabel(selectedCourt.getCode(), params.getParams().get(
             CallbackParams.Params.BEARER_TOKEN).toString()))
             .thenReturn(Optional.of(LocationRefData.builder()
@@ -1061,6 +1040,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
         when(featureToggleService.isLocationWhiteListedForCaseProgression(selectedCourt.getCode()))
             .thenReturn(isLocationWhiteListed);
+        when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation()))
+            .thenReturn(isLocationWhiteListed);
         when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
             CallbackParams.Params.BEARER_TOKEN).toString())).thenReturn(
             Optional.of(LocationRefData.builder()
@@ -1103,6 +1084,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
+        when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation()))
+            .thenReturn(isLocationWhiteListed);
         when(featureToggleService.isLocationWhiteListedForCaseProgression((selectedCourt.getCode()))).thenReturn(
             isLocationWhiteListed);
         when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
@@ -1148,6 +1131,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+        when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())).thenReturn(isLocationWhiteListed);
         when(featureToggleService.isLocationWhiteListedForCaseProgression((selectedCourt.getCode()))).thenReturn(
             isLocationWhiteListed);
         when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
@@ -1195,6 +1179,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         when(featureToggleService.isLocationWhiteListedForCaseProgression(selectedCourt.getCode()))
             .thenReturn(isLocationWhiteListed);
+        when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())).thenReturn(isLocationWhiteListed);
         when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
             CallbackParams.Params.BEARER_TOKEN).toString())).thenReturn(
             Optional.of(LocationRefData.builder()
@@ -1207,82 +1192,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
         assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
-    }
-
-    @Test
-    @SneakyThrows
-    void shouldThrowIllegalArgumentException_whenClaimTrackCannotDefined() {
-        DynamicList localOptions = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            )
-            .build();
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-            .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson)
-            .smallClaimsMethodInPerson(localOptions)
-            .fastTrackMethodInPerson(localOptions)
-            .disposalHearingMethodInPerson(localOptions)
-            .claimsTrack(ClaimsTrack.fastTrack)
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-        when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
-            CallbackParams.Params.BEARER_TOKEN).toString())).thenReturn(
-            Optional.of(LocationRefData.builder()
-                            .regionId("region id")
-                            .epimmsId("epimms id")
-                            .siteName("location name")
-                            .build()));
-
-        assertThrows(IllegalArgumentException.class, () -> handler.handle(params),
-                     "Epimms Id is not provided"
-        );
-    }
-
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void shouldNotSetEarlyAdoptersFlag_whenEarlyAdoptersToggleIsOff(Boolean isLocationWhiteListed) {
-        DynamicList localOptions = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            )
-            .build();
-
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-            .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson)
-            .fastTrackMethodInPerson(localOptions.toBuilder().value(selectedCourt).build())
-            .smallClaimsMethodInPerson(localOptions)
-            .disposalHearingMethodInPerson(localOptions)
-            .claimsTrack(ClaimsTrack.fastTrack)
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(false);
-        when(featureToggleService.isLocationWhiteListedForCaseProgression(selectedCourt.getCode())).thenReturn(
-            isLocationWhiteListed);
-        when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
-            CallbackParams.Params.BEARER_TOKEN).toString())).thenReturn(
-            Optional.of(LocationRefData.builder()
-                            .regionId("region id")
-                            .epimmsId("epimms id")
-                            .siteName("location name")
-                            .build()));
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-
-        assertThat(responseCaseData.getEaCourtLocation()).isNull();
     }
 
     @ParameterizedTest
@@ -1313,6 +1222,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+        when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())).thenReturn(isLocationWhiteListed);
         when(featureToggleService.isLocationWhiteListedForCaseProgression((selectedCourt.getCode()))).thenReturn(
             isLocationWhiteListed);
         when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
@@ -1357,6 +1267,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+        when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())).thenReturn(isLocationWhiteListed);
         when(featureToggleService.isLocationWhiteListedForCaseProgression((selectedCourt.getCode()))).thenReturn(
             isLocationWhiteListed);
         when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
@@ -1404,6 +1315,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         when(featureToggleService.isLocationWhiteListedForCaseProgression((selectedCourt.getCode()))).thenReturn(
             isLocationWhiteListed);
+        when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())).thenReturn(isLocationWhiteListed);
         when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
             CallbackParams.Params.BEARER_TOKEN).toString())).thenReturn(
             Optional.of(LocationRefData.builder()
@@ -1443,9 +1355,53 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
         when(featureToggleService.isPartOfNationalRollout(eq(selectedCourt.getCode()))).thenReturn(
             isLocationWhiteListed);
+        when(locationRefDataService.getLocationMatchingLabel(selectedCourt.getCode(), params.getParams().get(
+            CallbackParams.Params.BEARER_TOKEN).toString()))
+            .thenReturn(Optional.of(LocationRefData.builder()
+                                        .regionId("region id")
+                                        .epimmsId("epimms id")
+                                        .siteName("site name")
+                                        .build()));
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"true", "false"})
+    void shouldPopulateHmcEarlyAdoptersFlag_whenHmcIsEnabled(Boolean isLocationWhiteListed) {
+        DynamicList options = DynamicList.builder()
+            .listItems(List.of(
+                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
+                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
+                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
+                       )
+            )
+            .build();
+
+        DynamicListElement selectedCourt = DynamicListElement.builder()
+            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+            .disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson)
+            .disposalHearingMethodInPerson(options.toBuilder().value(selectedCourt).build())
+            .fastTrackMethodInPerson(options)
+            .smallClaimsMethodInPerson(options)
+            .disposalHearingMethodInPerson(options.toBuilder().value(selectedCourt).build())
+            .disposalHearingMethodToggle(Collections.singletonList(OrderDetailsPagesSectionsToggle.SHOW))
+            .orderType(OrderType.DISPOSAL)
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        when(featureToggleService.isPartOfNationalRollout(eq(selectedCourt.getCode()))).thenReturn(
+            isLocationWhiteListed);
+        when(featureToggleService.isHmcEnabled()).thenReturn(true);
+        when(featureToggleService.isLocationWhiteListedForCaseProgression(eq(selectedCourt.getCode()))).thenReturn(isLocationWhiteListed);
         when(locationRefDataService.getLocationMatchingLabel(selectedCourt.getCode(), params.getParams().get(
             CallbackParams.Params.BEARER_TOKEN).toString()))
             .thenReturn(Optional.of(LocationRefData.builder()
@@ -1631,6 +1587,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .fastTrackMethodInPerson(options.toBuilder().value(selectedCourt).build())
                     .drawDirectionsOrderRequired(NO)
                     .claimsTrack(ClaimsTrack.fastTrack)
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                     .build(),
                 AllocatedTrack.FAST_CLAIM
             ),
@@ -1641,6 +1598,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .fastTrackMethodInPerson(options.toBuilder().value(selectedCourt).build())
                     .drawDirectionsOrderRequired(YES)
                     .drawDirectionsOrderSmallClaims(NO)
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                     .orderType(OrderType.DECIDE_DAMAGES)
                     .build(),
                 AllocatedTrack.FAST_CLAIM
@@ -1653,6 +1611,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .drawDirectionsOrderRequired(YES)
                     .drawDirectionsOrderSmallClaims(NO)
                     .orderType(OrderType.DISPOSAL)
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                     .build(),
                 AllocatedTrack.FAST_CLAIM
             ),
@@ -1663,6 +1622,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .smallClaimsMethodInPerson(options.toBuilder().value(selectedCourt).build())
                     .drawDirectionsOrderRequired(NO)
                     .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                     .build(),
                 AllocatedTrack.SMALL_CLAIM
             ),
@@ -1674,6 +1634,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .drawDirectionsOrderRequired(YES)
                     .drawDirectionsOrderSmallClaims(YES)
                     .orderType(OrderType.DECIDE_DAMAGES)
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                     .build(),
                 AllocatedTrack.SMALL_CLAIM
             ),
@@ -1685,6 +1646,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .drawDirectionsOrderRequired(YES)
                     .drawDirectionsOrderSmallClaims(NO)
                     .orderType(OrderType.DISPOSAL)
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                     .build(),
                 AllocatedTrack.SMALL_CLAIM
             )
@@ -1714,6 +1676,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .fastTrackMethodInPerson(options.toBuilder().value(selectedCourt).build())
                     .drawDirectionsOrderRequired(NO)
                     .claimsTrack(ClaimsTrack.fastTrack)
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                     .build(),
                 "FAST_CLAIM"
             ),
@@ -1725,6 +1688,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .drawDirectionsOrderRequired(YES)
                     .drawDirectionsOrderSmallClaims(NO)
                     .orderType(OrderType.DECIDE_DAMAGES)
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                     .build(),
                 "FAST_CLAIM"
             ),
@@ -1734,6 +1698,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .responseClaimTrack("SMALL_CLAIM")
                     .drawDirectionsOrderRequired(YES)
                     .drawDirectionsOrderSmallClaims(NO)
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                     .orderType(OrderType.DECIDE_DAMAGES)
                     .build(),
                 "FAST_CLAIM"
@@ -1746,6 +1711,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .drawDirectionsOrderRequired(YES)
                     .drawDirectionsOrderSmallClaims(NO)
                     .orderType(OrderType.DISPOSAL)
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                     .build(),
                 "FAST_CLAIM"
             ),
@@ -1756,6 +1722,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .drawDirectionsOrderRequired(YES)
                     .drawDirectionsOrderSmallClaims(NO)
                     .orderType(OrderType.DISPOSAL)
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                     .build(),
                 "FAST_CLAIM"
             ),
@@ -1766,6 +1733,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .smallClaimsMethodInPerson(options.toBuilder().value(selectedCourt).build())
                     .drawDirectionsOrderRequired(NO)
                     .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                     .build(),
                 "SMALL_CLAIM"
             ),
@@ -1777,6 +1745,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .drawDirectionsOrderRequired(YES)
                     .drawDirectionsOrderSmallClaims(YES)
                     .orderType(OrderType.DECIDE_DAMAGES)
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                     .build(),
                 "SMALL_CLAIM"
             ),
@@ -1787,6 +1756,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .drawDirectionsOrderRequired(YES)
                     .drawDirectionsOrderSmallClaims(YES)
                     .orderType(OrderType.DECIDE_DAMAGES)
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                     .build(),
                 "SMALL_CLAIM"
             ),
@@ -1797,6 +1767,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .disposalHearingMethodInPerson(options.toBuilder().value(selectedCourt).build())
                     .drawDirectionsOrderRequired(YES)
                     .drawDirectionsOrderSmallClaims(NO)
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                     .orderType(OrderType.DISPOSAL)
                     .build(),
                 "SMALL_CLAIM"
@@ -2020,8 +1991,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "will not be permitted except with permission from the Court.");
 
             assertThat(response.getData()).extracting("fastTrackSchedulesOfLoss").extracting("input1")
-                .isEqualTo("The claimant must upload to the Digital Portal an up-to-date schedule of loss to the "
-                               + "defendant by 4pm on");
+                .isEqualTo("The claimant must upload to the Digital Portal an up-to-date schedule of loss by 4pm on");
             assertThat(response.getData()).extracting("fastTrackSchedulesOfLoss").extracting("date1")
                 .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("fastTrackSchedulesOfLoss").extracting("input2")
@@ -2224,7 +2194,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(nextWorkingDayDate.toString());
 
             assertThat(response.getData()).extracting("fastTrackRoadTrafficAccident").extracting("input")
-                .isEqualTo("Photographs and/or a place of the accident location shall be prepared and agreed by the "
+                .isEqualTo("Photographs and/or a plan of the accident location shall be prepared and agreed by the "
                                + "parties and uploaded to the Digital Portal by 4pm on");
 
             assertThat(response.getData()).extracting("smallClaimsJudgesRecital").extracting("input")
@@ -2342,7 +2312,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("This witness statement is limited to 10 pages per party, including any appendices.");
 
             assertThat(response.getData()).extracting("smallClaimsRoadTrafficAccident").extracting("input")
-                .isEqualTo("Photographs and/or a place of the accident location shall be prepared and agreed by the "
+                .isEqualTo("Photographs and/or a plan of the accident location shall be prepared and agreed by the "
                                + "parties and uploaded to the Digital Portal no later than 21 days before the "
                                + "hearing.");
             assertThat(response.getData()).extracting("disposalHearingHearingTime").extracting("input")

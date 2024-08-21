@@ -479,6 +479,7 @@ public class GeneralApplicationDetailsBuilder {
     }
 
     public CaseData getTestCaseDataWithEmptyCollectionOfApps(CaseData caseData) {
+        CaseLocationCivil caseManagementLoc = CaseLocationCivil.builder().region("1").baseLocation("22222").build();
         return caseData.toBuilder()
             .ccdCaseReference(1234L)
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
@@ -577,7 +578,8 @@ public class GeneralApplicationDetailsBuilder {
                         .unavailableTrialRequiredYesOrNo(YES)
                         .supportRequirementLanguageInterpreter(STRING_CONSTANT)
                         .build())
-                .build();
+            .caseManagementLocation(caseManagementLoc)
+            .build();
     }
 
     public CaseData getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement respondentOrderAgreement) {
@@ -685,6 +687,113 @@ public class GeneralApplicationDetailsBuilder {
                 .build();
     }
 
+    public CaseData getTestCaseDataForCaseManagementLocation(CaseCategory caseType, CaseState caseState) {
+        return CaseData.builder()
+            .caseAccessCategory(caseType)
+            .ccdState(caseState)
+            .ccdCaseReference(1234L)
+            .respondent1Represented(NO)
+            .caseManagementLocation(CaseLocationCivil.builder().region("2")
+                                        .baseLocation("11111").build())
+            .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                                               .organisation(Organisation.builder()
+                                                                 .organisationID(STRING_CONSTANT).build())
+                                               .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
+                                               .orgPolicyReference(STRING_CONSTANT).build())
+            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant1").build())
+            .applicant1DQ(Applicant1DQ.builder()
+                              .applicant1DQRequestedCourt(RequestedCourt.builder()
+                                                              .responseCourtCode("applicant1DQRequestedCourt")
+                                                              .caseLocation(CaseLocationCivil.builder()
+                                                                                .region("2")
+                                                                                .baseLocation("11111")
+                                                                                .build())
+                                                              .build())
+                              .build())
+            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent1").build())
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQRequestedCourt(RequestedCourt.builder()
+                                                                .responseCourtCode("respondent1DQRequestedCourt")
+                                                                .caseLocation(CaseLocationCivil.builder()
+                                                                                  .region("2")
+                                                                                  .baseLocation("00000")
+                                                                                  .build())
+                                                                .build())
+                               .build())
+            .addApplicant2(YES)
+            .applicant2(Party.builder().type(Party.Type.COMPANY).companyName("Applicant2").build())
+            .addRespondent2(YES)
+            .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Respondent2").build())
+            .generalAppType(GAApplicationType.builder()
+                                .types(singletonList(EXTEND_TIME))
+                                .build())
+            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder()
+                                              .generalAppUrgency(YES)
+                                              .reasonsForUrgency(STRING_CONSTANT)
+                                              .urgentAppConsiderationDate(APP_DATE_EPOCH)
+                                              .build())
+            .generalAppInformOtherParty(GAInformOtherParty.builder()
+                                            .isWithNotice(NO)
+                                            .reasonsForWithoutNotice(STRING_CONSTANT)
+                                            .build())
+            .generalAppDetailsOfOrder(STRING_CONSTANT)
+            .generalAppReasonsOfOrder(STRING_CONSTANT)
+            .generalAppStatementOfTruth(GAStatementOfTruth.builder()
+                                            .name(STRING_CONSTANT)
+                                            .role(STRING_CONSTANT)
+                                            .build())
+            .generalAppEvidenceDocument(wrapElements(Document.builder()
+                                                         .documentUrl(STRING_CONSTANT)
+                                                         .documentBinaryUrl(STRING_CONSTANT)
+                                                         .documentFileName(STRING_CONSTANT)
+                                                         .documentHash(STRING_CONSTANT)
+                                                         .build()))
+            .generalAppHearingDetails(GAHearingDetails.builder()
+                                          .judgeName(STRING_CONSTANT)
+                                          .hearingDate(APP_DATE_EPOCH)
+                                          .trialDateFrom(APP_DATE_EPOCH)
+                                          .trialDateTo(APP_DATE_EPOCH)
+                                          .hearingYesorNo(YES)
+                                          .hearingDuration(OTHER)
+                                          .generalAppHearingDays("1")
+                                          .generalAppHearingHours("2")
+                                          .generalAppHearingMinutes("30")
+                                          .supportRequirement(singletonList(OTHER_SUPPORT))
+                                          .judgeRequiredYesOrNo(YES)
+                                          .trialRequiredYesOrNo(YES)
+                                          .hearingDetailsEmailID(STRING_CONSTANT)
+                                          .generalAppUnavailableDates(wrapElements(GAUnavailabilityDates.builder()
+                                                                                       .unavailableTrialDateFrom(APP_DATE_EPOCH)
+                                                                                       .unavailableTrialDateTo(APP_DATE_EPOCH).build()))
+                                          .supportRequirementOther(STRING_CONSTANT)
+                                          .hearingPreferredLocation(getPreferredLoc())
+                                          .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
+                                          .reasonForPreferredHearingType(STRING_CONSTANT)
+                                          .telephoneHearingPreferredType(STRING_CONSTANT)
+                                          .supportRequirementSignLanguage(STRING_CONSTANT)
+                                          .hearingPreferencesPreferredType(IN_PERSON)
+                                          .unavailableTrialRequiredYesOrNo(YES)
+                                          .supportRequirementLanguageInterpreter(STRING_CONSTANT)
+                                          .build())
+            .generalAppPBADetails(GAPbaDetails.builder()
+                                      .build())
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
+                                                .id(STRING_CONSTANT)
+                                                .email(APPLICANT_EMAIL_ID_CONSTANT).build())
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                                              .organisation(Organisation.builder()
+                                                                .organisationID(STRING_CONSTANT).build())
+                                              .orgPolicyCaseAssignedRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName())
+                                              .orgPolicyReference(STRING_CONSTANT).build())
+            .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                               .organisation(Organisation.builder()
+                                                                 .organisationID(STRING_CONSTANT).build())
+                                               .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
+                                               .orgPolicyReference(STRING_CONSTANT).build())
+            .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
+            .build();
+    }
+
     public CaseData getTestCaseDataForStatementOfTruthCheck(GARespondentOrderAgreement respondentOrderAgreement) {
         return CaseData.builder()
             .caseAccessCategory(UNSPEC_CLAIM)
@@ -787,6 +896,7 @@ public class GeneralApplicationDetailsBuilder {
     }
 
     public CaseData getTestCaseDataSPEC(CaseCategory claimType) {
+        CaseLocationCivil caseManagementLoc = CaseLocationCivil.builder().region("1").baseLocation("22222").build();
         return CaseData.builder()
             .ccdCaseReference(1234L)
             .caseAccessCategory(claimType)
@@ -880,6 +990,7 @@ public class GeneralApplicationDetailsBuilder {
                                                                               .getFormattedName())
                                                .orgPolicyReference(STRING_CONSTANT).build())
             .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
+            .caseManagementLocation(caseManagementLoc)
             .build();
     }
 
@@ -1639,6 +1750,7 @@ public class GeneralApplicationDetailsBuilder {
     }
 
     public CaseData getVaryJudgmentWithN245TestData() {
+        CaseLocationCivil caseManagementLoc = CaseLocationCivil.builder().region("1").baseLocation("22222").build();
         return CaseData
                 .builder()
                 .ccdCaseReference(1L)
@@ -1721,6 +1833,7 @@ public class GeneralApplicationDetailsBuilder {
                         .unavailableTrialRequiredYesOrNo(YES)
                         .supportRequirementLanguageInterpreter(STRING_CONSTANT)
                         .build())
+            .caseManagementLocation(caseManagementLoc)
                 .build();
     }
 

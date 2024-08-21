@@ -50,6 +50,7 @@ public class DefendantResponsePartAdmitPayImmediatelyClaimantScenarioTest extend
             .totalClaimAmount(BigDecimal.valueOf(300))
             .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(300))
             .applicant1Represented(NO)
+            .responseClaimTrack("SMALL_CLAIM")
             .build();
 
         handler.handle(callbackParams(caseData));

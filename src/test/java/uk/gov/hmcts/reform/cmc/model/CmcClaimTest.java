@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cmc.model;
 
-import java.time.LocalDateTime;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.elasticsearch.core.List;
 import org.junit.jupiter.api.Test;
@@ -12,10 +11,12 @@ import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatus;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
@@ -129,6 +130,7 @@ public class CmcClaimTest {
             .build();
 
         assertTrue(claim.hasClaimantRejectOffer());
+        assertNull(claim.getResponse().getPaymentIntention());
     }
 
     @Test

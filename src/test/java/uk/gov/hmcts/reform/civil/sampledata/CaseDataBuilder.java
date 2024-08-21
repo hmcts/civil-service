@@ -683,6 +683,7 @@ public class CaseDataBuilder {
     private SdoR2FastTrackCreditHire sdoR2FastTrackCreditHire;
     private SdoR2FastTrackCreditHireDetails sdoR2FastTrackCreditHireDetails;
     private String claimantBilingualLanguagePreference;
+    private JudgmentPaidInFull judgmentPaidInFull;
 
     public CaseDataBuilder claimantBilingualLanguagePreference(String claimantBilingualLanguagePreference) {
         this.claimantBilingualLanguagePreference = claimantBilingualLanguagePreference;
@@ -6063,8 +6064,9 @@ public class CaseDataBuilder {
 
     public CaseData buildJudmentOnlineCaseDataWithPaymentByInstalment() {
         return build().toBuilder()
-            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .ccdState(All_FINAL_ORDERS_ISSUED)
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
+            .respondent1(PartyBuilder.builder().individual().build())
             .joInstalmentDetails(JudgmentInstalmentDetails.builder()
                                              .startDate(LocalDate.of(2022, 12, 12))
                                              .amount("120")
@@ -6080,6 +6082,7 @@ public class CaseDataBuilder {
     public CaseData buildJudgmentOnlineCaseDataWithDeterminationMeans() {
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .respondent1(PartyBuilder.builder().individual().build())
             .joJudgmentRecordReason(JudgmentRecordedReason.DETERMINATION_OF_MEANS)
             .joInstalmentDetails(JudgmentInstalmentDetails.builder()
                                              .startDate(LocalDate.of(2022, 12, 12))
@@ -6107,12 +6110,14 @@ public class CaseDataBuilder {
             .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .respondent1(PartyBuilder.builder().soleTrader().build())
             .joIsRegisteredWithRTL(YES).build();
     }
 
     public CaseData buildJudgmentOnlineCaseDataWithPaymentByDate() {
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .respondent1(PartyBuilder.builder().organisation().build())
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
             .joAmountOrdered("1200")
             .joAmountCostOrdered("1100")
@@ -6125,9 +6130,28 @@ public class CaseDataBuilder {
             .build();
     }
 
+    public CaseData buildJudgmentOnlineCaseDataWithPaymentByDate_Multi_party() {
+        return build().toBuilder()
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .respondent1(PartyBuilder.builder().organisation().build())
+            .addRespondent2(YES)
+            .respondent2(PartyBuilder.builder().individual().build())
+            .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
+            .joAmountOrdered("1200")
+            .joAmountCostOrdered("1100")
+            .joPaymentPlan(JudgmentPaymentPlan.builder()
+                               .type(PaymentPlanSelection.PAY_BY_DATE)
+                               .paymentDeadlineDate(LocalDate.of(2023, 12, 12)).build())
+            .joOrderMadeDate(LocalDate.of(2022, 12, 12))
+            .joIsRegisteredWithRTL(YES)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .build();
+    }
+
     public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days() {
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .respondent1(PartyBuilder.builder().soleTrader().build())
             .joOrderMadeDate(LocalDate.of(2023, 3, 1))
             .joJudgmentPaidInFull(JudgmentPaidInFull.builder()
                                       .dateOfFullPaymentMade(LocalDate.now().plusDays(35))
@@ -6141,6 +6165,7 @@ public class CaseDataBuilder {
     public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31Days() {
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .respondent1(PartyBuilder.builder().soleTrader().build())
             .joOrderMadeDate(LocalDate.of(2023, 3, 1))
             .joJudgmentPaidInFull(JudgmentPaidInFull.builder()
                                       .dateOfFullPaymentMade(LocalDate.now().plusDays(15))
@@ -7743,6 +7768,7 @@ public class CaseDataBuilder {
             .paymentSetDate(paymentSetDate)
             .repaymentFrequency(repaymentFrequency)
             .repaymentDate(repaymentDate)
+            .joJudgmentPaidInFull(judgmentPaidInFull)
             .build();
     }
 
@@ -7752,4 +7778,8 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder judgmentPaidInFull(JudgmentPaidInFull judgmentPaidInFull) {
+        this.judgmentPaidInFull = judgmentPaidInFull;
+        return this;
+    }
 }

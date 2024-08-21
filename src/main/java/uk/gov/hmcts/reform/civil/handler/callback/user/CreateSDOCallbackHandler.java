@@ -163,7 +163,6 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle.SHOW;
-import static uk.gov.hmcts.reform.civil.enums.sdo.OrderType.DISPOSAL;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicListElement.dynamicElementFromCode;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -434,8 +433,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
 
         FastTrackSchedulesOfLoss tempFastTrackSchedulesOfLoss = FastTrackSchedulesOfLoss.builder()
-            .input1("The claimant must upload to the Digital Portal an up-to-date schedule of loss to the "
-                        + "defendant by 4pm on")
+            .input1("The claimant must upload to the Digital Portal an up-to-date schedule of loss by 4pm on")
             .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
             .input2("If the defendant wants to challenge this claim, upload to the Digital Portal "
                         + "counter-schedule of loss by 4pm on")
@@ -644,7 +642,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.fastTrackPersonalInjury(tempFastTrackPersonalInjury).build();
 
         FastTrackRoadTrafficAccident tempFastTrackRoadTrafficAccident = FastTrackRoadTrafficAccident.builder()
-            .input("Photographs and/or a place of the accident location shall be prepared and agreed by the "
+            .input("Photographs and/or a plan of the accident location shall be prepared and agreed by the "
                        + "parties and uploaded to the Digital Portal by 4pm on")
             .date(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
             .build();
@@ -808,7 +806,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.smallClaimsCreditHire(tempSmallClaimsCreditHire).build();
 
         SmallClaimsRoadTrafficAccident tempSmallClaimsRoadTrafficAccident = SmallClaimsRoadTrafficAccident.builder()
-            .input("Photographs and/or a place of the accident location shall be prepared and agreed by the parties"
+            .input("Photographs and/or a plan of the accident location shall be prepared and agreed by the parties"
                        + " and uploaded to the Digital Portal no later than 21 days before the hearing.")
             .build();
 
@@ -1543,27 +1541,19 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         dataBuilder.hearingNotes(getHearingNotes(caseData));
 
-        if (featureToggleService.isNationalRolloutEnabled()) {
-            // LiP check ensures any LiP cases will always create takeCaseOffline WA task until CP goes live
-            if (!sdoSubmittedPreCPForLiPCase(caseData)
-                && featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
-                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
-                dataBuilder.eaCourtLocation(YES);
-            } else {
-                log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
-                dataBuilder.eaCourtLocation(NO);
+        // LiP check ensures any LiP cases will always create takeCaseOffline WA task until CP goes live
+        if (!sdoSubmittedPreCPForLiPCase(caseData)
+            && featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
+            log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+            dataBuilder.eaCourtLocation(YES);
+
+            if (featureToggleService.isHmcEnabled()) {
+                dataBuilder.hmcEaCourtLocation(featureToggleService.isLocationWhiteListedForCaseProgression(
+                    caseData.getCaseManagementLocation().getBaseLocation()) ? YES : NO);
             }
-        } else if (featureToggleService.isEarlyAdoptersEnabled()) {
-            // LiP check ensures any LiP cases will always create takeCaseOffline WA task until CP goes live
-            if (!sdoSubmittedPreCPForLiPCase(caseData)
-                && featureToggleService.isLocationWhiteListedForCaseProgression(getEpimmsId(caseData))
-                && featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation())) {
-                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
-                dataBuilder.eaCourtLocation(YES);
-            } else {
-                log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
-                dataBuilder.eaCourtLocation(NO);
-            }
+        } else {
+            log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
+            dataBuilder.eaCourtLocation(NO);
         }
 
         dataBuilder.disposalHearingMethodInPerson(deleteLocationList(
@@ -1641,36 +1631,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             return null;
         }
         return DynamicList.builder().value(list.getValue()).build();
-    }
-
-    private String getEpimmsId(CaseData caseData) {
-
-        Optional<DynamicList> toUseList;
-        if (DISPOSAL.equals(caseData.getOrderType())) {
-            toUseList = Optional.ofNullable(caseData.getDisposalHearingMethodInPerson());
-        } else if (featureToggleService.isSdoR2Enabled() && SdoHelper.isFastTrack(caseData)
-            && !SdoHelper.isNihlFastTrack(caseData)) {
-            toUseList = Optional.ofNullable(caseData.getFastTrackMethodInPerson());
-        } else if (featureToggleService.isSdoR2Enabled() && SdoHelper.isFastTrack(caseData)
-            && SdoHelper.isNihlFastTrack(caseData)) {
-            toUseList = caseData.getSdoR2Trial().getHearingCourtLocationList() != null
-                ? Optional.ofNullable(caseData.getSdoR2Trial().getHearingCourtLocationList())
-                : Optional.ofNullable(caseData.getSdoR2Trial().getAltHearingCourtLocationList());
-        } else if (SdoHelper.isFastTrack(caseData)) {
-            toUseList = Optional.ofNullable(caseData.getFastTrackMethodInPerson());
-        } else if (SdoHelper.isSmallClaimsTrack(caseData)) {
-            if (featureToggleService.isSdoR2Enabled() && SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)
-                && caseData.getSdoR2SmallClaimsHearing() != null) {
-                toUseList = caseData.getSdoR2SmallClaimsHearing().getHearingCourtLocationList() != null
-                    ? Optional.ofNullable(caseData.getSdoR2SmallClaimsHearing().getHearingCourtLocationList())
-                    : Optional.ofNullable(caseData.getSdoR2SmallClaimsHearing().getAltHearingCourtLocationList());
-            } else {
-                toUseList = Optional.ofNullable(caseData.getSmallClaimsMethodInPerson());
-            }
-        } else {
-            throw new IllegalArgumentException("Could not determine claim track");
-        }
-        return toUseList.map(DynamicList::getValue).map(DynamicListElement::getCode).orElse(null);
     }
 
     private boolean nonNull(Object object) {
@@ -1812,7 +1772,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private Optional<RequestedCourt> updateCaseManagementLocationIfLegalAdvisorSdo(CaseData.CaseDataBuilder<?, ?> updatedData, CaseData caseData) {
         Optional<RequestedCourt> preferredCourt;
-        if (isSpecClaim1000OrLessAndCcmcc(ccmccAmount, featureToggleService).test(caseData)) {
+        if (isSpecClaim1000OrLessAndCcmcc(ccmccAmount).test(caseData)) {
             preferredCourt = locationHelper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData, true);
             preferredCourt.map(RequestedCourt::getCaseLocation)
                 .ifPresent(updatedData::caseManagementLocation);
@@ -1822,11 +1782,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
     }
 
-    public Predicate<CaseData> isSpecClaim1000OrLessAndCcmcc(BigDecimal ccmccAmount,
-                                                                              FeatureToggleService featureToggleService) {
+    public Predicate<CaseData> isSpecClaim1000OrLessAndCcmcc(BigDecimal ccmccAmount) {
         return caseData ->
-            featureToggleService.isNationalRolloutEnabled()
-                && caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
+            caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
                 && ccmccAmount.compareTo(caseData.getTotalClaimAmount()) >= 0
                 && caseData.getCaseManagementLocation().getBaseLocation().equals(ccmccEpimsId);
     }

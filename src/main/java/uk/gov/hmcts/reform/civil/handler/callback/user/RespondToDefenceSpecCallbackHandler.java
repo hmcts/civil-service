@@ -35,10 +35,8 @@ import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
-import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
@@ -112,6 +110,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     implements ExpertsValidator, WitnessesValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CLAIMANT_RESPONSE_SPEC);
+    public static final String DOWNLOAD_URL_CLAIM_DOCUMENTS = "/cases/case-details/%s#Claim documents";
     private final ObjectMapper objectMapper;
     private final Time time;
     private final UnavailableDateValidator unavailableDateValidator;
@@ -346,11 +345,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         builder.respondent1ClaimResponseDocumentSpec(null);
 
         // When a case has been transferred, we do not update the location using claimant/defendant preferred location logic
-        if (featureToggleService.isNationalRolloutEnabled()) {
-            if (notTransferredOnline(caseData)) {
-                updateCaseManagementLocation(callbackParams, builder);
-            }
-        } else {
+        if (notTransferredOnline(caseData)) {
             updateCaseManagementLocation(callbackParams, builder);
         }
 
@@ -365,18 +360,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 .applicant1DQStatementOfTruth(statementOfTruth);
 
             // When a case has been transferred, we do not update the location using claimant/defendant preferred location logic
-            if (featureToggleService.isNationalRolloutEnabled()) {
-                if (notTransferredOnline(caseData) && (!isFlightDelayAndSmallClaim(caseData)
-                    || isFlightDelaySmallClaimAndOther(caseData))) {
-                    updateDQCourtLocations(callbackParams, caseData, builder, dq, isFlightDelaySmallClaimAndOther(caseData));
-                }
-            } else {
-                //Update Case Management location with DQ location only if either of following is true
-                // 1. It is a Fast_Claim 2. Small claim and not Flight Delay 3.Small Claim & Flight delay & Airline is Other
-                if (!isFlightDelayAndSmallClaim(caseData)
-                    || isFlightDelaySmallClaimAndOther(caseData)) {
-                    updateDQCourtLocations(callbackParams, caseData, builder, dq, isFlightDelaySmallClaimAndOther(caseData));
-                }
+            if (notTransferredOnline(caseData) && (!isFlightDelayAndSmallClaim(caseData)
+                || isFlightDelaySmallClaimAndOther(caseData))) {
+                updateDQCourtLocations(callbackParams, caseData, builder, dq, isFlightDelaySmallClaimAndOther(caseData));
             }
 
             var smallClaimWitnesses = builder.build().getApplicant1DQWitnessesSmallClaim();
@@ -431,26 +417,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                                              .expertRequired(NO)
                                              .build())
                     .build());
-        }
-
-        // Copy Clm1 DQ FRC to Clm2 DQ
-        if (getMultiPartyScenario(caseData) == TWO_V_ONE
-            && caseData.getApplicant1DQ() != null
-            && caseData.getApplicant1DQ().getApplicant1DQFixedRecoverableCostsIntermediate() != null) {
-            if (caseData.getApplicant2DQ() == null
-                || caseData.getApplicant2DQ().getApplicant2DQFixedRecoverableCostsIntermediate() == null) {
-                FixedRecoverableCosts app1Frc = caseData.getApplicant1DQ().getApplicant1DQFixedRecoverableCostsIntermediate();
-
-                builder.applicant2DQ(Applicant2DQ.builder().applicant2DQFixedRecoverableCostsIntermediate(
-                    FixedRecoverableCosts.builder()
-                            .isSubjectToFixedRecoverableCostRegime(app1Frc.getIsSubjectToFixedRecoverableCostRegime())
-                            .complexityBandingAgreed(app1Frc.getComplexityBandingAgreed())
-                            .band(app1Frc.getBand())
-                            .reasons(app1Frc.getReasons())
-                            .frcSupportingDocument(app1Frc.getFrcSupportingDocument())
-                            .build())
-                    .build());
-            }
         }
 
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder,
@@ -508,6 +474,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 nextState = CaseState.JUDICIAL_REFERRAL.name();
             } else if (caseData.isPartAdmitClaimSettled()) {
                 nextState = CaseState.CASE_SETTLED.name();
+            } else if (featureToggleService.isLipVLipEnabled()
+                && caseData.isLRvLipOneVOne()
+                && caseData.isClaimantDontWantToProceedWithFulLDefenceFD()) {
+                nextState = CaseState.CASE_STAYED.name();
             }
         }
 
@@ -697,14 +667,20 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 + "We'll review the case and contact you about what to do next.<br>"
                 + format(
                 "%n%n<a href=\"%s\" target=\"_blank\">View Directions questionnaire</a>",
-                format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+                format(DOWNLOAD_URL_CLAIM_DOCUMENTS, caseData.getCcdCaseReference())
+            );
+        }  else if (CaseState.All_FINAL_ORDERS_ISSUED == caseData.getCcdState()) {
+            return format(
+                "<br />%n%n<a href=\"%s\" target=\"_blank\">Download county court judgment</a>"
+                    + "<br><br>The defendant will be served the county court judgment<br><br>",
+                format(DOWNLOAD_URL_CLAIM_DOCUMENTS, caseData.getCcdCaseReference())
             );
         } else {
             return "<h2 class=\"govuk-heading-m\">What happens next</h2>"
                 + "You've decided not to proceed and the case will end.<br>"
                 + format(
                 "%n%n<a href=\"%s\" target=\"_blank\">View Directions questionnaire</a>",
-                format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+                format(DOWNLOAD_URL_CLAIM_DOCUMENTS, caseData.getCcdCaseReference())
             );
         }
     }
@@ -720,6 +696,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             return format(
                 "# You have rejected their response %n## Your Claim Number : %s",
                 caseData.getLegacyCaseReference()
+            );
+        } else if (CaseState.All_FINAL_ORDERS_ISSUED == caseData.getCcdState()) {
+            return format(
+                "# Judgment Submitted %n## A county court judgment(ccj) has been submitted for case %s",
+                claimNumber
             );
         } else {
             return format(

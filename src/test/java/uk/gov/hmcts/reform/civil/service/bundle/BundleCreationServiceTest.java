@@ -164,7 +164,7 @@ class BundleCreationServiceTest {
     }
 
     @Test
-    void testBundleApiClientIsInvoked() throws Exception {
+    void testBundleApiClientIsInvokedThroughEvent() throws Exception {
         //Given: case details with all document type
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         given(bundleRequestMapper.mapCaseDataToBundleCreateRequest(any(), any(), any(), any())).willReturn(null);
@@ -178,6 +178,26 @@ class BundleCreationServiceTest {
 
         //When: bundlecreation service is called
         bundlingService.createBundle(new BundleCreationTriggerEvent(1L));
+
+        //Then: BundleRest API should be called
+        verify(evidenceManagementApiClient).createNewBundle(anyString(), anyString(), any());
+    }
+
+    @Test
+    void testBundleApiClientIsInvokedThroughCaseReference() throws Exception {
+        //Given: case details with all document type
+        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        given(bundleRequestMapper.mapCaseDataToBundleCreateRequest(any(), any(), any(), any())).willReturn(null);
+        given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(null);
+        given(coreCaseDataService.getCase(1L)).willReturn(caseDetails);
+        given(userConfig.getUserName()).willReturn("test");
+        given(userConfig.getPassword()).willReturn("test");
+        given(objectMapper.convertValue(caseDetails.getData(), CaseData.class)).willReturn(caseData);
+        given(authTokenGenerator.generate()).willReturn("test");
+        given(userService.getAccessToken("test", "test")).willReturn("test");
+
+        //When: bundlecreation service is called
+        bundlingService.createBundle(1L);
 
         //Then: BundleRest API should be called
         verify(evidenceManagementApiClient).createNewBundle(anyString(), anyString(), any());
