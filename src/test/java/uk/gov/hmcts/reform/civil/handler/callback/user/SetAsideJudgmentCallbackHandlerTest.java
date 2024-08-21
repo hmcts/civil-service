@@ -115,7 +115,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertEquals(JudgmentState.SET_ASIDE, historicJudgment.getState());
             assertEquals(caseData.getJoSetAsideDefenceReceivedDate(), historicJudgment.getSetAsideDate());
             //and the caseState should not be updated
-            assertEquals(response.getState(),CaseState.All_FINAL_ORDERS_ISSUED.name());
+            assertEquals(response.getState(), CaseState.All_FINAL_ORDERS_ISSUED.name());
         }
 
         @Test
@@ -138,7 +138,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertEquals(JudgmentState.SET_ASIDE_ERROR, historicJudgment.getState());
             assertEquals(LocalDate.now(), historicJudgment.getSetAsideDate());
             //and the caseState should not be updated
-            assertEquals(response.getState(),CaseState.All_FINAL_ORDERS_ISSUED.name());
+            assertEquals(response.getState(), CaseState.All_FINAL_ORDERS_ISSUED.name());
         }
 
         @Test
@@ -161,7 +161,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Then: setAsideDate should be set correctly
             assertThat(response.getData()).extracting("joSetAsideOrderType").isNotNull();
             //and the caseState should be updated
-            assertEquals(response.getState(),CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name());
+            assertEquals(response.getState(), CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name());
         }
 
         @Test
