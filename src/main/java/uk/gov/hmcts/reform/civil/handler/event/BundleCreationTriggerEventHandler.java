@@ -68,8 +68,7 @@ public class BundleCreationTriggerEventHandler {
             log.info("Bundle Stitched Document: {}", bundle.getStitchedDocument());
             log.info("Bundle Hearing Date: {}", bundle.getBundleHearingDate());
             log.info("Bundle Description: {}", bundle.getDescription());
-        }
-        else{
+        } else {
             log.info("inside else");
         }
 
