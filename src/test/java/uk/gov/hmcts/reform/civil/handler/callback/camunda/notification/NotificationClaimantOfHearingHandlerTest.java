@@ -587,6 +587,33 @@ class NotificationClaimantOfHearingHandlerTest {
         }
 
         @Test
+        void shouldNotifyApplicantLip_whenInvokedAnd1v1HMC() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .hearingDate(LocalDate.of(2023, 05, 17))
+                .hearingTimeHourMinute("1030")
+                .applicant1Represented(YesOrNo.NO)
+                .claimantUserDetails(IdamUserDetails.builder().email("applicant1@example.com").build())
+                .hearingReferenceNumber("000HN001")
+                .addApplicant2(YesOrNo.NO)
+                .addRespondent2(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING_HMC").build()).build();
+            // When
+            when(notificationsProperties.getHearingNotificationLipDefendantTemplate())
+                .thenReturn("test-template-claimant-lip-id");
+            handler.handle(params);
+            // Then
+            verify(notificationService).sendMail(
+                "applicant1@example.com",
+                "test-template-claimant-lip-id",
+                getNotificationLipDataMap(caseData),
+                "notification-of-hearing-lip-000HN001"
+            );
+        }
+
+        @Test
         void shouldNotifyApplicantLipinWelsh_whenInvokedAnd1v1() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
