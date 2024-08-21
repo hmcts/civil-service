@@ -35,6 +35,8 @@ public class RecordJudgmentsOnlineMapperTest {
         assertEquals(YesOrNo.YES, activeJudgment.getIsJointJudgment());
         assertEquals(1, activeJudgment.getJudgmentId());
         assertEquals(caseData.getJoPaymentPlan(), activeJudgment.getPaymentPlan());
+        assertEquals("The Organisation", activeJudgment.getDefendant1Name());
+        assertNotNull(activeJudgment.getDefendant1Address());
     }
 
     @Test
@@ -56,6 +58,9 @@ public class RecordJudgmentsOnlineMapperTest {
         assertEquals(1, activeJudgment.getJudgmentId());
         assertEquals(caseData.getJoPaymentPlan(), activeJudgment.getPaymentPlan());
         assertEquals(caseData.getJoInstalmentDetails(), activeJudgment.getInstalmentDetails());
+        assertEquals("Mr. John Rambo", activeJudgment.getDefendant1Name());
+        assertNotNull(activeJudgment.getDefendant1Address());
+        assertNotNull(activeJudgment.getDefendant1Dob());
 
     }
 
@@ -78,6 +83,33 @@ public class RecordJudgmentsOnlineMapperTest {
         assertEquals(1, activeJudgment.getJudgmentId());
         assertEquals(caseData.getJoPaymentPlan(), activeJudgment.getPaymentPlan());
         assertEquals(caseData.getJoInstalmentDetails(), activeJudgment.getInstalmentDetails());
+        assertEquals("Mr. Sole Trader", activeJudgment.getDefendant1Name());
+        assertNotNull(activeJudgment.getDefendant1Address());
+        assertNotNull(activeJudgment.getDefendant1Dob());
+    }
 
+    @Test
+    void testIfActiveJudgmentIsAddedPayImmediately_Multi_party() {
+
+        CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate_Multi_party();
+        JudgmentDetails activeJudgment = judgmentOnlineMapper.addUpdateActiveJudgment(caseData);
+
+        assertNotNull(activeJudgment);
+        assertEquals(JudgmentState.ISSUED, activeJudgment.getState());
+        assertEquals("1200", activeJudgment.getOrderedAmount());
+        assertEquals("1100", activeJudgment.getCosts());
+        assertEquals("2300", activeJudgment.getTotalAmount());
+        assertEquals(YesOrNo.YES, activeJudgment.getIsRegisterWithRTL());
+        assertEquals(LocalDate.of(2022, 12, 12), activeJudgment.getIssueDate());
+        assertEquals("0123", activeJudgment.getCourtLocation());
+        assertEquals(JudgmentType.JUDGMENT_FOLLOWING_HEARING, activeJudgment.getType());
+        assertEquals(YesOrNo.YES, activeJudgment.getIsJointJudgment());
+        assertEquals(1, activeJudgment.getJudgmentId());
+        assertEquals(caseData.getJoPaymentPlan(), activeJudgment.getPaymentPlan());
+        assertEquals("The Organisation", activeJudgment.getDefendant1Name());
+        assertNotNull(activeJudgment.getDefendant1Address());
+        assertEquals("Mr. John Rambo", activeJudgment.getDefendant2Name());
+        assertNotNull(activeJudgment.getDefendant2Address());
+        assertNotNull(activeJudgment.getDefendant2Dob());
     }
 }
