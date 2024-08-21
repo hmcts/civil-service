@@ -72,7 +72,7 @@ class CaseLegacyReferenceSearchServiceTest {
     }
 
     @Test
-    void shouldReturnCaseDetailsSuccessfully_getCaseDataFromBothServices_whenCaseExits() {
+    void shouldReturnCaseDetailsSuccessfully_getCivilOrOcmcCaseData_whenCaseExits() {
         final Query EXPECTED_QUERY =
             new Query(boolQuery().must(
                 boolQuery()
@@ -83,19 +83,19 @@ class CaseLegacyReferenceSearchServiceTest {
         CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
         given(searchResult.getCases()).willReturn(Arrays.asList(caseDetails));
 
-        CaseDetails result = caseLegacyReferenceSearchService.getCaseDataFromBothServices(REFERENCE);
+        CaseDetails result = caseLegacyReferenceSearchService.getCivilOrOcmcCaseData(REFERENCE);
 
         assertThat(result).isNotNull();
         verify(coreCaseDataService).searchCases(refEq(EXPECTED_QUERY));
     }
 
     @Test
-    void shouldThrowException_getCaseDataFromBothServices_whenCaseIsNotFound() {
+    void shouldThrowException_getCivilOrOcmcCaseData_whenCaseIsNotFound() {
         given(searchResult.getCases()).willReturn(Collections.emptyList());
 
         assertThrows(
             SearchServiceCaseNotFoundException.class, () ->
-                caseLegacyReferenceSearchService.getCaseDataFromBothServices(REFERENCE));
+                caseLegacyReferenceSearchService.getCivilOrOcmcCaseData(REFERENCE));
     }
 
 }

@@ -32,7 +32,7 @@ public class CaseLegacyReferenceSearchService {
         return searchResult.getCases().get(0);
     }
 
-    public CaseDetails getCaseDataFromBothServices(String legacyReference) {
+    public CaseDetails getCivilOrOcmcCaseData(String legacyReference) {
         log.info("searching cases with reference {}", legacyReference);
         Query query = new Query(boolQuery().must(
             boolQuery()
