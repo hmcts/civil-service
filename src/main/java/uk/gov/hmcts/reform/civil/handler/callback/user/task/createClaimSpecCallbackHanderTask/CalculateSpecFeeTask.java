@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -22,6 +24,7 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
+@Component
 public class CalculateSpecFeeTask {
 
     private final InterestCalculator interestCalculator;
@@ -30,6 +33,7 @@ public class CalculateSpecFeeTask {
     private final ObjectMapper objectMapper;
     private final OrganisationService organisationService;
 
+    @Autowired
     public CalculateSpecFeeTask(InterestCalculator interestCalculator, FeatureToggleService featureToggleService,
                                 FeesService feesService, ObjectMapper objectMapper, OrganisationService organisationService) {
         this.interestCalculator = interestCalculator;
@@ -40,25 +44,60 @@ public class CalculateSpecFeeTask {
     }
 
     public CallbackResponse calculateSpecFee(CaseData caseData, String authorizationToken) {
-        Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
-        String reference = references.map(SolicitorReferences::getApplicantSolicitor1Reference).orElse("");
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
-        Optional<PaymentDetails> paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails());
-        String customerReference = paymentDetails.map(PaymentDetails::getCustomerReference).orElse(reference);
+        // Update payment details
+        updatePaymentDetails(caseData, caseDataBuilder);
+
+        // Calculate and update claim fee with interest
+        calculateAndUpdateClaimFee(caseData, caseDataBuilder);
+
+        // Handle PBA accounts and payment type
+        handlePbaAndPaymentType(authorizationToken, caseDataBuilder);
+
+        // Build and return the callback response
+        return buildCallbackResponse(caseDataBuilder);
+    }
+
+    private void updatePaymentDetails(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
+        String solicitorReference = getSolicitorReference(caseData);
+        String customerReference = getCustomerReference(caseData, solicitorReference);
+
         PaymentDetails updatedDetails = PaymentDetails.builder().customerReference(customerReference).build();
         caseDataBuilder.claimIssuedPaymentDetails(updatedDetails);
+    }
 
+    private String getSolicitorReference(CaseData caseData) {
+        return Optional.ofNullable(caseData.getSolicitorReferences())
+            .map(SolicitorReferences::getApplicantSolicitor1Reference)
+            .orElse("");
+    }
+
+    private String getCustomerReference(CaseData caseData, String solicitorReference) {
+        return Optional.ofNullable(caseData.getClaimIssuedPaymentDetails())
+            .map(PaymentDetails::getCustomerReference)
+            .orElse(solicitorReference);
+    }
+
+    private void calculateAndUpdateClaimFee(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
-        caseDataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(interest)));
+        BigDecimal totalClaimAmountWithInterest = caseData.getTotalClaimAmount().add(interest);
+
+        caseDataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(totalClaimAmountWithInterest))
+            .totalInterest(interest);
+    }
+
+    private void handlePbaAndPaymentType(String authorizationToken, CaseData.CaseDataBuilder caseDataBuilder) {
         if (featureToggleService.isPbaV3Enabled()) {
             caseDataBuilder.paymentTypePBASpec("PBAv3");
         }
+
         List<String> pbaNumbers = getPbaAccounts(authorizationToken);
         caseDataBuilder.applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
-            .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO)
-            .totalInterest(interest);
+            .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
+    }
 
+    private CallbackResponse buildCallbackResponse(CaseData.CaseDataBuilder caseDataBuilder) {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();

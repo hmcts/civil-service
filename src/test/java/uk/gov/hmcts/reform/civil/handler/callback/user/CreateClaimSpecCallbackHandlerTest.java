@@ -28,6 +28,15 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask.CalculateFeeTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask.CalculateSpecFeeTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask.CalculateTotalClaimAmountTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask.GetAirlineListTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask.SpecValidateClaimInterestDateTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask.SpecValidateClaimTimelineDateTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask.SubmitClaimTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask.ValidateClaimantDetailsTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask.ValidateRespondentDetailsTask;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
@@ -40,6 +49,7 @@ import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.Party.Type;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
@@ -137,6 +147,15 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
     TransitionsTestConfiguration.class,
     ValidateEmailService.class,
     PartyValidator.class,
+    CalculateFeeTask.class,
+    CalculateSpecFeeTask.class,
+    CalculateTotalClaimAmountTask.class,
+    GetAirlineListTask.class,
+    SpecValidateClaimInterestDateTask.class,
+    SpecValidateClaimTimelineDateTask.class,
+    ValidateRespondentDetailsTask.class,
+    ValidateClaimantDetailsTask.class,
+    SubmitClaimTask.class
 },
     properties = {"reference.database.enabled=false"})
 class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -422,6 +441,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .individualFirstName("This is very long name")
                                 .individualTitle("MR")
                                 .individualLastName("exceeds 70 characters to throw error for max length allowed")
+                                .primaryAddress(Address.builder().addressLine1("Address line 1").build())
                                 .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -444,6 +464,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .soleTraderFirstName("This is very long name")
                                 .soleTraderTitle("MR")
                                 .soleTraderLastName("exceeds 70 characters to throw error for max length allowed")
+                                .primaryAddress(Address.builder().addressLine1("Address line 1").build())
                                 .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -465,6 +486,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .type(Party.Type.ORGANISATION)
                                 .organisationName("This is very long name exceeds 70 characters "
                                                       + " to throw error for max length allowed")
+                                .primaryAddress(Address.builder().addressLine1("Address line 1").build())
                                 .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -630,6 +652,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .individualFirstName("This is very long name")
                                 .individualTitle("MR")
                                 .individualLastName("exceeds 70 characters to throw error for max length allowed")
+                                .primaryAddress(Address.builder().addressLine1("Address line 1").build())
                                 .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -648,10 +671,11 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant2(Party.builder()
-                                .type(Party.Type.SOLE_TRADER)
+                                .type(Type.SOLE_TRADER)
                                 .soleTraderFirstName("This is very long name")
                                 .soleTraderTitle("MR")
                                 .soleTraderLastName("exceeds 70 characters to throw error for max length allowed")
+                                .primaryAddress(Address.builder().addressLine1("Address line 1").build())
                                 .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -673,6 +697,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .type(Party.Type.ORGANISATION)
                                 .organisationName("This is very long name exceeds 70 characters "
                                                       + " to throw error for max length allowed")
+                                .primaryAddress(Address.builder().addressLine1("Address line 1").build())
                                 .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -1183,8 +1208,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .containsEntry("claimAmountBreakupSummaryObject", " | Description | Amount | \n" +
                     " |---|---| \n" +
-                    " | Test reason1 | £ 10.00 |\n" +
-                    " Test reason2 | £ 20.00 |\n" +
+                    "  | Test reason1 | £ 10.00 |\n" +
+                    "  | Test reason2 | £ 20.00 |\n" +
                     "  | **Total** | £ 30.00 | ");
         }
 

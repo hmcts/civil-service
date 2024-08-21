@@ -53,6 +53,5 @@ public class TakeCaseOfflineCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(mapper))
             .build();
-        
     }
 }

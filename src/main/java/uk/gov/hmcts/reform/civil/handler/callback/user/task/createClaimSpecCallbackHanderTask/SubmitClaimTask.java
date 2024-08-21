@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask;
 
+import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.units.qual.A;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -36,6 +39,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
@@ -68,11 +72,9 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 
 @Component
+@RequiredArgsConstructor
 public class SubmitClaimTask {
 
-    private final DateOfBirthValidator dateOfBirthValidator;
-    private final PartyValidator partyValidator;
-    private final PostcodeValidator postcodeValidator;
     private final FeatureToggleService featureToggleService;
     private final ObjectMapper objectMapper;
     private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
@@ -80,7 +82,7 @@ public class SubmitClaimTask {
     private final ToggleConfiguration toggleConfiguration;
     private final CaseFlagsInitialiser caseFlagInitialiser;
     private final FeesService feesService;
-    private final IdamClient idamClient;
+    private final UserService userService;
     private final Time time;
     private final SpecReferenceNumberRepository specReferenceNumberRepository;
     private final OrganisationService organisationService;
@@ -91,26 +93,6 @@ public class SubmitClaimTask {
     private String regionId;
     @Value("${court-location.specified-claim.epimms-id}")
     private String epimmsId;
-
-    // Constructor to initialize dependencies
-    public SubmitClaimTask(DateOfBirthValidator dateOfBirthValidator, PartyValidator partyValidator, PostcodeValidator postcodeValidator, FeatureToggleService featureToggleService, ObjectMapper objectMapper, DefendantPinToPostLRspecService defendantPinToPostLRspecService, InterestCalculator interestCalculator, ToggleConfiguration toggleConfiguration, CaseFlagsInitialiser caseFlagInitialiser, FeesService feesService, IdamClient idamClient, Time time, SpecReferenceNumberRepository specReferenceNumberRepository, OrganisationService organisationService, AirlineEpimsService airlineEpimsService, LocationReferenceDataService locationRefDataService) {
-        this.dateOfBirthValidator = dateOfBirthValidator;
-        this.partyValidator = partyValidator;
-        this.postcodeValidator = postcodeValidator;
-        this.featureToggleService = featureToggleService;
-        this.objectMapper = objectMapper;
-        this.defendantPinToPostLRspecService = defendantPinToPostLRspecService;
-        this.interestCalculator = interestCalculator;
-        this.toggleConfiguration = toggleConfiguration;
-        this.caseFlagInitialiser = caseFlagInitialiser;
-        this.feesService = feesService;
-        this.idamClient = idamClient;
-        this.time = time;
-        this.specReferenceNumberRepository = specReferenceNumberRepository;
-        this.organisationService = organisationService;
-        this.airlineEpimsService = airlineEpimsService;
-        this.locationRefDataService = locationRefDataService;
-    }
 
     public CallbackResponse submitClaim(CaseData caseData, String eventId, String authorisationToken, YesOrNo isFlightDelayClaim,
                                         FlightDelayDetails flightDelayDetails) {
@@ -260,7 +242,7 @@ public class SubmitClaimTask {
 
     private CaseData.CaseDataBuilder getSharedData(CaseData caseData, String authToken, String eventId) {
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        UserDetails userDetails = idamClient.getUserDetails(authToken);
+        UserDetails userDetails = userService.getUserDetails(authToken);
         IdamUserDetails.IdamUserDetailsBuilder idam = IdamUserDetails.builder().id(userDetails.getId());
         CorrectEmail applicantSolicitor1CheckEmail = caseData.getApplicantSolicitor1CheckEmail();
         CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();

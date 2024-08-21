@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -26,6 +27,7 @@ public class ValidateClaimantDetailsTask {
 
     private Function<CaseData, Party> getApplicant;
 
+    @Autowired
     public ValidateClaimantDetailsTask(DateOfBirthValidator dateOfBirthValidator,
                                        PartyValidator partyValidator,
                                        PostcodeValidator postcodeValidator,
