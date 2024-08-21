@@ -22,6 +22,7 @@ public class CaseLegacyReferenceSearchService {
     private final CoreCaseDataService coreCaseDataService;
 
     public CaseDetails getCaseDataByLegacyReference(String legacyReference) {
+        log.info("searching cases with reference {}", legacyReference);
         Query query = new Query(boolQuery().must(
             matchQuery("data.legacyCaseReference", legacyReference)), List.of(), 0);
         SearchResult searchResult = coreCaseDataService.searchCases(query);
