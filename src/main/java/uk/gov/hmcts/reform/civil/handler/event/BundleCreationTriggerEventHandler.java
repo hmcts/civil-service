@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
+import uk.gov.hmcts.reform.civil.model.bundle.BundleDetails;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -56,10 +57,27 @@ public class BundleCreationTriggerEventHandler {
         List<uk.gov.hmcts.reform.civil.model.bundle.Bundle> bundles = bundleCreateResponse.getData().getCaseBundles();
         Optional<uk.gov.hmcts.reform.civil.model.bundle.Bundle> lastCreatedBundle = bundles.stream()
             .max(Comparator.comparing(bundle -> bundle.getValue().getCreatedOn()));
+        if (lastCreatedBundle.isPresent()) {
+            log.info("inside if");
+            BundleDetails bundle = lastCreatedBundle.get().getValue();
+            log.info("Bundle ID: {}", bundle.getId());
+            log.info("Bundle Title: {}", bundle.getTitle());
+            log.info("Bundle File Name: {}", bundle.getFileName());
+            log.info("Bundle Created On: {}", bundle.getCreatedOn());
+            log.info("Bundle Stitch Status: {}", bundle.getStitchStatus());
+            log.info("Bundle Stitched Document: {}", bundle.getStitchedDocument());
+            log.info("Bundle Hearing Date: {}", bundle.getBundleHearingDate());
+            log.info("Bundle Description: {}", bundle.getDescription());
+        }
+        else{
+            log.info("inside else");
+        }
 
         YesOrNo hasBundleErrors = lastCreatedBundle
             .map(bundle -> "FAILED".equalsIgnoreCase(bundle.getValue().getStitchStatus()) ? YesOrNo.YES : null)
             .orElse(null);
+
+        log.info("hasBundleErrors: {}", hasBundleErrors);
 
         if (hasBundleErrors == null) {
             List<IdValue<Bundle>> caseBundles = new ArrayList<>(caseData.getCaseBundles());
