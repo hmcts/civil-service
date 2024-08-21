@@ -71,4 +71,31 @@ class CaseLegacyReferenceSearchServiceTest {
                 caseLegacyReferenceSearchService.getCaseDataByLegacyReference(REFERENCE));
     }
 
+    @Test
+    void shouldReturnCaseDetailsSuccessfully_getCaseDataFromBothServices_whenCaseExits() {
+        final Query EXPECTED_QUERY =
+            new Query(boolQuery().must(
+                boolQuery()
+                    .should(matchQuery("data.legacyCaseReference", REFERENCE))
+                    .should(matchQuery("data.previousServiceCaseReference", REFERENCE))
+            ), List.of(), 0);
+
+        CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
+        given(searchResult.getCases()).willReturn(Arrays.asList(caseDetails));
+
+        CaseDetails result = caseLegacyReferenceSearchService.getCaseDataFromBothServices(REFERENCE);
+
+        assertThat(result).isNotNull();
+        verify(coreCaseDataService).searchCases(refEq(EXPECTED_QUERY));
+    }
+
+    @Test
+    void shouldThrowException_getCaseDataFromBothServices_whenCaseIsNotFound() {
+        given(searchResult.getCases()).willReturn(Collections.emptyList());
+
+        assertThrows(
+            SearchServiceCaseNotFoundException.class, () ->
+                caseLegacyReferenceSearchService.getCaseDataFromBothServices(REFERENCE));
+    }
+
 }

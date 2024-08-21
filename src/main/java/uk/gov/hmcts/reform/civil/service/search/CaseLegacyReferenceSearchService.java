@@ -22,7 +22,6 @@ public class CaseLegacyReferenceSearchService {
     private final CoreCaseDataService coreCaseDataService;
 
     public CaseDetails getCaseDataByLegacyReference(String legacyReference) {
-        log.info("searching cases with reference {}", legacyReference);
         Query query = new Query(boolQuery().must(
             matchQuery("data.legacyCaseReference", legacyReference)), List.of(), 0);
         SearchResult searchResult = coreCaseDataService.searchCases(query);
@@ -33,4 +32,18 @@ public class CaseLegacyReferenceSearchService {
         return searchResult.getCases().get(0);
     }
 
+    public CaseDetails getCaseDataFromBothServices(String legacyReference) {
+        log.info("searching cases with reference {}", legacyReference);
+        Query query = new Query(boolQuery().must(
+            boolQuery()
+                .should(matchQuery("data.legacyCaseReference", legacyReference))
+                .should(matchQuery("data.previousServiceCaseReference", legacyReference))
+        ), List.of(), 0);
+        SearchResult searchResult = coreCaseDataService.searchCases(query);
+        if (searchResult == null || searchResult.getCases().isEmpty()) {
+            log.error("no case found for {}", legacyReference);
+            throw new SearchServiceCaseNotFoundException();
+        }
+        return searchResult.getCases().get(0);
+    }
 }
