@@ -8,14 +8,19 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.math.BigDecimal;
@@ -123,5 +128,55 @@ public class ClaimantResponseUtilsTest {
 
         String actualOutput = claimantResponseUtils.getDefendantRepaymentOption(caseData);
         Assertions.assertEquals(expectedOutput, actualOutput);
+    }
+
+    @Test
+    void shouldGetTheDefendantAdmittedAmount() {
+        when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(BigDecimal.TEN);
+        CaseData caseData = CaseData.builder()
+            .respondent1RepaymentPlan(RepaymentPlanLRspec.builder().repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
+                                          .firstRepaymentDate(LocalDate.of(2024, 1, 1))
+                                          .paymentAmount(new BigDecimal(10000)).build())
+            .issueDate(LocalDate.now())
+            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(2000)).build())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .totalClaimAmount(BigDecimal.valueOf(1000))
+            .build();
+
+        BigDecimal actualOutput = claimantResponseUtils.getDefendantAdmittedAmount(caseData);
+        assertThat(actualOutput).isNotNull();
+    }
+
+    @Test
+    void shouldGetTheDefendantAdmittedAmountWhenPartAdmit() {
+        when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(BigDecimal.TEN);
+        CaseData caseData = CaseData.builder()
+            .issueDate(LocalDate.now())
+            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(2000)).build())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .totalClaimAmount(BigDecimal.valueOf(1000))
+            .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(1000))
+            .build();
+
+        BigDecimal actualOutput = claimantResponseUtils.getDefendantAdmittedAmount(caseData);
+        assertThat(actualOutput).isNotNull();
+    }
+
+    @Test
+    void shouldGetTheDefendantAdmittedAmountWhenHWF() {
+        when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(BigDecimal.TEN);
+        CaseData caseData = CaseData.builder()
+            .issueDate(LocalDate.now())
+            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(2000)).build())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .totalClaimAmount(BigDecimal.valueOf(1000))
+            .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(1000))
+            .caseDataLiP(CaseDataLiP.builder().helpWithFees(HelpWithFees.builder().helpWithFee(YesOrNo.YES).build()).build())
+            .hwfFeeType(FeeType.CLAIMISSUED)
+            .claimIssuedHwfDetails(HelpWithFeesDetails.builder().outstandingFeeInPounds(BigDecimal.valueOf(100)).build())
+            .build();
+
+        BigDecimal actualOutput = claimantResponseUtils.getDefendantAdmittedAmount(caseData);
+        assertThat(actualOutput).isNotNull();
     }
 }

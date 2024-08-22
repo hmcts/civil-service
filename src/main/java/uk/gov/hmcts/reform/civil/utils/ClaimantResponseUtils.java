@@ -94,7 +94,6 @@ public class ClaimantResponseUtils {
     }
 
     public BigDecimal getDefendantAdmittedAmount(CaseData caseData) {
-        //BigDecimal interest = Optional.ofNullable(caseData.getTotalInterest()).orElse(BigDecimal.ZERO);
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION) {
             return caseData.getTotalClaimAmount().add(getClaimFee(caseData)).add(interest);
