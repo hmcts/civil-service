@@ -9,6 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -61,6 +62,7 @@ public class EditJudgmentsOnlineMapperTest {
         assertEquals("1100", activeJudgment.getCosts());
         assertEquals("2300", activeJudgment.getTotalAmount());
         assertEquals(YesOrNo.YES, activeJudgment.getIsRegisterWithRTL());
+        assertEquals(JudgmentRTLStatus.MODIFIED_EXISTING.getRtlState(), activeJudgment.getRtlState());
         assertEquals(LocalDate.of(2022, 12, 12), activeJudgment.getIssueDate());
         assertEquals("0123", activeJudgment.getCourtLocation());
         assertEquals(JudgmentType.JUDGMENT_FOLLOWING_HEARING, activeJudgment.getType());
@@ -87,6 +89,7 @@ public class EditJudgmentsOnlineMapperTest {
         assertEquals("0", activeJudgment.getCosts());
         assertEquals("1200", activeJudgment.getTotalAmount());
         assertEquals(YesOrNo.YES, activeJudgment.getIsRegisterWithRTL());
+        assertEquals(JudgmentRTLStatus.MODIFIED_EXISTING.getRtlState(), activeJudgment.getRtlState());
         assertEquals(LocalDate.of(2022, 12, 12), activeJudgment.getIssueDate());
         assertEquals("0123", activeJudgment.getCourtLocation());
         assertEquals(JudgmentType.JUDGMENT_FOLLOWING_HEARING, activeJudgment.getType());
@@ -123,6 +126,7 @@ public class EditJudgmentsOnlineMapperTest {
         assertEquals("0", activeJudgment.getCosts());
         assertEquals("100990", activeJudgment.getTotalAmount());
         assertEquals(YesOrNo.YES, activeJudgment.getIsRegisterWithRTL());
+        assertEquals(JudgmentRTLStatus.ISSUED.getRtlState(), activeJudgment.getRtlState());
         assertEquals(LocalDate.now(), activeJudgment.getIssueDate());
         assertEquals("0123", activeJudgment.getCourtLocation());
         assertEquals(JudgmentType.DEFAULT_JUDGMENT, activeJudgment.getType());

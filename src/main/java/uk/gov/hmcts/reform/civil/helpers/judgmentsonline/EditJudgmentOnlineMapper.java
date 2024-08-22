@@ -3,8 +3,10 @@ package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import java.math.BigDecimal;
 
@@ -24,6 +26,7 @@ public class EditJudgmentOnlineMapper extends JudgmentOnlineMapper {
                 .instalmentDetails(caseData.getJoInstalmentDetails())
                 .paymentPlan(caseData.getJoPaymentPlan())
                 .isRegisterWithRTL(caseData.getJoIsRegisteredWithRTL())
+                .rtlState(getRtlState(activeJudgment.getIsRegisterWithRTL(), activeJudgment.getRtlState()))
                 .issueDate(caseData.getJoOrderMadeDate())
                 .orderedAmount(orderAmount.toString())
                 .costs(costs.toString())
@@ -38,4 +41,12 @@ public class EditJudgmentOnlineMapper extends JudgmentOnlineMapper {
         return JudgmentState.MODIFIED;
     }
 
+    protected String getRtlState(YesOrNo isRegisterWithRTL, String rtlState) {
+        if (rtlState != null) {
+            return (rtlState.equalsIgnoreCase(JudgmentRTLStatus.ISSUED.getRtlState()) || rtlState.equalsIgnoreCase(
+                JudgmentRTLStatus.MODIFIED_EXISTING.getRtlState()))
+                ? JudgmentRTLStatus.MODIFIED_EXISTING.getRtlState() : rtlState;
+        }
+        return isRegisterWithRTL == YesOrNo.YES ? JudgmentRTLStatus.ISSUED.getRtlState() : rtlState;
+    }
 }
