@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -53,6 +54,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
+    private final AssignCategoryId assignCategoryId;
     private final OrganisationService organisationService;
     private final FeesService feesService;
     private final FeatureToggleService featureToggleService;
@@ -315,14 +317,16 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
             DocmosisTemplates docmosisTemplate = getDocmosisTemplate(event);
             DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(defaultJudgmentForm,
                                                                                                   docmosisTemplate);
-            caseDocuments.add(documentManagementService.uploadDocument(
+            CaseDocument caseDocument = documentManagementService.uploadDocument(
                 authorisation,
                 new PDF(
                     getFileName(caseData, docmosisTemplate),
                     docmosisDocument.getBytes(),
                     documentType
                 )
-            ));
+            );
+            assignCategoryId.assignCategoryIdToCaseDocument(caseDocument, "judgments");
+            caseDocuments.add(caseDocument);
         }
         return caseDocuments;
     }
