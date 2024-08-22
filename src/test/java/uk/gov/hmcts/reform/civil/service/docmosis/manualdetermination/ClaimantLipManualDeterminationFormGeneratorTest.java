@@ -65,7 +65,7 @@ class ClaimantLipManualDeterminationFormGeneratorTest {
         when(documentManagementService
                 .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, LIP_MANUAL_DETERMINATION)))
                 .thenReturn(CASE_DOCUMENT);
-}
+    }
 
     @Test
     void shouldGenerateClaimantManualDeterminationDoc_whenValidDataIsProvided() {
