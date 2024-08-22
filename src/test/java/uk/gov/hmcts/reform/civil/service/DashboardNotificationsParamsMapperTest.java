@@ -50,6 +50,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
@@ -105,6 +106,7 @@ public class DashboardNotificationsParamsMapperTest {
             new IdValue<>("2", Bundle.builder().createdOn(Optional.of(now)).build()),
             new IdValue<>("3", Bundle.builder().createdOn(Optional.of(now.minusDays(2))).build())
         );
+        when(claimantResponseUtils.getDefendantAdmittedAmount(any())).thenReturn(BigDecimal.valueOf(100));
 
         LocalDateTime applicant1ResponseDeadline = LocalDateTime.of(2024, 3, 21, 16, 0);
         caseData = caseData.toBuilder()

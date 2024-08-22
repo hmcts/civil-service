@@ -19,7 +19,6 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Optional;
 
-
 @Component
 @RequiredArgsConstructor
 public class InterlocutoryJudgementDocMapper implements MappableObject {
