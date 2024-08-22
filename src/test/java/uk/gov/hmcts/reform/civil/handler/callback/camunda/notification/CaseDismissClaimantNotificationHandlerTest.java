@@ -52,13 +52,15 @@ class CaseDismissClaimantNotificationHandlerTest {
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@example.com").build());
     }
 
-    private CaseData getCaseData(boolean isRespondentLiP, boolean isRespondentBilingual) {
+    private CaseData getCaseData(boolean isClaimantLiP, boolean isClaimantBilingual) {
         RespondentLiPResponse respondentLip = RespondentLiPResponse.builder()
-            .respondent1ResponseLanguage(isRespondentBilingual ? Language.BOTH.toString()
+            .respondent1ResponseLanguage(isClaimantBilingual ? Language.BOTH.toString()
                                              : Language.ENGLISH.toString()).build();
         return commonCaseData()
-            .respondent1Represented(isRespondentLiP ? YesOrNo.NO : YesOrNo.YES)
+            .applicant1Represented(isClaimantLiP ? YesOrNo.NO : YesOrNo.YES)
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@example.com").build())
+            .claimantBilingualLanguagePreference(isClaimantBilingual ? Language.BOTH.toString()
+                                                     : Language.ENGLISH.toString())
             .build().toBuilder()
             .caseDataLiP(CaseDataLiP.builder()
                              .respondent1LiPResponse(respondentLip).build())
@@ -106,7 +108,7 @@ class CaseDismissClaimantNotificationHandlerTest {
                 "name", "Jack Jackson",
                 "claimantvdefendant", "John Doe V Jack Jackson"
             ),
-            "dismiss-case-defendant-notification-1594901956117591"
+            "dismiss-case-claimant-notification-1594901956117591"
         );
         assertNotNull(response);
     }
