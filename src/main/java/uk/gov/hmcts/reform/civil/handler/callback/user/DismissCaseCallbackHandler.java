@@ -33,10 +33,17 @@ public class DismissCaseCallbackHandler extends CallbackHandler {
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
-            callbackKey(SUBMITTED), this::buildConfirmation
-        );
+        if (featureToggleService.isCaseEventsEnabled()) {
+            return Map.of(
+                callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
+                callbackKey(SUBMITTED), this::buildConfirmation
+            );
+        } else {
+            return Map.of(
+                callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
+                callbackKey(SUBMITTED), this::emptyCallbackResponse
+            );
+        }
     }
 
     @Override
@@ -45,16 +52,12 @@ public class DismissCaseCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
-        if (featureToggleService.isCaseEventsEnabled()) {
-            CaseData caseData = callbackParams.getCaseData();
-            CaseData.CaseDataBuilder<?, ?> caseDataUpdated = caseData.toBuilder()
-                .businessProcess(BusinessProcess.ready(DISMISS_CASE));
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseDataUpdated.build().toMap(objectMapper))
-                .build();
-        } else {
-            return emptyCallbackResponse(callbackParams);
-        }
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataUpdated = caseData.toBuilder()
+            .businessProcess(BusinessProcess.ready(DISMISS_CASE));
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataUpdated.build().toMap(objectMapper))
+            .build();
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
