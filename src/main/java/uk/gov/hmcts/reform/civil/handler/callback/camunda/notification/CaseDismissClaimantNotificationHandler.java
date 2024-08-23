@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import java.util.List;
 
 @Service
-public class CaseDismissClaimantNotificationHandler extends CaseDismissNotificationHandler {
+public class CaseDismissClaimantNotificationHandler extends AbstractCaseDismissNotificationHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(
         CaseEvent.NOTIFY_CLAIMANT_DISMISS_CASE

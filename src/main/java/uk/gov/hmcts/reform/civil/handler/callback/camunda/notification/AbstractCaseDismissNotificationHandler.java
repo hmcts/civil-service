@@ -16,7 +16,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @RequiredArgsConstructor
-public abstract class CaseDismissNotificationHandler extends CallbackHandler implements NotificationData {
+public abstract class AbstractCaseDismissNotificationHandler extends CallbackHandler implements NotificationData {
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
