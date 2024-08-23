@@ -48,6 +48,7 @@ public class DefendantResponsePartFullAdmitInstallmentsOrgComClaimantScenarioTes
                                           .firstRepaymentDate(firstPaymentDate)
                                           .build())
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+            .claimInterest(YesOrNo.NO)
             .totalClaimAmount(totalAmount)
             .build();
 
