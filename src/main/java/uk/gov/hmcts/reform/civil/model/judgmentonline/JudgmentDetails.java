@@ -41,6 +41,5 @@ public class JudgmentDetails {
     private String courtLocation;
     private JudgmentInstalmentDetails instalmentDetails;
     private JudgmentPaymentPlan paymentPlan;
-    private String paymentSummary;
     private JudgmentType type;
 }
