@@ -215,13 +215,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private DeadlineExtensionCalculatorService deadlineCalculatorService;
 
-    public static final String UNAVAILABLE_DATE_RANGE_MISSING = "Please provide at least one valid Date from if you cannot attend hearing within next 3 months.";
-    public static final String INVALID_UNAVAILABILITY_RANGE = "Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.";
-    public static final String INVALID_UNAVAILABLE_DATE_BEFORE_TODAY = "Unavailability Date must not be before today.";
-    public static final String INVALID_UNAVAILABLE_DATE_FROM_BEFORE_TODAY = "Unavailability Date From must not be before today.";
-    public static final String INVALID_UNAVAILABLE_DATE_TO_WHEN_MORE_THAN_YEAR = "Unavailability Date To must not be more than one year in the future.";
-    public static final String INVALID_UNAVAILABLE_DATE_WHEN_MORE_THAN_YEAR = "Unavailability Date must not be more than one year in the future.";
-
     @Nested
     class AboutToStart {
 
@@ -2753,16 +2746,16 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains(INVALID_UNAVAILABLE_DATE_BEFORE_TODAY);
+            assertThat(response.getErrors()).contains("Unavailability Date must not be before today.");
         }
 
         @Test
-        public void testApp1UnavailableDateWhenAvailabilityIsYesAndSingleDateIsBeyondYear() {
+        public void testApp1UnavailableDateWhenAvailabilityIsYesAndSingleDateIsBeyond3Months() {
 
             List<Element<UnavailableDate>> unAvailableDates = Stream.of(
                 UnavailableDate.builder()
                     .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                    .date(LocalDate.now().plusYears(4))
+                    .date(LocalDate.now().plusMonths(4))
                     .build(),
                 UnavailableDate.builder()
                     .unavailableDateType(UnavailableDateType.DATE_RANGE)
@@ -2784,7 +2777,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains(INVALID_UNAVAILABLE_DATE_WHEN_MORE_THAN_YEAR);
+            assertThat(response.getErrors()).contains("Unavailability Date must not be more than three months in the future.");
         }
 
         @Test
@@ -2815,7 +2808,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains(INVALID_UNAVAILABILITY_RANGE);
+            assertThat(response.getErrors()).contains("Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.");
         }
 
         @Test
@@ -2846,7 +2839,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains(INVALID_UNAVAILABLE_DATE_FROM_BEFORE_TODAY);
+            assertThat(response.getErrors()).contains("Unavailability Date From must not be before today.");
         }
 
         @Test
@@ -2877,11 +2870,11 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains(INVALID_UNAVAILABILITY_RANGE);
+            assertThat(response.getErrors()).contains("Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.");
         }
 
         @Test
-        public void testApp1UnavailableDateWhenDateToIsBeyondOneYear() {
+        public void testApp1UnavailableDateWhenDateToIsBeyondThreeMonths() {
 
             List<Element<UnavailableDate>> unAvailableDates = Stream.of(
                 UnavailableDate.builder()
@@ -2891,7 +2884,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 UnavailableDate.builder()
                     .unavailableDateType(UnavailableDateType.DATE_RANGE)
                     .fromDate(LocalDate.now().plusDays(6))
-                    .toDate(LocalDate.now().plusYears(4))
+                    .toDate(LocalDate.now().plusMonths(4))
                     .build()
             ).map(ElementUtils::element).toList();
 
@@ -2908,7 +2901,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains(INVALID_UNAVAILABLE_DATE_TO_WHEN_MORE_THAN_YEAR);
+            assertThat(response.getErrors()).contains("Unavailability Date To must not be more than three months in the future.");
         }
 
     }
