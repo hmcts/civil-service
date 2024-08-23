@@ -3,7 +3,7 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.GeneralApplication.Created.Claimant', '{}', '{"Notice.AAA6.GeneralApplication.Fee.Required" : ["applicationFee"]}'),
-       ('Scenario.AAA6.GeneralApplication.Created.Defendant', '{}', '{}'),
+       ('Scenario.AAA6.GeneralApplication.Created.Defendant', '{}', '{}');
 
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)

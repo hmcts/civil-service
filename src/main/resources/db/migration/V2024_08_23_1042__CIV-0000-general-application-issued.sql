@@ -2,7 +2,7 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA6.GeneralApplication.Complete.Claimant', '{"Notice.AAA6.GeneralApplication.Fee.Required"}', '{"Notice.AAA6.GeneralApplication.submitted"}'),
+VALUES ('Scenario.AAA6.GeneralApplication.Complete.Claimant', '{"Notice.AAA6.GeneralApplication.Fee.Required"}', '{"Notice.AAA6.GeneralApplication.submitted" : []}'),
        ('Scenario.AAA6.GeneralApplication.Complete.Defendant', '{}', '{}');
 
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
