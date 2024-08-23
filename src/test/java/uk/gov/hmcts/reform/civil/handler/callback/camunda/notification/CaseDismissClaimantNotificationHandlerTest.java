@@ -105,7 +105,7 @@ class CaseDismissClaimantNotificationHandlerTest {
             template,
             Map.of(
                 "claimReferenceNumber", "1594901956117591",
-                "name", "Jack Jackson",
+                "name", "John Doe",
                 "claimantvdefendant", "John Doe V Jack Jackson"
             ),
             "dismiss-case-claimant-notification-1594901956117591"
