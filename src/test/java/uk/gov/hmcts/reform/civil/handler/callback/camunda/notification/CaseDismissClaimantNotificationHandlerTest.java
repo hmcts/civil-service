@@ -40,7 +40,7 @@ class CaseDismissClaimantNotificationHandlerTest {
     private NotificationsProperties notificationsProperties;
 
     @InjectMocks
-    private CaseDismissDefendantNotificationHandler handler;
+    private CaseDismissClaimantNotificationHandler handler;
 
     private CaseDataBuilder commonCaseData() {
         return CaseDataBuilder.builder().atStateClaimDetailsNotified()
