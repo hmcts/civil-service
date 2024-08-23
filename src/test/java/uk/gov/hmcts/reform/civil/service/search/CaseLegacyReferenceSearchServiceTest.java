@@ -78,6 +78,7 @@ class CaseLegacyReferenceSearchServiceTest {
                 boolQuery()
                     .should(matchQuery("data.legacyCaseReference", REFERENCE))
                     .should(matchQuery("data.previousServiceCaseReference", REFERENCE))
+                    .minimumShouldMatch(1)
             ), List.of(), 0);
 
         CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
@@ -98,6 +99,7 @@ class CaseLegacyReferenceSearchServiceTest {
                 boolQuery()
                     .should(matchQuery("data.legacyCaseReference", REFERENCE))
                     .should(matchQuery("data.previousServiceCaseReference", REFERENCE))
+                    .minimumShouldMatch(1)
             ), List.of(), 0);
 
         CaseDetails caseDetails = CaseDetails.builder().id(1L).build();

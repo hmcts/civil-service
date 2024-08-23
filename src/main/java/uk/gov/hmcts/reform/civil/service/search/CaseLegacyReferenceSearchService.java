@@ -38,6 +38,7 @@ public class CaseLegacyReferenceSearchService {
             boolQuery()
                 .should(matchQuery("data.legacyCaseReference", caseReference))
                 .should(matchQuery("data.previousServiceCaseReference", caseReference))
+                .minimumShouldMatch(1)
         ), List.of(), 0);
         SearchResult searchResult = coreCaseDataService.searchCases(query);
         if (searchResult == null || searchResult.getCases().isEmpty()) {
