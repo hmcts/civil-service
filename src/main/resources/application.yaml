@@ -205,6 +205,9 @@ aca:
   api:
     baseurl: ${ACA_SERVICE_API_BASEURL:http://localhost:4454}
 
+rtl:
+  api:
+    url: http://localhost:4000
 
 dashboard:
   api:

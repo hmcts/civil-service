@@ -1,0 +1,113 @@
+package uk.gov.hmcts.reform.civil.service.judgments;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import uk.gov.hmcts.reform.civil.client.CjesApiClient;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.cjes.JudgmentDetailsCJES;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+
+class ReportJudgmentsServiceTest {
+
+    @Mock
+    private CjesApiClient cjesApiClient;
+
+    @Mock
+    private CjesMapper cjesMapper;
+
+    @Mock
+    private FeatureToggleService featureToggleService;
+
+    @InjectMocks
+    private ReportJudgmentsService reportJudgmentsService;
+
+    @BeforeEach
+    void setUp() {
+        cjesApiClient = mock(CjesApiClient.class);
+        cjesMapper = mock(CjesMapper.class);
+        featureToggleService = mock(FeatureToggleService.class);
+
+        reportJudgmentsService = new ReportJudgmentsService(cjesApiClient, cjesMapper, featureToggleService);
+    }
+
+    @Test
+    void sendJudgment_shouldUseActiveJudgment_whenIsActiveJudgementIsTrue() {
+        String caseId = String.valueOf(System.currentTimeMillis());
+        String legacyCcdReference = "reference";
+        LocalDateTime now = LocalDateTime.now();
+        JudgmentDetails activeJudgment = JudgmentDetails.builder()
+            .judgmentId(123)
+            .lastUpdateTimeStamp(now)
+            .courtLocation("123456")
+            .totalAmount("123.45")
+            .issueDate(now.toLocalDate())
+            .rtlState(JudgmentRTLStatus.ISSUED.getRtlState())
+            .cancelDate(now.toLocalDate())
+            .defendant1Name("Defendant 1")
+            .defendant1Dob(LocalDate.of(1980, 1, 1))
+            .build();
+
+        JudgmentDetailsCJES judgmentDetailsCJES = JudgmentDetailsCJES.builder()
+            .serviceId("123")
+            .build();
+
+        when(cjesMapper.toJudgmentDetailsCJES(any(JudgmentDetails.class), any(CaseData.class)))
+            .thenReturn(judgmentDetailsCJES);
+        when(featureToggleService.isCjesServiceAvailable()).thenReturn(false);
+        when(cjesApiClient.sendJudgmentDetailsCJES(any(JudgmentDetailsCJES.class))).thenReturn(null);
+
+        CaseData caseData = CaseData.builder()
+            .caseAccessCategory(SPEC_CLAIM)
+            .ccdCaseReference(Long.valueOf(caseId))
+            .legacyCaseReference(legacyCcdReference)
+            .activeJudgment(activeJudgment)
+            .build();
+
+        reportJudgmentsService.sendJudgment(caseData, true);
+
+        verify(cjesMapper, times(1)).toJudgmentDetailsCJES(activeJudgment, caseData);
+    }
+
+    @Test
+    void sendJudgment_shouldUseHistoricJudgment_whenIsActiveJudgementIsFalse() {
+        CaseData caseData = mock(CaseData.class);
+        JudgmentDetails historicJudgment = mock(JudgmentDetails.class);
+        when(caseData.getHistoricJudgment()).thenReturn(wrapElements(historicJudgment));
+        when(cjesMapper.toJudgmentDetailsCJES(any(JudgmentDetails.class), any(CaseData.class)))
+            .thenReturn(mock(JudgmentDetailsCJES.class));
+
+        reportJudgmentsService.sendJudgment(caseData, false);
+
+        verify(caseData, times(2)).getHistoricJudgment();
+        verify(cjesMapper, times(1)).toJudgmentDetailsCJES(historicJudgment, caseData);
+    }
+
+    @Test
+    void sendJudgment_shouldCallCjesApiClient_whenFeatureToggleIsOff() {
+        CaseData caseData = mock(CaseData.class);
+        JudgmentDetails judgmentDetails = mock(JudgmentDetails.class);
+        when(caseData.getActiveJudgment()).thenReturn(judgmentDetails);
+        JudgmentDetailsCJES judgmentDetailsCJES = mock(JudgmentDetailsCJES.class);
+        when(cjesMapper.toJudgmentDetailsCJES(any(JudgmentDetails.class), any(CaseData.class))).thenReturn(
+            judgmentDetailsCJES);
+        when(featureToggleService.isCjesServiceAvailable()).thenReturn(false);
+
+        reportJudgmentsService.sendJudgment(caseData, true);
+
+        verify(cjesApiClient, times(1)).sendJudgmentDetailsCJES(any(JudgmentDetailsCJES.class));
+        verify(featureToggleService).isCjesServiceAvailable();
+    }
+}
