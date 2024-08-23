@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.DefendantResponseClaimantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -34,7 +35,8 @@ public class DefendantResponsePartFullAdmitInstallmentsOrgComClaimantScenarioTes
         PaymentFrequencyLRspec frequency = PaymentFrequencyLRspec.ONCE_FOUR_WEEKS;
         BigDecimal installmentAmount = new BigDecimal("100");
         BigDecimal totalAmount = new BigDecimal("10000");
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
+        BigDecimal partAdmittedAmount = new BigDecimal("9000");
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentRespondToClaimSpec(RespondentResponseTypeSpec.PART_ADMISSION).build()
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
@@ -50,6 +52,7 @@ public class DefendantResponsePartFullAdmitInstallmentsOrgComClaimantScenarioTes
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
             .claimInterest(YesOrNo.NO)
             .totalClaimAmount(totalAmount)
+            .respondToAdmittedClaimOwingAmountPounds(partAdmittedAmount)
             .build();
 
         handler.handle(callbackParams(caseData));
@@ -60,7 +63,7 @@ public class DefendantResponsePartFullAdmitInstallmentsOrgComClaimantScenarioTes
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">Company One has offered to pay you "
-                        + "£" + totalAmount + " in "
+                        + "£" + partAdmittedAmount + " in "
                         + "instalments of £"
                         + MonetaryConversions.penniesToPounds(installmentAmount).toPlainString().replace(
                         ".00", "")
@@ -73,7 +76,7 @@ public class DefendantResponsePartFullAdmitInstallmentsOrgComClaimantScenarioTes
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae Company One wedi cynnig talu "
-                        + "£" + totalAmount
+                        + "£" + partAdmittedAmount
                         + " i chi mewn rhandaliadau o £"
                         + MonetaryConversions.penniesToPounds(installmentAmount).toPlainString().replace(
                         ".00", "")
