@@ -72,7 +72,7 @@ class CaseLegacyReferenceSearchServiceTest {
     }
 
     @Test
-    void shouldReturnCaseDetailsSuccessfully_getCivilOrOcmcCaseData_whenCaseExits() {
+    void shouldReturnCaseDetailsSuccessfully_getCivilOrOcmcCaseDataByCaseReference_whenCaseExits() {
         final Query EXPECTED_QUERY =
             new Query(boolQuery().must(
                 boolQuery()
@@ -83,19 +83,40 @@ class CaseLegacyReferenceSearchServiceTest {
         CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
         given(searchResult.getCases()).willReturn(Arrays.asList(caseDetails));
 
-        CaseDetails result = caseLegacyReferenceSearchService.getCivilOrOcmcCaseData(REFERENCE);
+        CaseDetails result = caseLegacyReferenceSearchService.getCivilOrOcmcCaseDataByCaseReference(REFERENCE);
 
         assertThat(result).isNotNull();
         verify(coreCaseDataService).searchCases(refEq(EXPECTED_QUERY));
     }
 
     @Test
-    void shouldThrowException_getCivilOrOcmcCaseData_whenCaseIsNotFound() {
+    void shouldReturnCaseDetailsSuccessfullyFromOCMC_getCivilOrOcmcCaseDataByCaseReference_whenCaseExits() {
+        given(coreCaseDataService.searchCases(any())).willReturn(null);
+        given(coreCaseDataService.searchCMCCases(any())).willReturn(searchResult);
+        final Query EXPECTED_QUERY =
+            new Query(boolQuery().must(
+                boolQuery()
+                    .should(matchQuery("data.legacyCaseReference", REFERENCE))
+                    .should(matchQuery("data.previousServiceCaseReference", REFERENCE))
+            ), List.of(), 0);
+
+        CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
+        given(searchResult.getCases()).willReturn(Arrays.asList(caseDetails));
+
+        CaseDetails result = caseLegacyReferenceSearchService.getCivilOrOcmcCaseDataByCaseReference(REFERENCE);
+
+        assertThat(result).isNotNull();
+        verify(coreCaseDataService).searchCases(refEq(EXPECTED_QUERY));
+        verify(coreCaseDataService).searchCMCCases(refEq(EXPECTED_QUERY));
+    }
+
+    @Test
+    void shouldThrowException_getCivilOrOcmcCaseDataByCaseReference_whenCaseIsNotFound() {
         given(searchResult.getCases()).willReturn(Collections.emptyList());
 
         assertThrows(
             SearchServiceCaseNotFoundException.class, () ->
-                caseLegacyReferenceSearchService.getCivilOrOcmcCaseData(REFERENCE));
+                caseLegacyReferenceSearchService.getCivilOrOcmcCaseDataByCaseReference(REFERENCE));
     }
 
 }
