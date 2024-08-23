@@ -26,7 +26,7 @@ public class SetAsideJudgmentOnlineMapper extends JudgmentOnlineMapper {
             .setAsideDate(getSetAsideDate(caseData))
             .lastUpdateTimeStamp(LocalDateTime.now())
             .cancelledTimeStamp(LocalDateTime.now())
-            .build();;
+            .build();
     }
 
     protected JudgmentState getJudgmentState(CaseData caseData) {
