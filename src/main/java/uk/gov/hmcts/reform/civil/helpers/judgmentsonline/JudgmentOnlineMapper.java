@@ -70,8 +70,8 @@ public abstract class JudgmentOnlineMapper {
         caseData.setJoTotalAmount(activeJudgment.getTotalAmount());
         caseData.setJoPaymentPlanSelected(activeJudgment.getPaymentPlan().getType());
 
-        if (null != activeJudgment.getPaymentPlan() &&
-            PaymentPlanSelection.PAY_IN_INSTALMENTS.equals(activeJudgment.getPaymentPlan().getType())) {
+        if (null != activeJudgment.getPaymentPlan()
+            && PaymentPlanSelection.PAY_IN_INSTALMENTS.equals(activeJudgment.getPaymentPlan().getType())) {
             caseData.setJoRepaymentAmount(activeJudgment.getInstalmentDetails().getAmount());
             caseData.setJoRepaymentStartDate(activeJudgment.getInstalmentDetails().getStartDate());
             caseData.setJoRepaymentFrequency(activeJudgment.getInstalmentDetails().getPaymentFrequency());

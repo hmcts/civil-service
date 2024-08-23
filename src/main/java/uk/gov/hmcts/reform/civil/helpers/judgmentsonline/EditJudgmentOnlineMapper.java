@@ -32,7 +32,6 @@ public class EditJudgmentOnlineMapper extends JudgmentOnlineMapper {
             super.updateJudgmentTabDataWithActiveJudgment(activeJudgment, caseData);
         }
 
-
         return activeJudgment;
     }
 
