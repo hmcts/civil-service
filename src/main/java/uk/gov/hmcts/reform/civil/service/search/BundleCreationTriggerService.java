@@ -32,7 +32,12 @@ public class BundleCreationTriggerService extends ElasticSearchService {
                 .should(boolQuery()
                             .must(rangeQuery("data.hearingDate").lte(LocalDate.now().plusWeeks(BUNDLE_CREATION_TIME_RANGE)))
                             .must(beState(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING))
-                ), List.of("reference"), startIndex
+                )
+                .mustNot(matchQuery("data.allocatedTrack", "MULTI_CLAIM"))
+                .mustNot(matchQuery("data.allocatedTrack", "INTERMEDIATE_CLAIM"))
+                .mustNot(matchQuery("data.responseClaimTrack", "MULTI_CLAIM"))
+                .mustNot(matchQuery("data.responseClaimTrack", "INTERMEDIATE_CLAIM")),
+            List.of("reference"), startIndex
         );
     }
 
