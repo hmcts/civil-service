@@ -23,10 +23,10 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
@@ -80,7 +80,7 @@ public class DefaultJudgmentOrderFormGeneratorTest {
     private DocumentHearingLocationHelper documentHearingLocationHelper;
 
     @MockBean
-    private IdamClient idamClient;
+    private UserService userService;
 
     @Autowired
     private DefaultJudgmentOrderFormGenerator generator;
@@ -91,7 +91,7 @@ public class DefaultJudgmentOrderFormGeneratorTest {
         fileNameTrial = LocalDate.now() + "_Judge Dredd" + ".pdf";
         FILE_NAME_DISPOSAL_HNL = LocalDate.now() + "_Judge Dredd" + ".pdf";
 
-        when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+        when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                     .forename("Judge")
                                                                     .surname("Dredd")
                                                                     .roles(Collections.emptyList()).build());

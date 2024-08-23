@@ -422,8 +422,8 @@ public class FlowPredicate {
     }
 
     private static boolean getCarmEnabledForDate(CaseData caseData) {
-        // Date of go live is 1st August, as we use "isAfter" we compare with 31st July
-        return caseData.getSubmittedDate().toLocalDate().isAfter(LocalDate.of(2024, 7, 31));
+        // Date of go live is  5th november , as we use "isAfter" we compare with 4th november
+        return caseData.getSubmittedDate().toLocalDate().isAfter(LocalDate.of(2024, 11, 4));
     }
 
     //TODO Remove after DTSCCI-244
@@ -1064,4 +1064,9 @@ public class FlowPredicate {
         caseData.getTakenOfflineByStaffDate() != null
         && (Objects.isNull(caseData.getMediation().getUnsuccessfulMediationReason())
             && Objects.isNull(caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect()));
+
+    public static final Predicate<CaseData> caseContainsLiP = caseData ->
+        caseData.isRespondent1LiP()
+            || caseData.isRespondent2LiP()
+            || caseData.isApplicantNotRepresented();
 }

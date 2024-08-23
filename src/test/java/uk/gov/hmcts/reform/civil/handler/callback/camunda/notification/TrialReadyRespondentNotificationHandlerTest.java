@@ -172,7 +172,7 @@ class TrialReadyRespondentNotificationHandlerTest extends BaseCallbackHandlerTes
         private Map<String, String> getNotificationDataMapLRvLiP(CaseData caseData) {
 
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 PARTY_NAME, caseData.getRespondent1().getPartyName(),
                 CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
             );

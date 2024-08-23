@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocuments;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -32,24 +32,27 @@ import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.D
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.ORDER_NOTICE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    UploadTranslatedDocumentDefaultStrategy.class,
-    JacksonAutoConfiguration.class,
-})
+@ExtendWith(MockitoExtension.class)
 class UploadTranslatedDocumentDefaultStrategyTest {
 
     private static final String FILE_NAME_1 = "Some file 1";
     private static final String FILE_NAME_2 = "Some file 2";
 
-    @Autowired
     private UploadTranslatedDocumentDefaultStrategy uploadTranslatedDocumentDefaultStrategy;
 
-    @MockBean
+    @Mock
     private SystemGeneratedDocumentService systemGeneratedDocumentService;
 
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
+
+    @BeforeEach
+    void setUp() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        uploadTranslatedDocumentDefaultStrategy = new UploadTranslatedDocumentDefaultStrategy(systemGeneratedDocumentService,
+                                                                                              objectMapper, featureToggleService);
+    }
 
     @Test
     void shouldReturnDocumentListWithTranslatedDocument() {
