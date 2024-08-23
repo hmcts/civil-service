@@ -2,14 +2,14 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA6.GeneralApplication.Created.Claimant', '{}', '{"Notice.AAA6.GeneralApplication.Fee.Required" : ["applicationFee"]}'),
-       ('Scenario.AAA6.GeneralApplication.Created.Defendant', '{}', '{}'),
+VALUES ('Scenario.AAA6.GeneralApplication.Complete.Claimant', '{"Notice.AAA6.GeneralApplication.Fee.Required"}', '{"Notice.AAA6.GeneralApplication.submitted"}'),
+       ('Scenario.AAA6.GeneralApplication.Complete.Defendant', '{}', '{}');
 
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
-VALUES ('Notice.AAA6.GeneralApplication.Fee.Required', 'You need to pay your Application fee', 'You need to pay your Application fee',
-        '<p class="govuk-body">Your Application has not yet been issued, in order to proceed you must pay the application fee of ${applicationFee}.</p>',
-        '<p class="govuk-body">Your Application has not yet been issued, in order to proceed you must pay the application fee of ${applicationFee}.</p>',
+VALUES ('Notice.AAA6.GeneralApplication.submitted', 'Your application has been submitted', 'Your application has been submitted',
+        '<p class="govuk-body">Your Application has been submitted.</p>',
+        '<p class="govuk-body">Your Application has been submitted.</p>',
         'CLAIMANT');
 
 /**
