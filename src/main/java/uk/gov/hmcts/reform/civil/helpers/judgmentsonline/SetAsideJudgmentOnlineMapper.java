@@ -21,12 +21,16 @@ public class SetAsideJudgmentOnlineMapper extends JudgmentOnlineMapper {
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
 
         JudgmentDetails activeJudgment = caseData.getActiveJudgment();
-        return activeJudgment.toBuilder()
+        JudgmentDetails activeJudgmentDetails = activeJudgment.toBuilder()
             .state(getJudgmentState(caseData))
             .setAsideDate(getSetAsideDate(caseData))
             .lastUpdateTimeStamp(LocalDateTime.now())
             .cancelledTimeStamp(LocalDateTime.now())
             .build();
+
+        super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, caseData);
+
+        return activeJudgmentDetails;
     }
 
     protected JudgmentState getJudgmentState(CaseData caseData) {

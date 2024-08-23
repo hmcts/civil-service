@@ -49,6 +49,7 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
             .orderedAmount(orderAmount.toString())
             .costs(costs.toString())
             .totalAmount(orderAmount.add(costs).toString())
+            .paymentSummary(caseData.getRepaymentSummaryObject()) // TODO: Update in other mappers if this field is set in casedata for other judgments
             .build();
     }
 

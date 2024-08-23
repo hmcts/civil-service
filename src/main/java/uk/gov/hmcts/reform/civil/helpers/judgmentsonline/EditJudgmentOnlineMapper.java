@@ -29,7 +29,10 @@ public class EditJudgmentOnlineMapper extends JudgmentOnlineMapper {
                 .costs(costs.toString())
                 .totalAmount(orderAmount.add(costs).toString())
                 .build();
+            super.updateJudgmentTabDataWithActiveJudgment(activeJudgment, caseData);
         }
+
+
         return activeJudgment;
     }
 

@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -61,6 +62,33 @@ public abstract class JudgmentOnlineMapper {
         return activeJudgment;
     }
 
+    public void updateJudgmentTabDataWithActiveJudgment(JudgmentDetails activeJudgment, CaseData caseData) {
+        caseData.setJoDefendantName1(activeJudgment.getDefendant1Name());
+        caseData.setJoDefendantName2(activeJudgment.getDefendant2Name());
+        caseData.setJoOrderedAmount(activeJudgment.getOrderedAmount());
+        caseData.setJoCosts(activeJudgment.getCosts());
+        caseData.setJoTotalAmount(activeJudgment.getTotalAmount());
+        caseData.setJoPaymentPlanSelected(activeJudgment.getPaymentPlan().getType());
+
+        if (null != activeJudgment.getPaymentPlan() &&
+            PaymentPlanSelection.PAY_IN_INSTALMENTS.equals(activeJudgment.getPaymentPlan().getType())) { // TODO:To check - && null != activeJudgment.getInstalmentDetails()
+            caseData.setJoRepaymentAmount(activeJudgment.getInstalmentDetails().getAmount());
+            caseData.setJoRepaymentStartDate(activeJudgment.getInstalmentDetails().getStartDate());
+            caseData.setJoRepaymentFrequency(activeJudgment.getInstalmentDetails().getPaymentFrequency());
+        } else {
+            caseData.setJoRepaymentAmount(null);
+            caseData.setJoRepaymentStartDate(null);
+            caseData.setJoRepaymentFrequency(null);
+        }
+
+        if (JudgmentState.CANCELLED.equals(activeJudgment.getState())
+            || JudgmentState.SATISFIED.equals(activeJudgment.getState())) {
+            caseData.setJoIssuedDate(activeJudgment.getIssueDate());
+            caseData.setJoState(activeJudgment.getState());
+            caseData.setJoFullyPaymentMadeDate(activeJudgment.getFullyPaymentMadeDate());
+        }
+    }
+
     protected abstract JudgmentState getJudgmentState(CaseData caseData);
 
     private Integer getNextJudgmentId(CaseData caseData) {
@@ -69,8 +97,7 @@ public abstract class JudgmentOnlineMapper {
     }
 
     private boolean isHistoricJudgment(JudgmentDetails activeJudgment) {
-        return JudgmentState.CANCELLED.equals(activeJudgment.getState())
-            || JudgmentState.SET_ASIDE_ERROR.equals(activeJudgment.getState())
+        return JudgmentState.SET_ASIDE_ERROR.equals(activeJudgment.getState())
             || JudgmentState.SET_ASIDE.equals(activeJudgment.getState());
     }
 }
