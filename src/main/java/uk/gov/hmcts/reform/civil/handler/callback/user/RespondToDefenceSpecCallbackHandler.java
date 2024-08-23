@@ -98,6 +98,7 @@ import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDeta
 import static uk.gov.hmcts.reform.civil.utils.CaseStateUtils.shouldMoveToInMediationState;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
+import static uk.gov.hmcts.reform.civil.utils.MediationUnavailableDatesUtils.checkUnavailable;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
 import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
 import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistPartyAddress;
@@ -131,12 +132,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
     private final FrcDocumentsUtils frcDocumentsUtils;
 
-    public static final String UNAVAILABLE_DATE_RANGE_MISSING = "Please provide at least one valid Date from if you cannot attend hearing within next 3 months.";
-    public static final String INVALID_UNAVAILABILITY_RANGE = "Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.";
-    public static final String INVALID_UNAVAILABLE_DATE_BEFORE_TODAY = "Unavailability Date must not be before today.";
-    public static final String INVALID_UNAVAILABLE_DATE_FROM_BEFORE_TODAY = "Unavailability Date From must not be before today.";
-    public static final String INVALID_UNAVAILABLE_DATE_TO_WHEN_MORE_THAN_YEAR = "Unavailability Date To must not be more than one year in the future.";
-    public static final String INVALID_UNAVAILABLE_DATE_WHEN_MORE_THAN_YEAR = "Unavailability Date must not be more than one year in the future.";
     @Value("${court-location.specified-claim.epimms-id}") String cnbcEpimsId;
 
     @Override
@@ -224,34 +219,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
-    }
-
-    private void checkUnavailable(List<String> errors,
-                                  List<Element<UnavailableDate>> datesUnavailableList) {
-        if (isEmpty(datesUnavailableList)) {
-            errors.add(UNAVAILABLE_DATE_RANGE_MISSING);
-        } else {
-            for (Element<UnavailableDate> dateRange : datesUnavailableList) {
-                var unavailableDateType = dateRange.getValue().getUnavailableDateType();
-                LocalDate dateFrom = dateRange.getValue().getFromDate();
-                LocalDate dateTo = dateRange.getValue().getToDate();
-                if (unavailableDateType.equals(UnavailableDateType.SINGLE_DATE)) {
-                    if (dateRange.getValue().getDate().isBefore(LocalDate.now())) {
-                        errors.add(INVALID_UNAVAILABLE_DATE_BEFORE_TODAY);
-                    } else if (dateRange.getValue().getDate().isAfter(LocalDate.now().plusYears(1))) {
-                        errors.add(INVALID_UNAVAILABLE_DATE_WHEN_MORE_THAN_YEAR);
-                    }
-                } else if (unavailableDateType.equals(UnavailableDateType.DATE_RANGE)) {
-                    if (dateTo != null && dateTo.isBefore(dateFrom)) {
-                        errors.add(INVALID_UNAVAILABILITY_RANGE);
-                    } else if (dateFrom != null && dateFrom.isBefore(LocalDate.now())) {
-                        errors.add(INVALID_UNAVAILABLE_DATE_FROM_BEFORE_TODAY);
-                    } else if (dateTo != null && dateTo.isAfter(LocalDate.now().plusYears(1))) {
-                        errors.add(INVALID_UNAVAILABLE_DATE_TO_WHEN_MORE_THAN_YEAR);
-                    }
-                }
-            }
-        }
     }
 
     private void setApplicantDefenceResponseDocFlag(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
