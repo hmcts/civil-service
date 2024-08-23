@@ -36,7 +36,7 @@ public class DefendantResponsePartFullAdmitInstallmentsOrgComClaimantScenarioTes
         BigDecimal installmentAmount = new BigDecimal("100");
         BigDecimal totalAmount = new BigDecimal("10000");
         BigDecimal partAdmittedAmount = new BigDecimal("9000");
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentRespondToClaimSpec(RespondentResponseTypeSpec.PART_ADMISSION).build()
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
