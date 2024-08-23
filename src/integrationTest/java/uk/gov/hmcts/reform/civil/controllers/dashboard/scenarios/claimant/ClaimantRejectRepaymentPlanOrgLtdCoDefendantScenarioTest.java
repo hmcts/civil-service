@@ -47,7 +47,6 @@ public class ClaimantRejectRepaymentPlanOrgLtdCoDefendantScenarioTest extends Da
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(1000))
             .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
-            .totalClaimAmount()
             .build();
 
         handler.handle(callbackParams(caseData));
