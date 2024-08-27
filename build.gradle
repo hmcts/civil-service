@@ -12,7 +12,7 @@ plugins {
   id 'au.com.dius.pact' version '4.2.14'
   id "io.freefair.lombok" version "8.10"
   id 'com.github.hmcts.rse-cft-lib' version '0.19.1335'
-  id "org.flywaydb.flyway" version "10.17.1"
+  id "org.flywaydb.flyway" version "10.17.2"
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -47,7 +47,7 @@ allprojects {
 
   checkstyle {
     maxWarnings = 0
-    toolVersion = '10.17.0'
+    toolVersion = '10.18.0'
     getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
   }
 
@@ -356,7 +356,7 @@ dependencies {
 
 
   implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.8.0'
-  implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.3'
+  implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.4'
   implementation group: 'javax.persistence', name: 'javax.persistence-api'
 
   implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.45.4'
@@ -431,7 +431,7 @@ dependencies {
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
   implementation group: 'com.azure', name: 'azure-core', version: '1.51.0'
-  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.2'
+  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.3'
   implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
 
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
