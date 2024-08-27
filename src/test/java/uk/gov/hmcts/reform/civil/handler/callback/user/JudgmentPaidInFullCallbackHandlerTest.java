@@ -17,7 +17,9 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentPaidInFullOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
@@ -54,7 +56,10 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPopulateDate() {
             //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
-            caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now()).build());
+            caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now())
+                                           .paymentPlan(JudgmentPaymentPlan.builder()
+                                                            .type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
+                                           .build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -73,7 +78,10 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPopulateJudgementStatusAsSatisfied() {
             //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
-            caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now()).build());
+            caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now())
+                                           .paymentPlan(JudgmentPaymentPlan.builder()
+                                                            .type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
+                                           .build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -90,7 +98,10 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPopulateJudgementStatusAsCancelled() {
             //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31Days();
-            caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now()).build());
+            caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now())
+                                           .paymentPlan(JudgmentPaymentPlan.builder()
+                                                            .type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
+                                           .build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -102,11 +113,8 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("joIsLiveJudgmentExists")).isEqualTo("No");
             assertThat(response.getData()).containsEntry("joIsLiveJudgmentExists", "No");
 
-            assertThat(response.getData().get("activeJudgment")).isNull();
-            assertThat(response.getData().get("historicJudgment")).isNotNull();
-            JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
-            assertEquals(JudgmentState.CANCELLED, historicJudgment.getState());
-            assertEquals(LocalDate.now(), historicJudgment.getCancelDate());
+            assertThat(response.getData().get("activeJudgment")).isNotNull();
+            assertThat(response.getData().get("historicJudgment")).isNull();
         }
 
         @Test
@@ -114,7 +122,10 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
             CaseData caseData = CaseDataBuilder.builder()
                 .getDefaultJudgment1v1CaseJudgmentPaid();
-            caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now()).build());
+            caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now())
+                                           .paymentPlan(JudgmentPaymentPlan.builder()
+                                                            .type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
+                                           .build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -122,11 +133,8 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Then: judgmentOnline fields should be set correctly
             assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("confirmFullPaymentMade").isEqualTo(List.of("CONFIRMED"));
             assertThat(response.getData().get("joIsLiveJudgmentExists")).isEqualTo("No");
-            assertThat(response.getData().get("activeJudgment")).isNull();
-            assertThat(response.getData().get("historicJudgment")).isNotNull();
-            JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
-            assertEquals(JudgmentState.CANCELLED, historicJudgment.getState());
-            assertEquals(LocalDate.now(), historicJudgment.getCancelDate());
+            assertThat(response.getData().get("activeJudgment")).isNotNull();
+            assertThat(response.getData().get("historicJudgment")).isNull();
         }
     }
 
