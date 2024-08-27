@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
@@ -46,6 +47,7 @@ public class JudgmentByDeterminationDocGenerator {
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
     private final OrganisationService organisationService;
+    private final AssignCategoryId assignCategoryId;
 
     public List<CaseDocument> generateDocs(CaseData caseData, String authorisation, String event) {
         List<JudgmentByDeterminationDocForm> judgmentByDeterminationDocFormList = new ArrayList<>();
@@ -71,14 +73,16 @@ public class JudgmentByDeterminationDocGenerator {
                 judgmentByDeterminationDocFormList.get(i),
                 docmosisTemplate
             );
-            caseDocuments.add(documentManagementService.uploadDocument(
+            CaseDocument uploadedDocument = documentManagementService.uploadDocument(
                 authorisation,
                 new PDF(
                     getFileName(caseData, docmosisTemplate),
                     docmosisDocument.getBytes(),
                     documentType
                 )
-            ));
+            );
+            assignCategoryId.assignCategoryIdToCaseDocument(uploadedDocument, "judgments");
+            caseDocuments.add(uploadedDocument);
         }
         return caseDocuments;
     }
