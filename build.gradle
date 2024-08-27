@@ -47,7 +47,7 @@ allprojects {
 
   checkstyle {
     maxWarnings = 0
-    toolVersion = '10.17.0'
+    toolVersion = '10.18.0'
     getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
   }
 
