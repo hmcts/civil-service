@@ -21,7 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
-class ReportJudgmentsServiceTest {
+class CjesServiceTest {
 
     @Mock
     private CjesApiClient cjesApiClient;
@@ -33,7 +33,7 @@ class ReportJudgmentsServiceTest {
     private FeatureToggleService featureToggleService;
 
     @InjectMocks
-    private ReportJudgmentsService reportJudgmentsService;
+    private CjesService cjesService;
 
     @BeforeEach
     void setUp() {
@@ -41,7 +41,7 @@ class ReportJudgmentsServiceTest {
         cjesMapper = mock(CjesMapper.class);
         featureToggleService = mock(FeatureToggleService.class);
 
-        reportJudgmentsService = new ReportJudgmentsService(cjesApiClient, cjesMapper, featureToggleService);
+        cjesService = new CjesService(cjesApiClient, cjesMapper, featureToggleService);
     }
 
     @Test
@@ -77,7 +77,7 @@ class ReportJudgmentsServiceTest {
             .activeJudgment(activeJudgment)
             .build();
 
-        reportJudgmentsService.sendJudgment(caseData, true);
+        cjesService.sendJudgment(caseData, true);
 
         verify(cjesMapper, times(1)).toJudgmentDetailsCJES(caseData, true);
     }
@@ -92,7 +92,7 @@ class ReportJudgmentsServiceTest {
             .thenReturn(judgmentDetailsCJES);
         when(featureToggleService.isCjesServiceAvailable()).thenReturn(false);
 
-        reportJudgmentsService.sendJudgment(caseData, true);
+        cjesService.sendJudgment(caseData, true);
 
         verify(cjesApiClient, times(1)).sendJudgmentDetailsCJES(any(JudgmentDetailsCJES.class));
         verify(featureToggleService).isCjesServiceAvailable();
@@ -102,10 +102,10 @@ class ReportJudgmentsServiceTest {
     void testSendJudgment_ExceptionHandling() {
         CaseData caseData = mock(CaseData.class);
 
-        when(cjesMapper.toJudgmentDetailsCJES(caseData, any(Boolean.class))).thenThrow(new RuntimeException());
+        when(cjesMapper.toJudgmentDetailsCJES(caseData, true)).thenThrow(new RuntimeException());
 
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-                                   () -> reportJudgmentsService.sendJudgment(caseData, true));
+                                   () -> cjesService.sendJudgment(caseData, true));
 
         assertEquals(
             "Failed to send judgment to RTL",

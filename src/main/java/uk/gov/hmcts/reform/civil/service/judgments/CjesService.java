@@ -11,7 +11,8 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ReportJudgmentsService {
+
+public class CjesService {
 
     private final CjesApiClient cjesApiClient;
     private final CjesMapper cjesMapper;
@@ -21,8 +22,10 @@ public class ReportJudgmentsService {
         try {
             JudgmentDetailsCJES requestBody = cjesMapper.toJudgmentDetailsCJES(caseData, isActiveJudgement);
 
-            if (!featureToggleService.isCjesServiceAvailable()) {
-                log.info("Sending judgement details");
+            log.info("Sending judgement details...");
+
+            if (featureToggleService.isCjesServiceAvailable()) {
+                // Feign client is not ready yet. Will be added later on in JO feature.
                 cjesApiClient.sendJudgmentDetailsCJES(requestBody);
             }
         } catch (Exception e) {
