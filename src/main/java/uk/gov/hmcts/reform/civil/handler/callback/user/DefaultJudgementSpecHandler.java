@@ -55,10 +55,8 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.utils.DefaultJudgmentUtils.calculateFixedCosts;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
-import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class DefaultJudgementSpecHandler extends CallbackHandler {
 
@@ -82,8 +80,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private final FeesService feesService;
     private final FeatureToggleService toggleService;
     private final DefaultJudgmentOnlineMapper djOnlineMapper;
-    private final CaseDetailsConverter caseDetailsConverter;
-
     BigDecimal theOverallTotal;
     private final Time time;
     private final FeatureToggleService featureToggleService;
@@ -443,16 +439,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             caseDataBuilder.activeJudgment(djOnlineMapper.addUpdateActiveJudgment(caseData));
             caseDataBuilder.joIsLiveJudgmentExists(YesOrNo.YES);
         }
-
-        log.info("Current Respondent1 Flag {} for caseId {}",
-                 caseData.getRespondent1().getFlags(), caseData.getCcdCaseReference());
-
-        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
-        log.info("oldCaseData Respondent1 Flag {} for caseId {}", oldCaseData.getRespondent1().getFlags(), oldCaseData.getCcdCaseReference());
-
-        // persist party flags (ccd issue)
-        persistFlagsForParties(oldCaseData, caseData, caseDataBuilder);
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(nextState)
