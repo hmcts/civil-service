@@ -6,9 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.client.CjesApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.cjes.JudgmentDetailsCJES;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 @Slf4j
 @Service
@@ -20,17 +18,15 @@ public class ReportJudgmentsService {
     private final FeatureToggleService featureToggleService;
 
     public void sendJudgment(CaseData caseData, Boolean isActiveJudgement) {
-        JudgmentDetails judgmentDetails = caseData.getActiveJudgment();
+        try {
+            JudgmentDetailsCJES requestBody = cjesMapper.toJudgmentDetailsCJES(caseData, isActiveJudgement);
 
-        if (!isActiveJudgement && !caseData.getHistoricJudgment().isEmpty()) {
-            judgmentDetails = unwrapElements(caseData.getHistoricJudgment()).get(0);
-        }
-
-        JudgmentDetailsCJES requestBody = cjesMapper.toJudgmentDetailsCJES(judgmentDetails, caseData);
-
-        if (!featureToggleService.isCjesServiceAvailable()) {
-            log.info("Sending judgement details");
-            cjesApiClient.sendJudgmentDetailsCJES(requestBody);
+            if (!featureToggleService.isCjesServiceAvailable()) {
+                log.info("Sending judgement details");
+                cjesApiClient.sendJudgmentDetailsCJES(requestBody);
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Failed to send judgment to RTL");
         }
     }
 }

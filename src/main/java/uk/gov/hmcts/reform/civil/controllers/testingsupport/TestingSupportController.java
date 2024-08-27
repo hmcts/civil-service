@@ -150,9 +150,8 @@ public class TestingSupportController {
         value = "/testing-support/rtlActiveJudgment",
         produces = "application/json")
     public String getRTLJudgment(
-        @RequestBody CaseData caseData) throws JsonProcessingException {
-        JudgmentDetails judgmentDetails = caseData.getActiveJudgment();
-        return cjesMapper.toJudgmentDetailsCJES(judgmentDetails, caseData).toString();
+        @RequestBody CaseData caseData) {
+        return cjesMapper.toJudgmentDetailsCJES(caseData, true).toString();
     }
 
     @GetMapping("/testing-support/trigger-case-dismissal-scheduler")

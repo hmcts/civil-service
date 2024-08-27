@@ -12,13 +12,14 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 class ReportJudgmentsServiceTest {
 
@@ -64,7 +65,7 @@ class ReportJudgmentsServiceTest {
             .serviceId("123")
             .build();
 
-        when(cjesMapper.toJudgmentDetailsCJES(any(JudgmentDetails.class), any(CaseData.class)))
+        when(cjesMapper.toJudgmentDetailsCJES(any(CaseData.class), true))
             .thenReturn(judgmentDetailsCJES);
         when(featureToggleService.isCjesServiceAvailable()).thenReturn(false);
         when(cjesApiClient.sendJudgmentDetailsCJES(any(JudgmentDetailsCJES.class))).thenReturn(null);
@@ -78,21 +79,7 @@ class ReportJudgmentsServiceTest {
 
         reportJudgmentsService.sendJudgment(caseData, true);
 
-        verify(cjesMapper, times(1)).toJudgmentDetailsCJES(activeJudgment, caseData);
-    }
-
-    @Test
-    void sendJudgment_shouldUseHistoricJudgment_whenIsActiveJudgementIsFalse() {
-        CaseData caseData = mock(CaseData.class);
-        JudgmentDetails historicJudgment = mock(JudgmentDetails.class);
-        when(caseData.getHistoricJudgment()).thenReturn(wrapElements(historicJudgment));
-        when(cjesMapper.toJudgmentDetailsCJES(any(JudgmentDetails.class), any(CaseData.class)))
-            .thenReturn(mock(JudgmentDetailsCJES.class));
-
-        reportJudgmentsService.sendJudgment(caseData, false);
-
-        verify(caseData, times(2)).getHistoricJudgment();
-        verify(cjesMapper, times(1)).toJudgmentDetailsCJES(historicJudgment, caseData);
+        verify(cjesMapper, times(1)).toJudgmentDetailsCJES(caseData, true);
     }
 
     @Test
@@ -101,7 +88,7 @@ class ReportJudgmentsServiceTest {
         JudgmentDetails judgmentDetails = mock(JudgmentDetails.class);
         when(caseData.getActiveJudgment()).thenReturn(judgmentDetails);
         JudgmentDetailsCJES judgmentDetailsCJES = mock(JudgmentDetailsCJES.class);
-        when(cjesMapper.toJudgmentDetailsCJES(any(JudgmentDetails.class), any(CaseData.class))).thenReturn(
+        when(cjesMapper.toJudgmentDetailsCJES(any(CaseData.class), true)).thenReturn(
             judgmentDetailsCJES);
         when(featureToggleService.isCjesServiceAvailable()).thenReturn(false);
 
@@ -109,5 +96,20 @@ class ReportJudgmentsServiceTest {
 
         verify(cjesApiClient, times(1)).sendJudgmentDetailsCJES(any(JudgmentDetailsCJES.class));
         verify(featureToggleService).isCjesServiceAvailable();
+    }
+
+    @Test
+    void testSendJudgment_ExceptionHandling() {
+        CaseData caseData = mock(CaseData.class);
+
+        when(cjesMapper.toJudgmentDetailsCJES(caseData, true)).thenThrow(new RuntimeException());
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                                   () -> reportJudgmentsService.sendJudgment(caseData, true));
+
+        assertEquals(
+            "Failed to send judgment to RTL",
+            e.getMessage()
+        );
     }
 }
