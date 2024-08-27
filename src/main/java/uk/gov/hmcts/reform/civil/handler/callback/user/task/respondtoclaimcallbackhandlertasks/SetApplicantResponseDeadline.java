@@ -119,7 +119,7 @@ public class SetApplicantResponseDeadline implements CaseTask {
         // 1v2 same legal rep - will respond for both and set applicant 1 response deadline
         if (respondent2HasSameLegalRep(caseData)) {
             // if responses are marked as same, copy respondent 1 values into respondent 2
-            handleBothRespodentsSameLegalRepResponse(
+            handleBothRespondentsSameLegalRepResponse(
                 callbackParams,
                 caseData,
                 updatedData,
@@ -205,15 +205,15 @@ public class SetApplicantResponseDeadline implements CaseTask {
         setApplicantDeadLineIfRespondent1DateExist(caseData, updatedData, applicant1Deadline);
     }
 
-    private void handleBothRespodentsSameLegalRepResponse(CallbackParams callbackParams,
+    private void handleBothRespondentsSameLegalRepResponse(CallbackParams callbackParams,
                                                           CaseData caseData,
                                                           CaseData.CaseDataBuilder<?, ?> updatedData,
                                                           LocalDateTime responseDate,
                                                           LocalDateTime applicant1Deadline) {
         if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == YES) {
-            responseIsSameUpdateValues(callbackParams, updatedData, caseData, responseDate, applicant1Deadline);
+            responseHasSameUpdateValues(callbackParams, updatedData, caseData, responseDate, applicant1Deadline);
         } else if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
-            responseIsNotSameUpdateValues(callbackParams, updatedData, responseDate, applicant1Deadline, caseData);
+            responseDoesNotHaveSameUpdateValues(callbackParams, updatedData, responseDate, applicant1Deadline, caseData);
         }
     }
 
@@ -336,7 +336,7 @@ public class SetApplicantResponseDeadline implements CaseTask {
         updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
     }
 
-    private void responseIsNotSameUpdateValues(CallbackParams callbackParams,
+    private void responseDoesNotHaveSameUpdateValues(CallbackParams callbackParams,
                                                CaseData.CaseDataBuilder<?, ?> updatedData,
                                                LocalDateTime responseDate,
                                                LocalDateTime applicant1Deadline,
@@ -376,7 +376,7 @@ public class SetApplicantResponseDeadline implements CaseTask {
         updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
     }
 
-    private void responseIsSameUpdateValues(CallbackParams callbackParams,
+    private void responseHasSameUpdateValues(CallbackParams callbackParams,
                                             CaseData.CaseDataBuilder<?, ?> updatedData,
                                             CaseData caseData,
                                             LocalDateTime responseDate,
@@ -403,7 +403,7 @@ public class SetApplicantResponseDeadline implements CaseTask {
         // 1v2 same Solicitor responding to respondents individually
     }
 
-    private static CaseData.CaseDataBuilder<?, ?> updateRespondentAddresses(CaseData caseData) {
+    private  CaseData.CaseDataBuilder<?, ?> updateRespondentAddresses(CaseData caseData) {
         if (ofNullable(caseData.getRespondent1Copy()).isPresent()
             && (caseData.getRespondent1Copy().getPrimaryAddress() == null)) {
             throw new IllegalArgumentException("Primary Address cannot be empty");
