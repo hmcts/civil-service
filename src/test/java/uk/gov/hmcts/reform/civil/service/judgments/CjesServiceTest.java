@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -67,7 +68,7 @@ class CjesServiceTest {
 
         when(cjesMapper.toJudgmentDetailsCJES(any(CaseData.class), any(Boolean.class)))
             .thenReturn(judgmentDetailsCJES);
-        when(featureToggleService.isCjesServiceAvailable()).thenReturn(false);
+        when(featureToggleService.isCjesServiceAvailable()).thenReturn(true);
         when(cjesApiClient.sendJudgmentDetailsCJES(any(JudgmentDetailsCJES.class))).thenReturn(null);
 
         CaseData caseData = CaseData.builder()
@@ -80,6 +81,7 @@ class CjesServiceTest {
         cjesService.sendJudgment(caseData, true);
 
         verify(cjesMapper, times(1)).toJudgmentDetailsCJES(caseData, true);
+        verify(cjesApiClient, times(1)).sendJudgmentDetailsCJES(any());
     }
 
     @Test
@@ -94,8 +96,7 @@ class CjesServiceTest {
 
         cjesService.sendJudgment(caseData, true);
 
-        verify(cjesApiClient, times(1)).sendJudgmentDetailsCJES(any(JudgmentDetailsCJES.class));
-        verify(featureToggleService).isCjesServiceAvailable();
+        verify(cjesApiClient, never()).sendJudgmentDetailsCJES(any());
     }
 
     @Test
