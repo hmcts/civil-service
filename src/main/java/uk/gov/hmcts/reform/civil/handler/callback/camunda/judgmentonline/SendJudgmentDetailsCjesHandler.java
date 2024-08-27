@@ -19,6 +19,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_JUDGMENT_DETAILS
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_JUDGMENT_DETAILS_CJES_SA;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
+
 @Service
 @RequiredArgsConstructor
 public class SendJudgmentDetailsCjesHandler extends CallbackHandler {
