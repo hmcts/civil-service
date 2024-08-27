@@ -23,6 +23,9 @@ import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.PopulateRespondentCopyObjects;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.SetApplicantResponseDeadline;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.ValidateRespondentExperts;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.ValidateRespondentWitnesses;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.ValidateUnavailableDates;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
@@ -106,6 +109,9 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     RespondToClaimCallbackHandler.class,
     PopulateRespondentCopyObjects.class,
     SetApplicantResponseDeadline.class,
+    ValidateRespondentWitnesses.class,
+    ValidateRespondentExperts.class,
+    ValidateUnavailableDates.class,
     ExitSurveyConfiguration.class,
     ExitSurveyContentService.class,
     JacksonAutoConfiguration.class,
