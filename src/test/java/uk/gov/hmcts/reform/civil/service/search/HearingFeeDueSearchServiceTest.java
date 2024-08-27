@@ -2,7 +2,9 @@ package uk.gov.hmcts.reform.civil.service.search;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.Mock;
 import uk.gov.hmcts.reform.civil.model.search.Query;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -14,9 +16,12 @@ import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
 class HearingFeeDueSearchServiceTest extends ElasticSearchServiceTest {
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     @BeforeEach
     void setup() {
-        searchService = new HearingFeeDueSearchService(coreCaseDataService);
+        searchService = new HearingFeeDueSearchService(coreCaseDataService, featureToggleService);
     }
 
     @Override

@@ -3,8 +3,10 @@ package uk.gov.hmcts.reform.civil.service.search;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -18,22 +20,37 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 @Service
 public class HearingFeeDueSearchService extends ElasticSearchService {
 
-    public HearingFeeDueSearchService(CoreCaseDataService coreCaseDataService) {
+
+    private final FeatureToggleService featureToggleService;
+
+    public HearingFeeDueSearchService(CoreCaseDataService coreCaseDataService, FeatureToggleService featureToggleService ) {
         super(coreCaseDataService);
+        this.featureToggleService = featureToggleService;
     }
 
     public Query query(int startIndex) {
-        return new Query(
-            boolQuery()
-                .minimumShouldMatch(1)
-                .should(boolQuery()
-                            .must(rangeQuery("data.hearingDueDate").lt(LocalDate.now()
-                                                                                    .atTime(LocalTime.MIN)
-                                                                                    .toString()))
-                            .must(beState(HEARING_READINESS))),
-            List.of("reference"),
-            startIndex
-        );
+        if( featureToggleService.isMintiEnabled()) {
+            return new Query(
+                boolQuery()
+                    .minimumShouldMatch(1)
+                    .should(boolQuery()
+                                .must(beState(HEARING_READINESS))),
+                List.of("reference"),
+                startIndex
+            );
+        } else {
+            return new Query(
+                boolQuery()
+                    .minimumShouldMatch(1)
+                    .should(boolQuery()
+                                .must(rangeQuery("data.hearingDueDate").lt(LocalDate.now()
+                                                                               .atTime(LocalTime.MIN)
+                                                                               .toString()))
+                                .must(beState(HEARING_READINESS))),
+                List.of("reference"),
+                startIndex
+            );
+        }
     }
 
     @Override
