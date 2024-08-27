@@ -26,7 +26,6 @@ import uk.gov.hmcts.reform.civil.handler.tasks.ClaimDismissedHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -150,9 +149,8 @@ public class TestingSupportController {
         value = "/testing-support/rtlActiveJudgment",
         produces = "application/json")
     public String getRTLJudgment(
-        @RequestBody CaseData caseData) throws JsonProcessingException {
-        JudgmentDetails judgmentDetails = caseData.getActiveJudgment();
-        return cjesMapper.toJudgmentDetailsCJES(judgmentDetails, caseData).toString();
+        @RequestBody CaseData caseData) {
+        return cjesMapper.toJudgmentDetailsCJES(caseData, true).toString();
     }
 
     @GetMapping("/testing-support/trigger-case-dismissal-scheduler")

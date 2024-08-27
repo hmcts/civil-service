@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.cjes.JudgmentDetailsCJES;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.cjes.RegistrationType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 @Component
 @AllArgsConstructor
@@ -18,8 +19,9 @@ public class CjesMapper {
     private static final String SPEC_SERVICE_ID = "AAA6";
     private static final String UNSPEC_SERVICE_ID = "AAA7";
 
-    public JudgmentDetailsCJES toJudgmentDetailsCJES(JudgmentDetails judgmentDetails, CaseData caseData) {
+    public JudgmentDetailsCJES toJudgmentDetailsCJES(CaseData caseData, Boolean isActiveJudgment) {
         JudgmentDetailsCJES.JudgmentDetailsCJESBuilder requestBody = JudgmentDetailsCJES.builder();
+        JudgmentDetails judgmentDetails = getJudgment(caseData, isActiveJudgment);
 
         if (judgmentDetails != null) {
             requestBody
@@ -49,7 +51,16 @@ public class CjesMapper {
 
             return requestBody.build();
         }
-        return null;
+        throw new IllegalArgumentException("Judgment details cannot be null");
+    }
+
+    private JudgmentDetails getJudgment(CaseData caseData, Boolean isActiveJudgment) {
+        JudgmentDetails judgmentDetails = caseData.getActiveJudgment();
+
+        if (!isActiveJudgment && !caseData.getHistoricJudgment().isEmpty()) {
+            judgmentDetails = unwrapElements(caseData.getHistoricJudgment()).get(0);
+        }
+        return judgmentDetails;
     }
 
     private JudgementAddress judgementAddressMapper(Address address) {
