@@ -88,8 +88,8 @@ class ReportJudgmentsServiceTest {
         JudgmentDetails judgmentDetails = mock(JudgmentDetails.class);
         when(caseData.getActiveJudgment()).thenReturn(judgmentDetails);
         JudgmentDetailsCJES judgmentDetailsCJES = mock(JudgmentDetailsCJES.class);
-        when(cjesMapper.toJudgmentDetailsCJES(any(CaseData.class), true)).thenReturn(
-            judgmentDetailsCJES);
+        when(cjesMapper.toJudgmentDetailsCJES(any(CaseData.class), any(Boolean.class)))
+            .thenReturn(judgmentDetailsCJES);
         when(featureToggleService.isCjesServiceAvailable()).thenReturn(false);
 
         reportJudgmentsService.sendJudgment(caseData, true);
@@ -102,7 +102,7 @@ class ReportJudgmentsServiceTest {
     void testSendJudgment_ExceptionHandling() {
         CaseData caseData = mock(CaseData.class);
 
-        when(cjesMapper.toJudgmentDetailsCJES(caseData, true)).thenThrow(new RuntimeException());
+        when(cjesMapper.toJudgmentDetailsCJES(caseData, any(Boolean.class))).thenThrow(new RuntimeException());
 
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
                                    () -> reportJudgmentsService.sendJudgment(caseData, true));
