@@ -26,7 +26,7 @@ public class EditJudgmentOnlineMapper extends JudgmentOnlineMapper {
                 .instalmentDetails(caseData.getJoInstalmentDetails())
                 .paymentPlan(caseData.getJoPaymentPlan())
                 .isRegisterWithRTL(caseData.getJoIsRegisteredWithRTL())
-                .rtlState(getRtlState(activeJudgment.getIsRegisterWithRTL(), activeJudgment.getRtlState()))
+                .rtlState(getRtlState(caseData.getJoIsRegisteredWithRTL(), activeJudgment.getRtlState()))
                 .issueDate(caseData.getJoOrderMadeDate())
                 .orderedAmount(orderAmount.toString())
                 .costs(costs.toString())
