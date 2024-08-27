@@ -63,11 +63,9 @@ public abstract class JudgmentOnlineMapper {
     }
 
     public void updateJudgmentTabDataWithActiveJudgment(JudgmentDetails activeJudgment, CaseData caseData) {
+        caseData.setJoIsDisplayInJudgmentTab(YesOrNo.YES);
         caseData.setJoDefendantName1(activeJudgment.getDefendant1Name());
         caseData.setJoDefendantName2(activeJudgment.getDefendant2Name());
-        caseData.setJoOrderedAmount(activeJudgment.getOrderedAmount());
-        caseData.setJoCosts(activeJudgment.getCosts());
-        caseData.setJoTotalAmount(activeJudgment.getTotalAmount());
         caseData.setJoPaymentPlanSelected(activeJudgment.getPaymentPlan().getType());
 
         if (null != activeJudgment.getPaymentPlan()

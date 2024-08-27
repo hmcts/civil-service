@@ -667,6 +667,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private String joOrderedAmount;
     private String joCosts;
     private String joTotalAmount;
+    private YesOrNo joIsDisplayInJudgmentTab;
 
     private final TransferCaseDetails transferCaseDetails;
 
