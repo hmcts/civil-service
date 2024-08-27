@@ -46,7 +46,7 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
                                    ? getInstalmentDetails(caseData) : null)
             .paymentPlan(getPaymentPlan(caseData))
             .isRegisterWithRTL(isNonDivergent ? YesOrNo.YES : YesOrNo.NO)
-            .rtlState(isNonDivergent ? JudgmentRTLStatus.ISSUED.getRtlState(): null)
+            .rtlState(isNonDivergent ? JudgmentRTLStatus.ISSUED.getRtlState() : null)
             .issueDate(LocalDate.now())
             .orderedAmount(orderAmount.toString())
             .costs(costs.toString())
