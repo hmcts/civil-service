@@ -14,22 +14,21 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.SetApplicantResponseDeadline;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.PopulateRespondentCopyObjects;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.SetApplicantResponseDeadline;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.ValidateRespondentExperts;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.ValidateRespondentWitnesses;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.ValidateUnavailableDates;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
-import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -48,9 +47,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
-import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -70,14 +67,15 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private final ExitSurveyContentService exitSurveyContentService;
     private final DateOfBirthValidator dateOfBirthValidator;
-    private final UnavailableDateValidator unavailableDateValidator;
     private final ObjectMapper objectMapper;
     private final IStateFlowEngine stateFlowEngine;
     private final CoreCaseUserService coreCaseUserService;
     private final UserService userService;
-    private final LocationReferenceDataService locationRefDataService;
     private final PopulateRespondentCopyObjects populateRespondentCopyObjects;
     private final SetApplicantResponseDeadline setApplicantResponseDeadline;
+    private final ValidateRespondentWitnesses validateRespondentWitnesses;
+    private final ValidateRespondentExperts validateRespondentExperts;
+    private final ValidateUnavailableDates validateUnavailableDates;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -116,58 +114,17 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     }
 
     private CallbackResponse validateRespondentWitnesses(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        if (!ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
-            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
-                return validateWitnesses(callbackParams.getCaseData().getRespondent1DQ());
-            } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
-                return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
-            } else if (respondent2HasSameLegalRep(caseData)
-                && (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO)
-                && (caseData.getRespondent2DQ() != null
-                && caseData.getRespondent2DQ().getRespondent2DQWitnesses() != null)) {
-                return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
-            }
-        }
-        return validateWitnesses(callbackParams.getCaseData().getRespondent1DQ());
+        return validateRespondentWitnesses.execute(callbackParams);
     }
 
     private CallbackResponse validateRespondentExperts(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        if (!ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
-            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
-                return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
-            } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
-                return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
-            } else if (respondent2HasSameLegalRep(caseData)
-                && (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO)
-                && (caseData.getRespondent2DQ() != null
-                && caseData.getRespondent2DQ().getRespondent2DQExperts() != null)) {
-                return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
-            }
-        }
-        return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
+        return validateRespondentExperts.execute(callbackParams);
+
     }
 
     private CallbackResponse validateUnavailableDates(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        Hearing hearing = caseData.getRespondent1DQ().getHearing();
+        return validateUnavailableDates.execute(callbackParams);
 
-        if (!ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
-            && (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
-            || (respondent2HasSameLegalRep(caseData)
-            && caseData.getRespondentResponseIsSame() != null
-            && caseData.getRespondentResponseIsSame() == NO
-            && caseData.getRespondent2DQ() != null
-            && caseData.getRespondent2DQ().getHearing() != null))) {
-            hearing = caseData.getRespondent2DQ().getHearing();
-        }
-
-        List<String> errors = unavailableDateValidator.validate(hearing);
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
     }
 
     private CallbackResponse validateDateOfBirth(CallbackParams callbackParams) {
