@@ -67,13 +67,6 @@ class DefaultJudgmentsOnlineMapperTest {
         assertEquals("Mr. Sole Trader", activeJudgment.getDefendant1Name());
         assertNotNull(activeJudgment.getDefendant1Address());
         assertNotNull(activeJudgment.getDefendant1Dob());
-
-        assertEquals("Mr. Sole Trader", caseData.getJoDefendantName1());
-        assertEquals("100990", caseData.getJoOrderedAmount());
-        assertEquals("0", caseData.getJoCosts());
-        assertEquals("100990", caseData.getJoTotalAmount());
-        assertEquals(PaymentPlanSelection.PAY_IMMEDIATELY, caseData.getJoPaymentPlanSelected());
-
     }
 
     @Test
@@ -143,15 +136,6 @@ class DefaultJudgmentsOnlineMapperTest {
         assertNotNull(activeJudgment.getDefendant1Address());
         assertNotNull(activeJudgment.getDefendant1Dob());
 
-        assertEquals("Mr. Sole Trader", caseData.getJoDefendantName1());
-        assertEquals("100990", caseData.getJoOrderedAmount());
-        assertEquals("0", caseData.getJoCosts());
-        assertEquals("100990", caseData.getJoTotalAmount());
-        assertEquals(PaymentPlanSelection.PAY_IN_INSTALMENTS, caseData.getJoPaymentPlanSelected());
-        assertEquals("100", caseData.getJoRepaymentAmount());
-        assertNotNull(caseData.getJoRepaymentStartDate());
-        assertEquals(PaymentFrequency.WEEKLY, caseData.getJoRepaymentFrequency());
-
     }
 
     @Test
@@ -192,10 +176,5 @@ class DefaultJudgmentsOnlineMapperTest {
         assertNotNull(activeJudgment.getDefendant1Address());
         assertNotNull(activeJudgment.getDefendant1Dob());
 
-        assertEquals("Mr. Sole Trader", caseData.getJoDefendantName1());
-        assertEquals("100990", caseData.getJoOrderedAmount());
-        assertEquals("0", caseData.getJoCosts());
-        assertEquals("100990", caseData.getJoTotalAmount());
-        assertEquals(PaymentPlanSelection.PAY_BY_DATE, caseData.getJoPaymentPlanSelected());
     }
 }

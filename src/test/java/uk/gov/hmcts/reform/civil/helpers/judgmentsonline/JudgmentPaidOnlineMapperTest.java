@@ -9,6 +9,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -55,6 +57,15 @@ public class JudgmentPaidOnlineMapperTest {
         assertEquals(LocalDate.of(2023, 1, 15), caseData.getActiveJudgment().getFullyPaymentMadeDate());
         assertNull(caseData.getActiveJudgment().getCancelDate());
         assertNull(caseData.getActiveJudgment().getCancelledTimeStamp());
+
+        assertEquals("Mr. John Rambo", caseData.getJoDefendantName1());
+        assertEquals("1200", caseData.getJoOrderedAmount());
+        assertEquals("1100", caseData.getJoCosts());
+        assertEquals("2300", caseData.getJoTotalAmount());
+        assertEquals(PaymentPlanSelection.PAY_IN_INSTALMENTS, caseData.getJoPaymentPlanSelected());
+        assertEquals("120", caseData.getJoRepaymentAmount());
+        assertNotNull(caseData.getJoRepaymentStartDate());
+        assertEquals(PaymentFrequency.MONTHLY, caseData.getJoRepaymentFrequency());
     }
 
     @Test
@@ -90,6 +101,12 @@ public class JudgmentPaidOnlineMapperTest {
         assertNotNull(caseData.getActiveJudgment());
         assertEquals(JudgmentState.CANCELLED, caseData.getActiveJudgment().getState());
         assertNull(caseData.getHistoricJudgment());
+
+        assertEquals("Mr. Sole Trader", caseData.getJoDefendantName1());
+        assertEquals("100990", caseData.getJoOrderedAmount());
+        assertEquals("0", caseData.getJoCosts());
+        assertEquals("100990", caseData.getJoTotalAmount());
+        assertEquals(PaymentPlanSelection.PAY_IMMEDIATELY, caseData.getJoPaymentPlanSelected());
 
     }
 }

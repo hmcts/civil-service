@@ -51,8 +51,6 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
             .totalAmount(orderAmount.add(costs).toString())
             .build();
 
-        super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, caseData);
-
         return activeJudgmentDetails;
     }
 
