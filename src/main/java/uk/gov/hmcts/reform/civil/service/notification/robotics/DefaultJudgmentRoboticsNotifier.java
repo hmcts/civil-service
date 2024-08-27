@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSp
 @Component
 public class DefaultJudgmentRoboticsNotifier extends RoboticsNotifier {
 
-
     protected final FeatureToggleService toggleService;
 
     public DefaultJudgmentRoboticsNotifier(RoboticsNotificationService roboticsNotificationService,
