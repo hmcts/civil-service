@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -85,7 +84,7 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_JUDGMENT_DETAILS_CJES.name());
 
-       sendJudgmentDetailsCjesHandler.handle(params);
+        sendJudgmentDetailsCjesHandler.handle(params);
 
         // Assert
         verify(cjesService, never()).sendJudgment(any(), any());
