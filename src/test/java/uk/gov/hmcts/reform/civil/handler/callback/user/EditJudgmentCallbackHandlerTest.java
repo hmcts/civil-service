@@ -178,6 +178,9 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
                 "120");
             assertThat(response.getData().get("activeJudgment")).extracting("instalmentDetails").extracting("startDate").isEqualTo(
                 "2022-12-12");
+            assertThat(response.getData().get("activeJudgment")).extracting("defendant1Name").isEqualTo("Mr. John Rambo");
+            assertThat(response.getData().get("activeJudgment")).extracting("defendant1Address").isNotNull();
+            assertThat(response.getData().get("activeJudgment")).extracting("defendant1Dob").isNotNull();
         }
 
         @Test
