@@ -15,9 +15,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 public class CjesMapperTest {
 
@@ -35,12 +36,6 @@ public class CjesMapperTest {
         String legacyCcdReference = "reference";
         LocalDateTime now = LocalDateTime.now();
 
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(SPEC_CLAIM)
-            .ccdCaseReference(Long.valueOf(caseId))
-            .legacyCaseReference(legacyCcdReference)
-            .build();
-
         JudgmentDetails judgmentDetails = JudgmentDetails.builder()
             .judgmentId(123)
             .lastUpdateTimeStamp(now)
@@ -54,7 +49,14 @@ public class CjesMapperTest {
             .defendant1Address(createMockAddress())
             .build();
 
-        JudgmentDetailsCJES result = cjesMapper.toJudgmentDetailsCJES(judgmentDetails, caseData);
+        CaseData caseData = CaseData.builder()
+            .caseAccessCategory(SPEC_CLAIM)
+            .ccdCaseReference(Long.valueOf(caseId))
+            .legacyCaseReference(legacyCcdReference)
+            .activeJudgment(judgmentDetails)
+            .build();
+
+        JudgmentDetailsCJES result = cjesMapper.toJudgmentDetailsCJES(caseData, true);
 
         assertNotNull(result);
         assertEquals("AAA6", result.getServiceId());
@@ -96,9 +98,13 @@ public class CjesMapperTest {
             .legacyCaseReference(ccdReference)
             .build();
 
-        JudgmentDetailsCJES result = cjesMapper.toJudgmentDetailsCJES(null, caseData);
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                     () -> cjesMapper.toJudgmentDetailsCJES(caseData, true));
 
-        assertNull(result);
+        assertEquals(
+            "Judgment details cannot be null",
+            e.getMessage()
+        );
     }
 
     @Test
@@ -106,12 +112,6 @@ public class CjesMapperTest {
         String caseId = String.valueOf(System.currentTimeMillis());
         String ccdReference = "reference";
         LocalDateTime now = LocalDateTime.now();
-
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(UNSPEC_CLAIM)
-            .ccdCaseReference(Long.valueOf(caseId))
-            .legacyCaseReference(ccdReference)
-            .build();
 
         JudgmentDetails judgmentDetails = JudgmentDetails.builder()
             .judgmentId(123)
@@ -129,7 +129,63 @@ public class CjesMapperTest {
             .defendant2Address(createMockAddress())
             .build();
 
-        JudgmentDetailsCJES result = cjesMapper.toJudgmentDetailsCJES(judgmentDetails, caseData);
+        CaseData caseData = CaseData.builder()
+            .caseAccessCategory(UNSPEC_CLAIM)
+            .ccdCaseReference(Long.valueOf(caseId))
+            .legacyCaseReference(ccdReference)
+            .activeJudgment(judgmentDetails)
+            .build();
+
+        JudgmentDetailsCJES result = cjesMapper.toJudgmentDetailsCJES(caseData, true);
+
+        assertNotNull(result);
+        assertEquals("AAA7", result.getServiceId());
+        assertNotNull(result.getDefendant2());
+
+        JudgmentDefendantDetails defendant2 = result.getDefendant2();
+        assertEquals("Defendant 2", defendant2.getDefendantName());
+        assertEquals(LocalDate.of(1990, 2, 2), defendant2.getDefendantDateOfBirth());
+
+        JudgementAddress defendant2Address = defendant2.getDefendantAddress();
+        assertNotNull(defendant2Address);
+        assertEquals("Line 1", defendant2Address.getDefendantAddressLine1());
+        assertEquals("Line 2", defendant2Address.getDefendantAddressLine2());
+        assertEquals("Line 3", defendant2Address.getDefendantAddressLine3());
+        assertEquals("Town", defendant2Address.getDefendantAddressLine4());
+        assertEquals("Country", defendant2Address.getDefendantAddressLine5());
+        assertEquals("PostCode", defendant2Address.getDefendantPostCode());
+    }
+
+    @Test
+    void toJudgmentDetailsCJES_forHistoricJudgement() {
+        String caseId = String.valueOf(System.currentTimeMillis());
+        String ccdReference = "reference";
+        LocalDateTime now = LocalDateTime.now();
+
+        JudgmentDetails judgmentDetails = JudgmentDetails.builder()
+            .judgmentId(123)
+            .lastUpdateTimeStamp(now)
+            .courtLocation("123456")
+            .totalAmount("123.45")
+            .issueDate(now.toLocalDate())
+            .rtlState(JudgmentRTLStatus.ISSUED.getRtlState())
+            .cancelDate(now.toLocalDate())
+            .defendant1Name("Defendant 1")
+            .defendant1Dob(LocalDate.of(1980, 1, 1))
+            .defendant1Address(createMockAddress())
+            .defendant2Name("Defendant 2")
+            .defendant2Dob(LocalDate.of(1990, 2, 2))
+            .defendant2Address(createMockAddress())
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .caseAccessCategory(UNSPEC_CLAIM)
+            .ccdCaseReference(Long.valueOf(caseId))
+            .legacyCaseReference(ccdReference)
+            .historicJudgment(wrapElements(judgmentDetails))
+            .build();
+
+        JudgmentDetailsCJES result = cjesMapper.toJudgmentDetailsCJES(caseData, false);
 
         assertNotNull(result);
         assertEquals("AAA7", result.getServiceId());
