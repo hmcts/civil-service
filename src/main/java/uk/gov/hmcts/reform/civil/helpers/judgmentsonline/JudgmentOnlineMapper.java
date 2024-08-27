@@ -83,7 +83,7 @@ public abstract class JudgmentOnlineMapper {
 
         if (JudgmentState.CANCELLED.equals(activeJudgment.getState())
             || JudgmentState.SATISFIED.equals(activeJudgment.getState())) {
-            caseData.setJoIssuedDate(activeJudgment.getIssueDate());
+            caseData.setJoIssueDate(activeJudgment.getIssueDate());
             caseData.setJoState(activeJudgment.getState());
             caseData.setJoFullyPaymentMadeDate(activeJudgment.getFullyPaymentMadeDate());
         }
