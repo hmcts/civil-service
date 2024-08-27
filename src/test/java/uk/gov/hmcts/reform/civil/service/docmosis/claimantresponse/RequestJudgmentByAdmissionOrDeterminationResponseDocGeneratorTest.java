@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.claimantresponse.JudgmentByAdmis
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.List;
 
@@ -50,6 +51,9 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGeneratorTest {
 
     @Mock
     private DocumentGeneratorService documentGeneratorService;
+
+    @Mock
+    private AssignCategoryId assignCategoryId;
 
     @InjectMocks
     private RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator generator;
@@ -161,6 +165,8 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGeneratorTest {
         // Then
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DocumentType.JUDGMENT_BY_ADMISSION_CLAIMANT));
+        verify(assignCategoryId)
+            .assignCategoryIdToCaseDocument(caseDocument, "judgments");
         assertThat(actual).contains(caseDocument);
     }
 
