@@ -37,4 +37,16 @@ public class CaseDismissDefendantDashboardNotificationHandler extends AbstractCa
     public boolean shouldRecordScenario(CaseData caseData) {
         return YesOrNo.NO.equals(caseData.getRespondent1Represented());
     }
+
+    @Override
+    protected void beforeRecordScenario(CaseData caseData, String authToken) {
+        dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "DEFENDANT",
+            authToken
+        );
+        dashboardApiClient.blockTaskProgress(caseData.getCcdCaseReference().toString(),
+                                             "DEFENDANT",
+                                             authToken);
+    }
 }

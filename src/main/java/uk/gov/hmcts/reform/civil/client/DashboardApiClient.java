@@ -8,12 +8,14 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import uk.gov.hmcts.reform.dashboard.data.Notification;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
+import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -28,6 +30,15 @@ public interface DashboardApiClient {
         "taskList/{ccd-case-identifier}/role/{role-type}",
     })
     ResponseEntity<List<TaskList>> getTaskListByCaseIdentifierAndRole(
+        @PathVariable("ccd-case-identifier") String ccdCaseIdentifier,
+        @PathVariable("role-type") String roleType,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
+    );
+
+    @PutMapping(path = {
+        "block/{ccd-case-identifier}/role/{role-type}",
+    })
+    ResponseEntity<List<TaskListEntity>> blockTaskProgress (
         @PathVariable("ccd-case-identifier") String ccdCaseIdentifier,
         @PathVariable("role-type") String roleType,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
