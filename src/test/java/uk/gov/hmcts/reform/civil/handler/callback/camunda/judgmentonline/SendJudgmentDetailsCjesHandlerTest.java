@@ -20,6 +20,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_JUDGMENT_DETAILS_CJES;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_JUDGMENT_DETAILS_CJES_SA;
@@ -151,5 +152,26 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
 
         assertEquals("Historic judgement cannot be empty or null after a judgment is set aside", e.getMessage());
         verify(cjesService, never()).sendJudgment(any(), any());
+    }
+
+    @Test
+    void shouldSendJudgmentDetailsWhenNoRecordedReasonAndCaseEventIsSendJudgmentDetailsCJES() {
+        String processId = "process-id";
+        CaseData caseData = CaseData.builder()
+            .businessProcess(BusinessProcess.builder().processInstanceId(processId).build())
+            .joIsRegisteredWithRTL(YES)
+            .activeJudgment(JudgmentDetails.builder()
+                                .isRegisterWithRTL(YES)
+                                .build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        params.getRequest().setEventId(SEND_JUDGMENT_DETAILS_CJES.name());
+
+        sendJudgmentDetailsCjesHandler.handle(params);
+
+        // Assert
+        verify(cjesService).sendJudgment(eq(caseData), eq(true));
+        verifyNoInteractions(runtimeService);
     }
 }
