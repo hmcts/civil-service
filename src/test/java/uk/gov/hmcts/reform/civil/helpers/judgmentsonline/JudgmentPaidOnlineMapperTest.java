@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -49,8 +48,7 @@ public class JudgmentPaidOnlineMapperTest {
                                              .dateOfFullPaymentMade(LocalDate.of(2023, 1, 15))
                                              .confirmFullPaymentMade(List.of("CONFIRMED"))
                                              .build());
-
-        judgmentPaidInFullOnlineMapper.moveToHistoricJudgment(caseData);
+        caseData.setActiveJudgment(judgmentPaidInFullOnlineMapper.addUpdateActiveJudgment(caseData));
 
         assertNotNull(caseData.getActiveJudgment());
         assertEquals(JudgmentState.SATISFIED, caseData.getActiveJudgment().getState());
@@ -69,13 +67,11 @@ public class JudgmentPaidOnlineMapperTest {
                                              .dateOfFullPaymentMade(LocalDate.of(2012, 12, 15))
                                              .confirmFullPaymentMade(List.of("CONFIRMED"))
                                              .build());
+        caseData.setActiveJudgment(judgmentPaidInFullOnlineMapper.addUpdateActiveJudgment(caseData));
 
-        judgmentPaidInFullOnlineMapper.moveToHistoricJudgment(caseData);
-        JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
-        assertNull(caseData.getActiveJudgment());
-        assertNotNull(caseData.getHistoricJudgment());
-        assertEquals(JudgmentState.CANCELLED, historicJudgment.getState());
-        assertEquals(LocalDate.now(), historicJudgment.getCancelDate());
+        assertNotNull(caseData.getActiveJudgment());
+        assertEquals(JudgmentState.CANCELLED, caseData.getActiveJudgment().getState());
+        assertNull(caseData.getHistoricJudgment());
     }
 
     @Test
@@ -89,12 +85,11 @@ public class JudgmentPaidOnlineMapperTest {
                                              .dateOfFullPaymentMade(LocalDate.now().plusDays(15))
                                              .confirmFullPaymentMade(List.of("CONFIRMED"))
                                              .build());
+        caseData.setActiveJudgment(judgmentPaidInFullOnlineMapper.addUpdateActiveJudgment(caseData));
 
-        judgmentPaidInFullOnlineMapper.moveToHistoricJudgment(caseData);
-        JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
-        assertNull(caseData.getActiveJudgment());
-        assertNotNull(caseData.getHistoricJudgment());
-        assertEquals(JudgmentState.CANCELLED, historicJudgment.getState());
-        assertEquals(LocalDate.now(), historicJudgment.getCancelDate());
+        assertNotNull(caseData.getActiveJudgment());
+        assertEquals(JudgmentState.CANCELLED, caseData.getActiveJudgment().getState());
+        assertNull(caseData.getHistoricJudgment());
+
     }
 }
