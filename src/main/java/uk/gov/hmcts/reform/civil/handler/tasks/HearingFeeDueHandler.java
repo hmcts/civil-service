@@ -9,10 +9,12 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
 import uk.gov.hmcts.reform.civil.event.HearingFeePaidEvent;
+import uk.gov.hmcts.reform.civil.event.NoHearingFeeDueEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.HearingFeeDueSearchService;
 
 import java.util.List;
@@ -26,6 +28,7 @@ public class HearingFeeDueHandler implements BaseExternalTaskHandler {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     public void handleTask(ExternalTask externalTask) {
@@ -38,15 +41,36 @@ public class HearingFeeDueHandler implements BaseExternalTaskHandler {
                 CaseData caseData = caseDetailsConverter.toCaseData(detailsWithData);
                 PaymentDetails hearingFeePaymentDetails = caseData.getHearingFeePaymentDetails();
 
-                if ((hearingFeePaymentDetails != null
+                if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+                    System.out.println("TOGGLE IS ON");
+                    if (caseData.getHearingDueDate() == null) {
+                        System.out.println("NO HEARING FEE DUE");
+                        log.info("Current case status '{}'", caseDetails.getState());
+                        applicationEventPublisher.publishEvent(new NoHearingFeeDueEvent(caseDetails.getId()));
+                    } else {
+                        if ((hearingFeePaymentDetails != null
+                            && hearingFeePaymentDetails.getStatus() == PaymentStatus.SUCCESS)
+                            || caseData.hearingFeePaymentDoneWithHWF()) {
+                            log.info("Current case status '{}'", caseDetails.getState());
+                            applicationEventPublisher.publishEvent(new HearingFeePaidEvent(caseDetails.getId()));
+                        } else if (hearingFeePaymentDetails == null
+                            || hearingFeePaymentDetails.getStatus() == PaymentStatus.FAILED) {
+                            log.info("Current case status '{}'", caseDetails.getState());
+                            applicationEventPublisher.publishEvent(new HearingFeeUnpaidEvent(caseDetails.getId()));
+                        }
+                    }
+
+                } else {
+                    if ((hearingFeePaymentDetails != null
                         && hearingFeePaymentDetails.getStatus() == PaymentStatus.SUCCESS)
                         || caseData.hearingFeePaymentDoneWithHWF()) {
-                    log.info("Current case status '{}'", caseDetails.getState());
-                    applicationEventPublisher.publishEvent(new HearingFeePaidEvent(caseDetails.getId()));
-                } else if (hearingFeePaymentDetails == null
-                            || hearingFeePaymentDetails.getStatus() == PaymentStatus.FAILED) {
-                    log.info("Current case status '{}'", caseDetails.getState());
-                    applicationEventPublisher.publishEvent(new HearingFeeUnpaidEvent(caseDetails.getId()));
+                        log.info("Current case status '{}'", caseDetails.getState());
+                        applicationEventPublisher.publishEvent(new HearingFeePaidEvent(caseDetails.getId()));
+                    } else if (hearingFeePaymentDetails == null
+                        || hearingFeePaymentDetails.getStatus() == PaymentStatus.FAILED) {
+                        log.info("Current case status '{}'", caseDetails.getState());
+                        applicationEventPublisher.publishEvent(new HearingFeeUnpaidEvent(caseDetails.getId()));
+                    }
                 }
             } catch (Exception e) {
                 //Continue for other cases if there is some error in some cases, as we don't want
