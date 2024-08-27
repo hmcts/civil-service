@@ -1,0 +1,92 @@
+package uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks;
+
+import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.CaseTask;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.dq.Hearing;
+import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+
+import java.util.List;
+
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
+
+@Component
+public class ValidateUnavailableDates implements CaseTask {
+
+    private final UnavailableDateValidator unavailableDateValidator;
+    private final IStateFlowEngine stateFlowEngine;
+    private final CoreCaseUserService coreCaseUserService;
+    private final UserService userService;
+
+    public ValidateUnavailableDates(UnavailableDateValidator unavailableDateValidator,
+                                    IStateFlowEngine stateFlowEngine,
+                                    CoreCaseUserService coreCaseUserService,
+                                    UserService userService) {
+        this.unavailableDateValidator = unavailableDateValidator;
+        this.stateFlowEngine = stateFlowEngine;
+        this.coreCaseUserService = coreCaseUserService;
+        this.userService = userService;
+    }
+
+    @Override
+    public CallbackResponse execute(CallbackParams callbackParams) {
+
+        CaseData caseData = callbackParams.getCaseData();
+        Hearing hearing = caseData.getRespondent1DQ().getHearing();
+
+        if (!ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
+            && (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
+            || hasRespondent2DifferentResponseAndHearing(caseData))) {
+            hearing = caseData.getRespondent2DQ().getHearing();
+        }
+
+        List<String> errors = unavailableDateValidator.validate(hearing);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
+    private boolean hasRespondent2DifferentResponseAndHearing(CaseData caseData) {
+        return respondent2HasSameLegalRep(caseData)
+            && caseData.getRespondentResponseIsSame() != null
+            && caseData.getRespondentResponseIsSame() == NO
+            && caseData.getRespondent2DQ() != null
+            && caseData.getRespondent2DQ().getHearing() != null;
+    }
+
+    private boolean respondent2HasSameLegalRep(CaseData caseData) {
+        return caseData.getRespondent2SameLegalRepresentative() != null
+            && caseData.getRespondent2SameLegalRepresentative() == YES;
+    }
+
+    private boolean solicitorRepresentsOnlyOneOfRespondents(CallbackParams callbackParams, CaseRole caseRole) {
+        return solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, caseRole);
+    }
+
+    private boolean solicitorRepresentsOnlyOneOrBothRespondents(CallbackParams callbackParams, CaseRole caseRole) {
+        CaseData caseData = callbackParams.getCaseData();
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        return stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)
+            && coreCaseUserService.userHasCaseRole(
+            caseData.getCcdCaseReference().toString(),
+            userInfo.getUid(),
+            caseRole
+        );
+    }
+}
+
