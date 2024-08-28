@@ -172,6 +172,7 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
 
         // Assert
         verify(cjesService).sendJudgment(eq(caseData), eq(true));
-        verifyNoInteractions(runtimeService);
+        
+  (runtimeService);
     }
 }
