@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.search;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -20,16 +19,15 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 @Service
 public class HearingFeeDueSearchService extends ElasticSearchService {
 
-
     private final FeatureToggleService featureToggleService;
 
-    public HearingFeeDueSearchService(CoreCaseDataService coreCaseDataService, FeatureToggleService featureToggleService ) {
+    public HearingFeeDueSearchService(CoreCaseDataService coreCaseDataService, FeatureToggleService featureToggleService) {
         super(coreCaseDataService);
         this.featureToggleService = featureToggleService;
     }
 
     public Query query(int startIndex) {
-        if( featureToggleService.isMintiEnabled()) {
+        if (featureToggleService.isMintiEnabled()) {
             return new Query(
                 boolQuery()
                     .minimumShouldMatch(1)
