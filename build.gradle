@@ -47,7 +47,7 @@ allprojects {
 
   checkstyle {
     maxWarnings = 0
-    toolVersion = '10.17.0'
+    toolVersion = '10.18.0'
     getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
   }
 
@@ -437,7 +437,7 @@ dependencies {
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.14.19'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.15.0'
   testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.14.19'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
