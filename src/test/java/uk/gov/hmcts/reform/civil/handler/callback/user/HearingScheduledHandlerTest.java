@@ -267,7 +267,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         "RELISTING,SMALL_CLAIMS,CASE_PROGRESSION,HEARING_READINESS",
         "RELISTING,OTHER,CASE_PROGRESSION,HEARING_READINESS"
     })
-    void shouldSetHearingReadinessStateOnListing_whenAboutToSubmitMinti(String listingType, String hearingNoticeType, String CurrentState, String expectedStateStr) {
+    void shouldSetHearingReadinessStateOnListing_whenAboutToSubmitMinti(String listingType, String hearingNoticeType, String currentState, String expectedStateStr) {
         given(time.now()).willReturn(LocalDateTime.now());
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
@@ -283,7 +283,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             .hearingNoticeList(hearingNoticeList)
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
             .listingOrRelisting(listingOrRelisting)
-            .ccdState(CaseState.valueOf(CurrentState))
+            .ccdState(CaseState.valueOf(currentState))
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 

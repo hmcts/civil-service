@@ -71,7 +71,6 @@ class HearingFeeDueSearchServiceTest extends ElasticSearchServiceTest {
         assertTrue(queryString.contains("data.hearingDueDate"), "Query should contain 'data.hearingDueDate' when the feature toggle is disabled");
     }
 
-
     @Override
     protected Query buildQueryInMediation(int fromValue, LocalDate date, boolean carmEnabled) {
         return null;
