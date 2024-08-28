@@ -42,37 +42,30 @@ public class HearingFeeDueHandler implements BaseExternalTaskHandler {
                 PaymentDetails hearingFeePaymentDetails = caseData.getHearingFeePaymentDetails();
 
                 if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-                    System.out.println("TOGGLE IS ON");
                     if (caseData.getHearingDueDate() == null) {
-                        System.out.println("NO HEARING FEE DUE");
                         log.info("Current case status '{}'", caseDetails.getState());
                         applicationEventPublisher.publishEvent(new NoHearingFeeDueEvent(caseDetails.getId()));
                     } else {
                         if ((hearingFeePaymentDetails != null
                             && hearingFeePaymentDetails.getStatus() == PaymentStatus.SUCCESS)
                             || caseData.hearingFeePaymentDoneWithHWF()) {
-                            System.out.println("HEARING FEE PAID TOGGLE ON");
                             log.info("Current case status '{}'", caseDetails.getState());
                             applicationEventPublisher.publishEvent(new HearingFeePaidEvent(caseDetails.getId()));
                         } else if (hearingFeePaymentDetails == null
                             || hearingFeePaymentDetails.getStatus() == PaymentStatus.FAILED) {
-                            System.out.println("HEARING FEE failed TOGGLE ON");
                             log.info("Current case status '{}'", caseDetails.getState());
                             applicationEventPublisher.publishEvent(new HearingFeeUnpaidEvent(caseDetails.getId()));
                         }
                     }
 
                 } else {
-                    System.out.println("TOGGLE IS OFF");
                     if ((hearingFeePaymentDetails != null
                         && hearingFeePaymentDetails.getStatus() == PaymentStatus.SUCCESS)
                         || caseData.hearingFeePaymentDoneWithHWF()) {
-                        System.out.println("HEARING FEE PAID TOGGLE OFF");
                         log.info("Current case status '{}'", caseDetails.getState());
                         applicationEventPublisher.publishEvent(new HearingFeePaidEvent(caseDetails.getId()));
                     } else if (hearingFeePaymentDetails == null
                         || hearingFeePaymentDetails.getStatus() == PaymentStatus.FAILED) {
-                        System.out.println("HEARING FEE failed TOGGLE OFF");
                         log.info("Current case status '{}'", caseDetails.getState());
                         applicationEventPublisher.publishEvent(new HearingFeeUnpaidEvent(caseDetails.getId()));
                     }
