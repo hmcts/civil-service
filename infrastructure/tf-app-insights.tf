@@ -12,7 +12,7 @@ module "application_insights" {
 }
 
 moved {
-  from = azurerm_application_insights.web
+  from = azurerm_application_insights.appinsights
   to   = module.application_insights.azurerm_application_insights.this
 }
 
