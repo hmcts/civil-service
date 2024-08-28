@@ -74,10 +74,12 @@ public class SendJudgmentDetailsCjesHandler extends CallbackHandler {
     }
 
     private void updateCamundaVars(CaseData caseData) {
-        runTimeService.setVariable(
-            caseData.getBusinessProcess().getProcessInstanceId(),
-            "judgmentRecordedReason",
-            caseData.getJoJudgmentRecordReason().toString()
-        );
+        if (caseData.getJoJudgmentRecordReason() != null) {
+            runTimeService.setVariable(
+                caseData.getBusinessProcess().getProcessInstanceId(),
+                "judgmentRecordedReason",
+                caseData.getJoJudgmentRecordReason().toString()
+            );
+        }
     }
 }
