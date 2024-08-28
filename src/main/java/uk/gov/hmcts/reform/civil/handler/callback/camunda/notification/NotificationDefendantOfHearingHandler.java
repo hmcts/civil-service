@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -106,7 +107,14 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
     public Map<String, String> addProperties(final CaseData caseData) {
         String legacyCaseRef = caseData.getLegacyCaseReference();
         String hearingDate = NotificationUtils.getFormattedHearingDate(caseData.getHearingDate());
-        String hearingTime = NotificationUtils.getFormattedHearingTime(caseData.getHearingTimeHourMinute());
+        String hearingTime;
+        if (Objects.nonNull(caseData.getHearingTimeHourMinute())) {
+            hearingTime = NotificationUtils.getFormattedHearingTime(caseData.getHearingTimeHourMinute());
+        } else {
+            LocalDateTime hearingStartDateTime = camundaService
+                .getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId()).getHearingStartDateTime();
+            hearingTime = NotificationUtils.getFormattedHearingTime(hearingStartDateTime.toLocalTime().toString());
+        }
         return new HashMap<>(Map.of(CLAIM_REFERENCE_NUMBER, legacyCaseRef, HEARING_DATE, hearingDate, HEARING_TIME, hearingTime));
     }
 
