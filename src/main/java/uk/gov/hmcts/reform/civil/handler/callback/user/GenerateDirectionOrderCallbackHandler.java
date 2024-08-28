@@ -63,6 +63,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_ORDER_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
@@ -70,6 +71,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.ASSISTED_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.CLAIMANT;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.STANDARD_BASIS;
@@ -493,6 +495,19 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         // we only use freeFormOrderDocument as a preview and do not want it shown on case file view, so to prevent it
         // showing, we remove.
         caseDataBuilder.finalOrderDocument(null);
+
+        if (featureToggleService.isMintiEnabled()) {
+            if (YES.equals(caseData.getFinalOrderAllocateToTrack())) {
+                if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+                    caseDataBuilder.responseClaimTrack(caseData.getFinalOrderTrackAllocation().getTrackList().name());
+                } else {
+                    caseDataBuilder.allocatedTrack(caseData.getFinalOrderTrackAllocation().getTrackList());
+                }
+            }
+            caseDataBuilder.finalOrderTrackAllocation(null)
+                .finalOrderAllocateToTrack(null);
+        }
+
         caseDataBuilder.businessProcess(BusinessProcess.ready(GENERATE_ORDER_NOTIFICATION));
 
         CaseState state = All_FINAL_ORDERS_ISSUED;
@@ -553,23 +568,5 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private boolean isJudicialReferral(CallbackParams callbackParams) {
         return JUDICIAL_REFERRAL.toString().equals(callbackParams.getRequest().getCaseDetails().getState())
             && featureToggleService.isMintiEnabled();
-    }
-
-    private AllocatedTrack getAllocatedTrackFromOrderTrackAllocation(FinalOrderTrackAllocation finalOrderTrackAllocation) {
-        switch (finalOrderTrackAllocation.getTrackList()) {
-            case SMALL_CLAIMS -> {
-                return AllocatedTrack.SMALL_CLAIM;
-            }
-            case FAST_TRACK -> {
-                return AllocatedTrack.FAST_CLAIM;
-            }
-            case INTERMEDIATE_TRACK -> {
-                return AllocatedTrack.INTERMEDIATE_CLAIM;
-            }
-            case MULTI_TRACK -> {
-                return AllocatedTrack.MULTI_CLAIM;
-            }
-            default -> throw new IllegalArgumentException("Invalid track type in " + finalOrderTrackAllocation);
-        }
     }
 }

@@ -19,6 +19,8 @@ import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.OrderOnCourtsList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.AssistedCostTypesList;
@@ -44,10 +46,12 @@ import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderAppeal;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRecitalsRecorded;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRepresentation;
+import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderTrackAllocation;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeFinalOrderGenerator;
@@ -73,6 +77,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantRepresentationList.CLAIMANT_NOT_ATTENDING;
@@ -101,6 +106,9 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
     @Mock
     private WorkingDayIndicator workingDayIndicator;
+
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     private ObjectMapper mapper;
 
@@ -138,7 +146,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         handler = new GenerateDirectionOrderCallbackHandler(locationRefDataService, mapper, judgeFinalOrderGenerator,
-                                                            locationHelper, theUserService, workingDayIndicator);
+                                                            locationHelper, theUserService, workingDayIndicator, featureToggleService);
     }
 
     @Nested
@@ -1015,6 +1023,128 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
             assertThat(response.getData()).extracting("hearingNotes").extracting("notes").isEqualTo("preexisting hearing notes");
+        }
+
+        @Test
+        void shouldMoveToCaseProgressionState_whenPreviousStateWasJudicialReferral() {
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                            .forename("Judge")
+                                                                            .surname("Judy")
+                                                                            .roles(Collections.emptyList()).build());
+            when(featureToggleService.isMintiEnabled()).thenReturn(true);
+            // Given
+            List<FinalOrderToggle> toggle = new ArrayList<>();
+            toggle.add(FinalOrderToggle.SHOW);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
+                .finalOrderFurtherHearingToggle(toggle)
+                .hearingNotes(HearingNotes.builder().notes("preexisting hearing notes").build())
+                .finalOrderDocument(finalOrder)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .finalOrderAllocateToTrack(YES)
+                .finalOrderTrackAllocation(FinalOrderTrackAllocation.builder()
+                                               .trackList(AllocatedTrack.MULTI_CLAIM)
+                                               .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, JUDICIAL_REFERRAL);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getState()).isEqualTo(CASE_PROGRESSION.name());
+        }
+
+        @Test
+        void shouldChangeClaimTrack_whenNewTrackIsAllocatedSpecClaim() {
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                            .forename("Judge")
+                                                                            .surname("Judy")
+                                                                            .roles(Collections.emptyList()).build());
+            when(featureToggleService.isMintiEnabled()).thenReturn(true);
+            // Given
+            List<FinalOrderToggle> toggle = new ArrayList<>();
+            toggle.add(FinalOrderToggle.SHOW);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
+                .finalOrderFurtherHearingToggle(toggle)
+                .hearingNotes(HearingNotes.builder().notes("preexisting hearing notes").build())
+                .finalOrderDocument(finalOrder)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .finalOrderAllocateToTrack(YES)
+                .finalOrderTrackAllocation(FinalOrderTrackAllocation.builder()
+                                               .trackList(AllocatedTrack.MULTI_CLAIM)
+                                               .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("finalOrderAllocateToTrack").isEqualTo(null);
+            assertThat(response.getData()).extracting("finalOrderTrackAllocation").isEqualTo(null);
+            assertThat(response.getData()).extracting("responseClaimTrack").isEqualTo("MULTI_CLAIM");
+        }
+
+        @Test
+        void shouldChangeClaimTrack_whenNewTrackIsAllocatedUnspecClaim() {
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                            .forename("Judge")
+                                                                            .surname("Judy")
+                                                                            .roles(Collections.emptyList()).build());
+            when(featureToggleService.isMintiEnabled()).thenReturn(true);
+            // Given
+            List<FinalOrderToggle> toggle = new ArrayList<>();
+            toggle.add(FinalOrderToggle.SHOW);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
+                .finalOrderFurtherHearingToggle(toggle)
+                .hearingNotes(HearingNotes.builder().notes("preexisting hearing notes").build())
+                .finalOrderDocument(finalOrder)
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+                .finalOrderAllocateToTrack(YES)
+                .finalOrderTrackAllocation(FinalOrderTrackAllocation.builder()
+                                               .trackList(AllocatedTrack.MULTI_CLAIM)
+                                               .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("finalOrderAllocateToTrack").isEqualTo(null);
+            assertThat(response.getData()).extracting("finalOrderTrackAllocation").isEqualTo(null);
+            assertThat(response.getData()).extracting("allocatedTrack").isEqualTo("MULTI_CLAIM");
+        }
+
+        @Test
+        void shouldNotChangeClaimTrack_whenNewTrackIsNotAllocated() {
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                            .forename("Judge")
+                                                                            .surname("Judy")
+                                                                            .roles(Collections.emptyList()).build());
+            when(featureToggleService.isMintiEnabled()).thenReturn(true);
+            // Given
+            List<FinalOrderToggle> toggle = new ArrayList<>();
+            toggle.add(FinalOrderToggle.SHOW);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
+                .finalOrderFurtherHearingToggle(toggle)
+                .hearingNotes(HearingNotes.builder().notes("preexisting hearing notes").build())
+                .finalOrderDocument(finalOrder)
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+                .finalOrderAllocateToTrack(NO)
+                .finalOrderTrackAllocation(FinalOrderTrackAllocation.builder()
+                                               .trackList(AllocatedTrack.MULTI_CLAIM)
+                                               .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("finalOrderAllocateToTrack").isEqualTo(null);
+            assertThat(response.getData()).extracting("finalOrderTrackAllocation").isEqualTo(null);
+            assertThat(response.getData()).extracting("allocatedTrack").isEqualTo("SMALL_CLAIM");
         }
     }
 
