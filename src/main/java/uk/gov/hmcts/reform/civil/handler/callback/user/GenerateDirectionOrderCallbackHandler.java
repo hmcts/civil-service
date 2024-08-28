@@ -38,6 +38,7 @@ import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetailsOrderWithoutNotice;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeFinalOrderGenerator;
@@ -64,6 +65,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_O
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_ORDER_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
@@ -131,6 +133,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private String ext = "";
     private final UserService userService;
     private final WorkingDayIndicator workingDayIndicator;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -493,7 +496,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         caseDataBuilder.businessProcess(BusinessProcess.ready(GENERATE_ORDER_NOTIFICATION));
 
         CaseState state = All_FINAL_ORDERS_ISSUED;
-        if (caseData.getFinalOrderFurtherHearingToggle() != null) {
+        if (caseData.getFinalOrderFurtherHearingToggle() != null || isJudicialReferral(callbackParams)) {
             state = CASE_PROGRESSION;
         }
 
@@ -544,6 +547,29 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                           caseData.getRespondent1().getPartyName());
         } else {
             return format(BODY_1_V_1, caseData.getApplicant1().getPartyName(), caseData.getRespondent1().getPartyName());
+        }
+    }
+
+    private boolean isJudicialReferral(CallbackParams callbackParams) {
+        return JUDICIAL_REFERRAL.toString().equals(callbackParams.getRequest().getCaseDetails().getState())
+            && featureToggleService.isMintiEnabled();
+    }
+
+    private AllocatedTrack getAllocatedTrackFromOrderTrackAllocation(FinalOrderTrackAllocation finalOrderTrackAllocation) {
+        switch (finalOrderTrackAllocation.getTrackList()) {
+            case SMALL_CLAIMS -> {
+                return AllocatedTrack.SMALL_CLAIM;
+            }
+            case FAST_TRACK -> {
+                return AllocatedTrack.FAST_CLAIM;
+            }
+            case INTERMEDIATE_TRACK -> {
+                return AllocatedTrack.INTERMEDIATE_CLAIM;
+            }
+            case MULTI_TRACK -> {
+                return AllocatedTrack.MULTI_CLAIM;
+            }
+            default -> throw new IllegalArgumentException("Invalid track type in " + finalOrderTrackAllocation);
         }
     }
 }
