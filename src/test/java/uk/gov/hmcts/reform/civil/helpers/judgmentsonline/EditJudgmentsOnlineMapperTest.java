@@ -136,7 +136,7 @@ public class EditJudgmentsOnlineMapperTest {
         assertEquals("0", activeJudgment.getCosts());
         assertEquals("100990", activeJudgment.getTotalAmount());
         assertEquals(YesOrNo.YES, activeJudgment.getIsRegisterWithRTL());
-        assertEquals(JudgmentRTLStatus.ISSUED.getRtlState(), activeJudgment.getRtlState());
+        assertEquals(JudgmentRTLStatus.MODIFIED_EXISTING.getRtlState(), activeJudgment.getRtlState());
         assertEquals(LocalDate.now(), activeJudgment.getIssueDate());
         assertEquals("0123", activeJudgment.getCourtLocation());
         assertEquals(JudgmentType.DEFAULT_JUDGMENT, activeJudgment.getType());
