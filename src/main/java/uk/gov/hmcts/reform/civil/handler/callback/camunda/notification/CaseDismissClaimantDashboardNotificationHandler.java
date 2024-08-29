@@ -17,7 +17,9 @@ public class CaseDismissClaimantDashboardNotificationHandler extends AbstractCas
     private static final List<CaseEvent> EVENTS = List
         .of(CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DISMISS_CASE_CLAIMANT);
 
-    public CaseDismissClaimantDashboardNotificationHandler(DashboardApiClient dashboardApiClient, DashboardNotificationsParamsMapper mapper, FeatureToggleService featureToggleService) {
+    public CaseDismissClaimantDashboardNotificationHandler(DashboardApiClient dashboardApiClient,
+                                                           DashboardNotificationsParamsMapper mapper,
+                                                           FeatureToggleService featureToggleService) {
         super(dashboardApiClient, mapper, featureToggleService);
     }
 

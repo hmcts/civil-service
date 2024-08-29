@@ -10,7 +10,6 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
-
 public abstract class AbstractCaseDismissDashboardNotificationHandler extends DashboardCallbackHandler {
 
     public AbstractCaseDismissDashboardNotificationHandler(DashboardApiClient dashboardApiClient,

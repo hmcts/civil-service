@@ -36,7 +36,6 @@ class CaseDismissClaimantDashboardNotificationHandlerTest extends BaseCallbackHa
     @Mock
     private FeatureToggleService featureToggleService;
 
-
     @Mock
     private DashboardApiClient dashboardApiClient;
 
