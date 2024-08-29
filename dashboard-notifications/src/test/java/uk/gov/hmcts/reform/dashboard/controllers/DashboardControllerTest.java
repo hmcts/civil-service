@@ -169,4 +169,17 @@ class DashboardControllerTest {
         //then
         assertThrows(RuntimeException.class, () -> dashboardController.deleteNotification(ID, AUTHORISATION));
     }
+
+    @Test
+    void shouldReturnOkWhenBlockingTaskProgress() {
+
+        //when
+        final ResponseEntity responseEntity = dashboardController
+            .blockTaskProgress(CASE_ID, "Claimant", AUTHORISATION,
+                               "application.json");
+
+        //then
+        assertEquals(OK, responseEntity.getStatusCode());
+        verify(taskListService).blockTaskProgress(CASE_ID, "Claimant");
+    }
 }

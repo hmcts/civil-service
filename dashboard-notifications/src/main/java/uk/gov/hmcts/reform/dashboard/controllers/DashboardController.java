@@ -103,7 +103,9 @@ public class DashboardController {
     public ResponseEntity<List<TaskListEntity>> blockTaskProgress(
         @PathVariable("ccd-case-identifier") String ccdCaseIdentifier,
         @PathVariable("role-type") String roleType,
-        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
+        // for some reason, I couldn't make this work without this parameter
+        @RequestHeader(HttpHeaders.CONTENT_TYPE) String contentType
     ) {
         log.info("Block progress on tasks for case {} and role {}", ccdCaseIdentifier, roleType);
 

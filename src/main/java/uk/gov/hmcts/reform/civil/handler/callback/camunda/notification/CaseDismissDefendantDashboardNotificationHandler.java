@@ -47,6 +47,7 @@ public class CaseDismissDefendantDashboardNotificationHandler extends AbstractCa
         );
         dashboardApiClient.blockTaskProgress(caseData.getCcdCaseReference().toString(),
                                              "DEFENDANT",
-                                             authToken);
+                                             authToken,
+                                             "application/json");
     }
 }

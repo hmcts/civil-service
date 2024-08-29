@@ -41,7 +41,8 @@ public interface DashboardApiClient {
     ResponseEntity<List<TaskListEntity>> blockTaskProgress (
         @PathVariable("ccd-case-identifier") String ccdCaseIdentifier,
         @PathVariable("role-type") String roleType,
-        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
+        @RequestHeader(HttpHeaders.CONTENT_TYPE) String contentType
     );
 
     @GetMapping(path = {

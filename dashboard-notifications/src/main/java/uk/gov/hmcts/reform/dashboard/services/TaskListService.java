@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.dashboard.services;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
@@ -14,6 +15,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -92,12 +95,35 @@ public class TaskListService {
         return taskListEntityList.stream().filter(t -> !READ_ONLY_TASK_IDS
                 .contains(t.getTaskItemTemplate().getTemplateName()))
             .map(t -> {
-                TaskListEntity updated = t.toBuilder().currentStatus(TaskStatus.INACTIVE.getPlaceValue())
+                TaskListEntity.TaskListEntityBuilder updated = t.toBuilder().currentStatus(TaskStatus.INACTIVE.getPlaceValue())
                     .nextStatus(TaskStatus.INACTIVE.getPlaceValue())
                     .hintTextCy("").hintTextEn("")
-                    .build();
-                return taskListRepository.save(updated);
+                    .taskNameEn(removeAnchor(t.getTaskNameEn()))
+                    .taskNameCy(removeAnchor(t.getTaskNameCy()));
+                return taskListRepository.save(updated.build());
             })
             .collect(Collectors.toList());
+    }
+
+    private static final Pattern closeAnchor = Pattern.compile("</a\\s*>", Pattern.CASE_INSENSITIVE);
+    private static final Pattern openAnchor = Pattern.compile("<a\\s+", Pattern.CASE_INSENSITIVE);
+
+    private String removeAnchor(String text) {
+        if (StringUtils.isBlank(text)) {
+            return text;
+        }
+        String current = text;
+        Matcher matcherClose, matcherOpen;
+        while ((matcherClose = closeAnchor.matcher(current)).find()
+            && (matcherOpen = openAnchor.matcher(current)).find()
+            && matcherOpen.start() < matcherClose.start()) {
+            current = matcherClose.replaceFirst("");
+            int open1 = matcherOpen.start();
+            int open2 = current.indexOf('>', open1);
+            if (open2 > -1) {
+                current = current.substring(0, open1) + current.substring(open2+1);
+            }
+        }
+        return current;
     }
 }
