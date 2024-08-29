@@ -128,8 +128,6 @@ public class JudgmentsOnlineHelper {
     public static String calculateRepaymentBreakdownSummary(CaseData caseData) {
 
         JudgmentDetails activeJudgment = caseData.getActiveJudgment();
-        BigDecimal orderedAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getOrderedAmount()));
-        BigDecimal costs = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getCosts()));
         BigDecimal totalAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getTotalAmount()));
 
         //creates  the text on the page, based on calculated values
@@ -137,10 +135,12 @@ public class JudgmentsOnlineHelper {
         repaymentBreakdown.append("The judgment will order the defendants to pay £").append(totalAmount);
         repaymentBreakdown.append(", including the claim fee and interest, if applicable, as shown:");
 
+        BigDecimal orderedAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getOrderedAmount()));
         if (null != orderedAmount) {
             repaymentBreakdown.append("\n").append("### Claim amount \n £").append(orderedAmount.setScale(2));
         }
 
+        BigDecimal costs = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getCosts()));
         if (null != costs) {
             repaymentBreakdown.append("\n ### Fixed cost amount \n").append("£").append(costs.setScale(2));
         }
