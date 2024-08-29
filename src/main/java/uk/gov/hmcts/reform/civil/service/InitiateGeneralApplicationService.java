@@ -250,7 +250,7 @@ public class InitiateGeneralApplicationService {
                 .isGaRespondentOneLip(NO)
                 .isGaRespondentTwoLip(NO);
         }
-
+        applicationBuilder.caseNameGaInternal(caseData.getCaseNameHmctsInternal());
         return helper.setRespondentDetailsIfPresent(applicationBuilder.build(), caseData, userDetails);
     }
 
