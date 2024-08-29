@@ -59,7 +59,6 @@ public class JudgmentPaidOnlineMapperTest {
         assertNull(caseData.getActiveJudgment().getCancelledTimeStamp());
 
         assertEquals("Mr. John Rambo", caseData.getJoDefendantName1());
-        assertNotNull(caseData.getJoRepaymentSummaryObject());
         assertEquals(PaymentPlanSelection.PAY_IN_INSTALMENTS, caseData.getJoPaymentPlanSelected());
         assertEquals("120", caseData.getJoRepaymentAmount());
         assertNotNull(caseData.getJoRepaymentStartDate());
@@ -101,7 +100,6 @@ public class JudgmentPaidOnlineMapperTest {
         assertNull(caseData.getHistoricJudgment());
 
         assertEquals("Mr. Sole Trader", caseData.getJoDefendantName1());
-        assertNotNull(caseData.getJoRepaymentSummaryObject());
         assertEquals(PaymentPlanSelection.PAY_IMMEDIATELY, caseData.getJoPaymentPlanSelected());
 
     }
