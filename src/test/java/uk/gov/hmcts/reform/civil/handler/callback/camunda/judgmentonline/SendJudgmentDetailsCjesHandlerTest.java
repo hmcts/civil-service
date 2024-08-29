@@ -71,6 +71,27 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
+    void shouldSendJudgmentDetailsWhenNoRecordedReasonAndCaseEventIsSendJudgmentDetailsCJES() {
+        String processId = "process-id";
+        CaseData caseData = CaseData.builder()
+            .businessProcess(BusinessProcess.builder().processInstanceId(processId).build())
+            .joIsRegisteredWithRTL(YES)
+            .activeJudgment(JudgmentDetails.builder()
+                                .isRegisterWithRTL(YES)
+                                .build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        params.getRequest().setEventId(SEND_JUDGMENT_DETAILS_CJES.name());
+
+        sendJudgmentDetailsCjesHandler.handle(params);
+
+        // Assert
+        verify(cjesService).sendJudgment(eq(caseData), eq(true));
+        verifyNoInteractions(runtimeService);
+    }
+
+    @Test
     void shouldNotSendJudgmentDetails_whenRTLisNo() {
         String processId = "process-id";
         CaseData caseData = CaseData.builder()
@@ -152,27 +173,5 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
 
         assertEquals("Historic judgement cannot be empty or null after a judgment is set aside", e.getMessage());
         verify(cjesService, never()).sendJudgment(any(), any());
-    }
-
-    @Test
-    void shouldSendJudgmentDetailsWhenNoRecordedReasonAndCaseEventIsSendJudgmentDetailsCJES() {
-        String processId = "process-id";
-        CaseData caseData = CaseData.builder()
-            .businessProcess(BusinessProcess.builder().processInstanceId(processId).build())
-            .joIsRegisteredWithRTL(YES)
-            .activeJudgment(JudgmentDetails.builder()
-                                .isRegisterWithRTL(YES)
-                                .build())
-            .build();
-
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        params.getRequest().setEventId(SEND_JUDGMENT_DETAILS_CJES.name());
-
-        sendJudgmentDetailsCjesHandler.handle(params);
-
-        // Assert
-        verify(cjesService).sendJudgment(eq(caseData), eq(true));
-        
-  (runtimeService);
     }
 }
