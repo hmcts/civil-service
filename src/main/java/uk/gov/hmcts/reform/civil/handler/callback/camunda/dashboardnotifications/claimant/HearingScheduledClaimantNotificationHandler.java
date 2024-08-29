@@ -88,7 +88,7 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
         boolean requiresHearingFee = false;
         boolean hasUnpaidFee = false;
 
-        if(isAutoHearingNotice) {
+        if (isAutoHearingNotice) {
             HearingNoticeVariables camundaVars = camundaService.getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId());
             requiresHearingFee = hearingFeeRequired(camundaVars.getHearingType());
             hasUnpaidFee = !(caseData.getHearingFeePaymentDetails() != null
