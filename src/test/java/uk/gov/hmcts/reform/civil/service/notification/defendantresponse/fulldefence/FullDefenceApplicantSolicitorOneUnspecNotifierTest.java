@@ -28,8 +28,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
-
-public class FullDefenceApplicantSolicitorOneUnspecNotifierTest {
+ class FullDefenceApplicantSolicitorOneUnspecNotifierTest {
 
     @Mock
     private NotificationService notificationService;

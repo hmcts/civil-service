@@ -61,7 +61,7 @@ public class FullDefenceRespondentSolicitorTwoCCSpecNotifier extends FullDefence
 
     }
 
-    //finding legal org name
+    @Override
     protected String getLegalOrganisationName(CaseData caseData) {
         String organisationID = caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
         Optional<Organisation> organisation = organisationService.findOrganisationById(organisationID);

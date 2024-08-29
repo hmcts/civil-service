@@ -31,8 +31,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
-
-public class FullDefenceApplicantSolicitorOneCCSpecNotifierTest {
+ class FullDefenceApplicantSolicitorOneCCSpecNotifierTest {
 
     @Mock
     private NotificationService notificationService;

@@ -27,8 +27,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DE
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-
-public class DirectionsQuestionnairePreparerTest {
+ class DirectionsQuestionnairePreparerTest {
 
     @Mock
     private DirectionsQuestionnaireGenerator directionsQuestionnaireGenerator;

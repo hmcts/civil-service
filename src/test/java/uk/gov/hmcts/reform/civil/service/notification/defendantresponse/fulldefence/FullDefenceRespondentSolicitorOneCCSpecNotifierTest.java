@@ -31,8 +31,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
-
-public class FullDefenceRespondentSolicitorOneCCSpecNotifierTest {
+ class FullDefenceRespondentSolicitorOneCCSpecNotifierTest {
 
     @Mock
     private NotificationService notificationService;
@@ -84,7 +83,7 @@ public class FullDefenceRespondentSolicitorOneCCSpecNotifierTest {
             .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
             .build();
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+        CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC")
                     .build())
             .build();

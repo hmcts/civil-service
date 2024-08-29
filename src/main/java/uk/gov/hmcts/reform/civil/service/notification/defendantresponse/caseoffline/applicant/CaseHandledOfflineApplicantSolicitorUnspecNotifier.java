@@ -9,14 +9,11 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.is1v1Or2v1Case;
 
 @Component
 public class CaseHandledOfflineApplicantSolicitorUnspecNotifier extends CaseHandledOfflineApplicantSolicitorNotifier {
-
-    private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
 
     public CaseHandledOfflineApplicantSolicitorUnspecNotifier(NotificationService notificationService,
                                                               NotificationsProperties notificationsProperties) {
         super(notificationService);
-        this.notificationService = notificationService;
         this.notificationsProperties = notificationsProperties;
     }
 
@@ -31,7 +28,5 @@ public class CaseHandledOfflineApplicantSolicitorUnspecNotifier extends CaseHand
 
         }
         sendNotificationToSolicitor(caseData, recipient, templateID);
-
     }
-
 }

@@ -627,16 +627,4 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
             .containsEntry("legalOrgName", "Signer Name")
             .containsEntry("claimReferenceNumber", "000DC001");
     }
-
-    @Test
-    void shouldReturnPropertiesSpec1v2DiffSol1_whenInvoked() {
-
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged()
-            .build();
-        assertThat(caseHandledOfflineRespondentSolicitorSpecNotifier.addPropertiesSpec1v2DiffSol(caseData,
-            CaseHandledOfflineRecipient.RESPONDENT_SOLICITOR2))
-            .containsEntry("legalOrgName", "Signer Name")
-            .containsEntry("claimReferenceNumber", "000DC001");
-    }
 }

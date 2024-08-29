@@ -262,6 +262,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
 
     @Deprecated
     private final YesOrNo respondent2DQCarerAllowanceCreditFullAdmission;
+    @Deprecated
     private final String responseToClaimAdmitPartWhyNotPayLRspec2;
     private final YesOrNo neitherCompanyNorOrganisation;
     private final RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteGeneric;
