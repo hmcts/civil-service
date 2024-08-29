@@ -123,7 +123,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
         String reference = "";
         String legacyCaseRef = caseData.getLegacyCaseReference();
         String hearingTime;
-        if(Objects.nonNull(caseData.getHearingTimeHourMinute())) {
+        if (Objects.nonNull(caseData.getHearingTimeHourMinute())) {
             hearingTime = NotificationUtils.getFormattedHearingTime(caseData.getHearingTimeHourMinute());
         } else {
             LocalDateTime hearingStartDateTime = camundaService
