@@ -21,7 +21,9 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.AssembleDocumentsForDeadlineResponse;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.PopulateRespondentCopyObjects;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.UpdateDataRespondentDeadlineResponse;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.SetApplicantResponseDeadline;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.ValidateRespondentExperts;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.ValidateRespondentWitnesses;
@@ -109,6 +111,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     RespondToClaimCallbackHandler.class,
     PopulateRespondentCopyObjects.class,
     SetApplicantResponseDeadline.class,
+    UpdateDataRespondentDeadlineResponse.class,
+    AssembleDocumentsForDeadlineResponse.class,
     ValidateRespondentWitnesses.class,
     ValidateRespondentExperts.class,
     ValidateUnavailableDates.class,
