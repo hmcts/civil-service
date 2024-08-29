@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
 import java.math.BigDecimal;
@@ -49,6 +50,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
@@ -70,9 +72,12 @@ public class DashboardNotificationsParamsMapperTest {
     @Mock
     private FeatureToggleService featureToggleService;
 
+    @Mock
+    private ClaimantResponseUtils claimantResponseUtils;
+
     @BeforeEach
     void setup() {
-        mapper = new DashboardNotificationsParamsMapper(featureToggleService);
+        mapper = new DashboardNotificationsParamsMapper(featureToggleService, claimantResponseUtils);
         caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
     }
 
@@ -101,6 +106,7 @@ public class DashboardNotificationsParamsMapperTest {
             new IdValue<>("2", Bundle.builder().createdOn(Optional.of(now)).build()),
             new IdValue<>("3", Bundle.builder().createdOn(Optional.of(now.minusDays(2))).build())
         );
+        when(claimantResponseUtils.getDefendantAdmittedAmount(any())).thenReturn(BigDecimal.valueOf(100));
 
         LocalDateTime applicant1ResponseDeadline = LocalDateTime.of(2024, 3, 21, 16, 0);
         caseData = caseData.toBuilder()
