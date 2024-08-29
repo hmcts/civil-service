@@ -181,8 +181,10 @@ class AmendRestitchBundleCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader("# The bundle has been restitched\n\n## All parties have been notified")
-                    .confirmationBody("&nbsp;")
+                    .confirmationHeader("# The bundle is being restitched")
+                    .confirmationBody("### What happens next\nCheck the Bundles tab to see if the restitch has been successful. "
+                                          + "\nRestitching can take up to 5 minutes. "
+                                          + "\n\nAll parties will be notified when the new bundle is ready to view.")
                     .build());
         }
     }
