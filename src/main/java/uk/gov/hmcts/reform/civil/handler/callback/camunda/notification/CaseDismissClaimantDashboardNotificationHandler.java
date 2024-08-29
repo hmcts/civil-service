@@ -43,10 +43,5 @@ public class CaseDismissClaimantDashboardNotificationHandler extends AbstractCas
             "CLAIMANT",
             authToken
         );
-        dashboardApiClient.blockTaskProgress(caseData.getCcdCaseReference().toString(),
-                                             "CLAIMANT",
-                                             authToken,
-                                             // for some reason, I couldn't make this work without this parameter
-                                             "application/json");
     }
 }

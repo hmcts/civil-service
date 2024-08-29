@@ -35,16 +35,6 @@ public interface DashboardApiClient {
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     );
 
-    @PutMapping(path = {
-        "block/{ccd-case-identifier}/role/{role-type}",
-    })
-    ResponseEntity<List<TaskListEntity>> blockTaskProgress (
-        @PathVariable("ccd-case-identifier") String ccdCaseIdentifier,
-        @PathVariable("role-type") String roleType,
-        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
-        @RequestHeader(HttpHeaders.CONTENT_TYPE) String contentType
-    );
-
     @GetMapping(path = {
         "notifications/{uuid}",
     })

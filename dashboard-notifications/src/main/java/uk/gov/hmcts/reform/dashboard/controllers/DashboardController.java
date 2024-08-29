@@ -93,27 +93,6 @@ public class DashboardController {
         return new ResponseEntity<>(taskListResponse, HttpStatus.OK);
     }
 
-    @PutMapping(path = {
-        "block/{ccd-case-identifier}/role/{role-type}",
-    })
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "OK"),
-        @ApiResponse(responseCode = "401", description = "Not Authorized"),
-        @ApiResponse(responseCode = "400", description = "Bad Request")})
-    public ResponseEntity<List<TaskListEntity>> blockTaskProgress(
-        @PathVariable("ccd-case-identifier") String ccdCaseIdentifier,
-        @PathVariable("role-type") String roleType,
-        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
-        // for some reason, I couldn't make this work without this parameter
-        @RequestHeader(HttpHeaders.CONTENT_TYPE) String contentType
-    ) {
-        log.info("Block progress on tasks for case {} and role {}", ccdCaseIdentifier, roleType);
-
-        var taskListResponse = taskListService.blockTaskProgress(ccdCaseIdentifier, roleType);
-
-        return new ResponseEntity<>(taskListResponse, HttpStatus.OK);
-    }
-
     @GetMapping(path = {
         "notifications/{uuid}",
     })

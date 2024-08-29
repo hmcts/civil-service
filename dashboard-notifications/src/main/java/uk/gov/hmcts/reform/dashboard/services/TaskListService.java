@@ -1,11 +1,9 @@
 package uk.gov.hmcts.reform.dashboard.services;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
-import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 import uk.gov.hmcts.reform.dashboard.entities.TaskItemTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
 import uk.gov.hmcts.reform.dashboard.repositories.TaskListRepository;
@@ -13,26 +11,12 @@ import uk.gov.hmcts.reform.dashboard.repositories.TaskListRepository;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class TaskListService {
 
-    /**
-     * tasks that do not allow progress.
-     */
-    private static final Set<String> READ_ONLY_TASK_IDS = Set.of("Application.View", "Claim.Claimant.Info",
-                                                                 "Claim.View", "Hearing.Bundle.View",
-                                                                 "Hearing.Document.View", "Hearing.View",
-                                                                 "Judgment.View", "Order.View",
-                                                                 "Response.Defendant.Info", "Response.View",
-                                                                 "View.Mediation.Documents"
-    );
     private final TaskListRepository taskListRepository;
 
     @Autowired
@@ -79,51 +63,5 @@ public class TaskListService {
             TaskListEntity updated = taskListEntity.toBuilder().currentStatus(taskListEntity.getNextStatus()).build();
             return taskListRepository.save(updated);
         }).orElseThrow(() -> new IllegalArgumentException("Invalid task item identifier " + taskItemIdentifier));
-    }
-
-    public List<TaskListEntity> blockTaskProgress(String ccdCaseIdentifier, String roleType) {
-
-        List<TaskListEntity> taskListEntityList = taskListRepository
-            .findByReferenceAndTaskItemTemplateRoleAndCurrentStatusIn(
-                ccdCaseIdentifier,
-                roleType,
-                Set.of(TaskStatus.IN_PROGRESS.getPlaceValue(), TaskStatus.AVAILABLE.getPlaceValue(),
-                       TaskStatus.OPTIONAL.getPlaceValue(), TaskStatus.ACTION_NEEDED.getPlaceValue()
-                )
-            );
-
-        return taskListEntityList.stream().filter(t -> !READ_ONLY_TASK_IDS
-                .contains(t.getTaskItemTemplate().getTemplateName()))
-            .map(t -> {
-                TaskListEntity.TaskListEntityBuilder updated = t.toBuilder().currentStatus(TaskStatus.INACTIVE.getPlaceValue())
-                    .nextStatus(TaskStatus.INACTIVE.getPlaceValue())
-                    .hintTextCy("").hintTextEn("")
-                    .taskNameEn(removeAnchor(t.getTaskNameEn()))
-                    .taskNameCy(removeAnchor(t.getTaskNameCy()));
-                return taskListRepository.save(updated.build());
-            })
-            .collect(Collectors.toList());
-    }
-
-    private static final Pattern closeAnchor = Pattern.compile("</a\\s*>", Pattern.CASE_INSENSITIVE);
-    private static final Pattern openAnchor = Pattern.compile("<a\\s+", Pattern.CASE_INSENSITIVE);
-
-    private String removeAnchor(String text) {
-        if (StringUtils.isBlank(text)) {
-            return text;
-        }
-        String current = text;
-        Matcher matcherClose, matcherOpen;
-        while ((matcherClose = closeAnchor.matcher(current)).find()
-            && (matcherOpen = openAnchor.matcher(current)).find()
-            && matcherOpen.start() < matcherClose.start()) {
-            current = matcherClose.replaceFirst("");
-            int open1 = matcherOpen.start();
-            int open2 = current.indexOf('>', open1);
-            if (open2 > -1) {
-                current = current.substring(0, open1) + current.substring(open2+1);
-            }
-        }
-        return current;
     }
 }
