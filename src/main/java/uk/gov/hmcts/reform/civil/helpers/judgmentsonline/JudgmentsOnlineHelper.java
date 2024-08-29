@@ -125,9 +125,8 @@ public class JudgmentsOnlineHelper {
     }
 
     @NotNull
-    public static String calculateRepaymentBreakdownSummary(CaseData caseData) {
+    public static String calculateRepaymentBreakdownSummary(JudgmentDetails activeJudgment) {
 
-        JudgmentDetails activeJudgment = caseData.getActiveJudgment();
         BigDecimal totalAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getTotalAmount()));
 
         //creates  the text on the page, based on calculated values
