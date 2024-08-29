@@ -84,9 +84,8 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        if (caseData.getJoSetAsideReason() == JudgmentSetAsideReason.JUDGMENT_ERROR) {
-            caseDataBuilder.businessProcess(BusinessProcess.ready(NOTIFY_SET_ASIDE_JUDGMENT));
-        }
+        //TODO update camunda runtime variable
+        caseDataBuilder.businessProcess(BusinessProcess.ready(NOTIFY_SET_ASIDE_JUDGMENT));
 
         String nextState;
         if (Objects.nonNull(caseData.getJoSetAsideOrderType()) && caseData.getJoSetAsideOrderType().equals(
