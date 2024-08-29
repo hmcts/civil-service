@@ -10,6 +10,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
+import java.math.BigDecimal;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -30,6 +32,7 @@ public class DefendantAcceptSettlementAgreementDefendantScenarioTest extends Das
             )
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
+            .totalClaimAmount(new BigDecimal(10000))
             .build();
 
         handler.handle(callbackParams(caseData));
