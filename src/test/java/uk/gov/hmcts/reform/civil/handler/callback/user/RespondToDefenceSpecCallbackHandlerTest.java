@@ -75,6 +75,7 @@ import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.DocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -90,6 +91,7 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataServ
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.DQResponseDocumentUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -104,6 +106,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import static java.time.LocalDateTime.now;
@@ -113,6 +116,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -143,6 +148,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -202,6 +208,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private LocationReferenceDataService locationRefDataService;
+
+    @MockBean
+    private DQResponseDocumentUtils dqResponseDocumentUtils;
 
     @Autowired
     private AssignCategoryId assignCategoryId;
@@ -759,6 +768,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
                 .build();
             when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
+            when(dqResponseDocumentUtils.buildClaimantResponseDocuments(any(CaseData.class))).thenReturn(new ArrayList<>());
         }
 
         @ParameterizedTest
@@ -778,6 +788,40 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsExactly(READY.name(), CLAIMANT_RESPONSE_SPEC.name());
 
             assertThat(response.getData()).containsEntry("applicant1ResponseDate", localDateTime.format(ISO_DATE_TIME));
+            verify(dqResponseDocumentUtils, times(1)).buildClaimantResponseDocuments(any(CaseData.class));
+        }
+
+        @Test
+        void shouldSetClaimantResponseDocs() {
+            Document document = DocumentBuilder.builder().build();
+            CaseData fullDefenceData = CaseDataBuilder.builder().atState(FULL_DEFENCE_PROCEED).build();
+            CaseData caseData = fullDefenceData.toBuilder()
+                .applicant1DQ(fullDefenceData.getApplicant1DQ().toBuilder()
+                                  .applicant1DQDraftDirections(document)
+                    .build())
+                .build();
+            var expectedResponseDocuments = List.of(
+                Element.<CaseDocument>builder()
+                    .id(UUID.randomUUID())
+                    .value(CaseDocument.builder()
+                               .documentLink(document)
+                               .documentName("doc-name")
+                               .createdBy("Claimant")
+                               .createdDatetime(LocalDateTime.now())
+                               .build())
+                    .build());
+            when(dqResponseDocumentUtils.buildClaimantResponseDocuments(any(CaseData.class))).thenReturn(expectedResponseDocuments);
+
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            var actualCaseData = getCaseData(response);
+
+            assertThat(actualCaseData.getClaimantResponseDocuments()).isEqualTo(expectedResponseDocuments);
+            assertThat(actualCaseData.getApplicant1DQ().getApplicant1DQDraftDirections()).isEqualTo(null);
+
+            verify(dqResponseDocumentUtils, times(1)).buildClaimantResponseDocuments(any(CaseData.class));
         }
 
         @ParameterizedTest
@@ -803,7 +847,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAddExperts_whenAtFullDefenceStateV1() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
+                .atState(FULL_DEFENCE_PROCEED)
                 .build();
             var params = callbackParamsOf(
                 CallbackVersion.V_1,
@@ -837,7 +881,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldMoveCaseToIn_MediationAndUpdateDate_V2() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
+                .atState(FULL_DEFENCE_PROCEED)
                 .build();
             var params = callbackParamsOf(
                 CallbackVersion.V_2,
