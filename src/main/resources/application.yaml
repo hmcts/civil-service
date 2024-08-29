@@ -447,6 +447,8 @@ notifications:
   notifyClaimantLrValidationDiscontinuanceFailureTemplate: "25398d9e-bb5f-4778-b76f-625c355f7c06"
 
   notifyLRBundleRestitched: "f42c83ed-03ce-4b1c-95b7-958045293793"
+  notifyLRCaseStayed: "c5e40526-e3f6-4d98-8881-b00c9bc4f200"
+  notifyLRCaseDismissed: "4fa16416-650a-4af3-8305-e21fd63a8754"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
@@ -762,5 +764,5 @@ caseFlags:
 stateflow:
   engine:
     simplification:
-      enabled: ${SIMPLE_STATE_FLOW_ENGINE_ENABLED:false}
+      enabled: ${SIMPLE_STATE_FLOW_ENGINE_ENABLED:true}
 

@@ -49,8 +49,10 @@ import uk.gov.hmcts.reform.civil.service.citizenui.RespondentMediationService;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.DQResponseDocumentUtils;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -68,11 +70,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.math.BigDecimal.ZERO;
+import static java.util.Objects.nonNull;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -122,6 +124,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final JudgementService judgementService;
     private final LocationHelper locationHelper;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
+    private final AssignCategoryId assignCategoryId;
     private static final String DATE_PATTERN = "dd MMMM yyyy";
     private final RespondentMediationService respondentMediationService;
     private final PaymentDateService paymentDateService;
@@ -130,6 +133,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final CaseDetailsConverter caseDetailsConverter;
     private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
     private final FrcDocumentsUtils frcDocumentsUtils;
+    private final DQResponseDocumentUtils dqResponseDocumentUtils;
 
     public static final String UNAVAILABLE_DATE_RANGE_MISSING = "Please provide at least one valid Date from if you cannot attend hearing within next 3 months.";
     public static final String INVALID_UNAVAILABILITY_RANGE = "Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.";
@@ -474,6 +478,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 nextState = CaseState.JUDICIAL_REFERRAL.name();
             } else if (caseData.isPartAdmitClaimSettled()) {
                 nextState = CaseState.CASE_SETTLED.name();
+            } else if (featureToggleService.isLipVLipEnabled()
+                && caseData.isLRvLipOneVOne()
+                && caseData.isClaimantDontWantToProceedWithFulLDefenceFD()) {
+                nextState = CaseState.CASE_STAYED.name();
             }
         }
 
@@ -487,6 +495,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         builder.businessProcess(businessProcess);
 
         frcDocumentsUtils.assembleClaimantsFRCDocuments(caseData);
+
+        builder.claimantResponseDocuments(
+            dqResponseDocumentUtils.buildClaimantResponseDocuments(builder.build()));
+
+        clearTempDocuments(builder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
@@ -533,7 +546,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (requestedCourt != null) {
             LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
                 fetchLocationData(callbackParams), requestedCourt.getResponseCourtLocations());
-            if (Objects.nonNull(courtLocation)) {
+            if (nonNull(courtLocation)) {
                 dataBuilder
                     .applicant1DQ(dq.applicant1DQRequestedCourt(
                         caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().toBuilder()
@@ -853,5 +866,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     public boolean notTransferredOnline(CaseData caseData) {
         return caseData.getCaseManagementLocation().getBaseLocation().equals(cnbcEpimsId);
+    }
+
+    private void clearTempDocuments(CaseData.CaseDataBuilder<?, ?> builder) {
+        Applicant1DQ applicant1DQ = builder.build().getApplicant1DQ();
+        if (nonNull(applicant1DQ)) {
+            builder.applicant1DQ(builder.build().getApplicant1DQ().toBuilder().applicant1DQDraftDirections(null).build());
+        }
     }
 }

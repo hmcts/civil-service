@@ -29,6 +29,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.of;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARK_PAID_FULL;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.VALIDATE_DISCONTINUE_CLAIM_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UpdateNextHearingInfo;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HEARING_DETAILS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_CASE_NOTE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_DEFENDANT_LITIGATION_FRIEND;
@@ -45,7 +54,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
@@ -54,14 +62,13 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DECISION_ON_RECONSIDERATION_REQUEST;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EDIT_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_PAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
@@ -69,6 +76,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HWF_REFERENCE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_PAID_IN_FULL;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_JUDGE_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_SUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_UNSUCCESSFUL;
@@ -79,29 +87,23 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_C
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_HEARING_PARTIES;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RECORD_JUDGMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_JUDGE_DEFENCE_RECEIVED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EDIT_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARK_PAID_FULL;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.VALIDATE_DISCONTINUE_CLAIM_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SET_ASIDE_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STAY_CASE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CASE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRANSFER_ONLINE_CASE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_CHECK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_NOTIFICATION;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HEARING_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UpdateNextHearingInfo;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CASE_STAYED;
@@ -393,7 +395,9 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         asyncStitchingComplete,
-                        COURT_OFFICER_ORDER
+                        COURT_OFFICER_ORDER,
+                        STAY_CASE,
+                        DISMISS_CASE
                     }
                 ),
                 of(
@@ -428,7 +432,9 @@ class FlowStateAllowedEventServiceTest {
                         SETTLE_CLAIM_MARK_PAID_FULL,
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
-                        COURT_OFFICER_ORDER
+                        COURT_OFFICER_ORDER,
+                        STAY_CASE,
+                        DISMISS_CASE
                     }
                 ),
                 of(
@@ -463,7 +469,9 @@ class FlowStateAllowedEventServiceTest {
                         SETTLE_CLAIM_MARK_PAID_FULL,
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
-                        COURT_OFFICER_ORDER
+                        COURT_OFFICER_ORDER,
+                        STAY_CASE,
+                        DISMISS_CASE
 
                     }
                 ),
@@ -508,7 +516,9 @@ class FlowStateAllowedEventServiceTest {
                         HEARING_FEE_UNPAID,
                         HEARING_FEE_PAID,
                         BUNDLE_CREATION_NOTIFICATION,
-                        COURT_OFFICER_ORDER
+                        COURT_OFFICER_ORDER,
+                        STAY_CASE,
+                        DISMISS_CASE
                     }
                 ),
                 of(
@@ -536,7 +546,9 @@ class FlowStateAllowedEventServiceTest {
                         SETTLE_CLAIM,
                         SETTLE_CLAIM_MARK_PAID_FULL,
                         DISCONTINUE_CLAIM_CLAIMANT,
-                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        STAY_CASE,
+                        DISMISS_CASE
                     }
                 ),
                 of(
@@ -564,7 +576,9 @@ class FlowStateAllowedEventServiceTest {
                         SETTLE_CLAIM,
                         SETTLE_CLAIM_MARK_PAID_FULL,
                         DISCONTINUE_CLAIM_CLAIMANT,
-                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        STAY_CASE,
+                        DISMISS_CASE
                     }
                 ),
                 of(
@@ -592,7 +606,9 @@ class FlowStateAllowedEventServiceTest {
                         SETTLE_CLAIM,
                         SETTLE_CLAIM_MARK_PAID_FULL,
                         DISCONTINUE_CLAIM_CLAIMANT,
-                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        STAY_CASE,
+                        DISMISS_CASE
                     }
                 ),
                 of(
@@ -617,7 +633,9 @@ class FlowStateAllowedEventServiceTest {
                         SETTLE_CLAIM,
                         SETTLE_CLAIM_MARK_PAID_FULL,
                         DISCONTINUE_CLAIM_CLAIMANT,
-                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        STAY_CASE,
+                        DISMISS_CASE
                     }
                 ),
                 of(
@@ -642,7 +660,9 @@ class FlowStateAllowedEventServiceTest {
                         SETTLE_CLAIM,
                         SETTLE_CLAIM_MARK_PAID_FULL,
                         DISCONTINUE_CLAIM_CLAIMANT,
-                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        STAY_CASE,
+                        DISMISS_CASE
                     }
                 ),
                 of(
@@ -722,7 +742,9 @@ class FlowStateAllowedEventServiceTest {
                         REQUEST_FOR_RECONSIDERATION,
                         DECISION_ON_RECONSIDERATION_REQUEST,
                         REFER_JUDGE_DEFENCE_RECEIVED,
-                        COURT_OFFICER_ORDER
+                        COURT_OFFICER_ORDER,
+                        STAY_CASE,
+                        DISMISS_CASE
                     }
                 ),
                 of(
@@ -745,7 +767,9 @@ class FlowStateAllowedEventServiceTest {
                         SETTLE_CLAIM,
                         SETTLE_CLAIM_MARK_PAID_FULL,
                         DISCONTINUE_CLAIM_CLAIMANT,
-                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        STAY_CASE,
+                        DISMISS_CASE
                     }
                 ),
                 of(
@@ -927,7 +951,9 @@ class FlowStateAllowedEventServiceTest {
                         SETTLE_CLAIM,
                         SETTLE_CLAIM_MARK_PAID_FULL,
                         DISCONTINUE_CLAIM_CLAIMANT,
-                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        STAY_CASE,
+                        DISMISS_CASE
                     }
                 ),
                 of(
@@ -978,7 +1004,9 @@ class FlowStateAllowedEventServiceTest {
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         INVALID_HWF_REFERENCE,
                         COURT_OFFICER_ORDER,
-                        AMEND_RESTITCH_BUNDLE
+                        AMEND_RESTITCH_BUNDLE,
+                        STAY_CASE,
+                        DISMISS_CASE
                     }
                 )
             );
@@ -1141,7 +1169,44 @@ class FlowStateAllowedEventServiceTest {
                     new String[] {
                         IN_HEARING_READINESS.fullName()
                     }
+                ),
+                of(
+                    STAY_CASE,
+                    new String[] {
+                        NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
+                        FULL_ADMISSION.fullName(),
+                        CLAIM_DETAILS_NOTIFIED.fullName(),
+                        CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
+                        IN_MEDIATION.fullName(),
+                        NOTIFICATION_ACKNOWLEDGED.fullName(),
+                        AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
+                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
+                        PART_ADMISSION.fullName(),
+                        FULL_DEFENCE_NOT_PROCEED.fullName(),
+                        FULL_DEFENCE.fullName(),
+                        FULL_DEFENCE_PROCEED.fullName(),
+                        IN_HEARING_READINESS.fullName()
+                    }
+                ),
+                of(
+                    DISMISS_CASE,
+                    new String[] {
+                        NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
+                        FULL_ADMISSION.fullName(),
+                        CLAIM_DETAILS_NOTIFIED.fullName(),
+                        CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
+                        IN_MEDIATION.fullName(),
+                        NOTIFICATION_ACKNOWLEDGED.fullName(),
+                        AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
+                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
+                        PART_ADMISSION.fullName(),
+                        FULL_DEFENCE_NOT_PROCEED.fullName(),
+                        FULL_DEFENCE.fullName(),
+                        FULL_DEFENCE_PROCEED.fullName(),
+                        IN_HEARING_READINESS.fullName()
+                    }
                 )
+
             );
         }
     }

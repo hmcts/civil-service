@@ -628,4 +628,9 @@ public class NotificationsProperties {
     @NotEmpty
     private String notifyClaimDiscontinuedLipTemplate;
 
+    @NotEmpty
+    private String notifyLRCaseStayed;
+
+    @NotEmpty
+    private String notifyLRCaseDismissed;
 }
