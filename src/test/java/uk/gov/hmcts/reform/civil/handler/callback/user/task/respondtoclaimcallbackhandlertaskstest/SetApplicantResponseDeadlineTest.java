@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.AssembleDocumentsForDeadlineResponse;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.UpdateDataRespondentDeadlineResponse;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.SetApplicantResponseDeadline;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -52,6 +53,9 @@ public class SetApplicantResponseDeadlineTest {
 
     @InjectMocks
     private SetApplicantResponseDeadline setApplicantResponseDeadline;
+
+    @Mock
+    private AssembleDocumentsForDeadlineResponse assembleDocumentsForDeadlineResponse;
 
     @Mock
     private UpdateDataRespondentDeadlineResponse updateDataRespondentDeadlineResponse;
@@ -97,10 +101,8 @@ public class SetApplicantResponseDeadlineTest {
 
     @BeforeEach
     void setUp() {
-        objectMapper = new ObjectMapper();
 
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-
     }
 
     @Test
