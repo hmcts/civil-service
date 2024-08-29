@@ -96,7 +96,7 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
             caseDataBuilder.respondent1ResponseDeadline(deadlinesCalculator.plus28DaysAt4pmDeadline(
                 caseData.getJoSetAsideOrderDate().atTime(0, 0)));
         } else {
-            nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
+            nextState = caseData.getCcdState().name();
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
