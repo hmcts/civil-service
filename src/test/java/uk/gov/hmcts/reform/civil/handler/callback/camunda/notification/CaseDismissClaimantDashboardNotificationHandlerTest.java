@@ -63,6 +63,11 @@ class CaseDismissClaimantDashboardNotificationHandlerTest extends BaseCallbackHa
         handler.handle(params);
 
         // Then
+        verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "CLAIMANT",
+            "BEARER_TOKEN"
+        );
         verify(dashboardApiClient).recordScenario(
             caseData.getCcdCaseReference().toString(),
             DashboardScenarios.SCENARIO_AAA6_DISMISS_CASE_CLAIMANT.getScenario(),

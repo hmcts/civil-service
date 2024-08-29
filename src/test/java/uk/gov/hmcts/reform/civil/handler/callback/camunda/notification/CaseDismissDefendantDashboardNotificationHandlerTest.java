@@ -32,7 +32,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTEN
 class CaseDismissDefendantDashboardNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
-    private CaseDismissClaimantDashboardNotificationHandler handler;
+    private CaseDismissDefendantDashboardNotificationHandler handler;
 
     @Mock
     private FeatureToggleService featureToggleService;
@@ -66,6 +66,11 @@ class CaseDismissDefendantDashboardNotificationHandlerTest extends BaseCallbackH
         handler.handle(params);
 
         // Then
+        verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "DEFENDANT",
+            "BEARER_TOKEN"
+        );
         verify(dashboardApiClient).recordScenario(
             caseData.getCcdCaseReference().toString(),
             DashboardScenarios.SCENARIO_AAA6_DISMISS_CASE_DEFENDANT.getScenario(),
