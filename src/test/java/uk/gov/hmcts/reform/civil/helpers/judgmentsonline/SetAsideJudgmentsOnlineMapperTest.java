@@ -48,7 +48,7 @@ public class SetAsideJudgmentsOnlineMapperTest {
         caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
         caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
         caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
-        judgmentOnlineMapper.moveToHistoricJudgment(caseData);
+        judgmentOnlineMapper.moveToHistoricJudgment(caseData, true);
 
         assertNull(caseData.getActiveJudgment());
         assertNotNull(caseData.getHistoricJudgment());
@@ -66,7 +66,7 @@ public class SetAsideJudgmentsOnlineMapperTest {
         //SET ASIDE
         caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
         caseData.setJoSetAsideDefenceReceivedDate(LocalDate.of(2022, 12, 12));
-        judgmentOnlineMapper.moveToHistoricJudgment(caseData);
+        judgmentOnlineMapper.moveToHistoricJudgment(caseData, true);
 
         assertNull(caseData.getActiveJudgment());
         assertNotNull(caseData.getHistoricJudgment());
@@ -84,7 +84,7 @@ public class SetAsideJudgmentsOnlineMapperTest {
         //SET ASIDE
         caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR);
         caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
-        judgmentOnlineMapper.moveToHistoricJudgment(caseData);
+        judgmentOnlineMapper.moveToHistoricJudgment(caseData, true);
 
         assertNull(caseData.getActiveJudgment());
         assertNotNull(caseData.getHistoricJudgment());
@@ -104,7 +104,7 @@ public class SetAsideJudgmentsOnlineMapperTest {
         //SET ASIDE
         caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR);
         caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
-        judgmentOnlineMapper.moveToHistoricJudgment(caseData);
+        judgmentOnlineMapper.moveToHistoricJudgment(caseData, true);
 
         assertNull(caseData.getActiveJudgment());
         assertNotNull(caseData.getHistoricJudgment());

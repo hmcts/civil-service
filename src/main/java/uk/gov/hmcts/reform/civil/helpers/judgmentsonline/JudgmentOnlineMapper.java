@@ -33,7 +33,7 @@ public abstract class JudgmentOnlineMapper {
             .build();
     }
 
-    public void moveToHistoricJudgment(CaseData caseData) {
+    public void moveToHistoricJudgment(CaseData caseData, boolean isSetAside) {
         JudgmentDetails activeJudgment = addUpdateActiveJudgment(caseData);
         if (isHistoricJudgment(activeJudgment)) {
             List<Element<JudgmentDetails>> historicList = isNull(caseData.getHistoricJudgment())
@@ -44,7 +44,13 @@ public abstract class JudgmentOnlineMapper {
                 (o1, o2) -> o2.getValue().getLastUpdateTimeStamp().compareTo(o1.getValue().getLastUpdateTimeStamp())
             );
             caseData.setHistoricJudgment(historicList);
-            caseData.setActiveJudgment(null);
+
+            if (isSetAside) {
+                caseData.setActiveJudgment(null);
+            } else {
+                caseData.setActiveJudgment(activeJudgment);
+            }
+
         } else {
             caseData.setActiveJudgment(activeJudgment);
         }
@@ -95,7 +101,8 @@ public abstract class JudgmentOnlineMapper {
     }
 
     private boolean isHistoricJudgment(JudgmentDetails activeJudgment) {
-        return JudgmentState.SET_ASIDE_ERROR.equals(activeJudgment.getState())
+        return JudgmentState.MODIFIED.equals(activeJudgment.getState())
+            || JudgmentState.SET_ASIDE_ERROR.equals(activeJudgment.getState())
             || JudgmentState.SET_ASIDE.equals(activeJudgment.getState());
     }
 }

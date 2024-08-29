@@ -80,7 +80,8 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
 
         CaseData caseData = callbackParams.getCaseData();
         caseData.setJoIsLiveJudgmentExists(YesOrNo.NO);
-        setAsideJudgmentOnlineMapper.moveToHistoricJudgment(caseData);
+        caseData.setJoIsDisplayInJudgmentTab(YesOrNo.NO);
+        setAsideJudgmentOnlineMapper.moveToHistoricJudgment(caseData, true);
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 

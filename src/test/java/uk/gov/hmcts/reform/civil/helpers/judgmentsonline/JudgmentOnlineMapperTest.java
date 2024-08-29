@@ -35,7 +35,7 @@ class JudgmentOnlineMapperTest {
         caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
         caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
         caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
-        setAsideJudgmentOnlineMapper.moveToHistoricJudgment(caseData);
+        setAsideJudgmentOnlineMapper.moveToHistoricJudgment(caseData, true);
 
         assertNull(caseData.getActiveJudgment());
         assertNotNull(caseData.getHistoricJudgment());
@@ -62,7 +62,7 @@ class JudgmentOnlineMapperTest {
         caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
         caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
         caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
-        setAsideJudgmentOnlineMapper.moveToHistoricJudgment(caseData);
+        setAsideJudgmentOnlineMapper.moveToHistoricJudgment(caseData, true);
 
         try {
             // if this test runs too fast, the time is the same and sort does not work as expected
@@ -84,7 +84,7 @@ class JudgmentOnlineMapperTest {
         caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
         caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
         caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
-        setAsideJudgmentOnlineMapper.moveToHistoricJudgment(caseData);
+        setAsideJudgmentOnlineMapper.moveToHistoricJudgment(caseData, true);
 
         assertNull(caseData.getActiveJudgment());
         assertNotNull(caseData.getHistoricJudgment());
