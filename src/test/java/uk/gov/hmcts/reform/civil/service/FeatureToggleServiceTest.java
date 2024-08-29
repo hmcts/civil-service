@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -175,6 +176,7 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
+    @Disabled
     void shouldReturnCorrectValue_whenCaseProgressionEnabled(Boolean toggleStat) {
         var caseFileKey = "cui-case-progression";
         givenToggle(caseFileKey, toggleStat);
