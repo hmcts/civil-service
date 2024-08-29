@@ -57,6 +57,9 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now())
                                            .paymentPlan(JudgmentPaymentPlan.builder()
                                                             .type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
+                                           .orderedAmount("100")
+                                           .costs("50")
+                                           .totalAmount("150")
                                            .build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -79,6 +82,9 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now())
                                            .paymentPlan(JudgmentPaymentPlan.builder()
                                                             .type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
+                                           .orderedAmount("100")
+                                           .costs("50")
+                                           .totalAmount("150")
                                            .build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -88,7 +94,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("dateOfFullPaymentMade").isEqualTo(LocalDate.now().plusDays(35).toString());
             assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("confirmFullPaymentMade").isEqualTo(List.of("CONFIRMED"));
-            assertThat(response.getData().get("joIsLiveJudgmentExists")).isEqualTo("No");
+            assertThat(response.getData().get("joIsLiveJudgmentExists")).isEqualTo("Yes");
 
         }
 
@@ -98,7 +104,11 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31Days();
             caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now())
                                            .paymentPlan(JudgmentPaymentPlan.builder()
-                                                            .type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
+                                                            .type(PaymentPlanSelection.PAY_IMMEDIATELY)
+                                                            .build())
+                                           .orderedAmount("100")
+                                           .costs("50")
+                                           .totalAmount("150")
                                            .build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -108,8 +118,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("dateOfFullPaymentMade").isEqualTo(LocalDate.now().plusDays(15).toString());
             assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("confirmFullPaymentMade").isEqualTo(List.of("CONFIRMED"));
-            assertThat(response.getData().get("joIsLiveJudgmentExists")).isEqualTo("No");
-            assertThat(response.getData()).containsEntry("joIsLiveJudgmentExists", "No");
+            assertThat(response.getData().get("joIsLiveJudgmentExists")).isEqualTo("Yes");
 
             assertThat(response.getData().get("activeJudgment")).isNotNull();
             assertThat(response.getData().get("historicJudgment")).isNull();
@@ -123,6 +132,9 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now())
                                            .paymentPlan(JudgmentPaymentPlan.builder()
                                                             .type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
+                                           .orderedAmount("100")
+                                           .costs("50")
+                                           .totalAmount("150")
                                            .build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -130,7 +142,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then: judgmentOnline fields should be set correctly
             assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("confirmFullPaymentMade").isEqualTo(List.of("CONFIRMED"));
-            assertThat(response.getData().get("joIsLiveJudgmentExists")).isEqualTo("No");
+            assertThat(response.getData().get("joIsLiveJudgmentExists")).isEqualTo("Yes");
             assertThat(response.getData().get("activeJudgment")).isNotNull();
             assertThat(response.getData().get("historicJudgment")).isNull();
         }

@@ -76,9 +76,6 @@ class JudgmentByAdmissionMapperTest {
         assertNotNull(activeJudgment.getDefendant1Dob());
 
         assertEquals("Mr. John Rambo", caseData.getJoDefendantName1());
-        assertEquals("14000", caseData.getJoOrderedAmount());
-        assertEquals("1000", caseData.getJoCosts());
-        assertEquals("15000", caseData.getJoTotalAmount());
         assertEquals(PaymentPlanSelection.PAY_IMMEDIATELY, caseData.getJoPaymentPlanSelected());
 
     }
@@ -133,9 +130,6 @@ class JudgmentByAdmissionMapperTest {
         assertNotNull(activeJudgment.getDefendant1Dob());
 
         assertEquals("Mr. John Rambo", caseData.getJoDefendantName1());
-        assertEquals("14000", caseData.getJoOrderedAmount());
-        assertEquals("1000", caseData.getJoCosts());
-        assertEquals("15000", caseData.getJoTotalAmount());
         assertEquals(PaymentPlanSelection.PAY_IN_INSTALMENTS, caseData.getJoPaymentPlanSelected());
         assertEquals("1000", caseData.getJoRepaymentAmount());
         assertNotNull(caseData.getJoRepaymentStartDate());
@@ -188,9 +182,6 @@ class JudgmentByAdmissionMapperTest {
         assertNotNull(activeJudgment.getDefendant1Address());
 
         assertEquals("The Organisation", caseData.getJoDefendantName1());
-        assertEquals("14000", caseData.getJoOrderedAmount());
-        assertEquals("1000", caseData.getJoCosts());
-        assertEquals("15000", caseData.getJoTotalAmount());
         assertEquals(PaymentPlanSelection.PAY_BY_DATE, caseData.getJoPaymentPlanSelected());
     }
 

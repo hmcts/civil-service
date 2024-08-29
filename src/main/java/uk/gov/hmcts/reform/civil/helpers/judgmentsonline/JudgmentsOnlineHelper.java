@@ -137,7 +137,7 @@ public class JudgmentsOnlineHelper {
         repaymentBreakdown.append("The judgment will order the defendants to pay £").append(totalAmount);
         repaymentBreakdown.append(", including the claim fee and interest, if applicable, as shown:");
 
-        if(null != orderedAmount) {
+        if (null != orderedAmount) {
             repaymentBreakdown.append("\n").append("### Claim amount \n £").append(orderedAmount.setScale(2));
         }
 
@@ -147,8 +147,8 @@ public class JudgmentsOnlineHelper {
 
         repaymentBreakdown.append("\n ## Subtotal \n £").append(totalAmount.setScale(2))
             .append("\n");
-
         repaymentBreakdown.append("\n ## Total still owed \n £").append(totalAmount.setScale(2));
+
         return repaymentBreakdown.toString();
     }
 
