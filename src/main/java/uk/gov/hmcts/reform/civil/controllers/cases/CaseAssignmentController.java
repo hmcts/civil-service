@@ -90,12 +90,15 @@ public class CaseAssignmentController {
         @PathVariable("caseReference") String caseReference) {
         log.info("Check claim reference {} is linked to defendant", caseReference);
         CaseDetails caseDetails = caseByLegacyReferenceSearchService.getCivilOrOcmcCaseDataByCaseReference(caseReference);
-        boolean isOcmcCase = caseDetails.getCaseTypeId().equals(CaseDefinitionConstants.CMC_CASE_TYPE);
-        boolean status;
-        if (isOcmcCase) {
-            status = defendantPinToPostLRspecService.isOcmcDefendantLinked(caseReference);
-        } else {
-            status = defendantPinToPostLRspecService.isDefendantLinked(caseDetails);
+        boolean isOcmcCase = false;
+        boolean status = false;
+        if (caseDetails != null) {
+            isOcmcCase = caseDetails.getCaseTypeId().equals(CaseDefinitionConstants.CMC_CASE_TYPE);
+            if (isOcmcCase) {
+                status = defendantPinToPostLRspecService.isOcmcDefendantLinked(caseReference);
+            } else {
+                status = defendantPinToPostLRspecService.isDefendantLinked(caseDetails);
+            }
         }
         DefendantLinkStatus defendantLinkStatus = new DefendantLinkStatus(isOcmcCase, status);
         return new ResponseEntity<>(defendantLinkStatus, HttpStatus.OK);

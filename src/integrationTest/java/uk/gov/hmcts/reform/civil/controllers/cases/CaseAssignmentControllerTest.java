@@ -157,6 +157,17 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
             .andExpect(status().isOk());
     }
 
+    @Test
+    @SneakyThrows
+    void givenNoClaim_whenDefendantLinkedStatus_shouldReturnStatusOk() {
+        when(caseByLegacyReferenceSearchService.getCivilOrOcmcCaseDataByCaseReference(any())).thenReturn(null);
+        DefendantLinkStatus defendantLinkStatus = new DefendantLinkStatus(false, false);
+
+        doGet("", DEFENDENT_LINK_CHECK_URL, "620MC123")
+            .andExpect(content().json(toJson(defendantLinkStatus)))
+            .andExpect(status().isOk());
+    }
+
     @Deprecated
     @Test
     @SneakyThrows

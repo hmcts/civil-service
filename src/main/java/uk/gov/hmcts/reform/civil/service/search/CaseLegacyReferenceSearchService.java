@@ -45,7 +45,7 @@ public class CaseLegacyReferenceSearchService {
             searchResult = coreCaseDataService.searchCMCCases(query);
             if (searchResult == null || searchResult.getCases().isEmpty()) {
                 log.error("no case found for {}", caseReference);
-                throw new SearchServiceCaseNotFoundException();
+                return null;
             }
         }
         return searchResult.getCases().get(0);

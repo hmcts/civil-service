@@ -113,12 +113,11 @@ class CaseLegacyReferenceSearchServiceTest {
     }
 
     @Test
-    void shouldThrowException_getCivilOrOcmcCaseDataByCaseReference_whenCaseIsNotFound() {
+    void shouldReturnEmpty_getCivilOrOcmcCaseDataByCaseReference_whenCaseIsNotFound() {
         given(searchResult.getCases()).willReturn(Collections.emptyList());
 
-        assertThrows(
-            SearchServiceCaseNotFoundException.class, () ->
-                caseLegacyReferenceSearchService.getCivilOrOcmcCaseDataByCaseReference(REFERENCE));
+        CaseDetails result = caseLegacyReferenceSearchService.getCivilOrOcmcCaseDataByCaseReference(REFERENCE);
+        assertThat(result).isNull();
     }
 
 }
