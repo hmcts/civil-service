@@ -211,10 +211,6 @@ public class SetApplicantResponseDeadline implements CaseTask {
     }
 
     private CaseData.CaseDataBuilder<?, ?> updateRespondentAddresses(CaseData caseData) {
-        if (ofNullable(caseData.getRespondent1Copy()).isPresent()
-            && (caseData.getRespondent1Copy().getPrimaryAddress() == null)) {
-            throw new IllegalArgumentException("Primary Address cannot be empty");
-        }
 
         Party updatedRespondent1 = caseData.getRespondent1().toBuilder()
             .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
@@ -227,7 +223,7 @@ public class SetApplicantResponseDeadline implements CaseTask {
 
         if (ofNullable(caseData.getRespondent2()).isPresent()
             && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
-            var updatedRespondent2 = caseData.getRespondent2().toBuilder()
+            Party updatedRespondent2 = caseData.getRespondent2().toBuilder()
                 .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
                 .flags(caseData.getRespondent2Copy().getFlags())
                 .build();
