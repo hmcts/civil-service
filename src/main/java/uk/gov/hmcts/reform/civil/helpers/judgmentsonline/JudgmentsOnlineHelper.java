@@ -139,14 +139,37 @@ public class JudgmentsOnlineHelper {
             repaymentBreakdown.append("\n").append("### Claim amount \n £").append(orderedAmount.setScale(2));
         }
 
-        BigDecimal costs = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getCosts()));
-        if (null != costs) {
-            repaymentBreakdown.append("\n ### Fixed cost amount \n").append("£").append(costs.setScale(2));
+
+        if (null != activeJudgment.getCosts()) {
+            BigDecimal costs = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getCosts()));
+            if (costs.compareTo(BigDecimal.ZERO) != 0) {
+                repaymentBreakdown.append("\n ### Fixed cost amount \n").append("£").append(costs.setScale(2));
+            }
+        }
+
+        if (null != activeJudgment.getClaimFeeAmount()) {
+            BigDecimal claimFeeAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getClaimFeeAmount()));
+            if (claimFeeAmount.compareTo(BigDecimal.ZERO) != 0) {
+                repaymentBreakdown.append("\n ### Claim fee amount \n").append("£").append(claimFeeAmount.setScale(2));
+            }
         }
 
         repaymentBreakdown.append("\n ## Subtotal \n £").append(totalAmount.setScale(2))
             .append("\n");
-        repaymentBreakdown.append("\n ## Total still owed \n £").append(totalAmount.setScale(2));
+
+        BigDecimal amountAlreadyPaid = ZERO;
+        if (null != activeJudgment.getAmountAlreadyPaid()) {
+            amountAlreadyPaid = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getAmountAlreadyPaid()));
+            if (amountAlreadyPaid.compareTo(BigDecimal.ZERO) != 0) {
+                repaymentBreakdown.append("\n ### Amount already paid \n").append("£").append(amountAlreadyPaid.setScale(
+                    2));
+            }
+        }
+
+        BigDecimal totalStillOwed = (null != activeJudgment.getAmountAlreadyPaid())
+            ? totalAmount.subtract(amountAlreadyPaid)
+            : totalAmount;
+        repaymentBreakdown.append("\n ## Total still owed \n £").append(totalStillOwed.setScale(2));
 
         return repaymentBreakdown.toString();
     }
