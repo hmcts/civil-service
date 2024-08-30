@@ -46,8 +46,10 @@ import uk.gov.hmcts.reform.civil.service.citizenui.RespondentMediationService;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.DQResponseDocumentUtils;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -65,11 +67,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.math.BigDecimal.ZERO;
+import static java.util.Objects.nonNull;
+import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -119,6 +122,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final JudgementService judgementService;
     private final LocationHelper locationHelper;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
+    private final AssignCategoryId assignCategoryId;
     private static final String DATE_PATTERN = "dd MMMM yyyy";
     private final RespondentMediationService respondentMediationService;
     private final PaymentDateService paymentDateService;
@@ -127,6 +131,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final CaseDetailsConverter caseDetailsConverter;
     private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
     private final FrcDocumentsUtils frcDocumentsUtils;
+    private final DQResponseDocumentUtils dqResponseDocumentUtils;
 
     @Value("${court-location.specified-claim.epimms-id}") String cnbcEpimsId;
 
@@ -455,6 +460,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         frcDocumentsUtils.assembleClaimantsFRCDocuments(caseData);
 
+        builder.claimantResponseDocuments(
+            dqResponseDocumentUtils.buildClaimantResponseDocuments(builder.build()));
+
+        clearTempDocuments(builder);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
             .state(nextState)
@@ -500,7 +510,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (requestedCourt != null) {
             LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
                 fetchLocationData(callbackParams), requestedCourt.getResponseCourtLocations());
-            if (Objects.nonNull(courtLocation)) {
+            if (nonNull(courtLocation)) {
                 dataBuilder
                     .applicant1DQ(dq.applicant1DQRequestedCourt(
                         caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().toBuilder()
@@ -820,5 +830,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     public boolean notTransferredOnline(CaseData caseData) {
         return caseData.getCaseManagementLocation().getBaseLocation().equals(cnbcEpimsId);
+    }
+
+    private void clearTempDocuments(CaseData.CaseDataBuilder<?, ?> builder) {
+        Applicant1DQ applicant1DQ = builder.build().getApplicant1DQ();
+        if (nonNull(applicant1DQ)) {
+            builder.applicant1DQ(builder.build().getApplicant1DQ().toBuilder().applicant1DQDraftDirections(null).build());
+        }
     }
 }
