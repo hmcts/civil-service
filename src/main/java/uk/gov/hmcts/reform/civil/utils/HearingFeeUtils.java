@@ -44,12 +44,11 @@ public class HearingFeeUtils {
             claimAmount = caseData.getTotalClaimAmount().setScale(2, RoundingMode.UNNECESSARY);
         }
 
-        if (claimTrack.equals("SMALL_CLAIM")) {
-            return hearingFeesService.getFeeForHearingSmallClaims(claimAmount);
-        } else if (claimTrack.equals("FAST_CLAIM")) {
-            return hearingFeesService.getFeeForHearingFastTrackClaims(claimAmount);
-        } else {
-            return hearingFeesService.getFeeForHearingMultiClaims(claimAmount);
-        }
+        return switch (claimTrack) {
+            case "SMALL_CLAIM" -> hearingFeesService.getFeeForHearingSmallClaims(claimAmount);
+            case "FAST_CLAIM" -> hearingFeesService.getFeeForHearingFastTrackClaims(claimAmount);
+            case "INTERMEDIATE_CLAIM", "MULTI_CLAIM" -> hearingFeesService.getFeeForHearingMultiClaims(claimAmount);
+            default -> throw new IllegalArgumentException("Invalid claim track: " + claimTrack);
+        };
     }
 }
