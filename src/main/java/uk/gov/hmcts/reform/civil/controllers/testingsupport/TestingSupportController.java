@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.judgments.CjesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
@@ -50,6 +51,7 @@ public class TestingSupportController {
     private final IStateFlowEngine stateFlowEngine;
     private final EventHistoryMapper eventHistoryMapper;
     private final RoboticsDataMapper roboticsDataMapper;
+    private final CjesMapper cjesMapper;
 
     private final ClaimDismissedHandler claimDismissedHandler;
     private final HearingFeePaidEventHandler hearingFeePaidHandler;
@@ -141,6 +143,14 @@ public class TestingSupportController {
     public String getRPAJsonInformationForCaseData(
         @RequestBody CaseData caseData) throws JsonProcessingException {
         return roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
+    }
+
+    @PostMapping(
+        value = "/testing-support/rtlActiveJudgment",
+        produces = "application/json")
+    public String getRTLJudgment(
+        @RequestBody CaseData caseData) {
+        return cjesMapper.toJudgmentDetailsCJES(caseData, true).toString();
     }
 
     @GetMapping("/testing-support/trigger-case-dismissal-scheduler")
