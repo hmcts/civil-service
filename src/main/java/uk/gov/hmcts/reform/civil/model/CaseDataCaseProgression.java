@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderReasons;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderAppeal;
+import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrdersComplexityBand;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRecitalsRecorded;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRepresentation;
@@ -166,6 +167,8 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private AssistedOrderReasons finalOrderGiveReasonsComplex;
     private YesOrNo finalOrderAllocateToTrack;
     private FinalOrderTrackAllocation finalOrderTrackAllocation;
+    private FinalOrdersComplexityBand finalOrderFastTrackComplexityBand;
+    private FinalOrdersComplexityBand finalOrderIntermediateTrackComplexityBand;
 
     // judge final freeform orders
     private final FinalOrderSelection finalOrderSelection;

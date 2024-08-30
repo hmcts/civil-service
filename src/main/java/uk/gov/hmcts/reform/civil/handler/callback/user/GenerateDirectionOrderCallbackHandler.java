@@ -505,7 +505,9 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                 }
             }
             caseDataBuilder.finalOrderTrackAllocation(null)
-                .finalOrderAllocateToTrack(null);
+                .finalOrderAllocateToTrack(null)
+                .finalOrderIntermediateTrackComplexityBand(null)
+                .finalOrderFastTrackComplexityBand(null);
         }
 
         caseDataBuilder.businessProcess(BusinessProcess.ready(GENERATE_ORDER_NOTIFICATION));
