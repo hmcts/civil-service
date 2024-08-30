@@ -247,6 +247,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         "documentIssuedDate,documentForDisclosure",
         "documentIssuedDate,documentReferredInStatement",
         "documentIssuedDate,documentEvidenceForTrial",
+        "documentIssuedDate,bundleEvidence",
     })
     void shouldNotReturnError_whenDocumentTypeUploadDatePresent(String dateField, String collectionField) {
         // Given
@@ -274,6 +275,8 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
             + " date entered must not be in the future (5).",
         "documentIssuedDate,documentEvidenceForTrial, Invalid date: \"Documentary evidence for trial\""
             + " date entered must not be in the future (10).",
+        "documentIssuedDate,bundleEvidence, Invalid date: \"Bundle Hearing date\""
+            + " date entered must not be in the future (11).",
     })
     void shouldReturnError_whenDocumentTypeUploadDateFuture(String dateField, String collectionField,
                                                             String expectedErrorMessage) {

@@ -367,7 +367,8 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                          List<Element<UploadEvidenceExpert>> uploadEvidenceExpert2,
                                          List<Element<UploadEvidenceExpert>> uploadEvidenceExpert3,
                                          List<Element<UploadEvidenceExpert>> uploadEvidenceExpert4,
-                                         List<Element<UploadEvidenceDocumentType>> trialDocumentEvidence) {
+                                         List<Element<UploadEvidenceDocumentType>> trialDocumentEvidence,
+                                         List<Element<UploadEvidenceDocumentType>> bundleEvidence) {
         List<String> errors = new ArrayList<>();
 
         checkDateCorrectness(time, errors, uploadEvidenceDocumentType, date -> date.getValue()
@@ -416,6 +417,11 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                  .getDocumentIssuedDate(),
                              "Invalid date: \"Documentary evidence for trial\" "
                                  + "date entered must not be in the future (10).");
+
+        checkDateCorrectness(time, errors, bundleEvidence, date -> date.getValue()
+                                 .getDocumentIssuedDate(),
+                             "Invalid date: \"Bundle Hearing date\" "
+                                 + "date entered must not be in the future (11).");
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)

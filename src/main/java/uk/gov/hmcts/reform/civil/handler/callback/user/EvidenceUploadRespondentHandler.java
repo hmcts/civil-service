@@ -47,7 +47,8 @@ public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
                                        caseData.getDocumentJointStatementRes2(),
                                        caseData.getDocumentQuestionsRes2(),
                                        caseData.getDocumentAnswersRes2(),
-                                       caseData.getDocumentEvidenceForTrialRes2());
+                                       caseData.getDocumentEvidenceForTrialRes2(),
+                                       caseData.getBundleEvidenceRes());
         } else {
             return validateValuesParty(caseData.getDocumentForDisclosureRes(),
                                        caseData.getDocumentWitnessStatementRes(),
@@ -58,7 +59,8 @@ public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
                                        caseData.getDocumentJointStatementRes(),
                                        caseData.getDocumentQuestionsRes(),
                                        caseData.getDocumentAnswersRes(),
-                                       caseData.getDocumentEvidenceForTrialRes());
+                                       caseData.getDocumentEvidenceForTrialRes(),
+                                       caseData.getBundleEvidenceRes());
         }
     }
 

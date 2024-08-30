@@ -71,7 +71,8 @@ public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
                     caseData.getDocumentJointStatementApp2(),
                     caseData.getDocumentQuestionsApp2(),
                     caseData.getDocumentAnswersApp2(),
-                    caseData.getDocumentEvidenceForTrialApp2());
+                    caseData.getDocumentEvidenceForTrialApp2(),
+                    caseData.getBundleEvidence());
         } else {
             return validateValuesParty(caseData.getDocumentForDisclosure(),
                     caseData.getDocumentWitnessStatement(),
@@ -82,7 +83,8 @@ public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
                     caseData.getDocumentJointStatement(),
                     caseData.getDocumentQuestions(),
                     caseData.getDocumentAnswers(),
-                    caseData.getDocumentEvidenceForTrial());
+                    caseData.getDocumentEvidenceForTrial(),
+                    caseData.getBundleEvidence());
         }
     }
 
