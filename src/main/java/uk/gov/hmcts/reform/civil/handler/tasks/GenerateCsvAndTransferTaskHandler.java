@@ -96,13 +96,14 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
         for (String s : row) {
             builder.append(s).append(",");
         }
-        builder.append("\n");
+        builder.deleteCharAt(builder.length() - 1);
+        builder.append("\r\n");
 
         return builder.toString();
     }
 
     private String[] getCSVHeaders() {
         return new String[] {"SITE_ID", "CASE_TYPE", "CHECK_LIST", "PARTY_STATUS", "CASE_NUMBER", "AMOUNT", "PARTY_TYPE",
-            "COMPANY_NAME", "CONTACT_NAME", "CONTACT_NUMBER", "CONTACT_EMAIL", "PILOT"};
+            "COMPANY_NAME", "CONTACT_NAME", "CONTACT_NUMBER", "CONTACT_EMAIL", "PILOT", "CASE_TITLE"};
     }
 }

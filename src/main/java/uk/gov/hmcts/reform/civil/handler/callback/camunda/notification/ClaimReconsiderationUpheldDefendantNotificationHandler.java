@@ -56,7 +56,7 @@ public class ClaimReconsiderationUpheldDefendantNotificationHandler extends Call
 
         if (caseData.getRespondent1() != null && !caseData.getRespondent1().getPartyName().isEmpty()) {
             notificationService.sendMail(
-                caseData.getRespondentSolicitor1EmailAddress(),
+                caseData.isRespondent1LiP() ? caseData.getRespondent1().getPartyEmail() : caseData.getRespondentSolicitor1EmailAddress(),
                 getTemplate(),
                 addProperties(caseData),
                 getReferenceTemplate(caseData)
@@ -78,7 +78,9 @@ public class ClaimReconsiderationUpheldDefendantNotificationHandler extends Call
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.isApplicantLiP()
+                ? caseData.getCcdCaseReference().toString()
+                : caseData.getLegacyCaseReference(),
             CLAIMANT_V_DEFENDANT, getClaimantVDefendant(caseData),
             PARTY_NAME, caseData.getRespondent1().getPartyName()
         );

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -15,7 +16,6 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -48,11 +47,13 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     private final Time time;
     private final FeatureToggleService featureToggleService;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
+    @Value("${case-flags.logging.enabled:false}")
+    private boolean caseFlagsLoggingEnabled;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::populateRespondentCopyObjects,
+            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
             callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
         );
@@ -63,18 +64,15 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse populateRespondentCopyObjects(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-            .respondent1Copy(caseData.getRespondent1());
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper))
-            .build();
-    }
-
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
+        if (caseFlagsLoggingEnabled) {
+            log.info(
+                "case id: {}, defendant response cui before about to submit: {}",
+                callbackParams.getRequest().getCaseDetails().getId(),
+                callbackParams.getCaseData().getRespondent1().getFlags()
+            );
+        }
+
         CaseData caseData = getUpdatedCaseData(callbackParams);
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
@@ -86,19 +84,10 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             addEventAndDateAddedToRespondentExperts(builder);
             addEventAndDateAddedToRespondentWitnesses(builder);
         }
+
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_CUI, builder);
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(
             builder, featureToggleService.isUpdateContactDetailsEnabled());
-
-        if (ofNullable(caseData.getRespondent1Copy()).isPresent()) {
-            CaseData latestData = builder.build();
-            Party updatedRespondent1 = latestData.getRespondent1().toBuilder()
-                .flags(latestData.getRespondent1Copy().getFlags())
-                .partyID(latestData.getRespondent1Copy().getPartyID())
-                .build();
-            builder.respondent1(updatedRespondent1)
-                .respondent1Copy(null);
-        }
 
         CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
@@ -106,6 +95,14 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
 
         if (!caseData.isRespondentResponseBilingual()) {
             responseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.name());
+        }
+
+        if (caseFlagsLoggingEnabled) {
+            log.info(
+                "case id: {}, defendant response cui after about to submit: {}",
+                callbackParams.getRequest().getCaseDetails().getId(),
+                caseData.getRespondent1().getFlags()
+            );
         }
 
         return responseBuilder.build();
@@ -121,7 +118,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             .respondent1ResponseDate(responseDate)
             .respondent1GeneratedResponseDocument(dummyDocument)
             .respondent1ClaimResponseDocumentSpec(dummyDocument)
-            .responseClaimTrack(AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null).name())
+            .responseClaimTrack(AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null, featureToggleService, caseData).name())
             .applicant1ResponseDeadline(deadlinesCalculator.calculateApplicantResponseDeadline(
                 responseDate,
                 allocatedTrack

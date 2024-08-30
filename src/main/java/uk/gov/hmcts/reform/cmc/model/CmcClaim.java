@@ -78,11 +78,6 @@ public class CmcClaim implements Claim {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_FORMAT)
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
-    private LocalDate admissionPayImmediatelyPastPaymentDate;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_FORMAT)
-    @JsonSerialize(using = LocalDateSerializer.class)
-    @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate intentionToProceedDeadline;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
@@ -403,6 +398,21 @@ public class CmcClaim implements Claim {
     }
 
     @Override
+    public boolean isSDOOrderInReview() {
+        return false;
+    }
+
+    @Override
+    public boolean isSDOOrderInReviewOtherParty() {
+        return false;
+    }
+
+    @Override
+    public boolean isDecisionForReconsiderationMade() {
+        return false;
+    }
+
+    @Override
     public boolean hasClaimEnded() {
         return (Objects.nonNull(response)
             && response.isFullDefence()
@@ -462,7 +472,8 @@ public class CmcClaim implements Claim {
     public boolean isPaymentPlanRejected() {
 
         return (hasResponse() && (response.isPartAdmit() || response.isFullAdmit())
-            && (response.getPaymentIntention().isPayByDate() || response.getPaymentIntention().isPayByInstallments()));
+            && (response.getPaymentIntention() != null
+            && (response.getPaymentIntention().isPayByDate() || response.getPaymentIntention().isPayByInstallments())));
     }
 
     @Override
@@ -545,5 +556,15 @@ public class CmcClaim implements Claim {
             .map(PartyStatement::getOffer)
             .map(Offer::getPaymentIntention)
             .isPresent();
+    }
+
+    @Override
+    public boolean isCaseStruckOut() {
+        return false;
+    }
+
+    @Override
+    public boolean isDefaultJudgementIssued() {
+        return false;
     }
 }

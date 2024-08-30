@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
@@ -43,7 +42,6 @@ public class CoreCaseDataService {
     private final CaseDetailsConverter caseDetailsConverter;
     private final UserService userService;
     private final FeatureToggleService featureToggleService;
-    private final IdamClient idamClient;
 
     public void triggerEvent(Long caseId, CaseEvent eventName) {
         triggerEvent(caseId, eventName, Map.of());
@@ -200,7 +198,7 @@ public class CoreCaseDataService {
 
     private String createQuery(String authorization, int startIndex, String userEmailField) {
         if (featureToggleService.isLipVLipEnabled()) {
-            UserDetails defendantInfo = idamClient.getUserDetails(authorization);
+            UserDetails defendantInfo = userService.getUserDetails(authorization);
             return new SearchSourceBuilder()
                 .query(QueryBuilders.boolQuery()
                            .must(QueryBuilders.termQuery(userEmailField, defendantInfo.getEmail())))

@@ -1,28 +1,33 @@
 package uk.gov.hmcts.reform.civil.service.citizen.defendant;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -31,6 +36,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_LIP_DEFENDANT;
 
 @ExtendWith(SpringExtension.class)
@@ -44,21 +50,27 @@ class LipDefendantCaseAssignmentServiceTest {
     @Mock
     private FeatureToggleService featureToggleService;
     @Mock
-    private IdamClient idamClient;
+    private UserService userService;
     @Mock
     private CaseEventService caseEventService;
-
     @Mock
     private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
+    @Mock
+    private CaseDetailsConverter caseDetailsConverter;
 
-    @InjectMocks
-    private LipDefendantCaseAssignmentService lipDefendantCaseAssignmentService;
+    LipDefendantCaseAssignmentService lipDefendantCaseAssignmentService;
+
+    @BeforeEach
+    public void setUp() {
+        lipDefendantCaseAssignmentService =
+            new LipDefendantCaseAssignmentService(userService, caseEventService, defendantPinToPostLRspecService, caseDetailsConverter, false);
+    }
 
     @Test
     void shouldAddDefendantDetails_whenLipVLipFlagIsEnabled() {
         //Given
         given(featureToggleService.isLipVLipEnabled()).willReturn(true);
-        given(idamClient.getUserDetails(anyString())).willReturn(UserDetails.builder().id(USER_ID).email(EMAIL).build());
+        given(userService.getUserDetails(anyString())).willReturn(UserDetails.builder().id(USER_ID).email(EMAIL).build());
         IdamUserDetails defendantUserDetails = IdamUserDetails.builder()
             .id(USER_ID)
             .email(EMAIL)
@@ -79,7 +91,7 @@ class LipDefendantCaseAssignmentServiceTest {
             Optional.empty()
         );
         //Then
-        verify(idamClient).getUserDetails(AUTHORIZATION);
+        verify(userService).getUserDetails(AUTHORIZATION);
         verify(caseEventService).submitEventForClaim(refEq(params));
     }
 
@@ -92,7 +104,7 @@ class LipDefendantCaseAssignmentServiceTest {
         Map<String, Object> data = new HashMap<>();
         data.put("respondent1PinToPostLRspec", pinInPostData);
         given(featureToggleService.isLipVLipEnabled()).willReturn(true);
-        given(idamClient.getUserDetails(anyString())).willReturn(UserDetails.builder().id(USER_ID).email(EMAIL)
+        given(userService.getUserDetails(anyString())).willReturn(UserDetails.builder().id(USER_ID).email(EMAIL)
                                                                      .build());
         given(defendantPinToPostLRspecService.removePinInPostData(any())).willReturn(data);
 
@@ -102,6 +114,13 @@ class LipDefendantCaseAssignmentServiceTest {
                                                .expiryDate(LocalDate.now().plusDays(180))
                                                .build())
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .respondent1(Party.builder()
+                             .flags(Flags.builder()
+                                        .partyName("Mr test")
+                                        .roleOnCase("Defendant 1")
+                                        .details(List.of()).build())
+                             .type(Party.Type.INDIVIDUAL)
+                             .build())
             .build();
         Optional<CaseDetails> caseDetails = Optional.of(CaseDetailsBuilder.builder().data(caseData).build());
         IdamUserDetails defendantUserDetails = IdamUserDetails.builder()
@@ -109,6 +128,8 @@ class LipDefendantCaseAssignmentServiceTest {
             .email(EMAIL)
             .build();
         data.put("defendantUserDetails", defendantUserDetails);
+        ReflectionTestUtils.setField(lipDefendantCaseAssignmentService, "caseFlagsLoggingEnabled", true);
+        when(caseDetailsConverter.toCaseData(caseDetails.get())).thenReturn(caseData);
         EventSubmissionParams params = EventSubmissionParams.builder()
             .caseId(CASE_ID)
             .userId(USER_ID)
@@ -124,7 +145,7 @@ class LipDefendantCaseAssignmentServiceTest {
             caseDetails
         );
         //Then
-        verify(idamClient).getUserDetails(AUTHORIZATION);
+        verify(userService).getUserDetails(AUTHORIZATION);
         verify(caseEventService).submitEventForClaim(refEq(params));
     }
 }

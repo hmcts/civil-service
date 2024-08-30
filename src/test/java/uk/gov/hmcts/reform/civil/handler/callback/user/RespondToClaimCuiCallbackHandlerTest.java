@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -18,7 +19,6 @@ import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
@@ -49,6 +49,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_CUI;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.EventAddedEvents.DEFENDANT_RESPONSE_EVENT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.ONE_DAY;
@@ -84,20 +85,11 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnNoError_WhenAboutToStartIsInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            ReflectionTestUtils.setField(handler, "caseFlagsLoggingEnabled", true);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isNull();
-        }
-
-        @Test
-        void shouldPopulateRespondent1Copy_WhenAboutToStartIsInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getRespondent1Copy()).isEqualTo(caseData.getRespondent1());
         }
     }
 
@@ -142,6 +134,33 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("READY");
             assertThat(response.getState()).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        }
+
+        @Test
+        void shouldUpdateBusinessProcessAndClaimStatus_when_is_multi_track() {
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .totalClaimAmount(BigDecimal.valueOf(150000))
+                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("ENGLISH").build()).build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent")
+                .isEqualTo(DEFENDANT_RESPONSE_CUI.name());
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("status")
+                .isEqualTo("READY");
+            assertThat(response.getState()).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
+            assertThat(updatedData.getResponseClaimTrack()).isEqualTo(MULTI_CLAIM.toString());
+
         }
 
         @Test
@@ -300,37 +319,6 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(expert.getEventAdded()).isEqualTo(DEFENDANT_RESPONSE_EVENT.getValue());
             assertThat(witness.getDateAdded()).isEqualTo(LocalDateTime.now().toLocalDate());
             assertThat(witness.getEventAdded()).isEqualTo(DEFENDANT_RESPONSE_EVENT.getValue());
-        }
-
-        @Test
-        void shouldCopyFlagsAndIdFromRespondentCopy() {
-            when(featureToggleService.isHmcEnabled()).thenReturn(true);
-            when(featureToggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
-
-            Party updatedRespondent1 = Party.builder()
-                .type(Party.Type.INDIVIDUAL)
-                .partyName("CLAIMANT_NAME")
-                .partyID("res-1-id")
-                .flags(Flags.builder()
-                           .roleOnCase("Defendant solicitor")
-                           .build()).build();
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .totalClaimAmount(BigDecimal.valueOf(1000))
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
-                .respondent1(Party.builder()
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName("CLAIMANT_NAME")
-                                 .build())
-                .respondent1Copy(updatedRespondent1)
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            CaseData updatedCaseData = getCaseData(response);
-
-            assertThat(updatedCaseData.getRespondent1()).isEqualTo(updatedRespondent1);
-            assertThat(updatedCaseData.getRespondent1Copy()).isNull();
         }
     }
 }

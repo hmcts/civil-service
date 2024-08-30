@@ -6,17 +6,19 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Objects;
 import java.util.Optional;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType.DEFAULT_JUDGMENT;
 
 @Slf4j
 public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher implements Claim {
@@ -86,15 +88,10 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     }
 
     @Override
-    public boolean hasResponseDeadlineBeenExtended() {
-        return caseData.getRespondent1TimeExtensionDate() != null;
-    }
-
-    @Override
     public boolean isEligibleForCCJ() {
         return caseData.getRespondent1ResponseDeadline() != null
             && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
-            && caseData.getPaymentTypeSelection() == null;
+            && caseData.getPaymentTypeSelection() == null && null == caseData.getActiveJudgment();
     }
 
     @Override
@@ -112,8 +109,10 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         if (featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) {
             return false;
         }
-        return caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() != null
-            && !hasSdoBeenDrawn();
+        return (caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() != null
+            && !hasSdoBeenDrawn())
+            || (null != caseData.getCcjPaymentDetails()
+            && null != caseData.getCcjPaymentDetails().getCcjJudgmentStatement());
     }
 
     @Override
@@ -136,7 +135,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
             return false;
         }
 
-        return Objects.nonNull(caseData.getTakenOfflineDate()) && Objects.nonNull(caseData.getCcdState())
+        return nonNull(caseData.getTakenOfflineDate()) && nonNull(caseData.getCcdState())
             && caseData.getCcdState().equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
     }
 
@@ -198,7 +197,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isHearingFormGenerated() {
-        return !caseData.getHearingDocuments().isEmpty();
+        return !caseData.getHearingDocuments().isEmpty() && !isPaperResponse();
     }
 
     @Override
@@ -237,27 +236,27 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     @Override
     public boolean isMediationSuccessful() {
         return !hasSdoBeenDrawn()
-            && Objects.nonNull(caseData.getMediation())
-            && Objects.nonNull(caseData.getMediation().getMediationSuccessful())
-            && Objects.nonNull(caseData.getMediation().getMediationSuccessful().getMediationAgreement());
+            && nonNull(caseData.getMediation())
+            && nonNull(caseData.getMediation().getMediationSuccessful())
+            && nonNull(caseData.getMediation().getMediationSuccessful().getMediationAgreement());
     }
 
     @Override
     public boolean isMediationUnsuccessful() {
         return !hasSdoBeenDrawn()
-            && Objects.nonNull(caseData.getMediation())
-            && ((Objects.nonNull(caseData.getMediation().getUnsuccessfulMediationReason())
+            && nonNull(caseData.getMediation())
+            && ((nonNull(caseData.getMediation().getUnsuccessfulMediationReason())
             && !caseData.getMediation().getUnsuccessfulMediationReason().isEmpty())
-            || (Objects.nonNull(caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect())
+            || (nonNull(caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect())
             && !caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect().isEmpty()));
     }
 
     @Override
     public boolean isMediationPending() {
-        return Objects.nonNull(caseData.getCcdState())
+        return nonNull(caseData.getCcdState())
             && caseData.getCcdState().equals(CaseState.IN_MEDIATION)
-            && Objects.nonNull(caseData.getMediation())
-            && Objects.nonNull(caseData.getMediation().getMediationSuccessful())
+            && nonNull(caseData.getMediation())
+            && nonNull(caseData.getMediation().getMediationSuccessful())
             && Objects.isNull(caseData.getMediation().getMediationSuccessful().getMediationAgreement());
     }
 
@@ -271,7 +270,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean hasClaimEnded() {
-        return (Objects.nonNull(caseData.getApplicant1ProceedsWithClaimSpec())
+        return (nonNull(caseData.getApplicant1ProceedsWithClaimSpec())
             && caseData.getApplicant1ProceedsWithClaimSpec().equals(YesOrNo.NO)
             && caseData.isRespondentResponseFullDefence())
             || caseData.getApplicant1ResponseDeadlinePassed();
@@ -302,16 +301,45 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     public boolean isSDOOrderCreated() {
         return caseData.getHearingDate() == null
             && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
-            && !isSDOOrderLegalAdviserCreated();
+            && !isSDOOrderLegalAdviserCreated()
+            && !isSDOOrderInReview()
+            && !isSDOOrderInReviewOtherParty()
+            && !isDecisionForReconsiderationMade();
     }
 
     @Override
     public boolean isSDOOrderLegalAdviserCreated() {
-        return featureToggleService.isLipVLipEnabled()
+        return featureToggleService.isCaseProgressionEnabled()
             && caseData.getHearingDate() == null
-            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
-            && caseData.isSmallClaim()
-            && caseData.getTotalClaimAmount().intValue() <= BigDecimal.valueOf(10000).intValue();
+            && isSDOMadeByLegalAdviser()
+            && !isSDOOrderInReview()
+            && !isSDOOrderInReviewOtherParty()
+            && !isDecisionForReconsiderationMade();
+    }
+
+    @Override
+    public boolean isSDOOrderInReview() {
+        return featureToggleService.isCaseProgressionEnabled()
+            && isSDOMadeByLegalAdviser()
+            && nonNull(caseData.getOrderRequestedForReviewDefendant())
+            && caseData.getOrderRequestedForReviewDefendant().equals(YES)
+            && !isDecisionForReconsiderationMade();
+    }
+
+    @Override
+    public boolean isSDOOrderInReviewOtherParty() {
+        return featureToggleService.isCaseProgressionEnabled()
+            && isSDOMadeByLegalAdviser()
+            && nonNull(caseData.getOrderRequestedForReviewClaimant())
+            && caseData.getOrderRequestedForReviewClaimant().equals(YES)
+            && !isSDOOrderInReview()
+            && !isDecisionForReconsiderationMade();
+    }
+
+    @Override
+    public boolean isDecisionForReconsiderationMade() {
+        return caseData.getHearingDate() == null
+            && caseData.getDecisionOnReconsiderationDocumentFromList().isPresent();
     }
 
     @Override
@@ -386,7 +414,10 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     }
 
     public boolean isWaitingForClaimantIntentDocUpload() {
-        return false;
+        return caseData.isRespondentResponseFullDefence()
+            && caseData.getApplicant1ResponseDate() != null
+            && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION
+            && caseData.isClaimantBilingual();
     }
 
     @Override
@@ -403,4 +434,12 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     public boolean isNocForDefendant() {
         return false;
     }
+
+    @Override
+    public boolean isDefaultJudgementIssued() {
+        return nonNull(caseData.getActiveJudgment())
+            && DEFAULT_JUDGMENT.equals(caseData.getActiveJudgment().getType())
+            && JudgmentState.ISSUED.equals(caseData.getActiveJudgment().getState());
+    }
+
 }

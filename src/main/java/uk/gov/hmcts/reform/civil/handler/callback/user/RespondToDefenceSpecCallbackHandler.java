@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -48,8 +49,11 @@ import uk.gov.hmcts.reform.civil.service.citizenui.RespondentMediationService;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.DQResponseDocumentUtils;
+import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
@@ -66,11 +70,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.math.BigDecimal.ZERO;
+import static java.util.Objects.nonNull;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -108,6 +112,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     implements ExpertsValidator, WitnessesValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CLAIMANT_RESPONSE_SPEC);
+    public static final String DOWNLOAD_URL_CLAIM_DOCUMENTS = "/cases/case-details/%s#Claim documents";
     private final ObjectMapper objectMapper;
     private final Time time;
     private final UnavailableDateValidator unavailableDateValidator;
@@ -119,6 +124,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final JudgementService judgementService;
     private final LocationHelper locationHelper;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
+    private final AssignCategoryId assignCategoryId;
     private static final String DATE_PATTERN = "dd MMMM yyyy";
     private final RespondentMediationService respondentMediationService;
     private final PaymentDateService paymentDateService;
@@ -126,6 +132,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final DeadlineExtensionCalculatorService deadlineCalculatorService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
+    private final FrcDocumentsUtils frcDocumentsUtils;
+    private final DQResponseDocumentUtils dqResponseDocumentUtils;
 
     public static final String UNAVAILABLE_DATE_RANGE_MISSING = "Please provide at least one valid Date from if you cannot attend hearing within next 3 months.";
     public static final String INVALID_UNAVAILABILITY_RANGE = "Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.";
@@ -133,6 +141,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     public static final String INVALID_UNAVAILABLE_DATE_FROM_BEFORE_TODAY = "Unavailability Date From must not be before today.";
     public static final String INVALID_UNAVAILABLE_DATE_TO_WHEN_MORE_THAN_YEAR = "Unavailability Date To must not be more than one year in the future.";
     public static final String INVALID_UNAVAILABLE_DATE_WHEN_MORE_THAN_YEAR = "Unavailability Date must not be more than one year in the future.";
+    @Value("${court-location.specified-claim.epimms-id}") String cnbcEpimsId;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -339,24 +348,13 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         builder.respondent2GeneratedResponseDocument(null);
         builder.respondent1ClaimResponseDocumentSpec(null);
 
-        //Update the caseManagement location to the flight location if
-        //Small claim & Flight Delay &Airline is not OTHER
-        if (isFlightDelaySmallClaimAndAirline(caseData)) {
-            builder.caseManagementLocation(caseData.getFlightDelayDetails().getFlightCourtLocation());
-        } else if (!isFlightDelayAndSmallClaim(caseData)) {
-            // 1. It is a Fast_Claim 2. Small claim and not Flight Delay
-            locationHelper.getCaseManagementLocation(caseData)
-                .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
-                    builder,
-                    requestedCourt,
-                    () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
-                        CallbackParams.Params.BEARER_TOKEN).toString())
-                ));
+        // When a case has been transferred, we do not update the location using claimant/defendant preferred location logic
+        if (notTransferredOnline(caseData)) {
+            updateCaseManagementLocation(callbackParams, builder);
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("Case management location for " + caseData.getLegacyCaseReference()
-                          + " is " + builder.build().getCaseManagementLocation());
+            log.debug("Case management location for {} is {}", caseData.getLegacyCaseReference(), builder.build().getCaseManagementLocation());
         }
 
         if (caseData.hasApplicantProceededWithClaim() || (caseData.isPartAdmitClaimSpec() && caseData.isPartAdmitClaimNotSettled())) {
@@ -365,10 +363,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             Applicant1DQ.Applicant1DQBuilder dq = caseData.getApplicant1DQ().toBuilder()
                 .applicant1DQStatementOfTruth(statementOfTruth);
 
-            //Update Case Management location with DQ location only if either of following is true
-            // 1. It is a Fast_Claim 2. Small claim and not Flight Delay 3.Small Claim & Flight delay & Airline is Other
-            if (!isFlightDelayAndSmallClaim(caseData)
-                || isFlightDelaySmallClaimAndOther(caseData)) {
+            // When a case has been transferred, we do not update the location using claimant/defendant preferred location logic
+            if (notTransferredOnline(caseData) && (!isFlightDelayAndSmallClaim(caseData)
+                || isFlightDelaySmallClaimAndOther(caseData))) {
                 updateDQCourtLocations(callbackParams, caseData, builder, dq, isFlightDelaySmallClaimAndOther(caseData));
             }
 
@@ -481,6 +478,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 nextState = CaseState.JUDICIAL_REFERRAL.name();
             } else if (caseData.isPartAdmitClaimSettled()) {
                 nextState = CaseState.CASE_SETTLED.name();
+            } else if (featureToggleService.isLipVLipEnabled()
+                && caseData.isLRvLipOneVOne()
+                && caseData.isClaimantDontWantToProceedWithFulLDefenceFD()) {
+                nextState = CaseState.CASE_STAYED.name();
             }
         }
 
@@ -492,6 +493,13 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
 
         builder.businessProcess(businessProcess);
+
+        frcDocumentsUtils.assembleClaimantsFRCDocuments(caseData);
+
+        builder.claimantResponseDocuments(
+            dqResponseDocumentUtils.buildClaimantResponseDocuments(builder.build()));
+
+        clearTempDocuments(builder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
@@ -519,8 +527,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString())
         ));
         if (log.isDebugEnabled()) {
-            log.debug("Case management location for " + caseData.getLegacyCaseReference()
-                          + " is " + builder.build().getCaseManagementLocation());
+            log.debug("Case management location for {} is {}", caseData.getLegacyCaseReference(), builder.build().getCaseManagementLocation());
         }
     }
 
@@ -539,7 +546,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (requestedCourt != null) {
             LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
                 fetchLocationData(callbackParams), requestedCourt.getResponseCourtLocations());
-            if (Objects.nonNull(courtLocation)) {
+            if (nonNull(courtLocation)) {
                 dataBuilder
                     .applicant1DQ(dq.applicant1DQRequestedCourt(
                         caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().toBuilder()
@@ -669,14 +676,20 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 + "We'll review the case and contact you about what to do next.<br>"
                 + format(
                 "%n%n<a href=\"%s\" target=\"_blank\">View Directions questionnaire</a>",
-                format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+                format(DOWNLOAD_URL_CLAIM_DOCUMENTS, caseData.getCcdCaseReference())
+            );
+        }  else if (CaseState.All_FINAL_ORDERS_ISSUED == caseData.getCcdState()) {
+            return format(
+                "<br />%n%n<a href=\"%s\" target=\"_blank\">Download county court judgment</a>"
+                    + "<br><br>The defendant will be served the county court judgment<br><br>",
+                format(DOWNLOAD_URL_CLAIM_DOCUMENTS, caseData.getCcdCaseReference())
             );
         } else {
             return "<h2 class=\"govuk-heading-m\">What happens next</h2>"
                 + "You've decided not to proceed and the case will end.<br>"
                 + format(
                 "%n%n<a href=\"%s\" target=\"_blank\">View Directions questionnaire</a>",
-                format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+                format(DOWNLOAD_URL_CLAIM_DOCUMENTS, caseData.getCcdCaseReference())
             );
         }
     }
@@ -692,6 +705,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             return format(
                 "# You have rejected their response %n## Your Claim Number : %s",
                 caseData.getLegacyCaseReference()
+            );
+        } else if (CaseState.All_FINAL_ORDERS_ISSUED == caseData.getCcdState()) {
+            return format(
+                "# Judgment Submitted %n## A county court judgment(ccj) has been submitted for case %s",
+                claimNumber
             );
         } else {
             return format(
@@ -826,5 +844,34 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         return (isFlightDelayAndSmallClaim(caseData) && caseData.getFlightDelayDetails() != null
             && caseData.getFlightDelayDetails().getAirlineList()
             .getValue().getCode().equals("OTHER"));
+    }
+
+    private void updateCaseManagementLocation(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> builder) {
+        CaseData caseData = callbackParams.getCaseData();
+        //Update the caseManagement location to the flight location if
+        //Small claim & Flight Delay &Airline is not OTHER
+        if (isFlightDelaySmallClaimAndAirline(caseData)) {
+            builder.caseManagementLocation(caseData.getFlightDelayDetails().getFlightCourtLocation());
+        } else if (!isFlightDelayAndSmallClaim(caseData)) {
+            // 1. It is a Fast_Claim 2. Small claim and not Flight Delay
+            locationHelper.getCaseManagementLocation(caseData)
+                .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
+                    builder,
+                    requestedCourt,
+                    () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
+                        CallbackParams.Params.BEARER_TOKEN).toString())
+                ));
+        }
+    }
+
+    public boolean notTransferredOnline(CaseData caseData) {
+        return caseData.getCaseManagementLocation().getBaseLocation().equals(cnbcEpimsId);
+    }
+
+    private void clearTempDocuments(CaseData.CaseDataBuilder<?, ?> builder) {
+        Applicant1DQ applicant1DQ = builder.build().getApplicant1DQ();
+        if (nonNull(applicant1DQ)) {
+            builder.applicant1DQ(builder.build().getApplicant1DQ().toBuilder().applicant1DQDraftDirections(null).build());
+        }
     }
 }

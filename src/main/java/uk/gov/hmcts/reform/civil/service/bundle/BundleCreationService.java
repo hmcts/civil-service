@@ -40,6 +40,14 @@ public class BundleCreationService {
                                 caseDetails.getJurisdiction(), caseDetails.getCaseTypeId()));
     }
 
+    public BundleCreateResponse createBundle(Long caseId) {
+        CaseDetails caseDetails = coreCaseDataService.getCase(caseId);
+        return createNewBundleRequest(getAccessToken(), serviceAuthTokenGenerator.generate(),
+                                      bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseDetailsConverter.toCaseData(caseDetails),
+                                                                                           bundleConfig,
+                                                                                           caseDetails.getJurisdiction(), caseDetails.getCaseTypeId()));
+    }
+
     private String getAccessToken() {
         return userService.getAccessToken(
             userConfig.getUserName(),

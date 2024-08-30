@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.ClaimantResponseOnCourtDecisionType;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -29,6 +30,9 @@ import uk.gov.hmcts.reform.civil.model.PaymentUponCourtOrder;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -136,6 +140,7 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void given_moreTimeRequested_whenGetStatus_thenReturnMoreTimeRequested() {
         CaseData claim = CaseData.builder()
+            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
             .respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
             .respondent1TimeExtensionDate(LocalDateTime.now().plusDays(30))
             .build();
@@ -214,6 +219,18 @@ class CcdClaimStatusDashboardFactoryTest {
             .respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
             .respondent1ResponseDate(LocalDateTime.now())
             .applicant1DQ(Applicant1DQ.builder().applicant1DQRequestedCourt(RequestedCourt.builder().build()).build())
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+            claim, featureToggleService));
+        assertThat(status).isEqualTo(DashboardClaimStatus.REQUESTED_COUNTRY_COURT_JUDGEMENT);
+    }
+
+    @Test
+    void given_claimantRequestedCountyCourtJudgementCui_whenGetStatus_thenReturnRequestedCountryCourtJudgement() {
+        CaseData claim = CaseData.builder()
+            .ccjPaymentDetails(CCJPaymentDetails.builder()
+                                   .ccjJudgmentStatement("test").build())
             .build();
 
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
@@ -679,5 +696,17 @@ class CcdClaimStatusDashboardFactoryTest {
         DashboardClaimStatus status =
             ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.DEFENDANT_APPLY_NOC);
+    }
+
+    @Test
+    void given_defaultJudgementStatusIssuedByClaimant_thenReturnDefaultJudgementStatus() {
+        CaseData claim =
+            CaseData.builder().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1)).activeJudgment(
+                JudgmentDetails.builder().type(JudgmentType.DEFAULT_JUDGMENT).issueDate(LocalDate.now())
+                    .state(JudgmentState.ISSUED).build()).build();
+        DashboardClaimStatus status =
+            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(claim,
+                                                                                                         featureToggleService));
+        assertThat(status).isEqualTo(DashboardClaimStatus.DEFAULT_JUDGEMENT_ISSUED);
     }
 }

@@ -2,23 +2,26 @@ package uk.gov.hmcts.reform.civil.documentmanagement.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+
 import java.time.LocalDateTime;
 
 @Data
 @Builder(toBuilder = true)
+@NoArgsConstructor
 @AllArgsConstructor
 public class CaseDocument {
 
-    private final Document documentLink;
-    private final String documentName;
-    private final DocumentType documentType;
-    private final long documentSize;
-    private final LocalDateTime createdDatetime;
-    private final String createdBy;
-    private final CaseRole ownedBy;
+    private Document documentLink;
+    private String documentName;
+    private DocumentType documentType;
+    private long documentSize;
+    private LocalDateTime createdDatetime;
+    private String createdBy;
+    private CaseRole ownedBy;
 
     @JsonIgnore
     public static CaseDocument toCaseDocument(Document document, DocumentType documentType) {

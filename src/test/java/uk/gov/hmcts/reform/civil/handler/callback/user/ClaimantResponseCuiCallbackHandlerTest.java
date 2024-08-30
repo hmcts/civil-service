@@ -1,16 +1,14 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
@@ -24,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
@@ -58,7 +57,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -75,53 +73,59 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.ONE_DAY;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    ClaimantResponseCuiCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    ResponseOneVOneShowTagService.class,
-    JacksonAutoConfiguration.class,
-    CourtLocationUtils.class,
-    LocationReferenceDataService.class,
-    LocationHelper.class,
-    UpdateCaseManagementDetailsService.class,
-    JudgementService.class,
-    CaseFlagsInitialiser.class
-})
+@ExtendWith(MockitoExtension.class)
 class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
-    private CourtLocationUtils courtLocationUtility;
-    @MockBean
+    @Mock
     private LocationHelper locationHelper;
-    @MockBean
+
+    @Mock
     private LocationReferenceDataService locationRefDataService;
-    @MockBean
+
+    @Mock
     private AirlineEpimsService airlineEpimsService;
-    @MockBean
+
+    @Mock
     private DeadlinesCalculator deadlinesCalculator;
-    @Autowired
+
     private ClaimantResponseCuiCallbackHandler handler;
-    @Autowired
-    CaseFlagsInitialiser caseFlagsInitialiser;
+
+    private ObjectMapper mapper;
+
+    @Mock
+    private ResponseOneVOneShowTagService responseOneVOneShowTagService;
+
+    @Mock
+    private FeatureToggleService featureToggleService;
+
+    @Mock
+    private OrganisationService organisationService;
+
+    @Mock
+    private Time time;
+
     private static final String courtLocation = "Site 1 - Adr 1 - AAA 111";
     private static final String LIVERPOOL_SITE_NAME = "Liverpool Civil and Family Court";
 
-    @Autowired
-    private final ObjectMapper mapper = new ObjectMapper();
-
-    @MockBean
-    private ResponseOneVOneShowTagService responseOneVOneShowTagService;
-    @MockBean
-    FeatureToggleService featureToggleService;
-    @MockBean
-    OrganisationService organisationService;
-
-    @Autowired
-    private JudgementService judgementService;
-
-    @MockBean
-    private Time time;
+    @BeforeEach
+    void setUp() {
+        mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        CaseFlagsInitialiser caseFlagsInitialiser = new CaseFlagsInitialiser(featureToggleService, organisationService);
+        JudgementService judgementService = new JudgementService(featureToggleService);
+        CourtLocationUtils courtLocationUtils = new CourtLocationUtils();
+        UpdateCaseManagementDetailsService updateCaseManagementLocationDetailsService = new UpdateCaseManagementDetailsService(locationHelper,
+                                                                                                                               locationRefDataService,
+                                                                                                                               courtLocationUtils,
+                                                                                                                               airlineEpimsService
+        );
+        handler = new ClaimantResponseCuiCallbackHandler(responseOneVOneShowTagService, featureToggleService,
+                                                         judgementService, mapper,
+                                                         time,
+                                                         updateCaseManagementLocationDetailsService, deadlinesCalculator,
+                                                         caseFlagsInitialiser
+        );
+    }
 
     @Nested
     class AboutToStartCallback {
@@ -135,26 +139,31 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isNull();
         }
+
+        @Test
+        void shouldUpdatePartAdmitPaidValuePounds_WhenAboutToStartIsInvoked() {
+            String suppliedValuePennies = "12345";
+            String expectedValuePounds = "123.45";
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData = caseData.toBuilder()
+                .respondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(new BigDecimal(suppliedValuePennies)).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData())
+                .extracting("partAdmitPaidValuePounds")
+                .isEqualTo(expectedValuePounds);
+        }
     }
 
     @Nested
     class AboutToSubmitCallback {
 
-        private final LocalDateTime submittedDate = LocalDateTime.now();
-
         @BeforeEach
         void before() {
-            LocationRefData locationRefData = LocationRefData.builder().siteName("Site 1").courtAddress("Adr 1").postcode(
-                    "AAA 111")
-                .courtName("Court Name").region("Region").regionId("1").courtVenueId("1")
-                .courtTypeId("10").courtLocationCode("court1")
-                .epimmsId("111").build();
-            given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
-                .willReturn(getSampleCourLocationsRefObject());
-            given(time.now()).willReturn(submittedDate);
-            given(locationHelper.updateCaseManagementLocation(any(), any(), any())).willReturn(Optional.ofNullable(
-                locationRefData));
-            given(deadlinesCalculator.getRespondToSettlementAgreementDeadline(any())).willReturn(LocalDateTime.MAX);
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
             when(featureToggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
         }
@@ -187,7 +196,8 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldOnlyUpdateClaimStatus_whenPartAdmitNotSettled_NoMediation() {
-            given(time.now()).willReturn(LocalDateTime.of(2024, 1, 1, 0, 0, 0));
+            given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                .willReturn(getSampleCourLocationsRefObject());
             Applicant1DQ applicant1DQ = Applicant1DQ.builder()
                 .applicant1DQRequestedCourt(
                     RequestedCourt.builder()
@@ -445,6 +455,8 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateCaseManagementLocationForFlightDelayClaimSpecificAirline() {
+            given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                .willReturn(getSampleCourLocationsRefObject());
             when(featureToggleService.isHmcEnabled()).thenReturn(true);
             when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
             when(airlineEpimsService.getEpimsIdForAirlineIgnoreCase("Sri Lankan")).thenReturn("111");
@@ -469,6 +481,8 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateCaseManagementLocationForFlightDelayClaimInvalidAirline() {
+            given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                .willReturn(getSampleCourLocationsRefObject());
             when(featureToggleService.isHmcEnabled()).thenReturn(true);
             when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
             when(airlineEpimsService.getEpimsIdForAirlineIgnoreCase("INVALID_AIRLINE")).thenReturn(null);
@@ -566,6 +580,9 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetSettlementAgreementDeadLine_whenClaimantSignedSettlementAgreement() {
+            given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                .willReturn(getSampleCourLocationsRefObject());
+            given(deadlinesCalculator.getRespondToSettlementAgreementDeadline(any())).willReturn(LocalDateTime.MAX);
             CaseData caseData = CaseDataBuilder.builder()
                     .caseDataLip(
                             CaseDataLiP.builder()

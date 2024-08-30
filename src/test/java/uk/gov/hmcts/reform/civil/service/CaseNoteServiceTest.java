@@ -1,17 +1,16 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentAndNote;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentWithName;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDateTime;
@@ -27,10 +26,18 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@SpringBootTest(classes = {
-    CaseNoteService.class,
-})
+@ExtendWith(MockitoExtension.class)
 class CaseNoteServiceTest {
+
+    @InjectMocks
+    private CaseNoteService caseNoteService;
+
+    @Mock
+    private UserService userService;
+
+    @Mock
+    private Time time;
+    private final LocalDateTime timeNow = LocalDateTime.of(2023, 10, 9, 1, 1, 1);
 
     private static final UserDetails USER_DETAILS = UserDetails.builder()
         .forename("John")
@@ -39,37 +46,20 @@ class CaseNoteServiceTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
 
-    @Autowired
-    private CaseNoteService caseNoteService;
-
-    @MockBean
-    private IdamClient idamClient;
-
-    @MockBean
-    private Time time;
-    private LocalDateTime timeNow = LocalDateTime.of(2023, 10, 9, 1, 1, 1);
-
     @Nested
     class BuildCaseNote {
-        @BeforeEach
-        void setUp() {
-
-            given(idamClient.getUserDetails(BEARER_TOKEN)).willReturn(USER_DETAILS);
-            when(time.now()).thenReturn(timeNow);
-        }
 
         @Test
         void shouldBuildNote_whenInvoked() {
+            when(time.now()).thenReturn(timeNow);
+            given(userService.getUserDetails(BEARER_TOKEN)).willReturn(USER_DETAILS);
+
             String note = "new note";
             CaseNote caseNote = caseNoteService.buildCaseNote(BEARER_TOKEN, note);
+            CaseNote expectedNote = caseNoteForToday(note);
 
-            assertThat(caseNote.getNote()).isEqualTo(caseNoteForToday(note).getNote());
-            assertThat(caseNote.getCreatedBy()).isEqualTo(caseNoteForToday(note).getCreatedBy());
-            assertThat(caseNote.getCreatedOn()).isCloseTo(
-                caseNoteForToday(note).getCreatedOn(),
-                within(1, ChronoUnit.SECONDS)
-            );
-            verify(idamClient).getUserDetails(BEARER_TOKEN);
+            assertCaseNoteEquals(caseNote, expectedNote);
+            verify(userService).getUserDetails(BEARER_TOKEN);
         }
 
         @Test
@@ -90,6 +80,8 @@ class CaseNoteServiceTest {
 
         @Test
         void shouldAddNoteToListWithNewestAtTop_WhenExistingNotes() {
+            when(time.now()).thenReturn(timeNow);
+
             LocalDateTime today = time.now();
             CaseNote newNote = caseNoteWithDate(today);
             CaseNote oldNote = caseNoteWithDate(today.minusDays(5));
@@ -101,31 +93,46 @@ class CaseNoteServiceTest {
 
         @Test
         void shouldBuildJudgeNote_whenInvokedAndDocumentAndNote() {
+            given(userService.getUserDetails(BEARER_TOKEN)).willReturn(USER_DETAILS);
+
             Document document = Document.builder().documentFileName("fileName").build();
             DocumentAndNote testDocument = DocumentAndNote.builder().documentName("testDocument").document(document).documentNote("Note").build();
-            when(idamClient.getUserDetails(BEARER_TOKEN)).thenReturn(USER_DETAILS);
 
             var builtDoc = caseNoteService.buildJudgeCaseNoteAndDocument(testDocument, BEARER_TOKEN);
 
-            assertThat(builtDoc.get(0).getValue().getDocumentName()).isEqualTo("testDocument");;
-            assertThat(builtDoc.get(0).getValue().getDocument()).isEqualTo(document);
-            assertThat(builtDoc.get(0).getValue().getDocumentNote()).isEqualTo("Note");
-            assertThat(builtDoc.get(0).getValue().getCreatedBy()).isEqualTo("John Smith");;
+            assertDocumentAndNoteEquals(builtDoc.get(0).getValue(), "testDocument", document, "Note");
         }
 
         @Test
         void shouldBuildJudgeNote_whenInvokedAndDocumentAndName() {
+            given(userService.getUserDetails(BEARER_TOKEN)).willReturn(USER_DETAILS);
+
             Document document = Document.builder().documentFileName("fileName").build();
             DocumentWithName testDocument = DocumentWithName.builder().documentName("testDocument").document(document).build();
-            when(idamClient.getUserDetails(BEARER_TOKEN)).thenReturn(USER_DETAILS);
 
             var builtDoc = caseNoteService.buildJudgeCaseNoteDocumentAndName(testDocument, BEARER_TOKEN);
 
-            assertThat(builtDoc.get(0).getValue().getDocumentName()).isEqualTo("testDocument");;
-            assertThat(builtDoc.get(0).getValue().getDocument()).isEqualTo(document);
-            assertThat(builtDoc.get(0).getValue().getCreatedBy()).isEqualTo("John Smith");;
+            assertDocumentWithNameEquals(builtDoc.get(0).getValue(), "testDocument", document);
         }
+    }
 
+    private void assertCaseNoteEquals(CaseNote actual, CaseNote expected) {
+        assertThat(actual.getNote()).isEqualTo(expected.getNote());
+        assertThat(actual.getCreatedBy()).isEqualTo(expected.getCreatedBy());
+        assertThat(actual.getCreatedOn()).isCloseTo(expected.getCreatedOn(), within(1, ChronoUnit.SECONDS));
+    }
+
+    private void assertDocumentAndNoteEquals(DocumentAndNote actual, String expectedName, Document expectedDocument, String expectedNote) {
+        assertThat(actual.getDocumentName()).isEqualTo(expectedName);
+        assertThat(actual.getDocument()).isEqualTo(expectedDocument);
+        assertThat(actual.getDocumentNote()).isEqualTo(expectedNote);
+        assertThat(actual.getCreatedBy()).isEqualTo(USER_DETAILS.getFullName());
+    }
+
+    private void assertDocumentWithNameEquals(DocumentWithName actual, String expectedName, Document expectedDocument) {
+        assertThat(actual.getDocumentName()).isEqualTo(expectedName);
+        assertThat(actual.getDocument()).isEqualTo(expectedDocument);
+        assertThat(actual.getCreatedBy()).isEqualTo(USER_DETAILS.getFullName());
     }
 
     private CaseNote caseNoteForToday(String note) {

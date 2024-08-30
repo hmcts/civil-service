@@ -42,7 +42,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
@@ -52,8 +51,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -93,8 +90,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     private DefaultJudgmentOrderFormGenerator defaultJudgmentOrderFormGenerator;
     @MockBean
     private LocationReferenceDataService locationRefDataService;
-    @MockBean
-    private IdamClient idamClient;
     @MockBean
     private UserDetails userDetails;
     @MockBean
@@ -163,7 +158,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             nextWorkingDayDate = LocalDate.of(2023, 12, 15);
             when(deadlinesCalculator.plusWorkingDays(any(), anyInt())).thenReturn(date);
             when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(nextWorkingDayDate);
-            given(idamClient.getUserDetails(any()))
+            given(userService.getUserDetails(any()))
                 .willReturn(UserDetails.builder().forename("test").surname("judge").build());
         }
 
@@ -333,7 +328,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             //trialHearingSchedulesOfLossDJ
             assertThat(response.getData()).extracting("trialHearingSchedulesOfLossDJ").extracting("input1")
                 .isEqualTo("The claimant must upload to the Digital Portal "
-                               + "an up-to-date schedule of loss to the defendant by 4pm on");
+                               + "an up-to-date schedule of loss by 4pm on");
             assertThat(response.getData()).extracting("trialHearingSchedulesOfLossDJ").extracting("input2")
                 .isEqualTo("If the defendant wants to challenge this claim, "
                                + "upload to the Digital Portal counter-schedule"
@@ -572,7 +567,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo(nextWorkingDayDate.toString());
 
             assertThat(response.getData()).extracting("trialRoadTrafficAccident").extracting("input")
-                .isEqualTo("Photographs and/or a place of the accident location shall be prepared "
+                .isEqualTo("Photographs and/or a plan of the accident location shall be prepared "
                                + "and agreed by the parties and uploaded to the Digital Portal by 4pm on");
             assertThat(response.getData()).extracting("trialRoadTrafficAccident").extracting("date1")
                 .isEqualTo(nextWorkingDayDate.toString());
@@ -717,11 +712,11 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
             List<String> hearingMethodValuesDisposalHearingDJActual = hearingMethodValuesDisposalHearingDJ.getListItems().stream()
                 .map(DynamicListElement::getLabel)
-                .collect(Collectors.toList());
+                .toList();
 
             List<String> hearingMethodValuesTrialHearingDJActual = hearingMethodValuesTrialHearingDJ.getListItems().stream()
                 .map(DynamicListElement::getLabel)
-                .collect(Collectors.toList());
+                .toList();
 
             assertThat(hearingMethodValuesDisposalHearingDJActual).containsOnly("In Person");
             assertThat(hearingMethodValuesTrialHearingDJActual).containsOnly("In Person");
@@ -895,6 +890,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             DynamicList options = DynamicList.fromList(items, Object::toString, Object::toString, items.get(0), false);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
                 .toBuilder()
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                 .disposalHearingMethodInPersonDJ(options)
                 .trialHearingMethodInPersonDJ(options)
                 .build();
@@ -923,6 +919,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             DynamicList options = DynamicList.fromList(items, Object::toString, items.get(0), false);
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("1010101").region("orange").build())
                 .trialHearingMethodInPersonDJ(options)
                 .disposalHearingMethodInPersonDJ(options)
                 .orderSDODocumentDJCollection(documentList)
@@ -958,6 +955,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(featureToggleService.isLocationWhiteListedForCaseProgression(eq(options.getValue().getCode()))).thenReturn(
                 isLocationWhiteListed);
+            when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation()))
+                .thenReturn(isLocationWhiteListed);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
@@ -965,8 +964,9 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
         }
 
-        @Test
-        void shouldNotPopulateEarlyAdoptersFlag_whenEarlyAdoptersToggleIsOff() {
+        @ParameterizedTest
+        @CsvSource({"true", "false"})
+        void shouldPopulateEarlyAdoptersFlag_whenPartOfNationalRolloutAndNationalRolloutEnabled(Boolean isLocationWhiteListed) {
             DynamicList options = DynamicList.builder()
                 .listItems(List.of(
                                DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
@@ -980,17 +980,16 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
                 .toBuilder()
                 .disposalHearingMethodInPersonDJ(options)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(options.getValue().getCode()).build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(false);
-            when(featureToggleService.isLocationWhiteListedForCaseProgression(eq(options.getValue().getCode())))
-                .thenReturn(true);
+            when(featureToggleService.isPartOfNationalRollout(eq(options.getValue().getCode()))).thenReturn(
+                isLocationWhiteListed);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(responseCaseData.getEaCourtLocation()).isNull();
+            assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
         }
     }
 
@@ -1013,6 +1012,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             .trialHearingMethodInPersonDJ(options)
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation()))
+            .thenReturn(isLocationWhiteListed);
         when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
         when(featureToggleService.isLocationWhiteListedForCaseProgression(eq(options.getValue().getCode()))).thenReturn(
             isLocationWhiteListed);
@@ -1021,6 +1022,36 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
         assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"true", "false"})
+    void shouldPopulateHmcEarlyAdoptersFlag_whenPartOfNationalRolloutAndNationalRolloutEnabled(Boolean isLocationWhiteListed) {
+        DynamicList options = DynamicList.builder()
+            .listItems(List.of(
+                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
+                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
+                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
+                       )
+            )
+            .value(DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build())
+            .build();
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
+            .toBuilder()
+            .disposalHearingMethodInPersonDJ(options)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(options.getValue().getCode()).build())
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        when(featureToggleService.isHmcEnabled()).thenReturn(true);
+        when(featureToggleService.isPartOfNationalRollout(eq(options.getValue().getCode()))).thenReturn(true);
+        when(featureToggleService.isLocationWhiteListedForCaseProgression(eq(options.getValue().getCode()))).thenReturn(
+            isLocationWhiteListed);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+
+        assertThat(responseCaseData.getHmcEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
     }
 
     @Nested

@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 import static java.util.Map.entry;
@@ -21,6 +20,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARK_PAID_FULL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.VALIDATE_DISCONTINUE_CLAIM_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UpdateNextHearingInfo;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HEARING_DETAILS;
@@ -33,6 +33,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_DEFENDANT_LITIGAT
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_OR_AMEND_CLAIM_DOCUMENTS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_UNAVAILABLE_DATES;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_PARTY_DETAILS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_RESTITCH_BUNDLE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_CLOSED_UPDATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_OFFLINE_UPDATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
@@ -97,6 +98,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SET_ASIDE_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STAY_CASE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CASE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRANSFER_ONLINE_CASE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
@@ -172,7 +175,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 @RequiredArgsConstructor
 public class FlowStateAllowedEventService {
 
-    private final StateFlowEngine stateFlowEngine;
+    private final IStateFlowEngine stateFlowEngine;
     private final CaseDetailsConverter caseDetailsConverter;
 
     private static final List<CaseEvent> EVENT_WHITELIST = List.of(
@@ -210,7 +213,8 @@ public class FlowStateAllowedEventService {
                 SET_ASIDE_JUDGMENT,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
             )
         ),
 
@@ -234,7 +238,8 @@ public class FlowStateAllowedEventService {
                 SET_ASIDE_JUDGMENT,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
             )
         ),
 
@@ -257,7 +262,8 @@ public class FlowStateAllowedEventService {
                     SET_ASIDE_JUDGMENT,
                     SETTLE_CLAIM,
                     SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                    DISCONTINUE_CLAIM_CLAIMANT,
+                    VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
             )
         ),
 
@@ -292,6 +298,7 @@ public class FlowStateAllowedEventService {
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
                 DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 RECORD_JUDGMENT,
                 EDIT_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
@@ -326,7 +333,8 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
             )
         ),
 
@@ -372,7 +380,10 @@ public class FlowStateAllowedEventService {
                 COURT_OFFICER_ORDER,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
 
@@ -407,7 +418,10 @@ public class FlowStateAllowedEventService {
                 COURT_OFFICER_ORDER,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
 
@@ -442,7 +456,10 @@ public class FlowStateAllowedEventService {
                 COURT_OFFICER_ORDER,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
 
@@ -486,7 +503,10 @@ public class FlowStateAllowedEventService {
                 COURT_OFFICER_ORDER,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
 
@@ -514,7 +534,10 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
 
@@ -542,7 +565,10 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
 
@@ -570,7 +596,10 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
 
@@ -595,7 +624,10 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
 
@@ -620,7 +652,10 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
 
@@ -643,7 +678,8 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
             )
         ),
 
@@ -701,7 +737,10 @@ public class FlowStateAllowedEventService {
                 COURT_OFFICER_ORDER,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
 
@@ -724,7 +763,10 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
         entry(
@@ -742,7 +784,8 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
             )
         ),
         entry(
@@ -760,7 +803,8 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
             )
         ),
         entry(
@@ -793,7 +837,8 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
             )
         ),
         entry(
@@ -810,7 +855,8 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
             )
         ),
         entry(
@@ -827,7 +873,8 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
             )
         ),
         entry(
@@ -842,7 +889,8 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
             )
         ),
         entry(
@@ -932,7 +980,10 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
         entry(
@@ -973,7 +1024,11 @@ public class FlowStateAllowedEventService {
                 COURT_OFFICER_ORDER,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                AMEND_RESTITCH_BUNDLE,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
         entry(
@@ -1022,6 +1077,7 @@ public class FlowStateAllowedEventService {
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
                 DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 RECORD_JUDGMENT,
                 EDIT_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
@@ -1047,6 +1103,7 @@ public class FlowStateAllowedEventService {
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
                 DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 RECORD_JUDGMENT,
                 EDIT_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
@@ -1104,7 +1161,10 @@ public class FlowStateAllowedEventService {
                 SET_ASIDE_JUDGMENT,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
         entry(
@@ -1147,7 +1207,10 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
         entry(
@@ -1173,7 +1236,10 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
 
@@ -1213,7 +1279,10 @@ public class FlowStateAllowedEventService {
                 COURT_OFFICER_ORDER,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
 
@@ -1243,7 +1312,10 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
 
@@ -1273,7 +1345,10 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
 
@@ -1304,7 +1379,10 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
 
@@ -1336,7 +1414,8 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
             )
         ),
         entry(
@@ -1359,7 +1438,9 @@ public class FlowStateAllowedEventService {
             List.of(
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                 CLAIMANT_RESPONSE_CUI,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
         entry(
@@ -1436,7 +1517,10 @@ public class FlowStateAllowedEventService {
                 COURT_OFFICER_ORDER,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
 
@@ -1461,7 +1545,8 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
             )
         ),
         entry(
@@ -1487,7 +1572,8 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
             )
         ),
         entry(
@@ -1498,7 +1584,8 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
             )
         ),
         entry(
@@ -1509,7 +1596,8 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
             )
         ),
         entry(
@@ -1546,7 +1634,10 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
         entry(
@@ -1559,7 +1650,10 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
         entry(
@@ -1575,7 +1669,10 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
         entry(
@@ -1588,6 +1685,7 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
+                ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
@@ -1625,7 +1723,11 @@ public class FlowStateAllowedEventService {
                 COURT_OFFICER_ORDER,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                AMEND_RESTITCH_BUNDLE,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
         entry(
@@ -1669,7 +1771,10 @@ public class FlowStateAllowedEventService {
                 COURT_OFFICER_ORDER,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
         entry(
@@ -1681,7 +1786,10 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE
 
             )
         ),
@@ -1725,7 +1833,11 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                LIP_CLAIM_SETTLED,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
         entry(
@@ -1737,7 +1849,12 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                LIP_CLAIM_SETTLED,
+                AMEND_RESTITCH_BUNDLE,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
         entry(
@@ -1818,14 +1935,17 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                LIP_CLAIM_SETTLED,
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
             )
         ),
         entry(
             FULL_ADMIT_REJECT_REPAYMENT.fullName(),
             List.of(
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                REQUEST_JUDGEMENT_ADMISSION_SPEC
+                REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                LIP_CLAIM_SETTLED
             )
         ),
         entry(
@@ -1838,8 +1958,12 @@ public class FlowStateAllowedEventService {
                 JUDGMENT_PAID_IN_FULL,
                 SET_ASIDE_JUDGMENT,
                 SETTLE_CLAIM,
+                LIP_CLAIM_SETTLED,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE
             )
         ),
         entry(
@@ -1852,7 +1976,8 @@ public class FlowStateAllowedEventService {
                 FULL_REMISSION_HWF,
                 UPDATE_HELP_WITH_FEE_NUMBER,
                 INVALID_HWF_REFERENCE,
-                NO_REMISSION_HWF
+                NO_REMISSION_HWF,
+                LIP_CLAIM_SETTLED
             )
         ),
         entry(
@@ -1866,7 +1991,8 @@ public class FlowStateAllowedEventService {
         entry(
             SIGN_SETTLEMENT_AGREEMENT.fullName(),
             List.of(
-                REQUEST_JUDGEMENT_ADMISSION_SPEC
+                REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                LIP_CLAIM_SETTLED
             )
         ),
         entry(
@@ -1920,11 +2046,11 @@ public class FlowStateAllowedEventService {
             return ALLOWED_EVENTS_ON_FLOW_STATE_SPEC.entrySet().stream()
                 .filter(entry -> entry.getValue().contains(caseEvent))
                 .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+                .toList();
         }
         return ALLOWED_EVENTS_ON_FLOW_STATE.entrySet().stream()
             .filter(entry -> entry.getValue().contains(caseEvent))
             .map(Map.Entry::getKey)
-            .collect(Collectors.toList());
+            .toList();
     }
 }

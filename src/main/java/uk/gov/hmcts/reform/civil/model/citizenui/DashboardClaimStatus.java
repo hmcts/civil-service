@@ -9,6 +9,9 @@ public enum DashboardClaimStatus {
     DEFENDANT_APPLY_NOC(
         Claim::isNocForDefendant
     ),
+    HEARING_FEE_UNPAID(
+        Claim::isCaseStruckOut
+    ),
     MEDIATION_UNSUCCESSFUL(
         Claim::isMediationUnsuccessful
     ),
@@ -29,6 +32,15 @@ public enum DashboardClaimStatus {
     ),
     SDO_ORDER_LEGAL_ADVISER_CREATED(
         Claim::isSDOOrderLegalAdviserCreated
+    ),
+    SDO_ORDER_IN_REVIEW(
+        Claim::isSDOOrderInReview
+    ),
+    SDO_ORDER_IN_REVIEW_OTHER_PARTY(
+        Claim::isSDOOrderInReviewOtherParty
+    ),
+    DECISION_FOR_RECONSIDERATION_MADE(
+        Claim::isDecisionForReconsiderationMade
     ),
     CLAIMANT_HWF_NO_REMISSION(
         Claim::isHwfNoRemission
@@ -175,6 +187,7 @@ public enum DashboardClaimStatus {
     RESPONSE_BY_POST(
         Claim::isPaperResponse
     ),
+    DEFAULT_JUDGEMENT_ISSUED(Claim::isDefaultJudgementIssued),
     NO_STATUS(c -> false);
 
     @Getter

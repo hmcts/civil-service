@@ -102,6 +102,10 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("minti");
     }
 
+    public boolean isCjesServiceAvailable() {
+        return featureToggleApi.isFeatureEnabled("isCjesServiceAvailable");
+    }
+
     public boolean isCarmEnabledForCase(CaseData caseData) {
         ZoneId zoneId = ZoneId.systemDefault();
         long epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
@@ -139,16 +143,17 @@ public class FeatureToggleService {
             && featureToggleApi.isFeatureEnabledForDate("is-dashboard-enabled-for-case", epoch, false);
     }
 
-    public boolean isNationalRolloutEnabled() {
-        return featureToggleApi.isFeatureEnabled("enable-national-rollout");
-    }
-
     public boolean isPartOfNationalRollout(String locationEpimms) {
         return locationEpimms != null && featureToggleApi
             .isFeatureEnabledForLocation("national-rollout-whitelist", locationEpimms, false);
     }
 
+    public boolean isCaseEventsEnabled() {
+        return featureToggleApi.isFeatureEnabled("cui-case-events-enabled");
+    }
+
     public boolean isGenAppsAllowedPreSdo() {
         return featureToggleApi.isFeatureEnabled("ga-allowed-pre-sdo");
     }
+
 }

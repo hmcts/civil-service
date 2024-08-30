@@ -29,7 +29,8 @@ public abstract class MediationCSVService {
             getCsvCompanyName(data.getApplicant1()), applicantContactDetails.getApplicantContactName(params),
             applicantContactDetails.getApplicantContactNumber(params),
             applicantContactDetails.getApplicantContactEmail(params),
-            isPilot(data.getTotalClaimAmount())
+            isPilot(data.getTotalClaimAmount()),
+            data.getCaseNamePublic()
         };
 
         String[] respondentData = {
@@ -37,7 +38,8 @@ public abstract class MediationCSVService {
             getCsvCompanyName(data.getRespondent1()), defendantContactDetails.getDefendantContactName(params),
             defendantContactDetails.getDefendantContactNumber(params),
             defendantContactDetails.getDefendantContactEmail(params),
-            isPilot(data.getTotalClaimAmount())
+            isPilot(data.getTotalClaimAmount()),
+            data.getCaseNamePublic()
         };
         return generateCSVRow(claimantData)
             + generateCSVRow(respondentData);
@@ -59,7 +61,8 @@ public abstract class MediationCSVService {
         for (String rowValue : row) {
             builder.append(rowValue).append(",");
         }
-        builder.append("\n");
+        builder.deleteCharAt(builder.length() - 1);
+        builder.append("\r\n");
 
         return builder.toString();
     }

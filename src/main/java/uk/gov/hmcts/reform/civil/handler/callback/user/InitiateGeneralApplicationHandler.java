@@ -26,9 +26,9 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
@@ -80,7 +80,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private static final String LR_VS_LIP = "Sorry this service is not available, please raise an application manually.";
     private final InitiateGeneralApplicationService initiateGeneralApplicationService;
     private final ObjectMapper objectMapper;
-    private final IdamClient idamClient;
+    private final UserService userService;
     private final UserRoleCaching userRoleCaching;
     private final GeneralAppFeesService feesService;
     private final LocationReferenceDataService locationRefDataService;
@@ -110,39 +110,23 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     }
 
     private CallbackResponse aboutToStartValidationAndSetup(CallbackParams callbackParams) {
-
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
         CaseData caseData = callbackParams.getCaseData();
 
-        if (featureToggleService.isNationalRolloutEnabled()) {
-            // If Pre SDO allow GA in all locations.
-            // If Post SDO including JUDICIAL REFERRAL, allow GA in all locations, except Birmingham
-            if (inStateAfterJudicialReferral(caseData.getCcdState())
-                && !featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
-                log.info("Gen apps for case {} not part of national rollout, post SDO", caseData.getCcdCaseReference());
-                errors.add(NOT_IN_EA_REGION);
-            }
-            if (!inStateAfterJudicialReferral(caseData.getCcdState()) && !featureToggleService.isGenAppsAllowedPreSdo()) {
-                log.info("Gen apps for case {} not allowed pre sdo", caseData.getCcdCaseReference());
-                errors.add(NOT_IN_EA_REGION);
-            }
-        } else {
-            if (featureToggleService.isEarlyAdoptersEnabled()
-                && (Objects.isNull(caseData.getCaseManagementLocation())
-                || !(featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation()
-                                                                                      .getBaseLocation())))) {
-                log.info("Gen apps for case {} not whitelisted in case progression", caseData.getCcdCaseReference());
-                errors.add(NOT_IN_EA_REGION);
-            }
+        // If Pre SDO allow GA in all locations.
+        // If Post SDO including JUDICIAL REFERRAL, allow GA in all locations, except Birmingham
+        if (inStateAfterJudicialReferral(caseData.getCcdState())
+            && !featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
+            log.info("Gen apps for case {} not part of national rollout, post SDO", caseData.getCcdCaseReference());
+            errors.add(NOT_IN_EA_REGION);
         }
 
-        if (!initiateGeneralApplicationService.respondentAssigned(caseData, authToken)) {
+        if (!initiateGeneralApplicationService.respondentAssigned(caseData)) {
             errors.add(RESP_NOT_ASSIGNED_ERROR);
         }
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        if (caseContainsLiP(caseData)) {
+        if (initiateGeneralApplicationService.caseContainsLiP(caseData)) {
             if (!featureToggleService.isGaForLipsEnabled()) {
                 errors.add(LR_VS_LIP);
             } else {
@@ -154,6 +138,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 }
             }
         }
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         caseDataBuilder
                 .generalAppHearingDetails(
                     GAHearingDetails
@@ -292,7 +277,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CallbackResponse submitApplication(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         caseData = setWithNoticeByType(caseData);
-        final UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        final UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
         final CaseData.CaseDataBuilder<?, ?> dataBuilder = getSharedData(callbackParams);
@@ -334,10 +319,11 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             caseData = updatedCaseData;
         }
 
+        Map<String, Object> data = initiateGeneralApplicationService
+                .buildCaseData(dataBuilder, caseData, userDetails, callbackParams.getParams().get(BEARER_TOKEN)
+                        .toString()).toMap(objectMapper);
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(initiateGeneralApplicationService
-                      .buildCaseData(dataBuilder, caseData, userDetails, callbackParams.getParams().get(BEARER_TOKEN)
-                          .toString()).toMap(objectMapper)).build();
+                .data(data).build();
     }
 
     /**
@@ -361,10 +347,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                             GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build()).build();
         }
         return caseData;
-    }
-
-    private boolean caseContainsLiP(CaseData caseData) {
-        return caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented();
     }
 
     private boolean inStateAfterJudicialReferral(CaseState state) {

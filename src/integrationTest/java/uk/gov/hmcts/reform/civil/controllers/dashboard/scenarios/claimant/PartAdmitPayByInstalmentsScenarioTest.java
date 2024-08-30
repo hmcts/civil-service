@@ -34,8 +34,10 @@ public class PartAdmitPayByInstalmentsScenarioTest extends DashboardBaseIntegrat
         PaymentFrequencyLRspec frequency = PaymentFrequencyLRspec.ONCE_FOUR_WEEKS;
         BigDecimal installmentAmount = new BigDecimal("100");
         BigDecimal totalAmount = new BigDecimal("10000");
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
+        BigDecimal partAdmittedAmount = new BigDecimal("10000");
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
             .toBuilder()
+            .responseClaimTrack("SMALL_CLAIM")
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
@@ -49,6 +51,7 @@ public class PartAdmitPayByInstalmentsScenarioTest extends DashboardBaseIntegrat
                                           .build())
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
             .totalClaimAmount(totalAmount)
+            .respondToAdmittedClaimOwingAmountPounds(partAdmittedAmount)
             .build();
 
         handler.handle(callbackParams(caseData));

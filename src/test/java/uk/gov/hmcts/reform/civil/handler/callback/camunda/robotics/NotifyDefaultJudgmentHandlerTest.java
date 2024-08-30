@@ -21,7 +21,10 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
+import uk.gov.hmcts.reform.civil.service.notification.robotics.DefaultJudgmentRoboticsNotifier;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
@@ -32,6 +35,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
+import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 
@@ -48,7 +52,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartySce
 
 @SpringBootTest(classes = {
     NotifyDefaultJudgmentHandler.class,
-    JsonSchemaValidationService.class,
+    DefaultJudgmentRoboticsNotifier.class,
     RoboticsDataMapper.class,
     RoboticsAddressMapper.class,
     AddressLinesMapper.class,
@@ -57,6 +61,9 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartySce
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
     StateFlowEngine.class,
+    SimpleStateFlowEngine.class,
+    SimpleStateFlowBuilder.class,
+    TransitionsTestConfiguration.class,
     OrganisationService.class
 })
 @ExtendWith(SpringExtension.class)

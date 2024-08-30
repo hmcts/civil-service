@@ -603,4 +603,34 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String notifySettleClaimMarkedPaidInFullDefendantTemplate;
+
+    @NotEmpty
+    private String notifyClaimantLRJudgmentByAdmissionTemplate;
+
+    @NotEmpty
+    private String notifyDefendantLIPJudgmentByAdmissionTemplate;
+
+    @NotEmpty
+    private String orderBeingTranslatedTemplateWelsh;
+
+    @NotEmpty
+    private String notifyLiPOrderTranslatedTemplate;
+
+    @NotEmpty
+    private String notifyClaimantLrValidationDiscontinuanceFailureTemplate;
+
+    @NotEmpty
+    private String notifyClaimDiscontinuedLRTemplate;
+
+    @NotEmpty
+    private String notifyLRBundleRestitched;
+
+    @NotEmpty
+    private String notifyClaimDiscontinuedLipTemplate;
+
+    @NotEmpty
+    private String notifyLRCaseStayed;
+
+    @NotEmpty
+    private String notifyLRCaseDismissed;
 }

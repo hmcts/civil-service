@@ -73,7 +73,16 @@ public class MediationJsonService {
     private boolean buildCaseFlags(CaseData caseData) {
         return checkForActiveCaseFlags(caseData) || checkApplicant1DQRequirements(caseData)
             || checkRespondent1DQRequirements(caseData) || checkRespondent2DQRequirements(caseData)
-            || checkApplicant2DQRequirements(caseData);
+            || checkApplicant2DQRequirements(caseData) || checkLiPApplicantIsWelsh(caseData)
+            || checkLiPDefendantIsWelsh(caseData);
+    }
+
+    private boolean checkLiPApplicantIsWelsh(CaseData caseData) {
+        return caseData.isClaimantBilingual();
+    }
+
+    private boolean checkLiPDefendantIsWelsh(CaseData caseData) {
+        return caseData.isRespondentResponseBilingual();
     }
 
     private boolean checkApplicant1DQRequirements(CaseData caseData) {
@@ -299,10 +308,8 @@ public class MediationJsonService {
     }
 
     private List<MediationUnavailability> getDateRangeToAvoid(MediationAvailability mediationAvailability) {
-        if (mediationAvailability != null) {
-            if (YES.equals(mediationAvailability.getIsMediationUnavailablityExists())) {
-                return toMediationUnavailableDates(mediationAvailability.getUnavailableDatesForMediation());
-            }
+        if (mediationAvailability != null && YES.equals(mediationAvailability.getIsMediationUnavailablityExists())) {
+            return toMediationUnavailableDates(mediationAvailability.getUnavailableDatesForMediation());
         }
         return List.of(MediationUnavailability.builder().build());
     }

@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -28,8 +29,8 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_APPLICATION;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_APPLICATION_AHN;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_FAST_TRACK;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_FAST_TRACK_AHN;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_TRIAL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_TRIAL_AHN;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_OTHER;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_OTHER_AHN;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_SMALL_CLAIMS;
@@ -48,6 +49,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
     private final FeatureToggleService featureToggleService;
     private final LocationReferenceDataService locationRefDataService;
     private LocationRefData caseManagementLocationDetails;
+    private final DocumentHearingLocationHelper documentHearingLocationHelper;
 
     public List<CaseDocument> generate(CaseData caseData, String authorisation) {
 
@@ -71,17 +73,11 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
     }
 
     public HearingForm getTemplateData(CaseData caseData, String authorisation) {
-        List<LocationRefData> locations = (locationRefDataService.getHearingCourtLocations(authorisation));
-        var foundLocations = locations.stream()
-            .filter(location -> location.getEpimmsId().equals(caseData.getCaseManagementLocation().getBaseLocation())).toList();
-        if (!foundLocations.isEmpty()) {
-            caseManagementLocationDetails = foundLocations.get(0);
-        } else {
-            throw new IllegalArgumentException("Base Court Location not found, in location data");
-        }
+        caseManagementLocationDetails = documentHearingLocationHelper
+            .getCaseManagementLocationDetailsNro(caseData, locationRefDataService, authorisation);
 
         return HearingForm.builder()
-            .courtName(caseManagementLocationDetails.getVenueName())
+            .courtName(caseManagementLocationDetails.getExternalShortName())
             .listingOrRelisting(caseData.getListingOrRelisting().toString())
             .court(caseData.getHearingLocation().getValue().getLabel())
             .caseNumber(caseData.getCcdCaseReference().toString())
@@ -138,7 +134,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
                 case SMALL_CLAIMS:
                     return HEARING_SMALL_CLAIMS;
                 case FAST_TRACK_TRIAL:
-                    return HEARING_FAST_TRACK;
+                    return HEARING_TRIAL;
                 case HEARING_OF_APPLICATION:
                     return HEARING_APPLICATION;
                 default:
@@ -149,7 +145,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
                 case SMALL_CLAIMS:
                     return HEARING_SMALL_CLAIMS_AHN;
                 case FAST_TRACK_TRIAL:
-                    return HEARING_FAST_TRACK_AHN;
+                    return HEARING_TRIAL_AHN;
                 case HEARING_OF_APPLICATION:
                     return HEARING_APPLICATION_AHN;
                 default:

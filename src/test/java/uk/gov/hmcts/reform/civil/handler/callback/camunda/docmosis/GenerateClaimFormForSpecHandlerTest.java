@@ -1,20 +1,18 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -49,41 +47,44 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    GenerateClaimFormForSpecCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    AssignCategoryId.class
-})
+@ExtendWith(MockitoExtension.class)
 class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
+    protected static final String UPLOAD_TIMESTAMP = "14 Apr 2024 00:00:00";
+    @InjectMocks
     private GenerateClaimFormForSpecCallbackHandler handler;
 
-    @MockBean
+    @Mock
     private SealedClaimFormGeneratorForSpec sealedClaimFormGeneratorForSpec;
 
-    @Autowired
-    private final ObjectMapper mapper = new ObjectMapper();
+    @Mock
+    private ObjectMapper mapper;
 
-    @Autowired
+    @InjectMocks
     private  AssignCategoryId assignCategoryId;
 
-    @MockBean
+    @Mock
     private Time time;
 
-    @MockBean
+    @Mock
     private DeadlinesCalculator deadlinesCalculator;
 
-    @MockBean
+    @Mock
     private CivilDocumentStitchingService civilDocumentStitchingService;
 
-    @MockBean
+    @Mock
     private LitigantInPersonFormGenerator litigantInPersonFormGenerator;
 
-    @MockBean
+    @Mock
     private FeatureToggleService toggleService;
+
+    @BeforeEach
+    void setUp() {
+        mapper = new ObjectMapper();
+        handler = new GenerateClaimFormForSpecCallbackHandler(sealedClaimFormGeneratorForSpec, mapper, time, deadlinesCalculator,
+                                                              civilDocumentStitchingService, toggleService, assignCategoryId, toggleService);
+        mapper.registerModule(new JavaTimeModule());
+    }
 
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
 
@@ -117,33 +118,26 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
     List<DocumentMetaData> documents = new ArrayList<>();
     List<DocumentMetaData> specClaimTimelineDocuments = new ArrayList<>();
 
-    @BeforeEach
-    void setup() {
-        when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
-        when(civilDocumentStitchingService.bundle(ArgumentMatchers.anyList(), anyString(), anyString(), anyString(),
-                                                  any(CaseData.class))).thenReturn(STITCHED_DOC);
-        when(time.now()).thenReturn(issueDate.atStartOfDay());
-        documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
-                                                      "Sealed Claim form",
-                                                      LocalDate.now().toString()));
-        specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
-                                                            "Sealed Claim form",
-                                                            LocalDate.now().toString()));
-        specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
-                                           "Claim timeline",
-                                           LocalDate.now().toString()));
-        specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
-                                                            "Supported docs",
-                                                            LocalDate.now().toString()));
-
-    }
-
     @Nested
     class GenerateClaimFormOnlySpec {
 
         @Test
         void shouldGenerateClaimForm_whenOneVsOne_andDefendantRepresentedSpecClaim() {
             // Given
+            when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
+            when(time.now()).thenReturn(issueDate.atStartOfDay());
+            documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                               "Sealed Claim form",
+                                               LocalDate.now().toString()));
+            specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                                "Sealed Claim form",
+                                                                LocalDate.now().toString()));
+            specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                                "Claim timeline",
+                                                                LocalDate.now().toString()));
+            specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                                "Supported docs",
+                                                                LocalDate.now().toString()));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStatePendingClaimIssued().build().toBuilder()
                 .specRespondent1Represented(YES)
@@ -165,6 +159,20 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGenerateClaimForm_whenOneVsTwo_andBothPartiesRepresentedSpecClaim() {
+            when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
+            when(time.now()).thenReturn(issueDate.atStartOfDay());
+            documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                               "Sealed Claim form",
+                                               LocalDate.now().toString()));
+            specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                                "Sealed Claim form",
+                                                                LocalDate.now().toString()));
+            specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                                "Claim timeline",
+                                                                LocalDate.now().toString()));
+            specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                                "Supported docs",
+                                                                LocalDate.now().toString()));
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimTwoDefendantSolicitorsSpec()
                 .atStatePendingClaimIssued().build().toBuilder()
@@ -184,18 +192,34 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGenerateClaimFormWithClaimTimeLineDocs_whenUploadedByRespondent() {
+            when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
+            when(civilDocumentStitchingService.bundle(ArgumentMatchers.anyList(), anyString(), anyString(), anyString(),
+                                                      any(CaseData.class))).thenReturn(STITCHED_DOC);
+            when(time.now()).thenReturn(issueDate.atStartOfDay());
+            documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                               "Sealed Claim form",
+                                               LocalDate.now().toString()));
+            specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                                "Sealed Claim form",
+                                                                LocalDate.now().toString()));
+            specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                                "Claim timeline",
+                                                                LocalDate.now().toString()));
+            specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                                "Supported docs",
+                                                                LocalDate.now().toString()));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStatePendingClaimIssued().build().toBuilder()
                 .specRespondent1Represented(YES)
                 .specClaimTemplateDocumentFiles(new Document("fake-url",
                                                              "binary-url",
                                                              "file-name",
-                                                             null, null))
+                                                             null, null, null))
 
                 .specClaimDetailsDocumentFiles(new Document("fake-url",
                                                              "binary-url",
                                                              "file-name",
-                                                             null, null))
+                                                             null, null, null))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -212,6 +236,20 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldAssignCategoryId_whenInvoked() {
         // Given
+        when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
+        when(time.now()).thenReturn(issueDate.atStartOfDay());
+        documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                           "Sealed Claim form",
+                                           LocalDate.now().toString()));
+        specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                            "Sealed Claim form",
+                                                            LocalDate.now().toString()));
+        specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                            "Claim timeline",
+                                                            LocalDate.now().toString()));
+        specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                            "Supported docs",
+                                                            LocalDate.now().toString()));
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued().build().toBuilder()
             .specRespondent1Represented(YES)
@@ -228,9 +266,25 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldAssignCategoryIdParticulars_whenInvoked() {
         // Given
+        when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
+        when(civilDocumentStitchingService.bundle(ArgumentMatchers.anyList(), anyString(), anyString(), anyString(),
+                                                  any(CaseData.class))).thenReturn(STITCHED_DOC);
+        when(time.now()).thenReturn(issueDate.atStartOfDay());
+        documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                           "Sealed Claim form",
+                                           LocalDate.now().toString()));
+        specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                            "Sealed Claim form",
+                                                            LocalDate.now().toString()));
+        specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                            "Claim timeline",
+                                                            LocalDate.now().toString()));
+        specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                            "Supported docs",
+                                                            LocalDate.now().toString()));
         Document testDocument = new Document("testurl",
                                              "testBinUrl", "A Fancy Name",
-                                             "hash", null);
+                                             "hash", null, UPLOAD_TIMESTAMP);
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued().build().toBuilder()
             .specClaimDetailsDocumentFiles(testDocument)
@@ -248,9 +302,25 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldAssignCategoryIdTimeline_whenInvoked() {
         // Given
+        when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
+        when(civilDocumentStitchingService.bundle(ArgumentMatchers.anyList(), anyString(), anyString(), anyString(),
+                                                  any(CaseData.class))).thenReturn(STITCHED_DOC);
+        when(time.now()).thenReturn(issueDate.atStartOfDay());
+        documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                           "Sealed Claim form",
+                                           LocalDate.now().toString()));
+        specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                            "Sealed Claim form",
+                                                            LocalDate.now().toString()));
+        specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                            "Claim timeline",
+                                                            LocalDate.now().toString()));
+        specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                            "Supported docs",
+                                                            LocalDate.now().toString()));
         Document testDocument = new Document("testurl",
                                              "testBinUrl", "A Fancy Name",
-                                             "hash", null);
+                                             "hash", null, UPLOAD_TIMESTAMP);
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued().build().toBuilder()
             .specClaimTemplateDocumentFiles(testDocument)
@@ -268,9 +338,25 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldAssignCategoryIdBothTimelineAndParticulars_whenInvoked() {
         // Given
+        when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
+        when(civilDocumentStitchingService.bundle(ArgumentMatchers.anyList(), anyString(), anyString(), anyString(),
+                                                  any(CaseData.class))).thenReturn(STITCHED_DOC);
+        when(time.now()).thenReturn(issueDate.atStartOfDay());
+        documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                           "Sealed Claim form",
+                                           LocalDate.now().toString()));
+        specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                            "Sealed Claim form",
+                                                            LocalDate.now().toString()));
+        specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                            "Claim timeline",
+                                                            LocalDate.now().toString()));
+        specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                            "Supported docs",
+                                                            LocalDate.now().toString()));
         Document testDocument = new Document("testurl",
                                              "testBinUrl", "A Fancy Name",
-                                             "hash", null);
+                                             "hash", null, UPLOAD_TIMESTAMP);
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued().build().toBuilder()
             .specClaimDetailsDocumentFiles(testDocument)
@@ -291,9 +377,25 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldNullDocuments_whenInvokedAndCaseFileEnabled() {
         // Given
+        when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
+        when(civilDocumentStitchingService.bundle(ArgumentMatchers.anyList(), anyString(), anyString(), anyString(),
+                                                  any(CaseData.class))).thenReturn(STITCHED_DOC);
+        when(time.now()).thenReturn(issueDate.atStartOfDay());
+        documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                           "Sealed Claim form",
+                                           LocalDate.now().toString()));
+        specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                            "Sealed Claim form",
+                                                            LocalDate.now().toString()));
+        specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                            "Claim timeline",
+                                                            LocalDate.now().toString()));
+        specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                            "Supported docs",
+                                                            LocalDate.now().toString()));
         Document testDocument = new Document("testurl",
                                              "testBinUrl", "A Fancy Name",
-                                             "hash", null);
+                                             "hash", null, UPLOAD_TIMESTAMP);
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued().build().toBuilder()
             .specClaimDetailsDocumentFiles(testDocument)
@@ -316,6 +418,20 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldStitchClaimFormWithLipForm_whenOneVsOne_withLitigantInPersonSpecClaim() {
+            when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
+            when(time.now()).thenReturn(issueDate.atStartOfDay());
+            documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                               "Sealed Claim form",
+                                               LocalDate.now().toString()));
+            specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                                "Sealed Claim form",
+                                                                LocalDate.now().toString()));
+            specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                                "Claim timeline",
+                                                                LocalDate.now().toString()));
+            specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                                "Supported docs",
+                                                                LocalDate.now().toString()));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStatePendingClaimIssuedUnrepresentedDefendant().build().toBuilder()
                 .specRespondent1Represented(NO)
@@ -333,6 +449,20 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldStitchClaimFormWithLipForm_whenOneVsTwo_andDef1LitigantInPersonSpecClaim() {
+            when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
+            when(time.now()).thenReturn(issueDate.atStartOfDay());
+            documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                               "Sealed Claim form",
+                                               LocalDate.now().toString()));
+            specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                                "Sealed Claim form",
+                                                                LocalDate.now().toString()));
+            specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                                "Claim timeline",
+                                                                LocalDate.now().toString()));
+            specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                                "Supported docs",
+                                                                LocalDate.now().toString()));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimSubmitted1v2AndOnlySecondRespondentIsRepresented().build().toBuilder()
                 .specRespondent1Represented(NO)
@@ -351,6 +481,20 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldStitchClaimFormWithLipForm_whenOneVsTwo_andDef2LitigantInPersonSpecClaim() {
+            when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
+            when(time.now()).thenReturn(issueDate.atStartOfDay());
+            documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                               "Sealed Claim form",
+                                               LocalDate.now().toString()));
+            specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                                "Sealed Claim form",
+                                                                LocalDate.now().toString()));
+            specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                                "Claim timeline",
+                                                                LocalDate.now().toString()));
+            specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                                "Supported docs",
+                                                                LocalDate.now().toString()));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimSubmitted1v2AndOnlyFirstRespondentIsRepresented().build().toBuilder()
                 .specRespondent1Represented(YES)
@@ -369,6 +513,20 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldStitchClaimFormWithLipForm_whenOneVsTwo_andBothDefendantsAreLitigantInPersonSpecClaim() {
+            when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
+            when(time.now()).thenReturn(issueDate.atStartOfDay());
+            documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                               "Sealed Claim form",
+                                               LocalDate.now().toString()));
+            specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                                "Sealed Claim form",
+                                                                LocalDate.now().toString()));
+            specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                                "Claim timeline",
+                                                                LocalDate.now().toString()));
+            specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                                "Supported docs",
+                                                                LocalDate.now().toString()));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimSubmittedNoRespondentRepresented().build().toBuilder()
                 .specRespondent1Represented(NO)
@@ -387,6 +545,18 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotGenerateClaimForm_whenLipvLipFlagIsOnAndApplicantIsLip() {
+            documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                               "Sealed Claim form",
+                                               LocalDate.now().toString()));
+            specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                                "Sealed Claim form",
+                                                                LocalDate.now().toString()));
+            specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                                "Claim timeline",
+                                                                LocalDate.now().toString()));
+            specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
+                                                                "Supported docs",
+                                                                LocalDate.now().toString()));
             given(toggleService.isLipVLipEnabled()).willReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()

@@ -3,8 +3,8 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Defendant',
-        '{"Notice.AAA6.ClaimantIntent.CCJ.Requested.Defendant"}',
-        '{"Notice.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Defendant": ["djDefendantNotificationMessage"]}');
+        '{"Notice.AAA6.ClaimantIntent.CCJ.Requested.Defendant","Notice.AAA6.DefResponse.ResponseTimeElapsed.Defendant"}',
+        '{"Notice.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Defendant": ["djDefendantNotificationMessage", "djDefendantNotificationMessageCy"]}');
 
 /**
  * Add notification template
@@ -13,9 +13,9 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
                                                   , notification_role)
 VALUES ('Notice.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Defendant',
         'A judgment has been made against you',
-        'A judgment has been made against you',
-        '<p class="govuk-body">The exact details of what you need to pay, and by when, are stated on the judgment. <br> If you want to dispute the judgment, or ask to change how and when you pay back the claim amount, you can ${djDefendantNotificationMessage}.</p>',
-        '<p class="govuk-body">The exact details of what you need to pay, and by when, are stated on the judgment. <br> If you want to dispute the judgment, or ask to change how and when you pay back the claim amount, you can ${djDefendantNotificationMessage}.</p>',
+        'Mae Dyfarniad wedi’i wneud yn eich erbyn',
+        '<p class="govuk-body">The exact details of what you need to pay, and by when, are stated on the judgment.   If you want to dispute the judgment, or ask to change how and when you pay back the claim amount, you can ${djDefendantNotificationMessage}.</p>',
+        '<p class="govuk-body">Mae union fanylion yr hyn mae arnoch angen ei dalu, ac erbyn pryd, wedi’u nodi ar y dyfarniad. Os ydych eisiau gwrthwynebu’r dyfarniad, neu ofyn i newid pryd a sut y byddwch yn talu swm yr hawliad yn ôl, gallwch ${djDefendantNotificationMessageCy}.</p>',
         'DEFENDANT');
 
 /**

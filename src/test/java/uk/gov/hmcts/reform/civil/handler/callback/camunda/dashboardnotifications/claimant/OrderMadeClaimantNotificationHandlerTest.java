@@ -1,17 +1,19 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.Mock;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -36,6 +38,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,27 +47,27 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE;
 import static uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType.NON_ATTENDANCE_STATEMENT;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    OrderMadeClaimantNotificationHandler.class,
-    DashboardApiClient.class,
-    JacksonAutoConfiguration.class,
-    ValidationAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
+    @InjectMocks
     private OrderMadeClaimantNotificationHandler handler;
-    @MockBean
+    @Mock
     private DashboardApiClient dashboardApiClient;
-    @MockBean
+    @Mock
     private DashboardNotificationsParamsMapper mapper;
-    @MockBean
+    @Mock
     private FeatureToggleService toggleService;
+    @Mock
+    private WorkingDayIndicator workingDayIndicator;
+    @Mock
+    private ObjectMapper objectMapper;
 
     public static final String TASK_ID = "GenerateDashboardNotificationFinalOrderClaimant";
 
@@ -105,9 +108,10 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "url");
+
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT.name()).build()
-            ).build();
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT.name())
+                    .caseDetails(CaseDetails.builder().state(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString()).build()).build()).build();
 
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
@@ -134,8 +138,8 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT.name()).build()
-            ).build();
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT.name())
+                    .caseDetails(CaseDetails.builder().state(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString()).build()).build()).build();
 
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
@@ -162,8 +166,8 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name()).build()
-            ).build();
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name())
+                    .caseDetails(CaseDetails.builder().state(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString()).build()).build()).build();
 
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
@@ -173,6 +177,30 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA6.CP.OrderMade.Claimant",
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
+        void shouldRecordScenarioClaimantFinalOrder_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
+                .applicant1Represented(YesOrNo.NO)
+                .build();
+
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT.name())
+                    .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
+
+            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
+
+            handler.handle(params);
+
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                "Scenario.AAA6.Update.Claimant.TaskList.UploadDocuments.FinalOrders",
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
@@ -267,8 +295,8 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name()).build()
-            ).build();
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name())
+                    .caseDetails(CaseDetails.builder().state(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString()).build()).build()).build();
 
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
@@ -303,8 +331,8 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name()).build()
-            ).build();
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name())
+                    .caseDetails(CaseDetails.builder().state(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString()).build()).build()).build();
 
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
@@ -349,8 +377,8 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
 
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
+            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .responseClaimTrack("SMALL_CLAIM")
@@ -368,6 +396,33 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
+        }
+
+        @Test
+        void shouldNotRecordScenarioInSdoLegalAdviser_whenInvokedWithFeatureToggleDisabled() {
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            scenarioParams.put("orderDocument", "urlDirectionsOrder");
+
+            when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .responseClaimTrack("SMALL_CLAIM")
+                .totalClaimAmount(BigDecimal.valueOf(500))
+                .applicant1Represented(YesOrNo.NO).build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name()).build()
+            ).build();
+            handler.handle(params);
+            ArgumentCaptor<String> secondParamCaptor = ArgumentCaptor.forClass(String.class);
+            verify(dashboardApiClient).recordScenario(
+                eq(caseData.getCcdCaseReference().toString()),
+                secondParamCaptor.capture(),
+                eq("BEARER_TOKEN"),
+                eq(ScenarioRequestParams.builder().params(scenarioParams).build())
+            );
+            String capturedSecondParam = secondParamCaptor.getValue();
+            Assertions.assertNotEquals("Scenario.AAA6.CP.SDOMadebyLA.Claimant", capturedSecondParam);
         }
     }
 }

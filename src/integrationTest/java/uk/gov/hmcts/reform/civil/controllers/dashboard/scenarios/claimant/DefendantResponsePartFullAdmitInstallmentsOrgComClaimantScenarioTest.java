@@ -34,11 +34,13 @@ public class DefendantResponsePartFullAdmitInstallmentsOrgComClaimantScenarioTes
         PaymentFrequencyLRspec frequency = PaymentFrequencyLRspec.ONCE_FOUR_WEEKS;
         BigDecimal installmentAmount = new BigDecimal("100");
         BigDecimal totalAmount = new BigDecimal("10000");
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
+        BigDecimal partAdmittedAmount = new BigDecimal("9000");
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
+            .responseClaimTrack("SMALL_CLAIM")
             .respondent1(Party.builder().companyName("Company One").type(Party.Type.COMPANY).build())
             .respondent1RepaymentPlan(RepaymentPlanLRspec
                                           .builder()
@@ -47,7 +49,9 @@ public class DefendantResponsePartFullAdmitInstallmentsOrgComClaimantScenarioTes
                                           .firstRepaymentDate(firstPaymentDate)
                                           .build())
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+            .claimInterest(YesOrNo.NO)
             .totalClaimAmount(totalAmount)
+            .respondToAdmittedClaimOwingAmountPounds(partAdmittedAmount)
             .build();
 
         handler.handle(callbackParams(caseData));
@@ -58,7 +62,7 @@ public class DefendantResponsePartFullAdmitInstallmentsOrgComClaimantScenarioTes
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">Company One has offered to pay you "
-                        + "£" + totalAmount + " in "
+                        + "£" + partAdmittedAmount + " in "
                         + "instalments of £"
                         + MonetaryConversions.penniesToPounds(installmentAmount).toPlainString().replace(
                         ".00", "")
@@ -71,7 +75,7 @@ public class DefendantResponsePartFullAdmitInstallmentsOrgComClaimantScenarioTes
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae Company One wedi cynnig talu "
-                        + "£" + totalAmount
+                        + "£" + partAdmittedAmount
                         + " i chi mewn rhandaliadau o £"
                         + MonetaryConversions.penniesToPounds(installmentAmount).toPlainString().replace(
                         ".00", "")

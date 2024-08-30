@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
@@ -27,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE;
 
@@ -59,14 +61,14 @@ public class OrderMadeClaimantScenarioTest extends DashboardBaseIntegrationTest 
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("An order has been made"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">The judge has made an order on your claim. "
-                        + "<a href=\"{VIEW_FINAL_ORDER}\" rel=\"noopener noreferrer\" target=\"_blank\""
-                        + " class=\"govuk-link\">View the order</a>.</p>"),
+                    "<p class=\"govuk-body\">The judge has made an order on your claim.</p>" +
+                        "<p class=\"govuk-body\"><a href=\"{VIEW_FINAL_ORDER}\" rel=\"noopener noreferrer\" " +
+                        "target=\"_blank\" class=\"govuk-link\">View the order</a></p>"),
                 jsonPath("$[0].titleCy").value("Mae gorchymyn wedi’i wneud"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Mae'r Barnwr wedi gwneud gorchymyn ar eich hawliad. "
-                        + "<a href=\"{VIEW_FINAL_ORDER}\" rel=\"noopener noreferrer\" target=\"_blank\""
-                        + " class=\"govuk-link\">Gweld y gorchymyn</a>.</p>")
+                    "<p class=\"govuk-body\">Mae'r Barnwr wedi gwneud gorchymyn ar eich hawliad.</p>" +
+                        "<p class=\"govuk-body\"><a href=\"{VIEW_FINAL_ORDER}\" rel=\"noopener noreferrer\" " +
+                        "target=\"_blank\" class=\"govuk-link\">Gweld y gorchymyn</a></p>")
             );
     }
 
@@ -130,12 +132,12 @@ public class OrderMadeClaimantScenarioTest extends DashboardBaseIntegrationTest 
             .andExpect(status().isOk())
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].titleEn").value("An order has been issued by the court."),
+                jsonPath("$[0].titleEn").value("An order has been issued by the court"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">Please follow instructions in the order and comply with the deadlines. " +
                         "Please send any documents to the court named in the order if required. " +
                         "The claim will now proceed offline, you will receive further updates by post.</p>"),
-                jsonPath("$[0].titleCy").value("Mae gorchymyn wedi’i gyhoeddi gan y llys."),
+                jsonPath("$[0].titleCy").value("Mae gorchymyn wedi’i gyhoeddi gan y llys"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Dilynwch y cyfarwyddiadau sydd yn y gorchymyn a chydymffurfiwch " +
                         "â’r dyddiadau terfyn. Anfonwch unrhyw ddogfennau i’r llys a enwir yn y gorchymyn os oes angen. " +
@@ -147,7 +149,8 @@ public class OrderMadeClaimantScenarioTest extends DashboardBaseIntegrationTest 
         return CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
             .request(CallbackRequest.builder().eventId(
-                CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT.name()).build())
+                CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT.name())
+                         .caseDetails(CaseDetails.builder().state(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString()).build()).build())
             .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
             .build();
     }

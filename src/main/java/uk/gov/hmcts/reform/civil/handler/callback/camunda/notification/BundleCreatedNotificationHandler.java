@@ -62,13 +62,13 @@ public class BundleCreatedNotificationHandler extends CallbackHandler implements
         if (isSameRespondentSolicitor) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
-        String emailAddress = getReceipientEmail(caseData, taskId);
+        String emailAddress = getRecipientEmail(caseData, taskId);
         String template = getReferenceTemplateString(taskId);
         if (nonNull(emailAddress)) {
             notificationService.sendMail(
                 emailAddress,
                 getTemplate(caseData, taskId),
-                isLip(caseData, taskId) ? addPropertiesDefendantLip(caseData) : addProperties(caseData),
+                isLip(caseData, taskId) ? addPropertiesLip(caseData, taskId) : addProperties(caseData),
                 String.format(template, caseData.getLegacyCaseReference())
             );
         }
@@ -112,7 +112,7 @@ public class BundleCreatedNotificationHandler extends CallbackHandler implements
         return isSameRespondentSolicitor;
     }
 
-    private String getReceipientEmail(CaseData caseData, String taskId) {
+    private String getRecipientEmail(CaseData caseData, String taskId) {
         if (taskId.equals(TASK_ID_APPLICANT)) {
             if (isApplicant1Lip(caseData)) {
                 return caseData.getApplicant1().getPartyEmail();
@@ -141,11 +141,12 @@ public class BundleCreatedNotificationHandler extends CallbackHandler implements
         );
     }
 
-    public Map<String, String> addPropertiesDefendantLip(CaseData caseData) {
+    public Map<String, String> addPropertiesLip(CaseData caseData, String taskId) {
+        String partyName = taskId.equals(TASK_ID_APPLICANT) ? caseData.getApplicant1().getPartyName() : caseData.getRespondent1().getPartyName();
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData),
-            PARTY_NAME, caseData.getRespondent1().getPartyName()
+            PARTY_NAME, partyName
         );
     }
 

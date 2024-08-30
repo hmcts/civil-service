@@ -4,48 +4,52 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
+import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState.ISSUED;
+import static uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection.PAY_IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection.PAY_IN_INSTALMENTS;
 import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
-import static uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils.getDefendantAdmittedAmount;
 
 @Service
 @RequiredArgsConstructor
 public class DashboardNotificationsParamsMapper {
 
+    public static final String EN = "EN";
+    public static final String WELSH = "WELSH";
     public static final String CLAIMANT1_ACCEPTED_REPAYMENT_PLAN = "accepted";
     public static final String CLAIMANT1_REJECTED_REPAYMENT_PLAN = "rejected";
     public static final String CLAIMANT1_ACCEPTED_REPAYMENT_PLAN_WELSH = "derbyn";
     public static final String CLAIMANT1_REJECTED_REPAYMENT_PLAN_WELSH = "gwrthod";
     public static final String ORDER_DOCUMENT = "orderDocument";
     private final FeatureToggleService featureToggleService;
+    private final ClaimantResponseUtils claimantResponseUtils;
 
     public HashMap<String, Object> mapCaseDataToParams(CaseData caseData) {
 
@@ -58,14 +62,19 @@ public class DashboardNotificationsParamsMapper {
 
         if (featureToggleService.isGeneralApplicationsEnabled()) {
             params.put("djClaimantNotificationMessage", "<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to vary the judgment</a>");
+            params.put("djClaimantNotificationMessageCy", "<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">wneud cais i amrywio’r dyfarniad</a>");
             params.put("djDefendantNotificationMessage", "<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to set aside (remove) or vary the judgment</a>");
+            params.put("djDefendantNotificationMessageCy", "<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">wneud cais i roi’r dyfarniad o’r naill du (ei ddileu) neu amrywio’r dyfarniad</a>");
         } else {
             params.put("djClaimantNotificationMessage", "<u>make an application to vary the judgment</u>");
+            params.put("djClaimantNotificationMessageCy", "<u>wneud cais i amrywio’r dyfarniad</u>");
             params.put("djDefendantNotificationMessage", "<u>make an application to set aside (remove) or vary the judgment</u>");
+            params.put("djDefendantNotificationMessageCy", "<u>wneud cais i roi’r dyfarniad o’r naill du (ei ddileu) neu amrywio’r dyfarniad</u>");
         }
 
         if (caseData.getJoJudgmentRecordReason() != null && caseData.getJoJudgmentRecordReason().equals(JudgmentRecordedReason.DETERMINATION_OF_MEANS)) {
-            params.put("paymentFrequencyMessage", getPaymentFrequencyMessage(caseData).toString());
+            params.put("paymentFrequencyMessage", getPaymentFrequencyMessage(caseData, EN).toString());
+            params.put("paymentFrequencyMessageCy", getPaymentFrequencyMessage(caseData, WELSH).toString());
         }
 
         if (nonNull(caseData.getApplicant1ResponseDeadline())) {
@@ -78,22 +87,14 @@ public class DashboardNotificationsParamsMapper {
         if (featureToggleService.isJudgmentOnlineLive()
             && nonNull(caseData.getActiveJudgment())
             && caseData.getActiveJudgment().getState().equals(ISSUED)
-            && nonNull(caseData.getActiveJudgment().getPaymentPlan())
-            && caseData.getActiveJudgment().getPaymentPlan().getType().equals(PAY_IN_INSTALMENTS)) {
-
-            JudgmentDetails judgmentDetails = caseData.getActiveJudgment();
-            JudgmentInstalmentDetails instalmentDetails = judgmentDetails.getInstalmentDetails();
-
-            params.put("ccjDefendantAdmittedAmount", MonetaryConversions.penniesToPounds(new BigDecimal(judgmentDetails.getOrderedAmount())));
-            params.put("ccjPaymentFrequency", getStringPaymentFrequency(instalmentDetails.getPaymentFrequency()));
-            params.put("ccjInstallmentAmount", MonetaryConversions.penniesToPounds(new BigDecimal(instalmentDetails.getAmount())));
-            params.put("ccjFirstRepaymentDateEn", DateUtils.formatDate(instalmentDetails.getStartDate()));
+            && nonNull(caseData.getActiveJudgment().getPaymentPlan())) {
+            updateCCJParams(caseData, params);
         }
 
-        if (nonNull(getDefendantAdmittedAmount(caseData))) {
+        if (nonNull(claimantResponseUtils.getDefendantAdmittedAmount(caseData))) {
             params.put(
                 "defendantAdmittedAmount",
-                "£" + this.removeDoubleZeros(formatAmount(getDefendantAdmittedAmount(caseData)))
+                "£" + this.removeDoubleZeros(formatAmount(claimantResponseUtils.getDefendantAdmittedAmount(caseData)))
             );
         }
         if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
@@ -209,7 +210,7 @@ public class DashboardNotificationsParamsMapper {
         }
 
         if (nonNull(caseData.getHearingDate())) {
-            LocalDate date = caseData.getHearingDate().minusWeeks(3);
+            LocalDate date = caseData.getHearingDate().minusWeeks(4);
             params.put("trialArrangementDeadlineEn", DateUtils.formatDate(date));
             params.put("trialArrangementDeadlineCy", DateUtils.formatDateInWelsh(date));
         }
@@ -234,6 +235,19 @@ public class DashboardNotificationsParamsMapper {
             );
         }
 
+        if (nonNull(caseData.getRequestForReconsiderationDeadline())) {
+            params.put("requestForReconsiderationDeadlineEn",
+                       DateUtils.formatDate(caseData.getRequestForReconsiderationDeadline()));
+            params.put("requestForReconsiderationDeadlineCy",
+                       DateUtils.formatDateInWelsh(caseData.getRequestForReconsiderationDeadline().toLocalDate()));
+        }
+
+        Optional<LocalDateTime> latestBundleCreatedOn = getLatestBundleCreatedOn(caseData);
+        latestBundleCreatedOn.ifPresent(date -> {
+            params.put("bundleRestitchedDateEn", DateUtils.formatDate(date));
+            params.put("bundleRestitchedDateCy", DateUtils.formatDateInWelsh(date.toLocalDate()));
+        });
+
         return params;
     }
 
@@ -244,14 +258,68 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(orderDocumentUrl)) {
             params.put(ORDER_DOCUMENT, orderDocumentUrl);
         }
-
-        if (CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.equals(caseEvent)
-            || CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.equals(caseEvent)) {
-            params.put("requestForReconsiderationDeadlineEn", DateUtils.formatDate(LocalDate.now().plusDays(7)));
-            params.put("requestForReconsiderationDeadlineCy", DateUtils.formatDateInWelsh(LocalDate.now().plusDays(7)));
-        }
-
         return params;
+    }
+
+    private static void updateCCJParams(CaseData caseData, HashMap<String, Object> params) {
+        JudgmentDetails judgmentDetails = caseData.getActiveJudgment();
+        String orderedAmount = judgmentDetails.getOrderedAmount();
+        params.put(
+            "ccjDefendantAdmittedAmount",
+            MonetaryConversions.penniesToPounds(new BigDecimal(orderedAmount))
+        );
+
+        if (caseData.getActiveJudgment().getPaymentPlan().getType().equals(PAY_IN_INSTALMENTS)) {
+            JudgmentInstalmentDetails instalmentDetails = judgmentDetails.getInstalmentDetails();
+            params.put("ccjPaymentMessageEn", getStringPaymentMessage(instalmentDetails));
+            params.put("ccjPaymentMessageCy", getStringPaymentMessageInWelsh(instalmentDetails));
+        } else if (caseData.getActiveJudgment().getPaymentPlan().getType().equals(PAY_IMMEDIATELY)) {
+            params.put("ccjPaymentMessageEn", "immediately");
+            params.put("ccjPaymentMessageCy", "ar unwaith");
+        } else {
+            params.put(
+                "ccjPaymentMessageEn",
+                "by " + DateUtils.formatDate(judgmentDetails.getPaymentPlan().getPaymentDeadlineDate())
+            );
+            params.put(
+                "ccjPaymentMessageCy",
+                "erbyn " + DateUtils.formatDateInWelsh(judgmentDetails.getPaymentPlan().getPaymentDeadlineDate())
+            );
+        }
+    }
+
+    private Optional<LocalDateTime> getLatestBundleCreatedOn(CaseData caseData) {
+        return Optional.ofNullable(caseData.getCaseBundles())
+            .map(bundles -> bundles.stream()
+                .map(IdValue::getValue)
+                .map(Bundle::getCreatedOn)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .max(Comparator.naturalOrder()))
+            .orElse(Optional.empty());
+    }
+
+    private static String getStringPaymentMessageInWelsh(JudgmentInstalmentDetails instalmentDetails) {
+        PaymentFrequency paymentFrequency = instalmentDetails.getPaymentFrequency();
+        String amount = instalmentDetails.getAmount();
+        BigDecimal convertedAmount = MonetaryConversions.penniesToPounds(new BigDecimal(amount));
+
+        String message = switch (paymentFrequency) {
+            case WEEKLY -> "mewn rhandaliadau wythnosol o £" + convertedAmount;
+            case EVERY_TWO_WEEKS -> "mewn rhandaliadau bob pythefnos o £" + convertedAmount;
+            case MONTHLY -> "mewn rhandaliadau misol o £" + convertedAmount;
+        };
+
+        return message + ". Bydd y taliad cyntaf yn ddyledus ar " + DateUtils.formatDateInWelsh(instalmentDetails.getStartDate());
+    }
+
+    private static String getStringPaymentMessage(JudgmentInstalmentDetails instalmentDetails) {
+        PaymentFrequency paymentFrequency = instalmentDetails.getPaymentFrequency();
+        String amount = instalmentDetails.getAmount();
+
+        return "in " + getStringPaymentFrequency(paymentFrequency) + " instalments of £"
+            + MonetaryConversions.penniesToPounds(new BigDecimal(amount))
+            + ". The first payment is due on " + DateUtils.formatDate(instalmentDetails.getStartDate());
     }
 
     private static String getStringPaymentFrequency(PaymentFrequency paymentFrequency) {
@@ -259,7 +327,6 @@ public class DashboardNotificationsParamsMapper {
             case WEEKLY -> "weekly";
             case EVERY_TWO_WEEKS -> "biweekly";
             case MONTHLY -> "monthly";
-            default -> "";
         };
     }
 
@@ -340,17 +407,6 @@ public class DashboardNotificationsParamsMapper {
         return CLAIMANT1_REJECTED_REPAYMENT_PLAN_WELSH;
     }
 
-    private String getInstalmentTimePeriod(PaymentFrequencyLRspec repaymentFrequency) {
-        return switch (repaymentFrequency) {
-            case ONCE_ONE_WEEK -> "week";
-            case ONCE_TWO_WEEKS -> "2 weeks";
-            case ONCE_THREE_WEEKS -> "3 weeks";
-            case ONCE_FOUR_WEEKS -> "4 weeks";
-            case ONCE_ONE_MONTH -> "month";
-            default -> null;
-        };
-    }
-
     private Optional<LocalDate> getInstalmentStartDate(CaseData caseData) {
         return Optional.ofNullable(caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate());
     }
@@ -391,7 +447,7 @@ public class DashboardNotificationsParamsMapper {
         return null;
     }
 
-    private static StringBuilder getPaymentFrequencyMessage(CaseData caseData) {
+    private static StringBuilder getPaymentFrequencyMessage(CaseData caseData, String language) {
         PaymentPlanSelection paymentPlanType = caseData.getJoPaymentPlan().getType();
         StringBuilder paymentFrequencyMessage = new StringBuilder();
         BigDecimal totalAmount = new BigDecimal(caseData.getJoAmountOrdered());
@@ -402,18 +458,17 @@ public class DashboardNotificationsParamsMapper {
         }
 
         JudgmentInstalmentDetails instalmentDetails = caseData.getJoInstalmentDetails();
-        String paymentFrecuencyString = getStringPaymentFrequency(instalmentDetails.getPaymentFrequency());
 
-        if (PaymentPlanSelection.PAY_IN_INSTALMENTS.equals(paymentPlanType)) {
-            paymentFrequencyMessage.append("You must pay the claim amount of £ ")
+        if (PaymentPlanSelection.PAY_IN_INSTALMENTS.equals(paymentPlanType) && EN.equals(language)) {
+            paymentFrequencyMessage.append("You must pay the claim amount of £")
                 .append(MonetaryConversions.penniesToPounds(totalAmount).toString())
-                .append(" in ")
-                .append(paymentFrecuencyString)
-                .append(" instalments of £ ")
-                .append(MonetaryConversions.penniesToPounds((new BigDecimal(instalmentDetails.getAmount()))).toString())
-                .append(". The first payment is due on ")
-                .append(instalmentDetails.getStartDate())
-                .append(".");
+                .append(" ")
+                .append(getStringPaymentMessage(instalmentDetails));
+        } else {
+            paymentFrequencyMessage.append("Rhaid i chi dalu swm yr hawliad, sef £")
+                .append(MonetaryConversions.penniesToPounds(totalAmount).toString())
+                .append(" ")
+                .append(getStringPaymentMessageInWelsh(instalmentDetails));
         }
         return paymentFrequencyMessage;
     }

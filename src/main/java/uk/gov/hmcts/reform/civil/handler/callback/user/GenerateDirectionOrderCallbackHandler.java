@@ -38,10 +38,10 @@ import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetailsOrderWithoutNotice;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeFinalOrderGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
@@ -120,6 +120,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     public static final String NOT_ALLOWED_DATE_PAST = "The date in %s may not be before the established date";
     public static final String JUDGE_HEARD_FROM_EMPTY = "Judge Heard from: 'Claimant(s) and defendant(s)' section for %s, requires a selection to be made";
     public static final String FURTHER_HEARING_OTHER_EMPTY = "Further hearing, Length of new hearing, Other is empty";
+    public static final String FURTHER_HEARING_OTHER_ALT_LOCATION = "Further hearing alternative location required.";
     private String defendantTwoPartyName;
     private String claimantTwoPartyName;
     public static final String APPEAL_NOTICE_DATE = "Appeal notice date";
@@ -128,7 +129,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private final JudgeFinalOrderGenerator judgeFinalOrderGenerator;
     private final DocumentHearingLocationHelper locationHelper;
     private String ext = "";
-    private final IdamClient idamClient;
+    private final UserService userService;
     private final WorkingDayIndicator workingDayIndicator;
 
     @Override
@@ -146,14 +147,17 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     public List<CaseEvent> handledEvents() {
         return EVENTS;
     }
-
     // Final orders can be submitted multiple times, we want each one to be a "clean slate"
     // so we remove previously selected options from both Free form orders and assisted orders.
     // Exception is fields which we specifically prepopulate e.g. date fields, or specific text.
+
     private CallbackResponse nullPreviousSelections(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        return nullPreviousSelections(caseDataBuilder);
+    }
 
+    private CallbackResponse nullPreviousSelections(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         caseDataBuilder.finalOrderSelection(null);
         // Free form orders
         caseDataBuilder
@@ -206,6 +210,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             checkJudgeHeardFrom(caseData, errors);
             checkFieldDate(caseData, errors);
             checkFurtherHearingOther(caseData, errors);
+            checkFurtherHearingOtherAlternateLocation(caseData, errors);
         }
 
         CaseDocument finalDocument = judgeFinalOrderGenerator.generate(
@@ -227,6 +232,17 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             && Objects.isNull(caseData.getFinalOrderFurtherHearingComplex()
                 .getLengthListOther())) {
             errors.add(FURTHER_HEARING_OTHER_EMPTY);
+        }
+    }
+
+    private void checkFurtherHearingOtherAlternateLocation(final CaseData caseData, final List<String> errors) {
+        if (caseData.getFinalOrderFurtherHearingToggle() != null
+            && !caseData.getFinalOrderFurtherHearingToggle().isEmpty()
+            && caseData.getFinalOrderFurtherHearingToggle().get(0).equals(FinalOrderToggle.SHOW)
+            && caseData.getFinalOrderFurtherHearingComplex().getHearingLocationList() != null
+            && caseData.getFinalOrderFurtherHearingComplex().getHearingLocationList().getValue().getCode().equals("OTHER_LOCATION")
+            && caseData.getFinalOrderFurtherHearingComplex().getAlternativeHearingList() == null) {
+            errors.add(FURTHER_HEARING_OTHER_ALT_LOCATION);
         }
     }
 
@@ -449,7 +465,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
     private CallbackResponse addGeneratedDocumentToCollection(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
         CaseDocument finalDocument = caseData.getFinalOrderDocument();
         List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
         finalCaseDocuments.add(element(finalDocument));
@@ -499,6 +515,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             }
         }
 
+        nullPreviousSelections(caseDataBuilder);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(state.name())

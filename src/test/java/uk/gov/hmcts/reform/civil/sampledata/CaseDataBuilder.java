@@ -6,33 +6,33 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.crd.model.Category;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
-import uk.gov.hmcts.reform.civil.enums.FeeType;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
-import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
-import uk.gov.hmcts.reform.civil.enums.CaseRole;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
-import uk.gov.hmcts.reform.civil.enums.MediationDecision;
-import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
-import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
-import uk.gov.hmcts.reform.civil.enums.PaymentType;
-import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
-import uk.gov.hmcts.reform.civil.enums.CaseCategory;
-import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
-import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
-import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.ConfirmationToggle;
+import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
+import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
+import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.enums.MediationDecision;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
+import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
+import uk.gov.hmcts.reform.civil.enums.PaymentType;
+import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
+import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
+import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
@@ -106,8 +106,8 @@ import uk.gov.hmcts.reform.civil.model.citizenui.AdditionalLipPartyDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
-import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
 import uk.gov.hmcts.reform.civil.model.citizenui.MediationLiPCarm;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -192,6 +192,7 @@ import java.util.List;
 
 import static java.time.LocalDate.now;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -199,8 +200,10 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
@@ -230,6 +233,80 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrder
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 public class CaseDataBuilder {
+
+    final String reason = """
+            Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
+            felis, ultricies nec, pellentesque eu, pretium quis, sem.
+            venenatis vitae, justo. Nullam dictum felis eu pede molli
+            consequat vitae, eleifend ac, enim. Aliquam lorem ante, d
+            nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam
+            quam nunc, blandit vel, luctus pulvinar, hendrerit id, lo
+            faucibus tincidunt. Duis leo. Sed fringilla mauris sit am
+            vulputate eleifend sapien. Vestibulum purus quam, sceleri
+            primis in faucibus orci luctus et ultrices posuere cubili
+            ipsum. Sed aliquam ultrices mauris. Integer ante arcu, ac
+            volutpat pretium libero. Cras id dui. Aenean ut eros et n
+            Phasellus nec sem in justo pellentesque facilisis. Etiam\s
+            non, euismod vitae, posuere imperdiet, leo. Maecenas male
+            ante ipsum primis in faucibus orci luctus et ultrices pos
+            vestibulum elit. Aenean tellus metus, bibendum sed, posue
+            cursus feugiat, nunc augue blandit nunc, eu sollicitudin\s
+            venenatis condimentum, sem libero volutpat nibh, nec pell
+            tincidunt libero. Phasellus dolor. Maecenas vestibulum mo
+            posuere eget, vestibulum et, tempor auctor, justo. In ac\s
+            rhoncus pede. Pellentesque habitant morbi tristique senec
+            In hac habitasse platea dictumst. Curabitur at lacus ac v
+            sem. Pellentesque libero tortor, tincidunt et, tincidunt\s
+            leo quis pede. Donec interdum, metus et hendrerit aliquet
+            venenatis vulputate lorem. Morbi nec metus. Phasellus bla
+            fermentum eu, tincidunt eu, varius ut, felis. In auctor l
+            Nullam cursus lacinia erat. Praesent blandit laoreet nibh
+            orci leo non est. Quisque id mi. Ut tincidunt tincidunt e
+            habitasse platea dictumst. Fusce a quam. Etiam ut purus m
+            Sed augue ipsum, egestas nec, vestibulum et, malesuada ad
+            fermentum libero. Praesent nonummy mi in odio. Nunc inter
+            Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
+            felis, ultricies nec, pellentesque eu, pretium quis, sem.
+            venenatis vitae, justo. Nullam dictum felis eu pede molli
+            consequat vitae, eleifend ac, enim. Aliquam lorem ante, d
+            nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam
+            quam nunc, blandit vel, luctus pulvinar, hendrerit id, lo
+            faucibus tincidunt. Duis leo. Sed fringilla mauris sit am
+            vulputate eleifend sapien. Vestibulum purus quam, sceleri
+            primis in faucibus orci luctus et ultrices posuere cubili
+            ipsum. Sed aliquam ultrices mauris. Integer ante arcu, ac
+            volutpat pretium libero. Cras id dui. Aenean ut eros et n
+            Phasellus nec sem in justo pellentesque facilisis. Etiam\s
+            non, euismod vitae, posuere imperdiet, leo. Maecenas male
+            ante ipsum primis in faucibus orci luctus et ultrices pos
+            vestibulum elit. Aenean tellus metus, bibendum sed, posue
+            cursus feugiat, nunc augue blandit nunc, eu sollicitudin\s
+            venenatis condimentum, sem libero volutpat nibh, nec pell
+            tincidunt libero. Phasellus dolor. Maecenas vestibulum mo
+            posuere eget, vestibulum et, tempor auctor, justo. In ac\s
+            rhoncus pede. Pellentesque habitant morbi tristique senec
+            In hac habitasse platea dictumst. Curabitur at lacus ac v
+            sem. Pellentesque libero tortor, tincidunt et, tincidunt\s
+            leo quis pede. Donec interdum, metus et hendrerit aliquet
+            venenatis vulputate lorem. Morbi nec metus. Phasellus bla
+            fermentum eu, tincidunt eu, varius ut, felis. In auctor l
+            Nullam cursus lacinia erat. Praesent blandit laoreet nibh
+            orci leo non est. Quisque id mi. Ut tincidunt tincidunt e
+            habitasse platea dictumst. Fusce a quam. Etiam ut purus m
+            Sed augue ipsum, egestas nec, vestibulum et, malesuada ad
+            fermentum libero. Praesent nonummy mi in odio. Nunc inter
+            fermentum eu, tincidunt eu, varius ut, felis. In auctor l
+            Nullam cursus lacinia erat. Praesent blandit laoreet nibh
+            orci leo non est. Quisque id mi. Ut tincidunt tincidunt e
+            habitasse platea dictumst. Fusce a quam. Etiam ut purus m
+            Sed augue ipsum, egestas nec, vestibulum et, malesuada ad
+            fermentum libero. Praesent nonummy mi in odio. Nunc inter
+            fermentum libero. Praesent nonummy mi in odio. Nunc inter
+            Sed augue ipsum, egestas nec, vestibulum et, malesuada ad
+            fermentum libero. Praesent nonummy mi in odio. Nunc inter
+            fermentum libero. Praesent nonummy mi in odio. Nunc inter
+            fermentum libero.Praesent nonummy mi in odio au.
+            """;
 
     public static final String LEGACY_CASE_REFERENCE = "000DC001";
     public static final Long CASE_ID = 1594901956117591L;
@@ -606,6 +683,7 @@ public class CaseDataBuilder {
     private SdoR2FastTrackCreditHire sdoR2FastTrackCreditHire;
     private SdoR2FastTrackCreditHireDetails sdoR2FastTrackCreditHireDetails;
     private String claimantBilingualLanguagePreference;
+    private JudgmentPaidInFull judgmentPaidInFull;
 
     public CaseDataBuilder claimantBilingualLanguagePreference(String claimantBilingualLanguagePreference) {
         this.claimantBilingualLanguagePreference = claimantBilingualLanguagePreference;
@@ -833,6 +911,32 @@ public class CaseDataBuilder {
                                                    .band(BAND_1)
                                                    .complexityBandingAgreed(YES)
                                                    .reasons("Good reason")
+                                                   .build()).build();
+        return this;
+    }
+
+    public CaseDataBuilder respondent1DQWithFixedRecoverableCostsIntermediate(Document document) {
+        respondent1DQ = respondent1DQ.toBuilder()
+            .respondent1DQFixedRecoverableCostsIntermediate(FixedRecoverableCosts.builder()
+                                                   .isSubjectToFixedRecoverableCostRegime(YES)
+                                                   .band(BAND_1)
+                                                   .complexityBandingAgreed(YES)
+                                                   .reasons("Good reason")
+                                                   .frcSupportingDocument(document)
+                                                   .build()).build();
+        return this;
+    }
+
+    public CaseDataBuilder respondent1DQWithFixedRecoverableCostsIntermediate() {
+        respondent1DQ = respondent1DQ.toBuilder()
+            .respondent1DQFixedRecoverableCostsIntermediate(FixedRecoverableCosts.builder()
+                                                   .isSubjectToFixedRecoverableCostRegime(YES)
+                                                   .band(BAND_1)
+                                                   .complexityBandingAgreed(YES)
+                                                   .reasons("Good reason")
+                                                   .frcSupportingDocument(
+                                                       DocumentBuilder.builder()
+                                                           .documentName("frc-doc1").build())
                                                    .build()).build();
         return this;
     }
@@ -1097,6 +1201,20 @@ public class CaseDataBuilder {
                                                     .band(BAND_1)
                                                     .complexityBandingAgreed(YES)
                                                     .reasons("Good reason")
+                                                    .build()).build();
+        return this;
+    }
+
+    public CaseDataBuilder respondent2DQWithFixedRecoverableCostsIntermediate() {
+        respondent2DQ = respondent2DQ.toBuilder()
+            .respondent2DQFixedRecoverableCostsIntermediate(FixedRecoverableCosts.builder()
+                                                    .isSubjectToFixedRecoverableCostRegime(YES)
+                                                    .band(BAND_1)
+                                                    .complexityBandingAgreed(YES)
+                                                    .reasons("Good reason")
+                                                    .frcSupportingDocument(
+                                                        DocumentBuilder.builder()
+                                                            .documentName("frc-doc1").build())
                                                     .build()).build();
         return this;
     }
@@ -1400,6 +1518,20 @@ public class CaseDataBuilder {
                                                    .band(BAND_1)
                                                    .complexityBandingAgreed(YES)
                                                    .reasons("Good reason")
+                                                   .build()).build();
+        return this;
+    }
+
+    public CaseDataBuilder applicant1DQWithFixedRecoverableCostsIntermediate() {
+        applicant1DQ = applicant1DQ.toBuilder()
+            .applicant1DQFixedRecoverableCostsIntermediate(FixedRecoverableCosts.builder()
+                                                   .isSubjectToFixedRecoverableCostRegime(YES)
+                                                   .band(BAND_1)
+                                                   .complexityBandingAgreed(YES)
+                                                   .reasons("Good reason")
+                                                   .frcSupportingDocument(
+                                                       DocumentBuilder.builder()
+                                                           .documentName("frc-doc1").build())
                                                    .build()).build();
         return this;
     }
@@ -3833,6 +3965,7 @@ public class CaseDataBuilder {
             .build();
         respondent1DQ();
         respondent1ResponseDate = respondent1AcknowledgeNotificationDate.plusDays(3);
+        caseManagementLocation = CaseLocationCivil.builder().baseLocation("11111").region("2").build();
         return this;
     }
 
@@ -4365,7 +4498,7 @@ public class CaseDataBuilder {
         applicant1DQ();
         applicant1ResponseDate = respondent1ResponseDate.plusDays(2);
         uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
-
+        caseManagementLocation = CaseLocationCivil.builder().baseLocation("00000").region("4").build();
         switch (mpScenario) {
             case ONE_V_TWO_ONE_LEGAL_REP: {
                 respondent2SameLegalRepresentative = YES;
@@ -4407,6 +4540,30 @@ public class CaseDataBuilder {
         ccdState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
         hearingDate = LocalDate.now().plusWeeks(5).plusDays(5);
         hearingDuration = MINUTES_120;
+        return this;
+    }
+
+    public CaseDataBuilder atCaseProgressionCheck() {
+        atStateHearingFeeDuePaid();
+        ccdState = CASE_PROGRESSION;
+        hearingDate = LocalDate.now().plusWeeks(5).plusDays(5);
+        hearingDuration = MINUTES_120;
+        return this;
+    }
+
+    public CaseDataBuilder atAllFinalOrdersIssuedCheck() {
+        atStateHearingFeeDuePaid();
+        ccdState = All_FINAL_ORDERS_ISSUED;
+        hearingDate = LocalDate.now().plusWeeks(5).plusDays(5);
+        hearingDuration = MINUTES_120;
+        return this;
+    }
+
+    public CaseDataBuilder atStateDecisionOutcome() {
+        atStateRespondentFullDefenceSpec();
+        hearingDate = LocalDate.now().plusWeeks(5).plusDays(5);
+        hearingDuration = MINUTES_120;
+        ccdState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
         return this;
     }
 
@@ -4495,6 +4652,7 @@ public class CaseDataBuilder {
         applicant1ProceedWithClaim = NO;
         applicant1ResponseDate = respondent1ResponseDate.plusDays(1);
         uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
+        caseManagementLocation = CaseLocationCivil.builder().baseLocation("00000").region("4").build();
         return this;
     }
 
@@ -4546,6 +4704,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder setMultiTrackClaim() {
         allocatedTrack = MULTI_CLAIM;
+        return this;
+    }
+
+    public CaseDataBuilder setIntermediateTrackClaim() {
+        allocatedTrack = INTERMEDIATE_CLAIM;
         return this;
     }
 
@@ -4864,11 +5027,9 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateBeforeTakenOfflineSDONotDrawnOverLimit() {
 
         atStateApplicantRespondToDefenceAndProceed();
-
         ccdState = JUDICIAL_REFERRAL;
         reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-            .input("This is more than 150 111111111111111111111111111111111111111111111111111111111111111111111111111"
-                       + "111111111111111111111111111111111111111111111111111111")
+            .input(reason)
             .build();
         unsuitableSDODate = applicant1ResponseDate.plusDays(1);
         return this;
@@ -4896,8 +5057,7 @@ public class CaseDataBuilder {
         notSuitableSdoOptions = NotSuitableSdoOptions.CHANGE_LOCATION;
 
         tocTransferCaseReason = TocTransferCaseReason.builder()
-            .reasonForCaseTransferJudgeTxt("This is more than 150 111111111111111111111111111111111111111111111111111111111111111111111111111"
-                       + "111111111111111111111111111111111111111111111111111111")
+            .reasonForCaseTransferJudgeTxt(reason)
             .build();
         unsuitableSDODate = applicant1ResponseDate.plusDays(1);
         return this;
@@ -5281,6 +5441,7 @@ public class CaseDataBuilder {
         this.respondent2SameLegalRepresentative = NO;
         this.respondentSolicitor2Reference = "01234";
         respondent2ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
+        caseManagementLocation = CaseLocationCivil.builder().baseLocation("00000").region("4").build();
         return this;
     }
 
@@ -5903,8 +6064,9 @@ public class CaseDataBuilder {
 
     public CaseData buildJudmentOnlineCaseDataWithPaymentByInstalment() {
         return build().toBuilder()
-            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .ccdState(All_FINAL_ORDERS_ISSUED)
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
+            .respondent1(PartyBuilder.builder().individual().build())
             .joInstalmentDetails(JudgmentInstalmentDetails.builder()
                                              .startDate(LocalDate.of(2022, 12, 12))
                                              .amount("120")
@@ -5920,6 +6082,7 @@ public class CaseDataBuilder {
     public CaseData buildJudgmentOnlineCaseDataWithDeterminationMeans() {
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .respondent1(PartyBuilder.builder().individual().build())
             .joJudgmentRecordReason(JudgmentRecordedReason.DETERMINATION_OF_MEANS)
             .joInstalmentDetails(JudgmentInstalmentDetails.builder()
                                              .startDate(LocalDate.of(2022, 12, 12))
@@ -5947,12 +6110,14 @@ public class CaseDataBuilder {
             .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .respondent1(PartyBuilder.builder().soleTrader().build())
             .joIsRegisteredWithRTL(YES).build();
     }
 
     public CaseData buildJudgmentOnlineCaseDataWithPaymentByDate() {
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .respondent1(PartyBuilder.builder().organisation().build())
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
             .joAmountOrdered("1200")
             .joAmountCostOrdered("1100")
@@ -5965,9 +6130,28 @@ public class CaseDataBuilder {
             .build();
     }
 
+    public CaseData buildJudgmentOnlineCaseDataWithPaymentByDate_Multi_party() {
+        return build().toBuilder()
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .respondent1(PartyBuilder.builder().organisation().build())
+            .addRespondent2(YES)
+            .respondent2(PartyBuilder.builder().individual().build())
+            .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
+            .joAmountOrdered("1200")
+            .joAmountCostOrdered("1100")
+            .joPaymentPlan(JudgmentPaymentPlan.builder()
+                               .type(PaymentPlanSelection.PAY_BY_DATE)
+                               .paymentDeadlineDate(LocalDate.of(2023, 12, 12)).build())
+            .joOrderMadeDate(LocalDate.of(2022, 12, 12))
+            .joIsRegisteredWithRTL(YES)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .build();
+    }
+
     public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days() {
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .respondent1(PartyBuilder.builder().soleTrader().build())
             .joOrderMadeDate(LocalDate.of(2023, 3, 1))
             .joJudgmentPaidInFull(JudgmentPaidInFull.builder()
                                       .dateOfFullPaymentMade(LocalDate.now().plusDays(35))
@@ -5981,6 +6165,7 @@ public class CaseDataBuilder {
     public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31Days() {
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .respondent1(PartyBuilder.builder().soleTrader().build())
             .joOrderMadeDate(LocalDate.of(2023, 3, 1))
             .joJudgmentPaidInFull(JudgmentPaidInFull.builder()
                                       .dateOfFullPaymentMade(LocalDate.now().plusDays(15))
@@ -7583,6 +7768,7 @@ public class CaseDataBuilder {
             .paymentSetDate(paymentSetDate)
             .repaymentFrequency(repaymentFrequency)
             .repaymentDate(repaymentDate)
+            .joJudgmentPaidInFull(judgmentPaidInFull)
             .build();
     }
 
@@ -7592,4 +7778,8 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder judgmentPaidInFull(JudgmentPaidInFull judgmentPaidInFull) {
+        this.judgmentPaidInFull = judgmentPaidInFull;
+        return this;
+    }
 }

@@ -98,7 +98,7 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
         }
         if (isLip) {
             if (isLipWelsh) {
-                return notificationsProperties.getNotifyLipUpdateTemplateBilingual();
+                return notificationsProperties.getOrderBeingTranslatedTemplateWelsh();
             } else {
                 return notificationsProperties.getNotifyLipUpdateTemplate();
             }
@@ -181,7 +181,7 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
 
     private Map<String, String> getLipProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_NAME, getPartyName(caseData),
             CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
         );
