@@ -11,10 +11,12 @@ import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
@@ -54,6 +56,7 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
             .instalmentDetails(paymentPlan.equals(PaymentPlanSelection.PAY_IN_INSTALMENTS)
                                    ? getInstalmentDetails(caseData) : null)
             .isRegisterWithRTL(isNonDivergent ? YesOrNo.YES : YesOrNo.NO)
+            .rtlState(isNonDivergent ? JudgmentRTLStatus.ISSUED.getRtlState() : null)
             .issueDate(LocalDate.now())
             .orderedAmount(orderAmount.toString())
             .costs(costs.toString())

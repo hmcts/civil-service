@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
@@ -66,6 +67,7 @@ class JudgmentByAdmissionMapperTest {
         assertEquals("1000", activeJudgment.getCosts());
         assertEquals("15000", activeJudgment.getTotalAmount());
         assertEquals(YesOrNo.YES, activeJudgment.getIsRegisterWithRTL());
+        assertEquals(JudgmentRTLStatus.ISSUED.getRtlState(), activeJudgment.getRtlState());
         assertEquals(LocalDate.now(), activeJudgment.getIssueDate());
         assertEquals("0123", activeJudgment.getCourtLocation());
         assertEquals(JudgmentType.JUDGMENT_BY_ADMISSION, activeJudgment.getType());
@@ -116,6 +118,7 @@ class JudgmentByAdmissionMapperTest {
         assertEquals("1000", activeJudgment.getCosts());
         assertEquals("15000", activeJudgment.getTotalAmount());
         assertEquals(YesOrNo.YES, activeJudgment.getIsRegisterWithRTL());
+        assertEquals(JudgmentRTLStatus.ISSUED.getRtlState(), activeJudgment.getRtlState());
         assertEquals(LocalDate.now(), activeJudgment.getIssueDate());
         assertEquals("0123", activeJudgment.getCourtLocation());
         assertEquals(JudgmentType.JUDGMENT_BY_ADMISSION, activeJudgment.getType());
@@ -170,6 +173,7 @@ class JudgmentByAdmissionMapperTest {
         assertEquals("1000", activeJudgment.getCosts());
         assertEquals("15000", activeJudgment.getTotalAmount());
         assertEquals(YesOrNo.YES, activeJudgment.getIsRegisterWithRTL());
+        assertEquals(JudgmentRTLStatus.ISSUED.getRtlState(), activeJudgment.getRtlState());
         assertEquals(LocalDate.now(), activeJudgment.getIssueDate());
         assertEquals("0123", activeJudgment.getCourtLocation());
         assertEquals(JudgmentType.JUDGMENT_BY_ADMISSION, activeJudgment.getType());
@@ -220,6 +224,7 @@ class JudgmentByAdmissionMapperTest {
         assertEquals("1000", activeJudgment.getCosts());
         assertEquals("15000", activeJudgment.getTotalAmount());
         assertEquals(YesOrNo.NO, activeJudgment.getIsRegisterWithRTL());
+        assertEquals(null, activeJudgment.getRtlState());
         assertEquals(LocalDate.now(), activeJudgment.getIssueDate());
         assertEquals("0123", activeJudgment.getCourtLocation());
         assertEquals(JudgmentType.JUDGMENT_BY_ADMISSION, activeJudgment.getType());
