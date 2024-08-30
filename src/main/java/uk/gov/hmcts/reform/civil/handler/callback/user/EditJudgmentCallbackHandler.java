@@ -105,8 +105,9 @@ public class EditJudgmentCallbackHandler extends CallbackHandler {
         }
 
         if (caseData.getActiveJudgment() != null) {
-            caseDataBuilder.activeJudgment(editJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
-            caseDataBuilder.joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(caseData.getActiveJudgment()));
+            JudgmentDetails activeJudgment = editJudgmentOnlineMapper.addUpdateActiveJudgment(caseData);
+            caseDataBuilder.activeJudgment(activeJudgment);
+            caseDataBuilder.joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment));
         } else {
             errors.add("There is no active judgment to edit");
         }
