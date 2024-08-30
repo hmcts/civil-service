@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.SetAsideJudgmentOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -113,6 +114,8 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
             assertEquals(JudgmentState.SET_ASIDE, historicJudgment.getState());
             assertEquals(caseData.getJoSetAsideDefenceReceivedDate(), historicJudgment.getSetAsideDate());
+            //and the caseState should not be updated
+            assertEquals(response.getState(), CaseState.All_FINAL_ORDERS_ISSUED.name());
         }
 
         @Test
@@ -134,7 +137,8 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
             assertEquals(JudgmentState.SET_ASIDE_ERROR, historicJudgment.getState());
             assertEquals(LocalDate.now(), historicJudgment.getSetAsideDate());
-
+            //and the caseState should not be updated
+            assertEquals(response.getState(), CaseState.All_FINAL_ORDERS_ISSUED.name());
         }
 
         @Test
@@ -156,10 +160,12 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             //Then: setAsideDate should be set correctly
             assertThat(response.getData()).extracting("joSetAsideOrderType").isNotNull();
+            //and the caseState should be updated
+            assertEquals(response.getState(), CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name());
         }
 
         @Test
-        void testSetAsideForDEfaultJudgment() {
+        void testSetAsideForDefaultJudgment() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
             CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);

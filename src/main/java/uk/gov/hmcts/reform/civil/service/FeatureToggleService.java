@@ -102,6 +102,10 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("minti");
     }
 
+    public boolean isCjesServiceAvailable() {
+        return featureToggleApi.isFeatureEnabled("isCjesServiceAvailable");
+    }
+
     public boolean isCarmEnabledForCase(CaseData caseData) {
         ZoneId zoneId = ZoneId.systemDefault();
         long epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
