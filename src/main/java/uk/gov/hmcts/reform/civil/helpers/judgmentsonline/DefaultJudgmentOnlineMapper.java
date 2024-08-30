@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -57,8 +56,6 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
 
         return judgmentDetails;
     }
-
-
 
     @Override
     protected JudgmentState getJudgmentState(CaseData caseData) {
@@ -104,7 +101,6 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
                 return null;
         }
     }
-
     private LocalDate getPaymentDeadLineDate(CaseData caseData) {
         return DJPaymentTypeSelection.SET_DATE.equals(caseData.getPaymentTypeSelection()) ? caseData.getPaymentSetDate() : null;
     }
