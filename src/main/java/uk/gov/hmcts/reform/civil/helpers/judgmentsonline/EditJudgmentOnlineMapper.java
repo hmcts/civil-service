@@ -9,12 +9,10 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
-
 import java.math.BigDecimal;
-import java.math.BigInteger;
 
 @Slf4j
 @Service
