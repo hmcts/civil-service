@@ -216,6 +216,7 @@ public class EditJudgmentsOnlineMapperTest {
     void testIfJudgmentByAdmission_scenario3() {
 
         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+            .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(140))
             .ccjPaymentPaidSomeOption(YesOrNo.YES)
             .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(10))
             .ccjJudgmentTotalStillOwed(BigDecimal.valueOf(150))
