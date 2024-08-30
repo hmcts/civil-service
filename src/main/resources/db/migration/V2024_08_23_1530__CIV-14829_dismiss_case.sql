@@ -22,7 +22,7 @@ VALUES ('Notice.AAA6.CP.Case.Dismissed.Claimant',
         '<p class="govuk-body">Mae’r achos wedi’i gau o ganlyniad i orchymyn  barnwr.<br>' ||
         'Gallwch weld y crynodeb o’r achos ond nid manylion yr achos. Ni allwch wneud unrhyw newidiadau i achos sydd wedi cau.</p>',
         'CLAIMANT', 'Session'),
-       ('Notice.AAA6.CP.Bundle.Updated.Defendant',
+       ('Notice.AAA6.CP.Case.Dismissed.Defendant',
         'The case has been closed',
         'Mae’r achos wedi’i gau',
         '<p class="govuk-body">The case has been closed as a result of a judge’s order.<br>' ||
