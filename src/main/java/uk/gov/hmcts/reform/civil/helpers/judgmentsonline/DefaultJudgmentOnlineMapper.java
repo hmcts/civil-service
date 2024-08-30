@@ -38,7 +38,7 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
         isNonDivergent =  JudgmentsOnlineHelper.isNonDivergentForDJ(caseData);
         JudgmentDetails activeJudgment = super.addUpdateActiveJudgment(caseData);
         activeJudgment = super.updateDefendantDetails(activeJudgment, caseData);
-        JudgmentDetails activeJudgmentDetails = activeJudgment.toBuilder()
+        JudgmentDetails judgmentDetails = activeJudgment.toBuilder()
             .createdTimestamp(LocalDateTime.now())
             .state(getJudgmentState(caseData))
             .type(JudgmentType.DEFAULT_JUDGMENT)
@@ -52,8 +52,9 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
             .costs(costs.toString())
             .totalAmount(orderAmount.add(costs).toString())
             .build();
+        super.updateJudgmentTabDataWithActiveJudgment(judgmentDetails, caseData);
 
-        return activeJudgmentDetails;
+        return judgmentDetails;
     }
 
     @Override
@@ -104,4 +105,5 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
     private LocalDate getPaymentDeadLineDate(CaseData caseData) {
         return DJPaymentTypeSelection.SET_DATE.equals(caseData.getPaymentTypeSelection()) ? caseData.getPaymentSetDate() : null;
     }
+
 }

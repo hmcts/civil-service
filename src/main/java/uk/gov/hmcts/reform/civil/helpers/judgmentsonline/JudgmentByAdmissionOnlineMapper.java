@@ -11,10 +11,12 @@ import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
@@ -34,7 +36,10 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
 
         BigDecimal costsInPounds = getCosts(caseData);
         BigInteger costs = MonetaryConversions.poundsToPennies(costsInPounds);
-        BigInteger orderAmount = MonetaryConversions.poundsToPennies(getOrderAmount(caseData, costsInPounds));
+        BigInteger orderAmount = MonetaryConversions.poundsToPennies(getOrderAmount(caseData));
+        BigInteger claimFeeAmount = MonetaryConversions.poundsToPennies(getClaimFeeAmount(caseData));
+        BigInteger totalStillOwed = MonetaryConversions.poundsToPennies(getTotalStillOwed(caseData));
+        BigInteger amountAlreadyPaid = MonetaryConversions.poundsToPennies(getAmountAlreadyPaid(caseData));
         isNonDivergent = JudgmentsOnlineHelper.isNonDivergentForJBA(caseData);
         PaymentPlanSelection paymentPlan = getPaymentPlan(caseData);
 
@@ -51,10 +56,13 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
             .instalmentDetails(paymentPlan.equals(PaymentPlanSelection.PAY_IN_INSTALMENTS)
                                    ? getInstalmentDetails(caseData) : null)
             .isRegisterWithRTL(isNonDivergent ? YesOrNo.YES : YesOrNo.NO)
+            .rtlState(isNonDivergent ? JudgmentRTLStatus.ISSUED.getRtlState() : null)
             .issueDate(LocalDate.now())
             .orderedAmount(orderAmount.toString())
             .costs(costs.toString())
-            .totalAmount(orderAmount.add(costs).toString())
+            .claimFeeAmount(claimFeeAmount.toString())
+            .amountAlreadyPaid(amountAlreadyPaid.toString())
+            .totalAmount(orderAmount.add(costs).add(claimFeeAmount).toString())
             .build();
 
         super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, caseData);
@@ -63,9 +71,27 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
     }
 
     @NotNull
-    private BigDecimal getOrderAmount(CaseData caseData, BigDecimal costs) {
+    private BigDecimal getOrderAmount(CaseData caseData) {
         return caseData.getCcjPaymentDetails() != null
-            ? getValue(caseData.getCcjPaymentDetails().getCcjJudgmentTotalStillOwed()).subtract(costs) : BigDecimal.ZERO;
+            ? getValue(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()) : BigDecimal.ZERO;
+    }
+
+    @NotNull
+    private BigDecimal getClaimFeeAmount(CaseData caseData) {
+        return caseData.getCcjPaymentDetails() != null
+            ? getValue(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee()) : BigDecimal.ZERO;
+    }
+
+    @NotNull
+    private BigDecimal getTotalStillOwed(CaseData caseData) {
+        return caseData.getCcjPaymentDetails() != null
+            ? getValue(caseData.getCcjPaymentDetails().getCcjJudgmentTotalStillOwed()) : BigDecimal.ZERO;
+    }
+
+    @NotNull
+    private BigDecimal getAmountAlreadyPaid(CaseData caseData) {
+        return caseData.getCcjPaymentDetails() != null
+            ? getValue(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmountInPounds()) : BigDecimal.ZERO;
     }
 
     @NotNull

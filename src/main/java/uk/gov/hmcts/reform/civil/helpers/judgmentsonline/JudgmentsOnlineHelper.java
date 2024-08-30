@@ -2,9 +2,8 @@ package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -17,7 +16,6 @@ import java.util.List;
 
 import static java.math.BigDecimal.ZERO;
 import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.reform.civil.utils.DefaultJudgmentUtils.calculateFixedCosts;
 
 public class JudgmentsOnlineHelper {
 
@@ -126,57 +124,53 @@ public class JudgmentsOnlineHelper {
         return val != null ? new BigDecimal(val) : ZERO;
     }
 
-    public static String calculateRepaymentBreakdownSummary(CaseData caseData, BigDecimal interest, Fee claimfee) {
-        BigDecimal claimFeePounds;
-        if (caseData.getOutstandingFeeInPounds() != null) {
-            claimFeePounds = caseData.getOutstandingFeeInPounds();
-        } else {
-            claimFeePounds = MonetaryConversions.penniesToPounds(claimfee.getCalculatedAmountInPence());
-        }
-        BigDecimal fixedCost = calculateFixedCosts(caseData);
-        StringBuilder repaymentBreakdown = buildRepaymentBreakdown(
-            caseData,
-            interest,
-            claimFeePounds,
-            fixedCost
-        );
-
-        return repaymentBreakdown.toString();
-    }
-
     @NotNull
-    private static StringBuilder buildRepaymentBreakdown(CaseData caseData, BigDecimal interest, BigDecimal claimFeePounds,
-                                                  BigDecimal fixedCost) {
+    public static String calculateRepaymentBreakdownSummary(JudgmentDetails activeJudgment) {
 
-        //calculate the relevant total, total claim value + interest if any, claim fee for case
-        var subTotal = caseData.getTotalClaimAmount()
-            .add(interest)
-            .add(claimFeePounds);
-        if (caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.YES) {
-            subTotal = subTotal.add(fixedCost);
-        }
+        BigDecimal totalAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getTotalAmount()));
 
         //creates  the text on the page, based on calculated values
         StringBuilder repaymentBreakdown = new StringBuilder();
-
-        repaymentBreakdown.append("The judgment will order the defendants to pay £").append(
-            subTotal);
+        repaymentBreakdown.append("The judgment will order the defendants to pay £").append(totalAmount);
         repaymentBreakdown.append(", including the claim fee and interest, if applicable, as shown:");
-        repaymentBreakdown.append("\n").append("### Claim amount \n £").append(caseData.getTotalClaimAmount().setScale(2));
 
-        if (interest.compareTo(BigDecimal.ZERO) != 0) {
-            repaymentBreakdown.append("\n ### Claim interest amount \n").append("£").append(interest.setScale(2));
+        BigDecimal orderedAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getOrderedAmount()));
+        if (null != orderedAmount) {
+            repaymentBreakdown.append("\n").append("### Claim amount \n £").append(orderedAmount.setScale(2));
         }
 
-        if (null != fixedCost) {
-            repaymentBreakdown.append("\n ### Fixed cost amount \n").append("£").append(fixedCost.setScale(2));
+        if (null != activeJudgment.getCosts()) {
+            BigDecimal costs = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getCosts()));
+            if (costs.compareTo(BigDecimal.ZERO) != 0) {
+                repaymentBreakdown.append("\n ### Fixed cost amount \n").append("£").append(costs.setScale(2));
+            }
         }
-        repaymentBreakdown.append("\n").append("### Claim fee amount \n £").append(claimFeePounds.setScale(2)).append(
-                "\n ## Subtotal \n £").append(subTotal.setScale(2))
+
+        if (null != activeJudgment.getClaimFeeAmount()) {
+            BigDecimal claimFeeAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getClaimFeeAmount()));
+            if (claimFeeAmount.compareTo(BigDecimal.ZERO) != 0) {
+                repaymentBreakdown.append("\n ### Claim fee amount \n").append("£").append(claimFeeAmount.setScale(2));
+            }
+        }
+
+        repaymentBreakdown.append("\n ## Subtotal \n £").append(totalAmount.setScale(2))
             .append("\n");
 
-        repaymentBreakdown.append("\n ## Total still owed \n £").append(subTotal.setScale(2));
-        return repaymentBreakdown;
+        BigDecimal amountAlreadyPaid = ZERO;
+        if (null != activeJudgment.getAmountAlreadyPaid()) {
+            amountAlreadyPaid = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getAmountAlreadyPaid()));
+            if (amountAlreadyPaid.compareTo(BigDecimal.ZERO) != 0) {
+                repaymentBreakdown.append("\n ### Amount already paid \n").append("£").append(amountAlreadyPaid.setScale(
+                    2));
+            }
+        }
+
+        BigDecimal totalStillOwed = (null != activeJudgment.getAmountAlreadyPaid())
+            ? totalAmount.subtract(amountAlreadyPaid)
+            : totalAmount;
+        repaymentBreakdown.append("\n ## Total still owed \n £").append(totalStillOwed.setScale(2));
+
+        return repaymentBreakdown.toString();
     }
 
 }

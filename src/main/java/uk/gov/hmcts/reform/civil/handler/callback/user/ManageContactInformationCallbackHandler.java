@@ -31,10 +31,12 @@ import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CaseNameUtils;
 import uk.gov.hmcts.reform.civil.utils.PartyDetailsChangedUtil;
+import uk.gov.hmcts.reform.civil.validation.PartyValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -129,6 +131,8 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final PostcodeValidator postcodeValidator;
     private final PartyDetailsChangedUtil partyDetailsChangedUtil;
+    private final FeatureToggleService featureToggleService;
+    private final PartyValidator partyValidator;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -337,6 +341,26 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         return party.getPrimaryAddress().getPostCode();
     }
 
+    private Party getPartyDetails(String partyChosen, CaseData caseData) {
+        switch (partyChosen) {
+            case CLAIMANT_ONE_ID: {
+                return caseData.getApplicant1();
+            }
+            case CLAIMANT_TWO_ID: {
+                return caseData.getApplicant2();
+            }
+            case DEFENDANT_ONE_ID: {
+                return caseData.getRespondent1();
+            }
+            case DEFENDANT_TWO_ID: {
+                return caseData.getRespondent2();
+            }
+            default: {
+                return null;
+            }
+        }
+    }
+
     private CallbackResponse showWarning(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String partyChosen = caseData.getUpdateDetailsForm().getPartyChosen().getValue().getCode();
@@ -352,6 +376,15 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
 
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             errors = postcodeValidator.validate(getPostCode(partyChosen, caseData));
+            if (featureToggleService.isJudgmentOnlineLive()) {
+                Party partyDetails = getPartyDetails(partyChosen, caseData);
+                if (partyDetails != null  && partyDetails.getPrimaryAddress() != null) {
+                    errors = partyValidator.validateAddress(partyDetails.getPrimaryAddress(), errors);
+                }
+                if (partyDetails != null && partyDetails.getPartyName() != null) {
+                    errors = partyValidator.validateName(partyDetails.getPartyName(), errors);
+                }
+            }
         }
 
         if (showLitigationFriendUpdateWarning(partyChosen, oldCaseData)) {
