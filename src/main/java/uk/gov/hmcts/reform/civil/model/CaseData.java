@@ -664,9 +664,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private LocalDate joIssueDate;
     private JudgmentState joState;
     private LocalDate joFullyPaymentMadeDate;
-    private String joOrderedAmount;
-    private String joCosts;
-    private String joTotalAmount;
     private YesOrNo joIsDisplayInJudgmentTab;
     private String joRepaymentSummaryObject;
 
