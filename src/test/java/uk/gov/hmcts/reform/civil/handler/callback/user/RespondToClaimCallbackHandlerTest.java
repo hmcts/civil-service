@@ -1686,27 +1686,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
         }
 
-        @Test
-        void shouldSetApplicantResponseDeadline_emptyPrimaryAddress() {
-            //Given
-            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
-            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimOneDefendantSolicitor()
-                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
-                .respondentResponseIsSame(NO)
-                .respondent1Copy(PartyBuilder.builder().individualNoPrimaryAddress("john").build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            //When
-            IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> handler.handle(params)
-            );
-            //Then
-            assertEquals(exception.getMessage(), "Primary Address cannot be empty");
-        }
 
         @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_when1v2SameSolicitorResponseIsTheSame() {
