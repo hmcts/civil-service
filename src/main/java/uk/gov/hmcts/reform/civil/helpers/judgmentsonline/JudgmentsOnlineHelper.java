@@ -139,7 +139,6 @@ public class JudgmentsOnlineHelper {
             repaymentBreakdown.append("\n").append("### Claim amount \n £").append(orderedAmount.setScale(2));
         }
 
-
         if (null != activeJudgment.getCosts()) {
             BigDecimal costs = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getCosts()));
             if (costs.compareTo(BigDecimal.ZERO) != 0) {
