@@ -181,7 +181,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
         return setApplicantResponseDeadline.execute(callbackParams);
-
     }
 
     private boolean isRespondent2SameLegalRep(CaseData caseData) {
