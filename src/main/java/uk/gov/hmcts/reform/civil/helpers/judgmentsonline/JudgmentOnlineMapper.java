@@ -95,8 +95,7 @@ public abstract class JudgmentOnlineMapper {
     }
 
     private boolean isHistoricJudgment(JudgmentDetails activeJudgment) {
-        return JudgmentState.MODIFIED.equals(activeJudgment.getState())
-            || JudgmentState.SET_ASIDE_ERROR.equals(activeJudgment.getState())
+        return JudgmentState.SET_ASIDE_ERROR.equals(activeJudgment.getState())
             || JudgmentState.SET_ASIDE.equals(activeJudgment.getState());
     }
 }
