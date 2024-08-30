@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -64,6 +65,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_ORDER_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
@@ -72,7 +74,12 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderDownloadTemplateOptions.BLANK_TEMPLATE_AFTER_HEARING;
+import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderDownloadTemplateOptions.BLANK_TEMPLATE_BEFORE_HEARING;
+import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderDownloadTemplateOptions.FIX_DATE_CCMC;
+import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderDownloadTemplateOptions.FIX_DATE_CMC;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.ASSISTED_ORDER;
+import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.FREE_FORM_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.CLAIMANT;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.STANDARD_BASIS;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.SUBJECT_DETAILED_ASSESSMENT;
@@ -184,6 +191,12 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             .finalOrderAppealToggle(null).finalOrderAppealComplex(null)
             .orderMadeOnDetailsList(null).finalOrderGiveReasonsComplex(null);
 
+        caseDataBuilder.finalOrderTrackAllocation(null)
+            .finalOrderAllocateToTrack(null)
+            .finalOrderIntermediateTrackComplexityBand(null)
+            .finalOrderFastTrackComplexityBand(null)
+            .templateOptions(null);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
@@ -198,8 +211,10 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             List<LocationRefData> locations = (locationRefDataService
                 .getHearingCourtLocations(authToken));
             caseDataBuilder = populateFields(caseDataBuilder, locations, caseData, authToken);
-        } else {
+        } else if (FREE_FORM_ORDER.equals(caseData.getFinalOrderSelection())) {
             caseDataBuilder = populateFreeFormFields(caseDataBuilder);
+        } else {
+            caseDataBuilder = populateDownloadTemplateOptions(caseDataBuilder);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -283,6 +298,27 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                     .withoutNoticeSelectionDate(workingDayIndicator
                                                                     .getNextWorkingDay(LocalDate.now().plusDays(7)))
                                     .build());
+    }
+
+    private CaseData.CaseDataBuilder<?, ?> populateDownloadTemplateOptions(CaseData.CaseDataBuilder<?, ?> builder) {
+        CaseData caseData = builder.build();
+        List<String> options = new ArrayList<>();
+        if (isTrack(AllocatedTrack.SMALL_CLAIM, caseData)) {
+            options.add(BLANK_TEMPLATE_AFTER_HEARING.getLabel());
+            options.add(BLANK_TEMPLATE_BEFORE_HEARING.getLabel());
+        }
+        if (isTrack(AllocatedTrack.FAST_CLAIM, caseData) || isTrack(AllocatedTrack.INTERMEDIATE_CLAIM, caseData)) {
+            options.add(BLANK_TEMPLATE_AFTER_HEARING.getLabel());
+            options.add(BLANK_TEMPLATE_BEFORE_HEARING.getLabel());
+            options.add(FIX_DATE_CMC.getLabel());
+        }
+        if (isTrack(AllocatedTrack.MULTI_CLAIM, caseData)) {
+            options.add(BLANK_TEMPLATE_AFTER_HEARING.getLabel());
+            options.add(BLANK_TEMPLATE_BEFORE_HEARING.getLabel());
+            options.add(FIX_DATE_CCMC.getLabel());
+            options.add(FIX_DATE_CMC.getLabel());
+        }
+        return builder.templateOptions(fromList(options));
     }
 
     private DynamicList getLocationsFromList(final List<LocationRefData> locations) {
@@ -504,10 +540,6 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                     caseDataBuilder.allocatedTrack(caseData.getFinalOrderTrackAllocation().getTrackList());
                 }
             }
-            caseDataBuilder.finalOrderTrackAllocation(null)
-                .finalOrderAllocateToTrack(null)
-                .finalOrderIntermediateTrackComplexityBand(null)
-                .finalOrderFastTrackComplexityBand(null);
         }
 
         caseDataBuilder.businessProcess(BusinessProcess.ready(GENERATE_ORDER_NOTIFICATION));
@@ -570,5 +602,16 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private boolean isJudicialReferral(CallbackParams callbackParams) {
         return JUDICIAL_REFERRAL.toString().equals(callbackParams.getRequest().getCaseDetails().getState())
             && featureToggleService.isMintiEnabled();
+    }
+
+    private boolean isTrack(AllocatedTrack track, CaseData caseData) {
+        if (YES.equals(caseData.getFinalOrderAllocateToTrack())) {
+            return track.equals(caseData.getFinalOrderTrackAllocation().getTrackList());
+        } else {
+            return (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                && track.name().equals(caseData.getResponseClaimTrack()))
+                || (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                && track.equals(caseData.getAllocatedTrack()));
+        }
     }
 }
