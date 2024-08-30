@@ -631,4 +631,6 @@ public class NotificationsProperties {
     @NotEmpty
     private String notifyLRCaseStayed;
 
+    @NotEmpty
+    private String notifyLRCaseDismissed;
 }
