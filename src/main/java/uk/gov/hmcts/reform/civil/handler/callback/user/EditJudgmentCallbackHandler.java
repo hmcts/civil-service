@@ -97,19 +97,19 @@ public class EditJudgmentCallbackHandler extends CallbackHandler {
 
     private CallbackResponse saveJudgmentDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<String> errors = new ArrayList<>();
 
         if (caseData.getJoIsRegisteredWithRTL() == YesOrNo.YES) {
-            caseData.setJoIssuedDate(caseData.getJoOrderMadeDate());
+            caseDataBuilder.joIssuedDate(caseData.getJoOrderMadeDate());
         }
+
         if (caseData.getActiveJudgment() != null) {
-            caseData.setActiveJudgment(editJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
-            caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(caseData.getActiveJudgment()));
+            caseDataBuilder.activeJudgment(editJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
+            caseDataBuilder.joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(caseData.getActiveJudgment()));
         } else {
             errors.add("There is no active judgment to edit");
         }
-
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (caseData.getJoJudgmentRecordReason() == JudgmentRecordedReason.DETERMINATION_OF_MEANS) {
             caseDataBuilder.businessProcess(BusinessProcess.ready(NOTIFY_JUDGMENT_VARIED_DETERMINATION_OF_MEANS));
