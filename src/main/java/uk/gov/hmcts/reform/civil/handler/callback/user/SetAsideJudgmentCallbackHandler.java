@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -43,6 +44,7 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
     private final SetAsideJudgmentOnlineMapper setAsideJudgmentOnlineMapper;
     private static final String ERROR_MESSAGE_DATE_ORDER_MUST_BE_IN_PAST = "Date must be in the past";
     private final DeadlinesCalculator deadlinesCalculator;
+    private final RuntimeService runTimeService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -84,7 +86,7 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        //TODO update camunda runtime variable
+        updateCamundaVars(caseData);
         caseDataBuilder.businessProcess(BusinessProcess.ready(NOTIFY_SET_ASIDE_JUDGMENT));
 
         String nextState;
@@ -101,6 +103,14 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(nextState)
             .build();
+    }
+
+    private void updateCamundaVars(CaseData caseData) {
+        runTimeService.setVariable(
+            caseData.getBusinessProcess().getProcessInstanceId(),
+            "JUDGMENT_SET_ASIDE_ERROR",
+            caseData.getJoSetAsideReason().equals(JudgmentSetAsideReason.JUDGMENT_ERROR)
+        );
     }
 
     @Override
