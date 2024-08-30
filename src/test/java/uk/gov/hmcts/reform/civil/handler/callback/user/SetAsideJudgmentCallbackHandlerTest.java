@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.camunda.bpm.engine.RuntimeService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -30,6 +31,7 @@ import java.time.LocalDateTime;
 import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -41,6 +43,11 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     private SetAsideJudgmentCallbackHandler handler;
 
     private SetAsideJudgmentOnlineMapper setAsideJudgmentOnlineMapper;
+
+    private static final String processId = "process-id";
+
+    @Mock
+    private RuntimeService runTimeService;
 
     @Mock
     private DeadlinesCalculator deadlinesCalculator;
@@ -139,6 +146,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertEquals(LocalDate.now(), historicJudgment.getSetAsideDate());
             //and the caseState should not be updated
             assertEquals(response.getState(), CaseState.All_FINAL_ORDERS_ISSUED.name());
+            verify(runTimeService).setVariable(processId, "JUDGMENT_SET_ASIDE_ERROR", true);
         }
 
         @Test
@@ -184,6 +192,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
             assertEquals(JudgmentState.SET_ASIDE, historicJudgment.getState());
             assertEquals(caseData.getJoSetAsideDefenceReceivedDate(), historicJudgment.getSetAsideDate());
+            verify(runTimeService).setVariable(processId, "JUDGMENT_SET_ASIDE_ERROR", false);
         }
     }
 
