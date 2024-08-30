@@ -34,7 +34,10 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
 
         BigDecimal costsInPounds = getCosts(caseData);
         BigInteger costs = MonetaryConversions.poundsToPennies(costsInPounds);
-        BigInteger orderAmount = MonetaryConversions.poundsToPennies(getOrderAmount(caseData, costsInPounds));
+        BigInteger orderAmount = MonetaryConversions.poundsToPennies(getOrderAmount(caseData));
+        BigInteger claimFeeAmount = MonetaryConversions.poundsToPennies(getClaimFeeAmount(caseData));
+        BigInteger totalStillOwed = MonetaryConversions.poundsToPennies(getTotalStillOwed(caseData));
+        BigInteger amountAlreadyPaid = MonetaryConversions.poundsToPennies(getAmountAlreadyPaid(caseData));
         isNonDivergent = JudgmentsOnlineHelper.isNonDivergentForJBA(caseData);
         PaymentPlanSelection paymentPlan = getPaymentPlan(caseData);
 
@@ -54,7 +57,9 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
             .issueDate(LocalDate.now())
             .orderedAmount(orderAmount.toString())
             .costs(costs.toString())
-            .totalAmount(orderAmount.add(costs).toString())
+            .claimFeeAmount(claimFeeAmount.toString())
+            .amountAlreadyPaid(amountAlreadyPaid.toString())
+            .totalAmount(orderAmount.add(costs).add(claimFeeAmount).toString())
             .build();
 
         super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, caseData);
@@ -63,9 +68,27 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
     }
 
     @NotNull
-    private BigDecimal getOrderAmount(CaseData caseData, BigDecimal costs) {
+    private BigDecimal getOrderAmount(CaseData caseData) {
         return caseData.getCcjPaymentDetails() != null
-            ? getValue(caseData.getCcjPaymentDetails().getCcjJudgmentTotalStillOwed()).subtract(costs) : BigDecimal.ZERO;
+            ? getValue(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()) : BigDecimal.ZERO;
+    }
+
+    @NotNull
+    private BigDecimal getClaimFeeAmount(CaseData caseData) {
+        return caseData.getCcjPaymentDetails() != null
+            ? getValue(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee()) : BigDecimal.ZERO;
+    }
+
+    @NotNull
+    private BigDecimal getTotalStillOwed(CaseData caseData) {
+        return caseData.getCcjPaymentDetails() != null
+            ? getValue(caseData.getCcjPaymentDetails().getCcjJudgmentTotalStillOwed()) : BigDecimal.ZERO;
+    }
+
+    @NotNull
+    private BigDecimal getAmountAlreadyPaid(CaseData caseData) {
+        return caseData.getCcjPaymentDetails() != null
+            ? getValue(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmountInPounds()) : BigDecimal.ZERO;
     }
 
     @NotNull
