@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
+import java.math.BigDecimal;
+
 public class CCJRequestedClaimantRejectsSettlementAgreementTest extends DashboardBaseIntegrationTest {
 
     @Autowired
@@ -30,6 +32,7 @@ public class CCJRequestedClaimantRejectsSettlementAgreementTest extends Dashboar
                              .applicant1LiPResponse(ClaimantLiPResponse.builder().applicant1SignedSettlementAgreement(YesOrNo.YES).build())
                              .respondentSignSettlementAgreement(YesOrNo.NO)
                              .build())
+            .totalClaimAmount(new BigDecimal(1000))
             .build();
 
         handler.handle(callbackParams(caseData));
