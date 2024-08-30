@@ -40,7 +40,7 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
 
         JudgmentDetails activeJudgment = super.addUpdateActiveJudgment(caseData);
         activeJudgment = super.updateDefendantDetails(activeJudgment, caseData);
-        return activeJudgment.toBuilder()
+        JudgmentDetails activeJudgmentDetails = activeJudgment.toBuilder()
             .createdTimestamp(LocalDateTime.now())
             .state(getJudgmentState(caseData))
             .type(JudgmentType.JUDGMENT_BY_ADMISSION)
@@ -56,6 +56,10 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
             .costs(costs.toString())
             .totalAmount(orderAmount.add(costs).toString())
             .build();
+
+        super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, caseData);
+
+        return activeJudgmentDetails;
     }
 
     @NotNull

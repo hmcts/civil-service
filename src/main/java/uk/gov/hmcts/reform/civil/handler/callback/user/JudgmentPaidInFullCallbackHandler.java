@@ -69,7 +69,8 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
     private CallbackResponse saveJudgmentPaidInFullDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         caseData.setJoIsLiveJudgmentExists(YesOrNo.NO);
-        paidInFullJudgmentOnlineMapper.moveToHistoricJudgment(caseData);
+        //paidInFullJudgmentOnlineMapper.moveToHistoricJudgment(caseData);
+        caseData.setActiveJudgment(paidInFullJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

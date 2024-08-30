@@ -17,7 +17,10 @@ import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.RecordJudgmentOnlineMap
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
+import uk.gov.hmcts.reform.civil.service.FeesService;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +39,10 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(RECORD_JUDGMENT);
     protected final ObjectMapper objectMapper;
     private final RecordJudgmentOnlineMapper recordJudgmentOnlineMapper;
+    private final InterestCalculator interestCalculator;
+    private final FeesService feesService;
+
+    BigDecimal theOverallTotal;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -97,13 +104,25 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
             caseData.setJoIssuedDate(caseData.getJoOrderMadeDate());
         }
         caseData.setActiveJudgment(recordJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
+
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.repaymentSummaryObject(calcRepaymentBreakdownSummary(caseData));
+
         if (caseData.getJoJudgmentRecordReason() == JudgmentRecordedReason.DETERMINATION_OF_MEANS) {
             caseDataBuilder.businessProcess(BusinessProcess.ready(RECORD_JUDGMENT_NOTIFICATION));
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private String calcRepaymentBreakdownSummary(CaseData caseData) {
+        BigDecimal interest = interestCalculator.calculateInterest(caseData);
+        BigDecimal totalInterest = caseData.getTotalInterest() != null ? caseData.getTotalInterest() : BigDecimal.ZERO;
+        BigDecimal claimWithInterest = caseData.getTotalClaimAmount().add(totalInterest);
+        var claimfee = feesService.getFeeDataByTotalClaimAmount(claimWithInterest);
+
+        return JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(caseData, interest, claimfee);
     }
 
     @Override
