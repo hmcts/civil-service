@@ -101,6 +101,7 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
                 return null;
         }
     }
+
     private LocalDate getPaymentDeadLineDate(CaseData caseData) {
         return DJPaymentTypeSelection.SET_DATE.equals(caseData.getPaymentTypeSelection()) ? caseData.getPaymentSetDate() : null;
     }
