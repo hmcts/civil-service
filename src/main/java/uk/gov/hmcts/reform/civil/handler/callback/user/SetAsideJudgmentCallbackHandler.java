@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.SetAsideJudgmentOnlineMapper;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
@@ -33,7 +32,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SET_ASIDE_JUDGMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_SET_ASIDE_JUDGMENT;
 
 @Service
 @RequiredArgsConstructor
@@ -86,7 +84,6 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         updateCamundaVars(caseData);
-        caseDataBuilder.businessProcess(BusinessProcess.ready(NOTIFY_SET_ASIDE_JUDGMENT));
 
         String nextState;
         if (Objects.nonNull(caseData.getJoSetAsideOrderType()) && caseData.getJoSetAsideOrderType().equals(

@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.SetAsideJudgmentOnlineMapper;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
@@ -44,7 +45,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private SetAsideJudgmentOnlineMapper setAsideJudgmentOnlineMapper;
 
-    private static final String processId = "process-id";
+    public static final String PROCESS_INSTANCE_ID = "processInstanceId";
 
     @Mock
     private RuntimeService runTimeService;
@@ -56,7 +57,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     void setup() {
         ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
         setAsideJudgmentOnlineMapper = new SetAsideJudgmentOnlineMapper();
-        handler = new SetAsideJudgmentCallbackHandler(objectMapper, setAsideJudgmentOnlineMapper, deadlinesCalculator);
+        handler = new SetAsideJudgmentCallbackHandler(objectMapper, setAsideJudgmentOnlineMapper, deadlinesCalculator, runTimeService);
     }
 
     @Test
@@ -73,7 +74,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         void setup() {
             ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
             objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-            handler = new SetAsideJudgmentCallbackHandler(objectMapper, setAsideJudgmentOnlineMapper, deadlinesCalculator);
+            handler = new SetAsideJudgmentCallbackHandler(objectMapper, setAsideJudgmentOnlineMapper, deadlinesCalculator, runTimeService);
             timeExtensionDate = LocalDateTime.of(2020, 1, 1, 12, 0, 0);
             respondent1ResponseDeadline = now().plusDays(28);
         }
@@ -128,7 +129,9 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateSetAsideJudgmentErrorText() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder()
+                .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
+                .buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR);
             caseData.setJoSetAsideJudgmentErrorText("Some text");
             caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE_ERROR).build());
@@ -146,7 +149,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertEquals(LocalDate.now(), historicJudgment.getSetAsideDate());
             //and the caseState should not be updated
             assertEquals(response.getState(), CaseState.All_FINAL_ORDERS_ISSUED.name());
-            verify(runTimeService).setVariable(processId, "JUDGMENT_SET_ASIDE_ERROR", true);
+            verify(runTimeService).setVariable(PROCESS_INSTANCE_ID, "JUDGMENT_SET_ASIDE_ERROR", true);
         }
 
         @Test
@@ -175,7 +178,9 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void testSetAsideForDefaultJudgment() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
-            CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case();
+            CaseData caseData = CaseDataBuilder.builder()
+                .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
+                .getDefaultJudgment1v1Case();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE);
             caseData.setJoSetAsideDefenceReceivedDate(LocalDate.of(2022, 12, 12));
@@ -192,7 +197,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
             assertEquals(JudgmentState.SET_ASIDE, historicJudgment.getState());
             assertEquals(caseData.getJoSetAsideDefenceReceivedDate(), historicJudgment.getSetAsideDate());
-            verify(runTimeService).setVariable(processId, "JUDGMENT_SET_ASIDE_ERROR", false);
+            verify(runTimeService).setVariable(PROCESS_INSTANCE_ID, "JUDGMENT_SET_ASIDE_ERROR", false);
         }
     }
 
@@ -228,7 +233,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class SubmittedCallback {
         @Test
-        public void whenSubmitted_thenIncludeHeader() {
+        void whenSubmitted_thenIncludeHeader() {
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             CallbackParams params = CallbackParams.builder()
                 .caseData(caseData)
