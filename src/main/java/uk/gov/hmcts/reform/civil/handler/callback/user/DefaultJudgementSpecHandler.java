@@ -424,6 +424,13 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        if (featureToggleService.isJudgmentOnlineLive()) {
+            JudgmentDetails activeJudgment = djOnlineMapper.addUpdateActiveJudgment(caseData);
+            caseData.setActiveJudgment(activeJudgment);
+            caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment));
+            caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
+        }
+
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         String nextState;
 
@@ -433,13 +440,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         } else {
             nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
             caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_SPEC));
-        }
-
-        if (featureToggleService.isJudgmentOnlineLive()) {
-            JudgmentDetails activeJudgment = djOnlineMapper.addUpdateActiveJudgment(caseData);
-            caseDataBuilder.activeJudgment(activeJudgment);
-            caseDataBuilder.joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment));
-            caseDataBuilder.joIsLiveJudgmentExists(YesOrNo.YES);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
