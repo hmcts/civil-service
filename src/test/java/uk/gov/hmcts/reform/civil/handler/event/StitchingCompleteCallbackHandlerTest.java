@@ -5,6 +5,9 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -18,9 +21,11 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -133,5 +138,26 @@ public class StitchingCompleteCallbackHandlerTest extends BaseCallbackHandlerTes
         assertThat(response.getErrors()).isNull();
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedData.getBusinessProcess()).isNull();
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideBundlesForLatestBundleTest")
+    void shouldReturnLatestBundle(List<IdValue<Bundle>> bundles, Optional<Bundle> expectedLatestBundle) {
+        CaseData caseData = CaseData.builder().caseBundles(bundles).build();
+        Optional<Bundle> latestBundle = StitchingCompleteCallbackHandler.getLatestBundle(caseData);
+        assertThat(latestBundle).isEqualTo(expectedLatestBundle);
+    }
+
+    private static Stream<Arguments> provideBundlesForLatestBundleTest() {
+        Bundle bundle1 = Bundle.builder().id("1").createdOn(Optional.of(LocalDateTime.of(2023, 1, 1, 0, 0))).build();
+        Bundle bundle2 = Bundle.builder().id("2").createdOn(Optional.of(LocalDateTime.of(2023, 2, 1, 0, 0))).build();
+        Bundle bundle3 = Bundle.builder().id("3").createdOn(Optional.of(LocalDateTime.of(2023, 3, 1, 0, 0))).build();
+
+        return Stream.of(
+            Arguments.of(List.of(), Optional.empty()),
+            Arguments.of(List.of(new IdValue<>("1", bundle1)), Optional.of(bundle1)),
+            Arguments.of(List.of(new IdValue<>("1", bundle1), new IdValue<>("2", bundle2)), Optional.of(bundle2)),
+            Arguments.of(List.of(new IdValue<>("1", bundle1), new IdValue<>("2", bundle2), new IdValue<>("3", bundle3)), Optional.of(bundle3))
+        );
     }
 }
