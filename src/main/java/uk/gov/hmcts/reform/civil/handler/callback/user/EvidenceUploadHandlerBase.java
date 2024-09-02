@@ -537,6 +537,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                 break;
             case BUNDLE_EVIDENCE_UPLOAD:
                 renameUploadEvidenceBundleType(documentUpload);
+                break;
             default:
                 break;
         }
