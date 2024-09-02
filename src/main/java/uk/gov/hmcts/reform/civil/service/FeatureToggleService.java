@@ -99,7 +99,7 @@ public class FeatureToggleService {
     }
 
     public boolean isMintiEnabled() {
-        return featureToggleApi.isFeatureEnabled("minti");
+        return true;
     }
 
     public boolean isCjesServiceAvailable() {
