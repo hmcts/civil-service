@@ -64,6 +64,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_ORDER_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument.toCaseDocument;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
@@ -79,6 +81,7 @@ import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderDownload
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderDownloadTemplateOptions.FIX_DATE_CCMC;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderDownloadTemplateOptions.FIX_DATE_CMC;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.ASSISTED_ORDER;
+import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.FREE_FORM_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.CLAIMANT;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.STANDARD_BASIS;
@@ -521,21 +524,20 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
         CaseDocument finalDocument = caseData.getFinalOrderDocument();
         List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
+
+        if (DOWNLOAD_ORDER_TEMPLATE.equals(caseData.getFinalOrderSelection())) {
+            finalDocument = toCaseDocument(caseData.getUploadOrderDocumentFromTemplate(), JUDGE_FINAL_ORDER);
+        }
+
+        String judgeName = userDetails.getFullName();
+        finalDocument.getDocumentLink().setCategoryID("caseManagementOrders");
+        finalDocument.getDocumentLink().setDocumentFileName(getDocumentFilename(caseData, finalDocument, judgeName));
+
         finalCaseDocuments.add(element(finalDocument));
 
         if (!isEmpty(caseData.getFinalOrderDocumentCollection())) {
             finalCaseDocuments.addAll(caseData.getFinalOrderDocumentCollection());
         }
-
-        String judgeName = userDetails.getFullName();
-        finalCaseDocuments.forEach(document -> document.getValue().getDocumentLink().setCategoryID("caseManagementOrders"));
-        finalCaseDocuments.forEach(document -> {
-            StringBuilder updatedFileName = new StringBuilder();
-            ext = FilenameUtils.getExtension(document.getValue().getDocumentLink().getDocumentFileName());
-            document.getValue().getDocumentLink().setDocumentFileName(updatedFileName
-                                                                          .append(document.getValue().getCreatedDatetime().toLocalDate().toString())
-                                                                          .append("_").append(judgeName).append(".").append(ext).toString());
-        });
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.finalOrderDocumentCollection(finalCaseDocuments);
@@ -543,6 +545,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         // we only use freeFormOrderDocument as a preview and do not want it shown on case file view, so to prevent it
         // showing, we remove.
         caseDataBuilder.finalOrderDocument(null);
+        caseDataBuilder.uploadOrderDocumentFromTemplate(null);
 
         if (featureToggleService.isMintiEnabled()) {
             if (YES.equals(caseData.getFinalOrderAllocateToTrack())) {
@@ -570,7 +573,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                                  .notes(caseData.getFinalOrderFurtherHearingComplex().getHearingNotesText())
                                                  .build());
             }
-        } else {
+        } else if (caseData.getFinalOrderSelection().equals(FREE_FORM_ORDER)) {
             if (nonNull(caseData.getFreeFormHearingNotes())) {
                 caseDataBuilder.hearingNotes(HearingNotes.builder()
                                                  .date(LocalDate.now())
@@ -625,5 +628,23 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                 || (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                 && track.equals(caseData.getAllocatedTrack()));
         }
+    }
+
+    private String getDocumentFilename(CaseData caseData, CaseDocument document, String judgeName) {
+        StringBuilder updatedFileName = new StringBuilder();
+        ext = FilenameUtils.getExtension(document.getDocumentLink().getDocumentFileName());
+        updatedFileName
+            .append(document.getCreatedDatetime().toLocalDate().toString());
+        if (DOWNLOAD_ORDER_TEMPLATE.equals(caseData.getFinalOrderSelection())) {
+            if (BLANK_TEMPLATE_AFTER_HEARING.getLabel().equals(caseData.getFinalOrderDownloadTemplateOptions().getValue().getLabel())) {
+                updatedFileName.append("_order");
+            } else {
+                updatedFileName.append("_directions order");
+            }
+        } else {
+            updatedFileName
+                .append("_").append(judgeName);
+        }
+        return updatedFileName.append(".").append(ext).toString();
     }
 }
