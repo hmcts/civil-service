@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -53,11 +54,11 @@ public class ClaimReconsiderationUpheldDefendantNotificationHandler extends Call
 
     private CallbackResponse notifyClaimReconsiderationUpheldToDefendant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
+        boolean isRespondent1Lip = isRespondent1Lip(caseData);
         if (caseData.getRespondent1() != null && !caseData.getRespondent1().getPartyName().isEmpty()) {
             notificationService.sendMail(
                 caseData.isRespondent1LiP() ? caseData.getRespondent1().getPartyEmail() : caseData.getRespondentSolicitor1EmailAddress(),
-                getTemplate(),
+                getTemplate(isRespondent1Lip),
                 addProperties(caseData),
                 getReferenceTemplate(caseData)
             );
@@ -67,7 +68,7 @@ public class ClaimReconsiderationUpheldDefendantNotificationHandler extends Call
                 caseData.getRespondentSolicitor2EmailAddress() != null
                     ? caseData.getRespondentSolicitor2EmailAddress() :
                     caseData.getRespondentSolicitor1EmailAddress(),
-                getTemplate(),
+                getTemplate(isRespondent1Lip),
                 addPropertiesDef2(caseData),
                 getReferenceTemplate(caseData)
             );
@@ -86,8 +87,9 @@ public class ClaimReconsiderationUpheldDefendantNotificationHandler extends Call
         );
     }
 
-    private String getTemplate() {
-        return notificationsProperties.getNotifyUpdateTemplate();
+    private String getTemplate(boolean isRespondentLip) {
+        return isRespondentLip ? notificationsProperties.getNotifyUpdateTemplate()
+            : notificationsProperties.getNotifyClaimReconsiderationLRTemplate();
     }
 
     private String getReferenceTemplate(CaseData caseData) {
@@ -100,5 +102,9 @@ public class ClaimReconsiderationUpheldDefendantNotificationHandler extends Call
             CLAIMANT_V_DEFENDANT, getClaimantVDefendant(caseData),
             PARTY_NAME, caseData.getRespondent2().getPartyName()
         ));
+    }
+
+    private boolean isRespondent1Lip(CaseData caseData) {
+        return (YesOrNo.NO.equals(caseData.getRespondent1Represented()));
     }
 }
