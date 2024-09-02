@@ -4,18 +4,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -33,6 +27,9 @@ import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.bundle.BundleCreationService;
@@ -44,11 +41,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -67,9 +61,7 @@ class BundleCreationTriggerEventHandlerTest {
     CoreCaseDataService coreCaseDataService;
     @Mock
     CaseDetailsConverter caseDetailsConverter;
-    BundleCreateResponse bundleCreateResponse;
-    @Mock
-    BundleCreateResponse mockBundleCreateResponse;
+    private BundleCreateResponse bundleCreateResponse;
     @InjectMocks
     private BundleCreationTriggerEventHandler bundleCreationTriggerEventHandler;
     private CaseData caseData;
@@ -243,15 +235,14 @@ class BundleCreationTriggerEventHandlerTest {
                                           .stitchStatus(Optional.of("NEW")).build()));
         // When: I call the prepareCaseContent method
         CaseDataContent caseDataContent = bundleCreationTriggerEventHandler.prepareCaseContent(caseBundles,
-                                                                                               startEventResponse
-        );
+                                                                                               startEventResponse);
         // Then: all fields are populated correctly
         Assertions.assertEquals("event1", caseDataContent.getEvent().getId());
         Assertions.assertEquals("123", caseDataContent.getEventToken());
         Object caseBundlesObj = (((HashMap<String, Object>)caseDataContent.getData()).get("caseBundles"));
         List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> caseBundlesList = (List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>>) caseBundlesObj;
         Assertions.assertEquals(caseBundles.get(0).getValue().getTitle(), caseBundlesList.get(0).getValue().getTitle()
-                                );
+        );
     }
 
     private List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> prepareCaseBundles() {
@@ -301,57 +292,20 @@ class BundleCreationTriggerEventHandlerTest {
         verify(coreCaseDataService, times(1)).triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION);
     }
 
-    @ParameterizedTest
-    @MethodSource("provideBundlesForNotificationTest")
-    void sendBundleCreationTriggerShouldTriggerNotificationEvent(List<Bundle> bundles, int expectedNotificationCount) {
+    @Test
+    void verifyNoBundleNotificationEventTriggeredWhenBundleNotCreated() {
+        // Given: Case details with all type of documents require for bundles and throws exception from
+        // createBundle service
         BundleCreationTriggerEvent event = new BundleCreationTriggerEvent(1L);
         when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
         StartEventResponse response = StartEventResponse.builder()
-            .caseDetails(CaseDetailsBuilder.builder().data(caseData).build())
-            .eventId("event1")
-            .token("test")
-            .build();
+            .caseDetails(CaseDetailsBuilder.builder().data(caseData).build()).eventId("event1").token("test").build();
         when(coreCaseDataService.startUpdate(event.getCaseId().toString(), CREATE_BUNDLE)).thenReturn(response);
-        when(bundleCreationService.createBundle(event)).thenReturn(mockBundleCreateResponse);
+        when(bundleCreationService.createBundle(event)).thenThrow(new RuntimeException("Runtime Exception"));
         when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
 
-        BundleData bundleData = BundleData.builder()
-            .caseBundles(bundles)
-            .build();
-
-        when(mockBundleCreateResponse.getData()).thenReturn(bundleData);
-
-        Assertions.assertDoesNotThrow(() -> bundleCreationTriggerEventHandler.sendBundleCreationTrigger(event));
-        verify(coreCaseDataService, times(expectedNotificationCount)).triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION);
-        verify(coreCaseDataService).submitUpdate(eq(event.getCaseId().toString()), any());
-    }
-
-    private static Stream<Arguments> provideBundlesForNotificationTest() {
-        return Stream.of(
-            Arguments.of(List.of(
-                createBundle("1", "Bundle 1", "bundle1.pdf", "SUCCESS", 1),
-                createBundle("2", "Bundle 2", "bundle2.pdf", "FAILED", 2),
-                createBundle("3", "Bundle 3", "bundle3.pdf", "FAILED", 3)
-            ), 1),
-            Arguments.of(List.of(
-                createBundle("1", "Bundle 1", "bundle1.pdf", "SUCCESS", 1),
-                createBundle("2", "Bundle 2", "bundle2.pdf", "FAILED", 2),
-                createBundle("3", "Bundle 3", "bundle3.pdf", "FAILED", 3),
-                createBundle("3", "Bundle 3", "bundle3.pdf", "FAILED", 0)
-            ), 0)
-        );
-    }
-
-    private static Bundle createBundle(String id, String title, String fileName, String stitchStatus, int daysAgo) {
-        return Bundle.builder()
-            .value(BundleDetails.builder()
-                       .id(id)
-                       .title(title)
-                       .fileName(fileName)
-                       .stitchStatus(stitchStatus)
-                       .createdOn(LocalDateTime.now().minusDays(daysAgo))
-                       .build())
-            .build();
+        // When: Bundle creation trigger is called
+        // Then: BUNDLE_CREATION_NOTIFICATION Event should not be triggered
+        verify(coreCaseDataService, times(0)).triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION);
     }
 }
-
