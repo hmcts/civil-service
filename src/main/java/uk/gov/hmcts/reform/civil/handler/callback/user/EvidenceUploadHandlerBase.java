@@ -157,7 +157,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     protected static final String TRIAL_AUTHORITIES_TEXT = "%s - Authorities";
     protected static final String TRIAL_COSTS_TEXT = "%s - Costs";
     protected static final String TRIAL_DOC_CORRESPONDENCE_TEXT = "%s - Documentary evidence for trial";
-    protected static final String BUNDLE_UPLOAD_TEXT = "%s - Bundle evidence for trial";
+    protected static final String BUNDLE_UPLOAD_TEXT = "%s - Bundle";
 
     protected static final String OPTION_APP1 = "Claimant 1 - ";
     protected static final String OPTION_APP2 = "Claimant 2 - ";
