@@ -47,7 +47,6 @@ import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderAppeal;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRecitalsRecorded;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRepresentation;
-import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderTrackAllocation;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrdersComplexityBand;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -181,7 +180,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void shouldNullPreviousSubmittedEventSelections_whenInvokedDownloadOrderTemplate() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE)
-                .finalOrderTrackAllocation(FinalOrderTrackAllocation.builder().trackList(AllocatedTrack.SMALL_CLAIM).build())
+                .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
                 .finalOrderAllocateToTrack(YES)
                 .finalOrderIntermediateTrackComplexityBand(FinalOrdersComplexityBand.builder()
                                                                .assignComplexityBand(YES)
@@ -625,9 +624,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                         .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                         .allocatedTrack(AllocatedTrack.FAST_CLAIM)
                         .finalOrderAllocateToTrack(YES)
-                        .finalOrderTrackAllocation(FinalOrderTrackAllocation.builder()
-                                                       .trackList(AllocatedTrack.SMALL_CLAIM)
-                                                       .build())
+                        .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
                         .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE).build();
                     CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                     // When
@@ -649,9 +646,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                         .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                         .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                         .finalOrderAllocateToTrack(YES)
-                        .finalOrderTrackAllocation(FinalOrderTrackAllocation.builder()
-                                                       .trackList(AllocatedTrack.FAST_CLAIM)
-                                                       .build())
+                        .finalOrderTrackAllocation(AllocatedTrack.FAST_CLAIM)
                         .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE).build();
                     CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                     // When
@@ -675,9 +670,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                         .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                         .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                         .finalOrderAllocateToTrack(YES)
-                        .finalOrderTrackAllocation(FinalOrderTrackAllocation.builder()
-                                                       .trackList(AllocatedTrack.INTERMEDIATE_CLAIM)
-                                                       .build())
+                        .finalOrderTrackAllocation(AllocatedTrack.INTERMEDIATE_CLAIM)
                         .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE).build();
                     CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                     // When
@@ -701,9 +694,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                         .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                         .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                         .finalOrderAllocateToTrack(YES)
-                        .finalOrderTrackAllocation(FinalOrderTrackAllocation.builder()
-                                                       .trackList(AllocatedTrack.MULTI_CLAIM)
-                                                       .build())
+                        .finalOrderTrackAllocation(AllocatedTrack.MULTI_CLAIM)
                         .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE).build();
                     CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                     // When
@@ -729,9 +720,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                         .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                         .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
                         .finalOrderAllocateToTrack(YES)
-                        .finalOrderTrackAllocation(FinalOrderTrackAllocation.builder()
-                                                       .trackList(AllocatedTrack.SMALL_CLAIM)
-                                                       .build())
+                        .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
                         .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE).build();
                     CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                     // When
@@ -753,9 +742,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                         .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                         .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                         .finalOrderAllocateToTrack(YES)
-                        .finalOrderTrackAllocation(FinalOrderTrackAllocation.builder()
-                                                       .trackList(AllocatedTrack.FAST_CLAIM)
-                                                       .build())
+                        .finalOrderTrackAllocation(AllocatedTrack.FAST_CLAIM)
                         .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE).build();
                     CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                     // When
@@ -779,9 +766,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                         .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                         .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                         .finalOrderAllocateToTrack(YES)
-                        .finalOrderTrackAllocation(FinalOrderTrackAllocation.builder()
-                                                       .trackList(AllocatedTrack.INTERMEDIATE_CLAIM)
-                                                       .build())
+                        .finalOrderTrackAllocation(AllocatedTrack.INTERMEDIATE_CLAIM)
                         .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE).build();
                     CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                     // When
@@ -805,9 +790,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                         .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                         .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                         .finalOrderAllocateToTrack(YES)
-                        .finalOrderTrackAllocation(FinalOrderTrackAllocation.builder()
-                                                       .trackList(AllocatedTrack.MULTI_CLAIM)
-                                                       .build())
+                        .finalOrderTrackAllocation(AllocatedTrack.MULTI_CLAIM)
                         .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE).build();
                     CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                     // When
@@ -1487,9 +1470,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                 .finalOrderAllocateToTrack(YES)
-                .finalOrderTrackAllocation(FinalOrderTrackAllocation.builder()
-                                               .trackList(AllocatedTrack.MULTI_CLAIM)
-                                               .build())
+                .finalOrderTrackAllocation(AllocatedTrack.MULTI_CLAIM)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, JUDICIAL_REFERRAL);
             // When
@@ -1516,9 +1497,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                 .finalOrderAllocateToTrack(YES)
-                .finalOrderTrackAllocation(FinalOrderTrackAllocation.builder()
-                                               .trackList(AllocatedTrack.MULTI_CLAIM)
-                                               .build())
+                .finalOrderTrackAllocation(AllocatedTrack.MULTI_CLAIM)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
@@ -1547,9 +1526,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                 .finalOrderAllocateToTrack(YES)
-                .finalOrderTrackAllocation(FinalOrderTrackAllocation.builder()
-                                               .trackList(AllocatedTrack.MULTI_CLAIM)
-                                               .build())
+                .finalOrderTrackAllocation(AllocatedTrack.MULTI_CLAIM)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
@@ -1578,9 +1555,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                 .finalOrderAllocateToTrack(NO)
-                .finalOrderTrackAllocation(FinalOrderTrackAllocation.builder()
-                                               .trackList(AllocatedTrack.MULTI_CLAIM)
-                                               .build())
+                .finalOrderTrackAllocation(AllocatedTrack.MULTI_CLAIM)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When

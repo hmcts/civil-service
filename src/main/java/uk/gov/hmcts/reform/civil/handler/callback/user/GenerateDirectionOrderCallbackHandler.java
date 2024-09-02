@@ -149,6 +149,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::nullPreviousSelections,
             callbackKey(MID, "populate-form-values"), this::populateFormValues,
+            callbackKey(MID, "create-download-template-document"), this::generateTemplate,
             callbackKey(MID, "validate-and-generate-document"), this::validateFormAndGeneratePreviewDocument,
             callbackKey(ABOUT_TO_SUBMIT), this::addGeneratedDocumentToCollection,
             callbackKey(SUBMITTED), this::buildConfirmation
@@ -196,6 +197,17 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             .finalOrderIntermediateTrackComplexityBand(null)
             .finalOrderFastTrackComplexityBand(null)
             .finalOrderDownloadTemplateOptions(null);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse generateTemplate(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        // generate and upload document here
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -535,9 +547,9 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         if (featureToggleService.isMintiEnabled()) {
             if (YES.equals(caseData.getFinalOrderAllocateToTrack())) {
                 if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-                    caseDataBuilder.responseClaimTrack(caseData.getFinalOrderTrackAllocation().getTrackList().name());
+                    caseDataBuilder.responseClaimTrack(caseData.getFinalOrderTrackAllocation().name());
                 } else {
-                    caseDataBuilder.allocatedTrack(caseData.getFinalOrderTrackAllocation().getTrackList());
+                    caseDataBuilder.allocatedTrack(caseData.getFinalOrderTrackAllocation());
                 }
             }
         }
@@ -606,7 +618,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
     private boolean isTrack(AllocatedTrack track, CaseData caseData) {
         if (YES.equals(caseData.getFinalOrderAllocateToTrack())) {
-            return track.equals(caseData.getFinalOrderTrackAllocation().getTrackList());
+            return track.equals(caseData.getFinalOrderTrackAllocation());
         } else {
             return (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                 && track.name().equals(caseData.getResponseClaimTrack()))
