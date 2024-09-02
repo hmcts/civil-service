@@ -169,7 +169,7 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private FinalOrderTrackAllocation finalOrderTrackAllocation;
     private FinalOrdersComplexityBand finalOrderFastTrackComplexityBand;
     private FinalOrdersComplexityBand finalOrderIntermediateTrackComplexityBand;
-    private DynamicList templateOptions;
+    private DynamicList finalOrderDownloadTemplateOptions;
 
     // judge final freeform orders
     private final FinalOrderSelection finalOrderSelection;
