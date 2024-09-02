@@ -139,6 +139,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     protected static final String APPLICANT_TWO_TRIAL_SKELETON = "ApplicantTwoTrialSkeleton";
     protected static final String APPLICANT_SCHEDULE_OF_COSTS = "ApplicantSchedulesOfCost";
     protected static final String APPLICANT_TWO_SCHEDULE_OF_COSTS = "ApplicantTwoSchedulesOfCost";
+    protected static final String BUNDLE_EVIDENCE_UPLOAD = "bundles";
     // Notification Strings used for email
     protected static StringBuilder notificationString = new StringBuilder();
     protected static final String DISCLOSURE_LIST_TEXT = "%s - Disclosure list";
@@ -156,6 +157,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     protected static final String TRIAL_AUTHORITIES_TEXT = "%s - Authorities";
     protected static final String TRIAL_COSTS_TEXT = "%s - Costs";
     protected static final String TRIAL_DOC_CORRESPONDENCE_TEXT = "%s - Documentary evidence for trial";
+    protected static final String BUNDLE_UPLOAD_TEXT = "%s - Bundle evidence for trial";
 
     protected static final String OPTION_APP1 = "Claimant 1 - ";
     protected static final String OPTION_APP2 = "Claimant 2 - ";
@@ -533,9 +535,23 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                 prefix = "Hearsay evidence";
                 renameUploadEvidenceWitness(documentUpload, prefix, true);
                 break;
+            case BUNDLE_EVIDENCE_UPLOAD:
+                renameUploadEvidenceBundleType(documentUpload);
             default:
                 break;
         }
+    }
+
+    private <T> void renameUploadEvidenceBundleType(final List<Element<T>> documentUpload) {
+        documentUpload.forEach(x -> {
+            UploadEvidenceDocumentType type = (UploadEvidenceDocumentType) x.getValue();
+            String ext = FilenameUtils.getExtension(type.getDocumentUpload().getDocumentFileName());
+            String newName = type.getDocumentIssuedDate().format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK))
+                + SPACE
+                + type.getBundleName()
+                + END + ext;
+            type.getDocumentUpload().setDocumentFileName(newName);
+        });
     }
 
     private <T> void renameUploadEvidenceWitness(final List<Element<T>> documentUpload,
@@ -674,6 +690,8 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                       TRIAL_COSTS_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), defendantString);
             setCategoryIdAndRenameDoc(caseData.getDocumentEvidenceForTrialRes(), document -> document.getValue().getDocumentUpload(), RESPONDENT_ONE_TRIAL_DOC_CORRESPONDENCE,
                                       TRIAL_DOC_CORRESPONDENCE_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), defendantString);
+            setCategoryIdAndRenameDoc(caseData.getBundleEvidence(), document -> document.getValue().getDocumentUpload(), BUNDLE_EVIDENCE_UPLOAD,
+                                      BUNDLE_UPLOAD_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), defendantString);
             if (selectedRole.equals(SELECTED_VALUE_DEF_BOTH)) {
                 caseData = copyResp1ChangesToResp2(caseData, caseDataBuilder);
             }
@@ -710,6 +728,8 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                       TRIAL_COSTS_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), defendantString);
             setCategoryIdAndRenameDoc(caseData.getDocumentEvidenceForTrialRes2(), document -> document.getValue().getDocumentUpload(), RESPONDENT_TWO_TRIAL_DOC_CORRESPONDENCE,
                                       TRIAL_DOC_CORRESPONDENCE_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), defendantString);
+            setCategoryIdAndRenameDoc(caseData.getBundleEvidence(), document -> document.getValue().getDocumentUpload(), BUNDLE_EVIDENCE_UPLOAD,
+                                      BUNDLE_UPLOAD_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), defendantString);
         }
 
         if (selectedRole.equals(CaseRole.APPLICANTSOLICITORONE.name()) || selectedRole.equals(SELECTED_VALUE_APP_BOTH)) {
@@ -747,6 +767,8 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                       TRIAL_COSTS_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
             setCategoryIdAndRenameDoc(caseData.getDocumentEvidenceForTrial(), document -> document.getValue().getDocumentUpload(), APPLICANT_TRIAL_DOC_CORRESPONDENCE,
                                       TRIAL_DOC_CORRESPONDENCE_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getBundleEvidence(), document -> document.getValue().getDocumentUpload(), BUNDLE_EVIDENCE_UPLOAD,
+                                      BUNDLE_UPLOAD_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
             if (selectedRole.equals(SELECTED_VALUE_APP_BOTH)) {
                 caseData = copyApp1ChangesToApp2(caseData, caseDataBuilder);
             }
@@ -784,6 +806,8 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                       TRIAL_COSTS_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
             setCategoryIdAndRenameDoc(caseData.getDocumentEvidenceForTrialApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_TRIAL_DOC_CORRESPONDENCE,
                                       TRIAL_DOC_CORRESPONDENCE_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getBundleEvidence(), document -> document.getValue().getDocumentUpload(), BUNDLE_EVIDENCE_UPLOAD,
+                                      BUNDLE_UPLOAD_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
         }
 
         // null the values of the lists, so that on future retriggers of the event, they are blank

@@ -88,7 +88,6 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private final List<Element<UploadEvidenceDocumentType>> documentAuthorities;
     private final List<Element<UploadEvidenceDocumentType>> documentCosts;
     private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrial;
-    private final List<Element<UploadEvidenceDocumentType>> bundleEvidence;
     //applicant2
     private final List<Element<UploadEvidenceDocumentType>> documentDisclosureListApp2;
     private final List<Element<UploadEvidenceDocumentType>> documentForDisclosureApp2;
@@ -122,7 +121,6 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private final List<Element<UploadEvidenceDocumentType>> documentAuthoritiesRes;
     private final List<Element<UploadEvidenceDocumentType>> documentCostsRes;
     private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialRes;
-    private final List<Element<UploadEvidenceDocumentType>> bundleEvidenceRes;
     //these fields are shown if the solicitor is for respondent 2 and respondents have different solicitors
     private final List<Element<UploadEvidenceDocumentType>> documentDisclosureListRes2;
     private final List<Element<UploadEvidenceDocumentType>> documentForDisclosureRes2;
@@ -143,6 +141,7 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private final HearingNotes hearingNotes;
     private final List<Element<UploadEvidenceDocumentType>> applicantDocsUploadedAfterBundle;
     private final List<Element<UploadEvidenceDocumentType>> respondentDocsUploadedAfterBundle;
+    private final List<Element<UploadEvidenceDocumentType>> bundleEvidence;
 
     /* Final Orders */
     private YesOrNo finalOrderMadeSelection;
