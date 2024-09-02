@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.handler.event.BundleCreationTriggerEventHandler;
 import uk.gov.hmcts.reform.civil.model.Bundle;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
@@ -32,6 +31,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_RESTITCH_BUNDLE
 public class AmendRestitchBundleCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(AMEND_RESTITCH_BUNDLE);
+    private static final String AMEND_RESTITCH_BUNDLE_EVENT = "AMEND_RESTITCH_BUNDLE";
 
     private final ObjectMapper mapper;
     private final BundleCreationService bundleCreationService;
@@ -73,8 +73,7 @@ public class AmendRestitchBundleCallbackHandler extends CallbackHandler {
                                .stream().map(bundle -> bundleCreationEventHandler.prepareNewBundle(bundle, caseData)
             ).toList());
         caseDataBuilder.caseBundles(caseBundles);
-
-        caseDataBuilder.businessProcess(BusinessProcess.ready(AMEND_RESTITCH_BUNDLE));
+        caseDataBuilder.bundleEvent(AMEND_RESTITCH_BUNDLE_EVENT);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(mapper))
