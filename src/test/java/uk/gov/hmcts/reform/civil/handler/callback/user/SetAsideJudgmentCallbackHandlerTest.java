@@ -198,6 +198,9 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertEquals(JudgmentState.SET_ASIDE, historicJudgment.getState());
             assertEquals(caseData.getJoSetAsideDefenceReceivedDate(), historicJudgment.getSetAsideDate());
             verify(runTimeService).setVariable(PROCESS_INSTANCE_ID, "JUDGMENT_SET_ASIDE_ERROR", false);
+            assertThat(response.getData()).extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(SET_ASIDE_JUDGMENT.name(), "READY");
         }
     }
 
