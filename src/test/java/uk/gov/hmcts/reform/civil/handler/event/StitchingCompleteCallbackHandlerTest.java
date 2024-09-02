@@ -61,20 +61,20 @@ public class StitchingCompleteCallbackHandlerTest extends BaseCallbackHandlerTes
     void shouldSetCategoryId() {
         List<IdValue<Bundle>> caseBundles = new ArrayList<>();
         caseBundles.add(new IdValue<>("1", Bundle.builder().id("1")
-                .title("Trial Bundle")
-                .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
-                .stitchedDocument(Optional.of(Document.builder()
-                                .documentUrl("url")
-                                .documentFileName("name")
-                        .build()))
-                .build()));
+            .title("Trial Bundle")
+            .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
+            .stitchedDocument(Optional.of(Document.builder()
+                                              .documentUrl("url")
+                                              .documentFileName("name")
+                                              .build()))
+            .build()));
         CaseData caseData = CaseData.builder().caseBundles(caseBundles).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isNull();
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedData.getCaseBundles().get(0)
-                .getValue().getStitchedDocument().get().getCategoryID()).isEqualTo("bundles");
+                       .getValue().getStitchedDocument().get().getCategoryID()).isEqualTo("bundles");
     }
 
     @Test
@@ -116,7 +116,10 @@ public class StitchingCompleteCallbackHandlerTest extends BaseCallbackHandlerTes
             Arguments.of(List.of(), Optional.empty()),
             Arguments.of(List.of(new IdValue<>("1", bundle1)), Optional.of(bundle1)),
             Arguments.of(List.of(new IdValue<>("1", bundle1), new IdValue<>("2", bundle2)), Optional.of(bundle2)),
-            Arguments.of(List.of(new IdValue<>("1", bundle1), new IdValue<>("2", bundle2), new IdValue<>("3", bundle3)), Optional.of(bundle3))
+            Arguments.of(
+                List.of(new IdValue<>("1", bundle1), new IdValue<>("2", bundle2), new IdValue<>("3", bundle3)),
+                Optional.of(bundle3)
+            )
         );
     }
 
@@ -141,10 +144,20 @@ public class StitchingCompleteCallbackHandlerTest extends BaseCallbackHandlerTes
         Bundle bundleFailed = Bundle.builder().id("2").stitchStatus(Optional.of("FAILED")).build();
 
         return Stream.of(
-            Arguments.of(CaseData.builder().caseBundles(List.of(new IdValue<>("1", bundleSuccess))).build(), null, null),
-            Arguments.of(CaseData.builder().caseBundles(List.of(new IdValue<>("1", bundleFailed))).build(), YesOrNo.YES, null),
-            Arguments.of(CaseData.builder().caseBundles(List.of(new IdValue<>("1", bundleSuccess))).bundleEvent("BUNDLE_CREATED_NOTIFICATION").build(), null, "BUNDLE_CREATION_NOTIFICATION"),
-            Arguments.of(CaseData.builder().caseBundles(List.of(new IdValue<>("1", bundleSuccess))).bundleEvent("AMEND_RESTITCH_BUNDLE").build(), null, "AMEND_RESTITCH_BUNDLE")
+            Arguments.of(
+                CaseData.builder().caseBundles(List.of(new IdValue<>("1", bundleSuccess))).build(),
+                null,
+                null
+            ),
+            Arguments.of(
+                CaseData.builder().caseBundles(List.of(new IdValue<>("1", bundleFailed))).build(),
+                YesOrNo.YES,
+                null
+            ),
+            Arguments.of(CaseData.builder().caseBundles(List.of(new IdValue<>("1", bundleSuccess))).bundleEvent(
+                "BUNDLE_CREATED_NOTIFICATION").build(), null, "BUNDLE_CREATION_NOTIFICATION"),
+            Arguments.of(CaseData.builder().caseBundles(List.of(new IdValue<>("1", bundleSuccess))).bundleEvent(
+                "AMEND_RESTITCH_BUNDLE").build(), null, "AMEND_RESTITCH_BUNDLE")
         );
     }
 }
