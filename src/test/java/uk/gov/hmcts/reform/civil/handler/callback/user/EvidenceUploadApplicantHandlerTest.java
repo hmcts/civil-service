@@ -299,6 +299,38 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
+        "documentIssuedDate,documentForDisclosureApp2, Invalid date: \"Documents for disclosure\""
+            + " date entered must not be in the future (1).",
+        "documentIssuedDate,documentReferredInStatementApp2, Invalid date: \"Documents referred to in the statement\""
+            + " date entered must not be in the future (5).",
+        "documentIssuedDate,documentEvidenceForTrialApp2, Invalid date: \"Documentary evidence for trial\""
+            + " date entered must not be in the future (10).",
+        "documentIssuedDate,bundleEvidence, Invalid date: \"Bundle Hearing date\""
+            + " date entered must not be in the future (11).",
+    })
+    void shouldReturnError_whenDocumentTypeUploadDateFutureApplicant2(String dateField, String collectionField,
+                                                            String expectedErrorMessage) {
+        // Given
+        List<Element<UploadEvidenceDocumentType>> date = new ArrayList<>();
+        date.add(0, element(invoke(uploadEvidenceDate3.toBuilder(), dateField, time.now()
+            .toLocalDate().plusWeeks(1)).build()));
+
+        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                                       .addApplicant2(YES)
+                                       .applicant1(PartyBuilder.builder().individual().build())
+                                       .applicant2(PartyBuilder.builder().individual().build())
+                                       .caseTypeFlag("ApplicantTwoFields")
+                                       .build().toBuilder(), collectionField, date)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        // Then
+        assertThat(response.getErrors()).contains(expectedErrorMessage);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
         "expertOptionUploadDate,documentExpertReport",
         "expertOptionUploadDate,documentJointStatement",
         "expertOptionUploadDate,documentQuestions",
@@ -366,6 +398,40 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
             .toLocalDate().plusWeeks(1)).build()));
 
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
+                                   collectionField, date)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // Then
+        assertThat(response.getErrors()).contains(expectedErrorMessage);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "expertOptionUploadDate,documentExpertReportApp2,Invalid date: \"Expert's report\""
+            + " date entered must not be in the future (6).",
+        "expertOptionUploadDate,documentJointStatementApp2,Invalid date: \"Joint statement of experts\" "
+            + "date entered must not be in the future (7).",
+        "expertOptionUploadDate,documentQuestionsApp2,Invalid date: \"Questions for other party's expert "
+            + "or joint experts\" expert statement date entered must not be in the future (8).",
+        "expertOptionUploadDate,documentAnswersApp2,Invalid date: \"Answers to questions asked by the other party\" "
+            + "date entered must not be in the future (9)."
+    })
+    void shouldReturnError_whenExpertOptionUploadDateFutureApplicant2(String dateField, String collectionField,
+                                                            String expectedErrorMessage) {
+        // Given
+        List<Element<UploadEvidenceExpert>> date = new ArrayList<>();
+        date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.now()
+            .toLocalDate().plusWeeks(1)).build()));
+
+        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                                       .addApplicant2(YES)
+                                       .applicant1(PartyBuilder.builder().individual().build())
+                                       .applicant2(PartyBuilder.builder().individual().build())
+                                       .caseTypeFlag("ApplicantTwoFields"),
                                    collectionField, date)
             .build();
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
