@@ -321,6 +321,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final ResponseDocument respondent2SpecDefenceResponseDocument;
 
     private final YesOrNo bundleError;
+    private final String bundleEvent;
 
     public RespondentResponseTypeSpec getRespondent1ClaimResponseTypeForSpec() {
 
