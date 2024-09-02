@@ -77,9 +77,7 @@ public class CalculateFeeTask {
     }
 
     private void updatePaymentType(CaseData.CaseDataBuilder caseDataBuilder) {
-        if (featureToggleService.isPbaV3Enabled()) {
-            caseDataBuilder.paymentTypePBASpec("PBAv3");
-        }
+        caseDataBuilder.paymentTypePBASpec("PBAv3");
     }
 
     private void updatePbaAccounts(String authToken, CaseData.CaseDataBuilder caseDataBuilder) {

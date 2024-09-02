@@ -88,9 +88,7 @@ public class CalculateSpecFeeTask {
     }
 
     private void handlePbaAndPaymentType(String authorizationToken, CaseData.CaseDataBuilder caseDataBuilder) {
-        if (featureToggleService.isPbaV3Enabled()) {
-            caseDataBuilder.paymentTypePBASpec("PBAv3");
-        }
+        caseDataBuilder.paymentTypePBASpec("PBAv3");
 
         List<String> pbaNumbers = getPbaAccounts(authorizationToken);
         caseDataBuilder.applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))

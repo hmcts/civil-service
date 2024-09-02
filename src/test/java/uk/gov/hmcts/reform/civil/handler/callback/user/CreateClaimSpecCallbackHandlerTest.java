@@ -1186,7 +1186,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     class MidAmountBreakup {
 
         @Test
-        void shouldCalculateAmoutBreakup_whenCalled() {
+        void shouldCalculateAmountBreakup_whenCalled() {
             // Given
             List<ClaimAmountBreakup> claimAmountBreakup = new ArrayList<>();
             claimAmountBreakup.add(ClaimAmountBreakup.builder()

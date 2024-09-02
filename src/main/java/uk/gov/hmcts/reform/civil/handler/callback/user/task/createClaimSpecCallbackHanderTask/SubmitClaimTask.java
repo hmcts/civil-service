@@ -258,11 +258,7 @@ public class SubmitClaimTask {
 
         if (null != eventId) {
             dataBuilder.legacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
-            if (!featureToggleService.isPbaV3Enabled()) {
-                dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC));
-            } else {
-                dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST_CLAIM));
-            }
+            dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST_CLAIM));
         }
 
         //set check email field to null for GDPR

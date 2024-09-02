@@ -37,6 +37,7 @@ public class ValidateRespondentDetailsTask {
 
     public CallbackResponse validateRespondentDetails(CaseData caseData) {
         Party respondent = getRespondent.apply(caseData);
+
         List<String> errors = postcodeValidator.validate(respondent.getPrimaryAddress().getPostCode());
         if (featureToggleService.isJudgmentOnlineLive()) {
             if (respondent.getPrimaryAddress() != null) {

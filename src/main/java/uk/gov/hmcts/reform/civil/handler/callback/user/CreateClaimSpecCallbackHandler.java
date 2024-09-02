@@ -27,19 +27,10 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallb
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask.ValidateClaimantDetailsTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask.ValidateRespondentDetailsTask;
 import uk.gov.hmcts.reform.civil.model.Address;
-import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
-import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.PaymentDetails;
-import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
-import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
-import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.AirlineEpimsDataLoader;
@@ -55,7 +46,6 @@ import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecServi
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
-import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.OrgPolicyValidator;
 import uk.gov.hmcts.reform.civil.validation.PartyValidator;
@@ -71,20 +61,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
-import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
@@ -385,7 +369,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         if (null != callbackParams.getRequest().getEventId()
             && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
             return SubmittedCallbackResponse.builder()
-                .confirmationHeader(getSpecHeader(caseData))
+                .confirmationHeader(getSpecHeader())
                 .confirmationBody(getSpecBody(caseData))
                 .build();
         } else {
@@ -396,15 +380,11 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         }
     }
 
-    static final String payFeeMessage = "# Please now pay your claim fee%n# using the link below";
+    static final String PAY_FEE_MESSAGE = "# Please now pay your claim fee%n# using the link below";
 
     private String getHeader(CaseData caseData) {
-        if (areRespondentsRepresentedAndRegistered(caseData)
-            || isPinInPostCaseMatched(caseData)) {
-            if (featureToggleService.isPbaV3Enabled()) {
-                return format(payFeeMessage);
-            }
-            return format("# Your claim has been received%n## Claim number: %s", caseData.getLegacyCaseReference());
+        if (areRespondentsRepresentedAndRegistered(caseData) || isPinInPostCaseMatched(caseData)) {
+            return format(PAY_FEE_MESSAGE);
         }
         return format(
             "# Your claim has been received and will progress offline%n## Claim number: %s",
@@ -430,20 +410,13 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                 + exitSurveyContentService.applicantSurvey();
     }
 
-    static final String caseDetailsUrl = "/cases/case-details/%s#Service%%20Request";
+    static final String CASE_DETAILS_URL = "/cases/case-details/%s#Service%%20Request";
 
     private String getConfirmationSummary(CaseData caseData) {
-        if (featureToggleService.isPbaV3Enabled()) {
-            return format(
-                CONFIRMATION_SUMMARY_PBA_V3,
-                format(caseDetailsUrl, caseData.getCcdCaseReference())
-            );
-        } else {
-            return format(
-                CONFIRMATION_SUMMARY,
-                format(CASE_DOC_LOCATION, caseData.getCcdCaseReference())
-            );
-        }
+        return format(
+            CONFIRMATION_SUMMARY_PBA_V3,
+            format(CASE_DETAILS_URL, caseData.getCcdCaseReference())
+        );
     }
 
     private CallbackResponse validateRespondent1Details(CallbackParams callbackParams) {
@@ -543,23 +516,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         return calculateSpecFeeTask.calculateSpecFee(callbackParams.getCaseData(), callbackParams.getParams().get(BEARER_TOKEN).toString());
     }
 
-    private String getSpecHeader(CaseData caseData) {
-        if (areRespondentsRepresentedAndRegistered(caseData)
-            || isPinInPostCaseMatched(caseData)) {
-            if (featureToggleService.isPbaV3Enabled()) {
-                return format(payFeeMessage);
-            }
-            return format("# Your claim has been received%n## Claim number: %s", caseData.getLegacyCaseReference());
-        } else {
-            if (featureToggleService.isPbaV3Enabled()) {
-                return format(payFeeMessage);
-            } else {
-                return format(
-                    "# Your claim has been received and will progress offline%n## Claim number: %s",
-                    caseData.getLegacyCaseReference()
-                );
-            }
-        }
+    private String getSpecHeader() {
+        return format(PAY_FEE_MESSAGE);
     }
 
     private String getSpecBody(CaseData caseData) {
@@ -570,17 +528,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             ((areRespondentsRepresentedAndRegistered(caseData)
                 || isPinInPostCaseMatched(caseData))
                 ? getSpecConfirmationSummary(caseData)
-                : toggleService.isPbaV3Enabled() ? format(
+                : format(
                 SPEC_LIP_CONFIRMATION_BODY_PBAV3,
-                format(caseDetailsUrl, caseData.getCcdCaseReference()),
-                format(CASE_DOC_LOCATION, caseData.getCcdCaseReference()),
-                claimUrlsConfiguration.getResponsePackLink(),
-                claimUrlsConfiguration.getN9aLink(),
-                claimUrlsConfiguration.getN9bLink(),
-                claimUrlsConfiguration.getN215Link(),
-                formattedServiceDeadline
-            ) : format(
-                SPEC_LIP_CONFIRMATION_BODY,
+                format(CASE_DETAILS_URL, caseData.getCcdCaseReference()),
                 format(CASE_DOC_LOCATION, caseData.getCcdCaseReference()),
                 claimUrlsConfiguration.getResponsePackLink(),
                 claimUrlsConfiguration.getN9aLink(),
@@ -591,17 +541,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private String getSpecConfirmationSummary(CaseData caseData) {
-        if (featureToggleService.isPbaV3Enabled()) {
-            return format(
-                SPEC_CONFIRMATION_SUMMARY_PBA_V3,
-                format(caseDetailsUrl, caseData.getCcdCaseReference())
-            );
-        } else {
-            return format(
-                SPEC_CONFIRMATION_SUMMARY,
-                format(CASE_DOC_LOCATION, caseData.getCcdCaseReference())
-            );
-        }
+        return format(
+            SPEC_CONFIRMATION_SUMMARY_PBA_V3,
+            format(CASE_DETAILS_URL, caseData.getCcdCaseReference())
+        );
     }
 
     private CallbackResponse validateSpecRespondent2RepEmail(CallbackParams callbackParams) {
