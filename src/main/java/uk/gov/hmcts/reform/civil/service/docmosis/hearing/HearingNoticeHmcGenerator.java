@@ -69,8 +69,8 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
 
     public HearingNoticeHmc getHearingNoticeTemplateData(CaseData caseData, HearingGetResponse hearing, String bearerToken,
                                                          String hearingLocation, String hearingId) {
-        var paymentFailed = caseData.getHearingFeePaymentDetails() == null
-            || caseData.getHearingFeePaymentDetails().getStatus().equals(PaymentStatus.FAILED);
+        var paymentFailed = (caseData.getHearingFeePaymentDetails() == null
+            || caseData.getHearingFeePaymentDetails().getStatus().equals(PaymentStatus.FAILED)) && !caseData.hearingFeePaymentDoneWithHWF();
         var hearingType = hearing.getHearingDetails().getHearingType();
         var feeAmount = paymentFailed && hearingFeeRequired(hearingType)
             ? HearingUtils.formatHearingFee(HearingFeeUtils.calculateAndApplyFee(hearingFeesService, caseData, caseData.getAssignedTrack())) : null;

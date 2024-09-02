@@ -86,17 +86,17 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
 
         boolean isAutoHearingNotice = isEvent(callbackParams, CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC);
         boolean requiresHearingFee = false;
-        boolean hasUnpaidFee = false;
+        boolean hasPaidFee = false;
 
         if (isAutoHearingNotice) {
             HearingNoticeVariables camundaVars = camundaService.getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId());
             requiresHearingFee = hearingFeeRequired(camundaVars.getHearingType());
-            hasUnpaidFee = !(caseData.getHearingFeePaymentDetails() != null
-                && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus()));
+            hasPaidFee = (caseData.getHearingFeePaymentDetails() != null
+                && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus())) || caseData.hearingFeePaymentDoneWithHWF();
         }
 
         if ((!isAutoHearingNotice && caseData.getCcdState() == HEARING_READINESS && caseData.getListingOrRelisting() == LISTING)
-            || (isAutoHearingNotice && requiresHearingFee && hasUnpaidFee)) {
+            || (isAutoHearingNotice && requiresHearingFee && !hasPaidFee)) {
 
             dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
                                               SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT.getScenario(), authToken,
