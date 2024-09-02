@@ -195,7 +195,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             .finalOrderAllocateToTrack(null)
             .finalOrderIntermediateTrackComplexityBand(null)
             .finalOrderFastTrackComplexityBand(null)
-            .templateOptions(null);
+            .finalOrderDownloadTemplateOptions(null);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -318,7 +318,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             options.add(FIX_DATE_CCMC.getLabel());
             options.add(FIX_DATE_CMC.getLabel());
         }
-        return builder.templateOptions(fromList(options));
+        return builder.finalOrderDownloadTemplateOptions(fromList(options));
     }
 
     private DynamicList getLocationsFromList(final List<LocationRefData> locations) {
