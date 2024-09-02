@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -98,48 +99,6 @@ public class StitchingCompleteCallbackHandlerTest extends BaseCallbackHandlerTes
         assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo("BUNDLE_CREATION_NOTIFICATION");
     }
 
-    @Test
-    void shouldSetAmendRestitchBundleBusinessProcessWhenBundleEventIsNotNull() {
-        List<IdValue<Bundle>> caseBundles = new ArrayList<>();
-        caseBundles.add(new IdValue<>("1", Bundle.builder().id("1")
-            .title("Trial Bundle")
-            .stitchStatus(Optional.of("SUCCESS")).description("Trial Bundle")
-            .stitchedDocument(Optional.of(Document.builder()
-                                              .documentUrl("url")
-                                              .documentFileName("name")
-                                              .build()))
-            .build()));
-        CaseData caseData = CaseData.builder().caseBundles(caseBundles)
-            .bundleEvent("AMEND_RESTITCH_BUNDLE").build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        assertThat(response.getErrors()).isNull();
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getBusinessProcess().getStatus()).isEqualTo(BusinessProcessStatus.READY);
-        assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo("AMEND_RESTITCH_BUNDLE");
-    }
-
-    @Test
-    void shouldNotSetBusinessProcessWhenBundleEventIsNull() {
-        List<IdValue<Bundle>> caseBundles = new ArrayList<>();
-        caseBundles.add(new IdValue<>("1", Bundle.builder().id("1")
-            .title("Trial Bundle")
-            .stitchStatus(Optional.of("SUCCESS")).description("Trial Bundle")
-            .stitchedDocument(Optional.of(Document.builder()
-                                              .documentUrl("url")
-                                              .documentFileName("name")
-                                              .build()))
-            .build()));
-        CaseData caseData = CaseData.builder().caseBundles(caseBundles).build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        assertThat(response.getErrors()).isNull();
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getBusinessProcess()).isNull();
-    }
-
     @ParameterizedTest
     @MethodSource("provideBundlesForLatestBundleTest")
     void shouldReturnLatestBundle(List<IdValue<Bundle>> bundles, Optional<Bundle> expectedLatestBundle) {
@@ -158,6 +117,34 @@ public class StitchingCompleteCallbackHandlerTest extends BaseCallbackHandlerTes
             Arguments.of(List.of(new IdValue<>("1", bundle1)), Optional.of(bundle1)),
             Arguments.of(List.of(new IdValue<>("1", bundle1), new IdValue<>("2", bundle2)), Optional.of(bundle2)),
             Arguments.of(List.of(new IdValue<>("1", bundle1), new IdValue<>("2", bundle2), new IdValue<>("3", bundle3)), Optional.of(bundle3))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideCaseDataForTriggerUpdateBundleCategoryIdTest")
+    void shouldUpdateBundleCategoryId(CaseData caseData, YesOrNo expectedBundleError, String expectedBusinessProcessEvent) {
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isNull();
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        assertThat(updatedData.getBundleError()).isEqualTo(expectedBundleError);
+        if (expectedBusinessProcessEvent != null) {
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(expectedBusinessProcessEvent);
+        } else {
+            assertThat(updatedData.getBusinessProcess()).isNull();
+        }
+    }
+
+    private static Stream<Arguments> provideCaseDataForTriggerUpdateBundleCategoryIdTest() {
+        Bundle bundleSuccess = Bundle.builder().id("1").stitchStatus(Optional.of("SUCCESS")).build();
+        Bundle bundleFailed = Bundle.builder().id("2").stitchStatus(Optional.of("FAILED")).build();
+
+        return Stream.of(
+            Arguments.of(CaseData.builder().caseBundles(List.of(new IdValue<>("1", bundleSuccess))).build(), null, null),
+            Arguments.of(CaseData.builder().caseBundles(List.of(new IdValue<>("1", bundleFailed))).build(), YesOrNo.YES, null),
+            Arguments.of(CaseData.builder().caseBundles(List.of(new IdValue<>("1", bundleSuccess))).bundleEvent("BUNDLE_CREATED_NOTIFICATION").build(), null, "BUNDLE_CREATION_NOTIFICATION"),
+            Arguments.of(CaseData.builder().caseBundles(List.of(new IdValue<>("1", bundleSuccess))).bundleEvent("AMEND_RESTITCH_BUNDLE").build(), null, "AMEND_RESTITCH_BUNDLE")
         );
     }
 }
