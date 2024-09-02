@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.DefaultJudgmentOnlineMapper;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -56,7 +57,6 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class DefaultJudgementSpecHandler extends CallbackHandler {
 
@@ -441,10 +441,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             caseDataBuilder.joIsLiveJudgmentExists(YesOrNo.YES);
         }
 
-        log.info("Current Respondent1 Flag {} for caseId {}",
-                 caseData.getRespondent1().getFlags(), caseData.getCcdCaseReference());
         CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
-        log.info("oldCaseData Respondent1 Flag {} for caseId {}", oldCaseData.getRespondent1().getFlags(), oldCaseData.getCcdCaseReference());
 
         // persist party flags (ccd issue)
         persistFlagsForParties(oldCaseData, caseData, caseDataBuilder);
