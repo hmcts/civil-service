@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
 public class GeneralApplicationMoreInfoRequiredScenarioTest extends BaseIntegrationTest {
+
     public static final String SCENARIO_GA_MORE_INFO_REQ = "Scenario.AAA6.GeneralApps.MoreInfoRequired.Applicant";
     private static final String DASHBOARD_CREATE_SCENARIO_URL
         = "/dashboard/scenarios/{scenario_ref}/{unique_case_identifier}";
@@ -30,7 +31,6 @@ public class GeneralApplicationMoreInfoRequiredScenarioTest extends BaseIntegrat
                DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_GA_MORE_INFO_REQ, caseId
         )
             .andExpect(status().isOk());
-
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "APPLICANT")
