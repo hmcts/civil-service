@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -23,9 +24,12 @@ import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
+import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +39,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -65,6 +70,9 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
 
     @Mock
     private HearingNoticeCamundaService hearingNoticeCamundaService;
+
+    @Mock
+    private HearingFeesService hearingFeesService;
 
     public static final String TASK_ID = "GenerateDashboardNotificationHearingScheduledClaimant";
 
@@ -171,10 +179,14 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
                             .hearingId("HER1234")
                             .hearingType("AAA7-TRI")
                             .build());
+        when(hearingFeesService.getFeeForHearingSmallClaims(any()))
+            .thenReturn(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build());
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
+            .totalClaimAmount(new BigDecimal(100))
+            .responseClaimTrack("SMALL_CLAIM")
             .hearingFeePaymentDetails(PaymentDetails.builder().status(PaymentStatus.FAILED).build())
             .businessProcess(BusinessProcess.builder().processInstanceId("").build())
             .build();
@@ -197,6 +209,7 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );
+        verify(hearingFeesService).getFeeForHearingSmallClaims(new BigDecimal(100).setScale(2, RoundingMode.UNNECESSARY));
     }
 
     @Test
@@ -208,10 +221,14 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
                             .hearingId("HER1234")
                             .hearingType("AAA7-TRI")
                             .build());
+        when(hearingFeesService.getFeeForHearingSmallClaims(any()))
+            .thenReturn(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build());
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
+            .totalClaimAmount(new BigDecimal(100))
+            .responseClaimTrack("SMALL_CLAIM")
             .businessProcess(BusinessProcess.builder().processInstanceId("").build())
             .build();
 
@@ -233,6 +250,7 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );
+        verify(hearingFeesService).getFeeForHearingSmallClaims(new BigDecimal(100).setScale(2, RoundingMode.UNNECESSARY));
     }
 
     @Test
@@ -265,6 +283,7 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
             ScenarioRequestParams.builder().params(params).build()
         );
         verifyNoMoreInteractions(dashboardApiClient);
+        verifyNoInteractions(hearingFeesService);
     }
 
     @Test
@@ -296,6 +315,7 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
             ScenarioRequestParams.builder().params(params).build()
         );
         verifyNoMoreInteractions(dashboardApiClient);
+        verifyNoInteractions(hearingFeesService);
     }
 
     @Test
@@ -331,6 +351,7 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
             ScenarioRequestParams.builder().params(params).build()
         );
         verifyNoMoreInteractions(dashboardApiClient);
+        verifyNoInteractions(hearingFeesService);
     }
 
     @Test
@@ -348,6 +369,8 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
             .ccdCaseReference(1234L)
             .respondent1Represented(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)
+            .totalClaimAmount(new BigDecimal(100))
+            .responseClaimTrack("SMALL_CLAIM")
             .hearingHelpFeesReferenceNumber("123")
             .businessProcess(BusinessProcess.builder().processInstanceId("").build())
             .build();
@@ -370,5 +393,6 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );
+        verify(hearingFeesService).getFeeForHearingSmallClaims(new BigDecimal(100).setScale(2, RoundingMode.UNNECESSARY));
     }
 }
