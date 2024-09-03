@@ -523,7 +523,6 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
         CaseDocument finalDocument = caseData.getFinalOrderDocument();
-        List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
 
         if (DOWNLOAD_ORDER_TEMPLATE.equals(caseData.getFinalOrderSelection())) {
             finalDocument = toCaseDocument(caseData.getUploadOrderDocumentFromTemplate(), JUDGE_FINAL_ORDER);
@@ -533,6 +532,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         finalDocument.getDocumentLink().setCategoryID("caseManagementOrders");
         finalDocument.getDocumentLink().setDocumentFileName(getDocumentFilename(caseData, finalDocument, judgeName));
 
+        List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
         finalCaseDocuments.add(element(finalDocument));
 
         if (!isEmpty(caseData.getFinalOrderDocumentCollection())) {
