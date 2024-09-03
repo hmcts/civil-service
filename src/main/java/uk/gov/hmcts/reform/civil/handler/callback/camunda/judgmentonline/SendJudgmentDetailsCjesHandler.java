@@ -49,13 +49,16 @@ public class SendJudgmentDetailsCjesHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
 
-        if (SEND_JUDGMENT_DETAILS_CJES.equals(caseEvent) && isActiveJudgmentRegisteredWithRTL(caseData)) {
-            cjesService.sendJudgment(caseData, true);
+        if (SEND_JUDGMENT_DETAILS_CJES.equals(caseEvent)) {
             updateCamundaVars(caseData);
-        } else if (SEND_JUDGMENT_DETAILS_CJES_SA.equals(caseEvent)
-            && isLatestHistoricJudgmentRegisteredWithRTL(caseData)) {
-            cjesService.sendJudgment(caseData, false);
+         if (Boolean.TRUE.equals(isActiveJudgmentRegisteredWithRTL(caseData))) {
+            cjesService.sendJudgment(caseData, true);
+         }
+        } else if (SEND_JUDGMENT_DETAILS_CJES_SA.equals(caseEvent)) {
             updateCamundaVarsSetAside(caseData);
+            if (Boolean.TRUE.equals(isLatestHistoricJudgmentRegisteredWithRTL(caseData))) {
+                cjesService.sendJudgment(caseData, false);
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -78,17 +81,16 @@ public class SendJudgmentDetailsCjesHandler extends CallbackHandler {
         if (caseData.getJoJudgmentRecordReason() != null) {
             runTimeService.setVariable(
                 caseData.getBusinessProcess().getProcessInstanceId(),
-                "judgmentRecordedReason",
-                caseData.getJoJudgmentRecordReason().toString()
-            );
+                "judgmentRecordedReason", caseData.getJoJudgmentRecordReason().toString());
         }
     }
 
     private void updateCamundaVarsSetAside(CaseData caseData) {
-        runTimeService.setVariable(
-            caseData.getBusinessProcess().getProcessInstanceId(),
-            "JUDGMENT_SET_ASIDE_ERROR",
-            caseData.getJoSetAsideReason().equals(JudgmentSetAsideReason.JUDGMENT_ERROR)
-        );
+        if (caseData.getJoSetAsideReason() != null) {
+            runTimeService.setVariable(
+                caseData.getBusinessProcess().getProcessInstanceId(),
+                "JUDGMENT_SET_ASIDE_ERROR",
+                caseData.getJoSetAsideReason().equals(JudgmentSetAsideReason.JUDGMENT_ERROR));
+        }
     }
 }

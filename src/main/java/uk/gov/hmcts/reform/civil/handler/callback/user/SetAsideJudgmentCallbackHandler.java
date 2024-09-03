@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
-import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -43,7 +42,6 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
     private final SetAsideJudgmentOnlineMapper setAsideJudgmentOnlineMapper;
     private static final String ERROR_MESSAGE_DATE_ORDER_MUST_BE_IN_PAST = "Date must be in the past";
     private final DeadlinesCalculator deadlinesCalculator;
-    private final RuntimeService runTimeService;
 
     @Override
     protected Map<String, Callback> callbacks() {

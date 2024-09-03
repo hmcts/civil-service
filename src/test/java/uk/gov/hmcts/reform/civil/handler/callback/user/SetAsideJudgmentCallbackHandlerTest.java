@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import org.camunda.bpm.engine.RuntimeService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -15,10 +14,8 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.SetAsideJudgmentOnlineMapper;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
@@ -33,7 +30,6 @@ import java.time.LocalDateTime;
 import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -46,11 +42,6 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private SetAsideJudgmentOnlineMapper setAsideJudgmentOnlineMapper;
 
-    public static final String PROCESS_INSTANCE_ID = "processInstanceId";
-
-    @Mock
-    private RuntimeService runTimeService;
-
     @Mock
     private DeadlinesCalculator deadlinesCalculator;
 
@@ -58,7 +49,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     void setup() {
         ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
         setAsideJudgmentOnlineMapper = new SetAsideJudgmentOnlineMapper();
-        handler = new SetAsideJudgmentCallbackHandler(objectMapper, setAsideJudgmentOnlineMapper, deadlinesCalculator, runTimeService);
+        handler = new SetAsideJudgmentCallbackHandler(objectMapper, setAsideJudgmentOnlineMapper, deadlinesCalculator);
     }
 
     @Test
@@ -75,7 +66,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         void setup() {
             ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
             objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-            handler = new SetAsideJudgmentCallbackHandler(objectMapper, setAsideJudgmentOnlineMapper, deadlinesCalculator, runTimeService);
+            handler = new SetAsideJudgmentCallbackHandler(objectMapper, setAsideJudgmentOnlineMapper, deadlinesCalculator);
             timeExtensionDate = LocalDateTime.of(2020, 1, 1, 12, 0, 0);
             respondent1ResponseDeadline = now().plusDays(28);
         }
@@ -87,8 +78,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
             caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
-            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE)
-                                           .isRegisterWithRTL(YesOrNo.YES).build());
+            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -102,6 +92,9 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
             assertEquals(JudgmentState.SET_ASIDE, historicJudgment.getState());
             assertEquals(caseData.getJoSetAsideOrderDate(), historicJudgment.getSetAsideDate());
+            assertThat(response.getData()).extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(SET_ASIDE_JUDGMENT.name(), "READY");
         }
 
         @Test
@@ -111,8 +104,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE);
             caseData.setJoSetAsideDefenceReceivedDate(LocalDate.of(2022, 12, 12));
-            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE)
-                                           .isRegisterWithRTL(YesOrNo.YES).build());
+            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -127,18 +119,18 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertEquals(caseData.getJoSetAsideDefenceReceivedDate(), historicJudgment.getSetAsideDate());
             //and the caseState should not be updated
             assertEquals(response.getState(), CaseState.All_FINAL_ORDERS_ISSUED.name());
+            assertThat(response.getData()).extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(SET_ASIDE_JUDGMENT.name(), "READY");
         }
 
         @Test
         void shouldPopulateSetAsideJudgmentErrorText() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
-            CaseData caseData = CaseDataBuilder.builder()
-                .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
-                .buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR);
             caseData.setJoSetAsideJudgmentErrorText("Some text");
-            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE_ERROR)
-                                           .isRegisterWithRTL(YesOrNo.YES).build());
+            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE_ERROR).build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -153,7 +145,9 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertEquals(LocalDate.now(), historicJudgment.getSetAsideDate());
             //and the caseState should not be updated
             assertEquals(response.getState(), CaseState.All_FINAL_ORDERS_ISSUED.name());
-            verify(runTimeService).setVariable(PROCESS_INSTANCE_ID, "JUDGMENT_SET_ASIDE_ERROR", true);
+            assertThat(response.getData()).extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(SET_ASIDE_JUDGMENT.name(), "READY");
         }
 
         @Test
@@ -167,8 +161,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
             caseData.setActiveJudgment(JudgmentDetails.builder().build());
             caseData.setJoSetAsideOrderDate(now());
-            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE)
-                                           .isRegisterWithRTL(YesOrNo.YES).build());
+            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -178,19 +171,19 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("joSetAsideOrderType").isNotNull();
             //and the caseState should be updated
             assertEquals(response.getState(), CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name());
+            assertThat(response.getData()).extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(SET_ASIDE_JUDGMENT.name(), "READY");
         }
 
         @Test
         void testSetAsideForDefaultJudgment() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
-            CaseData caseData = CaseDataBuilder.builder()
-                .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
-                .getDefaultJudgment1v1Case();
+            CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE);
             caseData.setJoSetAsideDefenceReceivedDate(LocalDate.of(2022, 12, 12));
-            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE)
-                                           .isRegisterWithRTL(YesOrNo.YES).build());
+            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -203,7 +196,6 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
             assertEquals(JudgmentState.SET_ASIDE, historicJudgment.getState());
             assertEquals(caseData.getJoSetAsideDefenceReceivedDate(), historicJudgment.getSetAsideDate());
-            verify(runTimeService).setVariable(PROCESS_INSTANCE_ID, "JUDGMENT_SET_ASIDE_ERROR", false);
             assertThat(response.getData()).extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(SET_ASIDE_JUDGMENT.name(), "READY");
