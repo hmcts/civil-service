@@ -16,7 +16,9 @@ import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
+import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.utils.HearingFeeUtils;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.List;
@@ -50,6 +52,7 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
     private final FeatureToggleService toggleService;
     private final LocationReferenceDataService locationRefDataService;
     private final HearingNoticeCamundaService camundaService;
+    private final HearingFeesService hearingFeesService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -93,6 +96,9 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
             requiresHearingFee = hearingFeeRequired(camundaVars.getHearingType());
             hasPaidFee = (caseData.getHearingFeePaymentDetails() != null
                 && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus())) || caseData.hearingFeePaymentDoneWithHWF();
+            if (requiresHearingFee && !hasPaidFee) {
+                caseData.setHearingFee(HearingFeeUtils.calculateAndApplyFee(hearingFeesService, caseData, caseData.getAssignedTrack()));
+            }
         }
 
         if ((!isAutoHearingNotice && caseData.getCcdState() == HEARING_READINESS && caseData.getListingOrRelisting() == LISTING)
