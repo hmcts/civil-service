@@ -211,6 +211,15 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenisCjesServiceAvailableEnabled(Boolean toggleStat) {
+        var key = "isCjesServiceAvailable";
+        givenToggle(key, toggleStat);
+
+        assertThat(featureToggleService.isCjesServiceAvailable()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsCarmEnabled(Boolean toggleStat) {
         var carmKey = "carm";
         var carmDateKey = "cam-enabled-for-case";
