@@ -31,6 +31,7 @@ class CaseHearingDateSearchServiceTest extends ElasticSearchServiceTest {
     @AfterAll
     static void tearDown() {
         currentDateMock.reset();
+        currentDateMock.close();
     }
 
     @BeforeEach

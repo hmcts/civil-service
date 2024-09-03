@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.DefaultJudgmentOnlineMapper;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -54,6 +55,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.utils.DefaultJudgmentUtils.calculateFixedCosts;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
+import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
 
 @Service
 @RequiredArgsConstructor
@@ -79,6 +81,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private final FeesService feesService;
     private final FeatureToggleService toggleService;
     private final DefaultJudgmentOnlineMapper djOnlineMapper;
+    private final CaseDetailsConverter caseDetailsConverter;
     BigDecimal theOverallTotal;
     private final Time time;
     private final FeatureToggleService featureToggleService;
@@ -424,6 +427,13 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        if (featureToggleService.isJudgmentOnlineLive()) {
+            JudgmentDetails activeJudgment = djOnlineMapper.addUpdateActiveJudgment(caseData);
+            caseData.setActiveJudgment(activeJudgment);
+            caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment));
+            caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
+        }
+
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         String nextState;
 
@@ -435,13 +445,10 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_SPEC));
         }
 
-        if (featureToggleService.isJudgmentOnlineLive()) {
-            JudgmentDetails activeJudgment = djOnlineMapper.addUpdateActiveJudgment(caseData);
-            caseDataBuilder.activeJudgment(activeJudgment);
-            caseDataBuilder.joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment));
-            caseDataBuilder.joIsLiveJudgmentExists(YesOrNo.YES);
-        }
+        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
 
+        // persist party flags (ccd issue)
+        persistFlagsForParties(oldCaseData, caseData, caseDataBuilder);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(nextState)
