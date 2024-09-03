@@ -534,6 +534,9 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         String judgeName = userDetails.getFullName();
         finalDocument.getDocumentLink().setCategoryID("caseManagementOrders");
         finalDocument.getDocumentLink().setDocumentFileName(getDocumentFilename(caseData, finalDocument, judgeName));
+        if (DOWNLOAD_ORDER_TEMPLATE.equals(caseData.getFinalOrderSelection())) {
+            finalDocument.setDocumentName(getDocumentFilename(caseData, finalDocument, judgeName));
+        }
 
         List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
         finalCaseDocuments.add(element(finalDocument));

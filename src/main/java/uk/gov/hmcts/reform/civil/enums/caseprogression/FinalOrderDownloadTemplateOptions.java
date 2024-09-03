@@ -9,8 +9,8 @@ public enum FinalOrderDownloadTemplateOptions {
 
     BLANK_TEMPLATE_AFTER_HEARING("Blank template to be used after a hearing"),
     BLANK_TEMPLATE_BEFORE_HEARING("Blank template to be used before a hearing/box work"),
-    FIX_DATE_CCMC("Fix a date for a CCMC"),
-    FIX_DATE_CMC("Fix a date for a CMC");
+    FIX_DATE_CCMC("Fix a date for CCMC"),
+    FIX_DATE_CMC("Fix a date for CMC");
 
     private final String label;
 }
