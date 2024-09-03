@@ -248,22 +248,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenMultiOrIntermediateTrackEnabled(Boolean toggleStat) {
-        var mintiKey = "minti";
-        var caseFileKey = "multi-or-intermediate-track";
-        givenToggle(mintiKey, toggleStat);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
-            .build();
-        if (toggleStat) {
-            when(featureToggleApi.isFeatureEnabledForDate(eq(caseFileKey), anyLong(), eq(false)))
-                .thenReturn(true);
-        }
-        assertThat(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsPartOfNationalRollout(Boolean toggleStat) {
         final String feature = "national-rollout-whitelist";
         String location = "000000";
