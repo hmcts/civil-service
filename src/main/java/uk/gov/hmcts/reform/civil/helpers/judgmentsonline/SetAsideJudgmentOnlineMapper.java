@@ -29,7 +29,7 @@ public class SetAsideJudgmentOnlineMapper extends JudgmentOnlineMapper {
             .setAsideDate(getSetAsideDate(caseData))
             .lastUpdateTimeStamp(LocalDateTime.now())
             .cancelledTimeStamp(LocalDateTime.now())
-            .rtlState(getNextRTLState(activeJudgment.getIsRegisterWithRTL(), activeJudgment.getRtlState()))
+            .rtlState(getNextRTLState(activeJudgment.getRtlState()))
             .build();
     }
 
@@ -38,10 +38,9 @@ public class SetAsideJudgmentOnlineMapper extends JudgmentOnlineMapper {
             .equals(caseData.getJoSetAsideReason()) ? JudgmentState.SET_ASIDE : JudgmentState.SET_ASIDE_ERROR;
     }
 
-    protected String getNextRTLState(YesOrNo isRegisterWithRTL, String rtlState){
-        return isRegisterWithRTL.equals(YesOrNo.YES)
-            && (Objects.equals(rtlState, JudgmentRTLStatus.ISSUED.getRtlState()) ||
-            Objects.equals(rtlState, JudgmentRTLStatus.MODIFIED_EXISTING.getRtlState())) ?
+    protected String getNextRTLState(String rtlState){
+        return Objects.equals(rtlState, JudgmentRTLStatus.ISSUED.getRtlState()) ||
+            Objects.equals(rtlState, JudgmentRTLStatus.MODIFIED_EXISTING.getRtlState()) ?
             JudgmentRTLStatus.CANCELLED.getRtlState() : rtlState;
     }
 
