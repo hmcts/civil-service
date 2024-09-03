@@ -13,11 +13,13 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
 import uk.gov.hmcts.reform.civil.event.HearingFeePaidEvent;
+import uk.gov.hmcts.reform.civil.event.NoHearingFeeDueEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.HearingFeeDueSearchService;
 
 import java.util.List;
@@ -54,6 +56,9 @@ class HearingFeeDueHandlerTest {
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     @InjectMocks
     private HearingFeeDueHandler handler;
 
@@ -62,6 +67,24 @@ class HearingFeeDueHandlerTest {
         when(mockTask.getTopicName()).thenReturn("test");
         when(mockTask.getWorkerId()).thenReturn("worker");
 
+    }
+
+    @Test
+    void shouldEmitNoHearingFeeDueEvent_whenCasesFoundNoFeeDue() {
+        long caseId = 1L;
+        CaseData caseData = CaseDataBuilder.builder().atStateNoHearingFeeDue().build();
+        Map<String, Object> data = Map.of("data", caseData);
+        List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
+
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+        when(searchService.getCases()).thenReturn(caseDetails);
+        when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.get(0));
+        when(caseDetailsConverter.toCaseData(caseDetails.get(0))).thenReturn(caseData);
+
+        handler.execute(mockTask, externalTaskService);
+
+        verify(applicationEventPublisher).publishEvent(new NoHearingFeeDueEvent(caseId));
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @Test
