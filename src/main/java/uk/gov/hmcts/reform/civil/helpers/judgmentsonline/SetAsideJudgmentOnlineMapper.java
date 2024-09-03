@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -28,7 +29,7 @@ public class SetAsideJudgmentOnlineMapper extends JudgmentOnlineMapper {
             .setAsideDate(getSetAsideDate(caseData))
             .lastUpdateTimeStamp(LocalDateTime.now())
             .cancelledTimeStamp(LocalDateTime.now())
-            .rtlState(getJudgmentRTLStatus(activeJudgment.getIsRegisterWithRTL(), activeJudgment.getRtlState()))
+            .rtlState(getNextRTLState(activeJudgment.getIsRegisterWithRTL(), activeJudgment.getRtlState()))
             .build();
     }
 
@@ -37,9 +38,10 @@ public class SetAsideJudgmentOnlineMapper extends JudgmentOnlineMapper {
             .equals(caseData.getJoSetAsideReason()) ? JudgmentState.SET_ASIDE : JudgmentState.SET_ASIDE_ERROR;
     }
 
-    protected String getJudgmentRTLStatus(YesOrNo isRegisteredWithRTL, String rtlState){
-        return isRegisteredWithRTL.equals(YesOrNo.YES) && (rtlState.equals(JudgmentRTLStatus.ISSUED.getRtlState()) ||
-            rtlState.equals(JudgmentRTLStatus.MODIFIED_EXISTING.getRtlState())) ?
+    protected String getNextRTLState(YesOrNo isRegisterWithRTL, String rtlState){
+        return isRegisterWithRTL.equals(YesOrNo.YES)
+            && (Objects.equals(rtlState, JudgmentRTLStatus.ISSUED.getRtlState()) ||
+            Objects.equals(rtlState, JudgmentRTLStatus.MODIFIED_EXISTING.getRtlState())) ?
             JudgmentRTLStatus.CANCELLED.getRtlState() : rtlState;
     }
 

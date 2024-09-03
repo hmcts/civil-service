@@ -81,9 +81,8 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         caseData.setJoIsLiveJudgmentExists(YesOrNo.NO);
         setAsideJudgmentOnlineMapper.moveToHistoricJudgment(caseData);
-        updateCamundaVars(caseData);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.businessProcess(BusinessProcess.ready(SET_ASIDE_JUDGMENT));
+//        caseDataBuilder.businessProcess(BusinessProcess.ready(SET_ASIDE_JUDGMENT));
         String nextState;
         if (Objects.nonNull(caseData.getJoSetAsideOrderType()) && caseData.getJoSetAsideOrderType().equals(
             JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION)) {
@@ -93,9 +92,10 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
         } else {
             nextState = caseData.getCcdState().name();
         }
-
+        CaseData updatedCaseData = caseDataBuilder.build();
+        updateCamundaVars(updatedCaseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(updatedCaseData.toMap(objectMapper))
             .state(nextState)
             .build();
     }
