@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user.RespondToClaimSpec;
+package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.CaseTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -36,7 +37,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.Defendan
 
 @Component
 @RequiredArgsConstructor
-public class RespondToClaimSpecCaseDataHandlerRespondentCopy {
+public class PopulateRespondent1Copy implements CaseTask {
 
     private final UserService userService;
     private final CoreCaseUserService coreCaseUserService;
@@ -47,7 +48,8 @@ public class RespondToClaimSpecCaseDataHandlerRespondentCopy {
 
     private static final String UNKNOWN_MP_SCENARIO = "Unknown mp scenario";
 
-    CallbackResponse populateRespondent1Copy(CallbackParams callbackParams) {
+    @Override
+    public CallbackResponse execute(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         Set<DefendantResponseShowTag> initialShowTags = getInitialShowTags(callbackParams);
 
@@ -76,17 +78,6 @@ public class RespondToClaimSpecCaseDataHandlerRespondentCopy {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseDataBuilder.build().toMap(objectMapper))
-            .build();
-    }
-
-    CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData updatedCaseData = caseData.toBuilder()
-            .uiStatementOfTruth(StatementOfTruth.builder().role("").build())
-            .build();
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
             .build();
     }
 

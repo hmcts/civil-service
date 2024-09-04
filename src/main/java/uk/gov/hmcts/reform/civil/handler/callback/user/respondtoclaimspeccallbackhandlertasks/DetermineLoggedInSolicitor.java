@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user.RespondToClaimSpec;
+package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.CaseTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
@@ -21,14 +22,20 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Component
-@RequiredArgsConstructor
-public class RespondToClaimSpecCaseDataHandlerSolicitorDetails {
+public class DetermineLoggedInSolicitor implements CaseTask {
 
     private final UserService userService;
     private final CoreCaseUserService coreCaseUserService;
     private final ObjectMapper objectMapper;
 
-    CallbackResponse determineLoggedInSolicitor(CallbackParams callbackParams) {
+    public DetermineLoggedInSolicitor(UserService userService, CoreCaseUserService coreCaseUserService, ObjectMapper objectMapper) {
+        this.userService = userService;
+        this.coreCaseUserService = coreCaseUserService;
+        this.objectMapper = objectMapper;
+    }
+
+    @Override
+    public CallbackResponse execute(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
 

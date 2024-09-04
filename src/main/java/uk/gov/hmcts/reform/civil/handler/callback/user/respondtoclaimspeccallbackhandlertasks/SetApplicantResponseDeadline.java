@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user.RespondToClaimSpec;
+package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.CaseTask;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -59,7 +60,7 @@ import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedT
 
 @Component
 @RequiredArgsConstructor
-public class RespondToClaimSpecCaseDataHandlerApplicantResponseDeadline {
+public class SetApplicantResponseDeadline implements CaseTask {
 
     private final UserService userService;
     private final CoreCaseUserService coreCaseUserService;
@@ -73,7 +74,8 @@ public class RespondToClaimSpecCaseDataHandlerApplicantResponseDeadline {
     private final FrcDocumentsUtils frcDocumentsUtils;
     private final RespondToClaimSpecDocumentHandler respondToClaimSpecDocumentHandler;
 
-    CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
+    @Override
+    public CallbackResponse execute(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDate = time.now();
 
@@ -127,7 +129,6 @@ public class RespondToClaimSpecCaseDataHandlerApplicantResponseDeadline {
 
         return buildResponse(updatedData, CaseState.AWAITING_APPLICANT_INTENTION);
     }
-
     private CaseData.CaseDataBuilder<?, ?> updateRespondentsAndAddresses(CaseData caseData, LocalDateTime responseDate) {
         Party updatedRespondent1 = updateRespondent1(caseData);
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
@@ -393,3 +394,5 @@ public class RespondToClaimSpecCaseDataHandlerApplicantResponseDeadline {
         return deadlinesCalculator.calculateApplicantResponseDeadlineSpec(responseDate);
     }
 }
+
+

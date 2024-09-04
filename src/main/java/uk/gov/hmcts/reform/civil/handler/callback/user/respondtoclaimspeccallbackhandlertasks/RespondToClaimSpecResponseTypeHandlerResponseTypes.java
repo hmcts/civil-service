@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user.RespondToClaimSpec;
+package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

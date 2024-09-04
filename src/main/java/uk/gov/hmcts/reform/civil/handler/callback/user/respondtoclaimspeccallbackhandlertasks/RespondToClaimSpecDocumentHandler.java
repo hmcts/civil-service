@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user.RespondToClaimSpec;
+package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

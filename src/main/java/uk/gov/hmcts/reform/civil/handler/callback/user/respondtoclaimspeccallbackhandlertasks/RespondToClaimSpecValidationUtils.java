@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user.RespondToClaimSpec;
+package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -166,7 +166,7 @@ public class RespondToClaimSpecValidationUtils implements DefendantAddressValida
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    CallbackResponse validateRespondentWitnesses(CallbackParams callbackParams) {
+    public CallbackResponse validateRespondentWitnesses(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (!ONE_V_ONE.equals(getMultiPartyScenario(caseData))) {
             return validateWitnessesForMultipleRespondents(callbackParams, caseData);
@@ -197,7 +197,7 @@ public class RespondToClaimSpecValidationUtils implements DefendantAddressValida
         return AboutToStartOrSubmitCallbackResponse.builder().errors(errors).build();
     }
 
-    CallbackResponse validateRespondentExperts(CallbackParams callbackParams) {
+    public CallbackResponse validateRespondentExperts(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (!ONE_V_ONE.equals(getMultiPartyScenario(caseData))) {
             return validateExpertsForMultipleRespondents(callbackParams, caseData);

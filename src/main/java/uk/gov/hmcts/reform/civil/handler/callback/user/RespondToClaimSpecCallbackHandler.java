@@ -1,24 +1,42 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user.RespondToClaimSpec;
+package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.HandleDefendAllClaim;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.PopulateRespondent1Copy;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.DetermineLoggedInSolicitor;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.HandleAdmitPartOfClaim;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.RespondToClaimSpecResponseTypeHandlerResponseTypes;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.RespondToClaimSpecValidationUtils;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.SetApplicantResponseDeadline;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -28,11 +46,14 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler {
 
     private final RespondToClaimSpecValidationUtils validationUtils;
     private final RespondToClaimSpecResponseTypeHandlerResponseTypes responseTypeHandlerResponseTypes;
-    private final RespondToClaimSpecResponseTypeHandlerClaims responseTypeHandlerClaims;
-    private final RespondToClaimSpecCaseDataHandlerRespondentCopy caseDataHandlerRespondentCopy;
-    private final RespondToClaimSpecCaseDataHandlerSolicitorDetails caseDataHandlerSolicitorDetails;
-    private final RespondToClaimSpecCaseDataHandlerApplicantResponseDeadline caseDataHandlerApplicantResponseDeadline;
-    private final RespondToClaimSpecConfirmationBuilder confirmationBuilder;
+    private final HandleAdmitPartOfClaim handleAdmitPartOfClaim;
+    private final HandleDefendAllClaim handleDefendAllClaim;
+    private final PopulateRespondent1Copy populateRespondent1Copy;
+    private final DetermineLoggedInSolicitor determineLoggedInSolicitor;
+    private final SetApplicantResponseDeadline setApplicantResponseDeadline;
+    private final ObjectMapper objectMapper;
+    private final List<RespondToClaimConfirmationTextSpecGenerator> confirmationTextSpecGenerators;
+    private final List<RespondToClaimConfirmationHeaderSpecGenerator> confirmationHeaderGenerators;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -67,7 +88,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse populateRespondent1Copy(CallbackParams callbackParams) {
-        return caseDataHandlerRespondentCopy.populateRespondent1Copy(callbackParams);
+        return populateRespondent1Copy.execute(callbackParams);
     }
 
     private CallbackResponse validateMediationUnavailableDates(CallbackParams callbackParams) {
@@ -91,7 +112,14 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
-        return caseDataHandlerRespondentCopy.resetStatementOfTruth(callbackParams);
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData updatedCaseData = caseData.toBuilder()
+            .uiStatementOfTruth(StatementOfTruth.builder().role("").build())
+            .build();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedCaseData.toMap(objectMapper))
+            .build();
     }
 
     private CallbackResponse validateRespondentPaymentDate(CallbackParams callbackParams) {
@@ -103,11 +131,11 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse determineLoggedInSolicitor(CallbackParams callbackParams) {
-        return caseDataHandlerSolicitorDetails.determineLoggedInSolicitor(callbackParams);
+        return determineLoggedInSolicitor.execute(callbackParams);
     }
 
     private CallbackResponse handleDefendAllClaim(CallbackParams callbackParams) {
-        return responseTypeHandlerClaims.handleDefendAllClaim(callbackParams);
+        return handleDefendAllClaim.execute(callbackParams);
     }
 
     private CallbackResponse handleRespondentResponseTypeForSpec(CallbackParams callbackParams) {
@@ -115,7 +143,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse handleAdmitPartOfClaim(CallbackParams callbackParams) {
-        return responseTypeHandlerClaims.handleAdmitPartOfClaim(callbackParams);
+        return handleAdmitPartOfClaim.execute(callbackParams);
     }
 
     private CallbackResponse validateLengthOfUnemployment(CallbackParams callbackParams) {
@@ -139,10 +167,54 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
-        return caseDataHandlerApplicantResponseDeadline.setApplicantResponseDeadline(callbackParams);
+        return setApplicantResponseDeadline.execute(callbackParams);
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        return confirmationBuilder.buildConfirmation(callbackParams);
+        CaseData caseData = callbackParams.getCaseData();
+        String claimNumber = caseData.getLegacyCaseReference();
+
+        String body = generateConfirmationBody(caseData);
+        String header = generateConfirmationHeader(caseData, claimNumber);
+
+        return SubmittedCallbackResponse.builder()
+            .confirmationHeader(header)
+            .confirmationBody(body)
+            .build();
+    }
+
+    private String generateConfirmationBody(CaseData caseData) {
+        return CaseDataToTextGenerator.getTextFor(
+            confirmationTextSpecGenerators.stream(),
+            () -> getDefaultConfirmationBody(caseData),
+            caseData
+        );
+    }
+
+    private String generateConfirmationHeader(CaseData caseData, String claimNumber) {
+        return CaseDataToTextGenerator.getTextFor(
+            confirmationHeaderGenerators.stream(),
+            () -> format("# You have submitted your response%n## Claim number: %s", claimNumber),
+            caseData
+        );
+    }
+
+    private String getDefaultConfirmationBody(CaseData caseData) {
+        LocalDateTime responseDeadline = caseData.getApplicant1ResponseDeadline();
+        String nextStepsMessage = getNextStepsMessage(responseDeadline);
+        return format(
+            "<h2 class=\"govuk-heading-m\">What happens next</h2>%n%n%s%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
+            nextStepsMessage,
+            format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+        );
+    }
+
+    private String getNextStepsMessage(LocalDateTime responseDeadline) {
+        if (responseDeadline == null) {
+            return "After the other solicitor has responded and/or the time for responding has passed the claimant will be notified.";
+        } else {
+            return format("The claimant has until 4pm on %s to respond to your claim. We will let you know when they respond.",
+                          formatLocalDateTime(responseDeadline, DATE));
+        }
     }
 }
