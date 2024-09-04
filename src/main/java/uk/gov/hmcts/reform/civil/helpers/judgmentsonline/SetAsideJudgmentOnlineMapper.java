@@ -37,10 +37,10 @@ public class SetAsideJudgmentOnlineMapper extends JudgmentOnlineMapper {
             .equals(caseData.getJoSetAsideReason()) ? JudgmentState.SET_ASIDE : JudgmentState.SET_ASIDE_ERROR;
     }
 
-    protected String getNextRTLState(String rtlState){
-        return Objects.equals(rtlState, JudgmentRTLStatus.ISSUED.getRtlState()) ||
-            Objects.equals(rtlState, JudgmentRTLStatus.MODIFIED_EXISTING.getRtlState()) ?
-            JudgmentRTLStatus.CANCELLED.getRtlState() : rtlState;
+    protected String getNextRTLState(String rtlState) {
+        return Objects.equals(rtlState, JudgmentRTLStatus.ISSUED.getRtlState())
+            || Objects.equals(rtlState, JudgmentRTLStatus.MODIFIED_EXISTING.getRtlState())
+            ? JudgmentRTLStatus.CANCELLED.getRtlState() : rtlState;
     }
 
     private LocalDate getSetAsideDate(CaseData caseData) {

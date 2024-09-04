@@ -51,9 +51,9 @@ public class SendJudgmentDetailsCjesHandler extends CallbackHandler {
 
         if (SEND_JUDGMENT_DETAILS_CJES.equals(caseEvent)) {
             updateCamundaVars(caseData);
-         if (Boolean.TRUE.equals(isActiveJudgmentRegisteredWithRTL(caseData))) {
-            cjesService.sendJudgment(caseData, true);
-         }
+            if (Boolean.TRUE.equals(isActiveJudgmentRegisteredWithRTL(caseData))) {
+                cjesService.sendJudgment(caseData, true);
+            }
         } else if (SEND_JUDGMENT_DETAILS_CJES_SA.equals(caseEvent)) {
             updateCamundaVarsSetAside(caseData);
             if (Boolean.TRUE.equals(isLatestHistoricJudgmentRegisteredWithRTL(caseData))) {
