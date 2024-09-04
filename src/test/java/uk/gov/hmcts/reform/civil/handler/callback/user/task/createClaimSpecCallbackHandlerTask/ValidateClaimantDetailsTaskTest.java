@@ -9,7 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask.CalculateSpecFeeTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask.ValidateClaimantDetailsTask;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -29,7 +28,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ValidateClaimantDetailsTaskTest {
@@ -49,7 +47,7 @@ public class ValidateClaimantDetailsTaskTest {
     @Mock
     private PartyValidator partyValidator;
 
-    String EVENT_ID = "Event";
+    String event = "Event";
 
     @BeforeEach
     public void setUp() {
@@ -71,9 +69,8 @@ public class ValidateClaimantDetailsTaskTest {
         given(postcodeValidator.validate(any())).willReturn(List.of());
         given(dateOfBirthValidator.validate(any())).willReturn(List.of());
 
-        // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateClaimantDetailsTask
-            .validateClaimantDetails(caseData, EVENT_ID);
+            .validateClaimantDetails(caseData, event);
 
         // Then
         assertThat(response).isNotNull();
@@ -103,7 +100,9 @@ public class ValidateClaimantDetailsTaskTest {
         errorList.add("This is an error");
 
         // When
-        var response = (AboutToStartOrSubmitCallbackResponse) validateClaimantDetailsTask.validateClaimantDetails(caseData, EVENT_ID);
+        var response = (AboutToStartOrSubmitCallbackResponse) validateClaimantDetailsTask.validateClaimantDetails(caseData,
+                                                                                                                  event
+        );
 
         // Then
         assertThat(response.getErrors()).isNotEmpty();

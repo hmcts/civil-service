@@ -27,64 +27,43 @@ public class CalculateTotalClaimAmountTask {
     }
 
     public CallbackResponse calculateTotalClaimAmount(CaseData caseData) {
-        BigDecimal totalClaimAmount = calculateTotalClaimAmount(caseData.getClaimAmountBreakup());
+        BigDecimal totalClaimAmount = new BigDecimal(0);
 
-        List<String> errors = validateClaimAmount(caseData, totalClaimAmount);
-        if (!errors.isEmpty()) {
-            return buildErrorResponse(errors);
-        }
+        List<ClaimAmountBreakup> claimAmountBreakups = caseData.getClaimAmountBreakup();
 
-        CaseData.CaseDataBuilder caseDataBuilder = updateCaseData(caseData, totalClaimAmount);
+        String totalAmount = " | Description | Amount | \n |---|---| \n | ";
+        StringBuilder stringBuilder = new StringBuilder();
+        for (ClaimAmountBreakup claimAmountBreakup : claimAmountBreakups) {
+            totalClaimAmount =
+                totalClaimAmount.add(claimAmountBreakup.getValue().getClaimAmount());
 
-        String claimAmountSummary = generateClaimAmountSummary(caseData.getClaimAmountBreakup(), totalClaimAmount);
-        caseDataBuilder.claimAmountBreakupSummaryObject(claimAmountSummary);
-
-        return buildSuccessResponse(caseDataBuilder);
-    }
-
-    private BigDecimal calculateTotalClaimAmount(List<ClaimAmountBreakup> claimAmountBreakups) {
-        return claimAmountBreakups.stream()
-            .map(breakup -> breakup.getValue().getClaimAmount())
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
-    private List<String> validateClaimAmount(CaseData caseData, BigDecimal totalClaimAmount) {
-        List<String> errors = new ArrayList<>();
-        if (!featureToggleService.isMultiOrIntermediateTrackEnabled(caseData) &&
-            MonetaryConversions.penniesToPounds(totalClaimAmount).doubleValue() > 25000) {
-            errors.add("Total Claim Amount cannot exceed £ 25,000");
-        }
-        return errors;
-    }
-
-    private CaseData.CaseDataBuilder updateCaseData(CaseData caseData, BigDecimal totalClaimAmount) {
-        return caseData.toBuilder()
-            .totalClaimAmount(MonetaryConversions.penniesToPounds(totalClaimAmount));
-    }
-
-    private String generateClaimAmountSummary(List<ClaimAmountBreakup> claimAmountBreakups, BigDecimal totalClaimAmount) {
-        StringBuilder summaryBuilder = new StringBuilder(" | Description | Amount | \n |---|---| \n ");
-        for (ClaimAmountBreakup breakup : claimAmountBreakups) {
-            summaryBuilder.append(" | ")
-                .append(breakup.getValue().getClaimReason())
-                .append(" | £ ")
-                .append(MonetaryConversions.penniesToPounds(breakup.getValue().getClaimAmount()))
+            stringBuilder.append(claimAmountBreakup.getValue().getClaimReason())
+                .append(" | ")
+                .append("£ ")
+                .append(MonetaryConversions.penniesToPounds(claimAmountBreakup.getValue().getClaimAmount()))
                 .append(" |\n ");
         }
-        summaryBuilder.append(" | **Total** | £ ")
-            .append(MonetaryConversions.penniesToPounds(totalClaimAmount))
-            .append(" | ");
+        totalAmount = totalAmount.concat(stringBuilder.toString());
 
-        return summaryBuilder.toString();
-    }
+        List<String> errors = new ArrayList<>();
+        if (!featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
+            && MonetaryConversions.penniesToPounds(totalClaimAmount).doubleValue() > 25000) {
+            errors.add("Total Claim Amount cannot exceed £ 25,000");
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(errors)
+                .build();
+        }
 
-    private CallbackResponse buildErrorResponse(List<String> errors) {
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
-    }
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
-    private CallbackResponse buildSuccessResponse(CaseData.CaseDataBuilder caseDataBuilder) {
+        caseDataBuilder.totalClaimAmount(
+            MonetaryConversions.penniesToPounds(totalClaimAmount));
+
+        totalAmount = totalAmount.concat(" | **Total** | £ " + MonetaryConversions
+            .penniesToPounds(totalClaimAmount) + " | ");
+
+        caseDataBuilder.claimAmountBreakupSummaryObject(totalAmount);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
