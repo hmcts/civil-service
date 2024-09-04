@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
@@ -50,50 +51,46 @@ public class PopulateRespondent1Copy implements CaseTask {
 
     @Override
     public CallbackResponse execute(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+        var caseData = callbackParams.getCaseData();
         Set<DefendantResponseShowTag> initialShowTags = getInitialShowTags(callbackParams);
-
-        CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder = caseData.toBuilder()
+        var updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1())
             .respondent1ClaimResponseTestForSpec(caseData.getRespondent1ClaimResponseTypeForSpec())
             .respondent2ClaimResponseTestForSpec(caseData.getRespondent2ClaimResponseTypeForSpec())
-            .showConditionFlags(initialShowTags)
-            .showCarmFields(toggleService.isCarmEnabledForCase(caseData) ? YES : NO)
-            .respondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build());
-
-        Optional.ofNullable(caseData.getRespondent2())
-            .ifPresent(r2 -> updatedCaseDataBuilder
-                .respondent2Copy(r2)
-                .respondent2DetailsForClaimDetailsTab(r2.toBuilder().flags(null).build()));
-
-        DynamicList courtLocationList = courtLocationUtils.getLocationsFromList(respondToClaimSpecUtilsCourtLocation.fetchLocationData(callbackParams));
-
-        if (initialShowTags.contains(CAN_ANSWER_RESPONDENT_1)) {
-            updatedCaseDataBuilder.respondent1DQ(buildRespondent1DQ(courtLocationList));
+            .showConditionFlags(initialShowTags);
+        if (toggleService.isCarmEnabledForCase(caseData)) {
+            updatedCaseData.showCarmFields(YES);
+        } else {
+            updatedCaseData.showCarmFields(NO);
         }
 
+        updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build());
+
+        ofNullable(caseData.getRespondent2())
+            .ifPresent(r2 -> updatedCaseData.respondent2Copy(r2)
+                .respondent2DetailsForClaimDetailsTab(r2.toBuilder().flags(null).build())
+            );
+
+        DynamicList courtLocationList = courtLocationUtils.getLocationsFromList(respondToClaimSpecUtilsCourtLocation.fetchLocationData(callbackParams));
+        if (initialShowTags.contains(CAN_ANSWER_RESPONDENT_1)) {
+            updatedCaseData.respondent1DQ(Respondent1DQ.builder()
+                                              .respondToCourtLocation(
+                                                  RequestedCourt.builder()
+                                                      .responseCourtLocations(courtLocationList)
+                                                      .build())
+                                              .build());
+        }
         if (initialShowTags.contains(CAN_ANSWER_RESPONDENT_2)) {
-            updatedCaseDataBuilder.respondent2DQ(buildRespondent2DQ(courtLocationList));
+            updatedCaseData.respondent2DQ(Respondent2DQ.builder()
+                                              .respondToCourtLocation2(
+                                                  RequestedCourt.builder()
+                                                      .responseCourtLocations(courtLocationList)
+                                                      .build())
+                                              .build());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseDataBuilder.build().toMap(objectMapper))
-            .build();
-    }
-
-    private Respondent1DQ buildRespondent1DQ(DynamicList courtLocationList) {
-        return Respondent1DQ.builder()
-            .respondToCourtLocation(RequestedCourt.builder()
-                                        .responseCourtLocations(courtLocationList)
-                                        .build())
-            .build();
-    }
-
-    private Respondent2DQ buildRespondent2DQ(DynamicList courtLocationList) {
-        return Respondent2DQ.builder()
-            .respondToCourtLocation2(RequestedCourt.builder()
-                                         .responseCourtLocations(courtLocationList)
-                                         .build())
+            .data(updatedCaseData.build().toMap(objectMapper))
             .build();
     }
 

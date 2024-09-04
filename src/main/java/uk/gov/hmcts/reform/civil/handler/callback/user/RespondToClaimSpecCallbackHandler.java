@@ -12,12 +12,14 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.HandleDefendAllClaim;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.HandleRespondentResponseTypeForSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.PopulateRespondent1Copy;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.DetermineLoggedInSolicitor;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.HandleAdmitPartOfClaim;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.RespondToClaimSpecResponseTypeHandlerResponseTypes;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.SetGenericResponseTypeFlag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.RespondToClaimSpecValidationUtils;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.SetApplicantResponseDeadline;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.SetUploadTimelineTypeFlag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
@@ -45,12 +47,14 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE_SPEC);
 
     private final RespondToClaimSpecValidationUtils validationUtils;
-    private final RespondToClaimSpecResponseTypeHandlerResponseTypes responseTypeHandlerResponseTypes;
+    private final SetGenericResponseTypeFlag setGenericResponseTypeFlag;
     private final HandleAdmitPartOfClaim handleAdmitPartOfClaim;
     private final HandleDefendAllClaim handleDefendAllClaim;
     private final PopulateRespondent1Copy populateRespondent1Copy;
     private final DetermineLoggedInSolicitor determineLoggedInSolicitor;
     private final SetApplicantResponseDeadline setApplicantResponseDeadline;
+    private final SetUploadTimelineTypeFlag setUploadTimelineTypeFlag;
+    private final HandleRespondentResponseTypeForSpec handleRespondentResponseTypeForSpec;
     private final ObjectMapper objectMapper;
     private final List<RespondToClaimConfirmationTextSpecGenerator> confirmationTextSpecGenerators;
     private final List<RespondToClaimConfirmationHeaderSpecGenerator> confirmationHeaderGenerators;
@@ -62,7 +66,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler {
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return ImmutableMap.<String, Callback>builder()
+        return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::populateRespondent1Copy)
             .put(callbackKey(MID, "validate-mediation-unavailable-dates"), this::validateMediationUnavailableDates)
             .put(callbackKey(MID, "confirm-details"), this::validateDateOfBirth)
@@ -139,7 +143,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse handleRespondentResponseTypeForSpec(CallbackParams callbackParams) {
-        return responseTypeHandlerResponseTypes.handleRespondentResponseTypeForSpec(callbackParams);
+        return handleRespondentResponseTypeForSpec.execute(callbackParams);
     }
 
     private CallbackResponse handleAdmitPartOfClaim(CallbackParams callbackParams) {
@@ -159,11 +163,11 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse setGenericResponseTypeFlag(CallbackParams callbackParams) {
-        return responseTypeHandlerResponseTypes.setGenericResponseTypeFlag(callbackParams);
+        return setGenericResponseTypeFlag.execute(callbackParams);
     }
 
     private CallbackResponse setUploadTimelineTypeFlag(CallbackParams callbackParams) {
-        return responseTypeHandlerResponseTypes.setUploadTimelineTypeFlag(callbackParams);
+        return setUploadTimelineTypeFlag.execute(callbackParams);
     }
 
     private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
