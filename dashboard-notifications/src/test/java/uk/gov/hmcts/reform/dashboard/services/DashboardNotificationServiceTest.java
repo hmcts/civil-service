@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.idam.client.IdamApi;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -85,12 +86,12 @@ public class DashboardNotificationServiceTest {
             List<String> gaCaseIds = new ArrayList<>();
             gaCaseIds.add("123");
             gaCaseIds.add("234");
+            Map<String,List<Notification>> notificationslist = dashboardNotificationService.getAllGaNotifications(gaCaseIds,
+                                                                                                                  "Claimant");
 
-            List<List<Notification>> actual = dashboardNotificationService.getAllGaNotifications(gaCaseIds, "Claimant");
-
-            assertThat(actual.get(0)).isEqualTo(getNotificationList());
-            assertThat(actual.get(1)).isEqualTo(getNotificationList());
-            assertThat(actual.size()).isEqualTo(2);
+            assertThat(notificationslist.get("123")).isEqualTo(getNotificationList());
+            assertThat(notificationslist.get("234")).isEqualTo(getNotificationList());
+            assertThat(notificationslist.size()).isEqualTo(2);
         }
 
         @Test

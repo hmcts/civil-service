@@ -139,10 +139,9 @@ class DashboardControllerTest {
     @Test
     void shouldReturnNotificationsForListOfCaseReferenceAndRole() {
 
-        List<Notification> notifications = getNotificationList();
-        List<List<Notification>> notificationslist = new ArrayList<>();
-        notificationslist.add(getNotificationList());
-        notificationslist.add(getNotificationList());
+        Map<String,List<Notification>> notificationslist = new HashMap<>();
+        notificationslist.put("123", getNotificationList());
+        notificationslist.put("1234", getNotificationList());
 
         String[] gaCaseIds = new String[]{"123", "1234"};
 
@@ -151,7 +150,7 @@ class DashboardControllerTest {
             .thenReturn(notificationslist);
 
         //when
-        ResponseEntity<List<List<Notification>>> output = dashboardController.getNotificationsByGaCaseIdentifiersAndRole(
+        ResponseEntity<Map<String,List<Notification>>> output = dashboardController.getNotificationsByGaCaseIdentifiersAndRole(
             gaCaseIds,
             "Claimant",
             AUTHORISATION
