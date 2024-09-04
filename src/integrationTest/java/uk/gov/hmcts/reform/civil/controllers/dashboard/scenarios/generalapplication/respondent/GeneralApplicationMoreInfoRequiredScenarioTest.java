@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.respondent;
+package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.generalapplication.respondent;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
