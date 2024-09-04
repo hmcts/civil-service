@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.dashboard.services;
 
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -59,10 +61,10 @@ public class DashboardNotificationService {
             .toList();
     }
 
-    public List<List<Notification>> getAllGaNotifications(List<String> ccdCaseIdentifiers, String roleType) {
-        List<List<Notification>> dashboardAllCasesNotificaltions = new ArrayList<>();
-        ccdCaseIdentifiers.stream().forEach(gaCaseId -> dashboardAllCasesNotificaltions.add(getNotifications(gaCaseId, roleType)));
-        return dashboardAllCasesNotificaltions;
+    public Map<String, List<Notification>> getAllGaNotifications(List<String> ccdCaseIdentifiers, String roleType) {
+        Map<String, List<Notification>> gaNotifications = new HashMap<>();
+        ccdCaseIdentifiers.stream().forEach(gaCaseId -> gaNotifications.put(gaCaseId, getNotifications(gaCaseId, roleType)));
+        return gaNotifications;
     }
 
     public DashboardNotificationsEntity saveOrUpdate(DashboardNotificationsEntity notification) {

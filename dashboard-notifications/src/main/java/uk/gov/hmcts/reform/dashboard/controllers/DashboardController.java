@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.dashboard.controllers;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -137,12 +138,12 @@ public class DashboardController {
         @ApiResponse(responseCode = "200", description = "OK"),
         @ApiResponse(responseCode = "401", description = "Not Authorized"),
         @ApiResponse(responseCode = "400", description = "Bad Request")})
-    public ResponseEntity<List<List<Notification>>> getNotificationsByGaCaseIdentifiersAndRole(
+    public ResponseEntity<Map<String, List<Notification>>> getNotificationsByGaCaseIdentifiersAndRole(
         @PathVariable("ccd-case-identifiers") String[] ccdCaseIdentifiers,
         @PathVariable("role-type") String roleType,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {
-        log.info("Get notifications for ccd-case-identifier: {}, role-type : {}", ccdCaseIdentifiers, roleType);
+        log.info("Get notifications for ccd-case-identifiers: {}, role-type : {}", ccdCaseIdentifiers, roleType);
 
         var notificationsResponse = dashboardNotificationService.getAllGaNotifications(List.of(ccdCaseIdentifiers), roleType);
 
