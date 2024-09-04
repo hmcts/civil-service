@@ -48,7 +48,7 @@ class ClaimReconsiderationUpheldClaimantNotificationHandlerTest extends BaseCall
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getNotifyUpdateTemplate()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyClaimReconsiderationLRTemplate()).thenReturn(TEMPLATE_ID);
         }
 
         @Test
@@ -101,9 +101,7 @@ class ClaimReconsiderationUpheldClaimantNotificationHandlerTest extends BaseCall
     @NotNull
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.isApplicantLiP()
-                ? caseData.getCcdCaseReference().toString()
-                : caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIMANT_V_DEFENDANT, getClaimantVDefendant(caseData),
             PARTY_NAME, caseData.getApplicant1().getPartyName()
         );

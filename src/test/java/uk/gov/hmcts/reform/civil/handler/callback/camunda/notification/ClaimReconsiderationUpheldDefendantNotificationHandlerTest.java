@@ -62,7 +62,7 @@ class ClaimReconsiderationUpheldDefendantNotificationHandlerTest extends BaseCal
 
         @Test
         void shouldNotifyDefendantSolicitor_whenInvoked() {
-            when(notificationsProperties.getNotifyUpdateTemplate()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyClaimReconsiderationLRTemplate()).thenReturn(TEMPLATE_ID);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
 
@@ -86,7 +86,7 @@ class ClaimReconsiderationUpheldDefendantNotificationHandlerTest extends BaseCal
 
         @Test
         void shouldNotifyDefendantBothSolicitors_whenInvoked() {
-            when(notificationsProperties.getNotifyUpdateTemplate()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyClaimReconsiderationLRTemplate()).thenReturn(TEMPLATE_ID);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
 
@@ -121,7 +121,7 @@ class ClaimReconsiderationUpheldDefendantNotificationHandlerTest extends BaseCal
 
         @Test
         void shouldNotifyDefendant_whenInvoked() {
-            when(notificationsProperties.getNotifyUpdateTemplate()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyClaimReconsiderationLRTemplate()).thenReturn(TEMPLATE_ID);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
                 .respondent1Represented(NO)
@@ -150,9 +150,7 @@ class ClaimReconsiderationUpheldDefendantNotificationHandlerTest extends BaseCal
     @NotNull
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.isApplicantLiP()
-                ? caseData.getCcdCaseReference().toString()
-                : caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIMANT_V_DEFENDANT, getClaimantVDefendant(caseData),
             PARTY_NAME, caseData.getRespondent1().getPartyName()
         );

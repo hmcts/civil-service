@@ -58,7 +58,7 @@ public class ClaimReconsiderationUpheldClaimantNotificationHandler extends Callb
         if (email != null) {
             notificationService.sendMail(
                 email,
-                getTemplate(isApplicantLip),
+                getTemplate(),
                 addProperties(caseData),
                 getReferenceTemplate(caseData)
             );
@@ -76,9 +76,8 @@ public class ClaimReconsiderationUpheldClaimantNotificationHandler extends Callb
             );
     }
 
-    private String getTemplate(boolean isClaimantLip) {
-        return isClaimantLip ? notificationsProperties.getNotifyUpdateTemplate()
-            : notificationsProperties.getNotifyClaimReconsiderationLRTemplate();
+    private String getTemplate() {
+        return notificationsProperties.getNotifyClaimReconsiderationLRTemplate();
     }
     private String getReferenceTemplate(CaseData caseData) {
         return String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
