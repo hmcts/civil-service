@@ -53,7 +53,6 @@ public class ClaimReconsiderationUpheldClaimantNotificationHandler extends Callb
 
     private CallbackResponse notifyClaimReconsiderationUpheldToClaimant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        boolean isApplicantLip = isApplicantLip(caseData);
         String email = caseData.isApplicantLiP() ? caseData.getApplicant1().getPartyEmail() : caseData.getApplicantSolicitor1UserDetails().getEmail();
         if (email != null) {
             notificationService.sendMail(
@@ -81,9 +80,5 @@ public class ClaimReconsiderationUpheldClaimantNotificationHandler extends Callb
     }
     private String getReferenceTemplate(CaseData caseData) {
         return String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
-    }
-
-    private boolean isApplicantLip(CaseData caseData) {
-        return (YesOrNo.NO.equals(caseData.getApplicant1Represented()));
     }
 }

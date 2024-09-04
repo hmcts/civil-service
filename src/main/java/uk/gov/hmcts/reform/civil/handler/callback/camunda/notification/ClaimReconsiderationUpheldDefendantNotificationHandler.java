@@ -54,7 +54,6 @@ public class ClaimReconsiderationUpheldDefendantNotificationHandler extends Call
 
     private CallbackResponse notifyClaimReconsiderationUpheldToDefendant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        boolean isRespondent1Lip = isRespondent1Lip(caseData);
         if (caseData.getRespondent1() != null && !caseData.getRespondent1().getPartyName().isEmpty()) {
             notificationService.sendMail(
                 caseData.isRespondent1LiP() ? caseData.getRespondent1().getPartyEmail() : caseData.getRespondentSolicitor1EmailAddress(),
@@ -101,7 +100,4 @@ public class ClaimReconsiderationUpheldDefendantNotificationHandler extends Call
         ));
     }
 
-    private boolean isRespondent1Lip(CaseData caseData) {
-        return (YesOrNo.NO.equals(caseData.getRespondent1Represented()));
-    }
 }
