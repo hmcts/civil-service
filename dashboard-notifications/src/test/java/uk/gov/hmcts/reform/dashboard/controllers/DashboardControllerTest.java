@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -133,6 +134,31 @@ class DashboardControllerTest {
 
         //then
         assertThat(output.getBody()).isEqualTo(notifications);
+    }
+
+    @Test
+    void shouldReturnNotificationsForListOfCaseReferenceAndRole() {
+
+        List<Notification> notifications = getNotificationList();
+        List<List<Notification>> notificationslist = new ArrayList<>();
+        notificationslist.add(getNotificationList());
+        notificationslist.add(getNotificationList());
+
+        String[] gaCaseIds = new String[]{"123", "1234"};
+
+        //given
+        when(dashboardNotificationService.getAllGaNotifications(any(), any()))
+            .thenReturn(notificationslist);
+
+        //when
+        ResponseEntity<List<List<Notification>>> output = dashboardController.getNotificationsByGaCaseIdentifiersAndRole(
+            gaCaseIds,
+            "Claimant",
+            AUTHORISATION
+        );
+
+        //then
+        assertThat(output.getBody()).isEqualTo(notificationslist);
     }
 
     @Test

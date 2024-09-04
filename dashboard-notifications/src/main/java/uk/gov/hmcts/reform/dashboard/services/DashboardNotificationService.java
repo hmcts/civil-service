@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.idam.client.IdamApi;
 
 import javax.transaction.Transactional;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -56,6 +57,12 @@ public class DashboardNotificationService {
             .sorted(Comparator.comparing(t -> t.getCreatedAt(), Comparator.reverseOrder()))
             .map(Notification::from)
             .toList();
+    }
+
+    public List<List<Notification>> getAllGaNotifications(List<String> ccdCaseIdentifiers, String roleType) {
+        List<List<Notification>> dashboardAllCasesNotificaltions = new ArrayList<>();
+        ccdCaseIdentifiers.stream().forEach(gaCaseId -> dashboardAllCasesNotificaltions.add(getNotifications(gaCaseId, roleType)));
+        return dashboardAllCasesNotificaltions;
     }
 
     public DashboardNotificationsEntity saveOrUpdate(DashboardNotificationsEntity notification) {
