@@ -60,7 +60,7 @@ public class DashboardNotificationService {
             .toList();
     }
 
-    public Map<String, List<Notification>> getAllGaNotifications(List<String> ccdCaseIdentifiers, String roleType) {
+    public Map<String, List<Notification>> getAllCasesNotifications(List<String> ccdCaseIdentifiers, String roleType) {
         Map<String, List<Notification>> gaNotifications = new HashMap<>();
         ccdCaseIdentifiers.stream().forEach(gaCaseId -> gaNotifications.put(gaCaseId, getNotifications(gaCaseId, roleType)));
         return gaNotifications;

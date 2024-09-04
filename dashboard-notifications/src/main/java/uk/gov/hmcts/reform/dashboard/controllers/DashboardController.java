@@ -132,20 +132,20 @@ public class DashboardController {
     }
 
     @GetMapping(path = {
-        "notifications/ga/{ccd-case-identifiers}/role/{role-type}",
+        "notifications/ids/{ccd-case-identifiers}/role/{role-type}",
     })
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
         @ApiResponse(responseCode = "401", description = "Not Authorized"),
         @ApiResponse(responseCode = "400", description = "Bad Request")})
-    public ResponseEntity<Map<String, List<Notification>>> getNotificationsByGaCaseIdentifiersAndRole(
+    public ResponseEntity<Map<String, List<Notification>>> getNotificationsByIdentifiersAndRole(
         @PathVariable("ccd-case-identifiers") String[] ccdCaseIdentifiers,
         @PathVariable("role-type") String roleType,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {
         log.info("Get notifications for ccd-case-identifiers: {}, role-type : {}", ccdCaseIdentifiers, roleType);
 
-        var notificationsResponse = dashboardNotificationService.getAllGaNotifications(List.of(ccdCaseIdentifiers), roleType);
+        var notificationsResponse = dashboardNotificationService.getAllCasesNotifications(List.of(ccdCaseIdentifiers), roleType);
 
         return new ResponseEntity<>(notificationsResponse, HttpStatus.OK);
     }

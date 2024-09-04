@@ -146,11 +146,11 @@ class DashboardControllerTest {
         String[] gaCaseIds = new String[]{"123", "1234"};
 
         //given
-        when(dashboardNotificationService.getAllGaNotifications(any(), any()))
+        when(dashboardNotificationService.getAllCasesNotifications(any(), any()))
             .thenReturn(notificationslist);
 
         //when
-        ResponseEntity<Map<String,List<Notification>>> output = dashboardController.getNotificationsByGaCaseIdentifiersAndRole(
+        ResponseEntity<Map<String,List<Notification>>> output = dashboardController.getNotificationsByIdentifiersAndRole(
             gaCaseIds,
             "Claimant",
             AUTHORISATION
