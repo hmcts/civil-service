@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -139,7 +138,7 @@ class DashboardControllerTest {
     @Test
     void shouldReturnNotificationsForListOfCaseReferenceAndRole() {
 
-        Map<String,List<Notification>> notificationslist = new HashMap<>();
+        Map<String, List<Notification>> notificationslist = new HashMap<>();
         notificationslist.put("123", getNotificationList());
         notificationslist.put("1234", getNotificationList());
 
@@ -150,7 +149,7 @@ class DashboardControllerTest {
             .thenReturn(notificationslist);
 
         //when
-        ResponseEntity<Map<String,List<Notification>>> output = dashboardController.getNotificationsByIdentifiersAndRole(
+        ResponseEntity<Map<String, List<Notification>>> output = dashboardController.getNotificationsByIdentifiersAndRole(
             gaCaseIds,
             "Claimant",
             AUTHORISATION

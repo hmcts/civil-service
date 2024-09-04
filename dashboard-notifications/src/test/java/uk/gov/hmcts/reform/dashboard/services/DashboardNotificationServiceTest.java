@@ -86,8 +86,8 @@ public class DashboardNotificationServiceTest {
             List<String> gaCaseIds = new ArrayList<>();
             gaCaseIds.add("123");
             gaCaseIds.add("234");
-            Map<String,List<Notification>> notificationslist = dashboardNotificationService.getAllCasesNotifications(gaCaseIds,
-                                                                                                                  "Claimant");
+            Map<String, List<Notification>> notificationslist = dashboardNotificationService
+                .getAllCasesNotifications(gaCaseIds, "Claimant");
 
             assertThat(notificationslist.get("123")).isEqualTo(getNotificationList());
             assertThat(notificationslist.get("234")).isEqualTo(getNotificationList());
