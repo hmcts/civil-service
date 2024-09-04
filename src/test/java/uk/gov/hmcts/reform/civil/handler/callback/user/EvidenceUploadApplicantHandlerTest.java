@@ -941,7 +941,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
                 .documentReferredInStatement(createEvidenceDocs("witness", null, "typeReferred", witnessDate))
                 .documentEvidenceForTrial(createEvidenceDocs(null, null, "typeForTrial", witnessDate))
                 .documentDisclosureList(createEvidenceDocs(null, null, null, null))
-                .documentCaseSummary(createEvidenceDocs(null, null,null, null))
+                .documentCaseSummary(createEvidenceDocs(null, null, null, null))
                 .documentSkeletonArgument(createEvidenceDocs(null, null, null, null))
                 .documentAuthorities(createEvidenceDocs(null, null, null, null))
                 .documentCosts(createEvidenceDocs(null, null, null, null))
