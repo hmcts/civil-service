@@ -567,4 +567,9 @@ public class CmcClaim implements Claim {
     public boolean isDefaultJudgementIssued() {
         return false;
     }
+
+    @Override
+    public boolean isCaseStayed() {
+        return false;
+    }
 }

@@ -442,4 +442,9 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
             && JudgmentState.ISSUED.equals(caseData.getActiveJudgment().getState());
     }
 
+    @Override
+    public boolean isCaseStayed() {
+        return caseData.getCcdState() == CaseState.CASE_STAYED;
+    }
+
 }
