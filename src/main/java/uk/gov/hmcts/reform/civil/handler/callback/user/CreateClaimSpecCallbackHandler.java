@@ -303,6 +303,26 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private CallbackResponse calculateFee(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
+        String reference = references.map(SolicitorReferences::getApplicantSolicitor1Reference).orElse("");
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
+        Optional<PaymentDetails> paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails());
+        String customerReference = paymentDetails.map(PaymentDetails::getCustomerReference).orElse(reference);
+        PaymentDetails updatedDetails = PaymentDetails.builder().customerReference(customerReference).build();
+        caseDataBuilder.claimIssuedPaymentDetails(updatedDetails);
+        caseDataBuilder.paymentTypePBASpec("PBAv3");
+        List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
+
+        caseDataBuilder.claimFee(feesService
+                                     .getFeeDataByClaimValue(caseData.getClaimValue()))
+            .applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
+            .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
         return calculateFeeTask.calculateFees(callbackParams.getCaseData(), callbackParams.getParams().get(BEARER_TOKEN).toString());
     }
 

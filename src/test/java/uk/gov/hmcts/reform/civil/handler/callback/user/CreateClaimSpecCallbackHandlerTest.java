@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -841,7 +840,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetPBAv3SpecFlagOn_whenPBAv3IsActivated() {
             // Given
             given(organisationService.findOrganisation(any())).willReturn(Optional.empty());
-            when(toggleService.isPbaV3Enabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
@@ -2611,7 +2609,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentationAndPBAv3IsOnAndEventIdMissing() {
                 // Given
-                Mockito.when(toggleService.isPbaV3Enabled()).thenReturn(true);
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                     .legacyCaseReference("000MC001")
                     .build();
