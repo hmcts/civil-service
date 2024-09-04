@@ -99,7 +99,7 @@ public class FeatureToggleService {
     }
 
     public boolean isMintiEnabled() {
-        return false;
+        return true;
     }
 
     public boolean isCjesServiceAvailable() {
@@ -120,7 +120,7 @@ public class FeatureToggleService {
     }
 
     public boolean isMultiOrIntermediateTrackEnabled(CaseData caseData) {
-        return false;
+        return true;
     }
 
     public boolean isDashboardEnabledForCase(CaseData caseData) {
