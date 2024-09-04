@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHandlerTask;
+package uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaimspeccallbackhandlertask;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask.SpecValidateClaimInterestDateTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaimspeccallbackhandertask.SpecValidateClaimInterestDateTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.time.LocalDate;

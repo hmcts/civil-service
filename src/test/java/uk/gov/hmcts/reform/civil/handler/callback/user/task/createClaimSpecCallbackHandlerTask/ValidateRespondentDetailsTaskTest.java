@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHandlerTask;
+package uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaimspeccallbackhandlertask;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask.ValidateRespondentDetailsTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaimspeccallbackhandertask.ValidateRespondentDetailsTask;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
