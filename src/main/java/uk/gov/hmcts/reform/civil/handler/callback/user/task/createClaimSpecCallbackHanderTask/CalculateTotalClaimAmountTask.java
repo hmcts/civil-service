@@ -31,17 +31,18 @@ public class CalculateTotalClaimAmountTask {
 
         List<ClaimAmountBreakup> claimAmountBreakups = caseData.getClaimAmountBreakup();
 
-        String totalAmount = " | Description | Amount | \n |---|---| \n | ";
+        String totalAmount = " | Description | Amount | \n |---|---| \n";
         StringBuilder stringBuilder = new StringBuilder();
         for (ClaimAmountBreakup claimAmountBreakup : claimAmountBreakups) {
             totalClaimAmount =
                 totalClaimAmount.add(claimAmountBreakup.getValue().getClaimAmount());
 
-            stringBuilder.append(claimAmountBreakup.getValue().getClaimReason())
+            stringBuilder.append(" | ")
+                .append(claimAmountBreakup.getValue().getClaimReason())
                 .append(" | ")
                 .append("£ ")
                 .append(MonetaryConversions.penniesToPounds(claimAmountBreakup.getValue().getClaimAmount()))
-                .append(" |\n ");
+                .append(" |\n");
         }
         totalAmount = totalAmount.concat(stringBuilder.toString());
 

@@ -45,16 +45,12 @@ public class CalculateSpecFeeTask {
     public CallbackResponse calculateSpecFee(CaseData caseData, String authorizationToken) {
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
-        // Update payment details
         updatePaymentDetails(caseData, caseDataBuilder);
 
-        // Calculate and update claim fee with interest
         calculateAndUpdateClaimFee(caseData, caseDataBuilder);
 
-        // Handle PBA accounts and payment type
         handlePbaAndPaymentType(authorizationToken, caseDataBuilder);
 
-        // Build and return the callback response
         return buildCallbackResponse(caseDataBuilder);
     }
 

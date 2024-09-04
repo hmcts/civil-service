@@ -61,11 +61,11 @@ public class CalculateTotalClaimAmountTaskTest {
             " | Description | Amount | \n" +
             " |---|---| \n" +
             " | Claim 1 | £ 10.00 |\n" +
-            " Claim 2 | £ 20.00 |\n" +
-            "  | **Total** | £ 30.00 | ";
+            " | Claim 2 | £ 20.00 |\n" +
+            " | **Total** | £ 30.00 | ";
 
-        System.out.println(expectedBreakupSummary);
-        System.out.println(actualBreakupSummary);
+        System.out.println("expected \n" + expectedBreakupSummary);
+        System.out.println("actual \n" + actualBreakupSummary);
 
         assertThat(response.getData()).isNotNull();
         assertThat(actualBreakupSummary).isEqualTo(expectedBreakupSummary);

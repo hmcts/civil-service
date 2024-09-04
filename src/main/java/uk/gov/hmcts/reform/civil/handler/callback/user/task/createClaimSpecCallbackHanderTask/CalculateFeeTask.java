@@ -40,19 +40,14 @@ public class CalculateFeeTask {
     public CallbackResponse calculateFees(CaseData caseData, String authorizationToken) {
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
-        // Update payment details
         updatePaymentDetails(caseData, caseDataBuilder);
 
-        // Update payment type based on feature toggle
         updatePaymentType(caseDataBuilder);
 
-        // Retrieve PBA accounts and update case data
         updatePbaAccounts(authorizationToken, caseDataBuilder);
 
-        // Set claim fee based on the claim value
         setClaimFee(caseData, caseDataBuilder);
 
-        // Build and return the response
         return buildCallbackResponse(caseDataBuilder);
     }
 
