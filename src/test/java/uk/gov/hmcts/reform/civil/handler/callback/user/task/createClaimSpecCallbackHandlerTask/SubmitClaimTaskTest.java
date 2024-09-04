@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
-public class SubmitClaimTaskTest {
+class SubmitClaimTaskTest {
 
     @Mock
     private FeatureToggleService featureToggleService;

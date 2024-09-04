@@ -17,7 +17,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-public class SpecValidateClaimTimelineDateTaskTest {
+class SpecValidateClaimTimelineDateTaskTest {
 
     @InjectMocks
     private SpecValidateClaimTimelineDateTask specValidateClaimTimelineDateTask;

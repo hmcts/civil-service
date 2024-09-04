@@ -24,14 +24,12 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @Component
 public class CalculateFeeTask {
 
-    private final FeatureToggleService featureToggleService;
     private final FeesService feesService;
     private final ObjectMapper objectMapper;
     private final OrganisationService organisationService;
 
     @Autowired
     public CalculateFeeTask(FeatureToggleService featureToggleService, FeesService feesService, ObjectMapper objectMapper, OrganisationService organisationService) {
-        this.featureToggleService = featureToggleService;
         this.feesService = feesService;
         this.objectMapper = objectMapper;
         this.organisationService = organisationService;

@@ -27,7 +27,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 public class CalculateSpecFeeTask {
 
     private final InterestCalculator interestCalculator;
-    private final FeatureToggleService featureToggleService;
     private final FeesService feesService;
     private final ObjectMapper objectMapper;
     private final OrganisationService organisationService;
@@ -36,14 +35,13 @@ public class CalculateSpecFeeTask {
     public CalculateSpecFeeTask(InterestCalculator interestCalculator, FeatureToggleService featureToggleService,
                                 FeesService feesService, ObjectMapper objectMapper, OrganisationService organisationService) {
         this.interestCalculator = interestCalculator;
-        this.featureToggleService = featureToggleService;
         this.feesService = feesService;
         this.objectMapper = objectMapper;
         this.organisationService = organisationService;
     }
 
     public CallbackResponse calculateSpecFee(CaseData caseData, String authorizationToken) {
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         updatePaymentDetails(caseData, caseDataBuilder);
 
@@ -54,7 +52,7 @@ public class CalculateSpecFeeTask {
         return buildCallbackResponse(caseDataBuilder);
     }
 
-    private void updatePaymentDetails(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
+    private void updatePaymentDetails(CaseData caseData, CaseData.CaseDataBuilder<?,?> caseDataBuilder) {
         String solicitorReference = getSolicitorReference(caseData);
         String customerReference = getCustomerReference(caseData, solicitorReference);
 
@@ -74,7 +72,7 @@ public class CalculateSpecFeeTask {
             .orElse(solicitorReference);
     }
 
-    private void calculateAndUpdateClaimFee(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
+    private void calculateAndUpdateClaimFee(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         BigDecimal totalClaimAmountWithInterest = caseData.getTotalClaimAmount().add(interest);
 
@@ -82,7 +80,7 @@ public class CalculateSpecFeeTask {
             .totalInterest(interest);
     }
 
-    private void handlePbaAndPaymentType(String authorizationToken, CaseData.CaseDataBuilder caseDataBuilder) {
+    private void handlePbaAndPaymentType(String authorizationToken, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         caseDataBuilder.paymentTypePBASpec("PBAv3");
 
         List<String> pbaNumbers = getPbaAccounts(authorizationToken);
@@ -90,7 +88,7 @@ public class CalculateSpecFeeTask {
             .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
     }
 
-    private CallbackResponse buildCallbackResponse(CaseData.CaseDataBuilder caseDataBuilder) {
+    private CallbackResponse buildCallbackResponse(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();

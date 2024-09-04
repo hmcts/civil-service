@@ -31,7 +31,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class ValidateRespondentDetailsTaskTest extends BaseCallbackHandlerTest {
+class ValidateRespondentDetailsTaskTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
     private ValidateRespondentDetailsTask validateRespondentDetailsTask;

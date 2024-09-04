@@ -23,7 +23,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class GetAirlineListTaskTest extends BaseCallbackHandlerTest {
+class GetAirlineListTaskTest extends BaseCallbackHandlerTest {
 
     @Mock
     private FeatureToggleService featureToggleService;

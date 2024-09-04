@@ -14,7 +14,7 @@ import java.time.LocalDate;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-public class SpecValidateClaimInterestDateTest extends BaseCallbackHandlerTest {
+class SpecValidateClaimInterestDateTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
     private SpecValidateClaimInterestDateTask specValidateClaimInterestDateTask;
