@@ -1202,8 +1202,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsEntry("claimAmountBreakupSummaryObject", " | Description | Amount | \n" +
                     " |---|---| \n" +
                     " | Test reason1 | £ 10.00 |\n" +
-                    " Test reason2 | £ 20.00 |\n" +
-                    "  | **Total** | £ 30.00 | ");
+                    " | Test reason2 | £ 20.00 |\n" +
+                    " | **Total** | £ 30.00 | ");
         }
 
         @Test
