@@ -58,7 +58,6 @@ public class ValidateClaimantDetailsTaskTest {
 
     @Test
     void shouldReturnNoErrors_whenClaimant1AddressValid() {
-        // Given
         Party applicant1 = PartyBuilder.builder().company().build();
         applicant1.setPrimaryAddress(Address.builder().addressLine1("Address line 1").build());
 
@@ -72,7 +71,6 @@ public class ValidateClaimantDetailsTaskTest {
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateClaimantDetailsTask
             .validateClaimantDetails(caseData, event);
 
-        // Then
         assertThat(response).isNotNull();
         assertThat(response.getData()).isNotNull();
         assertEquals(0, response.getErrors().size());
@@ -80,15 +78,14 @@ public class ValidateClaimantDetailsTaskTest {
 
     @Test
     void shouldReturnErrors_whenClaimant1AddressNotValid() {
-        // Given
         Party applicant1 = Party.builder().type(Type.ORGANISATION)
             .primaryAddress(Address.builder()
                                 .addressLine1("Line 1 test again for more than 35 characters")
-                                .addressLine2("Line 1 test again for more than 35 characters")
-                                .addressLine3("Line 1 test again for more than 35 characters")
-                                .county("Line 1 test again for more than 35 characters")
+                                .addressLine2("Line 2 test again for more than 35 characters")
+                                .addressLine3("Line 3 test again for more than 35 characters")
+                                .county("County line test again for more than 35 characters")
                                 .postCode("PostCode test more than 8 characters")
-                                .postTown("Line 1 test again for more than 35 characters").build())
+                                .postTown("Post town line test again for more than 35 characters").build())
             .build();
 
         validateClaimantDetailsTask.setGetApplicant(CaseData::getApplicant1);
@@ -100,12 +97,10 @@ public class ValidateClaimantDetailsTaskTest {
         given(postcodeValidator.validate(any())).willReturn(errorList);
         errorList.add("This is an error");
 
-        // When
         var response = (AboutToStartOrSubmitCallbackResponse) validateClaimantDetailsTask.validateClaimantDetails(caseData,
                                                                                                                   event
         );
 
-        // Then
         assertThat(response.getErrors()).isNotEmpty();
         assertThat(response.getErrors()).hasSize(1);
     }

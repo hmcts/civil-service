@@ -24,33 +24,27 @@ public class SpecValidateClaimTimelineDateTaskTest {
 
     @Test
     void shouldValidateClaimTimelineDate_whenPopulated() {
-        // Given
         List<TimelineOfEvents> timelineOfEvents = new ArrayList<>();
         timelineOfEvents.add(
             TimelineOfEvents.builder().value(TimelineOfEventDetails.builder().timelineDate(LocalDate.now().minusDays(1)).build()).build());
         CaseData caseData = CaseData.builder().timelineOfEvents(timelineOfEvents)
             .build();
 
-        // When
         var response = (AboutToStartOrSubmitCallbackResponse) specValidateClaimTimelineDateTask.specValidateClaimTimelineDateTask(caseData);
 
-        // Then
         assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
     void shouldReturnErrorWhenTimelineDatePopulatedWithFutureDate() {
-        // Given
         List<TimelineOfEvents> timelineOfEvents = new ArrayList<>();
         timelineOfEvents.add(
             TimelineOfEvents.builder().value(TimelineOfEventDetails.builder().timelineDate(LocalDate.now().plusDays(1)).build()).build());
         CaseData caseData = CaseData.builder().timelineOfEvents(timelineOfEvents)
             .build();
 
-        // When
         var response = (AboutToStartOrSubmitCallbackResponse) specValidateClaimTimelineDateTask.specValidateClaimTimelineDateTask(caseData);
 
-        // Then
         assertThat(response.getErrors()).contains("Correct the date. You can’t use a future date.");
     }
 }

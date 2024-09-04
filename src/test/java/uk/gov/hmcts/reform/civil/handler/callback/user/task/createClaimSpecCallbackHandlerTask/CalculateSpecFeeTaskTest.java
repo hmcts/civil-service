@@ -27,10 +27,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
-//pass
 @ExtendWith(MockitoExtension.class)
 public class CalculateSpecFeeTaskTest extends BaseCallbackHandlerTest {
 
@@ -57,7 +57,6 @@ public class CalculateSpecFeeTaskTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldCalculateSpecFee_whenPopulated() {
-        // Given
         List<TimelineOfEvents> timelineOfEvents = new ArrayList<>();
         timelineOfEvents.add(
             TimelineOfEvents.builder().value(TimelineOfEventDetails.builder().timelineDate(LocalDate.now().minusDays(1)).build()).build());
@@ -69,11 +68,8 @@ public class CalculateSpecFeeTaskTest extends BaseCallbackHandlerTest {
             .totalClaimAmount(new BigDecimal(1000))
             .build();
         when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
-        // When
         var response = (AboutToStartOrSubmitCallbackResponse) calculateSpecFeeTask.calculateSpecFee(caseData, authTokenGenerator);
 
-        // Then
         assertThat(response.getData()).containsEntry("applicantSolicitor1PbaAccountsIsEmpty", "Yes");
     }
-
 }

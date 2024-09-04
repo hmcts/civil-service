@@ -43,22 +43,12 @@ class CalculateFeeTaskTest extends BaseCallbackHandlerTest {
     @Mock
     private OrganisationService organisationService;
 
-    private ObjectMapper objectMapper;
-
     @InjectMocks
     private CalculateFeeTask calculateFeeTask;
 
-    private final Fee feeData = Fee.builder()
-        .code("CODE")
-        .calculatedAmountInPence(BigDecimal.valueOf(100))
-        .build();
-    private final Organisation organisation = Organisation.builder()
-        .paymentAccount(List.of("12345", "98765"))
-        .build();
-
     @BeforeEach
     public void setUp() {
-        objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         calculateFeeTask = new CalculateFeeTask(featureToggleService, feesService, objectMapper, organisationService);
     }
@@ -76,10 +66,8 @@ class CalculateFeeTaskTest extends BaseCallbackHandlerTest {
         given(feesService.getFeeDataByClaimValue(any())).willReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(1000L)).build());
         given(organisationService.findOrganisation(any())).willReturn(Optional.of(Organisation.builder().paymentAccount(pbaAccounts).build()));
 
-        // When
         CallbackResponse response = calculateFeeTask.calculateFees(caseData, "authToken");
 
-        // Then
         assertThat(response).isNotNull();
         Map<String, Object> responseData = ((AboutToStartOrSubmitCallbackResponse) response).getData();
         assertThat(responseData.get("claimFee")).isNotNull();
@@ -88,7 +76,6 @@ class CalculateFeeTaskTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldCalculateFeesSuccessfullyWithoutPbaAccounts() {
-        // Given
         CaseData caseData = CaseData.builder()
             .claimValue(ClaimValue.builder().statementOfValueInPennies(BigDecimal.valueOf(10000L)).build())
             .build();
@@ -96,10 +83,8 @@ class CalculateFeeTaskTest extends BaseCallbackHandlerTest {
         given(feesService.getFeeDataByClaimValue(any())).willReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(1000L)).build());
         given(organisationService.findOrganisation(any())).willReturn(Optional.empty());
 
-        // When
         CallbackResponse response = calculateFeeTask.calculateFees(caseData, "authToken");
 
-        // Then
         Map<String, Object> responseData = ((AboutToStartOrSubmitCallbackResponse) response).getData();
         assertThat(responseData.get("claimFee")).isNotNull();
         assertThat(responseData.get("applicantSolicitor1PbaAccounts")).isNotNull();
@@ -107,7 +92,6 @@ class CalculateFeeTaskTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldHandleMissingSolicitorReferences() {
-        // Given
         CaseData caseData = CaseData.builder()
             .claimValue(ClaimValue.builder().statementOfValueInPennies(BigDecimal.valueOf(10000L)).build())
             .build();
@@ -116,10 +100,8 @@ class CalculateFeeTaskTest extends BaseCallbackHandlerTest {
         given(feesService.getFeeDataByClaimValue(any())).willReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(1000L)).build());
         given(organisationService.findOrganisation(any())).willReturn(Optional.of(Organisation.builder().paymentAccount(pbaAccounts).build()));
 
-        // When
         CallbackResponse response = calculateFeeTask.calculateFees(caseData, "authToken");
 
-        // Then
         assertThat(response).isNotNull();
         Map<String, Object> responseData = ((AboutToStartOrSubmitCallbackResponse) response).getData();
         assertThat(responseData.get("claimFee")).isNotNull();
@@ -128,16 +110,13 @@ class CalculateFeeTaskTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldHandleNullClaimValue() {
-        // Given
         CaseData caseData = CaseData.builder().build();
 
         given(feesService.getFeeDataByClaimValue(any())).willReturn(Fee.builder().calculatedAmountInPence(BigDecimal.ZERO).build());
         given(organisationService.findOrganisation(any())).willReturn(Optional.empty());
 
-        // When
         CallbackResponse response = calculateFeeTask.calculateFees(caseData, "authToken");
 
-        // Then
         Map<String, Object> responseData = ((AboutToStartOrSubmitCallbackResponse) response).getData();
         assertThat(responseData.get("claimFee")).isNotNull();
         assertThat(responseData.get("claimFee").toString()).contains("calculatedAmountInPence=0");

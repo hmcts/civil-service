@@ -37,7 +37,6 @@ public class CalculateTotalClaimAmountTaskTest {
 
     @Test
     void shouldCalculateTotalClaimAmountSuccessfully() {
-        // Given
         List<ClaimAmountBreakup> claimAmountBreakup = new ArrayList<>();
         claimAmountBreakup.add(ClaimAmountBreakup.builder()
                                    .value(ClaimAmountBreakupDetails.builder()
@@ -53,20 +52,20 @@ public class CalculateTotalClaimAmountTaskTest {
 
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
 
-        // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse)
             calculateTotalClaimAmountTask.calculateTotalClaimAmount(caseData);
 
-        // Get actual data from response and cast to String
         String actualBreakupSummary = (String) response.getData().get("claimAmountBreakupSummaryObject");
 
-        // Expected values
         String expectedBreakupSummary =
             " | Description | Amount | \n" +
             " |---|---| \n" +
             " | Claim 1 | £ 10.00 |\n" +
             " Claim 2 | £ 20.00 |\n" +
             "  | **Total** | £ 30.00 | ";
+
+        System.out.println(expectedBreakupSummary);
+        System.out.println(actualBreakupSummary);
 
         assertThat(response.getData()).isNotNull();
         assertThat(actualBreakupSummary).isEqualTo(expectedBreakupSummary);

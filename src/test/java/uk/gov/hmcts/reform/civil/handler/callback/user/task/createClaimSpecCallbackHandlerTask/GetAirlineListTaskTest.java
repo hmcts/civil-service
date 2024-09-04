@@ -41,7 +41,6 @@ public class GetAirlineListTaskTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldGetAirlineList_whenRequired() {
-        // Given
         List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>();
         airlineEpimsIDList.add(AirlineEpimsId.builder().airline("BA/Cityflyer").epimsID("111000").build());
         airlineEpimsIDList.add(AirlineEpimsId.builder().airline("OTHER").epimsID("111111").build());
@@ -51,11 +50,9 @@ public class GetAirlineListTaskTest extends BaseCallbackHandlerTest {
 
         CaseData caseData = CaseData.builder().build();
 
-        // When
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) getAirlineListTask.getAirlineList(caseData);
 
-        // Then
         assertThat(response.getData()).extracting("flightDelayDetails").extracting("airlineList")
             .extracting("list_items").asList().extracting("label")
             .contains("BA/Cityflyer");

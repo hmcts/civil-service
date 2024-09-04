@@ -84,7 +84,6 @@ public class SubmitClaimTaskTest {
 
     @Test
     void shouldSubmitClaimSuccessfully() {
-        // Given
         CaseData caseData = CaseData.builder()
             .totalClaimAmount(new BigDecimal("1000"))
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("test@gmail.com").build())
@@ -96,7 +95,6 @@ public class SubmitClaimTaskTest {
 
         FlightDelayDetails flightDelayDetails = FlightDelayDetails.builder().build();
 
-        // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) submitClaimTask.submitClaim(
             caseData,
             "eventId",
@@ -105,7 +103,6 @@ public class SubmitClaimTaskTest {
             flightDelayDetails
         );
 
-        // Then
         assertThat(response.getData()).isNotNull();
         assertThat(response.getErrors()).isEmpty();
     }

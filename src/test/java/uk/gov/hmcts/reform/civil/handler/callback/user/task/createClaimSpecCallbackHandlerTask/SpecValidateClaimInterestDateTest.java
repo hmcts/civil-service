@@ -21,33 +21,27 @@ public class SpecValidateClaimInterestDateTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldReturnErrorForFutureInterestDate() {
-        // Given
         LocalDate futureDate = LocalDate.now().plusDays(1);
         CaseData caseData = CaseData.builder()
             .interestFromSpecificDate(futureDate)
             .build();
 
-        // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) specValidateClaimInterestDateTask
             .specValidateClaimInterestDate(caseData, "CREATE_CLAIM_SPEC");
 
-        // Then
         assertThat(response.getErrors()).contains("Correct the date. You can’t use a future date.");
     }
 
     @Test
     void shouldNotReturnErrorForPastOrTodayInterestDate() {
-        // Given
         LocalDate pastDate = LocalDate.now().minusDays(1);
         CaseData caseData = CaseData.builder()
             .interestFromSpecificDate(pastDate)
             .build();
 
-        // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) specValidateClaimInterestDateTask
             .specValidateClaimInterestDate(caseData, "CREATE_CLAIM_SPEC");
 
-        // Then
         assertThat(response.getErrors()).isEmpty();
     }
 
