@@ -17,20 +17,23 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask.CalculateFeeTask;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask.CalculateSpecFeeTask;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask.CalculateTotalClaimAmountTask;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask.GetAirlineListTask;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask.SpecValidateClaimInterestDateTask;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask.SpecValidateClaimTimelineDateTask;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask.SubmitClaimTask;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask.ValidateClaimantDetailsTask;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.createClaimSpecCallbackHanderTask.ValidateRespondentDetailsTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaimspeccallbackhandertask.CalculateFeeTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaimspeccallbackhandertask.CalculateSpecFeeTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaimspeccallbackhandertask.CalculateTotalClaimAmountTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaimspeccallbackhandertask.GetAirlineListTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaimspeccallbackhandertask.SpecValidateClaimInterestDateTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaimspeccallbackhandertask.SpecValidateClaimTimelineDateTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaimspeccallbackhandertask.SubmitClaimTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaimspeccallbackhandertask.ValidateClaimantDetailsTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaimspeccallbackhandertask.ValidateRespondentDetailsTask;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.AirlineEpimsDataLoader;
@@ -61,9 +64,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -303,27 +308,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private CallbackResponse calculateFee(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
-        String reference = references.map(SolicitorReferences::getApplicantSolicitor1Reference).orElse("");
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-
-        Optional<PaymentDetails> paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails());
-        String customerReference = paymentDetails.map(PaymentDetails::getCustomerReference).orElse(reference);
-        PaymentDetails updatedDetails = PaymentDetails.builder().customerReference(customerReference).build();
-        caseDataBuilder.claimIssuedPaymentDetails(updatedDetails);
-        caseDataBuilder.paymentTypePBASpec("PBAv3");
-        List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
-
-        caseDataBuilder.claimFee(feesService
-                                     .getFeeDataByClaimValue(caseData.getClaimValue()))
-            .applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
-            .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
-        return calculateFeeTask.calculateFees(callbackParams.getCaseData(), callbackParams.getParams().get(BEARER_TOKEN).toString());
+        return calculateFeeTask.calculateFees(
+            callbackParams.getCaseData(),
+            callbackParams.getParams().get(BEARER_TOKEN).toString()
+        );
     }
 
     private CallbackResponse getIdamEmail(CallbackParams callbackParams) {
