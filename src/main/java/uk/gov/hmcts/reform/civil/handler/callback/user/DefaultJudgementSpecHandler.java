@@ -444,7 +444,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
             caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_SPEC));
         }
-       if (featureToggleService.isJudgmentOnlineLive()) {
+        if (featureToggleService.isJudgmentOnlineLive()) {
             caseDataBuilder.activeJudgment(djOnlineMapper.addUpdateActiveJudgment(caseData));
             caseDataBuilder.joIsLiveJudgmentExists(YesOrNo.YES);
         }
