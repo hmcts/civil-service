@@ -62,12 +62,12 @@ public class ValidateClaimantDetailsTaskTest {
         Party applicant1 = PartyBuilder.builder().company().build();
         applicant1.setPrimaryAddress(Address.builder().addressLine1("Address line 1").build());
 
-        CaseData caseData = CaseData.builder().applicant1(applicant1).build();
-
         validateClaimantDetailsTask.setGetApplicant(CaseData::getApplicant1);
 
         given(postcodeValidator.validate(any())).willReturn(List.of());
         given(dateOfBirthValidator.validate(any())).willReturn(List.of());
+
+        CaseData caseData = CaseData.builder().applicant1(applicant1).build();
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateClaimantDetailsTask
             .validateClaimantDetails(caseData, event);
@@ -90,10 +90,11 @@ public class ValidateClaimantDetailsTaskTest {
                                 .postCode("PostCode test more than 8 characters")
                                 .postTown("Line 1 test again for more than 35 characters").build())
             .build();
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-            .applicant1(applicant1).build();
 
         validateClaimantDetailsTask.setGetApplicant(CaseData::getApplicant1);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+            .applicant1(applicant1).build();
 
         List<String> errorList = new ArrayList<>();
         given(postcodeValidator.validate(any())).willReturn(errorList);

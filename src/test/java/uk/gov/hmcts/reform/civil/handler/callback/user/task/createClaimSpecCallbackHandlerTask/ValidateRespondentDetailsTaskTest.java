@@ -59,12 +59,11 @@ public class ValidateRespondentDetailsTaskTest extends BaseCallbackHandlerTest {
         Party respondent1 = PartyBuilder.builder().company().build();
         respondent1.setPrimaryAddress(Address.builder().addressLine1("Address line 1").build());
 
-        CaseData caseData = CaseData.builder().respondent1(respondent1).build();
-
         List<String> errorList = List.of();
         given(postcodeValidator.validate(any())).willReturn(errorList);
         given(partyValidator.validateAddress(respondent1.getPrimaryAddress(), errorList)).willReturn(errorList);
 
+        CaseData caseData = CaseData.builder().respondent1(respondent1).build();
         validateRespondentDetailsTask.setGetRespondent(CaseData::getRespondent1);
 
         // When
@@ -89,15 +88,16 @@ public class ValidateRespondentDetailsTaskTest extends BaseCallbackHandlerTest {
                                 .postCode("PostCode test more than 8 characters")
                                 .postTown("Line 1 test again for more than 35 characters").build())
             .build();
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-            .respondent1(respondent1).build();
 
         validateRespondentDetailsTask.setGetRespondent(CaseData::getRespondent1);
 
         List<String> errorList = new ArrayList<>();
+        given(partyValidator.validateAddress(respondent1.getPrimaryAddress(), errorList)).willReturn(errorList);
         given(postcodeValidator.validate(any())).willReturn(errorList);
         errorList.add("This is an error");
-        given(partyValidator.validateAddress(respondent1.getPrimaryAddress(), errorList)).willReturn(errorList);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+            .respondent1(respondent1).build();
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) validateRespondentDetailsTask.validateRespondentDetails(caseData);

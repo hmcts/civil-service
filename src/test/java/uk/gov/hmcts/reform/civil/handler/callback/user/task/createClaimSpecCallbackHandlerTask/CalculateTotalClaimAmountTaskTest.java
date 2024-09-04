@@ -71,6 +71,4 @@ public class CalculateTotalClaimAmountTaskTest {
         assertThat(response.getData()).isNotNull();
         assertThat(actualBreakupSummary).isEqualTo(expectedBreakupSummary);
     }
-
-
 }
