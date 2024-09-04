@@ -52,7 +52,7 @@ public class CalculateSpecFeeTask {
         return buildCallbackResponse(caseDataBuilder);
     }
 
-    private void updatePaymentDetails(CaseData caseData, CaseData.CaseDataBuilder<?,?> caseDataBuilder) {
+    private void updatePaymentDetails(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         String solicitorReference = getSolicitorReference(caseData);
         String customerReference = getCustomerReference(caseData, solicitorReference);
 
