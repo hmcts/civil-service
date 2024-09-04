@@ -5,7 +5,7 @@ import lombok.Getter;
 import java.util.function.Predicate;
 
 /**
- * Using DashboardClaimStatusFactory means the order of the values of this enum reflect priority
+ * Using DashboardClaimStatusFactory means the order of the values of this enum reflect priority.
  */
 public enum DashboardClaimStatus {
 
