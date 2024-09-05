@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
@@ -47,6 +48,7 @@ import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 
 @ExtendWith(MockitoExtension.class)
 class CoreCaseDataServiceTest {
@@ -90,6 +92,7 @@ class CoreCaseDataServiceTest {
     @Nested
     class TriggerEvent {
 
+        private static final String UPDATE_CASE_DATA_EVENT = "UPDATE_CASE_DATA";
         private static final String EVENT_ID = "DISMISS_CLAIM";
         private static final String JURISDICTION = "CIVIL";
         private static final String EVENT_TOKEN = "eventToken";
@@ -107,11 +110,6 @@ class CoreCaseDataServiceTest {
             when(userService.getUserInfo(USER_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
             when(authTokenGenerator.generate()).thenReturn(SERVICE_AUTH_TOKEN);
             when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword())).thenReturn(USER_AUTH_TOKEN);
-
-            when(coreCaseDataApi.startEventForCaseWorker(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, USER_ID, JURISDICTION,
-                                                         CASE_TYPE, CASE_ID, EVENT_ID
-            )).thenReturn(buildStartEventResponse());
-
             when(coreCaseDataApi.submitEventForCaseWorker(
                      eq(USER_AUTH_TOKEN),
                      eq(SERVICE_AUTH_TOKEN),
@@ -127,6 +125,9 @@ class CoreCaseDataServiceTest {
 
         @Test
         void shouldStartAndSubmitEvent_WhenCalled() {
+            when(coreCaseDataApi.startEventForCaseWorker(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, USER_ID, JURISDICTION,
+                                                         CASE_TYPE, CASE_ID, EVENT_ID
+            )).thenReturn(buildStartEventResponse());
             service.triggerEvent(Long.valueOf(CASE_ID), CaseEvent.valueOf(EVENT_ID));
 
             verify(coreCaseDataApi).startEventForCaseWorker(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, USER_ID,
@@ -145,7 +146,38 @@ class CoreCaseDataServiceTest {
         }
 
         @Test
+        void shouldSetEventSummaryAndDescriptionWhenRespondent1FlagUpdates_WhenCalled() {
+            when(coreCaseDataApi.startEventForCaseWorker(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, USER_ID, JURISDICTION,
+                                                         CASE_TYPE, CASE_ID, UPDATE_CASE_DATA_EVENT
+            )).thenReturn(buildStartUpdateEventResponse());
+            CaseData caseData1 = CaseDataBuilder.builder()
+                .respondent1(Party.builder().individualFirstName("First").individualLastName("Last").partyName("First Last").type(INDIVIDUAL).build())
+                .buildClaimIssuedPaymentCaseData();
+            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseData1);
+
+            service.updateCaseFlagEvent(Long.valueOf(CASE_ID), CaseEvent.valueOf(UPDATE_CASE_DATA_EVENT), "Summary", "Desc");
+
+            verify(coreCaseDataApi).startEventForCaseWorker(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, USER_ID,
+                                                            JURISDICTION, CASE_TYPE, CASE_ID, UPDATE_CASE_DATA_EVENT
+            );
+
+            verify(coreCaseDataApi).submitEventForCaseWorker(
+                eq(USER_AUTH_TOKEN),
+                eq(SERVICE_AUTH_TOKEN),
+                eq(USER_ID),
+                eq(JURISDICTION),
+                eq(CASE_TYPE),
+                eq(CASE_ID),
+                anyBoolean(),
+                any(CaseDataContent.class)
+            );
+        }
+
+        @Test
         void shouldSetEventSummaryAndDescription_WhenCalled() {
+            when(coreCaseDataApi.startEventForCaseWorker(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, USER_ID, JURISDICTION,
+                                                         CASE_TYPE, CASE_ID, EVENT_ID
+            )).thenReturn(buildStartEventResponse());
             service.triggerEvent(Long.valueOf(CASE_ID), CaseEvent.valueOf(EVENT_ID), Map.of(), "Summary", "Desc");
 
             verify(coreCaseDataApi).startEventForCaseWorker(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, USER_ID,
@@ -175,6 +207,14 @@ class CoreCaseDataServiceTest {
         private StartEventResponse buildStartEventResponse() {
             return StartEventResponse.builder()
                 .eventId(EVENT_ID)
+                .token(EVENT_TOKEN)
+                .caseDetails(caseDetails)
+                .build();
+        }
+
+        private StartEventResponse buildStartUpdateEventResponse() {
+            return StartEventResponse.builder()
+                .eventId(UPDATE_CASE_DATA_EVENT)
                 .token(EVENT_TOKEN)
                 .caseDetails(caseDetails)
                 .build();

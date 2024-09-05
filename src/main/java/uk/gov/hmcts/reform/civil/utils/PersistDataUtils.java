@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
+
 import static java.util.Optional.ofNullable;
 
 public class PersistDataUtils {
@@ -109,5 +111,12 @@ public class PersistDataUtils {
             caseData.getRespondent2().setPrimaryAddress(oldCaseData.getRespondent2().getPrimaryAddress());
         }
         return caseData;
+    }
+
+    public static void persistFlagsForRespondent1(Flags flag, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+        var updatedRespondent1 = caseData.getRespondent1().toBuilder()
+            .flags(flag)
+            .build();
+        builder.respondent1(updatedRespondent1);
     }
 }

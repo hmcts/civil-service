@@ -11,12 +11,14 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -28,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.GENERALAPPLICATION_CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
 import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataContentFromStartEventResponse;
+import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForRespondent1;
 
 @Service
 @Slf4j
@@ -42,6 +45,7 @@ public class CoreCaseDataService {
     private final CaseDetailsConverter caseDetailsConverter;
     private final UserService userService;
     private final FeatureToggleService featureToggleService;
+    private final CoreCaseEventDataService coreCaseEventDataService;
 
     public void triggerEvent(Long caseId, CaseEvent eventName) {
         triggerEvent(caseId, eventName, Map.of());
@@ -56,6 +60,29 @@ public class CoreCaseDataService {
                              String eventSummary, String eventDescription) {
         StartEventResponse startEventResponse = startUpdate(caseId.toString(), eventName);
         CaseDataContent caseDataContent = caseDataContentFromStartEventResponse(startEventResponse, contentModified);
+        caseDataContent.getEvent().setSummary(eventSummary);
+        caseDataContent.getEvent().setDescription(eventDescription);
+
+        submitUpdate(caseId.toString(), caseDataContent);
+    }
+
+    public void updateCaseFlagEvent(Long caseId, CaseEvent eventName,
+                                    String eventSummary, String eventDescription) {
+        StartEventResponse startEventResponse = startUpdate(caseId.toString(), eventName);
+
+        CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        // persist party flags (ccd issue)
+        if (caseData.getRespondent1().getFlags() == null) {
+            Flags flag =  Flags.builder().partyName(caseData.getRespondent1().getPartyName()).roleOnCase("Defendant 1").build();
+            persistFlagsForRespondent1(flag, caseData, caseDataBuilder);
+        }
+
+        CaseData updatedCaseData = caseDataBuilder.build();
+        CaseDataContent caseDataContent = CaseDataContent.builder().eventToken(startEventResponse.getToken())
+            .event(Event.builder().id(startEventResponse.getEventId()).build())
+            .data(updatedCaseData.toMap(mapper)).build();
         caseDataContent.getEvent().setSummary(eventSummary);
         caseDataContent.getEvent().setDescription(eventDescription);
 

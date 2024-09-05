@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
@@ -29,7 +30,7 @@ class PersistDataUtilsTest {
             .withRespondent1Flags()
             .withRespondent2Flags().build();
 
-        CaseData.CaseDataBuilder builder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
         PersistDataUtils.persistFlagsForParties(oldCaseData, caseData, builder);
         CaseData results = builder.build();
@@ -57,7 +58,7 @@ class PersistDataUtilsTest {
             .withRespondent1Flags()
             .build();
 
-        CaseData.CaseDataBuilder builder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
         PersistDataUtils.persistFlagsForParties(oldCaseData, caseData, builder);
         CaseData results = builder.build();
@@ -85,7 +86,7 @@ class PersistDataUtilsTest {
             .withRespondent1LitigationFriendFlags()
             .withRespondent2LitigationFriendFlags().build();
 
-        CaseData.CaseDataBuilder builder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
         PersistDataUtils.persistFlagsForLitigationFriendParties(oldCaseData, caseData, builder);
         CaseData results = builder.build();
@@ -124,5 +125,20 @@ class PersistDataUtilsTest {
         assertThat(results.getApplicant2().getPrimaryAddress()).isEqualTo(expectedAddress);
         assertThat(results.getRespondent1().getPrimaryAddress()).isEqualTo(expectedAddress);
         assertThat(results.getRespondent2().getPrimaryAddress()).isEqualTo(expectedAddress);
+    }
+
+    @Test
+    void shouldCopyRespondent1() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).build())
+            .build();
+
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        Flags flag =  Flags.builder().partyName(caseData.getRespondent1().getPartyName()).roleOnCase("Defendant 1").build();
+        PersistDataUtils.persistFlagsForRespondent1(flag, caseData, builder);
+        CaseData results = builder.build();
+
+        assertThat(results.getRespondent1().getFlags()).isNotNull();
+        assertThat(results.getRespondent1().getFlags().getRoleOnCase()).isEqualTo("Defendant 1");
     }
 }
