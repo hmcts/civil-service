@@ -88,12 +88,12 @@ public class ClaimReconsiderationUpheldDefendantNotificationHandler extends Call
     }
 
     private String getReferenceTemplate(CaseData caseData) {
-        return String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
+        return String.format(REFERENCE_TEMPLATE, caseData.getCcdCaseReference().toString());
     }
 
     public Map<String, String> addPropertiesDef2(final CaseData caseData) {
         return new HashMap<>(Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIMANT_V_DEFENDANT, getClaimantVDefendant(caseData),
             PARTY_NAME, caseData.getRespondent2().getPartyName()
         ));

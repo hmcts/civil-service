@@ -79,6 +79,6 @@ public class ClaimReconsiderationUpheldClaimantNotificationHandler extends Callb
     }
 
     private String getReferenceTemplate(CaseData caseData) {
-        return String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
+        return String.format(REFERENCE_TEMPLATE, caseData.getCcdCaseReference().toString());
     }
 }
