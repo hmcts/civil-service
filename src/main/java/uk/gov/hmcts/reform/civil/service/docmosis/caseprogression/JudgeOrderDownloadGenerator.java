@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
@@ -36,6 +35,10 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FIX_D
 @Service
 public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFinalOrderForm> {
 
+    public static final String BLANK_TEMPLATE_TO_BE_USED_AFTER_A_HEARING = "Blank template to be used after a hearing";
+    public static final String BLANK_TEMPLATE_TO_BE_USED_BEFORE_A_HEARING_BOX_WORK = "Blank template to be used before a hearing/box work";
+    public static final String FIX_A_DATE_FOR_CCMC = "Fix a date for CCMC";
+    public static final String FIX_A_DATE_FOR_CMC = "Fix a date for CMC";
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
     private final UserService userService;
@@ -43,18 +46,20 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
     private final FeatureToggleService featureToggleService;
     private final DocumentHearingLocationHelper documentHearingLocationHelper;
     private LocationRefData caseManagementLocationDetails;
-    private DocmosisTemplates docmosisTemplate;
+    public DocmosisTemplates docmosisTemplate;
     private static final String DATE_FORMAT = "dd/MM/yyyy";
-    private static final String INTERMEDIATE_NO_BAND_NO_REASON = "This case is allocated to the Intermediate Track and is not allocated a complexity band.";
-    private static final String INTERMEDIATE_NO_BAND_WITH_REASON = "This case is allocated to the Intermediate Track and is not allocated a complexity band because %s.";
-    private static final String INTERMEDIATE_WITH_BAND_NO_REASON = "This case is allocated to the Intermediate Track and is allocated to complexity band %s.";
-    private static final String INTERMEDIATE_WITH_BAND_WITH_REASON = "This case is allocated to the Intermediate Track and is allocated to complexity band %s because %s.";
-    private static final String FAST_NO_BAND_NO_REASON = "This case is allocated to the Fast Track and is not allocated a complexity band.";
-    private static final String FAST_NO_BAND_WITH_REASON = "This case is allocated to the Fast Track and is not allocated a complexity band because %s.";
-    private static final String FAST_WITH_BAND_NO_REASON = "This case is allocated to the Fast Track and is allocated to complexity band %s.";
-    private static final String FAST_WITH_BAND_WITH_REASON = "This case is allocated to the Fast Track and is allocated to complexity band %s because %s.";
+    public static final String INTERMEDIATE_NO_BAND_NO_REASON = "This case is allocated to the Intermediate Track and is not allocated a complexity band.";
+    public static final String INTERMEDIATE_NO_BAND_WITH_REASON = "This case is allocated to the Intermediate Track and is not allocated a complexity band because %s.";
+    public static final String INTERMEDIATE_WITH_BAND_NO_REASON = "This case is allocated to the Intermediate Track and is allocated to complexity band %s.";
+    public static final String INTERMEDIATE_WITH_BAND_WITH_REASON = "This case is allocated to the Intermediate Track and is allocated to complexity band %s because %s.";
+    public static final String FAST_NO_BAND_NO_REASON = "This case is allocated to the Fast Track and is not allocated a complexity band.";
+    public static final String FAST_NO_BAND_WITH_REASON = "This case is allocated to the Fast Track and is not allocated a complexity band because %s.";
+    public static final String FAST_WITH_BAND_NO_REASON = "This case is allocated to the Fast Track and is allocated to complexity band %s.";
+    public static final String FAST_WITH_BAND_WITH_REASON = "This case is allocated to the Fast Track and is allocated to complexity band %s because %s.";
 
-    public JudgeOrderDownloadGenerator(DocumentManagementService documentManagementService, DocumentGeneratorService documentGeneratorService, UserService userService, LocationReferenceDataService locationRefDataService, FeatureToggleService featureToggleService, DocumentHearingLocationHelper documentHearingLocationHelper) {
+    public JudgeOrderDownloadGenerator(DocumentManagementService documentManagementService, DocumentGeneratorService documentGeneratorService,
+                                       UserService userService, LocationReferenceDataService locationRefDataService, FeatureToggleService featureToggleService,
+                                       DocumentHearingLocationHelper documentHearingLocationHelper) {
         super(documentManagementService, documentGeneratorService, userService, locationRefDataService, featureToggleService, documentHearingLocationHelper);
         this.documentManagementService = documentManagementService;
         this.documentGeneratorService = documentGeneratorService;
@@ -82,19 +87,19 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
         return format(docmosisTemplate.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
     }
 
-    private JudgeFinalOrderForm getDownloadTemplate(CaseData caseData, String authorisation) {
+    public JudgeFinalOrderForm getDownloadTemplate(CaseData caseData, String authorisation) {
 
         switch (caseData.getFinalOrderDownloadTemplateOptions().getValue().getLabel()) {
-            case "Blank template to be used after a hearing":
+            case BLANK_TEMPLATE_TO_BE_USED_AFTER_A_HEARING:
                 docmosisTemplate = BLANK_TEMPLATE_AFTER_HEARING_DOCX;
                 return getBlankAfterHearing(caseData, authorisation);
-            case "Blank template to be used before a hearing/box work":
+            case BLANK_TEMPLATE_TO_BE_USED_BEFORE_A_HEARING_BOX_WORK:
                 docmosisTemplate = BLANK_TEMPLATE_BEFORE_HEARING_DOCX;
                 return getBlankBeforeHearing(caseData, authorisation);
-            case "Fix a date for CCMC":
+            case FIX_A_DATE_FOR_CCMC:
                 docmosisTemplate = FIX_DATE_CCMC_DOCX;
                 return getFixDateCcmc(caseData, authorisation);
-            case "Fix a date for CMC":
+            case FIX_A_DATE_FOR_CMC:
                 docmosisTemplate = FIX_DATE_CMC_DOCX;
                 return getFixDateCmc(caseData, authorisation);
             default:
@@ -102,13 +107,13 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
         }
     }
 
-    private JudgeFinalOrderForm getBlankAfterHearing(CaseData caseData, String authorisation) {
+    public JudgeFinalOrderForm getBlankAfterHearing(CaseData caseData, String authorisation) {
         var blankAfterHearingBuilder = JudgeFinalOrderForm.builder();
 
         return blankAfterHearingBuilder.build();
     }
 
-    private JudgeFinalOrderForm getBlankBeforeHearing(CaseData caseData, String authorisation) {
+    public JudgeFinalOrderForm getBlankBeforeHearing(CaseData caseData, String authorisation) {
         UserDetails userDetails = userService.getUserDetails(authorisation);
         caseManagementLocationDetails = documentHearingLocationHelper
             .getCaseManagementLocationDetailsNro(caseData, locationRefDataService, authorisation);
@@ -129,19 +134,19 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
         return blankBeforerHearingBuilder.build();
     }
 
-    private JudgeFinalOrderForm getFixDateCcmc(CaseData caseData, String authorisation) {
+    public JudgeFinalOrderForm getFixDateCcmc(CaseData caseData, String authorisation) {
         var fixdateCcmcBuilder = JudgeFinalOrderForm.builder();
 
         return fixdateCcmcBuilder.build();
     }
 
-    private JudgeFinalOrderForm getFixDateCmc(CaseData caseData, String authorisation) {
+    public JudgeFinalOrderForm getFixDateCmc(CaseData caseData, String authorisation) {
         var fixdateCmcBuilder = JudgeFinalOrderForm.builder();
 
         return fixdateCmcBuilder.build();
     }
 
-    private String getTrackAndComplexityText(CaseData caseData) {
+    public String getTrackAndComplexityText(CaseData caseData) {
         if (nonNull(caseData.getFinalOrderAllocateToTrack())
             && caseData.getFinalOrderAllocateToTrack().equals(YES)) {
             return switch (caseData.getFinalOrderTrackAllocation()) {
@@ -158,28 +163,30 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
     private String getIntermediateClaimTrackAndComplexityText(CaseData caseData) {
         String complexityBand = getComplexityBand(caseData);
         if (caseData.getFinalOrderIntermediateTrackComplexityBand().getAssignComplexityBand().equals(NO)) {
-            return nonNull(caseData.getFinalOrderIntermediateTrackComplexityBand().getReasons()) ?
-                format(INTERMEDIATE_NO_BAND_WITH_REASON, caseData.getFinalOrderIntermediateTrackComplexityBand().getReasons() ) :
-                INTERMEDIATE_NO_BAND_NO_REASON;
+            return nonNull(caseData.getFinalOrderIntermediateTrackComplexityBand().getReasons())
+                ? format(INTERMEDIATE_NO_BAND_WITH_REASON, caseData.getFinalOrderIntermediateTrackComplexityBand().getReasons())
+                : INTERMEDIATE_NO_BAND_NO_REASON;
+        } else {
+            return  nonNull(caseData.getFinalOrderIntermediateTrackComplexityBand().getReasons())
+                ? format(INTERMEDIATE_WITH_BAND_WITH_REASON, complexityBand, caseData.getFinalOrderIntermediateTrackComplexityBand().getReasons())
+                : format(INTERMEDIATE_WITH_BAND_NO_REASON, complexityBand);
         }
-        else return  nonNull(caseData.getFinalOrderIntermediateTrackComplexityBand().getReasons()) ?
-            format(INTERMEDIATE_WITH_BAND_WITH_REASON, complexityBand, caseData.getFinalOrderIntermediateTrackComplexityBand().getReasons() ) :
-            format(INTERMEDIATE_WITH_BAND_NO_REASON, complexityBand);
     }
 
     private String getFastClaimTrackAndComplexityText(CaseData caseData) {
         String complexityBand = getComplexityBand(caseData);
         if (caseData.getFinalOrderFastTrackComplexityBand().getAssignComplexityBand().equals(NO)) {
-            return nonNull(caseData.getFinalOrderFastTrackComplexityBand().getReasons()) ?
-                format(FAST_NO_BAND_WITH_REASON, caseData.getFinalOrderFastTrackComplexityBand().getReasons() ) :
-                FAST_NO_BAND_NO_REASON;
+            return nonNull(caseData.getFinalOrderFastTrackComplexityBand().getReasons())
+                ? format(FAST_NO_BAND_WITH_REASON, caseData.getFinalOrderFastTrackComplexityBand().getReasons())
+                : FAST_NO_BAND_NO_REASON;
+        } else {
+            return  nonNull(caseData.getFinalOrderFastTrackComplexityBand().getReasons())
+                ? format(FAST_WITH_BAND_WITH_REASON, complexityBand, caseData.getFinalOrderFastTrackComplexityBand().getReasons())
+                : format(FAST_WITH_BAND_NO_REASON, complexityBand);
         }
-        else return  nonNull(caseData.getFinalOrderFastTrackComplexityBand().getReasons()) ?
-            format(FAST_WITH_BAND_WITH_REASON, complexityBand, caseData.getFinalOrderFastTrackComplexityBand().getReasons() ) :
-            format(FAST_WITH_BAND_NO_REASON, complexityBand);
     }
 
-    private String getComplexityBand(CaseData caseData) {
+    public String getComplexityBand(CaseData caseData) {
         if (nonNull(caseData.getFinalOrderIntermediateTrackComplexityBand())
             && caseData.getFinalOrderIntermediateTrackComplexityBand().getAssignComplexityBand().equals(YES)) {
             return switch (caseData.getFinalOrderIntermediateTrackComplexityBand().getBand()) {
@@ -192,7 +199,6 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
         }
         if (nonNull(caseData.getFinalOrderFastTrackComplexityBand())
             && caseData.getFinalOrderFastTrackComplexityBand().getAssignComplexityBand().equals(YES)) {
-            System.out.println("get fast band");
             return switch (caseData.getFinalOrderFastTrackComplexityBand().getBand()) {
                 case BAND_1 -> "1";
                 case BAND_2 -> "2";
