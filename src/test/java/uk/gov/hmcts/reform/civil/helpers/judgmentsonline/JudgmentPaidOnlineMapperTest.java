@@ -7,9 +7,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -49,14 +50,19 @@ public class JudgmentPaidOnlineMapperTest {
                                              .dateOfFullPaymentMade(LocalDate.of(2023, 1, 15))
                                              .confirmFullPaymentMade(List.of("CONFIRMED"))
                                              .build());
-
-        judgmentPaidInFullOnlineMapper.moveToHistoricJudgment(caseData);
+        caseData.setActiveJudgment(judgmentPaidInFullOnlineMapper.addUpdateActiveJudgment(caseData));
 
         assertNotNull(caseData.getActiveJudgment());
         assertEquals(JudgmentState.SATISFIED, caseData.getActiveJudgment().getState());
         assertEquals(LocalDate.of(2023, 1, 15), caseData.getActiveJudgment().getFullyPaymentMadeDate());
         assertNull(caseData.getActiveJudgment().getCancelDate());
         assertNull(caseData.getActiveJudgment().getCancelledTimeStamp());
+
+        assertEquals("Mr. John Rambo", caseData.getJoDefendantName1());
+        assertEquals(PaymentPlanSelection.PAY_IN_INSTALMENTS, caseData.getJoPaymentPlanSelected());
+        assertEquals("120", caseData.getJoRepaymentAmount());
+        assertNotNull(caseData.getJoRepaymentStartDate());
+        assertEquals(PaymentFrequency.MONTHLY, caseData.getJoRepaymentFrequency());
     }
 
     @Test
@@ -69,13 +75,11 @@ public class JudgmentPaidOnlineMapperTest {
                                              .dateOfFullPaymentMade(LocalDate.of(2012, 12, 15))
                                              .confirmFullPaymentMade(List.of("CONFIRMED"))
                                              .build());
+        caseData.setActiveJudgment(judgmentPaidInFullOnlineMapper.addUpdateActiveJudgment(caseData));
 
-        judgmentPaidInFullOnlineMapper.moveToHistoricJudgment(caseData);
-        JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
-        assertNull(caseData.getActiveJudgment());
-        assertNotNull(caseData.getHistoricJudgment());
-        assertEquals(JudgmentState.CANCELLED, historicJudgment.getState());
-        assertEquals(LocalDate.now(), historicJudgment.getCancelDate());
+        assertNotNull(caseData.getActiveJudgment());
+        assertEquals(JudgmentState.CANCELLED, caseData.getActiveJudgment().getState());
+        assertNull(caseData.getHistoricJudgment());
     }
 
     @Test
@@ -89,12 +93,14 @@ public class JudgmentPaidOnlineMapperTest {
                                              .dateOfFullPaymentMade(LocalDate.now().plusDays(15))
                                              .confirmFullPaymentMade(List.of("CONFIRMED"))
                                              .build());
+        caseData.setActiveJudgment(judgmentPaidInFullOnlineMapper.addUpdateActiveJudgment(caseData));
 
-        judgmentPaidInFullOnlineMapper.moveToHistoricJudgment(caseData);
-        JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
-        assertNull(caseData.getActiveJudgment());
-        assertNotNull(caseData.getHistoricJudgment());
-        assertEquals(JudgmentState.CANCELLED, historicJudgment.getState());
-        assertEquals(LocalDate.now(), historicJudgment.getCancelDate());
+        assertNotNull(caseData.getActiveJudgment());
+        assertEquals(JudgmentState.CANCELLED, caseData.getActiveJudgment().getState());
+        assertNull(caseData.getHistoricJudgment());
+
+        assertEquals("Mr. Sole Trader", caseData.getJoDefendantName1());
+        assertEquals(PaymentPlanSelection.PAY_IMMEDIATELY, caseData.getJoPaymentPlanSelected());
+
     }
 }
