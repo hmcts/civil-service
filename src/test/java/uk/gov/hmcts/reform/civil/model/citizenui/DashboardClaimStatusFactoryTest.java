@@ -19,7 +19,6 @@ class DashboardClaimStatusFactoryTest {
     static Stream<Arguments> caseToExpectedStatus() {
         return Stream.of(
             Arguments.arguments(CaseState.CASE_DISMISSED, DashboardClaimStatus.CASE_DISMISSED)
-            // Add more cases as needed
         );
     }
 
