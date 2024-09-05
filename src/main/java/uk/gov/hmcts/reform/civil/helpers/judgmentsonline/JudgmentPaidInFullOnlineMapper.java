@@ -20,13 +20,17 @@ public class JudgmentPaidInFullOnlineMapper extends JudgmentOnlineMapper {
 
         JudgmentDetails activeJudgment = caseData.getActiveJudgment();
         JudgmentState state = getJudgmentState(caseData);
-        return activeJudgment.toBuilder()
+        JudgmentDetails activeJudgmentDetails = activeJudgment.toBuilder()
             .state(state)
             .fullyPaymentMadeDate(caseData.getJoJudgmentPaidInFull().getDateOfFullPaymentMade())
             .lastUpdateTimeStamp(LocalDateTime.now())
             .cancelledTimeStamp(JudgmentState.CANCELLED.equals(state) ? LocalDateTime.now() : null)
             .cancelDate(JudgmentState.CANCELLED.equals(state) ? LocalDate.now() : null)
             .build();
+
+        super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, caseData);
+
+        return activeJudgmentDetails;
     }
 
     protected JudgmentState getJudgmentState(CaseData caseData) {
