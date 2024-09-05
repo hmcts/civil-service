@@ -602,11 +602,11 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             assertThat(response.getState())
-                .isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+                .isEqualTo(All_FINAL_ORDERS_ISSUED.name());
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("camundaEvent")
-                .isEqualTo(REQUEST_JUDGEMENT_ADMISSION_SPEC.name());
+                .isEqualTo(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC.name());
         }
 
         @Test

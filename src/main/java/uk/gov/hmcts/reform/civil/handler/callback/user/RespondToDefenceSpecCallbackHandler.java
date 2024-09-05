@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantRespon
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnlineMapper;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
@@ -414,14 +415,13 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         String nextState = putCaseStateInJudicialReferral(caseData);
 
         if (V_2.equals(callbackParams.getVersion())
-            && featureToggleService.isPinInPostEnabled()
-            && isOneVOne(caseData)) {
+            && featureToggleService.isPinInPostEnabled()) {
             if (caseData.hasClaimantAgreedToFreeMediation()) {
                 nextState = CaseState.IN_MEDIATION.name();
             } else if (caseData.hasApplicantAcceptedRepaymentPlan()) {
                 if (featureToggleService.isJudgmentOnlineLive()
                     && (caseData.isPayByInstallment() || caseData.isPayBySetDate())
-                    && caseData.isLRvLipOneVOne()) {
+                    && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
                     nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
                     businessProcess = BusinessProcess.ready(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC);
                 } else {
