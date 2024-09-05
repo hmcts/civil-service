@@ -69,7 +69,7 @@ class ClaimReconsiderationUpheldClaimantNotificationHandlerTest extends BaseCall
                 "applicantsolicitor@example.com",
                 TEMPLATE_ID,
                 getNotificationDataMap(caseData),
-                "reconsideration-upheld-applicant-notification-000DC001"
+                "reconsideration-upheld-applicant-notification-1594901956117591"
             );
         }
 
@@ -93,7 +93,7 @@ class ClaimReconsiderationUpheldClaimantNotificationHandlerTest extends BaseCall
                 "rambo@email.com",
                 TEMPLATE_ID,
                 getNotificationDataMap(caseData),
-                "reconsideration-upheld-applicant-notification-000DC001"
+                "reconsideration-upheld-applicant-notification-1594901956117591"
             );
         }
     }
