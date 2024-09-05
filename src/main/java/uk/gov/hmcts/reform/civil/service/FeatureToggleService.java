@@ -83,7 +83,7 @@ public class FeatureToggleService {
     }
 
     public boolean isCaseProgressionEnabled() {
-        return true;
+        return false;
     }
 
     public boolean isEarlyAdoptersEnabled() {
