@@ -16,14 +16,11 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class JudgmentPaidInFullOnlineMapper extends JudgmentOnlineMapper {
 
-    boolean isNonDivergent =  false;
-
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
 
         JudgmentDetails activeJudgment = caseData.getActiveJudgment();
         JudgmentState state = getJudgmentState(caseData);
-        isNonDivergent = JudgmentsOnlineHelper.isNonDivergentForJBA(caseData);
         JudgmentDetails activeJudgmentDetails = activeJudgment.toBuilder()
             .state(state)
             .fullyPaymentMadeDate(caseData.getJoJudgmentPaidInFull().getDateOfFullPaymentMade())
