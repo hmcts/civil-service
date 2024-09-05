@@ -80,10 +80,10 @@ public enum DocmosisTemplates {
     ASSISTED_ORDER_PDF("CV-UNS-DEC-ENG-01283.docx", "Order_%s.pdf"),
 
     // Judge order download order
-    BLANK_TEMPLATE_AFTER_HEARING_DOCX("temp1.docx", "Blank template to be used after a hearing (Opens in new tab).docx"),
-    BLANK_TEMPLATE_BEFORE_HEARING_DOCX("CV-UNS-DEC-ENG-01284.docx", "Blank template to be used before a hearing/box work (Opens in new tab).docx"),
-    FIX_DATE_CCMC_DOCX("temp3.docx", "Fix a date for CCMC (Opens in new tab).docx"),
-    FIX_DATE_CMC_DOCX("temp4.docx", "Fix a date for CMC (Opens in new tab).docx"),
+    BLANK_TEMPLATE_AFTER_HEARING_DOCX("temp1.docx", "%s Blank template to be used after a hearing.docx"),
+    BLANK_TEMPLATE_BEFORE_HEARING_DOCX("CV-UNS-DEC-ENG-01284.docx", "%s Blank template to be used before a hearing/box work.docx"),
+    FIX_DATE_CCMC_DOCX("temp3.docx", "%s Fix a date for CCMC.docx"),
+    FIX_DATE_CMC_DOCX("temp4.docx", "%s Fix a date for CMC.docx"),
 
     //Court officer order
     COURT_OFFICER_ORDER_PDF("CV-UNS-DEC-ENG-01299.docx", "Order_%s.pdf"),

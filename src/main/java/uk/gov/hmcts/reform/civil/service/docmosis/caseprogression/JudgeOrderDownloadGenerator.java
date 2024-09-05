@@ -20,10 +20,13 @@ import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
+import java.time.LocalDate;
+
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.BLANK_TEMPLATE_AFTER_HEARING_DOCX;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.BLANK_TEMPLATE_BEFORE_HEARING_DOCX;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FIX_DATE_CCMC_DOCX;
@@ -41,6 +44,7 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
     private final DocumentHearingLocationHelper documentHearingLocationHelper;
     private LocationRefData caseManagementLocationDetails;
     private DocmosisTemplates docmosisTemplate;
+    private static final String DATE_FORMAT = "dd/MM/yyyy";
     private static final String INTERMEDIATE_NO_BAND_NO_REASON = "This case is allocated to the Intermediate Track and is not allocated a complexity band.";
     private static final String INTERMEDIATE_NO_BAND_WITH_REASON = "This case is allocated to the Intermediate Track and is not allocated a complexity band because %s.";
     private static final String INTERMEDIATE_WITH_BAND_NO_REASON = "This case is allocated to the Intermediate Track and is allocated to complexity band %s.";
@@ -67,11 +71,15 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
         return documentManagementService.uploadDocument(
             authorisation,
             new PDF(
-                docmosisTemplate.getDocumentTitle(),
+                getFileName(docmosisTemplate),
                 docmosisDocument.getBytes(),
                 DocumentType.JUDGE_FINAL_ORDER
             )
         );
+    }
+
+    private String getFileName(DocmosisTemplates docmosisTemplate) {
+        return format(docmosisTemplate.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
     }
 
     private JudgeFinalOrderForm getDownloadTemplate(CaseData caseData, String authorisation) {
@@ -134,20 +142,15 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
     }
 
     private String getTrackAndComplexityText(CaseData caseData) {
-        if (nonNull(caseData.getFinalOrderAllocateToTrack())) {
-            switch (caseData.getFinalOrderTrackAllocation()) {
-                case SMALL_CLAIM:
-                    return "This case is allocated to the Small Claims.";
-                case FAST_CLAIM:
-                    System.out.println("fast claim track");
-                    return getFastClaimTrackAndComplexityText(caseData);
-                case INTERMEDIATE_CLAIM:
-                    return getIntermediateClaimTrackAndComplexityText(caseData);
-                case MULTI_CLAIM:
-                    return "This case is allocated to the Multi Track.";
-                default:
-                    return null;
-            }
+        if (nonNull(caseData.getFinalOrderAllocateToTrack())
+            && caseData.getFinalOrderAllocateToTrack().equals(YES)) {
+            return switch (caseData.getFinalOrderTrackAllocation()) {
+                case SMALL_CLAIM -> "This case is allocated to the Small Claims.";
+                case FAST_CLAIM -> getFastClaimTrackAndComplexityText(caseData);
+                case INTERMEDIATE_CLAIM -> getIntermediateClaimTrackAndComplexityText(caseData);
+                case MULTI_CLAIM -> "This case is allocated to the Multi Track.";
+                default -> null;
+            };
         }
         return null;
     }
@@ -179,34 +182,24 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
     private String getComplexityBand(CaseData caseData) {
         if (nonNull(caseData.getFinalOrderIntermediateTrackComplexityBand())
             && caseData.getFinalOrderIntermediateTrackComplexityBand().getAssignComplexityBand().equals(YES)) {
-            switch (caseData.getFinalOrderIntermediateTrackComplexityBand().getBand()) {
-                case BAND_1:
-                    return "1";
-                case BAND_2:
-                    return "2";
-                case BAND_3:
-                    return "3";
-                case BAND_4:
-                    return "4";
-                default:
-                    return null;
-            }
+            return switch (caseData.getFinalOrderIntermediateTrackComplexityBand().getBand()) {
+                case BAND_1 -> "1";
+                case BAND_2 -> "2";
+                case BAND_3 -> "3";
+                case BAND_4 -> "4";
+                default -> null;
+            };
         }
         if (nonNull(caseData.getFinalOrderFastTrackComplexityBand())
             && caseData.getFinalOrderFastTrackComplexityBand().getAssignComplexityBand().equals(YES)) {
             System.out.println("get fast band");
-            switch (caseData.getFinalOrderFastTrackComplexityBand().getBand()) {
-                case BAND_1:
-                    return "1";
-                case BAND_2:
-                    return "2";
-                case BAND_3:
-                    return "3";
-                case BAND_4:
-                    return "4";
-                default:
-                    return null;
-            }
+            return switch (caseData.getFinalOrderFastTrackComplexityBand().getBand()) {
+                case BAND_1 -> "1";
+                case BAND_2 -> "2";
+                case BAND_3 -> "3";
+                case BAND_4 -> "4";
+                default -> null;
+            };
         }
         return null;
     }

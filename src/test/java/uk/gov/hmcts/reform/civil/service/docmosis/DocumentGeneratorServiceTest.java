@@ -71,7 +71,8 @@ class DocumentGeneratorServiceTest {
                 HttpClientErrorException.class,
                 () -> documentGeneratorService.generateDocmosisDocument(
                     placeholders,
-                    N1
+                    N1,
+                    "pdf"
                 )
             );
 
