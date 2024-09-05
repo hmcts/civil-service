@@ -81,6 +81,8 @@ public class RecordJudgmentDeterminationOfMeansPiPLetterGenerator {
             .letterIssueDate(LocalDate.now())
             .pin(caseData.getRespondent1PinToPostLRspec().getAccessCode())
             .respondToClaimUrl(pipInPostConfiguration.getRespondToClaimUrl())
+            .varyJudgmentFee(String.valueOf(feeValue.formData()))
+            .certifOfSatisfactionFee(String.valueOf(feeValue.formData()))
             .build();
     }
 }

@@ -71,6 +71,21 @@ public class GeneralAppFeesService {
         );
     }
 
+    public Fee getFeeForJOWithApplicationType(GeneralApplicationTypes applicationType) {
+        Fee result;
+        switch (applicationType) {
+            case GeneralApplicationTypes.VARY_ORDER:
+                result = getFeeForGA(feesConfiguration.getAppnToVaryOrSuspend(), "miscellaneous", "other");
+            case GeneralApplicationTypes.SET_ASIDE_JUDGEMENT:
+                result = getFeeForGA(feesConfiguration.getWithNoticeKeyword(), null, null);
+            case GeneralApplicationTypes.OTHER:
+                result = getFeeForGA(feesConfiguration.getCertificateOfSatisfaction(), "miscellaneous", "other");
+            default:
+                result = null;
+        }
+        return result;
+    }
+
     private Fee getFeeForGA(List<GeneralApplicationTypes> types, Boolean respondentAgreed, Boolean informOtherParty, LocalDate hearingScheduledDate) {
         Fee result = Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(Integer.MAX_VALUE)).build();
         int typeSize = types.size();

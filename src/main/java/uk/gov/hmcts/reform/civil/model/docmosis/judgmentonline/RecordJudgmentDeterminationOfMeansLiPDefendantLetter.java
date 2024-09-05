@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 
@@ -26,4 +27,7 @@ public class RecordJudgmentDeterminationOfMeansLiPDefendantLetter implements Map
     private final LocalDate letterIssueDate;
     private final String respondToClaimUrl;
     private final String pin;
+    private final String varyJudgmentFee;
+    private final String certifOfSatisfactionFee;
+
 }
