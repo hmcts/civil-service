@@ -228,8 +228,8 @@ public class MediationJsonService {
                                                          MediationLiPCarm mediationLiPCarm) {
         List<MediationUnavailability> dateRangeToAvoid = getDateRangeToAvoid(mediationLiPCarm);
 
-        String mediationContactName = YES.equals(mediationLiPCarm.getIsMediationContactNameCorrect())
-            ? originalMediationContactPerson : mediationLiPCarm.getAlternativeMediationContactPerson();
+        String mediationContactName = getUnrepresentedLitigantMediationContactName(
+            party, originalMediationContactPerson, mediationLiPCarm);
 
         String mediationEmail = YES.equals(mediationLiPCarm.getIsMediationEmailCorrect())
             ? party.getPartyEmail() : mediationLiPCarm.getAlternativeMediationEmail();
@@ -338,5 +338,21 @@ public class MediationJsonService {
         Optional<Organisation> organisation = organisationService.findOrganisationById(orgId);
         Organisation solicitorOrgDetails = organisation.orElse(null);
         return solicitorOrgDetails != null ? solicitorOrgDetails.getName() : null;
+    }
+
+    private boolean isIndividualOrSoleTrader(Party party) {
+        return Party.Type.INDIVIDUAL.equals(party.getType())
+            || Party.Type.SOLE_TRADER.equals(party.getType());
+    }
+
+    private String getUnrepresentedLitigantMediationContactName(Party party,
+                                                                 String originalMediationContactPerson,
+                                                                 MediationLiPCarm mediationLiPCarm) {
+        if (isIndividualOrSoleTrader(party)) {
+            return party.getPartyName();
+        } else {
+            return YES.equals(mediationLiPCarm.getIsMediationContactNameCorrect())
+                ? originalMediationContactPerson : mediationLiPCarm.getAlternativeMediationContactPerson();
+        }
     }
 }
