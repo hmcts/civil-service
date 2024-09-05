@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -20,6 +21,9 @@ import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.ClaimantResponseOnCourtDecisionType;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -365,5 +369,27 @@ class UpdateClaimStateServiceTest {
 
         //Then
         assertThat(response).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+    }
+
+    @Test
+    void shouldUpdateCaseStateToAllFinalOrderIssued_whenApplicantAcceptOrRejectedRepaymentPlanAndRequestCCJ_JudgementOnlineLiveEnabled() {
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1ResponseDate(LocalDateTime.now())
+            .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
+            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("DEFENDANT_NAME").build())
+            .respondent1Represented(NO)
+            .specRespondent1Represented(NO)
+            .applicant1Represented(NO)
+            .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
+            .ccjPaymentDetails(CCJPaymentDetails.builder()
+                                   .ccjPaymentPaidSomeOption(YES)
+                                   .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(10))
+                                   .ccjJudgmentTotalStillOwed(BigDecimal.valueOf(150))
+                                   .build())
+            .build();
+        String actualState = service.setUpCaseState(caseData);
+
+        assertEquals(CaseState.All_FINAL_ORDERS_ISSUED.name(), actualState);
     }
 }
