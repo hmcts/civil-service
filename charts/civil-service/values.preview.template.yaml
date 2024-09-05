@@ -174,6 +174,7 @@ ccd:
       ingressHost: gateway-${SERVICE_FQDN}
       ingressIP: ${INGRESS_IP}
       keyVaults: []
+
   ccd-data-store-api:
     java:
       imagePullPolicy: Always
@@ -270,3 +271,15 @@ aac-manage-case-assignment:
       NOTIFY_MCA_API_KEY: ${NOTIFY_MCA_API_KEY}
     autoscaling:
       enabled: false
+
+  wiremock:
+    enabled: true
+    image:
+      repository: rodolpheche/wiremock
+      tag: 2.27.2
+    imagePullPolicy: Always
+    devcpuRequests: 100m
+    devmemoryRequests: 256Mi
+    devmemoryLimits: 256Mi
+    ingressHost: wiremock-${SERVICE_NAME}.preview.platform.hmcts.net
+

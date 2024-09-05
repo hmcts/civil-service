@@ -12,6 +12,10 @@ aac-manage-case-assignment:
   enabled: false
 ccd:
   enabled: false
+
+wiremock:
+  enabled: false
+
 java:
   applicationPort: 4000
   image: 'hmctspublic.azurecr.io/civil/service:latest'
