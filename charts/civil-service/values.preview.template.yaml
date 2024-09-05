@@ -268,5 +268,6 @@ aac-manage-case-assignment:
       IDAM_NOC_APPROVER_USERNAME: ${IDAM_NOC_APPROVER_USERNAME}
       IDAM_NOC_APPROVER_PASSWORD: ${IDAM_NOC_APPROVER_PASSWORD}
       NOTIFY_MCA_API_KEY: ${NOTIFY_MCA_API_KEY}
+      HMC_API_URL: http://localhost:8765
     autoscaling:
       enabled: false
