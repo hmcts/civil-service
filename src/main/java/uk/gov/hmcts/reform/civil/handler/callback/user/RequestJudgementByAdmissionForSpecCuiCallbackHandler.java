@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnlineMapper;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -117,6 +118,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         if (featureToggleService.isJudgmentOnlineLive()) {
             data.setActiveJudgment(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(data));
             data.setJoIsLiveJudgmentExists(YesOrNo.YES);
+            data.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(data.getActiveJudgment()));
         }
 
         CaseData.CaseDataBuilder caseDataBuilder = data.toBuilder()
