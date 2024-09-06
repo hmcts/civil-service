@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
@@ -59,6 +60,7 @@ class DefaultJudgmentsOnlineMapperTest {
         assertEquals("0", activeJudgment.getCosts());
         assertEquals("100990", activeJudgment.getTotalAmount());
         assertEquals(YesOrNo.YES, activeJudgment.getIsRegisterWithRTL());
+        assertEquals(JudgmentRTLStatus.ISSUED.getRtlState(), activeJudgment.getRtlState());
         assertEquals(LocalDate.now(), activeJudgment.getIssueDate());
         assertEquals("0123", activeJudgment.getCourtLocation());
         assertEquals(JudgmentType.DEFAULT_JUDGMENT, activeJudgment.getType());
@@ -67,7 +69,6 @@ class DefaultJudgmentsOnlineMapperTest {
         assertEquals("Mr. Sole Trader", activeJudgment.getDefendant1Name());
         assertNotNull(activeJudgment.getDefendant1Address());
         assertNotNull(activeJudgment.getDefendant1Dob());
-
     }
 
     @Test
@@ -136,6 +137,7 @@ class DefaultJudgmentsOnlineMapperTest {
         assertEquals(activeJudgment.getDefendant1Name(), "Mr. Sole Trader");
         assertNotNull(activeJudgment.getDefendant1Address());
         assertNotNull(activeJudgment.getDefendant1Dob());
+
     }
 
     @Test
@@ -175,5 +177,6 @@ class DefaultJudgmentsOnlineMapperTest {
         assertEquals(activeJudgment.getDefendant1Name(), "Mr. Sole Trader");
         assertNotNull(activeJudgment.getDefendant1Address());
         assertNotNull(activeJudgment.getDefendant1Dob());
+
     }
 }
