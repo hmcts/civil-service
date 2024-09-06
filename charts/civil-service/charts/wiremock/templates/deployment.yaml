@@ -1,4 +1,3 @@
-{{- if .Values.wiremock.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -37,4 +36,4 @@ spec:
         - name: wiremock-mocks
           configMap:
             name: {{ include "wiremock.fullname" . }}-mock-files
-  {{- end }}
+
