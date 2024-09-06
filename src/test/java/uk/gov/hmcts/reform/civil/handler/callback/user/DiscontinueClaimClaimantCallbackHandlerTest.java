@@ -2,18 +2,22 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PermissionGranted;
@@ -25,20 +29,27 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 
 @SpringBootTest(classes = {
     DiscontinueClaimClaimantCallbackHandler.class,
-    JacksonAutoConfiguration.class
+    JacksonAutoConfiguration.class,
+    CaseDetailsConverter.class
 })
 class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private DiscontinueClaimClaimantCallbackHandler handler;
+
+    @MockBean
+    private CaseDetailsConverter caseDetailsConverter;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -226,6 +237,17 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
 
     @Nested
     class AboutToSubmitCallback {
+
+        @BeforeEach
+        void setup() {
+            CaseData caseDataBefore = CaseDataBuilder.builder()
+                .applicant1(Party.builder().type(INDIVIDUAL).build())
+                .applicant2(Party.builder().type(INDIVIDUAL).build())
+                .respondent1(Party.builder().type(INDIVIDUAL).build())
+                .respondent2(Party.builder().type(INDIVIDUAL).build())
+                .buildClaimIssuedPaymentCaseData();
+            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+        }
 
         @Test
         void shouldUpdateCaseState_WhenNoCourtPermissionAndFullDiscontinue_2v1() {

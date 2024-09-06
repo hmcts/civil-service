@@ -6,6 +6,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
@@ -37,6 +39,9 @@ public class RecordJudgmentsOnlineMapperTest {
         assertEquals(caseData.getJoPaymentPlan(), activeJudgment.getPaymentPlan());
         assertEquals("The Organisation", activeJudgment.getDefendant1Name());
         assertNotNull(activeJudgment.getDefendant1Address());
+
+        assertEquals("The Organisation", caseData.getJoDefendantName1());
+        assertEquals(PaymentPlanSelection.PAY_BY_DATE, caseData.getJoPaymentPlanSelected());
     }
 
     @Test
@@ -62,6 +67,12 @@ public class RecordJudgmentsOnlineMapperTest {
         assertNotNull(activeJudgment.getDefendant1Address());
         assertNotNull(activeJudgment.getDefendant1Dob());
 
+        assertEquals("Mr. John Rambo", caseData.getJoDefendantName1());
+        assertEquals(PaymentPlanSelection.PAY_IN_INSTALMENTS, caseData.getJoPaymentPlanSelected());
+        assertEquals("120", caseData.getJoRepaymentAmount());
+        assertNotNull(caseData.getJoRepaymentStartDate());
+        assertEquals(PaymentFrequency.MONTHLY, caseData.getJoRepaymentFrequency());
+
     }
 
     @Test
@@ -86,6 +97,9 @@ public class RecordJudgmentsOnlineMapperTest {
         assertEquals("Mr. Sole Trader", activeJudgment.getDefendant1Name());
         assertNotNull(activeJudgment.getDefendant1Address());
         assertNotNull(activeJudgment.getDefendant1Dob());
+
+        assertEquals("Mr. Sole Trader", caseData.getJoDefendantName1());
+        assertEquals(PaymentPlanSelection.PAY_IMMEDIATELY, caseData.getJoPaymentPlanSelected());
     }
 
     @Test
