@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "wiremock.fullname" . }}
+  labels:
+    app: {{ include "wiremock.name" . }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "wiremock.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "wiremock.name" . }}
+    spec:
+      containers:
+        - name: wiremock
+          image: "{{ .Values.wiremock.image.repository }}:{{ .Values.wiremock.image.tag }}"
+          imagePullPolicy: {{ .Values.wiremock.imagePullPolicy }}
+          resources:
+            requests:
+              memory: {{ .Values.wiremock.devmemoryRequests }}
+              cpu: {{ .Values.wiremock.devcpuRequests }}
+            limits:
+              memory: {{ .Values.wiremock.devmemoryLimits }}
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: wiremock-mocks
+              mountPath: /home/wiremock
+          env:
+            - name: WIREMOCK_ROOT_DIRECTORY
+              value: /home/wiremock/mappings
+      volumes:
+        - name: wiremock-mocks
+          configMap:
+            name: {{ include "wiremock.fullname" . }}-mock-files

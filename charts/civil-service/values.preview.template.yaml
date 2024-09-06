@@ -270,3 +270,28 @@ aac-manage-case-assignment:
       NOTIFY_MCA_API_KEY: ${NOTIFY_MCA_API_KEY}
     autoscaling:
       enabled: false
+
+wiremock:
+  enabled: true
+  image:
+    repository: wiremock/wiremock
+    tag: 2.27.2
+    pullPolicy: Always
+
+  devcpuRequests: "100m"
+  devmemoryRequests: "256Mi"
+  devmemoryLimits: "256Mi"
+
+  ingressHost: wiremock-${SERVICE_NAME}.preview.platform.hmcts.net
+  ingress:
+    enabled: true
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /
+    tls: []
+    hosts:
+      - host: wiremock-${SERVICE_NAME}.preview.platform.hmcts.net
+        paths:
+          - /
+  mocks:
+    useConfigMap: true
+    directoryPath: /home/wiremock
