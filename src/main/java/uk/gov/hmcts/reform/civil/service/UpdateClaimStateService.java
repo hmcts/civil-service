@@ -89,6 +89,6 @@ public class UpdateClaimStateService {
     }
 
     private boolean hasJudgmentByAdmission(CaseData caseData, boolean judgmentOnlineLive) {
-        return JudgmentAdmissionUtils.getLIPJudgmentAdmission(caseData) && judgmentOnlineLive;
+        return judgmentOnlineLive && JudgmentAdmissionUtils.getLIPJudgmentAdmission(caseData);
     }
 }
