@@ -25,7 +25,7 @@ public class RecordJudgmentOnlineMapper extends JudgmentOnlineMapper {
         BigDecimal costs = JudgmentsOnlineHelper.getMoneyValue(caseData.getJoAmountCostOrdered());
         JudgmentDetails activeJudgment = super.addUpdateActiveJudgment(caseData);
         activeJudgment = super.updateDefendantDetails(activeJudgment, caseData);
-        return activeJudgment.toBuilder()
+        JudgmentDetails activeJudgmentDetails = activeJudgment.toBuilder()
             .createdTimestamp(LocalDateTime.now())
             .state(getJudgmentState(caseData))
             .rtlState(getRtlState(caseData.getJoIsRegisteredWithRTL()))
@@ -38,6 +38,10 @@ public class RecordJudgmentOnlineMapper extends JudgmentOnlineMapper {
             .costs(costs.toString())
             .totalAmount(orderAmount.add(costs).toString())
             .build();
+
+        super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, caseData);
+
+        return activeJudgmentDetails;
     }
 
     protected JudgmentState getJudgmentState(CaseData caseData) {
