@@ -117,6 +117,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler {
 
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+
+        // resetting statement of truth field, this resets in the page, but the data is still sent to the db.
+        // setting null here does not clear, need to overwrite with value.
+        // must be to do with the way XUI cache data entered through the lifecycle of an event.
         CaseData updatedCaseData = caseData.toBuilder()
             .uiStatementOfTruth(StatementOfTruth.builder().role("").build())
             .build();
@@ -178,8 +182,17 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         String claimNumber = caseData.getLegacyCaseReference();
 
-        String body = generateConfirmationBody(caseData);
-        String header = generateConfirmationHeader(caseData, claimNumber);
+        String body = CaseDataToTextGenerator.getTextFor(
+            confirmationTextSpecGenerators.stream(),
+            () -> getDefaultConfirmationBody(caseData),
+            caseData
+        );
+
+        String header = CaseDataToTextGenerator.getTextFor(
+            confirmationHeaderGenerators.stream(),
+            () -> format("# You have submitted your response%n## Claim number: %s", claimNumber),
+            caseData
+        );
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(header)
@@ -187,38 +200,25 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private String generateConfirmationBody(CaseData caseData) {
-        return CaseDataToTextGenerator.getTextFor(
-            confirmationTextSpecGenerators.stream(),
-            () -> getDefaultConfirmationBody(caseData),
-            caseData
-        );
-    }
-
-    private String generateConfirmationHeader(CaseData caseData, String claimNumber) {
-        return CaseDataToTextGenerator.getTextFor(
-            confirmationHeaderGenerators.stream(),
-            () -> format("# You have submitted your response%n## Claim number: %s", claimNumber),
-            caseData
-        );
-    }
-
     private String getDefaultConfirmationBody(CaseData caseData) {
         LocalDateTime responseDeadline = caseData.getApplicant1ResponseDeadline();
-        String nextStepsMessage = getNextStepsMessage(responseDeadline);
-        return format(
-            "<h2 class=\"govuk-heading-m\">What happens next</h2>%n%n%s%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
-            nextStepsMessage,
-            format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
-        );
-    }
-
-    private String getNextStepsMessage(LocalDateTime responseDeadline) {
         if (responseDeadline == null) {
-            return "After the other solicitor has responded and/or the time for responding has passed the claimant will be notified.";
+            return format(
+                "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+                    + "After the other solicitor has responded and/or the time"
+                    + " for responding has passed the claimant will be notified."
+                    + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
+                format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+            );
         } else {
-            return format("The claimant has until 4pm on %s to respond to your claim. We will let you know when they respond.",
-                          formatLocalDateTime(responseDeadline, DATE));
+            return format(
+                "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+                    + "%n%nThe claimant has until 4pm on %s to respond to your claim. "
+                    + "We will let you know when they respond."
+                    + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
+                formatLocalDateTime(responseDeadline, DATE),
+                format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+            );
         }
     }
 }

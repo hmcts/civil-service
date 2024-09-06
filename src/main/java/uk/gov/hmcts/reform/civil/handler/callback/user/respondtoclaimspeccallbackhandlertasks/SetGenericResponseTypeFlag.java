@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -29,7 +30,6 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
-import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
@@ -238,7 +238,7 @@ public class SetGenericResponseTypeFlag implements CaseTask {
                 IMMEDIATELY);
         }
 
-        Set<DefendantResponseShowTag> updatedShowConditions = RespondToClaimSpecUtilsDisputeDetails.whoDisputesPartAdmission(caseData);
+        Set<DefendantResponseShowTag> updatedShowConditions = whoDisputesPartAdmission(caseData);
         EnumSet<RespondentResponseTypeSpec> anyAdmission = EnumSet.of(
             RespondentResponseTypeSpec.PART_ADMISSION,
             RespondentResponseTypeSpec.FULL_ADMISSION
@@ -254,7 +254,7 @@ public class SetGenericResponseTypeFlag implements CaseTask {
             && anyAdmission.contains(caseData.getRespondent2ClaimResponseTypeForSpec())) {
             updatedShowConditions.add(RESPONDENT_2_ADMITS_PART_OR_FULL);
         }
-        if (RespondToClaimSpecUtilsDisputeDetails.someoneDisputes(caseData)) {
+        if (respondToClaimSpecUtilsDisputeDetails.someoneDisputes(caseData)) {
             updatedShowConditions.add(SOMEONE_DISPUTES);
         }
         if ((anyAdmission.contains(caseData.getRespondent1ClaimResponseTypeForSpec())
@@ -271,5 +271,20 @@ public class SetGenericResponseTypeFlag implements CaseTask {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .build();
+    }
+
+    /**
+     * The condition to show the right title for why does X disputes the claim is too complex for the current
+     * abilities of front, so we have to take care of it in back.
+     * This method may add the flags only_respondent_1_disputes, only_respondent_2_disputes or both_respondent_dispute.
+     *
+     * @param caseData the current case data
+     * @return updated copy of caseData.showConditionFlag
+     */
+    private Set<DefendantResponseShowTag> whoDisputesPartAdmission(CaseData caseData) {
+        Set<DefendantResponseShowTag> tags = new HashSet<>(caseData.getShowConditionFlags());
+        respondToClaimSpecUtilsDisputeDetails.removeWhoDisputesAndWhoPaidLess(tags);
+        tags.addAll(respondToClaimSpecUtilsDisputeDetails.whoDisputesBcoPartAdmission(caseData));
+        return tags;
     }
 }

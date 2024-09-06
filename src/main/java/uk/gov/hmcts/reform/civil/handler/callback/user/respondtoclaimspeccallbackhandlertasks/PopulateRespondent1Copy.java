@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.CaseTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -23,7 +22,6 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import static java.util.Optional.ofNullable;
@@ -97,32 +95,31 @@ public class PopulateRespondent1Copy implements CaseTask {
     private Set<DefendantResponseShowTag> getInitialShowTags(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         MultiPartyScenario mpScenario = getMultiPartyScenario(caseData);
-        Set<DefendantResponseShowTag> showTags = EnumSet.noneOf(DefendantResponseShowTag.class);
-
+        Set<DefendantResponseShowTag> set = EnumSet.noneOf(DefendantResponseShowTag.class);
         switch (mpScenario) {
-            case ONE_V_ONE, TWO_V_ONE -> showTags.add(CAN_ANSWER_RESPONDENT_1);
-            case ONE_V_TWO_ONE_LEGAL_REP -> {
-                showTags.add(CAN_ANSWER_RESPONDENT_1);
-                showTags.add(CAN_ANSWER_RESPONDENT_2);
-            }
-            case ONE_V_TWO_TWO_LEGAL_REP -> addUserRolesShowTags(callbackParams, showTags);
-            default -> throw new UnsupportedOperationException(UNKNOWN_MP_SCENARIO);
+            case ONE_V_ONE, TWO_V_ONE:
+                set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1);
+                break;
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1);
+                set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2);
+                break;
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+                List<String> roles = coreCaseUserService.getUserCaseRoles(
+                    callbackParams.getCaseData().getCcdCaseReference().toString(),
+                    userInfo.getUid()
+                );
+                if (roles.contains(RESPONDENTSOLICITORONE.getFormattedName())) {
+                    set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1);
+                }
+                if (roles.contains(RESPONDENTSOLICITORTWO.getFormattedName())) {
+                    set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2);
+                }
+                break;
+            default:
+                throw new UnsupportedOperationException(UNKNOWN_MP_SCENARIO);
         }
-
-        return showTags;
-    }
-
-    private void addUserRolesShowTags(CallbackParams callbackParams, Set<DefendantResponseShowTag> showTags) {
-        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        List<String> roles = coreCaseUserService.getUserCaseRoles(
-            callbackParams.getCaseData().getCcdCaseReference().toString(),
-            userInfo.getUid()
-        );
-        if (roles.contains(RESPONDENTSOLICITORONE.getFormattedName())) {
-            showTags.add(CAN_ANSWER_RESPONDENT_1);
-        }
-        if (roles.contains(RESPONDENTSOLICITORTWO.getFormattedName())) {
-            showTags.add(CAN_ANSWER_RESPONDENT_2);
-        }
+        return set;
     }
 }

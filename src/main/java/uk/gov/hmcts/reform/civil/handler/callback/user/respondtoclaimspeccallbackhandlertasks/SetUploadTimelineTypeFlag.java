@@ -30,20 +30,26 @@ public class SetUploadTimelineTypeFlag implements CaseTask {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
         Set<DefendantResponseShowTag> updatedShowConditions = new HashSet<>(caseData.getShowConditionFlags());
+        updatedShowConditions.removeIf(EnumSet.of(
+            TIMELINE_UPLOAD,
+            TIMELINE_MANUALLY
+        )::contains);
 
-        updatedShowConditions.removeAll(EnumSet.of(TIMELINE_UPLOAD, TIMELINE_MANUALLY));
-
-        if ((YES.equals(caseData.getIsRespondent1()) && caseData.getSpecClaimResponseTimelineList() == TimelineUploadTypeSpec.UPLOAD)
-            || (YES.equals(caseData.getIsRespondent2()) && caseData.getSpecClaimResponseTimelineList2() == TimelineUploadTypeSpec.UPLOAD)) {
+        if ((YES.equals(caseData.getIsRespondent1())
+            && caseData.getSpecClaimResponseTimelineList() == TimelineUploadTypeSpec.UPLOAD)
+            || (YES.equals(caseData.getIsRespondent2())
+            && caseData.getSpecClaimResponseTimelineList2() == TimelineUploadTypeSpec.UPLOAD)) {
             updatedShowConditions.add(TIMELINE_UPLOAD);
-        } else if ((YES.equals(caseData.getIsRespondent1()) && caseData.getSpecClaimResponseTimelineList() == TimelineUploadTypeSpec.MANUAL)
-            || (YES.equals(caseData.getIsRespondent2()) && caseData.getSpecClaimResponseTimelineList2() == TimelineUploadTypeSpec.MANUAL)) {
+        } else if ((YES.equals(caseData.getIsRespondent1())
+            && caseData.getSpecClaimResponseTimelineList() == TimelineUploadTypeSpec.MANUAL)
+            || (YES.equals(caseData.getIsRespondent2())
+            && caseData.getSpecClaimResponseTimelineList2() == TimelineUploadTypeSpec.MANUAL)) {
             updatedShowConditions.add(TIMELINE_MANUALLY);
         }
-
         updatedData.showConditionFlags(updatedShowConditions);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
-            .build();    }
+            .build();
+    }
 }

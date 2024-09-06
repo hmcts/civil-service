@@ -42,7 +42,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbac
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.HandleDefendAllClaim;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.HandleRespondentResponseTypeForSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.PopulateRespondent1Copy;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.RespondToClaimSpecDocumentHandler;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.RespondToClaimSpecUtilsCourtLocation;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.RespondToClaimSpecUtilsDisputeDetails;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.RespondToClaimSpecValidationUtils;
@@ -165,15 +164,14 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     StateFlowEngine.class,
     AssignCategoryId.class,
     FrcDocumentsUtils.class,
-    RespondToClaimSpecValidationUtils.class,
     DetermineLoggedInSolicitor.class,
     HandleAdmitPartOfClaim.class,
     HandleDefendAllClaim.class,
     HandleRespondentResponseTypeForSpec.class,
     PopulateRespondent1Copy.class,
-    RespondToClaimSpecDocumentHandler.class,
     RespondToClaimSpecUtilsCourtLocation.class,
     RespondToClaimSpecUtilsDisputeDetails.class,
+    RespondToClaimSpecValidationUtils.class,
     SetApplicantResponseDeadline.class,
     SetGenericResponseTypeFlag.class,
     SetUploadTimelineTypeFlag.class,
@@ -1471,13 +1469,13 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getData())
             .extracting("respondent1DQFixedRecoverableCostsIntermediate")
             .extracting("frcSupportingDocument")
-            .extracting("categoryID")
+            .extracting("category_id")
             .isEqualTo(DQ_DEF1.getValue());
 
         assertThat(response.getData())
             .extracting("respondent2DQFixedRecoverableCostsIntermediate")
             .extracting("frcSupportingDocument")
-            .extracting("categoryID")
+            .extracting("category_id")
             .isEqualTo(DQ_DEF2.getValue());
     }
 
@@ -1553,8 +1551,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .extracting("PostCode")
             .isEqualTo("new postcode");
         assertThat(response.getData().get("specAoSRespondentCorrespondenceAddressdetails"))
-            .extracting("PostCode")
-            .isNull();
+            .isEqualTo(Collections.emptyMap());
     }
 
     @Test
@@ -1602,8 +1599,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .extracting("PostCode")
             .isEqualTo("new postcode");
         assertThat(response.getData().get("specAoSRespondentCorrespondenceAddressdetails"))
-            .extracting("PostCode")
-            .isNull();
+            .isEqualTo(Collections.emptyMap());
         assertEquals(
             response.getData().get("specRespondentCorrespondenceAddressdetails"),
             response.getData().get("specRespondent2CorrespondenceAddressdetails")
@@ -1653,8 +1649,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .extracting("PostCode")
             .isEqualTo("new postcode");
         assertThat(response.getData().get("specAoSRespondent2CorrespondenceAddressdetails"))
-            .extracting("PostCode")
-            .isNull();
+            .isEqualTo(Collections.emptyMap());
     }
 
     @Test

@@ -52,7 +52,9 @@ public class HandleAdmitPartOfClaim implements CaseTask {
     private final ObjectMapper objectMapper;
     private final FeatureToggleService toggleService;
     private final PaymentDateValidator paymentDateValidator;
+    private final RespondToClaimSpecUtilsDisputeDetails respondToClaimSpecUtilsDisputeDetails;
 
+    // called on full_admit, also called after whenWillClaimBePaid
     @Override
     public CallbackResponse execute(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
@@ -163,55 +165,56 @@ public class HandleAdmitPartOfClaim implements CaseTask {
     private Set<DefendantResponseShowTag> checkNecessaryFinancialDetails(CaseData caseData) {
         Set<DefendantResponseShowTag> necessary = EnumSet.noneOf(DefendantResponseShowTag.class);
         MultiPartyScenario scenario = MultiPartyScenario.getMultiPartyScenario(caseData);
-
         if (caseData.getShowConditionFlags().contains(CAN_ANSWER_RESPONDENT_1)) {
-            addNecessaryFinancialDetailsForRespondent1(caseData, necessary, scenario);
+            if (caseData.getRespondent1().getType() != Party.Type.COMPANY
+                && caseData.getRespondent1().getType() != Party.Type.ORGANISATION && needFinancialInfo1(caseData)) {
+                necessary.add(NEED_FINANCIAL_DETAILS_1);
+            }
+
+            if (respondToClaimSpecUtilsDisputeDetails.respondent1doesNotPayImmediately(caseData, scenario)) {
+                necessary.add(WHY_1_DOES_NOT_PAY_IMMEDIATELY);
+            }
         }
 
         if (caseData.getShowConditionFlags().contains(CAN_ANSWER_RESPONDENT_2)) {
-            addNecessaryFinancialDetailsForRespondent2(caseData, necessary, scenario);
+            if (caseData.getRespondent2().getType() != Party.Type.COMPANY
+                && caseData.getRespondent2().getType() != Party.Type.ORGANISATION) {
+                if ((scenario == ONE_V_TWO_TWO_LEGAL_REP && needFinancialInfo21v2ds(caseData))
+                    || (scenario == ONE_V_TWO_ONE_LEGAL_REP
+                    && ((caseData.getRespondentResponseIsSame() != YES && needFinancialInfo21v2ds(caseData))
+                    || (needFinancialInfo1(caseData) && caseData.getRespondentResponseIsSame() == YES)))) {
+                    necessary.add(NEED_FINANCIAL_DETAILS_2);
+                }
+
+                if (respondToClaimSpecUtilsDisputeDetails.respondent2doesNotPayImmediately(caseData, scenario)) {
+                    necessary.add(WHY_2_DOES_NOT_PAY_IMMEDIATELY);
+                }
+            }
+
+            if (respondToClaimSpecUtilsDisputeDetails.respondent2doesNotPayImmediately(caseData, scenario)) {
+                necessary.add(WHY_2_DOES_NOT_PAY_IMMEDIATELY);
+            }
+
+            if ((caseData.getRespondentResponseIsSame() == YES
+                && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == SUGGESTION_OF_REPAYMENT_PLAN)
+                || caseData.getDefenceAdmitPartPaymentTimeRouteRequired2() == SUGGESTION_OF_REPAYMENT_PLAN) {
+                necessary.add(REPAYMENT_PLAN_2);
+            }
         }
 
         return necessary;
     }
 
-    private void addNecessaryFinancialDetailsForRespondent1(CaseData caseData, Set<DefendantResponseShowTag> necessary, MultiPartyScenario scenario) {
-        if (caseData.getRespondent1().getType() != Party.Type.COMPANY && caseData.getRespondent1().getType() != Party.Type.ORGANISATION && needFinancialInfo1(caseData)) {
-            necessary.add(NEED_FINANCIAL_DETAILS_1);
-        }
-
-        if (RespondToClaimSpecUtilsDisputeDetails.respondent1doesNotPayImmediately(caseData, scenario)) {
-            necessary.add(WHY_1_DOES_NOT_PAY_IMMEDIATELY);
-        }
-    }
-
-    private void addNecessaryFinancialDetailsForRespondent2(CaseData caseData, Set<DefendantResponseShowTag> necessary, MultiPartyScenario scenario) {
-        if (caseData.getRespondent2().getType() != Party.Type.COMPANY && caseData.getRespondent2().getType() != Party.Type.ORGANISATION) {
-            if ((scenario == ONE_V_TWO_TWO_LEGAL_REP && RespondToClaimSpecUtilsDisputeDetails.needFinancialInfo21v2ds(caseData))
-                || (scenario == ONE_V_TWO_ONE_LEGAL_REP && ((caseData.getRespondentResponseIsSame() != YES && RespondToClaimSpecUtilsDisputeDetails.needFinancialInfo21v2ds(caseData))
-                || (needFinancialInfo1(caseData) && caseData.getRespondentResponseIsSame() == YES)))) {
-                necessary.add(NEED_FINANCIAL_DETAILS_2);
-            }
-
-            if (RespondToClaimSpecUtilsDisputeDetails.respondent2doesNotPayImmediately(caseData, scenario)) {
-                necessary.add(WHY_2_DOES_NOT_PAY_IMMEDIATELY);
-            }
-        }
-
-        if (RespondToClaimSpecUtilsDisputeDetails.respondent2doesNotPayImmediately(caseData, scenario)) {
-            necessary.add(WHY_2_DOES_NOT_PAY_IMMEDIATELY);
-        }
-
-        if ((caseData.getRespondentResponseIsSame() == YES && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == SUGGESTION_OF_REPAYMENT_PLAN)
-            || caseData.getDefenceAdmitPartPaymentTimeRouteRequired2() == SUGGESTION_OF_REPAYMENT_PLAN) {
-            necessary.add(REPAYMENT_PLAN_2);
-        }
-    }
-
     public boolean mustWhenWillClaimBePaidBeShown(CaseData caseData) {
-        return RespondToClaimSpecUtilsDisputeDetails.mustWhenWillClaimBePaidBeShown(caseData);
+        return respondToClaimSpecUtilsDisputeDetails.mustWhenWillClaimBePaidBeShown(caseData);
     }
 
+    /**
+     * this condition has been copied from ccd's on the moment of writing.
+     *
+     * @param caseData the case data
+     * @return true if the financial details for r1 are needed. Doesn't consider if the r1
+     */
     private boolean needFinancialInfo1(CaseData caseData) {
         return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != IMMEDIATELY
             && caseData.getSpecDefenceAdmittedRequired() != YES
@@ -219,8 +222,23 @@ public class HandleAdmitPartOfClaim implements CaseTask {
             && caseData.getRespondentClaimResponseTypeForSpecGeneric() != FULL_DEFENCE
             && caseData.getRespondentClaimResponseTypeForSpecGeneric() != RespondentResponseTypeSpec.COUNTER_CLAIM
             && caseData.getMultiPartyResponseTypeFlags() != MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART
-            && (caseData.getSameSolicitorSameResponse() != NO || MultiPartyScenario.getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP)
+            && (caseData.getSameSolicitorSameResponse() != NO
+            || MultiPartyScenario.getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP)
             && caseData.getDefendantSingleResponseToBothClaimants() != NO;
+    }
+
+    /**
+     * Adapts the conditions from needFinancialInfo1 for use with 2nd solicitor.
+     *
+     * @param caseData case data
+     * @return true if the financial details for 2nd defendant are needed, in a 1v2 different solicitor claim.
+     */
+    private boolean needFinancialInfo21v2ds(CaseData caseData) {
+        return caseData.getDefenceAdmitPartPaymentTimeRouteRequired2() != IMMEDIATELY
+            && caseData.getSpecDefenceAdmitted2Required() != YES
+            && caseData.getSpecDefenceFullAdmitted2Required() != YES
+            && caseData.getRespondentClaimResponseTypeForSpecGeneric() != FULL_DEFENCE
+            && caseData.getRespondentClaimResponseTypeForSpecGeneric() != RespondentResponseTypeSpec.COUNTER_CLAIM;
     }
 
     private AllocatedTrack getAllocatedTrack(CaseData caseData) {

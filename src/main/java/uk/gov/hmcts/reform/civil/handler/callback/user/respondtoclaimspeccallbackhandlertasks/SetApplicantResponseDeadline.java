@@ -6,23 +6,32 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.CaseTask;
+import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -30,13 +39,20 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -53,6 +69,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDetails;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToRespondentExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
@@ -72,7 +89,12 @@ public class SetApplicantResponseDeadline implements CaseTask {
     private final IStateFlowEngine stateFlowEngine;
     private final DeadlinesCalculator deadlinesCalculator;
     private final FrcDocumentsUtils frcDocumentsUtils;
-    private final RespondToClaimSpecDocumentHandler respondToClaimSpecDocumentHandler;
+    private final RespondToClaimSpecUtilsDisputeDetails respondToClaimSpecUtilsDisputeDetails;
+    private final CourtLocationUtils courtLocationUtils;
+    private final RespondToClaimSpecUtilsCourtLocation respondToClaimSpecUtilsCourtLocation;
+
+    private static final String DEF2 = "Defendant 2";
+    private final AssignCategoryId assignCategoryId;
 
     @Override
     public CallbackResponse execute(CallbackParams callbackParams) {
@@ -98,7 +120,7 @@ public class SetApplicantResponseDeadline implements CaseTask {
             .respondent1(updatedRespondent1)
             .respondent1Copy(null);
 
-        if (RespondToClaimSpecUtilsDisputeDetails.respondent2HasSameLegalRep(caseData)
+        if (respondToClaimSpecUtilsDisputeDetails.respondent2HasSameLegalRep(caseData)
             && caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == YES) {
             updatedData.respondent2ClaimResponseTypeForSpec(caseData.getRespondent1ClaimResponseTypeForSpec());
             updatedData
@@ -146,7 +168,7 @@ public class SetApplicantResponseDeadline implements CaseTask {
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Respondent2DQ.Respondent2DQBuilder dq = caseData.getRespondent2DQ().toBuilder()
                 .respondent2DQStatementOfTruth(statementOfTruth);
-            respondToClaimSpecDocumentHandler.handleCourtLocationForRespondent2DQ(caseData, updatedData, dq, callbackParams);
+            handleCourtLocationForRespondent2DQ(caseData, updatedData, dq, callbackParams);
             updatedData.respondent2DQ(dq.build());
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
@@ -182,7 +204,7 @@ public class SetApplicantResponseDeadline implements CaseTask {
                                             .witnessesToAppear(caseData.getRespondent1DQWitnessesRequiredSpec())
                                             .details(caseData.getRespondent1DQWitnessesDetailsSpec())
                                             .build());
-            respondToClaimSpecDocumentHandler.handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
+            handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
             updatedData.respondent1DQ(dq.build());
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
@@ -305,7 +327,7 @@ public class SetApplicantResponseDeadline implements CaseTask {
                 .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
                 .build();
         }
-        respondToClaimSpecDocumentHandler.assembleResponseDocumentsSpec(caseData, updatedData);
+        assembleResponseDocumentsSpec(caseData, updatedData);
         frcDocumentsUtils.assembleDefendantsFRCDocuments(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -316,9 +338,12 @@ public class SetApplicantResponseDeadline implements CaseTask {
 
     private boolean ifResponseTypeIsPartOrFullAdmission(CaseData caseData) {
         return (RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))
-            || (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()));
+            || RespondentResponseTypeSpec.PART_ADMISSION.equals(
+            caseData.getRespondent2ClaimResponseTypeForSpec())
+        ) || (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.FULL_ADMISSION.equals(
+            caseData.getRespondent2ClaimResponseTypeForSpec())
+        );
     }
 
     private boolean solicitorRepresentsOnlyOneOfRespondents(CallbackParams callbackParams, CaseRole caseRole) {
@@ -329,13 +354,16 @@ public class SetApplicantResponseDeadline implements CaseTask {
             && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), caseRole);
     }
 
-    public void updateCorrespondenceAddress(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> updatedCaseData, CaseData caseData) {
+    private void updateCorrespondenceAddress(CallbackParams callbackParams,
+                                             CaseData.CaseDataBuilder<?, ?> updatedCaseData,
+                                             CaseData caseData) {
         if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORONE)
             && caseData.getSpecAoSRespondentCorrespondenceAddressRequired() == YesOrNo.NO) {
             Address newAddress = caseData.getSpecAoSRespondentCorrespondenceAddressdetails();
             updatedCaseData.specRespondentCorrespondenceAddressdetails(newAddress)
                 .specAoSRespondentCorrespondenceAddressdetails(Address.builder().build());
             if (getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP) {
+                // to keep with heading tab
                 updatedCaseData.specRespondent2CorrespondenceAddressdetails(newAddress);
             }
         } else if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORTWO)
@@ -343,6 +371,184 @@ public class SetApplicantResponseDeadline implements CaseTask {
             updatedCaseData.specRespondent2CorrespondenceAddressdetails(
                     caseData.getSpecAoSRespondent2CorrespondenceAddressdetails())
                 .specAoSRespondent2CorrespondenceAddressdetails(Address.builder().build());
+        }
+    }
+
+    private void assembleResponseDocumentsSpec(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+        List<Element<CaseDocument>> defendantUploads = new ArrayList<>();
+        ResponseDocument respondent1SpecDefenceResponseDocument = caseData.getRespondent1SpecDefenceResponseDocument();
+        if (respondent1SpecDefenceResponseDocument != null) {
+            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1ClaimDocument = respondent1SpecDefenceResponseDocument.getFile();
+            if (respondent1ClaimDocument != null) {
+                Element<CaseDocument> documentElement = buildElemCaseDocument(
+                    respondent1ClaimDocument, "Defendant",
+                    updatedCaseData.build().getRespondent1ResponseDate(),
+                    DocumentType.DEFENDANT_DEFENCE
+                );
+                assignCategoryId.assignCategoryIdToDocument(
+                    respondent1ClaimDocument,
+                    DocCategory.DEF1_DEFENSE_DQ.getValue()
+                );
+                defendantUploads.add(documentElement);
+            }
+        }
+        Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
+        if (respondent1DQ != null) {
+            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1DQDraftDirections = respondent1DQ.getRespondent1DQDraftDirections();
+            if (respondent1DQDraftDirections != null) {
+                Element<CaseDocument> documentElement = buildElemCaseDocument(
+                    respondent1DQDraftDirections,
+                    "Defendant",
+                    updatedCaseData.build().getRespondent1ResponseDate(),
+                    DocumentType.DEFENDANT_DRAFT_DIRECTIONS
+                );
+                assignCategoryId.assignCategoryIdToDocument(
+                    respondent1DQDraftDirections,
+                    DocCategory.DQ_DEF1.getValue()
+                );
+                defendantUploads.add(documentElement);
+            }
+            ResponseDocument respondent2SpecDefenceResponseDocument = caseData.getRespondent2SpecDefenceResponseDocument();
+            if (respondent2SpecDefenceResponseDocument != null) {
+                uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2ClaimDocument = respondent2SpecDefenceResponseDocument.getFile();
+                if (respondent2ClaimDocument != null) {
+                    Element<CaseDocument> documentElement = buildElemCaseDocument(
+                        respondent2ClaimDocument, DEF2,
+                        updatedCaseData.build().getRespondent2ResponseDate(),
+                        DocumentType.DEFENDANT_DEFENCE
+                    );
+                    assignCategoryId.assignCategoryIdToDocument(
+                        respondent2ClaimDocument,
+                        DocCategory.DEF2_DEFENSE_DQ.getValue()
+                    );
+                    defendantUploads.add(documentElement);
+                }
+            }
+        } else {
+            ResponseDocument respondent2SpecDefenceResponseDocument = caseData.getRespondent2SpecDefenceResponseDocument();
+            if (respondent2SpecDefenceResponseDocument != null) {
+                uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2ClaimDocument = respondent2SpecDefenceResponseDocument.getFile();
+                if (respondent2ClaimDocument != null) {
+                    Element<CaseDocument> documentElement = buildElemCaseDocument(
+                        respondent2ClaimDocument, DEF2,
+                        updatedCaseData.build().getRespondent2ResponseDate(),
+                        DocumentType.DEFENDANT_DEFENCE
+                    );
+                    assignCategoryId.assignCategoryIdToDocument(
+                        respondent2ClaimDocument,
+                        DocCategory.DEF2_DEFENSE_DQ.getValue()
+                    );
+                    CaseDocument copy = assignCategoryId
+                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF2.getValue());
+                    defendantUploads.add(documentElement);
+                    if (Objects.nonNull(copy)) {
+                        defendantUploads.add(ElementUtils.element(copy));
+                    }
+                }
+            }
+        }
+        Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
+        if (respondent2DQ != null) {
+            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2DQDraftDirections = respondent2DQ.getRespondent2DQDraftDirections();
+            if (respondent2DQDraftDirections != null) {
+                Element<CaseDocument> documentElement = buildElemCaseDocument(
+                    respondent2DQDraftDirections,
+                    DEF2,
+                    updatedCaseData.build().getRespondent2ResponseDate(),
+                    DocumentType.DEFENDANT_DRAFT_DIRECTIONS
+                );
+                assignCategoryId.assignCategoryIdToDocument(
+                    respondent2DQDraftDirections,
+                    DocCategory.DQ_DEF2.getValue()
+                );
+                defendantUploads.add(documentElement);
+            }
+        }
+        if (!defendantUploads.isEmpty()) {
+            updatedCaseData.defendantResponseDocuments(defendantUploads);
+        }
+        // these documents are added to defendantUploads, if we do not remove/null the original,
+        // case file view will show duplicate documents
+        updatedCaseData.respondent1SpecDefenceResponseDocument(null);
+        updatedCaseData.respondent2SpecDefenceResponseDocument(null);
+
+    }
+
+    private void handleCourtLocationForRespondent1DQ(CaseData caseData,
+                                                     Respondent1DQ.Respondent1DQBuilder dq,
+                                                     CallbackParams callbackParams) {
+        Optional<LocationRefData> optCourtLocation = getCourtLocationDefendant1(caseData, callbackParams);
+        // data for court location
+        if (optCourtLocation.isPresent()) {
+            LocationRefData courtLocation = optCourtLocation.get();
+
+            dq.respondent1DQRequestedCourt(caseData.getRespondent1DQ()
+                                               .getRespondToCourtLocation().toBuilder()
+                                               .reasonForHearingAtSpecificCourt(
+                                                   caseData.getRespondent1DQ()
+                                                       .getRespondToCourtLocation()
+                                                       .getReasonForHearingAtSpecificCourt())
+                                               .responseCourtLocations(null)
+                                               .caseLocation(LocationHelper.buildCaseLocation(courtLocation))
+                                               .responseCourtCode(courtLocation.getCourtLocationCode()).build());
+            dq.respondToCourtLocation(RequestedCourt.builder()
+                                          .responseCourtLocations(null)
+                                          .responseCourtCode(courtLocation.getCourtLocationCode())
+
+                                          .build())
+                .responseClaimCourtLocationRequired(YES);
+        } else {
+            dq.responseClaimCourtLocationRequired(NO);
+        }
+    }
+
+    private Optional<LocationRefData> getCourtLocationDefendant1(CaseData caseData, CallbackParams callbackParams) {
+        if (caseData.getRespondent1DQ() != null
+            && caseData.getRespondent1DQ().getRespondToCourtLocation() != null) {
+            DynamicList courtLocations = caseData
+                .getRespondent1DQ().getRespondToCourtLocation().getResponseCourtLocations();
+            LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
+                respondToClaimSpecUtilsCourtLocation.fetchLocationData(callbackParams), courtLocations);
+            return Optional.ofNullable(courtLocation);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private void handleCourtLocationForRespondent2DQ(CaseData caseData, CaseData.CaseDataBuilder updatedCase,
+                                                     Respondent2DQ.Respondent2DQBuilder dq,
+                                                     CallbackParams callbackParams) {
+        Optional<LocationRefData> optCourtLocation = getCourtLocationDefendant2(caseData, callbackParams);
+        if (optCourtLocation.isPresent()) {
+            LocationRefData courtLocation = optCourtLocation.get();
+            dq.respondent2DQRequestedCourt(caseData.getRespondent2DQ().getRespondToCourtLocation2().toBuilder()
+                                               .responseCourtLocations(null)
+                                               .caseLocation(LocationHelper.buildCaseLocation(courtLocation))
+                                               .responseCourtCode(courtLocation.getCourtLocationCode()).build())
+                .respondToCourtLocation2(RequestedCourt.builder()
+                                             .responseCourtLocations(null)
+                                             .responseCourtCode(courtLocation.getCourtLocationCode())
+                                             .reasonForHearingAtSpecificCourt(
+                                                 caseData.getRespondent2DQ().getRespondToCourtLocation2()
+                                                     .getReasonForHearingAtSpecificCourt()
+                                             )
+                                             .build());
+            updatedCase.responseClaimCourtLocation2Required(YES);
+        } else {
+            updatedCase.responseClaimCourtLocation2Required(NO);
+        }
+    }
+
+    public Optional<LocationRefData> getCourtLocationDefendant2(CaseData caseData, CallbackParams callbackParams) {
+        if (caseData.getRespondent2DQ() != null
+            && caseData.getRespondent2DQ().getRespondToCourtLocation2() != null) {
+            DynamicList courtLocations = caseData
+                .getRespondent2DQ().getRespondToCourtLocation2().getResponseCourtLocations();
+            LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
+                respondToClaimSpecUtilsCourtLocation.fetchLocationData(callbackParams), courtLocations);
+            return Optional.ofNullable(courtLocation);
+        } else {
+            return Optional.empty();
         }
     }
 
