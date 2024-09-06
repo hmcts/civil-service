@@ -113,5 +113,6 @@ public class BundleUpdatedDefendantScenarioTest extends CaseEventsDashboardBaseI
                 jsonPath("$[1].taskNameEn").value(
                     "<a href={VIEW_BUNDLE} class=\"govuk-link\">View the bundle</a>")
             );
+        }
     }
 }
