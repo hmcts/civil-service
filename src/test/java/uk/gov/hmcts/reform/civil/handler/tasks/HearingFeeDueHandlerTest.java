@@ -5,6 +5,8 @@ import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.context.ApplicationEventPublisher;
@@ -87,13 +89,15 @@ class HearingFeeDueHandlerTest {
         verify(externalTaskService).complete(mockTask, null);
     }
 
-    @Test
-    void shouldEmitHearingFeePaidEvent_whenCasesFoundPaid() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldEmitHearingFeePaidEvent_whenCasesFoundPaid(boolean toggle) {
         long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDuePaid().build();
         Map<String, Object> data = Map.of("data", caseData);
         List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
 
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(toggle);
         when(searchService.getCases()).thenReturn(caseDetails);
         when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.get(0));
         when(caseDetailsConverter.toCaseData(caseDetails.get(0))).thenReturn(caseData);
@@ -104,8 +108,9 @@ class HearingFeeDueHandlerTest {
         verify(externalTaskService).complete(mockTask, null);
     }
 
-    @Test
-    void shouldEmitHearingFeePaidEvent_whenCasesFoundPaidWithHWF() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldEmitHearingFeePaidEvent_whenCasesFoundPaidWithHWF(boolean toggle) {
         long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder()
             .atStateHearingFeeDuePaidWithHwf()
@@ -118,6 +123,7 @@ class HearingFeeDueHandlerTest {
         Map<String, Object> data = Map.of("data", caseData);
         List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
 
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(toggle);
         when(searchService.getCases()).thenReturn(caseDetails);
         when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.get(0));
         when(caseDetailsConverter.toCaseData(caseDetails.get(0))).thenReturn(caseData);
@@ -128,13 +134,15 @@ class HearingFeeDueHandlerTest {
         verify(externalTaskService).complete(mockTask, null);
     }
 
-    @Test
-    void shouldEmitHearingFeePaidEvent_whenCasesFoundUnpaid() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldEmitHearingFeeUnpaidEvent_whenCasesFoundUnpaid(boolean toggle) {
         long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDueUnpaid().build();
         Map<String, Object> data = Map.of("data", caseData);
         List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
 
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(toggle);
         when(searchService.getCases()).thenReturn(caseDetails);
         when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.get(0));
         when(caseDetailsConverter.toCaseData(caseDetails.get(0))).thenReturn(caseData);
