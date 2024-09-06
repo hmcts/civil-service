@@ -44,6 +44,8 @@ public class GeneralAppFeesService {
     public static final String FREE_REF = "FREE";
     private static final Fee FREE_FEE = Fee.builder()
         .calculatedAmountInPence(BigDecimal.ZERO).code(FREE_REF).version("1").build();
+    private static final String MISCELLANEOUS = "miscellaneous";
+    private static final String OTHER = "other";
 
     protected static final List<GeneralApplicationTypes> VARY_TYPES
         = Arrays.asList(
@@ -72,18 +74,12 @@ public class GeneralAppFeesService {
     }
 
     public Fee getFeeForJOWithApplicationType(GeneralApplicationTypes applicationType) {
-        Fee result;
-        switch (applicationType) {
-            case GeneralApplicationTypes.VARY_ORDER:
-                result = getFeeForGA(feesConfiguration.getAppnToVaryOrSuspend(), "miscellaneous", "other");
-            case GeneralApplicationTypes.SET_ASIDE_JUDGEMENT:
-                result = getFeeForGA(feesConfiguration.getWithNoticeKeyword(), null, null);
-            case GeneralApplicationTypes.OTHER:
-                result = getFeeForGA(feesConfiguration.getCertificateOfSatisfaction(), "miscellaneous", "other");
-            default:
-                result = null;
-        }
-        return result;
+        return switch (applicationType) {
+            case VARY_ORDER -> getFeeForGA(feesConfiguration.getAppnToVaryOrSuspend(), MISCELLANEOUS, OTHER);
+            case SET_ASIDE_JUDGEMENT -> getFeeForGA(feesConfiguration.getWithNoticeKeyword(), null, null);
+            case OTHER -> getFeeForGA(feesConfiguration.getCertificateOfSatisfaction(), MISCELLANEOUS, OTHER);
+            default -> null;
+        };
     }
 
     private Fee getFeeForGA(List<GeneralApplicationTypes> types, Boolean respondentAgreed, Boolean informOtherParty, LocalDate hearingScheduledDate) {
@@ -92,7 +88,7 @@ public class GeneralAppFeesService {
         if (CollectionUtils.containsAny(types, VARY_TYPES)) {
             //only minus 1 as VARY_PAYMENT_TERMS_OF_JUDGMENT can't be multi selected
             typeSize--;
-            result = getFeeForGA(feesConfiguration.getAppnToVaryOrSuspend(), "miscellaneous", "other");
+            result = getFeeForGA(feesConfiguration.getAppnToVaryOrSuspend(), MISCELLANEOUS, OTHER);
         }
         if (typeSize > 0
             && CollectionUtils.containsAny(types, SD_CONSENT_TYPES)) {
