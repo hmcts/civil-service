@@ -242,7 +242,7 @@ class BundleCreationTriggerEventHandlerTest {
         Object caseBundlesObj = (((HashMap<String, Object>)caseDataContent.getData()).get("caseBundles"));
         List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> caseBundlesList = (List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>>) caseBundlesObj;
         Assertions.assertEquals(caseBundles.get(0).getValue().getTitle(), caseBundlesList.get(0).getValue().getTitle()
-                                );
+        );
     }
 
     private List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> prepareCaseBundles() {
