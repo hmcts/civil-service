@@ -135,15 +135,15 @@ public class DefendantNocScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[0].taskNameCy").value("<a>Llwytho dogfennau'r gwrandawiad</a>"),
                 jsonPath("$[0].currentStatusCy").value(TaskStatus.INACTIVE.getWelshName()),
                 jsonPath("$[1].reference").value(caseId.toString()),
-                jsonPath("$[1].taskNameEn").value("<a>Contact the court to request a change to my case</a>"),
+                jsonPath("$[1].taskNameEn").value("<a>Add the trial arrangements</a>"),
                 jsonPath("$[1].currentStatusEn").value(TaskStatus.INACTIVE.getName()),
-                jsonPath("$[1].taskNameCy").value("<a>Contact the court to request a change to my case</a>"),
+                jsonPath("$[1].taskNameCy").value("<a>Ychwanegu trefniadau'r treial</a>"),
                 jsonPath("$[1].currentStatusCy").value(TaskStatus.INACTIVE.getWelshName()),
                 jsonPath("$[2].reference").value(caseId.toString()),
-                jsonPath("$[2].taskNameEn").value("<a>Add the trial arrangements</a>"),
+                jsonPath("$[2].taskNameEn").value("<a>Contact the court to request a change to my case</a>"),
                 jsonPath("$[2].currentStatusEn").value(TaskStatus.INACTIVE.getName()),
-                jsonPath("$[2].taskNameCy").value("<a>Ychwanegu trefniadau'r treial</a>"),
-                jsonPath("$[2].currentStatusCy").value(TaskStatus.INACTIVE.getWelshName())
+                jsonPath("$[2].taskNameCy").value("<a>Contact the court to request a change to my case</a>"),
+                jsonPath("$[2].currentStatusCy").value(TaskStatus.INACTIVE.getWelshName()),
             );
     }
 
@@ -152,14 +152,14 @@ public class DefendantNocScenarioTest extends DashboardBaseIntegrationTest {
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].reference").value(caseId.toString()),
-                jsonPath("$[0].taskNameEn").value("<a>Upload hearing documents</a>"),
+                jsonPath("$[0].taskNameEn").value("<a>Pay the hearing fee</a>"),
                 jsonPath("$[0].currentStatusEn").value(TaskStatus.INACTIVE.getName()),
-                jsonPath("$[0].taskNameCy").value("<a>Llwytho dogfennau'r gwrandawiad</a>"),
+                jsonPath("$[0].taskNameCy").value("<a>Talu ffi'r gwrandawiad</a>"),
                 jsonPath("$[0].currentStatusCy").value(TaskStatus.INACTIVE.getWelshName()),
                 jsonPath("$[1].reference").value(caseId.toString()),
-                jsonPath("$[1].taskNameEn").value("<a>Contact the court to request a change to my case</a>"),
+                jsonPath("$[1].taskNameEn").value("<a>Upload hearing documents</a>"),
                 jsonPath("$[1].currentStatusEn").value(TaskStatus.INACTIVE.getName()),
-                jsonPath("$[1].taskNameCy").value("<a>Contact the court to request a change to my case</a>"),
+                jsonPath("$[1].taskNameCy").value("<a>Llwytho dogfennau'r gwrandawiad</a>"),
                 jsonPath("$[1].currentStatusCy").value(TaskStatus.INACTIVE.getWelshName()),
                 jsonPath("$[2].reference").value(caseId.toString()),
                 jsonPath("$[2].taskNameEn").value("<a>Add the trial arrangements</a>"),
@@ -167,10 +167,11 @@ public class DefendantNocScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[2].taskNameCy").value("<a>Ychwanegu trefniadau'r treial</a>"),
                 jsonPath("$[2].currentStatusCy").value(TaskStatus.INACTIVE.getWelshName()),
                 jsonPath("$[3].reference").value(caseId.toString()),
-                jsonPath("$[3].taskNameEn").value("<a>Pay the hearing fee</a>"),
+                jsonPath("$[3].taskNameEn").value("<a>Contact the court to request a change to my case</a>"),
                 jsonPath("$[3].currentStatusEn").value(TaskStatus.INACTIVE.getName()),
-                jsonPath("$[3].taskNameCy").value("<a>Talu ffi'r gwrandawiad</a>"),
+                jsonPath("$[3].taskNameCy").value("<a>Contact the court to request a change to my case</a>"),
                 jsonPath("$[3].currentStatusCy").value(TaskStatus.INACTIVE.getWelshName())
+
             );
     }
 }
