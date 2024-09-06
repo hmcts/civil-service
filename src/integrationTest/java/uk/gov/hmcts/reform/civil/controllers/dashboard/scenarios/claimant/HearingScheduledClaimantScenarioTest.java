@@ -214,7 +214,13 @@ public class HearingScheduledClaimantScenarioTest extends CaseProgressionDashboa
             .hearingLocation(list).build();
 
         // When
-        handler.handle(callbackParams(caseData));
+        CallbackParams callbackParams = callbackParams(caseData);
+        callbackParams = callbackParams.toBuilder().request(CallbackRequest.builder()
+                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT")
+                                                                .build()).build();
+
+        // When
+        handler.handle(callbackParams);
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT")
