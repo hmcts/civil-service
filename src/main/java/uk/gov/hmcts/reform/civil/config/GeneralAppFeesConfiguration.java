@@ -31,7 +31,7 @@ public class GeneralAppFeesConfiguration {
             @Value("${genApp.fee.keywords.withNotice}") String withNoticeKeyword,
             @Value("${genApp.fee.keywords.consentedOrWithoutNotice}") String consentedOrWithoutNoticeKeyword,
             @Value("${genApp.fee.keywords.appnToVaryOrSuspend}") String appnToVaryOrSuspend,
-            @Value("${genApp.fee.keywords.cos}") String certificateOfSatisfaction) {
+            @Value("${genApp.fee.keywords.certificateOfSatisfaction}") String certificateOfSatisfaction) {
         this.url = url;
         this.endpoint = endpoint;
         this.service = service;

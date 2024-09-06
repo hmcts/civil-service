@@ -76,7 +76,7 @@ public class GeneralAppFeesService {
     public Fee getFeeForJOWithApplicationType(GeneralApplicationTypes applicationType) {
         return switch (applicationType) {
             case VARY_ORDER -> getFeeForGA(feesConfiguration.getAppnToVaryOrSuspend(), MISCELLANEOUS, OTHER);
-            case SET_ASIDE_JUDGEMENT -> getFeeForGA(feesConfiguration.getWithNoticeKeyword(), null, null);
+            case SET_ASIDE_JUDGEMENT -> getFeeForGA(feesConfiguration.getWithNoticeKeyword(), "general application", "general");
             case OTHER -> getFeeForGA(feesConfiguration.getCertificateOfSatisfaction(), MISCELLANEOUS, OTHER);
             default -> null;
         };

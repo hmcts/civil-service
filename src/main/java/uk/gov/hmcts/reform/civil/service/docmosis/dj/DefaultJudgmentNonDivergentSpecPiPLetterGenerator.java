@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.judgmentonline.DefaultJudgmentNonDivergentSpecLipDefendantLetter;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
+import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 
@@ -20,6 +21,9 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.OTHER;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SET_ASIDE_JUDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_ORDER;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_LIP_DEFENDANT_LETTER;
 
 @Slf4j
@@ -32,6 +36,7 @@ public class DefaultJudgmentNonDivergentSpecPiPLetterGenerator {
     private final DocumentDownloadService documentDownloadService;
     private final BulkPrintService bulkPrintService;
     private final PinInPostConfiguration pipInPostConfiguration;
+    private final GeneralAppFeesService generalAppFeesService;
     private static final String DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER_REF = "default-judgment-non-divergent-spec-pin_in_letter";
 
     public byte[] generateAndPrintDefaultJudgementSpecLetter(CaseData caseData, String authorisation) {
@@ -83,6 +88,9 @@ public class DefaultJudgmentNonDivergentSpecPiPLetterGenerator {
             .caseSubmittedDate(caseData.getSubmittedDate().toLocalDate())
             .pin(caseData.getRespondent1PinToPostLRspec().getAccessCode())
             .respondToClaimUrl(pipInPostConfiguration.getRespondToClaimUrl())
+            .varyJudgmentFee(String.valueOf(generalAppFeesService.getFeeForJOWithApplicationType(VARY_ORDER).formData()))
+            .judgmentSetAsideFee(String.valueOf(generalAppFeesService.getFeeForJOWithApplicationType(SET_ASIDE_JUDGEMENT).formData()))
+            .certifOfSatisfactionFee(String.valueOf(generalAppFeesService.getFeeForJOWithApplicationType(OTHER).formData()))
             .build();
     }
 }

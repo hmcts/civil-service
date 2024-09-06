@@ -18,5 +18,7 @@ public class JudgmentByAdmissionLiPDefendantLetter implements MappableObject {
     private final String claimReferenceNumber;
     private final String respondToClaimUrl;
     private final String pin;
+    private final String varyJudgmentFee;
+    private final String certifOfSatisfactionFee;
 
 }
