@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -49,6 +50,7 @@ import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentBySetDate;
+import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
@@ -223,13 +225,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private WorkingDayIndicator workingDayIndicator;
     @MockBean
     private DeadlineExtensionCalculatorService deadlineCalculatorService;
-
-    public static final String UNAVAILABLE_DATE_RANGE_MISSING = "Please provide at least one valid Date from if you cannot attend hearing within next 3 months.";
-    public static final String INVALID_UNAVAILABILITY_RANGE = "Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.";
-    public static final String INVALID_UNAVAILABLE_DATE_BEFORE_TODAY = "Unavailability Date must not be before today.";
-    public static final String INVALID_UNAVAILABLE_DATE_FROM_BEFORE_TODAY = "Unavailability Date From must not be before today.";
-    public static final String INVALID_UNAVAILABLE_DATE_TO_WHEN_MORE_THAN_YEAR = "Unavailability Date To must not be more than one year in the future.";
-    public static final String INVALID_UNAVAILABLE_DATE_WHEN_MORE_THAN_YEAR = "Unavailability Date must not be more than one year in the future.";
 
     @Nested
     class AboutToStart {
@@ -1370,6 +1365,15 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldChangeCaseState_WhenRespondentRepaymentPlanAndFlagV2WithJudgementLiveAndNotLrVLiP() {
             given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeOption(YesOrNo.YES)
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0))
+                .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
+                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
+                .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(500.0))
+                .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(50.0))
+                .ccjJudgmentTotalStillOwed(BigDecimal.valueOf(500.0))
+                .build();
             CaseData caseData = CaseData.builder()
                 .respondent1Represented(YesOrNo.YES)
                 .applicant1Represented(YesOrNo.YES)
@@ -1377,10 +1381,16 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .defenceAdmitPartPaymentTimeRouteRequired(SUGGESTION_OF_REPAYMENT_PLAN)
+                .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
+                                              .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                                              .firstRepaymentDate(LocalDate.now().plusDays(5))
+                                              .paymentAmount(BigDecimal.valueOf(100.0))
+                                              .build())
                 .respondent1(Party.builder()
                                  .primaryAddress(Address.builder().build())
                                  .type(Party.Type.COMPANY)
                                  .companyName("company name").build())
+                .ccjPaymentDetails(ccjPaymentDetails)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
                 .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
@@ -1399,6 +1409,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0))
                 .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
                 .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
+                .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(500.0))
+                .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(50.0))
+                .ccjJudgmentTotalStillOwed(BigDecimal.valueOf(500.0))
                 .build();
             CaseData caseData = CaseData.builder()
                 .respondent1Represented(YesOrNo.NO)
@@ -2797,16 +2810,16 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains(INVALID_UNAVAILABLE_DATE_BEFORE_TODAY);
+            assertThat(response.getErrors()).contains("Unavailability Date must not be before today.");
         }
 
         @Test
-        public void testApp1UnavailableDateWhenAvailabilityIsYesAndSingleDateIsBeyondYear() {
+        public void testApp1UnavailableDateWhenAvailabilityIsYesAndSingleDateIsBeyond3Months() {
 
             List<Element<UnavailableDate>> unAvailableDates = Stream.of(
                 UnavailableDate.builder()
                     .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                    .date(LocalDate.now().plusYears(4))
+                    .date(LocalDate.now().plusMonths(4))
                     .build(),
                 UnavailableDate.builder()
                     .unavailableDateType(UnavailableDateType.DATE_RANGE)
@@ -2828,7 +2841,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains(INVALID_UNAVAILABLE_DATE_WHEN_MORE_THAN_YEAR);
+            assertThat(response.getErrors()).contains("Unavailability Date must not be more than three months in the future.");
         }
 
         @Test
@@ -2859,7 +2872,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains(INVALID_UNAVAILABILITY_RANGE);
+            assertThat(response.getErrors()).contains("Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.");
         }
 
         @Test
@@ -2890,7 +2903,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains(INVALID_UNAVAILABLE_DATE_FROM_BEFORE_TODAY);
+            assertThat(response.getErrors()).contains("Unavailability Date From must not be before today.");
         }
 
         @Test
@@ -2921,11 +2934,11 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains(INVALID_UNAVAILABILITY_RANGE);
+            assertThat(response.getErrors()).contains("Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.");
         }
 
         @Test
-        public void testApp1UnavailableDateWhenDateToIsBeyondOneYear() {
+        public void testApp1UnavailableDateWhenDateToIsBeyondThreeMonths() {
 
             List<Element<UnavailableDate>> unAvailableDates = Stream.of(
                 UnavailableDate.builder()
@@ -2935,7 +2948,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 UnavailableDate.builder()
                     .unavailableDateType(UnavailableDateType.DATE_RANGE)
                     .fromDate(LocalDate.now().plusDays(6))
-                    .toDate(LocalDate.now().plusYears(4))
+                    .toDate(LocalDate.now().plusMonths(4))
                     .build()
             ).map(ElementUtils::element).toList();
 
@@ -2952,7 +2965,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains(INVALID_UNAVAILABLE_DATE_TO_WHEN_MORE_THAN_YEAR);
+            assertThat(response.getErrors()).contains("Unavailability Date To must not be more than three months in the future.");
         }
 
     }
