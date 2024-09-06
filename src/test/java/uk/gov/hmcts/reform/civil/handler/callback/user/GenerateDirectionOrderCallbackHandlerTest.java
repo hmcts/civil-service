@@ -13,12 +13,16 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ByteArrayResource;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.ComplexityBand;
@@ -51,6 +55,7 @@ import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrdersComplexityBand;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -120,6 +125,9 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
     @Mock
     private FeatureToggleService featureToggleService;
 
+    @Mock
+    private DocumentManagementService documentManagementService;
+
     private ObjectMapper mapper;
 
     private static final String ON_INITIATIVE_SELECTION_TEXT = "As this order was made on the court's own initiative "
@@ -128,6 +136,13 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
     private static final String WITHOUT_NOTICE_SELECTION_TEXT = "If you were not notified of the application before "
         + "this order was made, you may apply to set aside, vary or stay the order. Any such application must be made "
         + "by 4pm on";
+    private static final String BEARER_TOKEN = "BEARER_TOKEN";
+    private static final byte[] bytes = {116, 101, 115, 116};
+    private static final CaseDocumentBuilder CASE_DOCUMENT = CaseDocumentBuilder.builder()
+        .documentType(JUDGE_FINAL_ORDER);
+    private static final DownloadedDocumentResponse downloadedDocumentResponse =
+        new DownloadedDocumentResponse(new ByteArrayResource("test".getBytes()), "TEST_DOCUMENT_1.pdf",
+                                       "application/pdf");
 
     @Mock
     private LocationReferenceDataService locationRefDataService;
@@ -172,7 +187,8 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         handler = new GenerateDirectionOrderCallbackHandler(locationRefDataService, mapper, judgeFinalOrderGenerator, judgeOrderDownloadGenerator,
-                                                            locationHelper, theUserService, workingDayIndicator, featureToggleService);
+                                                            locationHelper, theUserService, workingDayIndicator,
+                                                             featureToggleService, documentManagementService);
     }
 
     @Nested
@@ -1309,10 +1325,17 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldAddTemplateDocumentToCollection_onAboutToSubmit() {
+            String fileName = LocalDate.now() + "_order.docx";
             when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                             .forename("Judge")
                                                                             .surname("Judy")
                                                                             .roles(Collections.emptyList()).build());
+            when(documentManagementService
+                     .downloadDocumentWithMetaData(BEARER_TOKEN, "documents/fake-url"))
+                .thenReturn(downloadedDocumentResponse);
+            when(documentManagementService
+                     .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, JUDGE_FINAL_ORDER)))
+                .thenReturn(CASE_DOCUMENT.documentName(fileName).build());
             // Given
             List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
             finalCaseDocuments.add(element(finalOrder));
@@ -1330,7 +1353,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             // Then
-            String fileName = LocalDate.now() + "_order.docx";
             assertThat(response.getData()).extracting("finalOrderDocumentCollection").isNotNull();
             assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
                            .getValue().getDocumentLink().getCategoryID()).isEqualTo("caseManagementOrders");

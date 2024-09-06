@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -12,7 +13,11 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
@@ -47,6 +52,8 @@ import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeOrderDown
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -148,6 +155,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private final UserService userService;
     private final WorkingDayIndicator workingDayIndicator;
     private final FeatureToggleService featureToggleService;
+    private final DocumentManagementService documentManagementService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -524,19 +532,35 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
     private CallbackResponse addGeneratedDocumentToCollection(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        String authorisation = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        UserDetails userDetails = userService.getUserDetails(authorisation);
         CaseDocument finalDocument = caseData.getFinalOrderDocument();
 
         if (DOWNLOAD_ORDER_TEMPLATE.equals(caseData.getFinalOrderSelection())) {
-            finalDocument = toCaseDocument(caseData.getUploadOrderDocumentFromTemplate(), JUDGE_FINAL_ORDER);
+            CaseDocument caseDocumentFromUploadedOrder = toCaseDocument(
+                caseData.getUploadOrderDocumentFromTemplate(),
+                JUDGE_FINAL_ORDER);
+            DownloadedDocumentResponse downloadedDocumentResponse = getDocument(
+                authorisation,
+                caseDocumentFromUploadedOrder);
+            byte[] bytes = new byte[0];
+            try {
+                InputStream inputStream = downloadedDocumentResponse.file().getInputStream();
+                bytes = IOUtils.toByteArray(inputStream);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            String updatedDocumentFilename = getUploadedFromTemplateDocumentName(
+                caseData,
+                caseDocumentFromUploadedOrder);
+            finalDocument = reuploadDownloadedTemplate(authorisation, bytes, updatedDocumentFilename);
+        } else {
+            String judgeName = userDetails.getFullName();
+            String updatedDocumentFilename = getDocumentFilename(finalDocument, judgeName);
+            finalDocument.getDocumentLink().setDocumentFileName(updatedDocumentFilename);
         }
 
-        String judgeName = userDetails.getFullName();
         finalDocument.getDocumentLink().setCategoryID("caseManagementOrders");
-        finalDocument.getDocumentLink().setDocumentFileName(getDocumentFilename(caseData, finalDocument, judgeName));
-        if (DOWNLOAD_ORDER_TEMPLATE.equals(caseData.getFinalOrderSelection())) {
-            finalDocument.setDocumentName(getDocumentFilename(caseData, finalDocument, judgeName));
-        }
 
         List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
         finalCaseDocuments.add(element(finalDocument));
@@ -637,21 +661,45 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         }
     }
 
-    private String getDocumentFilename(CaseData caseData, CaseDocument document, String judgeName) {
+    private String getDocumentFilename(CaseDocument document, String judgeName) {
+        StringBuilder updatedFileName = new StringBuilder();
+        ext = FilenameUtils.getExtension(document.getDocumentLink().getDocumentFileName());
+        return updatedFileName
+            .append(document.getCreatedDatetime().toLocalDate().toString()).append("_").append(judgeName)
+            .append(".").append(ext).toString();
+    }
+
+    private String getUploadedFromTemplateDocumentName(CaseData caseData, CaseDocument document) {
         StringBuilder updatedFileName = new StringBuilder();
         ext = FilenameUtils.getExtension(document.getDocumentLink().getDocumentFileName());
         updatedFileName
             .append(document.getCreatedDatetime().toLocalDate().toString());
-        if (DOWNLOAD_ORDER_TEMPLATE.equals(caseData.getFinalOrderSelection())) {
-            if (BLANK_TEMPLATE_AFTER_HEARING.getLabel().equals(caseData.getFinalOrderDownloadTemplateOptions().getValue().getLabel())) {
-                updatedFileName.append("_order");
-            } else {
-                updatedFileName.append("_directions order");
-            }
+        if (BLANK_TEMPLATE_AFTER_HEARING.getLabel()
+            .equals(caseData.getFinalOrderDownloadTemplateOptions().getValue().getLabel())) {
+            updatedFileName.append("_order");
         } else {
-            updatedFileName
-                .append("_").append(judgeName);
+            updatedFileName.append("_directions order");
         }
         return updatedFileName.append(".").append(ext).toString();
+    }
+
+    private CaseDocument reuploadDownloadedTemplate(String auth, byte[] bytes, String documentFilename) {
+        return documentManagementService.uploadDocument(
+            auth,
+            new PDF(
+                documentFilename,
+                bytes,
+                DocumentType.JUDGE_FINAL_ORDER
+            )
+        );
+    }
+
+    private DownloadedDocumentResponse getDocument(String authToken, CaseDocument document) {
+        String documentId = document.getDocumentLink().getDocumentUrl()
+            .substring(document.getDocumentLink().getDocumentUrl().lastIndexOf("/") + 1);
+        return documentManagementService.downloadDocumentWithMetaData(
+            authToken,
+            String.format("documents/%s", documentId)
+        );
     }
 }
