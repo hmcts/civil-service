@@ -256,7 +256,7 @@ public class HearingScheduledClaimantScenarioTest extends CaseProgressionDashboa
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
         when(hearingFeesService.getFeeForHearingSmallClaims(any()))
-            .thenReturn(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build());
+            .thenReturn(Fee.builder().calculatedAmountInPence(new BigDecimal(20000)).build());
         when(hearingNoticeCamundaService.getProcessVariables(any()))
             .thenReturn(HearingNoticeVariables.builder()
                             .hearingId("HER1234")
@@ -272,6 +272,9 @@ public class HearingScheduledClaimantScenarioTest extends CaseProgressionDashboa
             .hearingDueDate(LocalDate.of(2024, 4, 1))
             .hearingDate(LocalDate.of(2024, 4, 1))
             .businessProcess(BusinessProcess.builder().processInstanceId("").build())
+            .totalClaimAmount(new BigDecimal(10))
+            .responseClaimTrack("SMALL_CLAIM")
+            .allocatedTrack(null)
             .hearingLocation(list).build();
 
         CallbackParams callbackParams = callbackParams(caseData);
