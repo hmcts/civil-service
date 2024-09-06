@@ -13,7 +13,7 @@ VALUES ('Scenario.AAA6.CP.Bundle.Updated.Claimant',
         '{"Notice.AAA6.CP.Bundle.Updated.Claimant": ["bundleRestitchedDateEn", "bundleRestitchedDateCy"]}'),
        ('Scenario.AAA6.CP.Bundle.Updated.TrialReady.Defendant',
         '{"Notice.AAA6.CP.Bundle.Ready.Defendant", "Notice.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Defendant", "Notice.AAA6.CP.Trial.Arrangements.Required.Defendant"}',
-        '{"Notice.AAA6.CP.Bundle.Updated.Defendant": ["bundleRestitchedDateEn", "bundleRestitchedDateCy"]}')
+        '{"Notice.AAA6.CP.Bundle.Updated.Defendant": ["bundleRestitchedDateEn", "bundleRestitchedDateCy"]}');
 
 /**
  * Add notification template
