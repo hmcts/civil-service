@@ -81,7 +81,7 @@ public enum DocmosisTemplates {
 
     // Judge order download order
     BLANK_TEMPLATE_AFTER_HEARING_DOCX("temp1.docx", "%s Blank template to be used after a hearing.docx"),
-    BLANK_TEMPLATE_BEFORE_HEARING_DOCX("CV-UNS-DEC-ENG-01284.docx", "%s Blank template to be used before a hearing/box work.docx"),
+    BLANK_TEMPLATE_BEFORE_HEARING_DOCX("CV-UNS-DEC-ENG-01301.docx", "%s Blank template to be used before a hearing/box work.docx"),
     FIX_DATE_CCMC_DOCX("temp3.docx", "%s Fix a date for CCMC.docx"),
     FIX_DATE_CMC_DOCX("temp4.docx", "%s Fix a date for CMC.docx"),
 
