@@ -19,12 +19,8 @@ VALUES ('Notice.AAA6.DefendantNoticeOfChange.Claimant',
 
 INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
                                     scenario_name, task_status_sequence, role, task_order, hint_text_en, hint_text_cy)
-VALUES ('<a>Pay the hearing fee</a>', 'Hearing' ,'<a>Talu ffi''r gwrandawiad</a>',
-        'Gwrandawiad', 'Hearing.Fee.Pay', 'Scenario.AAA6.DefendantNoticeOfChange.Claimant', '{2, 2}', 'CLAIMANT', 9, null, null),
-       ('<a>Upload hearing documents</a>', 'Hearing' ,'<a>Llwytho dogfennau''r gwrandawiad</a>',
+VALUES ('<a>Upload hearing documents</a>', 'Hearing' ,'<a>Llwytho dogfennau''r gwrandawiad</a>',
         'Gwrandawiad', 'Hearing.Document.Upload', 'Scenario.AAA6.DefendantNoticeOfChange.Claimant', '{2, 2}', 'CLAIMANT', 10, null, null),
-       ('<a>Add the trial arrangements</a>', 'Hearing' ,'<a>Ychwanegu trefniadau''r treial</a>',
-        'Gwrandawiad', 'Hearing.Arrangements.Add', 'Scenario.AAA6.DefendantNoticeOfChange.Claimant', '{2, 2}', 'CLAIMANT', 12, null, null),
        ('<a>Contact the court to request a change to my case</a>', 'Applications',
         '<a>Contact the court to request a change to my case</a>',
         'Ceisiadau', 'Application.Create', 'Scenario.AAA6.DefendantNoticeOfChange.Claimant', '{2, 2}', 'CLAIMANT', 16, null, null);
