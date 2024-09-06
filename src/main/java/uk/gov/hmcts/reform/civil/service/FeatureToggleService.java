@@ -38,10 +38,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("pin-in-post");
     }
 
-    public boolean isPbaV3Enabled() {
-        return this.featureToggleApi.isFeatureEnabled("pba-version-3-ways-to-pay");
-    }
-
     public boolean isRPAEmailEnabled() {
         return this.featureToggleApi.isFeatureEnabled("enable-rpa-emails");
     }
@@ -100,6 +96,10 @@ public class FeatureToggleService {
 
     public boolean isMintiEnabled() {
         return featureToggleApi.isFeatureEnabled("minti");
+    }
+
+    public boolean isCjesServiceAvailable() {
+        return featureToggleApi.isFeatureEnabled("isCjesServiceAvailable");
     }
 
     public boolean isCarmEnabledForCase(CaseData caseData) {

@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
@@ -37,7 +38,7 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
         isNonDivergent =  JudgmentsOnlineHelper.isNonDivergentForDJ(caseData);
         JudgmentDetails activeJudgment = super.addUpdateActiveJudgment(caseData);
         activeJudgment = super.updateDefendantDetails(activeJudgment, caseData);
-        return activeJudgment.toBuilder()
+        JudgmentDetails judgmentDetails = activeJudgment.toBuilder()
             .createdTimestamp(LocalDateTime.now())
             .state(getJudgmentState(caseData))
             .type(JudgmentType.DEFAULT_JUDGMENT)
@@ -45,11 +46,15 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
                                    ? getInstalmentDetails(caseData) : null)
             .paymentPlan(getPaymentPlan(caseData))
             .isRegisterWithRTL(isNonDivergent ? YesOrNo.YES : YesOrNo.NO)
+            .rtlState(isNonDivergent ? JudgmentRTLStatus.ISSUED.getRtlState() : null)
             .issueDate(LocalDate.now())
             .orderedAmount(orderAmount.toString())
             .costs(costs.toString())
             .totalAmount(orderAmount.add(costs).toString())
             .build();
+        super.updateJudgmentTabDataWithActiveJudgment(judgmentDetails, caseData);
+
+        return judgmentDetails;
     }
 
     @Override
@@ -100,4 +105,5 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
     private LocalDate getPaymentDeadLineDate(CaseData caseData) {
         return DJPaymentTypeSelection.SET_DATE.equals(caseData.getPaymentTypeSelection()) ? caseData.getPaymentSetDate() : null;
     }
+
 }
