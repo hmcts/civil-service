@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaimspeccallbackhandertask;
+package uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
