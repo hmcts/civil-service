@@ -185,7 +185,9 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_CLAIMANT("Scenario.AAA6.ClaimantIntent.ClaimantEndsClaim.Claimant"),
     SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_DEFENDANT("Scenario.AAA6.ClaimantIntent.ClaimantEndsClaim.Defendant"),
     SCENARIO_AAA6_CP_BUNDLE_UPDATED_CLAIMANT("Scenario.AAA6.CP.Bundle.Updated.Claimant"),
-    SCENARIO_AAA6_CP_BUNDLE_UPDATED_DEFENDANT("Scenario.AAA6.CP.Bundle.Updated.Defendant");
+    SCENARIO_AAA6_CP_BUNDLE_UPDATED_DEFENDANT("Scenario.AAA6.CP.Bundle.Updated.Defendant"),
+    SCENARIO_AAA6_CP_BUNDLE_UPDATED_TRIAL_READY_CLAIMANT("Scenario.AAA6.CP.Bundle.Updated.TrialReady.Claimant"),
+    SCENARIO_AAA6_CP_BUNDLE_UPDATED_TRIAL_READY_DEFENDANT("Scenario.AAA6.CP.Bundle.Updated.TrialReady.Defendant");
 
     private final String scenario;
 

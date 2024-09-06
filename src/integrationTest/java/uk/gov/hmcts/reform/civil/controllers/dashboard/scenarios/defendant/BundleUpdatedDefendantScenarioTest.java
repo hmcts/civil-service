@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.CaseEventsDashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
+import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,27 +29,35 @@ public class BundleUpdatedDefendantScenarioTest extends CaseEventsDashboardBaseI
 
     @Test
     void should_create_bundle_update_scenario() throws Exception {
-        CaseData caseData = createCaseData(YesOrNo.NO);
+        CaseData caseData = createCaseData(YesOrNo.NO, false);
         handler.handle(callbackParams(caseData));
 
-        verifyNotification(caseData.getCcdCaseReference().toString(), "DEFENDANT", true);
+        verifyNotification(caseData.getCcdCaseReference().toString(), "DEFENDANT", true, false);
+    }
+
+    @Test
+    void should_create_trial_ready_bundle_update_scenario() throws Exception {
+        CaseData caseData = createCaseData(YesOrNo.NO, true);
+        handler.handle(callbackParams(caseData));
+
+        verifyNotification(caseData.getCcdCaseReference().toString(), "DEFENDANT", true, true);
     }
 
     @Test
     void should_not_create_bundle_updated_scenario() throws Exception {
-        CaseData caseData = createCaseData(YesOrNo.YES);
+        CaseData caseData = createCaseData(YesOrNo.YES, false);
         handler.handle(callbackParams(caseData));
 
-        verifyNotification(caseData.getCcdCaseReference().toString(), "DEFENDANT", false);
+        verifyNotification(caseData.getCcdCaseReference().toString(), "DEFENDANT", false, false);
     }
 
-    private CaseData createCaseData(YesOrNo respondentRepresented) {
+    private CaseData createCaseData(YesOrNo respondentRepresented, boolean isFastTrack) {
         List<IdValue<Bundle>> bundles = List.of(
             new IdValue<>("1", Bundle.builder().createdOn(Optional.of(LocalDateTime.of(2024, 3, 1, 0, 0))).build()),
             new IdValue<>("2", Bundle.builder().createdOn(Optional.of(LocalDateTime.of(2024, 4, 1, 0, 0))).build())
         );
 
-        return CaseDataBuilder.builder().atStateTrialReadyCheck().build()
+        CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(12325480L)
@@ -58,10 +68,23 @@ public class BundleUpdatedDefendantScenarioTest extends CaseEventsDashboardBaseI
             .orderType(OrderType.DECIDE_DAMAGES)
             .caseBundles(bundles)
             .build();
+
+        if (isFastTrack) {
+            caseData = caseData.toBuilder().drawDirectionsOrderRequired(YesOrNo.YES)
+                .drawDirectionsOrderSmallClaims(YesOrNo.NO)
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .orderType(OrderType.DECIDE_DAMAGES)
+                .build();
+        }
+
+        return caseData;
     }
 
-    private void verifyNotification(String caseId, String role, boolean isCreated) throws Exception {
+    private void verifyNotification(String caseId, String role, boolean isCreated, boolean isFastTrack) throws Exception {
         var resultActions = doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, role)
+            .andExpect(status().isOk());
+
+        var taskListResultActions = doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, role)
             .andExpect(status().isOk());
 
         if (isCreated) {
@@ -79,6 +102,17 @@ public class BundleUpdatedDefendantScenarioTest extends CaseEventsDashboardBaseI
             );
         } else {
             resultActions.andExpect(jsonPath("$").isEmpty());
+        }
+
+        if (isFastTrack) {
+            taskListResultActions.andExpectAll(
+                status().is(HttpStatus.OK.value()),
+                jsonPath("$[0].taskNameEn").value("<a>Add the trial arrangements</a>"),
+                jsonPath("$[0].currentStatusEn").value(TaskStatus.INACTIVE.getName()),
+                jsonPath("$[1].reference").value(caseId.toString()),
+                jsonPath("$[1].taskNameEn").value(
+                    "<a href={VIEW_BUNDLE} class=\"govuk-link\">View the bundle</a>")
+            );
         }
     }
 }
