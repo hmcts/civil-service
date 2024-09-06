@@ -62,7 +62,7 @@ class ClaimReconsiderationUpheldDefendantNotificationHandlerTest extends BaseCal
 
         @Test
         void shouldNotifyDefendantSolicitor_whenInvoked() {
-            when(notificationsProperties.getNotifyUpdateTemplate()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyClaimReconsiderationLRTemplate()).thenReturn(TEMPLATE_ID);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
 
@@ -80,13 +80,13 @@ class ClaimReconsiderationUpheldDefendantNotificationHandlerTest extends BaseCal
                 "respondentsolicitor@example.com",
                 TEMPLATE_ID,
                 getNotificationDataMap(caseData),
-                "reconsideration-upheld-applicant-notification-000DC001"
+                "reconsideration-upheld-applicant-notification-1594901956117591"
             );
         }
 
         @Test
         void shouldNotifyDefendantBothSolicitors_whenInvoked() {
-            when(notificationsProperties.getNotifyUpdateTemplate()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyClaimReconsiderationLRTemplate()).thenReturn(TEMPLATE_ID);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
 
@@ -110,18 +110,18 @@ class ClaimReconsiderationUpheldDefendantNotificationHandlerTest extends BaseCal
             assertThat(targetEmail.getAllValues().get(0)).isEqualTo("respondentsolicitor@example.com");
             assertThat(emailTemplate.getAllValues().get(0)).isEqualTo("template-id");
             assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getNotificationDataMap(caseData));
-            assertThat(reference.getAllValues().get(0)).isEqualTo("reconsideration-upheld-applicant-notification-000DC001");
+            assertThat(reference.getAllValues().get(0)).isEqualTo("reconsideration-upheld-applicant-notification-1594901956117591");
             //Email to respondent2
             assertThat(targetEmail.getAllValues().get(1)).isEqualTo("respondentsolicitor2@example.com");
             assertThat(emailTemplate.getAllValues().get(1)).isEqualTo("template-id");
             assertThat(notificationDataMap.getAllValues().get(1)).isEqualTo(getNotificationDataMap2(caseData));
-            assertThat(reference.getAllValues().get(1)).isEqualTo("reconsideration-upheld-applicant-notification-000DC001");
+            assertThat(reference.getAllValues().get(1)).isEqualTo("reconsideration-upheld-applicant-notification-1594901956117591");
 
         }
 
         @Test
         void shouldNotifyDefendant_whenInvoked() {
-            when(notificationsProperties.getNotifyUpdateTemplate()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyClaimReconsiderationLRTemplate()).thenReturn(TEMPLATE_ID);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
                 .respondent1Represented(NO)
@@ -141,7 +141,7 @@ class ClaimReconsiderationUpheldDefendantNotificationHandlerTest extends BaseCal
                 "sole.trader@email.com",
                 TEMPLATE_ID,
                 getNotificationDataMap(caseData),
-                "reconsideration-upheld-applicant-notification-000DC001"
+                "reconsideration-upheld-applicant-notification-1594901956117591"
             );
         }
 
@@ -150,9 +150,7 @@ class ClaimReconsiderationUpheldDefendantNotificationHandlerTest extends BaseCal
     @NotNull
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.isApplicantLiP()
-                ? caseData.getCcdCaseReference().toString()
-                : caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIMANT_V_DEFENDANT, getClaimantVDefendant(caseData),
             PARTY_NAME, caseData.getRespondent1().getPartyName()
         );
@@ -161,7 +159,7 @@ class ClaimReconsiderationUpheldDefendantNotificationHandlerTest extends BaseCal
     @NotNull
     private Map<String, String> getNotificationDataMap2(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIMANT_V_DEFENDANT, getClaimantVDefendant(caseData),
             PARTY_NAME, caseData.getRespondent2().getPartyName()
         );
