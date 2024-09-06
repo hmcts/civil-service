@@ -76,12 +76,31 @@ public class JudgeOrderDownloadGeneratorTest {
     private static final CaseLocationCivil caseManagementLocation = CaseLocationCivil.builder().baseLocation("000000").build();
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
-    private static final String DATE_FORMAT = "dd/MM/yyyy";
+    private static final String DATE_FORMAT = "dd-MM-yyyy";
     private static final String fileBlankBeforeHearing = format(BLANK_TEMPLATE_BEFORE_HEARING_DOCX.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
+    private static final String fileBlankAfterHearing = format(BLANK_TEMPLATE_AFTER_HEARING_DOCX.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
+    private static final String fileFixDateCmc = format(FIX_DATE_CMC_DOCX.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
+    private static final String fileFixDateCcmc = format(FIX_DATE_CCMC_DOCX.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
     private static final CaseDocument BLANK_TEMPLATE_BEFORE_HEARING = CaseDocumentBuilder.builder()
         .documentName(fileBlankBeforeHearing)
         .documentType(JUDGE_FINAL_ORDER)
         .build();
+
+    private static final CaseDocument BLANK_TEMPLATE_AFTER_HEARING = CaseDocumentBuilder.builder()
+        .documentName(fileBlankAfterHearing)
+        .documentType(JUDGE_FINAL_ORDER)
+        .build();
+
+    private static final CaseDocument FIX_DATE_CMC = CaseDocumentBuilder.builder()
+        .documentName(fileFixDateCmc)
+        .documentType(JUDGE_FINAL_ORDER)
+        .build();
+
+    private static final CaseDocument FIX_DATE_CCMC = CaseDocumentBuilder.builder()
+        .documentName(fileFixDateCcmc)
+        .documentType(JUDGE_FINAL_ORDER)
+        .build();
+
     private static LocationRefData locationRefData = LocationRefData.builder().siteName("SiteName")
         .courtAddress("1").postcode("1")
         .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
@@ -372,4 +391,80 @@ public class JudgeOrderDownloadGeneratorTest {
         verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileBlankBeforeHearing, bytes, JUDGE_FINAL_ORDER));
     }
 
+    @Test
+    void shouldGenerateBlankTemplateAfterHearing_whenOptionSelected() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(BLANK_TEMPLATE_AFTER_HEARING_DOCX), eq("docx")))
+            .thenReturn(new DocmosisDocument(BLANK_TEMPLATE_AFTER_HEARING_DOCX.getDocumentTitle(), bytes));
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileBlankAfterHearing, bytes, JUDGE_FINAL_ORDER)))
+            .thenReturn(BLANK_TEMPLATE_AFTER_HEARING);
+        when(documentHearingLocationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE)
+            .finalOrderAllocateToTrack(YES)
+            .finalOrderTrackAllocation(SMALL_CLAIM)
+            .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                   .value(DynamicListElement
+                                                              .dynamicElement("Blank template to be used after a hearing"))
+                                                   .build())
+            .caseManagementLocation(caseManagementLocation)
+            .build();
+        CaseDocument caseDocument = judgeOrderDownloadGenerator.generate(caseData, BEARER_TOKEN);
+
+        assertNotNull(caseDocument);
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileBlankAfterHearing, bytes, JUDGE_FINAL_ORDER));
+    }
+
+    @Test
+    void shouldGenerateFixDateCMC_whenOptionSelected() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(FIX_DATE_CMC_DOCX), eq("docx")))
+            .thenReturn(new DocmosisDocument(FIX_DATE_CMC_DOCX.getDocumentTitle(), bytes));
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileFixDateCmc, bytes, JUDGE_FINAL_ORDER)))
+            .thenReturn(FIX_DATE_CMC);
+        when(documentHearingLocationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE)
+            .finalOrderAllocateToTrack(YES)
+            .finalOrderTrackAllocation(INTERMEDIATE_CLAIM)
+            .finalOrderIntermediateTrackComplexityBand(FinalOrdersComplexityBand.builder()
+                                                           .assignComplexityBand(YES)
+                                                           .band(ComplexityBand.BAND_2)
+                                                           .reasons("important reasons")
+                                                           .build())
+            .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                   .value(DynamicListElement
+                                                              .dynamicElement("Fix a date for CMC"))
+                                                   .build())
+            .caseManagementLocation(caseManagementLocation)
+            .build();
+        CaseDocument caseDocument = judgeOrderDownloadGenerator.generate(caseData, BEARER_TOKEN);
+
+        assertNotNull(caseDocument);
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileFixDateCmc, bytes, JUDGE_FINAL_ORDER));
+    }
+
+    @Test
+    void shouldGenerateFixDateCCMC_whenOptionSelected() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(FIX_DATE_CCMC_DOCX), eq("docx")))
+            .thenReturn(new DocmosisDocument(FIX_DATE_CCMC_DOCX.getDocumentTitle(), bytes));
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileFixDateCcmc, bytes, JUDGE_FINAL_ORDER)))
+            .thenReturn(FIX_DATE_CCMC);
+        when(documentHearingLocationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE)
+            .finalOrderAllocateToTrack(YES)
+            .finalOrderTrackAllocation(MULTI_CLAIM)
+            .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                   .value(DynamicListElement
+                                                              .dynamicElement("Fix a date for CCMC"))
+                                                   .build())
+            .caseManagementLocation(caseManagementLocation)
+            .build();
+        CaseDocument caseDocument = judgeOrderDownloadGenerator.generate(caseData, BEARER_TOKEN);
+
+        assertNotNull(caseDocument);
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileFixDateCcmc, bytes, JUDGE_FINAL_ORDER));
+    }
 }

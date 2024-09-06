@@ -47,7 +47,7 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
     private final DocumentHearingLocationHelper documentHearingLocationHelper;
     private LocationRefData caseManagementLocationDetails;
     public DocmosisTemplates docmosisTemplate;
-    private static final String DATE_FORMAT = "dd/MM/yyyy";
+    private static final String DATE_FORMAT = "dd-MM-yyyy";
     public static final String INTERMEDIATE_NO_BAND_NO_REASON = "This case is allocated to the Intermediate Track and is not allocated a complexity band.";
     public static final String INTERMEDIATE_NO_BAND_WITH_REASON = "This case is allocated to the Intermediate Track and is not allocated a complexity band because %s.";
     public static final String INTERMEDIATE_WITH_BAND_NO_REASON = "This case is allocated to the Intermediate Track and is allocated to complexity band %s.";
@@ -108,17 +108,34 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
     }
 
     public JudgeFinalOrderForm getBlankAfterHearing(CaseData caseData, String authorisation) {
-        var blankAfterHearingBuilder = JudgeFinalOrderForm.builder();
-
-        return blankAfterHearingBuilder.build();
+        return getBaseTemplateData(caseData, authorisation).build();
     }
 
     public JudgeFinalOrderForm getBlankBeforeHearing(CaseData caseData, String authorisation) {
+        return getBaseTemplateData(caseData, authorisation)
+            .claimTrack(caseData.getFinalOrderAllocateToTrack())
+            .trackAndComplexityBandText(getTrackAndComplexityText(caseData))
+            .build();
+    }
+
+    public JudgeFinalOrderForm getFixDateCcmc(CaseData caseData, String authorisation) {
+        return getBaseTemplateData(caseData, authorisation).build();
+    }
+
+    public JudgeFinalOrderForm getFixDateCmc(CaseData caseData, String authorisation) {
+        return getBaseTemplateData(caseData, authorisation)
+            .claimTrack(caseData.getFinalOrderAllocateToTrack())
+            .trackAndComplexityBandText(getTrackAndComplexityText(caseData))
+            .build();
+    }
+
+    private JudgeFinalOrderForm.JudgeFinalOrderFormBuilder getBaseTemplateData(CaseData caseData,
+                                                                               String authorisation) {
         UserDetails userDetails = userService.getUserDetails(authorisation);
         caseManagementLocationDetails = documentHearingLocationHelper
             .getCaseManagementLocationDetailsNro(caseData, locationRefDataService, authorisation);
 
-        var blankBeforerHearingBuilder = JudgeFinalOrderForm.builder()
+        return JudgeFinalOrderForm.builder()
             .judgeNameTitle(userDetails.getFullName())
             .courtName(caseManagementLocationDetails.getExternalShortName())
             .caseNumber(caseData.getCcdCaseReference().toString())
@@ -127,23 +144,7 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
             .defendant1Name(caseData.getRespondent1().getPartyName())
             .defendant2Name(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
             .claimantNum(nonNull(caseData.getApplicant2()) ? "Claimant 1" : "Claimant")
-            .defendantNum(nonNull(caseData.getRespondent2()) ? "Defendant 1" : "Defendant")
-            .claimTrack(caseData.getFinalOrderAllocateToTrack())
-            .trackAndComplexityBandText(getTrackAndComplexityText(caseData));
-
-        return blankBeforerHearingBuilder.build();
-    }
-
-    public JudgeFinalOrderForm getFixDateCcmc(CaseData caseData, String authorisation) {
-        var fixdateCcmcBuilder = JudgeFinalOrderForm.builder();
-
-        return fixdateCcmcBuilder.build();
-    }
-
-    public JudgeFinalOrderForm getFixDateCmc(CaseData caseData, String authorisation) {
-        var fixdateCmcBuilder = JudgeFinalOrderForm.builder();
-
-        return fixdateCmcBuilder.build();
+            .defendantNum(nonNull(caseData.getRespondent2()) ? "Defendant 1" : "Defendant");
     }
 
     public String getTrackAndComplexityText(CaseData caseData) {
