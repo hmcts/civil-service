@@ -188,7 +188,25 @@ public enum DashboardClaimStatus {
         Claim::isPaperResponse
     ),
     DEFAULT_JUDGEMENT_ISSUED(Claim::isDefaultJudgementIssued),
-    NO_STATUS(c -> false);
+    NO_STATUS(c -> false),
+    TRIAL_OR_HEARING_SCHEDULED(
+        // TODO
+        c -> false),
+    TRIAL_ARRANGEMENTS_REQUIRED(
+        // TODO
+        c -> false),
+    TRIAL_ARRANGEMENTS_SUBMITTED(
+        // TODO
+        c -> false),
+    BUNDLE_CREATED(
+        // TODO
+        c -> false),
+    AWAITING_JUDGMENT(
+        // TODO
+        c -> false),
+    ORDER_MADE(
+        // TODO
+        c -> false);
 
     @Getter
     private final Predicate<Claim> claimMatcher;
