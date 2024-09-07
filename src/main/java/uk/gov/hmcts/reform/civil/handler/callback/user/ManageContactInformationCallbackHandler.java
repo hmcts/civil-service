@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -44,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -52,6 +54,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_GA_CASE_DATA;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
@@ -133,6 +136,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     private final PartyDetailsChangedUtil partyDetailsChangedUtil;
     private final FeatureToggleService featureToggleService;
     private final PartyValidator partyValidator;
+    private final CoreCaseDataService coreCaseDataService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -473,6 +477,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         updateWitnesses(partyChosenId, caseData, builder);
         updateLRIndividuals(partyChosenId, caseData, builder);
         updateOrgIndividuals(partyChosenId, caseData, builder);
+        updateGaCaseName(caseData);
 
         if (isParty(partyChosenId) || isLitigationFriend(partyChosenId)) {
             // update case name for hmc if applicant/respondent/litigation friend was updated
@@ -511,6 +516,15 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                                         .build())
                         .build().toMap(objectMapper))
                 .build();
+    }
+
+    private void updateGaCaseName(CaseData caseData) {
+        if (ofNullable(caseData.getGeneralApplications()).isPresent()) {
+            caseData.getGeneralApplications().forEach(app -> coreCaseDataService
+                .triggerGeneralApplicationEvent(Long.parseLong(app.getValue().getCaseLink().getCaseReference()),
+                                               UPDATE_GA_CASE_DATA,
+                                               Map.of("caseNameGaInternal", CaseNameUtils.buildCaseName(caseData))));
+        }
     }
 
     private void updateClaimDetailsTab(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {

@@ -1405,6 +1405,7 @@ public class GeneralApplicationDetailsBuilder {
                                             .baseLocation("34567")
                                             .region("4").build())
                 .isCcmccLocation(YES)
+                .caseLink(CaseLink.builder().caseReference("1234").build())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
                         .hasAgreed(NO)
                         .build())

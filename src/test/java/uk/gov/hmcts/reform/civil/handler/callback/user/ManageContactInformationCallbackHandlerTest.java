@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
@@ -45,6 +46,8 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
@@ -61,9 +64,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -135,6 +142,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
     @MockBean
     private FeatureToggleService featureToggleService;
+
+    @MockBean
+    private CoreCaseDataService coreCaseDataService;
 
     private static final UserInfo ADMIN_USER = UserInfo.builder()
         .roles(List.of("caseworker-civil-admin"))
@@ -941,6 +951,55 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             assertEquals(READY, responseData.getBusinessProcess().getStatus());
             assertEquals(
                 EVENT.toBuilder().submittedByCaseworker(YES).build(), responseData.getContactDetailsUpdatedEvent());
+        }
+
+        @Test
+        void shouldReturnExpectedResponseCaseData_whenTriggeredByAdmin_withPartyChangesWithGaData() {
+            Flags respondent1Flags = Flags.builder().partyName("respondent1name").roleOnCase("respondent1").build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1(Party.builder()
+                                 .individualFirstName("Dis")
+                                 .individualLastName("Guy")
+                                 .type(INDIVIDUAL).flags(respondent1Flags).build())
+                .buildClaimIssuedPaymentCaseData();
+
+            CaseData caseDataBefore = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseData(caseData);
+
+            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+
+            CaseData updated = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .updateDetailsForm(UpdateDetailsForm.builder()
+                                       .partyChosen(DynamicList.builder()
+                                                        .value(DynamicListElement.builder()
+                                                                   .code(DEFENDANT_ONE_ID)
+                                                                   .build())
+                                                        .build())
+                                       .partyChosenId(DEFENDANT_ONE_ID)
+                                       .build())
+                .build();
+
+            CaseData updatedCaseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseData(updated);
+
+            when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
+            when(partyDetailsChangedUtil.buildChangesEvent(any(CaseData.class), any(CaseData.class))).thenReturn(
+                EVENT);
+            when(coreCaseDataService.triggerGeneralApplicationEvent(anyLong(), any(CaseEvent.class), anyMap())).thenReturn(updatedCaseData);
+            CallbackParams params = callbackParamsOf(updatedCaseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData responseData = mapper.convertValue(response.getData(), CaseData.class);
+
+            assertEquals(updated.getApplicant1(), responseData.getApplicant1());
+            assertEquals(MANAGE_CONTACT_INFORMATION.name(), responseData.getBusinessProcess().getCamundaEvent());
+            assertEquals(READY, responseData.getBusinessProcess().getStatus());
+            assertEquals(EVENT.toBuilder().submittedByCaseworker(YES).build(), responseData.getContactDetailsUpdatedEvent());
+            verify(coreCaseDataService).triggerGeneralApplicationEvent(eq(1234L), eq(CaseEvent.UPDATE_GA_CASE_DATA), anyMap());
         }
 
         @Test
