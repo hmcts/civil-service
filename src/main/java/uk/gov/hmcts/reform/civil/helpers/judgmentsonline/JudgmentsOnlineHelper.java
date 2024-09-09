@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
+import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -120,6 +122,55 @@ public class JudgmentsOnlineHelper {
 
     public static BigDecimal getMoneyValue(String val) {
         return val != null ? new BigDecimal(val) : ZERO;
+    }
+
+    @NotNull
+    public static String calculateRepaymentBreakdownSummary(JudgmentDetails activeJudgment) {
+
+        BigDecimal totalAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getTotalAmount()));
+
+        //creates  the text on the page, based on calculated values
+        StringBuilder repaymentBreakdown = new StringBuilder();
+        repaymentBreakdown.append("The judgment will order the defendants to pay £").append(totalAmount);
+        repaymentBreakdown.append(", including the claim fee and interest, if applicable, as shown:");
+
+        BigDecimal orderedAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getOrderedAmount()));
+        if (null != orderedAmount) {
+            repaymentBreakdown.append("\n").append("### Claim amount \n £").append(orderedAmount.setScale(2));
+        }
+
+        if (null != activeJudgment.getCosts()) {
+            BigDecimal costs = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getCosts()));
+            if (costs.compareTo(BigDecimal.ZERO) != 0) {
+                repaymentBreakdown.append("\n ### Fixed cost amount \n").append("£").append(costs.setScale(2));
+            }
+        }
+
+        if (null != activeJudgment.getClaimFeeAmount()) {
+            BigDecimal claimFeeAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getClaimFeeAmount()));
+            if (claimFeeAmount.compareTo(BigDecimal.ZERO) != 0) {
+                repaymentBreakdown.append("\n ### Claim fee amount \n").append("£").append(claimFeeAmount.setScale(2));
+            }
+        }
+
+        repaymentBreakdown.append("\n ## Subtotal \n £").append(totalAmount.setScale(2))
+            .append("\n");
+
+        BigDecimal amountAlreadyPaid = ZERO;
+        if (null != activeJudgment.getAmountAlreadyPaid()) {
+            amountAlreadyPaid = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getAmountAlreadyPaid()));
+            if (amountAlreadyPaid.compareTo(BigDecimal.ZERO) != 0) {
+                repaymentBreakdown.append("\n ### Amount already paid \n").append("£").append(amountAlreadyPaid.setScale(
+                    2));
+            }
+        }
+
+        BigDecimal totalStillOwed = (null != activeJudgment.getAmountAlreadyPaid())
+            ? totalAmount.subtract(amountAlreadyPaid)
+            : totalAmount;
+        repaymentBreakdown.append("\n ## Total still owed \n £").append(totalStillOwed.setScale(2));
+
+        return repaymentBreakdown.toString();
     }
 
 }
