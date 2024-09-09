@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/dummy"
+  },
+  "response": {
+    "status": 200,
+    "body": "{\"message\": \"This is a mock!!!\"}",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

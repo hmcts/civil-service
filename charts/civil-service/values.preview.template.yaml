@@ -273,3 +273,10 @@ aac-manage-case-assignment:
 
 wiremock:
     enabled: true
+    volumeMounts:
+      - name: wiremock-mocks
+        mountPath: /home/wiremock/mappings
+    volumes:
+      - name: wiremock-mocks
+        hostPath:
+          path: /charts/civil-service/charts/wiremock/mocks

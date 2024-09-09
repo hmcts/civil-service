@@ -26,4 +26,10 @@ spec:
               memory: {{ .Values.wiremock.devmemoryLimits }}
           ports:
             - containerPort: 8080
-          command: ["java", "-jar", "wiremock-standalone.jar", "--verbose"]
+          volumeMounts:
+            - name: wiremock-mocks
+              mountPath: /mappings
+      volumes:
+        - name: wiremock-mocks
+          hostPath:
+            path: /charts/civil-service/charts/wiremock/mocks/mappings
