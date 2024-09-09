@@ -9,6 +9,9 @@ import java.util.function.Predicate;
  */
 public enum DashboardClaimStatus {
 
+    CASE_DISMISSED(
+        Claim::isCaseDismissed
+    ),
     CASE_STAYED(Claim::isCaseStayed),
     DEFENDANT_APPLY_NOC(
         Claim::isNocForDefendant

@@ -132,5 +132,9 @@ public interface Claim {
 
     boolean isDefaultJudgementIssued();
 
+    default boolean isCaseDismissed() {
+        return false;
+    }
+
     boolean isCaseStayed();
 }

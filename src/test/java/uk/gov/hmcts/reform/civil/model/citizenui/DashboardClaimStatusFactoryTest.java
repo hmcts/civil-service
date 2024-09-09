@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.util.ArrayList;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,10 +25,19 @@ class DashboardClaimStatusFactoryTest {
         CcdDashboardDefendantClaimMatcher defendant = new CcdDashboardDefendantClaimMatcher(caseData, toggleService);
         CcdDashboardClaimantClaimMatcher claimant = new CcdDashboardClaimantClaimMatcher(caseData, toggleService);
 
-        return Stream.of(
-            Arguments.arguments(defendant, DashboardClaimStatus.CASE_STAYED),
-            Arguments.arguments(claimant, DashboardClaimStatus.CASE_STAYED)
-        );
+        List<Arguments> argumentList = new ArrayList<>();
+        argumentList.add(Arguments.arguments(defendant, DashboardClaimStatus.CASE_STAYED));
+        argumentList.add(Arguments.arguments(claimant, DashboardClaimStatus.CASE_STAYED));
+
+        caseData = CaseData.builder()
+            .ccdState(CaseState.CASE_DISMISSED)
+            .build();
+        defendant = new CcdDashboardDefendantClaimMatcher(caseData, toggleService);
+        claimant = new CcdDashboardClaimantClaimMatcher(caseData, toggleService);
+        argumentList.add(Arguments.arguments(defendant, DashboardClaimStatus.CASE_DISMISSED));
+        argumentList.add(Arguments.arguments(claimant, DashboardClaimStatus.CASE_DISMISSED));
+
+        return argumentList.stream();
     }
 
     @ParameterizedTest

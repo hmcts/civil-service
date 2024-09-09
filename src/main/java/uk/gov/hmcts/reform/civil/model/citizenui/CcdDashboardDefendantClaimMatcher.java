@@ -443,6 +443,11 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     }
 
     @Override
+    public boolean isCaseDismissed() {
+        return caseData.getCcdState() == CaseState.CASE_DISMISSED;
+    }
+
+    @Override
     public boolean isCaseStayed() {
         return caseData.getCcdState() == CaseState.CASE_STAYED;
     }
