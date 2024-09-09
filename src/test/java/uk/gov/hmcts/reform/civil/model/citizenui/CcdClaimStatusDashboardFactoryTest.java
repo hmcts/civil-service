@@ -709,4 +709,15 @@ class CcdClaimStatusDashboardFactoryTest {
                                                                                                          featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.DEFAULT_JUDGEMENT_ISSUED);
     }
+
+    @Test
+    void given_caseDismissed_whenGetStatus_thenReturnCaseDismissed() {
+        CaseData claim = CaseData.builder()
+            .ccdState(CaseState.CASE_DISMISSED)
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+            claim, featureToggleService));
+        assertThat(status).isEqualTo(DashboardClaimStatus.CASE_DISMISSED);
+    }
 }

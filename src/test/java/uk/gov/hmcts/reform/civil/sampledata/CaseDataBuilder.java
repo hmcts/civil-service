@@ -3240,6 +3240,15 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimIssuedCompanyClaimant() {
+        atStatePendingClaimIssued();
+        claimNotificationDeadline = NOTIFICATION_DEADLINE;
+        ccdState = CASE_ISSUED;
+        applicant1 = PartyBuilder.builder().company().build().toBuilder().partyID("app-1-party-id").build();
+        buildHmctsInternalCaseName();
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimIssued1v1LiP() {
         atStatePendingClaimIssued();
         ccdState = CASE_ISSUED;
@@ -4992,6 +5001,14 @@ public class CaseDataBuilder {
         atStateApplicantRespondToDefenceAndProceed();
         hearingDueDate = LocalDate.now().minusDays(1);
         hearingFeePaymentDetails = PaymentDetails.builder().status(FAILED).build();
+        ccdState = HEARING_READINESS;
+        return this;
+    }
+
+    public CaseDataBuilder atStateNoHearingFeeDue() {
+        atStateApplicantRespondToDefenceAndProceed();
+        hearingDueDate = null;
+        hearingFeePaymentDetails = null;
         ccdState = HEARING_READINESS;
         return this;
     }
