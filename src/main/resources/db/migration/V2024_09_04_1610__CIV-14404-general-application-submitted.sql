@@ -10,7 +10,7 @@ VALUES ('Scenario.AAA6.GeneralApps.ApplicationSubmitted.Applicant',
  * Add notification template
  */
 INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, title_Cy, description_En, description_Cy
-                                                  , notification_role, time_to_live)
+                                                  , notification_role)
 VALUES ('Notice.AAA6.GeneralApps.ApplicationSubmitted.Applicant',
         'Application is being processed',
         'Mae’r cais yn cael ei brosesu',
@@ -20,4 +20,4 @@ VALUES ('Notice.AAA6.GeneralApps.ApplicationSubmitted.Applicant',
         '<p class="govuk-body"> Bydd barnwr yn ystyried y cais. </p>' ||
         '<p class="govuk-body"> Gall y partïon eraill ymateb o fewn 5 diwrnod gwaith ar ôl i’r cais gael ei gyflwyno, oni bai eich bod wedi dewis peidio â rhoi gwybod iddynt. Os oes gennych wrandawiad o fewn y 10 diwrnod nesaf, bydd eich cais yn cael ei drin ar frys. </p>' ||
         '<p> <a href="{GA_VIEW_APPLICATION_URL}" class="govuk-link">Gweld dogfennau’r cais</a>.</p>',
-        'APPLICANT', '');
+        'APPLICANT');
