@@ -572,7 +572,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
         }
 
         @Test
-        void shouldSetUpBusinessProcessAndContinueOfflineAndCaseState_whenIs2v1AndPaidImmediately() {
+        void shouldSetUpBusinessProcessAndNoContinueOfflineAndCaseState_whenIs2v1AndPaidImmediately() {
 
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeOption(YesOrNo.YES)

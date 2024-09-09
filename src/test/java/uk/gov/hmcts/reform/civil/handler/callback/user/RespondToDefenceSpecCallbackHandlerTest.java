@@ -1384,6 +1384,91 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldChangeCaseState_WhenRespondentRepaymentPlanAndFlagV2WithJudgementLive2LrVLr() {
+            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
+            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
+            CaseData caseData = CaseData.builder()
+                .respondent1Represented(YesOrNo.YES)
+                .applicant1Represented(YesOrNo.YES)
+                .addApplicant2(YesOrNo.YES)
+                .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
+                .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
+                .applicant2(Party.builder().type(COMPANY).companyName("Applicant2").build())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(SUGGESTION_OF_REPAYMENT_PLAN)
+                .respondent1(Party.builder()
+                                 .primaryAddress(Address.builder().build())
+                                 .type(Party.Type.COMPANY)
+                                 .companyName("company name").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getState())
+                .isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+        }
+
+        @Test
+        void shouldChangeCaseState_WhenRespondentRepaymentPlanAndFlagV2WithJudgementLive2LipVLr() {
+            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
+            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
+            CaseData caseData = CaseData.builder()
+                .respondent1Represented(YesOrNo.YES)
+                .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
+                .applicant1(Party.builder().type(INDIVIDUAL).companyName("Applicant1").build())
+                .applicant2(Party.builder().type(INDIVIDUAL).companyName("Applicant2").build())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(SUGGESTION_OF_REPAYMENT_PLAN)
+                .respondent1(Party.builder()
+                                 .primaryAddress(Address.builder().build())
+                                 .type(Party.Type.COMPANY)
+                                 .companyName("company name").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getState())
+                .isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+        }
+
+        @Test
+        void shouldChangeCaseState_WhenRespondentRepaymentPlanAndFlagV2WithJudgementLiveLrV2Lr() {
+            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
+            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
+            CaseData caseData = CaseData.builder()
+                .respondent1Represented(YesOrNo.YES)
+                .applicant1Represented(YesOrNo.YES)
+                .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
+                .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
+               .respondent2Represented(YesOrNo.YES)
+                .respondent2SameLegalRepresentative(YesOrNo.YES)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(SUGGESTION_OF_REPAYMENT_PLAN)
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("Both")
+                                                     .build())
+                                          .build())
+                .respondent1(Party.builder()
+                                 .primaryAddress(Address.builder().build())
+                                 .type(Party.Type.COMPANY)
+                                 .companyName("company name").build())
+                .respondent2(Party.builder()
+                                 .primaryAddress(Address.builder().build())
+                                 .type(Party.Type.COMPANY)
+                                 .companyName("company name 2").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getState())
+                .isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+        }
+
+        @Test
         void shouldChangeCaseState_WhenRespondentPaymentSetByDateAndFlagV2WithJudgementLive() {
             given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
