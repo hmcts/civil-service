@@ -26,3 +26,4 @@ spec:
               memory: {{ .Values.wiremock.devmemoryLimits }}
           ports:
             - containerPort: 8080
+          command: ["java", "-jar", "wiremock-standalone.jar", "--verbose"]
