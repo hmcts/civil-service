@@ -1400,7 +1400,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                  .primaryAddress(Address.builder().build())
                                  .type(Party.Type.COMPANY)
                                  .companyName("company name").build())
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
+                .caseManagementLocation(CaseLocationCivil.builder()
+                                            .baseLocation("11111")
+                                            .region("2").build())
                 .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1424,7 +1426,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                  .primaryAddress(Address.builder().build())
                                  .type(Party.Type.COMPANY)
                                  .companyName("company name").build())
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
+                .caseManagementLocation(CaseLocationCivil.builder()
+                                            .baseLocation("11111")
+                                            .region("2").build())
                 .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1459,7 +1463,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                  .primaryAddress(Address.builder().build())
                                  .type(Party.Type.COMPANY)
                                  .companyName("company name 2").build())
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
+                .caseManagementLocation(CaseLocationCivil.builder()
+                                            .baseLocation("11111")
+                                            .region("2").build())
                 .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
