@@ -270,3 +270,6 @@ aac-manage-case-assignment:
       NOTIFY_MCA_API_KEY: ${NOTIFY_MCA_API_KEY}
     autoscaling:
       enabled: false
+
+wiremock:
+  enabled: true

@@ -1,0 +1,18 @@
+replicas: 1
+
+image:
+  respository: wiremock/wiremock
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  annotations:
+  paths:
+    - /product/p0001
+  tls: []
+  hosts:
+    - 'wiremock-test.platform.hmcts.net'
