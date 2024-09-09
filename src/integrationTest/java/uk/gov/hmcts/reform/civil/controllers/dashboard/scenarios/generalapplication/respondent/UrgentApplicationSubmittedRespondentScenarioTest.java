@@ -22,7 +22,7 @@ public class UrgentApplicationSubmittedRespondentScenarioTest extends BaseIntegr
         = "/dashboard/scenarios/{scenario_ref}/{unique_case_identifier}";
 
     @Test
-    void should_create_scenario_for_respondent_when_other_party_uploaded_document() throws Exception {
+    void should_create_scenario_for_respondent_when_urgent_application_submitted() throws Exception {
 
         UUID caseId = UUID.randomUUID();
         doPost(BEARER_TOKEN,
