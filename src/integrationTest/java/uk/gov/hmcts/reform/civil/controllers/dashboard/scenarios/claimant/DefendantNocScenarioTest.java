@@ -55,30 +55,18 @@ public class DefendantNocScenarioTest extends DashboardBaseIntegrationTest {
     }
 
     private CaseData buildCaseData(String caseId) {
+        PaymentDetails paymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS).build();
         return CaseDataBuilder.builder()
             .atStateClaimIssued1v1LiP().build()
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
+            .hearingFeePaymentDetails(paymentDetails)
             .build();
     }
 
     private CaseData buildCaseDataWithTrialArrangements(String caseId) {
-        return CaseDataBuilder.builder()
-            .atStateClaimIssued1v1LiP().build()
-            .toBuilder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(Long.valueOf(caseId))
-            .trialReadyApplicant(null)
-            .drawDirectionsOrderRequired(YesOrNo.YES)
-            .drawDirectionsOrderSmallClaims(NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
-            .orderType(OrderType.DECIDE_DAMAGES)
-            .build();
-    }
-
-    private CaseData buildCaseDataWithHearingFee(String caseId) {
-        PaymentDetails paymentDetails = PaymentDetails.builder().status(PaymentStatus.FAILED).build();
+        PaymentDetails paymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS).build();
         return CaseDataBuilder.builder()
             .atStateClaimIssued1v1LiP().build()
             .toBuilder()
@@ -90,6 +78,21 @@ public class DefendantNocScenarioTest extends DashboardBaseIntegrationTest {
             .claimsTrack(ClaimsTrack.fastTrack)
             .orderType(OrderType.DECIDE_DAMAGES)
             .hearingFeePaymentDetails(paymentDetails)
+            .build();
+    }
+
+    private CaseData buildCaseDataWithHearingFee(String caseId) {
+        return CaseDataBuilder.builder()
+            .atStateClaimIssued1v1LiP().build()
+            .toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(Long.valueOf(caseId))
+            .trialReadyApplicant(null)
+            .drawDirectionsOrderRequired(YesOrNo.YES)
+            .drawDirectionsOrderSmallClaims(NO)
+            .claimsTrack(ClaimsTrack.fastTrack)
+            .orderType(OrderType.DECIDE_DAMAGES)
+            .hearingFeePaymentDetails(null)
             .build();
     }
 

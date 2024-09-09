@@ -10,10 +10,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
-import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -75,8 +73,7 @@ public class DefendantNocDashboardNotificationHandler extends CallbackHandler {
             );
         }
 
-        PaymentDetails hearingFeePaymentDetails = caseData.getHearingFeePaymentDetails();
-        if (hearingFeePaymentDetails != null && hearingFeePaymentDetails.getStatus() != PaymentStatus.SUCCESS) {
+        if (isNull(caseData.getHearingFeePaymentDetails())) {
             dashboardApiClient.recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST.getScenario(),

@@ -117,13 +117,12 @@ public class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHa
         }
 
         @Test
-        void shouldRecordScenarioWhenHearingFeePaymentStatusIsNotSuccess() {
+        void shouldRecordScenarioWhenHearingFeePaymentStatusIsNotPaid() {
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
-            PaymentDetails paymentDetails = PaymentDetails.builder().status(PaymentStatus.FAILED).build();
             CaseData caseData = CaseData.builder()
                 .ccdCaseReference(123455L)
-                .hearingFeePaymentDetails(paymentDetails)
+                .hearingFeePaymentDetails(null)
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
