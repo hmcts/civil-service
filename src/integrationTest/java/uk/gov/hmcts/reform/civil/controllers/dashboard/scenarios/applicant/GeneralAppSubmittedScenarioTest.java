@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
+package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.applicant;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -34,13 +34,25 @@ public class GeneralAppSubmittedScenarioTest extends BaseIntegrationTest {
             .andExpect(status().isOk());
 
         //Verify Dashboard Notification is created
-        doGet(BEARER_TOKEN, UPDATE_DASHBOARD_NOTIFICATION, caseId, "CLAIMANT")
+
+        doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "APPLICANT")
+            .andExpect(status().isOk())
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].reference").value(caseId.toString()),
-                jsonPath("$[0].template_name").value(
-                    "<a href={GA_VIEW_APPLICATION_URL} rel=\"noopener noreferrer\" class=\"govuk-link\">View application documents</a>"),
-                jsonPath("$[0].currentStatusEn").value("Available")
+                jsonPath("$[0].titleEn").value("Application is being processed"),
+                jsonPath("$[0].titleCy").value("Mae’r cais yn cael ei brosesu"),
+                jsonPath("$[0].descriptionEn").value(
+                    "<p class=\"govuk-body\"> A judge will consider the application. </p>' \n" +
+                        "        '<p class=\"govuk-body\"> The other parties can respond within 5 working days after the application is submitted," +
+                        " unless you''ve chosen not to inform them." +
+                        " If you have a hearing in the next 10 days, your application will be treated urgently.</p>' \n" +
+                        "        ' <p> <a href=\"{GA_VIEW_APPLICATION_URL}\" class=\"govuk-link\">View application documents</a>.</p>"),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\"> Bydd barnwr yn ystyried y cais. </p>' \n" +
+                        "        '<p class=\"govuk-body\"> Gall y partïon eraill ymateb o fewn 5 diwrnod gwaith ar ôl i’r cais gael ei gyflwyno," +
+                        " oni bai eich bod wedi dewis peidio â rhoi gwybod iddynt." +
+                        " Os oes gennych wrandawiad o fewn y 10 diwrnod nesaf, bydd eich cais yn cael ei drin ar frys. </p>' \n" +
+                        "        '<p> <a href=\"{GA_VIEW_APPLICATION_URL}\" class=\"govuk-link\">Gweld dogfennau’r cais</a>.")
             );
     }
 }
