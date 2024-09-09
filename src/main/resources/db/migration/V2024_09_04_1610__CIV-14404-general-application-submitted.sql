@@ -19,5 +19,5 @@ VALUES ('Notice.AAA6.GeneralApps.ApplicationSubmitted.Applicant',
         ' <p> <a href="{GA_VIEW_APPLICATION_URL}" class="govuk-link">View application documents</a>.</p>',
         '<p class="govuk-body"> Bydd barnwr yn ystyried y cais. </p>' ||
         '<p class="govuk-body"> Gall y partïon eraill ymateb o fewn 5 diwrnod gwaith ar ôl i’r cais gael ei gyflwyno, oni bai eich bod wedi dewis peidio â rhoi gwybod iddynt. Os oes gennych wrandawiad o fewn y 10 diwrnod nesaf, bydd eich cais yn cael ei drin ar frys. </p>' ||
-        '<p> <a href="{GA_VIEW_APPLICATION_URL}" class="govuk-link">Gweld dogfennau’r cais</a>.</p>',
+        ' <p> <a href="{GA_VIEW_APPLICATION_URL}" class="govuk-link">Gweld dogfennau’r cais</a>.</p>',
         'APPLICANT');
