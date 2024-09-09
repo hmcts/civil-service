@@ -5005,6 +5005,14 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateNoHearingFeeDue() {
+        atStateApplicantRespondToDefenceAndProceed();
+        hearingDueDate = null;
+        hearingFeePaymentDetails = null;
+        ccdState = HEARING_READINESS;
+        return this;
+    }
+
     public CaseDataBuilder atStateHearingFeeDuePaid() {
         atStateApplicantRespondToDefenceAndProceed();
         hearingDueDate = now().minusDays(1);
