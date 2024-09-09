@@ -272,5 +272,4 @@ aac-manage-case-assignment:
       enabled: false
 
 wiremock:
-  enabled: true
-
+    enabled: true

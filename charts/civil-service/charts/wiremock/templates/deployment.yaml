@@ -17,7 +17,7 @@ spec:
       containers:
         - name: wiremock
           image: "{{ .Values.wiremock.image.repository }}:{{ .Values.wiremock.image.tag }}"
-          imagePullPolicy: {{ .Values.wiremock.imagePullPolicy }}
+          imagePullPolicy: Always
           resources:
             requests:
               memory: {{ .Values.wiremock.devmemoryRequests }}

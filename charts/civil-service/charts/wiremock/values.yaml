@@ -20,4 +20,3 @@ wiremock:
       - host: wiremock-test.preview.platform.hmcts.net
         paths:
           - /
-
