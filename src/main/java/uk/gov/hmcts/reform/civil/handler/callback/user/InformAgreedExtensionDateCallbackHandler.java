@@ -100,7 +100,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         }
 
         if ((caseData.getNextDeadline() != null && caseData.getNextDeadline().isBefore(LocalDate.now()))
-            || (currentResponseDeadline != null && currentResponseDeadline.toLocalDate().isBefore(LocalDate.now()))) {
+            || (currentResponseDeadline != null && currentResponseDeadline.isBefore(LocalDateTime.now()))) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(ERROR_DEADLINE_PAST))
                 .build();
