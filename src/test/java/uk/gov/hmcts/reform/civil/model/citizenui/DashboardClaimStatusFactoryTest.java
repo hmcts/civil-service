@@ -19,24 +19,10 @@ class DashboardClaimStatusFactoryTest {
     private final DashboardClaimStatusFactory claimStatusFactory = new DashboardClaimStatusFactory();
 
     static Stream<Arguments> caseToExpectedStatus() {
-        FeatureToggleService toggleService = Mockito.mock(FeatureToggleService.class);
-        CaseData caseData = CaseData.builder()
-            .ccdState(CaseState.CASE_STAYED)
-            .build();
-        CcdDashboardDefendantClaimMatcher defendant = new CcdDashboardDefendantClaimMatcher(caseData, toggleService);
-        CcdDashboardClaimantClaimMatcher claimant = new CcdDashboardClaimantClaimMatcher(caseData, toggleService);
-
         List<Arguments> argumentList = new ArrayList<>();
-        argumentList.add(Arguments.arguments(defendant, DashboardClaimStatus.CASE_STAYED));
-        argumentList.add(Arguments.arguments(claimant, DashboardClaimStatus.CASE_STAYED));
-
-        caseData = CaseData.builder()
-            .ccdState(CaseState.CASE_DISMISSED)
-            .build();
-        defendant = new CcdDashboardDefendantClaimMatcher(caseData, toggleService);
-        claimant = new CcdDashboardClaimantClaimMatcher(caseData, toggleService);
-        argumentList.add(Arguments.arguments(defendant, DashboardClaimStatus.CASE_DISMISSED));
-        argumentList.add(Arguments.arguments(claimant, DashboardClaimStatus.CASE_DISMISSED));
+        FeatureToggleService toggleService = Mockito.mock(FeatureToggleService.class);
+        addCaseStayedCases(argumentList, toggleService);
+        addCaseDismissCases(argumentList, toggleService);
 
         return argumentList.stream();
     }
@@ -45,5 +31,27 @@ class DashboardClaimStatusFactoryTest {
     @MethodSource("caseToExpectedStatus")
     void shouldReturnCorrectStatus_whenInvoked(Claim claim, DashboardClaimStatus status) {
         assertEquals(status, claimStatusFactory.getDashboardClaimStatus(claim));
+    }
+
+    private static void addCaseStayedCases(List<Arguments> argumentList, FeatureToggleService toggleService) {
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.CASE_STAYED)
+            .build();
+        CcdDashboardDefendantClaimMatcher defendant = new CcdDashboardDefendantClaimMatcher(caseData, toggleService);
+        CcdDashboardClaimantClaimMatcher claimant = new CcdDashboardClaimantClaimMatcher(caseData, toggleService);
+
+        argumentList.add(Arguments.arguments(defendant, DashboardClaimStatus.CASE_STAYED));
+        argumentList.add(Arguments.arguments(claimant, DashboardClaimStatus.CASE_STAYED));
+    }
+
+    private static void addCaseDismissCases(List<Arguments> argumentList, FeatureToggleService toggleService) {
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.CASE_DISMISSED)
+            .build();
+        CcdDashboardDefendantClaimMatcher defendant = new CcdDashboardDefendantClaimMatcher(caseData, toggleService);
+        CcdDashboardClaimantClaimMatcher claimant = new CcdDashboardClaimantClaimMatcher(caseData, toggleService);
+
+        argumentList.add(Arguments.arguments(defendant, DashboardClaimStatus.CASE_DISMISSED));
+        argumentList.add(Arguments.arguments(claimant, DashboardClaimStatus.CASE_DISMISSED));
     }
 }
