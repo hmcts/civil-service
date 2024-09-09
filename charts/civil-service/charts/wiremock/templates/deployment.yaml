@@ -26,14 +26,3 @@ spec:
               memory: {{ .Values.wiremock.devmemoryLimits }}
           ports:
             - containerPort: 8080
-          volumeMounts:
-            - name: wiremock-mocks
-              mountPath: /home/wiremock
-          env:
-            - name: WIREMOCK_ROOT_DIRECTORY
-              value: /home/wiremock/mappings
-      volumes:
-        - name: wiremock-mocks
-          configMap:
-            name: {{ include "wiremock.fullname" . }}-mock-files
-
