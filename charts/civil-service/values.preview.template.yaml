@@ -282,14 +282,6 @@ wiremock:
     repository: wiremock/wiremock
     pullPolicy: Always
 
-  ingressHost: wiremock-test.preview.platform.hmcts.net
-  ingress:
-    enabled: true
-    annotations:
-      nginx.ingress.kubernetes.io/rewrite-target: /
-    tls: []
-    hosts:
-      - host: wiremock-test.preview.platform.hmcts.net
-        paths:
-          - /
+  releaseNameOverride: ${SERVICE_NAME}-aac-manage-case-assignment
+
 
