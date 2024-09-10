@@ -282,6 +282,6 @@ wiremock:
     repository: wiremock/wiremock
     pullPolicy: Always
 
-  releaseNameOverride: ${SERVICE_NAME}-aac-manage-case-assignment
+  releaseNameOverride: ${SERVICE_NAME}-wiremock
 
 
