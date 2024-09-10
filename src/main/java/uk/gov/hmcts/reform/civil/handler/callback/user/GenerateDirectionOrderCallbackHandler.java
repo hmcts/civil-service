@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
@@ -100,6 +101,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_DIRECTIONS_ORDER);
@@ -548,7 +550,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                 InputStream inputStream = downloadedDocumentResponse.file().getInputStream();
                 bytes = IOUtils.toByteArray(inputStream);
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Unable to stream downloadedDocumentResponse from case %s : %s".formatted(caseData.getCcdCaseReference(), e.getMessage()));
             }
             String updatedDocumentFilename = getUploadedFromTemplateDocumentName(
                 caseData,

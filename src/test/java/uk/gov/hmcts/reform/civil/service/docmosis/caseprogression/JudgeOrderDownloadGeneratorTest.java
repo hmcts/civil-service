@@ -71,33 +71,33 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeOr
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class JudgeOrderDownloadGeneratorTest {
+class JudgeOrderDownloadGeneratorTest {
 
     private static final CaseLocationCivil caseManagementLocation = CaseLocationCivil.builder().baseLocation("000000").build();
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final String DATE_FORMAT = "dd-MM-yyyy";
-    private static final String fileBlankBeforeHearing = format(BLANK_TEMPLATE_BEFORE_HEARING_DOCX.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
-    private static final String fileBlankAfterHearing = format(BLANK_TEMPLATE_AFTER_HEARING_DOCX.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
-    private static final String fileFixDateCmc = format(FIX_DATE_CMC_DOCX.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
-    private static final String fileFixDateCcmc = format(FIX_DATE_CCMC_DOCX.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
+    private static final String FILE_BLANK_BEFORE_HEARING = format(BLANK_TEMPLATE_BEFORE_HEARING_DOCX.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
+    private static final String FILE_BLANK_AFTER_HEARING = format(BLANK_TEMPLATE_AFTER_HEARING_DOCX.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
+    private static final String FILE_FIX_DATE_CMC = format(FIX_DATE_CMC_DOCX.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
+    private static final String FILE_FIX_DATE_CCMC = format(FIX_DATE_CCMC_DOCX.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
     private static final CaseDocument BLANK_TEMPLATE_BEFORE_HEARING = CaseDocumentBuilder.builder()
-        .documentName(fileBlankBeforeHearing)
+        .documentName(FILE_BLANK_BEFORE_HEARING)
         .documentType(JUDGE_FINAL_ORDER)
         .build();
 
     private static final CaseDocument BLANK_TEMPLATE_AFTER_HEARING = CaseDocumentBuilder.builder()
-        .documentName(fileBlankAfterHearing)
+        .documentName(FILE_BLANK_AFTER_HEARING)
         .documentType(JUDGE_FINAL_ORDER)
         .build();
 
     private static final CaseDocument FIX_DATE_CMC = CaseDocumentBuilder.builder()
-        .documentName(fileFixDateCmc)
+        .documentName(FILE_FIX_DATE_CMC)
         .documentType(JUDGE_FINAL_ORDER)
         .build();
 
     private static final CaseDocument FIX_DATE_CCMC = CaseDocumentBuilder.builder()
-        .documentName(fileFixDateCcmc)
+        .documentName(FILE_FIX_DATE_CCMC)
         .documentType(JUDGE_FINAL_ORDER)
         .build();
 
@@ -120,7 +120,7 @@ public class JudgeOrderDownloadGeneratorTest {
     private DocumentHearingLocationHelper documentHearingLocationHelper;
 
     @BeforeEach
-    public void setUp() throws JsonProcessingException {
+    public void setUp() {
         when(userService.getUserDetails(any())).thenReturn(new UserDetails("1", "test@email.com", "Test", "User", null));
         when(documentHearingLocationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
     }
@@ -138,20 +138,20 @@ public class JudgeOrderDownloadGeneratorTest {
                                                    .value(DynamicListElement.dynamicElement(templateToUse))
                                                    .build())
             .build();
-        JudgeFinalOrderForm response = judgeOrderDownloadGenerator.getDownloadTemplate(caseData, "auth");
+        judgeOrderDownloadGenerator.getDownloadTemplate(caseData, "auth");
 
         switch (templateToUse) {
             case BLANK_TEMPLATE_TO_BE_USED_AFTER_A_HEARING:
-                assertEquals(judgeOrderDownloadGenerator.docmosisTemplate, BLANK_TEMPLATE_AFTER_HEARING_DOCX);
+                assertEquals(BLANK_TEMPLATE_AFTER_HEARING_DOCX, judgeOrderDownloadGenerator.docmosisTemplate);
                 break;
             case BLANK_TEMPLATE_TO_BE_USED_BEFORE_A_HEARING_BOX_WORK:
-                assertEquals(judgeOrderDownloadGenerator.docmosisTemplate, BLANK_TEMPLATE_BEFORE_HEARING_DOCX);
+                assertEquals(BLANK_TEMPLATE_BEFORE_HEARING_DOCX, judgeOrderDownloadGenerator.docmosisTemplate);
                 break;
             case FIX_A_DATE_FOR_CCMC:
-                assertEquals(judgeOrderDownloadGenerator.docmosisTemplate, FIX_DATE_CCMC_DOCX);
+                assertEquals(FIX_DATE_CCMC_DOCX, judgeOrderDownloadGenerator.docmosisTemplate);
                 break;
             case FIX_A_DATE_FOR_CMC:
-                assertEquals(judgeOrderDownloadGenerator.docmosisTemplate, FIX_DATE_CMC_DOCX);
+                assertEquals(FIX_DATE_CMC_DOCX, judgeOrderDownloadGenerator.docmosisTemplate);
                 break;
             default: // do nothing
         }
@@ -290,16 +290,16 @@ public class JudgeOrderDownloadGeneratorTest {
 
         switch (band) {
             case BAND_1:
-                assertEquals(response, "1");
+                assertEquals("1", response);
                 break;
             case BAND_2:
-                assertEquals(response, "2");
+                assertEquals("2", response);
                 break;
             case BAND_3:
-                assertEquals(response, "3");
+                assertEquals("3", response);
                 break;
             case BAND_4:
-                assertEquals(response, "4");
+                assertEquals("4", response);
                 break;
             default: // do nothing
         }
@@ -323,16 +323,16 @@ public class JudgeOrderDownloadGeneratorTest {
 
         switch (band) {
             case BAND_1:
-                assertEquals(response, "1");
+                assertEquals("1", response);
                 break;
             case BAND_2:
-                assertEquals(response, "2");
+                assertEquals("2", response);
                 break;
             case BAND_3:
-                assertEquals(response, "3");
+                assertEquals("3", response);
                 break;
             case BAND_4:
-                assertEquals(response, "4");
+                assertEquals("4", response);
                 break;
             default: // do nothing
         }
@@ -342,7 +342,7 @@ public class JudgeOrderDownloadGeneratorTest {
     void shouldGenerateBlankTemplateBeforeHearing_whenOptionSelected_intermediateClaim() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(BLANK_TEMPLATE_BEFORE_HEARING_DOCX), eq("docx")))
             .thenReturn(new DocmosisDocument(BLANK_TEMPLATE_BEFORE_HEARING_DOCX.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileBlankBeforeHearing, bytes, JUDGE_FINAL_ORDER)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_BLANK_BEFORE_HEARING, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(BLANK_TEMPLATE_BEFORE_HEARING);
         when(documentHearingLocationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
 
@@ -364,14 +364,14 @@ public class JudgeOrderDownloadGeneratorTest {
         CaseDocument caseDocument = judgeOrderDownloadGenerator.generate(caseData, BEARER_TOKEN);
 
         assertNotNull(caseDocument);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileBlankBeforeHearing, bytes, JUDGE_FINAL_ORDER));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_BLANK_BEFORE_HEARING, bytes, JUDGE_FINAL_ORDER));
     }
 
     @Test
     void shouldGenerateBlankTemplateBeforeHearing_whenOptionSelected_smallClaim() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(BLANK_TEMPLATE_BEFORE_HEARING_DOCX), eq("docx")))
             .thenReturn(new DocmosisDocument(BLANK_TEMPLATE_BEFORE_HEARING_DOCX.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileBlankBeforeHearing, bytes, JUDGE_FINAL_ORDER)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_BLANK_BEFORE_HEARING, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(BLANK_TEMPLATE_BEFORE_HEARING);
         when(documentHearingLocationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
 
@@ -388,14 +388,14 @@ public class JudgeOrderDownloadGeneratorTest {
         CaseDocument caseDocument = judgeOrderDownloadGenerator.generate(caseData, BEARER_TOKEN);
 
         assertNotNull(caseDocument);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileBlankBeforeHearing, bytes, JUDGE_FINAL_ORDER));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_BLANK_BEFORE_HEARING, bytes, JUDGE_FINAL_ORDER));
     }
 
     @Test
     void shouldGenerateBlankTemplateAfterHearing_whenOptionSelected() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(BLANK_TEMPLATE_AFTER_HEARING_DOCX), eq("docx")))
             .thenReturn(new DocmosisDocument(BLANK_TEMPLATE_AFTER_HEARING_DOCX.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileBlankAfterHearing, bytes, JUDGE_FINAL_ORDER)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_BLANK_AFTER_HEARING, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(BLANK_TEMPLATE_AFTER_HEARING);
         when(documentHearingLocationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
 
@@ -412,14 +412,14 @@ public class JudgeOrderDownloadGeneratorTest {
         CaseDocument caseDocument = judgeOrderDownloadGenerator.generate(caseData, BEARER_TOKEN);
 
         assertNotNull(caseDocument);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileBlankAfterHearing, bytes, JUDGE_FINAL_ORDER));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_BLANK_AFTER_HEARING, bytes, JUDGE_FINAL_ORDER));
     }
 
     @Test
     void shouldGenerateFixDateCMC_whenOptionSelected() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(FIX_DATE_CMC_DOCX), eq("docx")))
             .thenReturn(new DocmosisDocument(FIX_DATE_CMC_DOCX.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileFixDateCmc, bytes, JUDGE_FINAL_ORDER)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_FIX_DATE_CMC, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(FIX_DATE_CMC);
         when(documentHearingLocationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
 
@@ -441,14 +441,14 @@ public class JudgeOrderDownloadGeneratorTest {
         CaseDocument caseDocument = judgeOrderDownloadGenerator.generate(caseData, BEARER_TOKEN);
 
         assertNotNull(caseDocument);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileFixDateCmc, bytes, JUDGE_FINAL_ORDER));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_FIX_DATE_CMC, bytes, JUDGE_FINAL_ORDER));
     }
 
     @Test
     void shouldGenerateFixDateCCMC_whenOptionSelected() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(FIX_DATE_CCMC_DOCX), eq("docx")))
             .thenReturn(new DocmosisDocument(FIX_DATE_CCMC_DOCX.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileFixDateCcmc, bytes, JUDGE_FINAL_ORDER)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_FIX_DATE_CCMC, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(FIX_DATE_CCMC);
         when(documentHearingLocationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
 
@@ -465,6 +465,6 @@ public class JudgeOrderDownloadGeneratorTest {
         CaseDocument caseDocument = judgeOrderDownloadGenerator.generate(caseData, BEARER_TOKEN);
 
         assertNotNull(caseDocument);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileFixDateCcmc, bytes, JUDGE_FINAL_ORDER));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_FIX_DATE_CCMC, bytes, JUDGE_FINAL_ORDER));
     }
 }

@@ -43,9 +43,7 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
     private final DocumentGeneratorService documentGeneratorService;
     private final UserService userService;
     private final LocationReferenceDataService locationRefDataService;
-    private final FeatureToggleService featureToggleService;
     private final DocumentHearingLocationHelper documentHearingLocationHelper;
-    private LocationRefData caseManagementLocationDetails;
     public DocmosisTemplates docmosisTemplate;
     private static final String DATE_FORMAT = "dd-MM-yyyy";
     public static final String INTERMEDIATE_NO_BAND_NO_REASON = "This case is allocated to the Intermediate Track and is not allocated a complexity band.";
@@ -65,10 +63,10 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
         this.documentGeneratorService = documentGeneratorService;
         this.userService = userService;
         this.locationRefDataService = locationRefDataService;
-        this.featureToggleService = featureToggleService;
         this.documentHearingLocationHelper = documentHearingLocationHelper;
     }
 
+    @Override
     public CaseDocument generate(CaseData caseData, String authorisation) {
         JudgeFinalOrderForm templateData = getDownloadTemplate(caseData, authorisation);
         DocmosisDocument docmosisDocument =
@@ -132,7 +130,7 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
     private JudgeFinalOrderForm.JudgeFinalOrderFormBuilder getBaseTemplateData(CaseData caseData,
                                                                                String authorisation) {
         UserDetails userDetails = userService.getUserDetails(authorisation);
-        caseManagementLocationDetails = documentHearingLocationHelper
+        LocationRefData caseManagementLocationDetails = documentHearingLocationHelper
             .getCaseManagementLocationDetailsNro(caseData, locationRefDataService, authorisation);
 
         return JudgeFinalOrderForm.builder()

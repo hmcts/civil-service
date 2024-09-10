@@ -468,7 +468,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                     CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
                     // Then
-                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(2);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems()).hasSize(2);
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
                         .isEqualTo(SMALL_CLAIMS_OPTIONS.getListItems().get(0).getLabel());
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
@@ -489,7 +489,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                     CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
                     // Then
-                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(3);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems()).hasSize(3);
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
                         .isEqualTo(FAST_INT_OPTIONS.getListItems().get(0).getLabel());
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
@@ -512,7 +512,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                     CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
                     // Then
-                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(3);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems()).hasSize(3);
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
                         .isEqualTo(FAST_INT_OPTIONS.getListItems().get(0).getLabel());
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
@@ -535,7 +535,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                     CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
                     // Then
-                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(4);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems()).hasSize(4);
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
                         .isEqualTo(MULTI_OPTIONS.getListItems().get(0).getLabel());
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
@@ -560,7 +560,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                     CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
                     // Then
-                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(2);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems()).hasSize(2);
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
                         .isEqualTo(SMALL_CLAIMS_OPTIONS.getListItems().get(0).getLabel());
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
@@ -581,7 +581,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                     CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
                     // Then
-                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(3);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems()).hasSize(3);
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
                         .isEqualTo(FAST_INT_OPTIONS.getListItems().get(0).getLabel());
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
@@ -604,7 +604,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                     CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
                     // Then
-                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(3);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems()).hasSize(3);
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
                         .isEqualTo(FAST_INT_OPTIONS.getListItems().get(0).getLabel());
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
@@ -627,7 +627,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                     CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
                     // Then
-                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(4);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems()).hasSize(4);
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
                         .isEqualTo(MULTI_OPTIONS.getListItems().get(0).getLabel());
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
@@ -657,7 +657,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                     CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
                     // Then
-                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(2);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems()).hasSize(2);
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
                         .isEqualTo(SMALL_CLAIMS_OPTIONS.getListItems().get(0).getLabel());
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
@@ -679,7 +679,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                     CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
                     // Then
-                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(3);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems()).hasSize(3);
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
                         .isEqualTo(FAST_INT_OPTIONS.getListItems().get(0).getLabel());
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
@@ -703,7 +703,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                     CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
                     // Then
-                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(3);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems()).hasSize(3);
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
                         .isEqualTo(FAST_INT_OPTIONS.getListItems().get(0).getLabel());
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
@@ -727,7 +727,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                     CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
                     // Then
-                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(4);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems()).hasSize(4);
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
                         .isEqualTo(MULTI_OPTIONS.getListItems().get(0).getLabel());
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
@@ -753,7 +753,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                     CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
                     // Then
-                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(2);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems()).hasSize(2);
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
                         .isEqualTo(SMALL_CLAIMS_OPTIONS.getListItems().get(0).getLabel());
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
@@ -775,7 +775,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                     CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
                     // Then
-                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(3);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems()).hasSize(3);
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
                         .isEqualTo(FAST_INT_OPTIONS.getListItems().get(0).getLabel());
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
@@ -799,7 +799,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                     CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
                     // Then
-                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(3);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems()).hasSize(3);
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
                         .isEqualTo(FAST_INT_OPTIONS.getListItems().get(0).getLabel());
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
@@ -823,7 +823,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                     CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
                     // Then
-                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(4);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems()).hasSize(4);
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
                         .isEqualTo(MULTI_OPTIONS.getListItems().get(0).getLabel());
                     assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
@@ -1566,8 +1566,8 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
-            assertThat(response.getData()).extracting("finalOrderAllocateToTrack").isEqualTo(null);
-            assertThat(response.getData()).extracting("finalOrderTrackAllocation").isEqualTo(null);
+            assertThat(response.getData()).extracting("finalOrderAllocateToTrack").isNull();
+            assertThat(response.getData()).extracting("finalOrderTrackAllocation").isNull();
             assertThat(response.getData()).extracting("responseClaimTrack").isEqualTo("MULTI_CLAIM");
         }
 
@@ -1595,8 +1595,8 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
-            assertThat(response.getData()).extracting("finalOrderAllocateToTrack").isEqualTo(null);
-            assertThat(response.getData()).extracting("finalOrderTrackAllocation").isEqualTo(null);
+            assertThat(response.getData()).extracting("finalOrderAllocateToTrack").isNull();
+            assertThat(response.getData()).extracting("finalOrderTrackAllocation").isNull();
             assertThat(response.getData()).extracting("allocatedTrack").isEqualTo("MULTI_CLAIM");
         }
 
@@ -1624,8 +1624,8 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
-            assertThat(response.getData()).extracting("finalOrderAllocateToTrack").isEqualTo(null);
-            assertThat(response.getData()).extracting("finalOrderTrackAllocation").isEqualTo(null);
+            assertThat(response.getData()).extracting("finalOrderAllocateToTrack").isNull();
+            assertThat(response.getData()).extracting("finalOrderTrackAllocation").isNull();
             assertThat(response.getData()).extracting("allocatedTrack").isEqualTo("SMALL_CLAIM");
         }
     }
