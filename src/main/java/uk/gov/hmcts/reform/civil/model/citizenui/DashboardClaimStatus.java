@@ -4,11 +4,15 @@ import lombok.Getter;
 
 import java.util.function.Predicate;
 
+/**
+ * Using DashboardClaimStatusFactory means the order of the values of this enum reflect priority.
+ */
 public enum DashboardClaimStatus {
 
     CASE_DISMISSED(
         Claim::isCaseDismissed
     ),
+    CASE_STAYED(Claim::isCaseStayed),
     DEFENDANT_APPLY_NOC(
         Claim::isNocForDefendant
     ),
