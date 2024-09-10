@@ -3,7 +3,11 @@ kind: Deployment
 metadata:
   name: {{ include "wiremock.fullname" . }}
   labels:
+    app.kubernetes.io/name: {{ .Values.releaseNameOverride }}
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     app: {{ include "wiremock.name" . }}
+    app.kubernetes.io/instance: {{ .Values.releaseNameOverride }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   replicas: 1
   selector:
