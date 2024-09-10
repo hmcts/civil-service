@@ -110,15 +110,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsPbaV3EnabledInvoked(Boolean toggleStat) {
-        var pbaV3Key = "pba-version-3-ways-to-pay";
-        givenToggle(pbaV3Key, toggleStat);
-
-        assertThat(featureToggleService.isPbaV3Enabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenHmcIsEnabled(Boolean toggleStat) {
         var hmcKey = "hmc";
         givenToggle(hmcKey, toggleStat);

@@ -118,6 +118,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         if (featureToggleService.isJudgmentOnlineLive()) {
             data.setActiveJudgment(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(data));
             data.setJoIsLiveJudgmentExists(YesOrNo.YES);
+            data.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(data.getActiveJudgment()));
         }
 
         CaseData.CaseDataBuilder caseDataBuilder = data.toBuilder()
