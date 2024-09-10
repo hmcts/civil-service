@@ -147,6 +147,37 @@ public class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHa
         }
 
         @Test
+        void shouldRecordScenarioWhenHearingFeePaymentStatusIsFailed() {
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            PaymentDetails paymentDetails = PaymentDetails.builder().status(PaymentStatus.FAILED).build();
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(123455L)
+                .hearingFeePaymentDetails(paymentDetails)
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_NOC.name()).build()
+            ).build();
+
+            handler.handle(params);
+
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
         void shouldNotRecordTrialArrangementsScenarioWhenTrialReadyApplicantIsNotNull() {
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
