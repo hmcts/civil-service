@@ -41,7 +41,7 @@ public class JudgmentByAdmissionPiPLetterGenerator {
 
     public byte[] generateAndPrintJudgmentByAdmissionLetter(CaseData caseData, String authorisation) {
         DocmosisDocument judgmentByAdmissionLetter = generate(caseData);
-        CaseDocument caseDocument =  documentManagementService.uploadDocument(
+        CaseDocument caseDocument = documentManagementService.uploadDocument(
             authorisation,
             new PDF(
                 JUDGMENT_BY_ADMISSION_PIN_IN_POST_LIP_DEFENDANT_LETTER.getDocumentTitle(),

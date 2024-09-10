@@ -146,7 +146,7 @@ public class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
     }
 
     @Test
-    void shouldGetTemplateDataCorrectly() {
+    void shouldGetTemplateFeesCorrectly() {
         //Given
         when(generalAppFeesService.getFeeForJOWithApplicationType(VARY_ORDER))
             .thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(1500)).build());
