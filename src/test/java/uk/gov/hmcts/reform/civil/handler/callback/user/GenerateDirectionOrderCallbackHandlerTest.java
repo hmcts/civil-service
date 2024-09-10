@@ -835,6 +835,394 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 }
             }
         }
+
+        @Nested
+        class MidEventPopulateOrderFieldsDownloadOrderTemplate {
+
+            @Nested
+            class FinalOrderTrackNotAllocated {
+
+                @Test
+                void shouldPopulateDownloadOrderTemplateValues_whenUnspecClaimSmallClaim() {
+                    // Given
+                    CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                        .build().toBuilder()
+                        .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                        .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+                        .finalOrderAllocateToTrack(NO)
+                        .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE).build();
+                    CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                    // When
+                    var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                    CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                    // Then
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(2);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
+                        .isEqualTo(SMALL_CLAIMS_OPTIONS.getListItems().get(0).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
+                        .isEqualTo(SMALL_CLAIMS_OPTIONS.getListItems().get(1).getLabel());
+                }
+
+                @Test
+                void shouldPopulateDownloadOrderTemplateValues_whenUnspecClaimFastClaim() {
+                    // Given
+                    CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                        .build().toBuilder()
+                        .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                        .allocatedTrack(AllocatedTrack.FAST_CLAIM)
+                        .finalOrderAllocateToTrack(NO)
+                        .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE).build();
+                    CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                    // When
+                    var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                    CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                    // Then
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(3);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
+                        .isEqualTo(FAST_INT_OPTIONS.getListItems().get(0).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
+                        .isEqualTo(FAST_INT_OPTIONS.getListItems().get(1).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(2).getLabel())
+                        .isEqualTo(FAST_INT_OPTIONS.getListItems().get(2).getLabel());
+                }
+
+                @Test
+                void shouldPopulateDownloadOrderTemplateValues_whenUnspecClaimIntermediateClaim() {
+                    // Given
+                    CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                        .build().toBuilder()
+                        .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                        .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
+                        .finalOrderAllocateToTrack(NO)
+                        .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE).build();
+                    CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                    // When
+                    var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                    CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                    // Then
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(3);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
+                        .isEqualTo(FAST_INT_OPTIONS.getListItems().get(0).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
+                        .isEqualTo(FAST_INT_OPTIONS.getListItems().get(1).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(2).getLabel())
+                        .isEqualTo(FAST_INT_OPTIONS.getListItems().get(2).getLabel());
+                }
+
+                @Test
+                void shouldPopulateDownloadOrderTemplateValues_whenUnspecClaimMultiClaim() {
+                    // Given
+                    CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                        .build().toBuilder()
+                        .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                        .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
+                        .finalOrderAllocateToTrack(NO)
+                        .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE).build();
+                    CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                    // When
+                    var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                    CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                    // Then
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(4);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
+                        .isEqualTo(MULTI_OPTIONS.getListItems().get(0).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
+                        .isEqualTo(MULTI_OPTIONS.getListItems().get(1).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(2).getLabel())
+                        .isEqualTo(MULTI_OPTIONS.getListItems().get(2).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(3).getLabel())
+                        .isEqualTo(MULTI_OPTIONS.getListItems().get(3).getLabel());
+                }
+
+                @Test
+                void shouldPopulateDownloadOrderTemplateValues_whenSpecClaimSmallClaim() {
+                    // Given
+                    CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                        .build().toBuilder()
+                        .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                        .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                        .finalOrderAllocateToTrack(NO)
+                        .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE).build();
+                    CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                    // When
+                    var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                    CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                    // Then
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(2);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
+                        .isEqualTo(SMALL_CLAIMS_OPTIONS.getListItems().get(0).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
+                        .isEqualTo(SMALL_CLAIMS_OPTIONS.getListItems().get(1).getLabel());
+                }
+
+                @Test
+                void shouldPopulateDownloadOrderTemplateValues_whenSpecClaimFastClaim() {
+                    // Given
+                    CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                        .build().toBuilder()
+                        .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                        .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
+                        .finalOrderAllocateToTrack(NO)
+                        .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE).build();
+                    CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                    // When
+                    var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                    CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                    // Then
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(3);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
+                        .isEqualTo(FAST_INT_OPTIONS.getListItems().get(0).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
+                        .isEqualTo(FAST_INT_OPTIONS.getListItems().get(1).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(2).getLabel())
+                        .isEqualTo(FAST_INT_OPTIONS.getListItems().get(2).getLabel());
+                }
+
+                @Test
+                void shouldPopulateDownloadOrderTemplateValues_whenSpecClaimIntermediateClaim() {
+                    // Given
+                    CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                        .build().toBuilder()
+                        .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                        .responseClaimTrack(AllocatedTrack.INTERMEDIATE_CLAIM.name())
+                        .finalOrderAllocateToTrack(NO)
+                        .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE).build();
+                    CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                    // When
+                    var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                    CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                    // Then
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(3);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
+                        .isEqualTo(FAST_INT_OPTIONS.getListItems().get(0).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
+                        .isEqualTo(FAST_INT_OPTIONS.getListItems().get(1).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(2).getLabel())
+                        .isEqualTo(FAST_INT_OPTIONS.getListItems().get(2).getLabel());
+                }
+
+                @Test
+                void shouldPopulateDownloadOrderTemplateValues_whenSpecClaimMultiClaim() {
+                    // Given
+                    CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                        .build().toBuilder()
+                        .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                        .responseClaimTrack(AllocatedTrack.MULTI_CLAIM.name())
+                        .finalOrderAllocateToTrack(NO)
+                        .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE).build();
+                    CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                    // When
+                    var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                    CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                    // Then
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(4);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
+                        .isEqualTo(MULTI_OPTIONS.getListItems().get(0).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
+                        .isEqualTo(MULTI_OPTIONS.getListItems().get(1).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(2).getLabel())
+                        .isEqualTo(MULTI_OPTIONS.getListItems().get(2).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(3).getLabel())
+                        .isEqualTo(MULTI_OPTIONS.getListItems().get(3).getLabel());
+                }
+            }
+
+            @Nested
+            class FinalOrderTrackAllocated {
+
+                @Test
+                void shouldPopulateDownloadOrderTemplateValues_whenUnspecClaimAllocatedToSmallClaim() {
+                    // Given
+                    CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                        .build().toBuilder()
+                        .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                        .allocatedTrack(AllocatedTrack.FAST_CLAIM)
+                        .finalOrderAllocateToTrack(YES)
+                        .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
+                        .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE).build();
+                    CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                    // When
+                    var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                    CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                    // Then
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(2);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
+                        .isEqualTo(SMALL_CLAIMS_OPTIONS.getListItems().get(0).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
+                        .isEqualTo(SMALL_CLAIMS_OPTIONS.getListItems().get(1).getLabel());
+                }
+
+                @Test
+                void shouldPopulateDownloadOrderTemplateValues_whenUnspecClaimAllocatedToFastClaim() {
+                    // Given
+                    CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                        .build().toBuilder()
+                        .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                        .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+                        .finalOrderAllocateToTrack(YES)
+                        .finalOrderTrackAllocation(AllocatedTrack.FAST_CLAIM)
+                        .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE).build();
+                    CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                    // When
+                    var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                    CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                    // Then
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(3);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
+                        .isEqualTo(FAST_INT_OPTIONS.getListItems().get(0).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
+                        .isEqualTo(FAST_INT_OPTIONS.getListItems().get(1).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(2).getLabel())
+                        .isEqualTo(FAST_INT_OPTIONS.getListItems().get(2).getLabel());
+                }
+
+                @Test
+                void shouldPopulateDownloadOrderTemplateValues_whenUnspecClaimAllocatedToIntermediateClaim() {
+                    // Given
+                    CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                        .build().toBuilder()
+                        .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                        .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+                        .finalOrderAllocateToTrack(YES)
+                        .finalOrderTrackAllocation(AllocatedTrack.INTERMEDIATE_CLAIM)
+                        .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE).build();
+                    CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                    // When
+                    var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                    CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                    // Then
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(3);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
+                        .isEqualTo(FAST_INT_OPTIONS.getListItems().get(0).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
+                        .isEqualTo(FAST_INT_OPTIONS.getListItems().get(1).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(2).getLabel())
+                        .isEqualTo(FAST_INT_OPTIONS.getListItems().get(2).getLabel());
+                }
+
+                @Test
+                void shouldPopulateDownloadOrderTemplateValues_whenUnspecClaimAllocatedToMultiClaim() {
+                    // Given
+                    CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                        .build().toBuilder()
+                        .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                        .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+                        .finalOrderAllocateToTrack(YES)
+                        .finalOrderTrackAllocation(AllocatedTrack.MULTI_CLAIM)
+                        .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE).build();
+                    CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                    // When
+                    var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                    CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                    // Then
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(4);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
+                        .isEqualTo(MULTI_OPTIONS.getListItems().get(0).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
+                        .isEqualTo(MULTI_OPTIONS.getListItems().get(1).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(2).getLabel())
+                        .isEqualTo(MULTI_OPTIONS.getListItems().get(2).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(3).getLabel())
+                        .isEqualTo(MULTI_OPTIONS.getListItems().get(3).getLabel());
+                }
+
+                @Test
+                void shouldPopulateDownloadOrderTemplateValues_whenSpecClaimAllocatedToSmallClaim() {
+                    // Given
+                    CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                        .build().toBuilder()
+                        .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                        .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
+                        .finalOrderAllocateToTrack(YES)
+                        .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
+                        .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE).build();
+                    CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                    // When
+                    var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                    CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                    // Then
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(2);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
+                        .isEqualTo(SMALL_CLAIMS_OPTIONS.getListItems().get(0).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
+                        .isEqualTo(SMALL_CLAIMS_OPTIONS.getListItems().get(1).getLabel());
+                }
+
+                @Test
+                void shouldPopulateDownloadOrderTemplateValues_whenSpecClaimAllocatedToFastClaim() {
+                    // Given
+                    CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                        .build().toBuilder()
+                        .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                        .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                        .finalOrderAllocateToTrack(YES)
+                        .finalOrderTrackAllocation(AllocatedTrack.FAST_CLAIM)
+                        .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE).build();
+                    CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                    // When
+                    var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                    CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                    // Then
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(3);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
+                        .isEqualTo(FAST_INT_OPTIONS.getListItems().get(0).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
+                        .isEqualTo(FAST_INT_OPTIONS.getListItems().get(1).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(2).getLabel())
+                        .isEqualTo(FAST_INT_OPTIONS.getListItems().get(2).getLabel());
+                }
+
+                @Test
+                void shouldPopulateDownloadOrderTemplateValues_whenSpecClaimAllocatedToIntermediateClaim() {
+                    // Given
+                    CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                        .build().toBuilder()
+                        .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                        .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                        .finalOrderAllocateToTrack(YES)
+                        .finalOrderTrackAllocation(AllocatedTrack.INTERMEDIATE_CLAIM)
+                        .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE).build();
+                    CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                    // When
+                    var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                    CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                    // Then
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(3);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
+                        .isEqualTo(FAST_INT_OPTIONS.getListItems().get(0).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
+                        .isEqualTo(FAST_INT_OPTIONS.getListItems().get(1).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(2).getLabel())
+                        .isEqualTo(FAST_INT_OPTIONS.getListItems().get(2).getLabel());
+                }
+
+                @Test
+                void shouldPopulateDownloadOrderTemplateValues_whenSpecClaimAllocatedToMultiClaim() {
+                    // Given
+                    CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                        .build().toBuilder()
+                        .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                        .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                        .finalOrderAllocateToTrack(YES)
+                        .finalOrderTrackAllocation(AllocatedTrack.MULTI_CLAIM)
+                        .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE).build();
+                    CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                    // When
+                    var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                    CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                    // Then
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().size()).isEqualTo(4);
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(0).getLabel())
+                        .isEqualTo(MULTI_OPTIONS.getListItems().get(0).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(1).getLabel())
+                        .isEqualTo(MULTI_OPTIONS.getListItems().get(1).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(2).getLabel())
+                        .isEqualTo(MULTI_OPTIONS.getListItems().get(2).getLabel());
+                    assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(3).getLabel())
+                        .isEqualTo(MULTI_OPTIONS.getListItems().get(3).getLabel());
+                }
+            }
+        }
     }
 
     @Nested
@@ -1316,6 +1704,37 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Then
             String fileName = LocalDate.now() + "_Judge Judy" + ".pdf";
             assertThat(updatedData).extracting("finalOrderFurtherHearingToggle").isNull();
+            assertThat(response.getData()).extracting("finalOrderDocumentCollection").isNotNull();
+            assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
+                           .getValue().getDocumentLink().getCategoryID()).isEqualTo("caseManagementOrders");
+            assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
+                           .getValue().getDocumentLink().getDocumentFileName()).isEqualTo(fileName);
+        }
+
+        @Test
+        void shouldAddTemplateDocumentToCollection_onAboutToSubmit() {
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                            .forename("Judge")
+                                                                            .surname("Judy")
+                                                                            .roles(Collections.emptyList()).build());
+            // Given
+            List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
+            finalCaseDocuments.add(element(finalOrder));
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE)
+                .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                       .value(DynamicListElement.builder()
+                                                                  .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
+                                                                  .build()).build())
+                .finalOrderDocumentCollection(finalCaseDocuments)
+                .uploadOrderDocumentFromTemplate(uploadedDocument)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            // Then
+            String fileName = LocalDate.now() + "_order.docx";
             assertThat(response.getData()).extracting("finalOrderDocumentCollection").isNotNull();
             assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
                            .getValue().getDocumentLink().getCategoryID()).isEqualTo("caseManagementOrders");
