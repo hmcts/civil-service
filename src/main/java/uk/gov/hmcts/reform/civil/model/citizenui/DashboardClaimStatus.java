@@ -190,20 +190,16 @@ public enum DashboardClaimStatus {
     DEFAULT_JUDGEMENT_ISSUED(Claim::isDefaultJudgementIssued),
     NO_STATUS(c -> false),
     TRIAL_OR_HEARING_SCHEDULED(
-        // TODO
-        c -> false),
+        c -> c.isHearingScheduled() && !c.isHearingLessThanDaysAway(6*7)),
     TRIAL_ARRANGEMENTS_REQUIRED(
-        // TODO
-        c -> false),
+        // same day amount than TRIAL_OR_HEARING_SCHEDULED
+        c -> c.isHearingScheduled() && c.isHearingLessThanDaysAway(6*7)),
     TRIAL_ARRANGEMENTS_SUBMITTED(
-        // TODO
-        c -> false),
+        Claim::trialArrangementsSubmitted),
     BUNDLE_CREATED(
-        // TODO
-        c -> false),
+        c -> c.isHearingScheduled() && c.isHearingLessThanDaysAway(3*7) && c.isHearingBundleCreated()),
     AWAITING_JUDGMENT(
-        // TODO
-        c -> false),
+        Claim::isAwaitingJudgment),
     ORDER_MADE(
         // TODO
         c -> false);

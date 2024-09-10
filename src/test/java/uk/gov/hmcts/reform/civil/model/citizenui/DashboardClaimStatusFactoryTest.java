@@ -1,75 +1,456 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.Bundle;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 public class DashboardClaimStatusFactoryTest {
 
     private final DashboardClaimStatusFactory claimStatusFactory = new DashboardClaimStatusFactory();
+    private final FeatureToggleService toggleService = Mockito.mock(FeatureToggleService.class);
 
-    @ParameterizedTest
-    @MethodSource("hearingFeeHistory")
-    void shouldReturnCorrectStatus_hearingFeePaid(Claim claim, DashboardClaimStatus status) {
-        assertEquals(status, claimStatusFactory.getDashboardClaimStatus(claim));
+    public CaseData fastClaim() {
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.CASE_PROGRESSION)
+            .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
+            .totalClaimAmount(BigDecimal.valueOf(1000))
+            .build();
+        Assertions.assertEquals(
+            DashboardClaimStatus.SDO_ORDER_CREATED,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        Assertions.assertEquals(
+            DashboardClaimStatus.SDO_ORDER_CREATED,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        return caseData;
     }
 
-    static Stream<Arguments> hearingFeeHistory() {
-        FeatureToggleService toggleService = Mockito.mock(FeatureToggleService.class);
+    public CaseData scheduleHearingDays(CaseData previous, int days) {
+        LocalDate hearingDate = LocalDate.now().plusDays(days);
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = previous.toBuilder()
+            .hearingDate(hearingDate);
+        DashboardClaimStatus expectedStatus;
+        if (days > 6 * 7) {
+            expectedStatus = DashboardClaimStatus.TRIAL_OR_HEARING_SCHEDULED;
+        } else if (days <= 3 * 7) {
+            caseDataBuilder.caseBundles(List.of(new IdValue<>(
+                "bundle1",
+                Bundle.builder()
+                    .bundleHearingDate(Optional.of(hearingDate))
+                    .build()
+            )));
+            expectedStatus = DashboardClaimStatus.BUNDLE_CREATED;
+        } else {
+            expectedStatus = DashboardClaimStatus.TRIAL_ARRANGEMENTS_REQUIRED;
+        }
+        CaseData caseData = caseDataBuilder.build();
+        Assertions.assertEquals(
+            expectedStatus,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        Assertions.assertEquals(
+            expectedStatus,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+
+        return caseData;
+    }
+
+    public CaseData requestHwF(CaseData previous) {
+        DashboardClaimStatus defendantStatus = claimStatusFactory.getDashboardClaimStatus(
+            new CcdDashboardDefendantClaimMatcher(previous, toggleService)
+        );
+        CaseData caseData = previous.toBuilder()
+            .hwfFeeType(FeeType.CLAIMISSUED)
+            .ccdState(CaseState.PENDING_CASE_ISSUED)
+            .build();
+        Assertions.assertEquals(
+            defendantStatus,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        Assertions.assertEquals(
+            DashboardClaimStatus.CLAIM_SUBMIT_HWF,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        return caseData;
+    }
+
+    public CaseData invalidHwFReferenceNumber(CaseData previous) {
+        DashboardClaimStatus defendantStatus = claimStatusFactory.getDashboardClaimStatus(
+            new CcdDashboardDefendantClaimMatcher(previous, toggleService)
+        );
+        CaseData caseData = previous.toBuilder()
+            .ccdState(CaseState.HEARING_READINESS)
+            .hearingHwfDetails(HelpWithFeesDetails.builder()
+                                   .hwfCaseEvent(CaseEvent.INVALID_HWF_REFERENCE)
+                                   .build())
+            .build();
+
+        Assertions.assertEquals(
+            defendantStatus,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        Assertions.assertEquals(
+            DashboardClaimStatus.CLAIMANT_HWF_INVALID_REF_NUMBER,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        return caseData;
+    }
+
+    public CaseData updatedHwFReferenceNumber(CaseData previous) {
+        DashboardClaimStatus defendantStatus = claimStatusFactory.getDashboardClaimStatus(
+            new CcdDashboardDefendantClaimMatcher(previous, toggleService)
+        );
+        CaseData caseData = previous.toBuilder()
+            .ccdState(CaseState.HEARING_READINESS)
+            .hearingHwfDetails(HelpWithFeesDetails.builder()
+                                   .hwfCaseEvent(CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER)
+                                   .build())
+            .build();
+        Assertions.assertEquals(
+            defendantStatus,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        Assertions.assertEquals(
+            DashboardClaimStatus.CLAIMANT_HWF_UPDATED_REF_NUMBER,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        return caseData;
+    }
+
+    public CaseData moreInformationRequiredHwF(CaseData previous) {
+        DashboardClaimStatus defendantStatus = claimStatusFactory.getDashboardClaimStatus(
+            new CcdDashboardDefendantClaimMatcher(previous, toggleService)
+        );
+        CaseData caseData = previous.toBuilder()
+            .ccdState(CaseState.HEARING_READINESS)
+            .hearingHwfDetails(HelpWithFeesDetails.builder()
+                                   .hwfCaseEvent(CaseEvent.MORE_INFORMATION_HWF)
+                                   .build())
+            .build();
+        Assertions.assertEquals(
+            defendantStatus,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        Assertions.assertEquals(
+            DashboardClaimStatus.HWF_MORE_INFORMATION_NEEDED,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        return caseData;
+    }
+
+    public CaseData hwfRejected(CaseData previous) {
+        DashboardClaimStatus defendantStatus = claimStatusFactory.getDashboardClaimStatus(
+            new CcdDashboardDefendantClaimMatcher(previous, toggleService)
+        );
+        CaseData caseData = previous.toBuilder()
+            .ccdState(CaseState.HEARING_READINESS)
+            .hearingHwfDetails(HelpWithFeesDetails.builder()
+                                   .hwfCaseEvent(CaseEvent.NO_REMISSION_HWF)
+                                   .build())
+            .build();
+        Assertions.assertEquals(
+            defendantStatus,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        Assertions.assertEquals(
+            DashboardClaimStatus.CLAIMANT_HWF_NO_REMISSION,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        return caseData;
+    }
+
+    public CaseData payHearingFee(CaseData previous) {
+        DashboardClaimStatus defendantStatus = claimStatusFactory.getDashboardClaimStatus(
+            new CcdDashboardDefendantClaimMatcher(previous, toggleService)
+        );
+        CaseData caseData = previous.toBuilder()
+            .ccdState(CaseState.HEARING_READINESS)
+            .hwfFeeType(FeeType.HEARING)
+            .hearingHwfDetails(HelpWithFeesDetails.builder()
+                                   .hwfCaseEvent(CaseEvent.FEE_PAYMENT_OUTCOME)
+                                   .build())
+            .build();
+        Assertions.assertEquals(
+            defendantStatus,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        Assertions.assertEquals(
+            DashboardClaimStatus.CLAIMANT_HWF_FEE_PAYMENT_OUTCOME,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        return caseData;
+    }
+
+    @Test
+    void shouldReturnCorrectStatus_hearingFeePaid() {
+        CaseData caseData = fastClaim();
+        caseData = scheduleHearingDays(caseData, 6 * 7 + 1);
+        caseData = requestHwF(caseData);
+        caseData = invalidHwFReferenceNumber(caseData);
+        caseData = updatedHwFReferenceNumber(caseData);
+        caseData = moreInformationRequiredHwF(caseData);
+        caseData = hwfRejected(caseData);
+        payHearingFee(caseData);
+    }
+
+    public CaseData smallClaim() {
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.CASE_PROGRESSION)
+            .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+            .totalClaimAmount(BigDecimal.valueOf(999))
+            .build();
+        Assertions.assertEquals(
+            DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        Assertions.assertEquals(
+            DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        return caseData;
+    }
+
+    public CaseData hwfPartial(CaseData previous) {
+        DashboardClaimStatus defendantStatus = claimStatusFactory.getDashboardClaimStatus(
+            new CcdDashboardDefendantClaimMatcher(previous, toggleService)
+        );
+        CaseData caseData = previous.toBuilder()
+            .ccdState(CaseState.HEARING_READINESS)
+            .hwfFeeType(FeeType.HEARING)
+            .hearingHwfDetails(HelpWithFeesDetails.builder()
+                                   .hwfCaseEvent(CaseEvent.PARTIAL_REMISSION_HWF_GRANTED)
+                                   .build())
+            .build();
+        Assertions.assertEquals(
+            defendantStatus,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        Assertions.assertEquals(
+            DashboardClaimStatus.CLAIMANT_HWF_PARTIAL_REMISSION,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        return caseData;
+    }
+
+    public CaseData doNotPayHearingFee(CaseData previous) {
+        CaseData caseData = previous.toBuilder()
+            .caseDismissedHearingFeeDueDate(LocalDateTime.now())
+            .build();
+        Assertions.assertEquals(
+            DashboardClaimStatus.HEARING_FEE_UNPAID,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        Assertions.assertEquals(
+            DashboardClaimStatus.HEARING_FEE_UNPAID,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        return caseData;
+    }
+
+    @Test
+    void shouldReturnCorrectStatus_feeNotPaid() {
+        CaseData caseData = smallClaim();
+        caseData = scheduleHearingDays(caseData, 6 * 7 + 1);
+        caseData = requestHwF(caseData);
+        caseData = hwfPartial(caseData);
+        doNotPayHearingFee(caseData);
+    }
+
+    public CaseData hwfFull(CaseData previous) {
+        DashboardClaimStatus defendantStatus = claimStatusFactory.getDashboardClaimStatus(
+            new CcdDashboardDefendantClaimMatcher(previous, toggleService)
+        );
+        CaseData caseData = previous.toBuilder()
+            .ccdState(CaseState.HEARING_READINESS)
+            .hwfFeeType(FeeType.HEARING)
+            .hearingHwfDetails(HelpWithFeesDetails.builder()
+                                   .hwfCaseEvent(CaseEvent.FEE_PAYMENT_OUTCOME)
+                                   .build())
+            .build();
+        Assertions.assertEquals(
+            defendantStatus,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        Assertions.assertEquals(
+            DashboardClaimStatus.CLAIMANT_HWF_FEE_PAYMENT_OUTCOME,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        return caseData;
+    }
+
+    public CaseData submitClaimantHearingArrangements(CaseData previous) {
+        DashboardClaimStatus otherPartyStatus = claimStatusFactory.getDashboardClaimStatus(
+            new CcdDashboardDefendantClaimMatcher(
+            previous,
+            toggleService
+        ));
+        CaseData caseData = previous.toBuilder()
+            .trialReadyApplicant(YesOrNo.YES)
+            .build();
+        Assertions.assertEquals(
+            otherPartyStatus,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        Assertions.assertEquals(
+            DashboardClaimStatus.TRIAL_ARRANGEMENTS_SUBMITTED,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        return caseData;
+    }
+
+    public CaseData submitDefendantHearingArrangements(CaseData previous) {
+        DashboardClaimStatus otherPartyStatus = claimStatusFactory.getDashboardClaimStatus(
+            new CcdDashboardDefendantClaimMatcher(
+                previous,
+                toggleService
+            ));
+        CaseData caseData = previous.toBuilder()
+            .trialReadyRespondent1(YesOrNo.YES)
+            .build();
+        Assertions.assertEquals(
+            DashboardClaimStatus.TRIAL_ARRANGEMENTS_SUBMITTED,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        Assertions.assertEquals(
+            otherPartyStatus,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        return caseData;
+    }
+
+    public CaseData awaitingJudgment(CaseData previous) {
+        CaseData caseData = previous.toBuilder()
+            // TODO
+            .build();
+        Assertions.assertEquals(
+            DashboardClaimStatus.AWAITING_JUDGMENT,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        Assertions.assertEquals(
+            DashboardClaimStatus.AWAITING_JUDGMENT,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                caseData,
+                toggleService
+            ))
+        );
+        return caseData;
+    }
+
+    @Test
+    void shouldReturnCorrectStatus_awaitingJudgment() {
         Mockito.when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
-
-        return CaseDataHistory.fastClaim()
-            .scheduleHearingDays(6*7+1)
-            .requestHwF()
-            .invalidHwFReferenceNumber()
-            .updatedHwFReferenceNumber()
-            .moreInformationRequiredHwF()
-            .hwfRejected()
-            .payHearingFee().getArguments(toggleService);
-    }
-
-    @ParameterizedTest
-    @MethodSource("feeNotPaid")
-    void shouldReturnCorrectStatus_feeNotPaid(Claim claim, DashboardClaimStatus status) {
-        assertEquals(status, claimStatusFactory.getDashboardClaimStatus(claim));
-    }
-
-    static Stream<Arguments> feeNotPaid() {
-        FeatureToggleService toggleService = Mockito.mock(FeatureToggleService.class);
-        Mockito.when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
-
-        return CaseDataHistory.smallClaim()
-            .scheduleHearingDays(6*7+1)
-            .requestHwF()
-            .hwfPartial()
-            .doNotPayHearingFee()
-            .payHearingFee().getArguments(toggleService);
-    }
-
-    @ParameterizedTest
-    @MethodSource("awaitingJudgment")
-    void shouldReturnCorrectStatus_awaitingJudgment(Claim claim, DashboardClaimStatus status) {
-        assertEquals(status, claimStatusFactory.getDashboardClaimStatus(claim));
-    }
-
-    static Stream<Arguments> awaitingJudgment() {
-        FeatureToggleService toggleService = Mockito.mock(FeatureToggleService.class);
-        Mockito.when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
-
-        return CaseDataHistory.fastClaim()
-            .scheduleHearingDays(6*7+1)
-            .requestHwF()
-            .hwfFull()
-            .scheduleHearingDays(6*7)
-            .submitClaimantHearingArrangements()
-            .submitDefendantHearingArrangements()
-            .scheduleHearingDays(3*7)
-            .awaitingJudgment().getArguments(toggleService);
+        CaseData caseData = fastClaim();
+        caseData = scheduleHearingDays(caseData, 6 * 7 + 1);
+        caseData = requestHwF(caseData);
+        caseData = hwfFull(caseData);
+        caseData = scheduleHearingDays(caseData, 6*7);
+        caseData = submitClaimantHearingArrangements(caseData);
+        caseData = submitDefendantHearingArrangements(caseData);
+        caseData = scheduleHearingDays(caseData, 3*7);
+        awaitingJudgment(caseData);
     }
 }

@@ -442,4 +442,32 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
             && JudgmentState.ISSUED.equals(caseData.getActiveJudgment().getState());
     }
 
+    @Override
+    public boolean isHearingScheduled() {
+        return caseData.getHearingDate() != null;
+    }
+
+    @Override
+    public boolean isHearingLessThanDaysAway(int i) {
+        return caseData.getHearingDate() != null
+            && LocalDate.now().plusDays(i + 1).isAfter(caseData.getHearingDate());
+    }
+
+    @Override
+    public boolean isHearingBundleCreated() {
+        return caseData.getHearingDate() != null && caseData.getCaseBundles().stream()
+            .anyMatch(b -> b.getValue().getBundleHearingDate()
+                .map(d -> caseData.getHearingDate().equals(d)).orElse(Boolean.FALSE));
+    }
+
+    @Override
+    public boolean isAwaitingJudgment() {
+        // TODO decision outcome before the final order has been made
+        return caseData.getCcdState() == CaseState.DECISION_OUTCOME;
+    }
+
+    @Override
+    public boolean trialArrangementsSubmitted() {
+        return caseData.getTrialReadyRespondent1() == YesOrNo.YES;
+    }
 }

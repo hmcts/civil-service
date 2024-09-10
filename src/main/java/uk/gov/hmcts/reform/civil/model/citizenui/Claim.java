@@ -131,4 +131,30 @@ public interface Claim {
     boolean isCaseStruckOut();
 
     boolean isDefaultJudgementIssued();
+
+    /**
+     * Hearing scheduled implies at least that hearing date is defined.
+     *
+     * @return true if hearing is scheduled
+     */
+    boolean isHearingScheduled();
+
+    /**
+     * Some statuses consider how far is the hearing date.
+     *
+     * @param i days
+     * @return true if hearing date is defined and it is less or equal than i days away
+     */
+    boolean isHearingLessThanDaysAway(int i);
+
+    /**
+     * Hearing Bundle is one particular bundle.
+     *
+     * @return true if claim has the hearing bundle created.
+     */
+    boolean isHearingBundleCreated();
+
+    boolean isAwaitingJudgment();
+
+    boolean trialArrangementsSubmitted();
 }

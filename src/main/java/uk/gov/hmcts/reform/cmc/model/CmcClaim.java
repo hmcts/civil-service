@@ -567,4 +567,29 @@ public class CmcClaim implements Claim {
     public boolean isDefaultJudgementIssued() {
         return false;
     }
+
+    @Override
+    public boolean isHearingScheduled() {
+        return false;
+    }
+
+    @Override
+    public boolean isHearingLessThanDaysAway(int i) {
+        return false;
+    }
+
+    @Override
+    public boolean isHearingBundleCreated() {
+        return false;
+    }
+
+    @Override
+    public boolean isAwaitingJudgment() {
+        return false;
+    }
+
+    @Override
+    public boolean trialArrangementsSubmitted() {
+        return false;
+    }
 }
