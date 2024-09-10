@@ -101,12 +101,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.time.LocalDateTime.now;
@@ -1438,6 +1433,11 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1(Party.builder().type(INDIVIDUAL).companyName("Applicant1").build())
                 .applicant2(Party.builder().type(INDIVIDUAL).companyName("Applicant2").build())
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
+                                                .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                                                .firstRepaymentDate(LocalDate.now().plusDays(5))
+                                                .paymentAmount(BigDecimal.valueOf(100.0))
+                                                .build())
                 .defenceAdmitPartPaymentTimeRouteRequired(SUGGESTION_OF_REPAYMENT_PLAN)
                 .respondent1(Party.builder()
                                  .primaryAddress(Address.builder().build())
