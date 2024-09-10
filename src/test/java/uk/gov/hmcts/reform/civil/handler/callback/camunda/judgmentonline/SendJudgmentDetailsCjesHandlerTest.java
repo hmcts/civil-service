@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
 import uk.gov.hmcts.reform.civil.service.judgments.CjesService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,7 +28,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_JUDGMENT_DETAILS
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason.DETERMINATION_OF_MEANS;
-import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason.JUDGE_ORDER;
 
 class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
 
@@ -119,7 +119,7 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseData.builder()
             .businessProcess(BusinessProcess.builder().processInstanceId(processId).build())
             .joIsRegisteredWithRTL(YES)
-            .joJudgmentRecordReason(JUDGE_ORDER)
+            .joSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER)
             .historicJudgment(ElementUtils.wrapElements(JudgmentDetails.builder()
                                                             .isRegisterWithRTL(YES)
                                                             .build()))
@@ -132,7 +132,7 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
 
         // Assert
         verify(cjesService).sendJudgment(eq(caseData), eq(false));
-        verify(runtimeService).setVariable(processId, "judgmentRecordedReason", JUDGE_ORDER.toString());
+        verify(runtimeService).setVariable(processId, "JUDGMENT_SET_ASIDE_ERROR", false);
     }
 
     @Test
@@ -141,7 +141,7 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseData.builder()
             .businessProcess(BusinessProcess.builder().processInstanceId(processId).build())
             .joIsRegisteredWithRTL(YES)
-            .joJudgmentRecordReason(JUDGE_ORDER)
+            .joSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR)
             .historicJudgment(ElementUtils.wrapElements(JudgmentDetails.builder()
                                                             .isRegisterWithRTL(NO)
                                                             .build()))
@@ -154,7 +154,7 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
 
         // Assert
         verify(cjesService, never()).sendJudgment(any(), any());
-        verify(runtimeService).setVariable(processId, "judgmentRecordedReason", JUDGE_ORDER.toString());
+        verify(runtimeService).setVariable(processId, "JUDGMENT_SET_ASIDE_ERROR", true);
     }
 
     @Test
@@ -162,7 +162,7 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
         String processId = "process-id";
         CaseData caseData = CaseData.builder()
             .businessProcess(BusinessProcess.builder().processInstanceId(processId).build())
-            .joJudgmentRecordReason(JUDGE_ORDER)
+            .joSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR)
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
