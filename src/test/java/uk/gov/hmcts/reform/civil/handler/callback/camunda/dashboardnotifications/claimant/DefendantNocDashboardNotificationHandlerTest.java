@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -178,6 +179,37 @@ public class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHa
         }
 
         @Test
+        void shouldRecordScenarioWhenHearingFeePaymentStatusIsHelpWithFeeRequested() {
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(123455L)
+                .hearingFeePaymentDetails(null)
+                .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails())
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_NOC.name()).build()
+            ).build();
+
+            handler.handle(params);
+
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+
+            verify(dashboardApiClient, never()).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
         void shouldNotRecordTrialArrangementsScenarioWhenTrialReadyApplicantIsNotNull() {
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
@@ -237,5 +269,6 @@ public class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHa
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
+
     }
 }
