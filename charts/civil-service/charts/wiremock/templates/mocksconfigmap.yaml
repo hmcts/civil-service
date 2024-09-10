@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wiremock-mocks
+data:
+  example-mapping.json: |
+    {
+      "request": {
+        "method": "GET",
+        "url": "/api/mock"
+      },
+      "response": {
+        "status": 200,
+        "body": "{\"message\": \"This is a mock!\"}",
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }

@@ -28,8 +28,8 @@ spec:
             - containerPort: 8080
           volumeMounts:
             - name: wiremock-mocks
-              mountPath: /mappings
+              mountPath: /home/wiremock
       volumes:
         - name: wiremock-mocks
           hostPath:
-            path: /charts/civil-service/charts/wiremock/mocks/mappings
+            path: ./charts/civil-service/charts/wiremock/mocks
