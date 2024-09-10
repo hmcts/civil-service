@@ -272,4 +272,24 @@ aac-manage-case-assignment:
       enabled: false
 
 wiremock:
+  enabled: true
+
+  devcpuRequests: "100m"
+  devmemoryRequests: "256Mi"
+  devmemoryLimits: "256Mi"
+
+  image:
+    repository: wiremock/wiremock
+    pullPolicy: Always
+
+  ingressHost: wiremock-test.preview.platform.hmcts.net
+  ingress:
     enabled: true
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /
+    tls: []
+    hosts:
+      - host: wiremock-test.preview.platform.hmcts.net
+        paths:
+          - /
+
