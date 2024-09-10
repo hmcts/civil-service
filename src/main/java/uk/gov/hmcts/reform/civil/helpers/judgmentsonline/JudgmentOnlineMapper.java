@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,13 +51,13 @@ public abstract class JudgmentOnlineMapper {
         }
     }
 
-    public JudgmentDetails updateDefendantDetails(JudgmentDetails activeJudgment, CaseData caseData, JudgmentAddressMapper judgmentAddressMapper) {
+    public JudgmentDetails updateDefendantDetails(JudgmentDetails activeJudgment, CaseData caseData, RoboticsAddressMapper addressMapper) {
         activeJudgment.setDefendant1Name(caseData.getRespondent1().getPartyName());
-        activeJudgment.setDefendant1Address(judgmentAddressMapper.getJudgmentAddress(caseData.getRespondent1().getPrimaryAddress()));
+        activeJudgment.setDefendant1Address(JudgmentsOnlineHelper.getJudgmentAddress(caseData.getRespondent1().getPrimaryAddress(), addressMapper));
         activeJudgment.setDefendant1Dob(caseData.getRespondent1().getDateOfBirth());
         if (YesOrNo.YES == caseData.getAddRespondent2()) {
             activeJudgment.setDefendant2Name(caseData.getRespondent2().getPartyName());
-            activeJudgment.setDefendant2Address(judgmentAddressMapper.getJudgmentAddress(caseData.getRespondent2().getPrimaryAddress()));
+            activeJudgment.setDefendant2Address(JudgmentsOnlineHelper.getJudgmentAddress(caseData.getRespondent2().getPrimaryAddress(), addressMapper));
             activeJudgment.setDefendant2Dob(caseData.getRespondent2().getDateOfBirth());
         }
         return activeJudgment;

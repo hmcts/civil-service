@@ -22,6 +22,8 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
@@ -30,23 +32,16 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DefaultJudgmentsOnlineMapperTest {
 
     @MockBean
     private Time time;
-    @Mock
-    private InterestCalculator interestCalculator;
-    @InjectMocks
-    private DefaultJudgmentOnlineMapper defaultJudgmentOnlineMapper;
+    private InterestCalculator interestCalculator = new InterestCalculator(time);
+    private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
 
-    @BeforeEach
-    void setup() {
-        when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(BigDecimal.ZERO);
-    }
+    private DefaultJudgmentOnlineMapper defaultJudgmentOnlineMapper  = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
 
     @Test
     void testIfDefaultJudgmentIsMarkedActive_1v1() {

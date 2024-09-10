@@ -18,17 +18,23 @@ import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentAddressMapper;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.RecordJudgmentOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
+import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddress;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -38,7 +44,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RECORD_JUDGMENT;
 @SpringBootTest(classes = {
     RecordJudgmentOnlineMapper.class,
     RecordJudgmentCallbackHandler.class,
-    JacksonAutoConfiguration.class
+    JacksonAutoConfiguration.class,
+    RoboticsAddressMapper.class,
+    AddressLinesMapper.class
 })
 class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -48,8 +56,11 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private RoboticsAddressMapper addressMapper;
+
     @Test
-    void handleEventsReturnsTheExpectedCallbackEvents() {
+    public void handleEventsReturnsTheExpectedCallbackEvents() {
         assertThat(handler.handledEvents()).containsOnly(RECORD_JUDGMENT);
     }
 

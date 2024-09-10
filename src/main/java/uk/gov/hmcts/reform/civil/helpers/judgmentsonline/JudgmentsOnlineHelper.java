@@ -2,9 +2,13 @@ package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentAddress;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
+import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddress;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -173,4 +177,15 @@ public class JudgmentsOnlineHelper {
         return repaymentBreakdown.toString();
     }
 
+    public static JudgmentAddress getJudgmentAddress(Address address, RoboticsAddressMapper addressMapper) {
+
+        RoboticsAddress roboticsAddress = addressMapper.toRoboticsAddress(address);
+        return JudgmentAddress.builder()
+            .defendantAddressLine1(roboticsAddress.getAddressLine1())
+            .defendantAddressLine2(roboticsAddress.getAddressLine2())
+            .defendantAddressLine3(roboticsAddress.getAddressLine3())
+            .defendantAddressLine4(roboticsAddress.getAddressLine4())
+            .defendantAddressLine5(roboticsAddress.getAddressLine5())
+            .defendantPostCode(roboticsAddress.getPostCode()).build();
+    }
 }

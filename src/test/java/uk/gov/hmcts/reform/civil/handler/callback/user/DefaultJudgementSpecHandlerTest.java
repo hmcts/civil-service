@@ -33,12 +33,16 @@ import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
+import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddress;
+import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
@@ -74,7 +78,9 @@ import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
     CaseDetailsConverter.class,
     InterestCalculator.class,
     FeesService.class,
-    DefaultJudgmentOnlineMapper.class
+    DefaultJudgmentOnlineMapper.class,
+    RoboticsAddressMapper.class,
+    AddressLinesMapper.class
 })
 public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
@@ -95,6 +101,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private FeatureToggleService featureToggleService;
+
+    @MockBean
+    private RoboticsAddressMapper addressMapper;
+
     @Autowired
     private CaseDetailsConverter caseDetailsConverter;
 
@@ -1031,6 +1041,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(0)
                 );
+            when(addressMapper.toRoboticsAddress(any())).thenReturn(RoboticsAddress.builder().build());
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .partialPaymentAmount("10")
@@ -1083,6 +1094,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(0)
                 );
+            when(addressMapper.toRoboticsAddress(any())).thenReturn(RoboticsAddress.builder().build());
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .applicant1(PartyBuilder.builder().individual().build())
@@ -1143,6 +1155,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(0)
                 );
+            when(addressMapper.toRoboticsAddress(any())).thenReturn(RoboticsAddress.builder().build());
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .applicant1(PartyBuilder.builder().individual().build())
@@ -1242,6 +1255,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(0)
                 );
+            when(addressMapper.toRoboticsAddress(any())).thenReturn(RoboticsAddress.builder().build());
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .applicant1(PartyBuilder.builder().individual().build())

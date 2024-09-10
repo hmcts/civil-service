@@ -2,11 +2,14 @@ package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -105,5 +108,10 @@ public class JudgmentsOnlineHelperTest {
     void testMoneyValue() {
         assertThat(getMoneyValue(null)).isEqualTo(BigDecimal.ZERO);
         assertThat(getMoneyValue("12.36")).isEqualTo("12.36");
+    }
+
+    @Test
+    void testAddress() {
+        assertThat(JudgmentsOnlineHelper.getJudgmentAddress(Address.builder().build(), new RoboticsAddressMapper(new AddressLinesMapper()))).isNotNull();
     }
 }

@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -18,7 +19,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class RecordJudgmentOnlineMapper extends JudgmentOnlineMapper {
 
-    private final JudgmentAddressMapper judgmentAddressMapper;
+    private final RoboticsAddressMapper addressMapper;
 
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
@@ -26,7 +27,7 @@ public class RecordJudgmentOnlineMapper extends JudgmentOnlineMapper {
         BigDecimal orderAmount = JudgmentsOnlineHelper.getMoneyValue(caseData.getJoAmountOrdered());
         BigDecimal costs = JudgmentsOnlineHelper.getMoneyValue(caseData.getJoAmountCostOrdered());
         JudgmentDetails activeJudgment = super.addUpdateActiveJudgment(caseData);
-        activeJudgment = super.updateDefendantDetails(activeJudgment, caseData, judgmentAddressMapper);
+        activeJudgment = super.updateDefendantDetails(activeJudgment, caseData, addressMapper);
         JudgmentDetails activeJudgmentDetails = activeJudgment.toBuilder()
             .createdTimestamp(LocalDateTime.now())
             .state(getJudgmentState(caseData))

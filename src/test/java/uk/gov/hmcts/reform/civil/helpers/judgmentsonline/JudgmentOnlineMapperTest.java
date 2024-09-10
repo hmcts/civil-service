@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
@@ -10,6 +9,8 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 
 import java.time.LocalDate;
 
@@ -19,9 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 class JudgmentOnlineMapperTest {
-    @Mock
-    private JudgmentAddressMapper judgmentAddressMapper;
-    private RecordJudgmentOnlineMapper recordJudgmentMapper = new RecordJudgmentOnlineMapper(judgmentAddressMapper);
+
+    private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
+    private RecordJudgmentOnlineMapper recordJudgmentMapper = new RecordJudgmentOnlineMapper(addressMapper);
     private SetAsideJudgmentOnlineMapper setAsideJudgmentOnlineMapper = new SetAsideJudgmentOnlineMapper();
 
     @Test
