@@ -1,5 +1,5 @@
-camundaBranch=${1:-master}
-ccdBranch=${2:-master}
+ccdBranch=${1:-master}
+camundaBranch=${2:-master}
 
 echo "export ENVIRONMENT=devuser-preview"
 echo "Loading Environment Variables"
