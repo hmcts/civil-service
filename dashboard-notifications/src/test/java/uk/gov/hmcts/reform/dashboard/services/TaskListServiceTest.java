@@ -18,7 +18,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.dashboard.utils.DashboardNotificationsTestUtils.getTaskListEntity;
 import static uk.gov.hmcts.reform.dashboard.utils.DashboardNotificationsTestUtils.getTaskListEntityList;
 import static uk.gov.hmcts.reform.dashboard.utils.DashboardNotificationsTestUtils.getTaskListList;
@@ -127,14 +129,14 @@ class TaskListServiceTest {
         tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder().currentStatus(7).build());
 
         when(taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotIn(
-            "123", "Claimant", List.of(4, 7))).thenReturn(tasks);
+            "123", "Claimant", List.of(3, 7))).thenReturn(tasks);
 
         //when
         taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant");
 
         //then
         verify(taskListRepository)
-            .findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotIn("123", "Claimant", List.of(4, 7));
+            .findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotIn("123", "Claimant", List.of(3, 7));
         verify(taskListRepository, atLeast(5)).save(any(TaskListEntity.class));
     }
 

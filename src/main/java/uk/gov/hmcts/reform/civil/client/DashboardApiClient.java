@@ -1,8 +1,11 @@
 package uk.gov.hmcts.reform.civil.client;
 
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.FeignClientProperties;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -70,6 +73,15 @@ public interface DashboardApiClient {
         "notifications/{ccd-case-identifier}/role/{role-type}"
     })
     ResponseEntity<Void> deleteNotificationsForCaseIdentifierAndRole(
+        @PathVariable("ccd-case-identifier") String ccdCaseIdentifier,
+        @PathVariable("role-type") String roleType,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
+    );
+
+    @DeleteMapping(path = {
+        "tasks/{ccd-case-identifier}/role/{role-type}"
+    })
+    ResponseEntity<Void> makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
         @PathVariable("ccd-case-identifier") String ccdCaseIdentifier,
         @PathVariable("role-type") String roleType,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation

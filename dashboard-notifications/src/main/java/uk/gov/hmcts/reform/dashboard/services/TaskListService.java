@@ -67,7 +67,7 @@ public class TaskListService {
 
     public void makeProgressAbleTasksInactiveForCaseIdentifierAndRole(String caseIdentifier, String role) {
         List<TaskListEntity> tasks = taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotIn(
-            caseIdentifier, role, List.of(4, 7));
+            caseIdentifier, role, List.of(3, 7));
         tasks.forEach(taskListEntity -> taskListRepository.save(taskListEntity.toBuilder().currentStatus(2).build()));
         log.info("{} tasks made inactive for claim = {}", tasks.size(), caseIdentifier);
     }
