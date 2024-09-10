@@ -74,14 +74,14 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
         return documentManagementService.uploadDocument(
             authorisation,
             new PDF(
-                getFileName(docmosisTemplate),
+                getDownloadFileName(docmosisTemplate),
                 docmosisDocument.getBytes(),
                 DocumentType.JUDGE_FINAL_ORDER
             )
         );
     }
 
-    private String getFileName(DocmosisTemplates docmosisTemplate) {
+    private String getDownloadFileName(DocmosisTemplates docmosisTemplate) {
         return format(docmosisTemplate.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
     }
 
