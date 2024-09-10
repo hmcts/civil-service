@@ -199,11 +199,11 @@ class DashboardControllerTest {
 
         //when
         final ResponseEntity responseEntity = dashboardController
-            .makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "CLaimant", AUTHORISATION);
+            .makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant", AUTHORISATION);
 
         //then
         assertEquals(OK, responseEntity.getStatusCode());
-        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "CLaimant");
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant");
     }
 
     @Test
@@ -211,10 +211,10 @@ class DashboardControllerTest {
 
         //given
         doThrow(new RuntimeException()).when(taskListService)
-            .makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "CLaimant");
+            .makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant");
 
         //then
         assertThrows(RuntimeException.class, () -> dashboardController
-            .makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "CLaimant", AUTHORISATION));
+            .makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant", AUTHORISATION));
     }
 }

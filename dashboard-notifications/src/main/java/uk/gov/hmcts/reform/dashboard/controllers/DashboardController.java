@@ -217,9 +217,9 @@ public class DashboardController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @DeleteMapping(path = {
-        "tasks/{ccd-case-identifier}/role/{role-type}"
-    }, consumes = MediaType.ALL_VALUE)
+    @PutMapping(path = {
+        "taskList/{ccd-case-identifier}/role/{role-type}/status"
+    })
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
         @ApiResponse(responseCode = "401", description = "Not Authorized"),

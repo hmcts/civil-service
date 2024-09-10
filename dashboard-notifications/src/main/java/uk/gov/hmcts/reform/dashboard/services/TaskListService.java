@@ -4,9 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
+import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 import uk.gov.hmcts.reform.dashboard.entities.TaskItemTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
 import uk.gov.hmcts.reform.dashboard.repositories.TaskListRepository;
+import uk.gov.hmcts.reform.dashboard.utilities.StringUtility;
 
 import java.util.Comparator;
 import java.util.List;
@@ -67,8 +69,18 @@ public class TaskListService {
 
     public void makeProgressAbleTasksInactiveForCaseIdentifierAndRole(String caseIdentifier, String role) {
         List<TaskListEntity> tasks = taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotIn(
-            caseIdentifier, role, List.of(3, 7));
-        tasks.forEach(taskListEntity -> taskListRepository.save(taskListEntity.toBuilder().currentStatus(2).build()));
+            caseIdentifier, role, List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue()));
+        tasks.forEach(t -> {
+            TaskListEntity task = t.toBuilder()
+                .currentStatus(TaskStatus.INACTIVE.getPlaceValue())
+                .nextStatus(TaskStatus.INACTIVE.getPlaceValue())
+                .hintTextCy("")
+                .hintTextEn("")
+                .taskNameEn(StringUtility.removeAnchor(t.getTaskNameEn()))
+                .taskNameCy(StringUtility.removeAnchor(t.getTaskNameCy()))
+                .build();
+            taskListRepository.save(task);
+        });
         log.info("{} tasks made inactive for claim = {}", tasks.size(), caseIdentifier);
     }
 }
