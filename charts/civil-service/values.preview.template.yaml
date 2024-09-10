@@ -280,6 +280,7 @@ wiremock:
 
   image:
     repository: wiremock/wiremock
+    tag: "2.27.2"
     pullPolicy: Always
 
   releaseNameOverride: ${SERVICE_NAME}-wiremock

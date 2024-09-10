@@ -16,14 +16,14 @@ spec:
     spec:
       containers:
         - name: wiremock
-          image: "{{ .Values.wiremock.image.repository }}:{{ .Values.wiremock.image.tag }}"
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: Always
           resources:
             requests:
-              memory: {{ .Values.wiremock.devmemoryRequests }}
-              cpu: {{ .Values.wiremock.devcpuRequests }}
+              memory: {{ .Values.devmemoryRequests }}
+              cpu: {{ .Values.devcpuRequests }}
             limits:
-              memory: {{ .Values.wiremock.devmemoryLimits }}
+              memory: {{ .Values.devmemoryLimits }}
           ports:
             - containerPort: 8080
           volumeMounts:
