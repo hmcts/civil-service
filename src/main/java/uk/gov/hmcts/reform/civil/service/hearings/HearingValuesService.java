@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.EarlyAdoptersService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 
@@ -77,6 +78,7 @@ public class HearingValuesService {
     private final ObjectMapper mapper;
     private final CaseFlagsInitialiser caseFlagInitialiser;
     private final EarlyAdoptersService earlyAdoptersService;
+    private final FeatureToggleService featuretoggleService;
 
     public ServiceHearingValuesModel getValues(Long caseId, String authToken) throws Exception {
         CaseData caseData = retrieveCaseData(caseId);
@@ -140,7 +142,8 @@ public class HearingValuesService {
     private void populateMissingFields(Long caseId, CaseData caseData) throws Exception {
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         boolean partyIdsUpdated = populateMissingPartyIds(builder, caseData);
-        boolean unavailableDatesUpdated = populateMissingUnavailableDatesFields(builder);
+        boolean unavailableDatesUpdated = featuretoggleService.isManageContactInformationEnabled()
+            ? populateMissingUnavailableDatesFields(builder) : false;
         boolean caseFlagsUpdated = initialiseMissingCaseFlags(builder);
 
         if (partyIdsUpdated || unavailableDatesUpdated || caseFlagsUpdated) {
