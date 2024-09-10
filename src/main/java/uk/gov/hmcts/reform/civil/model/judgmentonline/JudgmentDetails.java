@@ -36,6 +36,8 @@ public class JudgmentDetails {
     private YesOrNo isJointJudgment;
     private String orderedAmount;
     private String costs;
+    private String claimFeeAmount;
+    private String amountAlreadyPaid;
     private String totalAmount;
     private String courtLocation;
     private JudgmentInstalmentDetails instalmentDetails;
