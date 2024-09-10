@@ -49,13 +49,13 @@ public abstract class JudgmentOnlineMapper {
         }
     }
 
-    public JudgmentDetails updateDefendantDetails(JudgmentDetails activeJudgment, CaseData caseData) {
+    public JudgmentDetails updateDefendantDetails(JudgmentDetails activeJudgment, CaseData caseData, JudgmentAddressMapper judgmentAddressMapper) {
         activeJudgment.setDefendant1Name(caseData.getRespondent1().getPartyName());
-        activeJudgment.setDefendant1Address(caseData.getRespondent1().getPrimaryAddress());
+        activeJudgment.setDefendant1Address(judgmentAddressMapper.getJudgmentAddress(caseData.getRespondent1().getPrimaryAddress()));
         activeJudgment.setDefendant1Dob(caseData.getRespondent1().getDateOfBirth());
         if (YesOrNo.YES == caseData.getAddRespondent2()) {
             activeJudgment.setDefendant2Name(caseData.getRespondent2().getPartyName());
-            activeJudgment.setDefendant2Address(caseData.getRespondent2().getPrimaryAddress());
+            activeJudgment.setDefendant2Address(judgmentAddressMapper.getJudgmentAddress(caseData.getRespondent2().getPrimaryAddress()));
             activeJudgment.setDefendant2Dob(caseData.getRespondent2().getDateOfBirth());
         }
         return activeJudgment;

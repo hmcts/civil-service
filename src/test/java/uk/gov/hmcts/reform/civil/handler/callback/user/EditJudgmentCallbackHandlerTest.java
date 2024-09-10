@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.DefaultJudgmentOnlineMapper;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.EditJudgmentOnlineMapper;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentAddressMapper;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.RecordJudgmentOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -56,12 +57,15 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private DefaultJudgmentOnlineMapper defaultJudgmentOnlineMapper;
 
+    @Mock
+    private JudgmentAddressMapper judgmentAddressMapper;
+
     @BeforeEach
     void setUp() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        defaultJudgmentOnlineMapper = new DefaultJudgmentOnlineMapper(interestCalculator);
+        defaultJudgmentOnlineMapper = new DefaultJudgmentOnlineMapper(interestCalculator, judgmentAddressMapper);
         EditJudgmentOnlineMapper editJudgmentOnlineMapper = new EditJudgmentOnlineMapper();
         handler = new EditJudgmentCallbackHandler(objectMapper, editJudgmentOnlineMapper);
     }
@@ -80,7 +84,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Given: Casedata in All_FINAL_ORDERS_ISSUED State
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoIsRegisteredWithRTL(value);
-            RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper();
+            RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper(judgmentAddressMapper);
             caseData.setActiveJudgment(recordMapper.addUpdateActiveJudgment(caseData));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -136,7 +140,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State and RTL is Yes in active judgment
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoShowRegisteredWithRTLOption(YesOrNo.NO);
-            RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper();
+            RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper(judgmentAddressMapper);
             caseData.setActiveJudgment(recordMapper.addUpdateActiveJudgment(caseData));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -189,7 +193,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             caseData.setJoShowRegisteredWithRTLOption(YesOrNo.YES);
-            RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper();
+            RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper(judgmentAddressMapper);
             caseData.setActiveJudgment(recordMapper.addUpdateActiveJudgment(caseData));
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -228,7 +232,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
             caseData.setJoIsRegisteredWithRTL(YesOrNo.NO);
             caseData.setJoShowRegisteredWithRTLOption(YesOrNo.YES);
-            RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper();
+            RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper(judgmentAddressMapper);
             caseData.setActiveJudgment(recordMapper.addUpdateActiveJudgment(caseData));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

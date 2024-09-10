@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -30,6 +29,7 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
 
     boolean isNonDivergent =  false;
     private final InterestCalculator interestCalculator;
+    private final JudgmentAddressMapper judgmentAddressMapper;
 
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
@@ -38,7 +38,7 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
         BigInteger costs = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getCostOfJudgmentForDJ(caseData));
         isNonDivergent =  JudgmentsOnlineHelper.isNonDivergentForDJ(caseData);
         JudgmentDetails activeJudgment = super.addUpdateActiveJudgment(caseData);
-        activeJudgment = super.updateDefendantDetails(activeJudgment, caseData);
+        activeJudgment = super.updateDefendantDetails(activeJudgment, caseData, judgmentAddressMapper);
         return activeJudgment.toBuilder()
             .createdTimestamp(LocalDateTime.now())
             .state(getJudgmentState(caseData))

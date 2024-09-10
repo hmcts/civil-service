@@ -18,13 +18,15 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class RecordJudgmentOnlineMapper extends JudgmentOnlineMapper {
 
+    private final JudgmentAddressMapper judgmentAddressMapper;
+
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
 
         BigDecimal orderAmount = JudgmentsOnlineHelper.getMoneyValue(caseData.getJoAmountOrdered());
         BigDecimal costs = JudgmentsOnlineHelper.getMoneyValue(caseData.getJoAmountCostOrdered());
         JudgmentDetails activeJudgment = super.addUpdateActiveJudgment(caseData);
-        activeJudgment = super.updateDefendantDetails(activeJudgment, caseData);
+        activeJudgment = super.updateDefendantDetails(activeJudgment, caseData, judgmentAddressMapper);
         return activeJudgment.toBuilder()
             .createdTimestamp(LocalDateTime.now())
             .state(getJudgmentState(caseData))

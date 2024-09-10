@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
@@ -15,7 +16,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class RecordJudgmentsOnlineMapperTest {
 
-    private RecordJudgmentOnlineMapper judgmentOnlineMapper = new RecordJudgmentOnlineMapper();
+    @Mock
+    private JudgmentAddressMapper judgmentAddressMapper;
+
+    private RecordJudgmentOnlineMapper judgmentOnlineMapper = new RecordJudgmentOnlineMapper(judgmentAddressMapper);
 
     @Test
     void testIfActiveJudgmentIsAddedPayDate() {
