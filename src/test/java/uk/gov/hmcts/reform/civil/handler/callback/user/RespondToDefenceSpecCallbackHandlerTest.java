@@ -1446,7 +1446,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1Represented(YesOrNo.YES)
                 .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
                 .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
-               .respondent2Represented(YesOrNo.YES)
+                .respondent2Represented(YesOrNo.YES)
                 .respondent2SameLegalRepresentative(YesOrNo.YES)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .defenceAdmitPartPaymentTimeRouteRequired(SUGGESTION_OF_REPAYMENT_PLAN)
