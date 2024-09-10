@@ -2,8 +2,8 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA6.Claimant.DecisionOutcome', '{}', '{}'),
-       ('Scenario.AAA6.Claimant.TrialReady.DecisionOutcome', '{}', '{}');
+VALUES ('Scenario.AAA6.Claimant.DecisionOutcome', '{"Notice.AAA6.CP.HearingDocuments.Upload.Claimant", "Notice.AAA6.CP.Trial.Arrangements.Required.Claimant"}', '{}'),
+       ('Scenario.AAA6.Claimant.TrialReady.DecisionOutcome', '{"Notice.AAA6.CP.HearingDocuments.Upload.Claimant", "Notice.AAA6.CP.Trial.Arrangements.Required.Claimant"}', '{}');
 
 
 /**
