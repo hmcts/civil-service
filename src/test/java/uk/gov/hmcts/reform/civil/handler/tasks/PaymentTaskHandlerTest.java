@@ -95,7 +95,7 @@ class PaymentTaskHandlerTest {
                                                   FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false,
                                                   FlowFlag.CASE_PROGRESSION_ENABLED.name(), false,
                                                   FlowFlag.BULK_CLAIM_ENABLED.name(), false,
-                                                  FlowFlag.JBA_ONLINE_LIVE_ENABLED.name(), false));
+                                                  FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false));
 
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
