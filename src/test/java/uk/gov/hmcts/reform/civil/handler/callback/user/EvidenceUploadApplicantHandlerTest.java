@@ -20,6 +20,10 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploadhandlerbasetask.ApplicantDocumentUploadTimeTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploadhandlerbasetask.ApplicantSetOptionsTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploadhandlerbasetask.DocumentUploadTimeTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploadhandlerbasetask.SetOptionsTask;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -72,7 +76,9 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     EvidenceUploadApplicantHandler.class,
-    JacksonAutoConfiguration.class
+    JacksonAutoConfiguration.class,
+    ApplicantSetOptionsTask.class,
+    ApplicantDocumentUploadTimeTask.class
 })
 class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
 
