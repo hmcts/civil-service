@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
@@ -79,7 +80,8 @@ public class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHa
     class AboutToSubmitCallback {
         @BeforeEach
         void setup() {
-            when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(Optional.empty()));
+            when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
+                Optional.empty()));
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
@@ -123,7 +125,6 @@ public class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHa
 
             CaseData caseData = CaseData.builder()
                 .ccdCaseReference(123455L)
-                .hearingFeePaymentDetails(null)
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -179,13 +180,16 @@ public class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHa
         }
 
         @Test
-        void shouldRecordScenarioWhenHearingFeePaymentStatusIsHelpWithFeeRequested() {
+        void shouldNotRecordScenarioWhenHearingFeePaymentStatusIsHelpWithFeeRequestedFullRemission() {
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             CaseData caseData = CaseData.builder()
                 .ccdCaseReference(123455L)
                 .hearingFeePaymentDetails(null)
-                .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails())
+                .hwfFeeType(FeeType.HEARING)
+                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
+                                              .hwfFullRemissionGrantedForHearingFee(YesOrNo.YES)
+                                              .build())
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -202,6 +206,73 @@ public class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHa
             );
 
             verify(dashboardApiClient, never()).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
+        void shouldRecordScenarioWhenHearingFeePaymentStatusIsHelpWithFeeRequestedNoFullRemission() {
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(123455L)
+                .hearingFeePaymentDetails(null)
+                .hwfFeeType(FeeType.HEARING)
+                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
+                                              .hwfFullRemissionGrantedForHearingFee(YesOrNo.NO)
+                                              .build())
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_NOC.name()).build()
+            ).build();
+
+            handler.handle(params);
+
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
+        void shouldRecordScenarioWhenHearingFeePaymentStatusIsHelpWithFeeRequestedButFeePaymentOutcomeIsNotDone() {
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(123455L)
+                .hearingFeePaymentDetails(null)
+                .hwfFeeType(FeeType.HEARING)
+                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
+                                              .build())
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_NOC.name()).build()
+            ).build();
+
+            handler.handle(params);
+
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+
+            verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST.getScenario(),
                 "BEARER_TOKEN",
