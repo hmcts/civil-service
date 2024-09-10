@@ -97,6 +97,8 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
             caseData.setJoIssuedDate(caseData.getJoOrderMadeDate());
         }
         caseData.setActiveJudgment(recordJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
+        caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(caseData.getActiveJudgment()));
+
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (caseData.getJoJudgmentRecordReason() == JudgmentRecordedReason.DETERMINATION_OF_MEANS) {
             caseDataBuilder.businessProcess(BusinessProcess.ready(RECORD_JUDGMENT_NOTIFICATION));
@@ -110,4 +112,5 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
     public List<CaseEvent> handledEvents() {
         return EVENTS;
     }
+
 }
