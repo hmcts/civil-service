@@ -675,7 +675,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             );
         } else if (CaseState.All_FINAL_ORDERS_ISSUED == caseData.getCcdState()) {
             return format(
-                "# Judgment Submitted %n## A county court judgment(ccj) has been submitted for case %s",
+                "# Judgment Submitted %n## A county court judgment(CCJ) has been submitted for case %s",
                 claimNumber
             );
         } else {

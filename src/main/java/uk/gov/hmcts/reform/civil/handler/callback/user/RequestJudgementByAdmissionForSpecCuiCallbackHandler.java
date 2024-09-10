@@ -142,7 +142,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     private String setUpHeader(CaseData caseData) {
         String claimNumber = caseData.getLegacyCaseReference();
         return format(
-            "# Judgment Submitted %n## A county court judgment(ccj) has been submitted for case %s",
+            "# Judgment Submitted %n## A county court judgment(CCJ) has been submitted for case %s",
             claimNumber
         );
     }

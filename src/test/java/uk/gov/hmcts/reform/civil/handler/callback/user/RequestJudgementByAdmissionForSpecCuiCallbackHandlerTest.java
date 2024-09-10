@@ -666,7 +666,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler
                 .handle(params);
-            assertEquals(format("# Judgment Submitted %n## A county court judgment(ccj) has been submitted for case %s", caseData.getLegacyCaseReference()),
+            assertEquals(format("# Judgment Submitted %n## A county court judgment(CCJ) has been submitted for case %s", caseData.getLegacyCaseReference()),
                          response.getConfirmationHeader());
             assertEquals("<br /><h2 class=\"govuk-heading-m\"><u>What happens next</u></h2>"
                               + "<br>This case will now proceed offline. Any updates will be sent by post.<br><br>", response.getConfirmationBody());
@@ -702,7 +702,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler
                 .handle(params);
-            assertEquals(format("# Judgment Submitted %n## A county court judgment(ccj) has been submitted for case %s",
+            assertEquals(format("# Judgment Submitted %n## A county court judgment(CCJ) has been submitted for case %s",
                                 caseData.getLegacyCaseReference()), response.getConfirmationHeader());
             assertThat(response.getConfirmationBody()).contains("Download county court judgment");
         }
