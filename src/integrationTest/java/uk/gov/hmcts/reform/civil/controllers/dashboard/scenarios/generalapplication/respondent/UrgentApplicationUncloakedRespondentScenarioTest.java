@@ -40,11 +40,11 @@ public class UrgentApplicationUncloakedRespondentScenarioTest extends BaseIntegr
                 jsonPath("$[0].titleCy").value("Mae’r partïon eraill wedi gofyn am newid yr achos"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">Their request is being treated urgently as there’s a hearing date in the next 10 days. A judge will decide what the next steps"
-                        + " should be.</p><p class=\"govuk-body\">You can still <a href=\"{GENERAL_APPLICATION_RESPONSE_URL}\" class=\"govuk-link\">review the request and respond</a>"
+                        + " should be.</p><p class=\"govuk-body\">You can still <a href=\"{GA_RESPONDENT_INFORMATION_URL}\" class=\"govuk-link\">review the request and respond</a>"
                         + " by 4pm on ${judgeRequestMoreInfoByDateEn}, but a judge may have decided on the next steps before you do so.</p>"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae eu cais yn cael ei drin ar frys gan fod dyddiad gwrandawiad o fewn y 10 diwrnod nesaf. Bydd barnwr yn penderfynu beth"
-                        + " ddylai'r camau nesaf fod.</p><p class=\"govuk-body\">Gallwch barhau i <a href=\"{GENERAL_APPLICATION_RESPONSE_URL}\" class=\"govuk-link\">adolygu’r cais ac ymateb</a>"
+                        + " ddylai'r camau nesaf fod.</p><p class=\"govuk-body\">Gallwch barhau i <a href=\"{GA_RESPONDENT_INFORMATION_URL}\" class=\"govuk-link\">adolygu’r cais ac ymateb</a>"
                         + " erbyn 4pm ar ${judgeRequestMoreInfoByDateCy}, ond efallai y bydd barnwr wedi penderfynu ar y camau nesaf cyn i chi wneud hynny.</p>")
             );
     }

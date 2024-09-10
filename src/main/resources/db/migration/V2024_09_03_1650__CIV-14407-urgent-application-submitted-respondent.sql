@@ -8,9 +8,9 @@ INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, titl
                                                   ,notification_role)
 VALUES ('Notice.AAA6.GeneralApps.UrgentApplicationMade.Respondent', 'The other parties have requested a change to the case', 'Mae’r partïon eraill wedi gofyn am newid yr achos',
         '<p class="govuk-body">Their request is being treated urgently as there’s a hearing date in the next 10 days. A judge will decide what the next steps should be.</p>'
-            '<p class="govuk-body">You can still <a href="{GENERAL_APPLICATION_RESPONSE_URL}" class="govuk-link">review the request and respond</a> by 4pm on ${generalAppNotificationDeadlineDateEn}, but a judge may have decided on the next steps before you do so.</p>',
+            '<p class="govuk-body">You can still <a href="{GA_RESPONDENT_INFORMATION_URL}" class="govuk-link">review the request and respond</a> by 4pm on ${generalAppNotificationDeadlineDateEn}, but a judge may have decided on the next steps before you do so.</p>',
         '<p class="govuk-body">Mae eu cais yn cael ei drin ar frys gan fod dyddiad gwrandawiad o fewn y 10 diwrnod nesaf. Bydd barnwr yn penderfynu beth ddylai''r camau nesaf fod.</p>'
-           '<p class="govuk-body">Gallwch barhau i <a href="{GENERAL_APPLICATION_RESPONSE_URL}" class="govuk-link">adolygu’r cais ac ymateb</a> erbyn 4pm ar ${generalAppNotificationDeadlineDateCy}, ond efallai y bydd barnwr wedi penderfynu ar y camau nesaf cyn i chi wneud hynny.</p>',
+           '<p class="govuk-body">Gallwch barhau i <a href="{GA_RESPONDENT_INFORMATION_URL}" class="govuk-link">adolygu’r cais ac ymateb</a> erbyn 4pm ar ${generalAppNotificationDeadlineDateCy}, ond efallai y bydd barnwr wedi penderfynu ar y camau nesaf cyn i chi wneud hynny.</p>',
         'RESPONDENT');
 
 /**
@@ -23,7 +23,7 @@ INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, titl
                                                   ,notification_role)
 VALUES ('Notice.AAA6.GeneralApps.UrgentApplicationUncloaked.Respondent', 'The other parties have requested a change to the case', 'Mae’r partïon eraill wedi gofyn am newid yr achos',
         '<p class="govuk-body">Their request is being treated urgently as there’s a hearing date in the next 10 days. A judge will decide what the next steps should be.</p>'
-          '<p class="govuk-body">You can still <a href="{GENERAL_APPLICATION_RESPONSE_URL}" class="govuk-link">review the request and respond</a> by 4pm on ${judgeRequestMoreInfoByDateEn}, but a judge may have decided on the next steps before you do so.</p>',
+          '<p class="govuk-body">You can still <a href="{GA_RESPONDENT_INFORMATION_URL}" class="govuk-link">review the request and respond</a> by 4pm on ${judgeRequestMoreInfoByDateEn}, but a judge may have decided on the next steps before you do so.</p>',
         '<p class="govuk-body">Mae eu cais yn cael ei drin ar frys gan fod dyddiad gwrandawiad o fewn y 10 diwrnod nesaf. Bydd barnwr yn penderfynu beth ddylai''r camau nesaf fod.</p>'
-          '<p class="govuk-body">Gallwch barhau i <a href="{GENERAL_APPLICATION_RESPONSE_URL}" class="govuk-link">adolygu’r cais ac ymateb</a> erbyn 4pm ar ${judgeRequestMoreInfoByDateCy}, ond efallai y bydd barnwr wedi penderfynu ar y camau nesaf cyn i chi wneud hynny.</p>',
+          '<p class="govuk-body">Gallwch barhau i <a href="{GA_RESPONDENT_INFORMATION_URL}" class="govuk-link">adolygu’r cais ac ymateb</a> erbyn 4pm ar ${judgeRequestMoreInfoByDateCy}, ond efallai y bydd barnwr wedi penderfynu ar y camau nesaf cyn i chi wneud hynny.</p>',
         'RESPONDENT');
