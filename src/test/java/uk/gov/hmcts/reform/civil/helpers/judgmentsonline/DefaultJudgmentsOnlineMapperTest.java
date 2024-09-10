@@ -69,7 +69,6 @@ class DefaultJudgmentsOnlineMapperTest {
         assertEquals("Mr. Sole Trader", activeJudgment.getDefendant1Name());
         assertNotNull(activeJudgment.getDefendant1Address());
         assertNotNull(activeJudgment.getDefendant1Dob());
-
     }
 
     @Test
@@ -138,6 +137,7 @@ class DefaultJudgmentsOnlineMapperTest {
         assertEquals(activeJudgment.getDefendant1Name(), "Mr. Sole Trader");
         assertNotNull(activeJudgment.getDefendant1Address());
         assertNotNull(activeJudgment.getDefendant1Dob());
+
     }
 
     @Test
@@ -177,5 +177,6 @@ class DefaultJudgmentsOnlineMapperTest {
         assertEquals(activeJudgment.getDefendant1Name(), "Mr. Sole Trader");
         assertNotNull(activeJudgment.getDefendant1Address());
         assertNotNull(activeJudgment.getDefendant1Dob());
+
     }
 }
