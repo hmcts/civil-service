@@ -40,6 +40,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static java.lang.String.format;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOADED;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
@@ -151,13 +152,20 @@ public abstract class DocumentUploadTimeTask {
             notificationString = new StringBuilder(caseData.getNotificationText());
         }
     }
+
+    private void updateDocumentListUploadedAfterBundle(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+        if (nonNull(caseData.getCaseBundles()) && !caseData.getCaseBundles().isEmpty()) {
+            updateDocumentListUploadedAfterBundle(caseDataBuilder, caseData);
+        }
+    }
+
     public CallbackResponse documentUploadTime(CaseData caseData, String selectedRole) {
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         // If notification has already been populated in current day, we want to append to that existing notification
         getNotificationText(caseData);
         applyDocumentUploadDate(caseDataBuilder, time.now());
-        updateDocumentListUploadedAfterBundle(caseDataBuilder, caseData);
+        updateDocumentListUploadedAfterBundle(caseData, caseDataBuilder);
 
         if (selectedRole.equals(RESPONDENTSOLICITORONE.name()) || selectedRole.equals(SELECTED_VALUE_DEF_BOTH)) {
             String defendantString = "Defendant 1";
