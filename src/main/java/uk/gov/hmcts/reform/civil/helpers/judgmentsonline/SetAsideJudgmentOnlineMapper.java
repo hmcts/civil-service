@@ -5,12 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -26,12 +28,19 @@ public class SetAsideJudgmentOnlineMapper extends JudgmentOnlineMapper {
             .setAsideDate(getSetAsideDate(caseData))
             .lastUpdateTimeStamp(LocalDateTime.now())
             .cancelledTimeStamp(LocalDateTime.now())
+            .rtlState(getNextRTLState(activeJudgment.getRtlState()))
             .build();
     }
 
     protected JudgmentState getJudgmentState(CaseData caseData) {
         return JudgmentSetAsideReason.JUDGE_ORDER
             .equals(caseData.getJoSetAsideReason()) ? JudgmentState.SET_ASIDE : JudgmentState.SET_ASIDE_ERROR;
+    }
+
+    protected String getNextRTLState(String rtlState) {
+        return Objects.equals(rtlState, JudgmentRTLStatus.ISSUED.getRtlState())
+            || Objects.equals(rtlState, JudgmentRTLStatus.MODIFIED_EXISTING.getRtlState())
+            ? JudgmentRTLStatus.CANCELLED.getRtlState() : rtlState;
     }
 
     private LocalDate getSetAsideDate(CaseData caseData) {
