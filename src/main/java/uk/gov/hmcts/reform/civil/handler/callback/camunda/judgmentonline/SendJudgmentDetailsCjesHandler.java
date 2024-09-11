@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
 import uk.gov.hmcts.reform.civil.service.judgments.CjesService;
 import java.util.List;
 import java.util.Map;
@@ -48,14 +49,17 @@ public class SendJudgmentDetailsCjesHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
 
-        if (SEND_JUDGMENT_DETAILS_CJES.equals(caseEvent) && isActiveJudgmentRegisteredWithRTL(caseData)) {
-            cjesService.sendJudgment(caseData, true);
-        } else if (SEND_JUDGMENT_DETAILS_CJES_SA.equals(caseEvent)
-            && isLatestHistoricJudgmentRegisteredWithRTL(caseData)) {
-            cjesService.sendJudgment(caseData, false);
+        if (SEND_JUDGMENT_DETAILS_CJES.equals(caseEvent)) {
+            updateCamundaVars(caseData);
+            if (Boolean.TRUE.equals(isActiveJudgmentRegisteredWithRTL(caseData))) {
+                cjesService.sendJudgment(caseData, true);
+            }
+        } else if (SEND_JUDGMENT_DETAILS_CJES_SA.equals(caseEvent)) {
+            updateCamundaVarsSetAside(caseData);
+            if (Boolean.TRUE.equals(isLatestHistoricJudgmentRegisteredWithRTL(caseData))) {
+                cjesService.sendJudgment(caseData, false);
+            }
         }
-
-        updateCamundaVars(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -77,9 +81,16 @@ public class SendJudgmentDetailsCjesHandler extends CallbackHandler {
         if (caseData.getJoJudgmentRecordReason() != null) {
             runTimeService.setVariable(
                 caseData.getBusinessProcess().getProcessInstanceId(),
-                "judgmentRecordedReason",
-                caseData.getJoJudgmentRecordReason().toString()
-            );
+                "judgmentRecordedReason", caseData.getJoJudgmentRecordReason().toString());
+        }
+    }
+
+    private void updateCamundaVarsSetAside(CaseData caseData) {
+        if (caseData.getJoSetAsideReason() != null) {
+            runTimeService.setVariable(
+                caseData.getBusinessProcess().getProcessInstanceId(),
+                "JUDGMENT_SET_ASIDE_ERROR",
+                caseData.getJoSetAsideReason().equals(JudgmentSetAsideReason.JUDGMENT_ERROR));
         }
     }
 }

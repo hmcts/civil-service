@@ -371,9 +371,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         String customerReference = paymentDetails.map(PaymentDetails::getCustomerReference).orElse(reference);
         PaymentDetails updatedDetails = PaymentDetails.builder().customerReference(customerReference).build();
         caseDataBuilder.claimIssuedPaymentDetails(updatedDetails);
-        if (toggleService.isPbaV3Enabled()) {
-            caseDataBuilder.paymentTypePBASpec("PBAv3");
-        }
+        caseDataBuilder.paymentTypePBASpec("PBAv3");
         List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         caseDataBuilder.claimFee(feesService
@@ -623,11 +621,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         if (null != callbackParams.getRequest().getEventId()) {
             dataBuilder.legacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
-            if (!featureToggleService.isPbaV3Enabled()) {
-                dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC));
-            } else {
-                dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST_CLAIM));
-            }
+            dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST_CLAIM));
         }
 
         //set check email field to null for GDPR
@@ -641,7 +635,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         if (null != callbackParams.getRequest().getEventId()
             && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
             return SubmittedCallbackResponse.builder()
-                .confirmationHeader(getSpecHeader(caseData))
+                .confirmationHeader(getSpecHeader())
                 .confirmationBody(getSpecBody(caseData))
                 .build();
         } else {
@@ -652,15 +646,11 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         }
     }
 
-    static final String payFeeMessage = "# Please now pay your claim fee%n# using the link below";
+    static final String PAY_FEE_MESSAGE = "# Please now pay your claim fee%n# using the link below";
 
     private String getHeader(CaseData caseData) {
-        if (areRespondentsRepresentedAndRegistered(caseData)
-            || isPinInPostCaseMatched(caseData)) {
-            if (featureToggleService.isPbaV3Enabled()) {
-                return format(payFeeMessage);
-            }
-            return format("# Your claim has been received%n## Claim number: %s", caseData.getLegacyCaseReference());
+        if (areRespondentsRepresentedAndRegistered(caseData) || isPinInPostCaseMatched(caseData)) {
+            return format(PAY_FEE_MESSAGE);
         }
         return format(
             "# Your claim has been received and will progress offline%n## Claim number: %s",
@@ -686,20 +676,13 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                 + exitSurveyContentService.applicantSurvey();
     }
 
-    static final String caseDetailsUrl = "/cases/case-details/%s#Service%%20Request";
+    static final String CASE_DETAILS_URL = "/cases/case-details/%s#Service%%20Request";
 
     private String getConfirmationSummary(CaseData caseData) {
-        if (featureToggleService.isPbaV3Enabled()) {
-            return format(
-                CONFIRMATION_SUMMARY_PBA_V3,
-                format(caseDetailsUrl, caseData.getCcdCaseReference())
-            );
-        } else {
-            return format(
-                CONFIRMATION_SUMMARY,
-                format(CASE_DOC_LOCATION, caseData.getCcdCaseReference())
-            );
-        }
+        return format(
+            CONFIRMATION_SUMMARY_PBA_V3,
+            format(CASE_DETAILS_URL, caseData.getCcdCaseReference())
+        );
     }
 
     private CallbackResponse validateRespondent1Details(CallbackParams callbackParams) {
@@ -862,9 +845,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         caseDataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(interest)));
-        if (toggleService.isPbaV3Enabled()) {
-            caseDataBuilder.paymentTypePBASpec("PBAv3");
-        }
+        caseDataBuilder.paymentTypePBASpec("PBAv3");
         List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
         caseDataBuilder.applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
             .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO)
@@ -875,23 +856,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .build();
     }
 
-    private String getSpecHeader(CaseData caseData) {
-        if (areRespondentsRepresentedAndRegistered(caseData)
-            || isPinInPostCaseMatched(caseData)) {
-            if (featureToggleService.isPbaV3Enabled()) {
-                return format(payFeeMessage);
-            }
-            return format("# Your claim has been received%n## Claim number: %s", caseData.getLegacyCaseReference());
-        } else {
-            if (featureToggleService.isPbaV3Enabled()) {
-                return format(payFeeMessage);
-            } else {
-                return format(
-                    "# Your claim has been received and will progress offline%n## Claim number: %s",
-                    caseData.getLegacyCaseReference()
-                );
-            }
-        }
+    private String getSpecHeader() {
+        return format(PAY_FEE_MESSAGE);
     }
 
     private String getSpecBody(CaseData caseData) {
@@ -902,17 +868,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             ((areRespondentsRepresentedAndRegistered(caseData)
                 || isPinInPostCaseMatched(caseData))
                 ? getSpecConfirmationSummary(caseData)
-                : toggleService.isPbaV3Enabled() ? format(
+                : format(
                 SPEC_LIP_CONFIRMATION_BODY_PBAV3,
-                format(caseDetailsUrl, caseData.getCcdCaseReference()),
-                format(CASE_DOC_LOCATION, caseData.getCcdCaseReference()),
-                claimUrlsConfiguration.getResponsePackLink(),
-                claimUrlsConfiguration.getN9aLink(),
-                claimUrlsConfiguration.getN9bLink(),
-                claimUrlsConfiguration.getN215Link(),
-                formattedServiceDeadline
-            ) : format(
-                SPEC_LIP_CONFIRMATION_BODY,
+                format(CASE_DETAILS_URL, caseData.getCcdCaseReference()),
                 format(CASE_DOC_LOCATION, caseData.getCcdCaseReference()),
                 claimUrlsConfiguration.getResponsePackLink(),
                 claimUrlsConfiguration.getN9aLink(),
@@ -923,17 +881,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private String getSpecConfirmationSummary(CaseData caseData) {
-        if (featureToggleService.isPbaV3Enabled()) {
-            return format(
-                SPEC_CONFIRMATION_SUMMARY_PBA_V3,
-                format(caseDetailsUrl, caseData.getCcdCaseReference())
-            );
-        } else {
-            return format(
-                SPEC_CONFIRMATION_SUMMARY,
-                format(CASE_DOC_LOCATION, caseData.getCcdCaseReference())
-            );
-        }
+        return format(
+            SPEC_CONFIRMATION_SUMMARY_PBA_V3,
+            format(CASE_DETAILS_URL, caseData.getCcdCaseReference())
+        );
     }
 
     private CallbackResponse validateSpecRespondent2RepEmail(CallbackParams callbackParams) {
