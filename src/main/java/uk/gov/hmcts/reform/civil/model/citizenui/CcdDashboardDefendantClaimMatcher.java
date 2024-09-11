@@ -64,7 +64,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
             return false;
         }
         return hasResponseFullAdmit()
-                && isPayImmediately();
+            && isPayImmediately();
     }
 
     @Override
@@ -462,7 +462,6 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isAwaitingJudgment() {
-        // TODO decision outcome before the final order has been made
         return caseData.getCcdState() == CaseState.DECISION_OUTCOME;
     }
 

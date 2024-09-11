@@ -2,16 +2,20 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
 import java.util.Optional;
@@ -312,22 +316,32 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isSDOOrderCreated() {
+        Optional<LocalDateTime> lastNonSdoOrderTime;
+        Optional<LocalDateTime> sdoTime;
         return caseData.getHearingDate() == null
             && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && !isSDOOrderLegalAdviserCreated()
             && !isSDOOrderInReview()
             && !isSDOOrderInReviewOtherParty()
-            && !isDecisionForReconsiderationMade();
+            && !isDecisionForReconsiderationMade()
+            && (sdoTime = getSDOTime()).isPresent()
+            && ((lastNonSdoOrderTime = getTimeOfLastNonSDOOrder()).isEmpty()
+            || sdoTime.get().isAfter(lastNonSdoOrderTime.get()));
     }
 
     @Override
     public boolean isSDOOrderLegalAdviserCreated() {
+        Optional<LocalDateTime> lastNonSdoOrderTime;
+        Optional<LocalDateTime> sdoTime;
         return featureToggleService.isCaseProgressionEnabled()
             && caseData.getHearingDate() == null
             && isSDOMadeByLegalAdviser()
             && !isSDOOrderInReview()
             && !isSDOOrderInReviewOtherParty()
-            && !isDecisionForReconsiderationMade();
+            && !isDecisionForReconsiderationMade()
+            && (sdoTime = getSDOTime()).isPresent()
+            && ((lastNonSdoOrderTime = getTimeOfLastNonSDOOrder()).isEmpty()
+            || sdoTime.get().isAfter(lastNonSdoOrderTime.get()));
     }
 
     @Override
@@ -479,12 +493,17 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isAwaitingJudgment() {
-        // TODO decision outcome before the final order has been made
         return caseData.getCcdState() == CaseState.DECISION_OUTCOME;
     }
 
     @Override
     public boolean trialArrangementsSubmitted() {
         return caseData.getTrialReadyApplicant() == YesOrNo.YES;
+    }
+
+    @Override
+    public boolean isHwFHearingSubmit() {
+        return caseData.getCcdState() == CaseState.HEARING_READINESS
+            && caseData.isHWFTypeHearing();
     }
 }

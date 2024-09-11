@@ -157,4 +157,9 @@ public interface Claim {
     boolean isAwaitingJudgment();
 
     boolean trialArrangementsSubmitted();
+
+    default boolean isHwFHearingSubmit() {
+        return false;
+    }
+    boolean isOrderMadeLast();
 }

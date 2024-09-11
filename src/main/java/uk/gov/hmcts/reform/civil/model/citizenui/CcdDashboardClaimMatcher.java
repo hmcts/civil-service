@@ -1,16 +1,21 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import lombok.AllArgsConstructor;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.math.BigDecimal;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 @AllArgsConstructor
-public abstract class CcdDashboardClaimMatcher {
+public abstract class CcdDashboardClaimMatcher implements Claim {
 
     protected CaseData caseData;
 
@@ -43,12 +48,13 @@ public abstract class CcdDashboardClaimMatcher {
 
     public boolean isClaimProceedInCaseMan() {
         List<CaseState> caseMovedInCaseManStates = List.of(CaseState.AWAITING_APPLICANT_INTENTION,
-                CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT,
-                CaseState.IN_MEDIATION, CaseState.JUDICIAL_REFERRAL);
+                                                           CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT,
+                                                           CaseState.IN_MEDIATION, CaseState.JUDICIAL_REFERRAL
+        );
 
-        return  Objects.nonNull(caseData.getTakenOfflineDate())
-                && Objects.nonNull(caseData.getPreviousCCDState())
-                && (caseMovedInCaseManStates.contains(caseData.getPreviousCCDState()));
+        return Objects.nonNull(caseData.getTakenOfflineDate())
+            && Objects.nonNull(caseData.getPreviousCCDState())
+            && (caseMovedInCaseManStates.contains(caseData.getPreviousCCDState()));
     }
 
     protected boolean isSDOMadeByLegalAdviser() {
@@ -65,5 +71,30 @@ public abstract class CcdDashboardClaimMatcher {
     public boolean hasResponseDeadlineBeenExtended() {
         return caseData.getRespondent1TimeExtensionDate() != null
             && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+    }
+
+    @Override
+    public boolean isOrderMadeLast() {
+        return caseData.getCcdState() == CaseState.All_FINAL_ORDERS_ISSUED
+            || (caseData.getCcdState() == CaseState.CASE_PROGRESSION
+            && getTimeOfLastNonSDOOrder().isPresent()
+        );
+    }
+
+    protected Optional<LocalDateTime> getTimeOfLastNonSDOOrder() {
+        return Stream.concat(
+                Stream.ofNullable(caseData.getPreviewCourtOfficerOrder()),
+                caseData.getFinalOrderDocumentCollection().stream()
+                    .map(Element::getValue)
+            ).filter(Objects::nonNull).map(CaseDocument::getCreatedDatetime)
+            .max(LocalDateTime::compareTo);
+    }
+
+    protected Optional<LocalDateTime> getSDOTime() {
+        return caseData.getSystemGeneratedCaseDocuments().stream()
+            .map(Element::getValue)
+            .filter(d -> d.getDocumentType() == DocumentType.SDO_ORDER)
+            .map(CaseDocument::getCreatedDatetime)
+            .max(LocalDateTime::compareTo);
     }
 }

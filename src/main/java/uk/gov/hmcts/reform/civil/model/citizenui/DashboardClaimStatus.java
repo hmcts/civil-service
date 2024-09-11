@@ -42,6 +42,19 @@ public enum DashboardClaimStatus {
     DECISION_FOR_RECONSIDERATION_MADE(
         Claim::isDecisionForReconsiderationMade
     ),
+    AWAITING_JUDGMENT(
+        Claim::isAwaitingJudgment
+    ),
+    BUNDLE_CREATED(
+        c -> c.isHearingScheduled() && c.isHearingLessThanDaysAway(3*7) && c.isHearingBundleCreated()
+    ),
+    TRIAL_ARRANGEMENTS_SUBMITTED(
+        Claim::trialArrangementsSubmitted
+    ),
+    TRIAL_ARRANGEMENTS_REQUIRED(
+        // same day amount than TRIAL_OR_HEARING_SCHEDULED
+        c -> c.isHearingScheduled() && c.isHearingLessThanDaysAway(6*7)
+    ),
     CLAIMANT_HWF_NO_REMISSION(
         Claim::isHwfNoRemission
     ),
@@ -62,6 +75,12 @@ public enum DashboardClaimStatus {
     ),
     CLAIMANT_HWF_FEE_PAYMENT_OUTCOME(
         Claim::isHwfPaymentOutcome
+    ),
+    HEARING_SUBMIT_HWF(
+        Claim::isHwFHearingSubmit
+    ),
+    TRIAL_OR_HEARING_SCHEDULED(
+        c -> c.isHearingScheduled() && !c.isHearingLessThanDaysAway(6*7)
     ),
     MORE_DETAILS_REQUIRED(
         Claim::isMoreDetailsRequired
@@ -189,20 +208,9 @@ public enum DashboardClaimStatus {
     ),
     DEFAULT_JUDGEMENT_ISSUED(Claim::isDefaultJudgementIssued),
     NO_STATUS(c -> false),
-    TRIAL_OR_HEARING_SCHEDULED(
-        c -> c.isHearingScheduled() && !c.isHearingLessThanDaysAway(6*7)),
-    TRIAL_ARRANGEMENTS_REQUIRED(
-        // same day amount than TRIAL_OR_HEARING_SCHEDULED
-        c -> c.isHearingScheduled() && c.isHearingLessThanDaysAway(6*7)),
-    TRIAL_ARRANGEMENTS_SUBMITTED(
-        Claim::trialArrangementsSubmitted),
-    BUNDLE_CREATED(
-        c -> c.isHearingScheduled() && c.isHearingLessThanDaysAway(3*7) && c.isHearingBundleCreated()),
-    AWAITING_JUDGMENT(
-        Claim::isAwaitingJudgment),
     ORDER_MADE(
-        // TODO
-        c -> false);
+        Claim::isOrderMadeLast
+    );
 
     @Getter
     private final Predicate<Claim> claimMatcher;

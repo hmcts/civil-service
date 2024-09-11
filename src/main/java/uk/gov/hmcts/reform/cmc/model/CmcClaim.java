@@ -592,4 +592,9 @@ public class CmcClaim implements Claim {
     public boolean trialArrangementsSubmitted() {
         return false;
     }
+
+    @Override
+    public boolean isOrderMadeLast() {
+        return false;
+    }
 }
