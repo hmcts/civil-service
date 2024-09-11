@@ -284,6 +284,6 @@ wiremock:
     tag: "2.27.2"
     pullPolicy: Always
 
-  releaseNameOverride: ${SERVICE_NAME}-wiremock
+  nameOverride : ${SERVICE_NAME}-wiremock
 
 
