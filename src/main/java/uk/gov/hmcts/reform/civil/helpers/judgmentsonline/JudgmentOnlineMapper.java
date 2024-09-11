@@ -24,6 +24,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 @RequiredArgsConstructor
 public abstract class JudgmentOnlineMapper {
 
+    private int MAX_LENGTH_PARTY_NAME = 70;
+
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
         JudgmentDetails activeJudgment = isNull(caseData.getActiveJudgment()) ? JudgmentDetails.builder()
             .judgmentId(getNextJudgmentId(caseData)).build() : caseData.getActiveJudgment();
@@ -52,7 +54,13 @@ public abstract class JudgmentOnlineMapper {
     }
 
     public JudgmentDetails updateDefendantDetails(JudgmentDetails activeJudgment, CaseData caseData, RoboticsAddressMapper addressMapper) {
-        activeJudgment.setDefendant1Name(caseData.getRespondent1().getPartyName());
+        if (caseData.getRespondent1().getPartyName() != null
+            && caseData.getRespondent1().getPartyName().length() > MAX_LENGTH_PARTY_NAME) {
+            activeJudgment.setDefendant1Name(JudgmentsOnlineHelper.removeWelshCharacters(caseData.getRespondent1().getPartyName().substring(
+                0, MAX_LENGTH_PARTY_NAME)));
+        } else {
+            activeJudgment.setDefendant1Name(JudgmentsOnlineHelper.removeWelshCharacters(caseData.getRespondent1().getPartyName()));
+        }
         activeJudgment.setDefendant1Address(JudgmentsOnlineHelper.getJudgmentAddress(caseData.getRespondent1().getPrimaryAddress(), addressMapper));
         activeJudgment.setDefendant1Dob(caseData.getRespondent1().getDateOfBirth());
         if (YesOrNo.YES == caseData.getAddRespondent2()) {

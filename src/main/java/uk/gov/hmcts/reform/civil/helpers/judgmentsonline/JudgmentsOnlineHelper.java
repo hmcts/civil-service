@@ -27,6 +27,8 @@ public class JudgmentsOnlineHelper {
     private static final String ERROR_MESSAGE_DATE_FIRST_INSTALMENT_MUST_BE_IN_FUTURE = "Date of first instalment must be in the future";
     private static final String ERROR_MESSAGE_DATE_ORDER_MUST_BE_IN_PAST = "Date judge made the order must be in the past";
 
+    private static final String regex = "[ˆ`´¨]";
+
     private JudgmentsOnlineHelper() {
     }
 
@@ -179,7 +181,16 @@ public class JudgmentsOnlineHelper {
 
     public static JudgmentAddress getJudgmentAddress(Address address, RoboticsAddressMapper addressMapper) {
 
-        RoboticsAddress roboticsAddress = addressMapper.toRoboticsAddress(address);
+        Address newAddress = Address.builder()
+            .addressLine1(removeWelshCharacters(address.getAddressLine1()))
+            .addressLine2(removeWelshCharacters(address.getAddressLine2()))
+            .addressLine3(removeWelshCharacters(address.getAddressLine3()))
+            .postCode(removeWelshCharacters(address.getPostCode()))
+            .postTown(removeWelshCharacters(address.getPostTown()))
+            .county(removeWelshCharacters(address.getCounty()))
+            .country(removeWelshCharacters(address.getCountry())).build();
+
+        RoboticsAddress roboticsAddress = addressMapper.toRoboticsAddress(newAddress);
         return JudgmentAddress.builder()
             .defendantAddressLine1(roboticsAddress.getAddressLine1())
             .defendantAddressLine2(roboticsAddress.getAddressLine2())
@@ -187,5 +198,9 @@ public class JudgmentsOnlineHelper {
             .defendantAddressLine4(roboticsAddress.getAddressLine4())
             .defendantAddressLine5(roboticsAddress.getAddressLine5())
             .defendantPostCode(roboticsAddress.getPostCode()).build();
+    }
+
+    public static String removeWelshCharacters (String input) {
+        return input != null ? input.replaceAll(regex, "") : input;
     }
 }

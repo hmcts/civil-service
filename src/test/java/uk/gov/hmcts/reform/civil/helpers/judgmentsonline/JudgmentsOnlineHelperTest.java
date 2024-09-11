@@ -114,4 +114,9 @@ public class JudgmentsOnlineHelperTest {
     void testAddress() {
         assertThat(JudgmentsOnlineHelper.getJudgmentAddress(Address.builder().build(), new RoboticsAddressMapper(new AddressLinesMapper()))).isNotNull();
     }
+
+    @Test
+    void testWelshChar() {
+        assertThat(JudgmentsOnlineHelper.removeWelshCharacters("TEST Welsh ˆ`´¨")).isEqualTo("TEST Welsh ");
+    }
 }
