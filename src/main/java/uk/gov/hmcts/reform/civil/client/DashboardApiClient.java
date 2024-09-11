@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.client;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.FeignClientProperties;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -78,7 +79,7 @@ public interface DashboardApiClient {
 
     @PutMapping(path = {
         "taskList/{ccd-case-identifier}/role/{role-type}/status"
-    })
+    }, consumes = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<Void> makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
         @PathVariable("ccd-case-identifier") String ccdCaseIdentifier,
         @PathVariable("role-type") String roleType,
