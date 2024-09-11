@@ -3,7 +3,7 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.CP.HearingFee.Paid.Claimant',
-        '{"Notice.AAA6.CP.HearingFee.Required.Claimant"}',
+        '{"Notice.AAA6.CP.HearingFee.Required.Claimant", "Notice.AAA6.CP.HearingFee.HWF.AppliedFor.Claimant", "Notice.AAA6.CP.HearingFee.HWF.InvalidRef", "Notice.AAA6.CP.HearingFee.HWF.Updated", "Notice.AAA6.CP.HearingFee.HWF.InfoRequired", "Notice.AAA6.CP.HearingFee.HWF.PartRemission", "Notice.AAA6.CP.HearingFee.HWF.Rejected"}',
         '{"Notice.AAA6.CP.HearingFee.Paid.Claimant": []}');
 
 /**

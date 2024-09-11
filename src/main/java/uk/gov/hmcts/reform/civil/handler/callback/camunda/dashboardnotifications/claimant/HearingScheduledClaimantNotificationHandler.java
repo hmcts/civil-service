@@ -70,13 +70,15 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
             caseData = caseData.toBuilder().hearingLocationCourtName(locationRefData.getSiteName()).build();
         }
 
-        dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
-                                          SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario(), authToken,
-                                          ScenarioRequestParams.builder().params(
-                                              mapper.mapCaseDataToParams(caseData)).build()
-        );
+        if (caseData.isApplicant1NotRepresented()) {
+            dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
+                                              SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario(), authToken,
+                                              ScenarioRequestParams.builder().params(
+                                                  mapper.mapCaseDataToParams(caseData)).build()
+            );
+        }
 
-        if (caseData.getCcdState() == HEARING_READINESS && caseData.getListingOrRelisting() == LISTING) {
+        if (caseData.getCcdState() == HEARING_READINESS && caseData.getListingOrRelisting() == LISTING && caseData.isApplicant1NotRepresented()) {
             dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
                                               SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT.getScenario(), authToken,
                                               ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
