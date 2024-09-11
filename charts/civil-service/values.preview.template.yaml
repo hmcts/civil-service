@@ -28,7 +28,6 @@ java:
     ROLE_INITIALISATION_ENABLED: true
     CASE_FLAGS_LOGGING_ENABLED: true
     SIMPLE_STATE_FLOW_ENGINE_ENABLED: true
-    HMC_API_URL: http://localhost:8765
   keyVaults:
     civil:
       resourceGroup: civil
