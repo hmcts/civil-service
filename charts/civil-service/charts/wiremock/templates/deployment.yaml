@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "wiremock.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    app: {{ include "wiremock.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "wiremock.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "wiremock.name" . }}
+    spec:
+      containers:
+        - name: wiremock
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: {{ .Values.devmemoryRequests }}
+              cpu: {{ .Values.devcpuRequests }}
+            limits:
+              memory: {{ .Values.devmemoryLimits }}
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: wiremock-mocks
+              mountPath: /home/wiremock
+      volumes:
+        - name: wiremock-mocks
+          hostPath:
+            path: /charts/civil-service/charts/wiremock/mocks

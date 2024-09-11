@@ -94,6 +94,7 @@ You should get a response similar to this:
 Preview environment will be created when opening new PR. CCD and Camunda BPMN definitions will be pulled from the latest
 GitHub releases.
 
+
 To access XUI visit url (make sure that it starts with `https`, otherwise IDAM won't let you log in):
 
 - `https://xui-civil-service-pr-PR_NUMBER.service.core-compute-preview.internal`

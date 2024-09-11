@@ -23,6 +23,7 @@ java:
     STITCHING_API_ENABLED: true
     ACA_SERVICE_API_BASEURL: http://${SERVICE_NAME}-aac-manage-case-assignment
     HMC_HEARINGS_SUBSCRIPTION_ENABLED: false
+    HMC_API_URL: http://${SERVICE_NAME}-wiremock
     ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
     ROLE_INITIALISATION_ENABLED: true
     CASE_FLAGS_LOGGING_ENABLED: true
@@ -271,3 +272,19 @@ aac-manage-case-assignment:
       NOTIFY_MCA_API_KEY: ${NOTIFY_MCA_API_KEY}
     autoscaling:
       enabled: false
+
+wiremock:
+  enabled: true
+
+  devcpuRequests: "100m"
+  devmemoryRequests: "256Mi"
+  devmemoryLimits: "256Mi"
+
+  image:
+    repository: wiremock/wiremock
+    tag: "2.27.2"
+    pullPolicy: Always
+
+  releaseNameOverride: ${SERVICE_NAME}-wiremock
+
+
