@@ -59,6 +59,15 @@ public class GeneralAppFeesService {
     protected static final List<GeneralApplicationTypes> SD_CONSENT_TYPES
         = List.of(GeneralApplicationTypes.SETTLE_BY_CONSENT);
 
+    public Fee getFeeForJOWithApplicationType(GeneralApplicationTypes applicationType) {
+        return switch (applicationType) {
+            case VARY_ORDER -> getFeeForGA(feesConfiguration.getAppnToVaryOrSuspend(), MISCELLANEOUS, OTHER);
+            case SET_ASIDE_JUDGEMENT -> getFeeForGA(feesConfiguration.getWithNoticeKeyword(), "general application", "general");
+            case OTHER -> getFeeForGA(feesConfiguration.getCertificateOfSatisfaction(), MISCELLANEOUS, OTHER);
+            default -> null;
+        };
+    }
+
     public Fee getFeeForGALiP(List<GeneralApplicationTypes> applicationTypes, Boolean withConsent,
                               Boolean withNotice, LocalDate hearingDate) {
         return getFeeForGA(applicationTypes, withConsent, withNotice, hearingDate);
@@ -71,15 +80,6 @@ public class GeneralAppFeesService {
             getInformOtherParty(caseData),
             getHearingDate(caseData)
         );
-    }
-
-    public Fee getFeeForJOWithApplicationType(GeneralApplicationTypes applicationType) {
-        return switch (applicationType) {
-            case VARY_ORDER -> getFeeForGA(feesConfiguration.getAppnToVaryOrSuspend(), MISCELLANEOUS, OTHER);
-            case SET_ASIDE_JUDGEMENT -> getFeeForGA(feesConfiguration.getWithNoticeKeyword(), "general application", "general");
-            case OTHER -> getFeeForGA(feesConfiguration.getCertificateOfSatisfaction(), MISCELLANEOUS, OTHER);
-            default -> null;
-        };
     }
 
     private Fee getFeeForGA(List<GeneralApplicationTypes> types, Boolean respondentAgreed, Boolean informOtherParty, LocalDate hearingScheduledDate) {
