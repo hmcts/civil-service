@@ -89,6 +89,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
+            .applicant1Represented(YesOrNo.NO)
             .respondent1ResponseDeadline(dateTime)
             .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
             .build();
@@ -118,6 +119,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
+            .applicant1Represented(YesOrNo.NO)
             .respondent1ResponseDeadline(LocalDateTime.now())
             .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
@@ -186,6 +188,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         CaseData defendantBreakSSA = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
+            .applicant1Represented(YesOrNo.NO)
             .respondent1ResponseDeadline(LocalDateTime.now())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)

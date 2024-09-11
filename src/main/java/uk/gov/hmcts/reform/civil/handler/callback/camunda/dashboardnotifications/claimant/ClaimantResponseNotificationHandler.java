@@ -51,6 +51,7 @@ public class ClaimantResponseNotificationHandler extends DashboardCallbackHandle
     public boolean shouldRecordScenario(CaseData caseData) {
         return YesOrNo.NO.equals(caseData.getApplicant1Represented());
     }
+
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
