@@ -170,6 +170,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         CaseData defendantRejectedSSA = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
+            .applicant1Represented(YesOrNo.NO)
             .respondent1ResponseDeadline(LocalDateTime.now())
             .caseDataLiP(CaseDataLiP.builder()
                              .respondentSignSettlementAgreement(YesOrNo.NO)
@@ -179,6 +180,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
 
         CaseData defendantNotRespondedToSSA = CaseData.builder()
             .legacyCaseReference("reference")
+            .applicant1Represented(YesOrNo.NO)
             .ccdCaseReference(1234L)
             .respondent1ResponseDeadline(LocalDateTime.now())
             .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.of(2024, 3, 1, 12, 0, 0))
