@@ -1,0 +1,162 @@
+{
+  "requestDetails": {
+    "status": "LISTED",
+    "timestamp": "2024-11-15T14:20:17.270956",
+    "versionNumber": 1,
+    "hearingRequestID": "2000005721"
+  },
+  "hearingDetails": {
+    "hearingType": "AAA7-DIS",
+    "hearingWindow": {},
+    "duration": 60,
+    "hearingPriorityType": "Standard",
+    "numberOfPhysicalAttendees": 0,
+    "hearingInWelshFlag": false,
+    "hearingLocations": [
+      {
+        "locationType": "court",
+        "locationId": "739514"
+      }
+    ],
+    "facilitiesRequired": [
+      "11"
+    ],
+    "privateHearingRequiredFlag": false,
+    "panelRequirements": {
+      "roleType": [
+        "19"
+      ],
+      "authorisationTypes": [],
+      "authorisationSubType": [],
+      "panelPreferences": [],
+      "panelSpecialisms": []
+    },
+    "hearingIsLinkedFlag": false,
+    "hearingChannels": [
+      "INTER"
+    ],
+    "autolistFlag": false
+  },
+  "caseDetails": {
+    "hmctsServiceCode": "AAA7",
+    "caseRef": "1686565578345150",
+    "caseDeepLink": "https://manage-case.demo.platform.hmcts.net/cases/case-details/1686565578345150",
+    "hmctsInternalCaseName": "Mr claimant test v miss defendant test",
+    "publicCaseName": "'claimant test' v 'defendant test'",
+    "caseAdditionalSecurityFlag": false,
+    "caseInterpreterRequiredFlag": true,
+    "caseCategories": [
+      {
+        "categoryType": "caseType",
+        "categoryValue": "AAA7-SMALL_CLAIM"
+      },
+      {
+        "categoryType": "caseSubType",
+        "categoryValue": "AAA7-SMALL_CLAIM",
+        "categoryParent": "AAA7-SMALL_CLAIM"
+      }
+    ],
+    "caseManagementLocationCode": "739514",
+    "caserestrictedFlag": false,
+    "caseSLAStartDate": "2024-01-08"
+  },
+  "partyDetails": [
+    {
+      "partyID": "7e3dba5d-d51d-46",
+      "partyType": "IND",
+      "partyRole": "CLAI",
+      "individualDetails": {
+        "title": null,
+        "firstName": "claimant",
+        "lastName": "test",
+        "preferredHearingChannel": "INTER",
+        "interpreterLanguage": null,
+        "reasonableAdjustments": [],
+        "vulnerableFlag": false,
+        "vulnerabilityDetails": null,
+        "hearingChannelEmail": [],
+        "hearingChannelPhone": [],
+        "relatedParties": [],
+        "custodyStatus": null,
+        "otherReasonableAdjustmentDetails": null
+      }
+    },
+    {
+      "partyID": "d6ab40b7-1143-4e",
+      "partyType": "IND",
+      "partyRole": "DEFE",
+      "individualDetails": {
+        "title": null,
+        "firstName": "defendant",
+        "lastName": "test",
+        "preferredHearingChannel": "INTER",
+        "interpreterLanguage": "bfi",
+        "reasonableAdjustments": [
+          "RA0042"
+        ],
+        "vulnerableFlag": false,
+        "vulnerabilityDetails": null,
+        "hearingChannelEmail": [],
+        "hearingChannelPhone": [],
+        "relatedParties": [],
+        "custodyStatus": null,
+        "otherReasonableAdjustmentDetails": null
+      }
+    },
+    {
+      "partyID": "B04IXE4",
+      "partyType": "ORG",
+      "partyRole": "LGRP",
+      "organisationDetails": {
+        "name": "Civil - Organisation 1",
+        "organisationType": "ORG",
+        "cftOrganisationID": "B04IXE4"
+      }
+    },
+    {
+      "partyID": "DAWY9LJ",
+      "partyType": "ORG",
+      "partyRole": "LGRP",
+      "organisationDetails": {
+        "name": "Civil - Organisation 2",
+        "organisationType": "ORG",
+        "cftOrganisationID": "DAWY9LJ"
+      }
+    }
+  ],
+  "hearingResponse": {
+    "hearingDaySchedule": [
+      {
+        "hearingStartDateTime": "2025-10-15T11:00:00",
+        "hearingEndDateTime": "2025-10-15T12:00:00",
+        "hearingVenueId": "739514",
+        "hearingRoomId": "Clerkenwell and Shoreditch Courtroom 01",
+        "hearingJudgeId": null,
+        "panelMemberIds": null,
+        "attendees": [
+          {
+            "hearingSubChannel": "INTER",
+            "partyID": "7e3dba5d-d51d-46"
+          },
+          {
+            "hearingSubChannel": "INTER",
+            "partyID": "d6ab40b7-1143-4e"
+          },
+          {
+            "hearingSubChannel": null,
+            "partyID": "B04IXE4"
+          },
+          {
+            "hearingSubChannel": null,
+            "partyID": "DAWY9LJ"
+          }
+        ],
+        "listAssistSessionID": null
+      }
+    ],
+    "laCaseStatus": "LISTED",
+    "listingStatus": "FIXED",
+    "receivedDateTime": "2024-10-15T14:32:45",
+    "requestVersion": 1
+  }
+}
