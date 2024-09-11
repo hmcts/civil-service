@@ -18,6 +18,17 @@ spec:
       labels:
         app: {{ include "wiremock.name" . }}
     spec:
+      initContainers:
+        - name: git-clone
+          image: alpine/git
+          command:
+            - git
+            - clone
+            - https://github.com/your/repo.git
+            - /tmp/mocks
+          volumeMounts:
+            - name: wiremock-mocks
+              mountPath: /tmp/mocks
       containers:
         - name: wiremock
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"

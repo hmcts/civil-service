@@ -284,6 +284,8 @@ wiremock:
     tag: "2.27.2"
     pullPolicy: Always
 
+  mocksRepository: https://github.com/hmcts/civil-ccd-definition
+
   releaseNameOverride: ${SERVICE_NAME}-wiremock
 
 
