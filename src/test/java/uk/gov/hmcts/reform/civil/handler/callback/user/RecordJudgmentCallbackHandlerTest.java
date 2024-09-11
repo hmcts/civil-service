@@ -56,7 +56,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     private RoboticsAddressMapper addressMapper;
 
     @Test
-    public void handleEventsReturnsTheExpectedCallbackEvents() {
+    void handleEventsReturnsTheExpectedCallbackEvents() {
         assertThat(handler.handledEvents()).containsOnly(RECORD_JUDGMENT);
     }
 
