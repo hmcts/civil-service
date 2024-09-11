@@ -80,7 +80,6 @@ def checkForEnableHelmLabel(branch_name) {
 withPipeline(type, product, component) {
 
   onPR {
-    enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
     env.ENVIRONMENT = "preview"
     env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     loadVaultSecrets(secrets)

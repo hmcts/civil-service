@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "wiremock.fullname" . }}
+  name: {{ template "wiremock.fullname" . }}
   labels:
     app.kubernetes.io/name: {{ .Release.Name }}
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
@@ -16,7 +16,7 @@ spec:
   template:
     metadata:
       labels:
-        app: {{ include "wiremock.name" . }}
+        app: {{ .Chart.Name }}
     spec:
       containers:
         - name: wiremock
