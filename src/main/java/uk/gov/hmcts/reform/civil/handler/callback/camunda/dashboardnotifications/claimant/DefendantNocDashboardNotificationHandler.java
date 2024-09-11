@@ -79,7 +79,6 @@ public class DefendantNocDashboardNotificationHandler extends CallbackHandler {
         boolean isFeePaymentOutcomeNotDone = caseData.isHWFTypeHearing() && isNull(caseData.getFeePaymentOutcomeDetails().getHwfFullRemissionGrantedForHearingFee())
             && (isNull(hearingFeePaymentDetails) || hearingFeePaymentDetails.getStatus() != PaymentStatus.SUCCESS);
 
-
         if (isHearingFeeNotPaid || isFeePaymentOutcomeNotDone) {
             dashboardApiClient.recordScenario(
                 caseData.getCcdCaseReference().toString(),
