@@ -315,11 +315,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         String customerReference = paymentDetails.map(PaymentDetails::getCustomerReference).orElse(reference);
         PaymentDetails updatedDetails = PaymentDetails.builder().customerReference(customerReference).build();
         caseDataBuilder.claimIssuedPaymentDetails(updatedDetails);
-
         caseDataBuilder.claimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()));
-        if (toggleService.isPbaV3Enabled()) {
-            caseDataBuilder.paymentTypePBA("PBAv3");
-        }
+        caseDataBuilder.paymentTypePBA("PBAv3");
         List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
         caseDataBuilder.applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
                        .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
@@ -593,12 +590,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             dataBuilder.applicantSolicitor1UserDetails(idam.email(applicantSolicitor1UserDetails.getEmail()).build());
         }
 
-        if (!toggleService.isPbaV3Enabled()) {
-            dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM));
-        } else {
-            dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST_CLAIM));
-        }
-
+        dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST_CLAIM));
         dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
 
         //Copy Unspec Claim Type into Spec claim Type if SDO R" feature toggle is on

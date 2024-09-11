@@ -92,6 +92,9 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
             assertEquals(JudgmentState.SET_ASIDE, historicJudgment.getState());
             assertEquals(caseData.getJoSetAsideOrderDate(), historicJudgment.getSetAsideDate());
+            assertThat(response.getData()).extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(SET_ASIDE_JUDGMENT.name(), "READY");
         }
 
         @Test
@@ -116,6 +119,9 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertEquals(caseData.getJoSetAsideDefenceReceivedDate(), historicJudgment.getSetAsideDate());
             //and the caseState should not be updated
             assertEquals(response.getState(), CaseState.All_FINAL_ORDERS_ISSUED.name());
+            assertThat(response.getData()).extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(SET_ASIDE_JUDGMENT.name(), "READY");
         }
 
         @Test
@@ -139,6 +145,9 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertEquals(LocalDate.now(), historicJudgment.getSetAsideDate());
             //and the caseState should not be updated
             assertEquals(response.getState(), CaseState.All_FINAL_ORDERS_ISSUED.name());
+            assertThat(response.getData()).extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(SET_ASIDE_JUDGMENT.name(), "READY");
         }
 
         @Test
@@ -162,6 +171,9 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("joSetAsideOrderType").isNotNull();
             //and the caseState should be updated
             assertEquals(response.getState(), CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name());
+            assertThat(response.getData()).extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(SET_ASIDE_JUDGMENT.name(), "READY");
         }
 
         @Test
@@ -184,6 +196,9 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
             assertEquals(JudgmentState.SET_ASIDE, historicJudgment.getState());
             assertEquals(caseData.getJoSetAsideDefenceReceivedDate(), historicJudgment.getSetAsideDate());
+            assertThat(response.getData()).extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(SET_ASIDE_JUDGMENT.name(), "READY");
         }
     }
 
@@ -219,7 +234,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class SubmittedCallback {
         @Test
-        public void whenSubmitted_thenIncludeHeader() {
+        void whenSubmitted_thenIncludeHeader() {
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             CallbackParams params = CallbackParams.builder()
                 .caseData(caseData)
