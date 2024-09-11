@@ -284,7 +284,10 @@ wiremock:
     tag: "2.27.2"
     pullPolicy: Always
 
-  mocksRepository: https://github.com/hmcts/civil-ccd-definition
+  git:
+    repo: "https://github.com/hmcts/civil-ccd-definition.git"
+    branch: "feat/civ-15169"
+    sparseCheckoutFolder: "/e2e/wiremock"
 
   releaseNameOverride: ${SERVICE_NAME}-wiremock
 

@@ -19,16 +19,21 @@ spec:
         app: {{ include "wiremock.name" . }}
     spec:
       initContainers:
-        - name: git-clone
+        - name: wiremock-mocks
           image: alpine/git
           command:
-            - git
-            - clone
-            - https://github.com/your/repo.git
-            - /tmp/mocks
+            - /bin/sh
+            - -c
+            - |
+              git init
+              git remote add origin {{ .Values.git.repo }}
+              git config core.sparseCheckout true
+              echo "{{ .Values.git.sparseCheckoutFolder }}/" >> .git/info/sparse-checkout
+              git pull origin {{ .Values.git.branch }}
+              cp -r {{ .Values.git.sparseCheckoutFolder }} /shared/mocks
           volumeMounts:
             - name: wiremock-mocks
-              mountPath: /tmp/mocks
+              mountPath: /home/wiremock/mappings
       containers:
         - name: wiremock
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -46,5 +51,4 @@ spec:
               mountPath: /home/wiremock
       volumes:
         - name: wiremock-mocks
-          hostPath:
-            path: /charts/civil-service/charts/wiremock/mocks
+          emptyDir: { }
