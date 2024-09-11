@@ -44,7 +44,7 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
     private final LocationReferenceDataService locationRefDataService;
 
     @Override
-    protected Map<String, Callback> callbacks() {
+    protected Map<String, Callback> callbacks() { 
         return toggleService.isCaseProgressionEnabled()
             ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForHearingScheduled)
             : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
