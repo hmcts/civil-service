@@ -1556,7 +1556,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
             && isAwaitingAnotherDefendantResponse(caseData)) {
 
-            if (fullDefenceResponse(caseData)) {
+            if (isDefending(caseData)) {
                 assembleResponseDocumentsSpec(caseData, updatedData);
             }
 
@@ -1591,9 +1591,12 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
-    private boolean fullDefenceResponse(CaseData caseData) {
+    private boolean isDefending(CaseData caseData) {
         return FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec());
+            || FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+            || PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()
+        );
     }
 
     private boolean ifResponseTypeIsPartOrFullAdmission(CaseData caseData) {
