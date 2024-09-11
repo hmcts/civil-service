@@ -42,6 +42,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
@@ -91,7 +92,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
     private DocmosisTemplates getSealedDocmosisTemplate(CaseData caseData) {
         DocmosisTemplates sealedTemplate;
         if (caseData.getApplicant2() != null) {
-            if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())) {
+            if (NO.equals(caseData.getSpecRespondent1Represented())) {
                 sealedTemplate = N2_2V1_LIP;
             } else {
                 sealedTemplate = N2_2V1;
@@ -101,7 +102,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
                 && caseData.getRespondent2SameLegalRepresentative() == YES) {
                 sealedTemplate = N2_1V2_SAME_SOL;
             } else {
-                if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())) {
+                if (NO.equals(caseData.getSpecRespondent1Represented())) {
                     sealedTemplate = N2_1V2_DIFFERENT_SOL_LIP;
                 } else {
                     sealedTemplate = N2_1V2_DIFFERENT_SOL;
@@ -181,6 +182,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             .applicantRepresentativeOrganisationName(representativeService.getApplicantRepresentative(caseData)
                                                          .getOrganisationName())
             .defendantResponseDeadlineDate(getResponseDeadline(caseData))
+            .respondentsOrgRegistered(getRespondentsOrgRegistered(caseData))
             .build();
     }
 
@@ -324,4 +326,10 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             .build();
     }
 
+    private YesOrNo getRespondentsOrgRegistered(CaseData caseData) {
+        if (NO.equals(caseData.getRespondent1OrgRegistered()) || NO.equals(caseData.getRespondent2OrgRegistered())) {
+            return NO;
+        }
+        return YES;
+    }
 }
