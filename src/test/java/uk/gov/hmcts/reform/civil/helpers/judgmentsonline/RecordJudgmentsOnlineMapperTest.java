@@ -137,7 +137,7 @@ public class RecordJudgmentsOnlineMapperTest {
         CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediatelyWithOldAddress();
         JudgmentDetails activeJudgment = judgmentOnlineMapper.addUpdateActiveJudgment(caseData);
         assertNotNull(activeJudgment);
-        assertThat(activeJudgment.getDefendant1Name().length()).isLessThanOrEqualTo( 70);
+        assertThat(activeJudgment.getDefendant1Name().length()).isLessThanOrEqualTo(70);
         assertThat(activeJudgment.getDefendant1Address().getDefendantAddressLine1().length()).isLessThanOrEqualTo(35);
     }
 }

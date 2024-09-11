@@ -200,7 +200,7 @@ public class JudgmentsOnlineHelper {
             .defendantPostCode(roboticsAddress.getPostCode()).build();
     }
 
-    public static String removeWelshCharacters (String input) {
+    public static String removeWelshCharacters(String input) {
         return input != null ? input.replaceAll(regex, "") : input;
     }
 }

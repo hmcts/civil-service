@@ -24,7 +24,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 @RequiredArgsConstructor
 public abstract class JudgmentOnlineMapper {
 
-    private int MAX_LENGTH_PARTY_NAME = 70;
+    private static final int MAX_LENGTH_PARTY_NAME = 70;
 
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
         JudgmentDetails activeJudgment = isNull(caseData.getActiveJudgment()) ? JudgmentDetails.builder()
