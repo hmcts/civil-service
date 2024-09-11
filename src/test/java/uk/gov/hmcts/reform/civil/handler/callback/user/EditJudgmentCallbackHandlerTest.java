@@ -83,6 +83,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @EnumSource(value = YesOrNo.class, names = {"YES", "NO"})
         void shouldPopulateIfRTLRadioDisplay(YesOrNo value) {
             //Given: Casedata in All_FINAL_ORDERS_ISSUED State
+            when(addressMapper.toRoboticsAddress(any())).thenReturn(RoboticsAddress.builder().build());
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoIsRegisteredWithRTL(value);
             RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper(addressMapper);
