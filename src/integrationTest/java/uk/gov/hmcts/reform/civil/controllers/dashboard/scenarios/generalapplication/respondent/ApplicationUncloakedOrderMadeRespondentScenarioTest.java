@@ -41,7 +41,7 @@ public class ApplicationUncloakedOrderMadeRespondentScenarioTest extends BaseInt
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">The other parties have requested a change to the case "
                         + "and the judge has made an order.</p><a href=\"{GA_RESPONSE_VIEW_APPLICATION_URL}\""
-                        + "class=\"govuk-link\">View the request and order from the judge</a>"),
+                        + " class=\"govuk-link\">View the request and order from the judge</a>"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae’r partïon eraill wedi gofyn i newid gael ei wneud "
                         + "i'r achos ac mae’r barnwr wedi gwneud gorchymyn.</p>"
