@@ -43,11 +43,11 @@ public class FeatureToggleService {
     }
 
     public boolean isHmcEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("hmc");
+        return true;
     }
 
     public boolean isAutomatedHearingNoticeEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("ahn");
+        return true;
     }
 
     public boolean isFastTrackUpliftsEnabled() {

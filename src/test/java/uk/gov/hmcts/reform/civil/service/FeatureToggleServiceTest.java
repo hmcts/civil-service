@@ -38,11 +38,8 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenAutomatedHearingNoticeEnabledInvoked(Boolean toggleStat) {
-        var hearingAndListingKey = "ahn";
-        givenToggle(hearingAndListingKey, toggleStat);
-
-        assertThat(featureToggleService.isAutomatedHearingNoticeEnabled()).isEqualTo(toggleStat);
+    void shouldReturnCorrectValue_whenAutomatedHearingNoticeEnabledInvoked() {
+        assertThat(featureToggleService.isAutomatedHearingNoticeEnabled()).isEqualTo(true);
     }
 
     @ParameterizedTest
@@ -110,11 +107,8 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenHmcIsEnabled(Boolean toggleStat) {
-        var hmcKey = "hmc";
-        givenToggle(hmcKey, toggleStat);
-
-        assertThat(featureToggleService.isHmcEnabled()).isEqualTo(toggleStat);
+    void shouldReturnCorrectValue_whenHmcIsEnabled() {
+        assertThat(featureToggleService.isHmcEnabled()).isEqualTo(true);
     }
 
     @ParameterizedTest
