@@ -2,7 +2,7 @@
 nameOverride: ""
 fullnameOverride: ""
 
-applicationPort: 4550
+applicationPort: 8080
 imagePullPolicy: IfNotPresent
 replicas: 1
 registerAdditionalDns:
