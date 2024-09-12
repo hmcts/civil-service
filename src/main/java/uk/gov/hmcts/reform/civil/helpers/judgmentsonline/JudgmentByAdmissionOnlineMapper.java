@@ -168,7 +168,7 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
                 return (caseData.getApplicant1RequestedPaymentDateForDefendantSpec()) != null
                     ? caseData.getApplicant1RequestedPaymentDateForDefendantSpec().getPaymentSetDate() : null;
             }
-            return PaymentPlanSelection.PAY_BY_DATE.equals(paymentPlan) && caseData.getRespondToClaimAdmitPartLRspec() != null
+            return caseData.getRespondToClaimAdmitPartLRspec() != null
                 ? caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() : null;
         }
         return null;
