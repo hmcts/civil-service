@@ -23,13 +23,11 @@ import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType.DEFAUL
 @Slf4j
 public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher implements Claim {
 
-    public CcdDashboardDefendantClaimMatcher(CaseData caseData, FeatureToggleService featureToggleService) {
-        super(caseData);
-        this.featureToggleService = featureToggleService;
-    }
-
     private static final LocalTime FOUR_PM = LocalTime.of(16, 1, 0);
-    private FeatureToggleService featureToggleService;
+
+    public CcdDashboardDefendantClaimMatcher(CaseData caseData, FeatureToggleService featureToggleService) {
+        super(caseData, featureToggleService);
+    }
 
     @Override
     public boolean hasResponsePending() {
@@ -229,11 +227,6 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     }
 
     @Override
-    public boolean isMoreDetailsRequired() {
-        return hasSdoBeenDrawn() && isBeforeHearing() && featureToggleService.isCaseProgressionEnabled();
-    }
-
-    @Override
     public boolean isMediationSuccessful() {
         return !hasSdoBeenDrawn()
             && nonNull(caseData.getMediation())
@@ -295,26 +288,6 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     public boolean isPartialAdmissionRejected() {
         return CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState())
             && caseData.isPartAdmitClaimSpec();
-    }
-
-    @Override
-    public boolean isSDOOrderCreated() {
-        return caseData.getHearingDate() == null
-            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
-            && !isSDOOrderLegalAdviserCreated()
-            && !isSDOOrderInReview()
-            && !isSDOOrderInReviewOtherParty()
-            && !isDecisionForReconsiderationMade();
-    }
-
-    @Override
-    public boolean isSDOOrderLegalAdviserCreated() {
-        return featureToggleService.isCaseProgressionEnabled()
-            && caseData.getHearingDate() == null
-            && isSDOMadeByLegalAdviser()
-            && !isSDOOrderInReview()
-            && !isSDOOrderInReviewOtherParty()
-            && !isDecisionForReconsiderationMade();
     }
 
     @Override

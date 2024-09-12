@@ -29,11 +29,9 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher implements Claim {
 
     private static final LocalTime FOUR_PM = LocalTime.of(16, 1, 0);
-    private FeatureToggleService featureToggleService;
 
     public CcdDashboardClaimantClaimMatcher(CaseData caseData, FeatureToggleService featureToggleService) {
-        super(caseData);
-        this.featureToggleService = featureToggleService;
+        super(caseData, featureToggleService);
     }
 
     @Override
@@ -243,10 +241,6 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
             .orElse(false);
     }
 
-    @Override
-    public boolean isMoreDetailsRequired() {
-        return hasSdoBeenDrawn() && isBeforeHearing() && featureToggleService.isCaseProgressionEnabled();
-    }
 
     @Override
     public boolean isMediationSuccessful() {
@@ -314,35 +308,9 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
             && NO.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec());
     }
 
-    @Override
-    public boolean isSDOOrderCreated() {
-        Optional<LocalDateTime> lastNonSdoOrderTime;
-        Optional<LocalDateTime> sdoTime;
-        return caseData.getHearingDate() == null
-            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
-            && !isSDOOrderLegalAdviserCreated()
-            && !isSDOOrderInReview()
-            && !isSDOOrderInReviewOtherParty()
-            && !isDecisionForReconsiderationMade()
-            && (sdoTime = getSDOTime()).isPresent()
-            && ((lastNonSdoOrderTime = getTimeOfLastNonSDOOrder()).isEmpty()
-            || sdoTime.get().isAfter(lastNonSdoOrderTime.get()));
-    }
 
-    @Override
-    public boolean isSDOOrderLegalAdviserCreated() {
-        Optional<LocalDateTime> lastNonSdoOrderTime;
-        Optional<LocalDateTime> sdoTime;
-        return featureToggleService.isCaseProgressionEnabled()
-            && caseData.getHearingDate() == null
-            && isSDOMadeByLegalAdviser()
-            && !isSDOOrderInReview()
-            && !isSDOOrderInReviewOtherParty()
-            && !isDecisionForReconsiderationMade()
-            && (sdoTime = getSDOTime()).isPresent()
-            && ((lastNonSdoOrderTime = getTimeOfLastNonSDOOrder()).isEmpty()
-            || sdoTime.get().isAfter(lastNonSdoOrderTime.get()));
-    }
+
+
 
     @Override
     public boolean isSDOOrderInReview() {

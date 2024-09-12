@@ -57,40 +57,22 @@ public class DashboardClaimStatusFactoryTest {
 
     @ParameterizedTest
     @MethodSource("hearingFeePaidOrders")
-    void shouldReturnCorrectStatus_hearingFeePaid() {
+    void shouldReturnCorrectStatus_hearingFeePaid(int orderPosition, boolean isOfficerOrder) {
         CaseData caseData = fastClaim(LocalDateTime.now().minusDays(10*7));
-//        caseData = applyOrderIfPosition(position, 1, officerOrder,
-//                                        LocalDateTime.now().minusDays(6 * 7 + 2), caseData
-//        );
+        caseData = applyOrderIfPosition(1, orderPosition, isOfficerOrder,
+                                        LocalDateTime.now().minusDays(6 * 7 + 2), caseData
+        );
         caseData = scheduleHearingDays(caseData, 6 * 7 + 1);
-//        caseData = applyOrderIfPosition(position, 2, officerOrder,
-//                                        LocalDateTime.now().minusDays(6 * 7 + 2), caseData
-//        );
         caseData = requestHwF(caseData);
-//        caseData = applyOrderIfPosition(position, 3, officerOrder,
-//                                        LocalDateTime.now().minusDays(6 * 7 + 2), caseData
-//        );
         caseData = invalidHwFReferenceNumber(caseData);
-//        caseData = applyOrderIfPosition(position, 4, officerOrder,
-//                                        LocalDateTime.now().minusDays(6 * 7 + 2), caseData
-//        );
         caseData = updatedHwFReferenceNumber(caseData);
-//        caseData = applyOrderIfPosition(position, 5, officerOrder,
-//                                        LocalDateTime.now().minusDays(6 * 7 + 2), caseData
-//        );
         caseData = moreInformationRequiredHwF(caseData);
-//        caseData = applyOrderIfPosition(position, 6, officerOrder,
-//                                        LocalDateTime.now().minusDays(6 * 7 + 2), caseData
-//        );
         caseData = hwfRejected(caseData);
-//        caseData = applyOrderIfPosition(position, 7, officerOrder,
-//                                        LocalDateTime.now().minusDays(6 * 7 + 2), caseData
-//        );
         payHearingFee(caseData);
     }
 
     static Stream<Arguments> hearingFeePaidOrders() {
-        return positionAndOrderTypeArguments(7);
+        return positionAndOrderTypeArguments(1);
     }
 
     @Test

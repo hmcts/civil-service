@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -18,6 +19,7 @@ import java.util.stream.Stream;
 public abstract class CcdDashboardClaimMatcher implements Claim {
 
     protected CaseData caseData;
+    protected FeatureToggleService featureToggleService;
 
     public boolean hasClaimantAndDefendantSignedSettlementAgreement() {
         return caseData.hasApplicant1SignedSettlementAgreement() && caseData.isRespondentSignedSettlementAgreement() && !isSettled();
@@ -91,10 +93,47 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     }
 
     protected Optional<LocalDateTime> getSDOTime() {
-        return caseData.getSystemGeneratedCaseDocuments().stream()
-            .map(Element::getValue)
-            .filter(d -> d.getDocumentType() == DocumentType.SDO_ORDER)
-            .map(CaseDocument::getCreatedDatetime)
-            .max(LocalDateTime::compareTo);
+        return caseData.getSDODocument().map(d -> d.getValue().getCreatedDatetime());
+    }
+
+    @Override
+    public boolean isSDOOrderCreated() {
+        Optional<LocalDateTime> lastNonSdoOrderTime;
+        Optional<LocalDateTime> sdoTime;
+        return caseData.getHearingDate() == null
+            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+            && !isSDOOrderLegalAdviserCreated()
+            && !isSDOOrderInReview()
+            && !isSDOOrderInReviewOtherParty()
+            && !isDecisionForReconsiderationMade()
+            && (sdoTime = getSDOTime()).isPresent()
+            && ((lastNonSdoOrderTime = getTimeOfLastNonSDOOrder()).isEmpty()
+            || sdoTime.get().isAfter(lastNonSdoOrderTime.get()));
+    }
+
+    @Override
+    public boolean isSDOOrderLegalAdviserCreated() {
+        Optional<LocalDateTime> lastNonSdoOrderTime;
+        Optional<LocalDateTime> sdoTime;
+        return featureToggleService.isCaseProgressionEnabled()
+            && caseData.getHearingDate() == null
+            && isSDOMadeByLegalAdviser()
+            && !isSDOOrderInReview()
+            && !isSDOOrderInReviewOtherParty()
+            && !isDecisionForReconsiderationMade()
+            && (sdoTime = getSDOTime()).isPresent()
+            && ((lastNonSdoOrderTime = getTimeOfLastNonSDOOrder()).isEmpty()
+            || sdoTime.get().isAfter(lastNonSdoOrderTime.get()));
+    }
+
+    @Override
+    public boolean isMoreDetailsRequired() {
+        Optional<LocalDateTime> lastOrder;
+        Optional<LocalDateTime> sdoTime;
+        return (sdoTime = getSDOTime()).isPresent()
+            && isBeforeHearing()
+            && featureToggleService.isCaseProgressionEnabled()
+            && ((lastOrder = getTimeOfLastNonSDOOrder()).isEmpty()
+            || lastOrder.get().isBefore(sdoTime.get()));
     }
 }
