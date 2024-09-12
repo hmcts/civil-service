@@ -279,7 +279,6 @@ wiremock:
   imagePullPolicy: Always
   releaseNameOverride : ${SERVICE_NAME}-wiremock
   ingressHost: wiremock-${SERVICE_NAME}.preview.platform.hmcts.net
-  aadIdentityName: civil
   volumeMounts:
     - name: charts/civil-service/charts/wiremock/mocks
       mountPath: /home/wiremock
