@@ -248,6 +248,11 @@ public class DashboardNotificationsParamsMapper {
             params.put("bundleRestitchedDateCy", DateUtils.formatDateInWelsh(date.toLocalDate()));
         });
 
+        if (caseData.getGeneralAppPBADetails() != null) {
+            params.put("applicationFee",
+                       "£" + this.removeDoubleZeros(String.valueOf(MonetaryConversions.penniesToPounds(caseData.getGeneralAppPBADetails().getFee().getCalculatedAmountInPence()))));
+        }
+
         return params;
     }
 
