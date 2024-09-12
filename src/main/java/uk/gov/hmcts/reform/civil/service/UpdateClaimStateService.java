@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
+import uk.gov.hmcts.reform.civil.utils.JudgmentAdmissionUtils;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -33,6 +34,8 @@ public class UpdateClaimStateService {
             return CaseState.CASE_SETTLED.name();
         } else if (updatedData.hasApplicantNotProceededWithClaim()) {
             return CaseState.CASE_STAYED.name();
+        } else if (hasJudgmentByAdmission(updatedData, featureToggleService.isJudgmentOnlineLive())) {
+            return CaseState.All_FINAL_ORDERS_ISSUED.name();
         } else if (isProceedsInHeritageSystemAllowed(updatedData)) {
             return CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
         } else {
@@ -83,5 +86,9 @@ public class UpdateClaimStateService {
     private boolean isClaimantOrDefendantRejectMediation(CaseData caseData) {
         return (Objects.nonNull(caseData.getCaseDataLiP()) && caseData.getCaseDataLiP().hasClaimantNotAgreedToFreeMediation())
             || caseData.hasDefendantNotAgreedToFreeMediation();
+    }
+
+    private boolean hasJudgmentByAdmission(CaseData caseData, boolean judgmentOnlineLive) {
+        return judgmentOnlineLive && JudgmentAdmissionUtils.getLIPJudgmentAdmission(caseData);
     }
 }
