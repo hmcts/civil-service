@@ -737,8 +737,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     }
 
     private boolean isAwaitingAnotherDefendantResponse(CaseData caseData) {
-        return caseData.getRespondent1ClaimResponseTypeForSpec() == null
-            || caseData.getRespondent2ClaimResponseTypeForSpec() == null;
+        return caseData.getRespondent1ClaimResponseType() == null
+            || caseData.getRespondent2ClaimResponseType() == null;
     }
 
     private boolean solicitorRepresentsOnlyOneOfRespondents(CallbackParams callbackParams, CaseRole caseRole) {

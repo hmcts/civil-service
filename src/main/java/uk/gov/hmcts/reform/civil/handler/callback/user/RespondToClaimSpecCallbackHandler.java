@@ -11,22 +11,35 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.HandleDefendAllClaim;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.HandleRespondentResponseTypeForSpec;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.PopulateRespondent1Copy;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.DetermineLoggedInSolicitor;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.HandleAdmitPartOfClaim;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.SetGenericResponseTypeFlag;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.RespondToClaimSpecValidationUtils;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.SetApplicantResponseDeadline;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.SetUploadTimelineTypeFlag;
+import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.DetermineLoggedInSolicitor;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.HandleAdmitPartOfClaim;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.HandleDefendAllClaim;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.HandleRespondentResponseTypeForSpec;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.PopulateRespondent1Copy;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.SetApplicantResponseDeadline;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.SetGenericResponseTypeFlag;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.SetUploadTimelineTypeFlag;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.ValidateDateOfBirth;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.ValidateLengthOfUnemployment;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.ValidateMediationUnavailableDates;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.ValidateRespondentExperts;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.ValidateRespondentPaymentDate;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.ValidateRespondentWitnesses;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.ValidateUnavailableDates;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
+import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
+import uk.gov.hmcts.reform.civil.validation.interfaces.DefendantAddressValidator;
+import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -42,11 +55,10 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 
 @Service
 @RequiredArgsConstructor
-public class RespondToClaimSpecCallbackHandler extends CallbackHandler {
+public class RespondToClaimSpecCallbackHandler extends CallbackHandler implements DefendantAddressValidator, WitnessesValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE_SPEC);
 
-    private final RespondToClaimSpecValidationUtils validationUtils;
     private final SetGenericResponseTypeFlag setGenericResponseTypeFlag;
     private final HandleAdmitPartOfClaim handleAdmitPartOfClaim;
     private final HandleDefendAllClaim handleDefendAllClaim;
@@ -58,6 +70,15 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final List<RespondToClaimConfirmationTextSpecGenerator> confirmationTextSpecGenerators;
     private final List<RespondToClaimConfirmationHeaderSpecGenerator> confirmationHeaderGenerators;
+    private final ValidateMediationUnavailableDates validateMediationUnavailableDates;
+    private final ValidateUnavailableDates validateUnavailableDates;
+    private final ValidateDateOfBirth validateDateOfBirth;
+    private final ValidateRespondentPaymentDate validateRespondentPaymentDate;
+    private final ValidateLengthOfUnemployment validateLengthOfUnemployment;
+    private final UnavailableDateValidator unavailableDateValidator;
+    private final PostcodeValidator postcodeValidator;
+    private final ValidateRespondentWitnesses validateRespondentWitnesses;
+    private final ValidateRespondentExperts validateRespondentExperts;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -96,23 +117,23 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse validateMediationUnavailableDates(CallbackParams callbackParams) {
-        return validationUtils.validateMediationUnavailableDates(callbackParams);
+        return validateMediationUnavailableDates.execute(callbackParams);
     }
 
     private CallbackResponse validateDateOfBirth(CallbackParams callbackParams) {
-        return validationUtils.validateDateOfBirth(callbackParams);
+        return validateDateOfBirth.execute(callbackParams);
     }
 
     private CallbackResponse validateUnavailableDates(CallbackParams callbackParams) {
-        return validationUtils.validateUnavailableDates(callbackParams);
+        return validateUnavailableDates.execute(callbackParams);
     }
 
     private CallbackResponse validateRespondentExperts(CallbackParams callbackParams) {
-        return validationUtils.validateRespondentExperts(callbackParams);
+        return validateRespondentExperts.execute(callbackParams);
     }
 
     private CallbackResponse validateRespondentWitnesses(CallbackParams callbackParams) {
-        return validationUtils.validateRespondentWitnesses(callbackParams);
+        return validateRespondentWitnesses.execute(callbackParams);
     }
 
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
@@ -131,11 +152,15 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse validateRespondentPaymentDate(CallbackParams callbackParams) {
-        return validationUtils.validateRespondentPaymentDate(callbackParams);
+        return validateRespondentPaymentDate.execute(callbackParams);
     }
 
     private CallbackResponse validateCorrespondenceApplicantAddress(CallbackParams callbackParams) {
-        return validationUtils.validateCorrespondenceApplicantAddress(callbackParams);
+        if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
+            return validateCorrespondenceApplicantAddress(callbackParams, postcodeValidator);
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .build();
     }
 
     private CallbackResponse determineLoggedInSolicitor(CallbackParams callbackParams) {
@@ -155,15 +180,31 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse validateLengthOfUnemployment(CallbackParams callbackParams) {
-        return validationUtils.validateLengthOfUnemployment(callbackParams);
+        return validateLengthOfUnemployment.execute(callbackParams);
     }
 
     private CallbackResponse validateDefendant1RepaymentPlan(CallbackParams callbackParams) {
-        return validationUtils.validateDefendant1RepaymentPlan(callbackParams);
+        return validateRepaymentPlan(callbackParams.getCaseData().getRespondent1RepaymentPlan());
     }
 
     private CallbackResponse validateDefendant2RepaymentPlan(CallbackParams callbackParams) {
-        return validationUtils.validateDefendant2RepaymentPlan(callbackParams);
+        return validateRepaymentPlan(callbackParams.getCaseData().getRespondent2RepaymentPlan());
+    }
+
+    private CallbackResponse validateRepaymentPlan(RepaymentPlanLRspec repaymentPlan) {
+        List<String> errors;
+
+        if (repaymentPlan != null
+            && repaymentPlan.getFirstRepaymentDate() != null) {
+            errors = unavailableDateValidator.validateFuturePaymentDate(repaymentPlan
+                                                                            .getFirstRepaymentDate());
+        } else {
+            errors = new ArrayList<>();
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
     }
 
     private CallbackResponse setGenericResponseTypeFlag(CallbackParams callbackParams) {

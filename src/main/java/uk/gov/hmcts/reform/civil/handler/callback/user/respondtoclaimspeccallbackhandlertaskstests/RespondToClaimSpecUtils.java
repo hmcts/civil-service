@@ -1,15 +1,25 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks;
+package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
@@ -31,12 +41,18 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.Defendan
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.SOMEONE_DISPUTES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.WHEN_WILL_CLAIM_BE_PAID;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.WHY_2_DOES_NOT_PAY_IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 
 @Component
 @RequiredArgsConstructor
-public class RespondToClaimSpecUtilsDisputeDetails {
+public class RespondToClaimSpecUtils {
 
     static final String UNKNOWN_MP_SCENARIO = "Unknown mp scenario";
+
+    private final LocationReferenceDataService locationRefDataService;
+    private final UserService userService;
+    private final IStateFlowEngine stateFlowEngine;
+    private final CoreCaseUserService coreCaseUserService;
 
     /**
      * WhenWillClaimBePaid has to be shown if the respondent admits (full or part) and say they didn't pay.
@@ -188,5 +204,22 @@ public class RespondToClaimSpecUtilsDisputeDetails {
         return caseData.getShowConditionFlags().contains(respondent)
             && (response == FULL_DEFENCE
             || (response == PART_ADMISSION && !NO.equals(caseData.getRespondentResponseIsSame())));
+    }
+
+    public List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
+    }
+
+    public boolean solicitorRepresentsOnlyOneOfRespondents(CallbackParams callbackParams, CaseRole caseRole) {
+        CaseData caseData = callbackParams.getCaseData();
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+
+        return stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)
+            && coreCaseUserService.userHasCaseRole(
+            caseData.getCcdCaseReference().toString(),
+            userInfo.getUid(),
+            caseRole
+        );
     }
 }
