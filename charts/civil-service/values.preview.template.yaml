@@ -284,7 +284,7 @@ wiremock:
     tag: "2.27.2"
     pullPolicy: Always
 
-  nameOverride : ${SERVICE_NAME}-wiremock
+  releaseNameOverride : ${SERVICE_NAME}-wiremock
   ingressHost: wiremock-${SERVICE_NAME}.preview.platform.hmcts.net
 
 
