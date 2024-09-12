@@ -155,6 +155,8 @@ public interface Claim {
 
     boolean trialArrangementsSubmitted();
 
+    Optional<LocalDateTime> getTrialArrangementsSubmittedDate();
+
     default boolean isHwFHearingSubmit() {
         return false;
     }
@@ -162,4 +164,5 @@ public interface Claim {
     Optional<LocalDate> getHearingDate();
     Optional<LocalDateTime> getTimeOfLastNonSDOOrder();
     Optional<LocalDateTime> getBundleCreationDate();
+    Optional<LocalDateTime> getLastHearingFormDate();
 }

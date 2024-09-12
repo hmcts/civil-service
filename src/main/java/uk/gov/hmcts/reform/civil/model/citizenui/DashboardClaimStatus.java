@@ -108,7 +108,19 @@ public enum DashboardClaimStatus {
         Claim::isHwFHearingSubmit
     ),
     TRIAL_OR_HEARING_SCHEDULED(
-        c -> c.isHearingScheduled() && !c.isHearingLessThanDaysAway(6 * 7)
+        c -> {
+            Optional<LocalDateTime> hearingFormDate;
+            Optional<LocalDateTime> orderDate;
+            if (c.isHearingScheduled()
+                && !c.isHearingLessThanDaysAway(6 * 7)
+                && ((hearingFormDate = c.getLastHearingFormDate()).isPresent())
+            ) {
+                return ((orderDate = c.getTimeOfLastNonSDOOrder()).isEmpty()
+                    || orderDate.get().isBefore(hearingFormDate.get()));
+            } else {
+                return false;
+            }
+        }
     ),
     MORE_DETAILS_REQUIRED(
         Claim::isMoreDetailsRequired

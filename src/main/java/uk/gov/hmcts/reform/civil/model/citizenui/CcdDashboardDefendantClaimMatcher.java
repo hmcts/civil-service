@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -12,7 +15,9 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -25,8 +30,10 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     private static final LocalTime FOUR_PM = LocalTime.of(16, 1, 0);
 
-    public CcdDashboardDefendantClaimMatcher(CaseData caseData, FeatureToggleService featureToggleService) {
-        super(caseData, featureToggleService);
+    public CcdDashboardDefendantClaimMatcher(CaseData caseData,
+                                             FeatureToggleService featureToggleService,
+                                             List<CaseEventDetail> eventHistory) {
+        super(caseData, featureToggleService, eventHistory);
     }
 
     @Override
@@ -428,5 +435,17 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     @Override
     public boolean trialArrangementsSubmitted() {
         return caseData.getTrialReadyRespondent1() == YesOrNo.YES;
+    }
+
+    @Override
+    public Optional<LocalDateTime> getTrialArrangementsSubmittedDate() {
+        if (caseData.getTrialReadyApplicant() == YesOrNo.YES) {
+            return caseData.getTrialReadyDocuments().stream()
+                .filter(e -> e.getValue().getDocumentType() == DocumentType.TRIAL_READY_DOCUMENT
+                    && DocCategory.DQ_DEF1.name().equals(e.getValue().getDocumentLink().getCategoryID()))
+                .map(e -> e.getValue().getCreatedDatetime())
+                .max(LocalDateTime::compareTo);
+        }
+        return Optional.empty();
     }
 }

@@ -589,6 +589,11 @@ public class CmcClaim implements Claim {
     }
 
     @Override
+    public Optional<LocalDateTime> getTrialArrangementsSubmittedDate() {
+        return Optional.empty();
+    }
+
+    @Override
     public boolean isOrderMadeLast() {
         return false;
     }
@@ -605,6 +610,11 @@ public class CmcClaim implements Claim {
 
     @Override
     public Optional<LocalDateTime> getBundleCreationDate() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<LocalDateTime> getLastHearingFormDate() {
         return Optional.empty();
     }
 }

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import lombok.AllArgsConstructor;
+import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -21,6 +22,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
 
     protected CaseData caseData;
     protected FeatureToggleService featureToggleService;
+    protected List<CaseEventDetail> eventHistory;
 
     public boolean hasClaimantAndDefendantSignedSettlementAgreement() {
         return caseData.hasApplicant1SignedSettlementAgreement() && caseData.isRespondentSignedSettlementAgreement() && !isSettled();
@@ -161,5 +163,13 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
                 .max(LocalDateTime::compareTo);
         }
         return Optional.empty();
+    }
+
+    @Override
+    public Optional<LocalDateTime> getLastHearingFormDate() {
+        return caseData.getSystemGeneratedCaseDocuments().stream()
+            .filter(e -> e.getValue().getDocumentType() == DocumentType.HEARING_FORM)
+            .map(e -> e.getValue().getCreatedDatetime())
+            .max(LocalDateTime::compareTo);
     }
 }

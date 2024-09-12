@@ -1,8 +1,11 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -12,7 +15,9 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -26,8 +31,10 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     private static final LocalTime FOUR_PM = LocalTime.of(16, 1, 0);
 
-    public CcdDashboardClaimantClaimMatcher(CaseData caseData, FeatureToggleService featureToggleService) {
-        super(caseData, featureToggleService);
+    public CcdDashboardClaimantClaimMatcher(CaseData caseData,
+                                            FeatureToggleService featureToggleService,
+                                            List<CaseEventDetail> eventHistory) {
+        super(caseData, featureToggleService, eventHistory);
     }
 
     @Override
@@ -305,9 +312,6 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     }
 
 
-
-
-
     @Override
     public boolean isSDOOrderInReview() {
         return featureToggleService.isCaseProgressionEnabled()
@@ -450,6 +454,18 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     @Override
     public boolean trialArrangementsSubmitted() {
         return caseData.getTrialReadyApplicant() == YesOrNo.YES;
+    }
+
+    @Override
+    public Optional<LocalDateTime> getTrialArrangementsSubmittedDate() {
+        if (caseData.getTrialReadyApplicant() == YesOrNo.YES) {
+            return caseData.getTrialReadyDocuments().stream()
+                .filter(e -> e.getValue().getDocumentType() == DocumentType.TRIAL_READY_DOCUMENT
+                    && DocCategory.DQ_APP1.name().equals(e.getValue().getDocumentLink().getCategoryID()))
+                .map(e -> e.getValue().getCreatedDatetime())
+                .max(LocalDateTime::compareTo);
+        }
+        return Optional.empty();
     }
 
     @Override
