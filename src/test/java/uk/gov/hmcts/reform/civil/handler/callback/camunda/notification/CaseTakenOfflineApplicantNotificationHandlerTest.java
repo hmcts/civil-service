@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import static org.mockito.Mockito.verify;
@@ -41,13 +42,9 @@ class CaseTakenOfflineApplicantNotificationHandlerTest extends BaseCallbackHandl
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn("template-id");
-        }
-
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked() {
+            when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn("template-id");
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -56,6 +53,26 @@ class CaseTakenOfflineApplicantNotificationHandlerTest extends BaseCallbackHandl
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
                 "template-id",
+                getNotificationDataMap(caseData),
+                "case-taken-offline-applicant-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldUseApplicantNotRespondedTemplate_when1v1SpecBothPartiesRepresented() {
+            when(notificationsProperties.getSolicitorCaseTakenOfflineNoApplicantResponse()).thenReturn("template-id2");
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified().build().toBuilder()
+                .applicant1ResponseDeadline(LocalDateTime.now())
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "applicantsolicitor@example.com",
+                "template-id2",
                 getNotificationDataMap(caseData),
                 "case-taken-offline-applicant-notification-000DC001"
             );
