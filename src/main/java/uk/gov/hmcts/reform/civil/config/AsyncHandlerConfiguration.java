@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.config;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.reform.civil.request.SimpleRequestData;
 import javax.annotation.Nonnull;
 import java.util.concurrent.Executor;
 
+@Slf4j
 @Configuration
 @EnableAsync
 @RequiredArgsConstructor
@@ -45,10 +47,14 @@ public class AsyncHandlerConfiguration implements AsyncConfigurer {
 
         @Override
         public Runnable decorate(@Nonnull Runnable task) {
-            SimpleRequestData requestData = new SimpleRequestData(context.getBean(RequestData.class));
-
             return () -> {
-                RequestDataCache.add(requestData);
+                try {
+                    SimpleRequestData requestData = new SimpleRequestData(context.getBean(RequestData.class));
+                    RequestDataCache.add(requestData);
+                } catch (IllegalStateException e) {
+                    log.debug("Request data not provided. Skipping adding to request cache.");
+                }
+
                 try {
                     task.run();
                 } finally {
