@@ -1,5 +1,11 @@
 apiVersion: v2
-
+description: A helm chart for wiremock
 name: wiremock
 version: 0.1.97
 appVersion: "2.27.2"
+
+
+dependencies:
+  - name: library
+    version: 2.2.1
+    repository: https://hmctspublic.azurecr.io/helm/v1/repo/
