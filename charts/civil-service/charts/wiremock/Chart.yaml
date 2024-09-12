@@ -1,7 +1,7 @@
 apiVersion: v2
 description: A helm chart for wiremock
 name: wiremock
-version: 0.1.97
+version: 0.2.5
 appVersion: "2.27.2"
 
 
