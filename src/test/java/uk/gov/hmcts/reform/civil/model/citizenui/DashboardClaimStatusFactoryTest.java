@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,45 +57,130 @@ public class DashboardClaimStatusFactoryTest {
     }
 
     @ParameterizedTest
-    @MethodSource("hearingFeePaidOrders")
+    @MethodSource("hearingFeePaidArguments")
     void shouldReturnCorrectStatus_hearingFeePaid(int orderPosition, boolean isOfficerOrder) {
-        CaseData caseData = fastClaim(LocalDateTime.now().minusDays(10*7));
+        CaseData caseData = fastClaim(LocalDateTime.now().minusDays(10 * 7));
         caseData = applyOrderIfPosition(1, orderPosition, isOfficerOrder,
                                         LocalDateTime.now().minusDays(6 * 7 + 2), caseData
         );
         caseData = scheduleHearingDays(caseData, 6 * 7 + 1);
+        // TODO we need to know the date of HEARING_SCHEDULED event to compare with last order
+//        caseData = applyOrderIfPosition(2, orderPosition, isOfficerOrder,
+//                                        LocalDateTime.now().minusDays(6 * 7), caseData
+//        );
         caseData = requestHwF(caseData);
+        // TODO we need to know the date of HEARING_SCHEDULED event to compare with last order, because defendant still has it
+//        caseData = applyOrderIfPosition(3, orderPosition, isOfficerOrder,
+//                                        LocalDateTime.now().minusDays(6 * 7 -1), caseData
+//        );
         caseData = invalidHwFReferenceNumber(caseData);
+        // TODO we need to know the date of HEARING_SCHEDULED event to compare with last order, because defendant still has it
+//        caseData = applyOrderIfPosition(4, orderPosition, isOfficerOrder,
+//                                        LocalDateTime.now().minusDays(6 * 7 - 2), caseData
+//        );
         caseData = updatedHwFReferenceNumber(caseData);
+        // TODO we need to know the date of HEARING_SCHEDULED event to compare with last order, because defendant still has it
+//        caseData = applyOrderIfPosition(5, orderPosition, isOfficerOrder,
+//                                        LocalDateTime.now().minusDays(6 * 7 - 3), caseData
+//        );
         caseData = moreInformationRequiredHwF(caseData);
+        // TODO we need to know the date of HEARING_SCHEDULED event to compare with last order, because defendant still has it
+//        caseData = applyOrderIfPosition(6, orderPosition, isOfficerOrder,
+//                                        LocalDateTime.now().minusDays(6 * 7 - 4), caseData
+//        );
         caseData = hwfRejected(caseData);
-        payHearingFee(caseData);
+        // TODO we need to know the date of HEARING_SCHEDULED event to compare with last order, because defendant still has it
+//        caseData = applyOrderIfPosition(7, orderPosition, isOfficerOrder,
+//                                        LocalDateTime.now().minusDays(6 * 7 - 5), caseData
+//        );
+        caseData = payHearingFee(caseData);
+        // TODO we don't have the date of payment, or I could not find it
+//        applyOrderIfPosition(8, orderPosition, isOfficerOrder,
+//                                        LocalDateTime.now().minusDays(6 * 7 - 6), caseData
+//        );
     }
 
-    static Stream<Arguments> hearingFeePaidOrders() {
-        return positionAndOrderTypeArguments(1);
+    static Stream<Arguments> hearingFeePaidArguments() {
+        return positionAndOrderTypeArguments(8);
     }
 
-    @Test
-    void shouldReturnCorrectStatus_awaitingJudgment() {
-        CaseData caseData = fastClaim(LocalDateTime.now().minusDays(10*7));
+    @ParameterizedTest
+    @MethodSource("awaitingJudgmentArguments")
+    void shouldReturnCorrectStatus_awaitingJudgment(int orderPosition, boolean isOfficerOrder) {
+        CaseData caseData = fastClaim(LocalDateTime.now().minusDays(10 * 7));
+        caseData = applyOrderIfPosition(1, orderPosition, isOfficerOrder,
+                                        LocalDateTime.now().minusDays(10 * 7 - 1), caseData
+        );
         caseData = scheduleHearingDays(caseData, 6 * 7 + 1);
+        // TODO we need to know the date of HEARING_SCHEDULED event to compare with last order, because defendant still has it
+//        caseData = applyOrderIfPosition(2, orderPosition, isOfficerOrder,
+//                                        LocalDateTime.now().minusDays(6 * 7), caseData
+//        );
         caseData = requestHwF(caseData);
+        // TODO we need to know the date of HEARING_SCHEDULED event to compare with last order, because defendant still has it
+//        caseData = applyOrderIfPosition(3, orderPosition, isOfficerOrder,
+//                                        LocalDateTime.now().minusDays(6 * 7 - 1), caseData
+//        );
         caseData = hwfFull(caseData);
+        // TODO we need to know the date of HEARING_SCHEDULED event to compare with last order, because defendant still has it
+//        caseData = applyOrderIfPosition(4, orderPosition, isOfficerOrder,
+//                                        LocalDateTime.now().minusDays(6 * 7 - 2), caseData
+//        );
         caseData = scheduleHearingDays(caseData, 6 * 7);
+        caseData = applyOrderIfPosition(5, orderPosition, isOfficerOrder,
+                                        caseData.getHearingDate()
+                                            .atTime(LocalTime.now())
+                                            .minusDays(6 * 7 - 1), caseData
+        );
         caseData = submitClaimantHearingArrangements(caseData);
+//        caseData = applyOrderIfPosition(6, orderPosition, isOfficerOrder,
+//                                        caseData.getHearingDate()
+//                                            .atTime(LocalTime.now())
+//                                            .minusDays(6 * 7 - 2), caseData
+//        );
         caseData = submitDefendantHearingArrangements(caseData);
+//        caseData = applyOrderIfPosition(7, orderPosition, isOfficerOrder,
+//                                        caseData.getHearingDate()
+//                                            .atTime(LocalTime.now())
+//                                            .minusDays(6 * 7 - 3), caseData
+//        );
         caseData = scheduleHearingDays(caseData, 3 * 7);
+//        caseData = applyOrderIfPosition(8, orderPosition, isOfficerOrder,
+//                                        caseData.getHearingDate()
+//                                            .atTime(LocalTime.now())
+//                                            .minusDays(6 * 7 - 4), caseData
+//        );
         awaitingJudgment(caseData);
     }
 
-    @Test
-    void shouldReturnCorrectStatus_feeNotPaid() {
-        CaseData caseData = smallClaim(LocalDateTime.now().minusDays(10*7));
+    static Stream<Arguments> awaitingJudgmentArguments() {
+        return positionAndOrderTypeArguments(8);
+    }
+
+    @ParameterizedTest
+    @MethodSource("feeNotPaidArguments")
+    void shouldReturnCorrectStatus_feeNotPaid(int orderPosition, boolean isOfficerOrder) {
+        CaseData caseData = smallClaim(LocalDateTime.now().minusDays(10 * 7));
+        caseData = applyOrderIfPosition(1, orderPosition, isOfficerOrder,
+                                        LocalDateTime.now().minusDays(10 * 7 - 1), caseData
+        );
         caseData = scheduleHearingDays(caseData, 6 * 7 + 1);
+        caseData = applyOrderIfPosition(2, orderPosition, isOfficerOrder,
+                                        LocalDateTime.now().minusDays(6 * 7), caseData
+        );
         caseData = requestHwF(caseData);
+        caseData = applyOrderIfPosition(3, orderPosition, isOfficerOrder,
+                                        LocalDateTime.now().minusDays(6 * 7 - 1), caseData
+        );
         caseData = hwfPartial(caseData);
+        caseData = applyOrderIfPosition(4, orderPosition, isOfficerOrder,
+                                        LocalDateTime.now().minusDays(6 * 7 - 2), caseData
+        );
         doNotPayHearingFee(caseData);
+    }
+
+    static Stream<Arguments> feeNotPaidArguments() {
+        return positionAndOrderTypeArguments(8);
     }
 
     /**
@@ -535,6 +621,11 @@ public class DashboardClaimStatusFactoryTest {
      * @return updated caseData
      */
     private CaseData generateDirectionOrder(CaseData previous, LocalDateTime created) {
+        if (previous.getCcdState() != CaseState.CASE_PROGRESSION
+            && previous.getCcdState() != CaseState.All_FINAL_ORDERS_ISSUED) {
+            // GENERATE_DIRECTIONS_ORDER does not change state, and ORDER_MADE requires one of those states
+            return previous;
+        }
         List<Element<CaseDocument>> orderList = Optional.ofNullable(
             previous.getFinalOrderDocumentCollection()).orElseGet(ArrayList::new);
         int daysDelta = -orderList.stream().map(e -> e.getValue().getCreatedDatetime())

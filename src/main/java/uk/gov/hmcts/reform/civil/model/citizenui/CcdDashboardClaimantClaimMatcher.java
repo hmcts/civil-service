@@ -447,12 +447,6 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     }
 
     @Override
-    public boolean isHearingLessThanDaysAway(int i) {
-        return caseData.getHearingDate() != null
-            && LocalDate.now().plusDays(i + 1).isAfter(caseData.getHearingDate());
-    }
-
-    @Override
     public boolean isHearingBundleCreated() {
         return caseData.getHearingDate() != null && caseData.getCaseBundles().stream()
             .anyMatch(b -> b.getValue().getBundleHearingDate()

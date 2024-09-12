@@ -2,6 +2,9 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import lombok.Getter;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 public enum DashboardClaimStatus {
@@ -46,14 +49,29 @@ public enum DashboardClaimStatus {
         Claim::isAwaitingJudgment
     ),
     BUNDLE_CREATED(
-        c -> c.isHearingScheduled() && c.isHearingLessThanDaysAway(3*7) && c.isHearingBundleCreated()
+        c -> c.isHearingScheduled() && c.isHearingLessThanDaysAway(3 * 7) && c.isHearingBundleCreated()
     ),
     TRIAL_ARRANGEMENTS_SUBMITTED(
         Claim::trialArrangementsSubmitted
     ),
     TRIAL_ARRANGEMENTS_REQUIRED(
-        // same day amount than TRIAL_OR_HEARING_SCHEDULED
-        c -> c.isHearingScheduled() && c.isHearingLessThanDaysAway(6*7)
+        c -> {
+            // same day amount than TRIAL_OR_HEARING_SCHEDULED
+            int dayLimit = 6*7;
+            Optional<LocalDate> hearingDate = c.getHearingDate();
+            if (hearingDate.isPresent()
+                && LocalDate.now().plusDays(dayLimit + 1).isAfter(hearingDate.get())) {
+                Optional<LocalDateTime> lastOrder = c.getTimeOfLastNonSDOOrder();
+                if (lastOrder.isPresent()) {
+                    LocalDate trigger = hearingDate.get().minusDays(dayLimit);
+                    return trigger.isAfter(lastOrder.get().toLocalDate());
+                } else {
+                    return true;
+                }
+            } else {
+                return false;
+            }
+        }
     ),
     CLAIMANT_HWF_NO_REMISSION(
         Claim::isHwfNoRemission
@@ -80,7 +98,7 @@ public enum DashboardClaimStatus {
         Claim::isHwFHearingSubmit
     ),
     TRIAL_OR_HEARING_SCHEDULED(
-        c -> c.isHearingScheduled() && !c.isHearingLessThanDaysAway(6*7)
+        c -> c.isHearingScheduled() && !c.isHearingLessThanDaysAway(6 * 7)
     ),
     MORE_DETAILS_REQUIRED(
         Claim::isMoreDetailsRequired

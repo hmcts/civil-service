@@ -1,5 +1,9 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 public interface Claim {
 
     boolean hasResponsePending();
@@ -162,4 +166,6 @@ public interface Claim {
         return false;
     }
     boolean isOrderMadeLast();
+    Optional<LocalDate> getHearingDate();
+    Optional<LocalDateTime> getTimeOfLastNonSDOOrder();
 }

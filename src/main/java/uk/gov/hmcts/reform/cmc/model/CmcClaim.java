@@ -597,4 +597,14 @@ public class CmcClaim implements Claim {
     public boolean isOrderMadeLast() {
         return false;
     }
+
+    @Override
+    public Optional<LocalDate> getHearingDate() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<LocalDateTime> getTimeOfLastNonSDOOrder() {
+        return Optional.empty();
+    }
 }

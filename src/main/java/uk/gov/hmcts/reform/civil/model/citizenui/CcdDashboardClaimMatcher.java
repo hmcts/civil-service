@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -83,7 +84,8 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
         );
     }
 
-    protected Optional<LocalDateTime> getTimeOfLastNonSDOOrder() {
+    @Override
+    public Optional<LocalDateTime> getTimeOfLastNonSDOOrder() {
         return Stream.concat(
                 Stream.ofNullable(caseData.getPreviewCourtOfficerOrder()),
                 caseData.getFinalOrderDocumentCollection().stream()
@@ -135,5 +137,16 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
             && featureToggleService.isCaseProgressionEnabled()
             && ((lastOrder = getTimeOfLastNonSDOOrder()).isEmpty()
             || lastOrder.get().isBefore(sdoTime.get()));
+    }
+
+    @Override
+    public boolean isHearingLessThanDaysAway(int i) {
+        return caseData.getHearingDate() != null
+            && LocalDate.now().plusDays(i + 1).isAfter(caseData.getHearingDate());
+    }
+
+    @Override
+    public Optional<LocalDate> getHearingDate() {
+        return Optional.ofNullable(caseData.getHearingDate());
     }
 }
