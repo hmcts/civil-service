@@ -279,5 +279,8 @@ wiremock:
   imagePullPolicy: Always
   releaseNameOverride : ${SERVICE_NAME}-wiremock
   ingressHost: wiremock-${SERVICE_NAME}.preview.platform.hmcts.net
+  volumeMounts:
+    - name: wiremock-mocks
+      mountPath: /home/wiremock
 
 
