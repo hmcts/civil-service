@@ -16,7 +16,8 @@ spec:
   template:
     metadata:
       labels:
-        app: {{ .Chart.Name }}
+        app: {{ include "wiremock.name" . }}
+        release: {{ .Release.Name | quote }}
     spec:
       containers:
         - name: wiremock
