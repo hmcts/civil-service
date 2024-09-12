@@ -579,11 +579,6 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public boolean isHearingBundleCreated() {
-        return false;
-    }
-
-    @Override
     public boolean isAwaitingJudgment() {
         return false;
     }
@@ -605,6 +600,11 @@ public class CmcClaim implements Claim {
 
     @Override
     public Optional<LocalDateTime> getTimeOfLastNonSDOOrder() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<LocalDateTime> getBundleCreationDate() {
         return Optional.empty();
     }
 }

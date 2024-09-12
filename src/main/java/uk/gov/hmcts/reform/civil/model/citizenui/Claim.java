@@ -151,13 +151,6 @@ public interface Claim {
      */
     boolean isHearingLessThanDaysAway(int i);
 
-    /**
-     * Hearing Bundle is one particular bundle.
-     *
-     * @return true if claim has the hearing bundle created.
-     */
-    boolean isHearingBundleCreated();
-
     boolean isAwaitingJudgment();
 
     boolean trialArrangementsSubmitted();
@@ -168,4 +161,5 @@ public interface Claim {
     boolean isOrderMadeLast();
     Optional<LocalDate> getHearingDate();
     Optional<LocalDateTime> getTimeOfLastNonSDOOrder();
+    Optional<LocalDateTime> getBundleCreationDate();
 }

@@ -420,14 +420,6 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         return caseData.getHearingDate() != null;
     }
 
-
-    @Override
-    public boolean isHearingBundleCreated() {
-        return caseData.getHearingDate() != null && caseData.getCaseBundles().stream()
-            .anyMatch(b -> b.getValue().getBundleHearingDate()
-                .map(d -> caseData.getHearingDate().equals(d)).orElse(Boolean.FALSE));
-    }
-
     @Override
     public boolean isAwaitingJudgment() {
         return caseData.getCcdState() == CaseState.DECISION_OUTCOME;

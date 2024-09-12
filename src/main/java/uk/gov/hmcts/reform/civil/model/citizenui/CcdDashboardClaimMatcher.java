@@ -149,4 +149,17 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     public Optional<LocalDate> getHearingDate() {
         return Optional.ofNullable(caseData.getHearingDate());
     }
+
+    @Override
+    public Optional<LocalDateTime> getBundleCreationDate() {
+        if (caseData.getHearingDate() != null) {
+            return caseData.getCaseBundles().stream()
+                .filter(b -> b.getValue().getCreatedOn().isPresent()
+                    && b.getValue().getBundleHearingDate()
+                    .map(d -> caseData.getHearingDate().equals(d)).orElse(Boolean.FALSE))
+                .map(d -> d.getValue().getCreatedOn().orElse(null))
+                .max(LocalDateTime::compareTo);
+        }
+        return Optional.empty();
+    }
 }

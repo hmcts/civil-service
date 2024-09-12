@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.math.BigDecimal;
@@ -28,6 +29,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class DashboardClaimStatusFactoryTest {
@@ -94,7 +96,7 @@ public class DashboardClaimStatusFactoryTest {
 //                                        LocalDateTime.now().minusDays(6 * 7 - 5), caseData
 //        );
         caseData = payHearingFee(caseData);
-        // TODO we don't have the date of payment, or I could not find it
+        // TODO we need to know the date of CITIZEN_HEARING_FEE_PAYMENT event
 //        applyOrderIfPosition(8, orderPosition, isOfficerOrder,
 //                                        LocalDateTime.now().minusDays(6 * 7 - 6), caseData
 //        );
@@ -133,22 +135,25 @@ public class DashboardClaimStatusFactoryTest {
                                             .minusDays(6 * 7 - 1), caseData
         );
         caseData = submitClaimantHearingArrangements(caseData);
+        // TODO can't because we don-t know when TRIAL_READINESS happened
 //        caseData = applyOrderIfPosition(6, orderPosition, isOfficerOrder,
 //                                        caseData.getHearingDate()
 //                                            .atTime(LocalTime.now())
 //                                            .minusDays(6 * 7 - 2), caseData
 //        );
         caseData = submitDefendantHearingArrangements(caseData);
+        // TODO can't because we don-t know when TRIAL_READINESS happened
 //        caseData = applyOrderIfPosition(7, orderPosition, isOfficerOrder,
 //                                        caseData.getHearingDate()
 //                                            .atTime(LocalTime.now())
 //                                            .minusDays(6 * 7 - 3), caseData
 //        );
         caseData = scheduleHearingDays(caseData, 3 * 7);
+        // TODO can't because we don-t know when TRIAL_READINESS happened
 //        caseData = applyOrderIfPosition(8, orderPosition, isOfficerOrder,
 //                                        caseData.getHearingDate()
-//                                            .atTime(LocalTime.now())
-//                                            .minusDays(6 * 7 - 4), caseData
+//                                            .atTime(LocalTime.now().plusHours(1))
+//                                            .minusDays(3 * 7 - 1), caseData
 //        );
         awaitingJudgment(caseData);
     }
@@ -180,7 +185,7 @@ public class DashboardClaimStatusFactoryTest {
     }
 
     static Stream<Arguments> feeNotPaidArguments() {
-        return positionAndOrderTypeArguments(8);
+        return positionAndOrderTypeArguments(4);
     }
 
     /**
@@ -234,10 +239,54 @@ public class DashboardClaimStatusFactoryTest {
         return caseData;
     }
 
+    private CaseData.CaseDataBuilder<?, ?> updateDocumentDates(CaseData previous, int deltaDays) {
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = previous.toBuilder();
+
+        return caseDataBuilder;
+    }
+
     private CaseData scheduleHearingDays(CaseData previous, int days) {
         LocalDate hearingDate = LocalDate.now().plusDays(days);
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = previous.toBuilder()
-            .hearingDate(hearingDate);
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder;
+        if (previous.getHearingDate() != null) {
+            // to pretend time has passed, we have to modify the dates of the relevant documents
+            caseDataBuilder = previous.toBuilder()
+                .caseBundles(
+                    previous.getCaseBundles().stream()
+                        .map(idValue ->
+                                 new IdValue<>(
+                                     idValue.getId(),
+                                     idValue.getValue().toBuilder()
+                                         .createdOn(Optional.of(
+                                             hearingDate
+                                                 .minusDays(3 * 7)
+                                                 .atTime(LocalTime.now())))
+                                         .bundleHearingDate(Optional.of(hearingDate))
+                                         .build()
+                                 )
+                        ).collect(Collectors.toList()));
+            int deltaDays = (int) (-Math.abs(ChronoUnit.DAYS.between(hearingDate, previous.getHearingDate())));
+            List<Element<CaseDocument>> updatedDocuments = previous.getFinalOrderDocumentCollection().stream()
+                .map(e -> Element.<CaseDocument>builder()
+                    .id(e.getId())
+                    .value(e.getValue().toBuilder()
+                               .createdDatetime(e.getValue().getCreatedDatetime().plusDays(deltaDays))
+                               .build())
+                    .build())
+                .collect(Collectors.toList());
+            caseDataBuilder.finalOrderDocumentCollection(updatedDocuments);
+            if (previous.getPreviewCourtOfficerOrder() != null) {
+                caseDataBuilder.previewCourtOfficerOrder(
+                    previous.getPreviewCourtOfficerOrder().toBuilder()
+                        .createdDatetime(previous.getPreviewCourtOfficerOrder().getCreatedDatetime()
+                                             .plusDays(deltaDays))
+                        .build()
+                );
+            }
+        } else {
+            caseDataBuilder = previous.toBuilder();
+        }
+        caseDataBuilder.hearingDate(hearingDate);
         DashboardClaimStatus expectedStatus;
         if (days > 6 * 7) {
             expectedStatus = DashboardClaimStatus.TRIAL_OR_HEARING_SCHEDULED;
@@ -246,6 +295,9 @@ public class DashboardClaimStatusFactoryTest {
                 "bundle1",
                 Bundle.builder()
                     .bundleHearingDate(Optional.of(hearingDate))
+                    .createdOn(Optional.of(hearingDate
+                                               .minusDays(3 * 7)
+                                               .atTime(LocalTime.now())))
                     .build()
             )));
             expectedStatus = DashboardClaimStatus.BUNDLE_CREATED;

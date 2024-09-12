@@ -49,7 +49,17 @@ public enum DashboardClaimStatus {
         Claim::isAwaitingJudgment
     ),
     BUNDLE_CREATED(
-        c -> c.isHearingScheduled() && c.isHearingLessThanDaysAway(3 * 7) && c.isHearingBundleCreated()
+        c -> {
+            Optional<LocalDateTime> bundleDate;
+            Optional<LocalDateTime> lastOrderDate;
+            return c.isHearingScheduled()
+                && c.isHearingLessThanDaysAway(3 * 7)
+                && (bundleDate = c.getBundleCreationDate()).isPresent()
+                && (
+                (lastOrderDate = c.getTimeOfLastNonSDOOrder()).isEmpty()
+                    || lastOrderDate.get().isBefore(bundleDate.get())
+            );
+        }
     ),
     TRIAL_ARRANGEMENTS_SUBMITTED(
         Claim::trialArrangementsSubmitted
@@ -57,7 +67,7 @@ public enum DashboardClaimStatus {
     TRIAL_ARRANGEMENTS_REQUIRED(
         c -> {
             // same day amount than TRIAL_OR_HEARING_SCHEDULED
-            int dayLimit = 6*7;
+            int dayLimit = 6 * 7;
             Optional<LocalDate> hearingDate = c.getHearingDate();
             if (hearingDate.isPresent()
                 && LocalDate.now().plusDays(dayLimit + 1).isAfter(hearingDate.get())) {

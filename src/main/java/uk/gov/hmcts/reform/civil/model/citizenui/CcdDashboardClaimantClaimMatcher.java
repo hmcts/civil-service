@@ -2,20 +2,16 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
 import java.util.Optional;
@@ -444,13 +440,6 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     @Override
     public boolean isHearingScheduled() {
         return caseData.getHearingDate() != null;
-    }
-
-    @Override
-    public boolean isHearingBundleCreated() {
-        return caseData.getHearingDate() != null && caseData.getCaseBundles().stream()
-            .anyMatch(b -> b.getValue().getBundleHearingDate()
-                .map(d -> caseData.getHearingDate().equals(d)).orElse(Boolean.FALSE));
     }
 
     @Override
