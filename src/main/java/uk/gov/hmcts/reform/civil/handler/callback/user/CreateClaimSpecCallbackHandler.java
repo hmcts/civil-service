@@ -11,37 +11,26 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.Callback;
-import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
-import uk.gov.hmcts.reform.civil.enums.CaseCategory;
-import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.CalculateFeeTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.CalculateSpecFeeTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.CalculateTotalClaimAmountTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.GetAirlineListTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.SpecValidateClaimInterestDateTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.SpecValidateClaimTimelineDateTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.SubmitClaimTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.ValidateClaimantDetailsTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.ValidateRespondentDetailsTask;
 import uk.gov.hmcts.reform.civil.model.Address;
-import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.CaseManagementCategory;
-import uk.gov.hmcts.reform.civil.model.CaseManagementCategoryElement;
-import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
-import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.PaymentDetails;
-import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
-import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
-import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
-import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.AirlineEpimsDataLoader;
@@ -57,8 +46,6 @@ import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecServi
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
-import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
-import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.OrgPolicyValidator;
 import uk.gov.hmcts.reform.civil.validation.PartyValidator;
@@ -74,29 +61,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
-import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
-import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseName;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 
 @Slf4j
 @Service
@@ -192,6 +168,15 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final AirlineEpimsDataLoader airlineEpimsDataLoader;
     private final AirlineEpimsService airlineEpimsService;
     private final PartyValidator partyValidator;
+    private final ValidateClaimantDetailsTask validateClaimantDetailsTask;
+    private final SubmitClaimTask submitClaimTask;
+    private final SpecValidateClaimInterestDateTask specValidateClaimInterestDateTask;
+    private final SpecValidateClaimTimelineDateTask specValidateClaimTimelineDateTask;
+    private final CalculateFeeTask calculateFeeTask;
+    private final CalculateTotalClaimAmountTask calculateTotalClaimAmountTask;
+    private final CalculateSpecFeeTask calculateSpecFeeTask;
+    private final GetAirlineListTask getAirlineListTask;
+    private final ValidateRespondentDetailsTask validateRespondentDetailsTask;
 
     @Value("${court-location.specified-claim.region-id}")
     private String regionId;
@@ -273,27 +258,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     private CallbackResponse validateClaimantDetails(CallbackParams callbackParams,
                                                      Function<CaseData, Party> getApplicant) {
-        CaseData caseData = callbackParams.getCaseData();
-        Party applicant = getApplicant.apply(caseData);
-        List<String> errors = dateOfBirthValidator.validate(applicant);
-        if (featureToggleService.isJudgmentOnlineLive()) {
-            if (applicant.getPrimaryAddress() != null) {
-                partyValidator.validateAddress(applicant.getPrimaryAddress(), errors);
-            }
-            partyValidator.validateName(applicant.getPartyName(), errors);
-        }
-
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        if (errors.isEmpty() && callbackParams.getRequest().getEventId() != null) {
-            errors = postcodeValidator.validate(
-                applicant.getPrimaryAddress().getPostCode());
-        }
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .data(errors.isEmpty()
-                      ? caseDataBuilder.build().toMap(objectMapper) : null)
-            .build();
+        validateClaimantDetailsTask.setGetApplicant(getApplicant);
+        return validateClaimantDetailsTask.validateClaimantDetails(callbackParams.getCaseData(), callbackParams.getRequest().getEventId());
     }
 
     private CallbackResponse validateApplicantSolicitorOrgPolicy(CallbackParams callbackParams) {
@@ -318,36 +284,11 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private CallbackResponse specValidateClaimInterestDate(CallbackParams callbackParams) {
-        if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
-            CaseData caseData = callbackParams.getCaseData();
-            List<String> errors = new ArrayList<>();
-            if (caseData.getInterestFromSpecificDate() != null && caseData.getInterestFromSpecificDate().isAfter(LocalDate.now())) {
-                errors.add("Correct the date. You can’t use a future date.");
-            }
-
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(errors)
-                .build();
-        }
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .build();
+        return specValidateClaimInterestDateTask.specValidateClaimInterestDate(callbackParams.getCaseData(), callbackParams.getRequest().getEventId());
     }
 
     private CallbackResponse specValidateClaimTimelineDate(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        List<String> errors = new ArrayList<>();
-        if (caseData.getTimelineOfEvents() != null) {
-            List<TimelineOfEvents> timelineOfEvent = caseData.getTimelineOfEvents();
-            timelineOfEvent.forEach(timelineOfEvents -> {
-                if (timelineOfEvents.getValue().getTimelineDate().isAfter(LocalDate.now())) {
-                    errors.add("Correct the date. You can’t use a future date.");
-                }
-            });
-        }
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
+        return specValidateClaimTimelineDateTask.specValidateClaimTimelineDateTask(callbackParams.getCaseData());
     }
 
     private CallbackResponse validateRespondentSolicitor2OrgPolicy(CallbackParams callbackParams) {
@@ -362,26 +303,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private CallbackResponse calculateFee(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
-        String reference = references.map(SolicitorReferences::getApplicantSolicitor1Reference).orElse("");
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-
-        Optional<PaymentDetails> paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails());
-        String customerReference = paymentDetails.map(PaymentDetails::getCustomerReference).orElse(reference);
-        PaymentDetails updatedDetails = PaymentDetails.builder().customerReference(customerReference).build();
-        caseDataBuilder.claimIssuedPaymentDetails(updatedDetails);
-        caseDataBuilder.paymentTypePBASpec("PBAv3");
-        List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
-
-        caseDataBuilder.claimFee(feesService
-                                     .getFeeDataByClaimValue(caseData.getClaimValue()))
-            .applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
-            .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
+        return calculateFeeTask.calculateFees(
+            callbackParams.getCaseData(),
+            callbackParams.getParams().get(BEARER_TOKEN).toString()
+        );
     }
 
     private CallbackResponse getIdamEmail(CallbackParams callbackParams) {
@@ -420,12 +345,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .build();
     }
 
-    private List<String> getPbaAccounts(String authToken) {
-        return organisationService.findOrganisation(authToken)
-            .map(Organisation::getPaymentAccount)
-            .orElse(emptyList());
-    }
-
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
@@ -441,192 +360,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        CaseData.CaseDataBuilder<?, ?> dataBuilder = getSharedData(callbackParams);
-
-        // moving statement of truth value to correct field, this was not possible in mid event.
-        // resetting statement of truth to make sure it's empty the next time it appears in the UI.
-        StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-        dataBuilder.uiStatementOfTruth(StatementOfTruth.builder().build());
-        dataBuilder.applicantSolicitor1ClaimStatementOfTruth(statementOfTruth);
-        if (callbackParams.getRequest().getEventId() != null) {
-            var respondent1Represented = caseData.getSpecRespondent1Represented();
-            dataBuilder.respondent1Represented(respondent1Represented);
-            var respondent2Represented = caseData.getSpecRespondent2Represented();
-            dataBuilder.respondent2Represented(respondent2Represented);
-        }
-
-        addOrgPolicy2ForSameLegalRepresentative(dataBuilder.build(), dataBuilder);
-
-        if (isPinInPostCaseMatched(caseData)) {
-            dataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
-        }
-
-        dataBuilder
-            .caseManagementLocation(CaseLocationCivil.builder().region(regionId).baseLocation(epimmsId).build())
-            .respondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build())
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM);
-
-        if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            dataBuilder.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2().toBuilder().flags(null).build());
-        }
-
-        dataBuilder.caseAccessCategory(CaseCategory.SPEC_CLAIM);
-        dataBuilder.featureToggleWA(toggleConfiguration.getFeatureToggle());
-
-        //assign case management category to the case and caseNameHMCTSinternal
-        dataBuilder.caseNameHmctsInternal(buildCaseName(caseData));
-        dataBuilder.caseNamePublic(buildCaseName(caseData));
-
-        CaseManagementCategoryElement civil =
-            CaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
-        List<Element<CaseManagementCategoryElement>> itemList = new ArrayList<>();
-        itemList.add(element(civil));
-        dataBuilder.caseManagementCategory(
-            CaseManagementCategory.builder().value(civil).list_items(itemList).build());
-        log.info("Case management equals: " + caseData.getCaseManagementCategory());
-        log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
-
-        OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
-
-        caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM_SPEC, dataBuilder);
-
-        CaseData temporaryCaseData = dataBuilder.build();
-
-        if (temporaryCaseData.getRespondent1OrgRegistered() == YES
-            && temporaryCaseData.getRespondent1Represented() == YES
-            && temporaryCaseData.getRespondent2SameLegalRepresentative() == YES) {
-            // Predicate: Def1 registered, Def 2 unregistered.
-            // This is required to ensure mutual exclusion in 1v2 same solicitor case.
-            dataBuilder
-                .respondent2OrgRegistered(YES)
-                .respondentSolicitor2EmailAddress(caseData.getRespondentSolicitor1EmailAddress());
-            Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
-            references.ifPresent(ref -> {
-                SolicitorReferences updatedSolicitorReferences = SolicitorReferences.builder()
-                    .applicantSolicitor1Reference(ref.getApplicantSolicitor1Reference())
-                    .respondentSolicitor1Reference(ref.getRespondentSolicitor1Reference())
-                    .respondentSolicitor2Reference(ref.getRespondentSolicitor1Reference())
-                    .build();
-                dataBuilder.solicitorReferences(updatedSolicitorReferences);
-            });
-            dataBuilder
-                .respondentSolicitor2ServiceAddressRequired(caseData.getRespondentSolicitor1ServiceAddressRequired());
-            dataBuilder.respondentSolicitor2ServiceAddress(caseData.getRespondentSolicitor1ServiceAddress());
-        } else if (temporaryCaseData.getRespondent1OrgRegistered() == NO
-            && temporaryCaseData.getRespondent1Represented() == YES
-            && temporaryCaseData.getRespondent2SameLegalRepresentative() == YES) {
-            dataBuilder
-                .respondent2OrgRegistered(NO)
-                .respondentSolicitor2EmailAddress(caseData.getRespondentSolicitor1EmailAddress());
-            Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
-            references.ifPresent(ref -> {
-                SolicitorReferences updatedSolicitorReferences = SolicitorReferences.builder()
-                    .applicantSolicitor1Reference(ref.getApplicantSolicitor1Reference())
-                    .respondentSolicitor1Reference(ref.getRespondentSolicitor1Reference())
-                    .respondentSolicitor2Reference(ref.getRespondentSolicitor1Reference())
-                    .build();
-                dataBuilder.solicitorReferences(updatedSolicitorReferences);
-            });
-            dataBuilder
-                .respondentSolicitor2ServiceAddressRequired(caseData.getRespondentSolicitor1ServiceAddressRequired());
-            dataBuilder.respondentSolicitor2ServiceAddress(caseData.getRespondentSolicitor1ServiceAddress());
-            dataBuilder.respondentSolicitor2OrganisationDetails(caseData.getRespondentSolicitor1OrganisationDetails());
-        }
-
-        if (toggleService.isHmcEnabled()) {
-            populateWithPartyIds(dataBuilder);
-        }
-
-        if (caseData.getSdtRequestIdFromSdt() != null) {
-            // assign StdRequestId, to ensure duplicate requests from SDT/bulk claims are not processed
-            List<Element<String>> stdRequestIdList = new ArrayList<>();
-            stdRequestIdList.add(element(caseData.getSdtRequestIdFromSdt()));
-            dataBuilder.sdtRequestId(stdRequestIdList);
-            BigDecimal bulkInterest = interestCalculator.calculateBulkInterest(caseData);
-            if (!bulkInterest.equals(BigDecimal.ZERO)) {
-                dataBuilder.interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST);
-            }
-            dataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(bulkInterest)));
-            //PBA manual selection
-            List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
-            dataBuilder.applicantSolicitor1PbaAccounts(DynamicList.builder()
-                                                           .value(DynamicListElement.builder()
-                                                                      .label(pbaNumbers.get(0))
-                                                                      .build()).build());
-        }
-
-        List<String> errors = new ArrayList<>();
-        if (getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP
-            && caseData.getSpecRespondentCorrespondenceAddressdetails() != null) {
-            // to keep with heading tab
-            dataBuilder
-                .specRespondent2CorrespondenceAddressRequired(
-                    caseData.getSpecRespondentCorrespondenceAddressRequired())
-                .specRespondent2CorrespondenceAddressdetails(
-                    caseData.getSpecRespondentCorrespondenceAddressdetails());
-        }
-
-        if (toggleService.isSdoR2Enabled() && callbackParams.getCaseData().getIsFlightDelayClaim() != null && callbackParams.getCaseData().getIsFlightDelayClaim().equals(YES)) {
-            FlightDelayDetails flightDelayDetails = callbackParams.getCaseData().getFlightDelayDetails();
-            String selectedAirlineCode = flightDelayDetails.getAirlineList().getValue().getCode();
-            dataBuilder.claimType(ClaimType.FLIGHT_DELAY)
-                .flightDelayDetails(FlightDelayDetails.builder()
-                                        .airlineList(DynamicList.builder().value(flightDelayDetails.getAirlineList().getValue()).build())
-                                        .nameOfAirline(flightDelayDetails.getNameOfAirline())
-                                        .flightNumber(flightDelayDetails.getFlightNumber())
-                                        .scheduledDate(flightDelayDetails.getScheduledDate())
-                                        .flightCourtLocation(getAirlineCaseLocation(selectedAirlineCode, callbackParams))
-                                        .build());
-        }
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .data(dataBuilder.build().toMap(objectMapper))
-            .build();
-    }
-
-    private void addOrgPolicy2ForSameLegalRepresentative(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
-        if (caseData.getRespondent2SameLegalRepresentative() == YES) {
-            OrganisationPolicy.OrganisationPolicyBuilder organisationPolicy2Builder = OrganisationPolicy.builder();
-
-            OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
-            if (respondent1OrganisationPolicy != null) {
-                organisationPolicy2Builder.organisation(respondent1OrganisationPolicy.getOrganisation())
-                    .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
-                    .build();
-            }
-            organisationPolicy2Builder.orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName());
-            caseDataBuilder.respondent2OrganisationPolicy(organisationPolicy2Builder.build());
-        }
-    }
-
-    private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        IdamUserDetails.IdamUserDetailsBuilder idam = IdamUserDetails.builder().id(userDetails.getId());
-        CorrectEmail applicantSolicitor1CheckEmail = caseData.getApplicantSolicitor1CheckEmail();
-        CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
-
-        if (applicantSolicitor1CheckEmail != null && applicantSolicitor1CheckEmail.isCorrect()) {
-            dataBuilder.applicantSolicitor1UserDetails(idam.email(applicantSolicitor1CheckEmail.getEmail()).build());
-        } else {
-            IdamUserDetails applicantSolicitor1UserDetails = caseData.getApplicantSolicitor1UserDetails();
-            dataBuilder.applicantSolicitor1UserDetails(idam.email(applicantSolicitor1UserDetails.getEmail()).build());
-        }
-
-        dataBuilder.submittedDate(time.now());
-
-        if (null != callbackParams.getRequest().getEventId()) {
-            dataBuilder.legacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
-            dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST_CLAIM));
-        }
-
-        //set check email field to null for GDPR
-        dataBuilder.applicantSolicitor1CheckEmail(CorrectEmail.builder().build());
-        return dataBuilder;
+        return submitClaimTask.submitClaim(callbackParams.getCaseData(), callbackParams.getRequest().getEventId(),
+                                           callbackParams.getParams().get(BEARER_TOKEN).toString(),
+                                           callbackParams.getCaseData().getIsFlightDelayClaim(),
+                                           callbackParams.getCaseData().getFlightDelayDetails());
     }
 
     //--------v1 callback overloaded, return to single param
@@ -695,20 +432,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     private CallbackResponse validateRespondentDetails(CallbackParams callbackParams,
                                                      Function<CaseData, Party> getRespondent) {
-        CaseData caseData = callbackParams.getCaseData();
-        Party respondent = getRespondent.apply(caseData);
-        List<String> errors = postcodeValidator.validate(respondent.getPrimaryAddress().getPostCode());
-        if (featureToggleService.isJudgmentOnlineLive()) {
-            if (respondent.getPrimaryAddress() != null) {
-                partyValidator.validateAddress(respondent.getPrimaryAddress(), errors);
-            }
-            partyValidator.validateName(respondent.getPartyName(), errors);
-        }
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .data(errors.isEmpty()
-                      ? caseData.toBuilder().build().toMap(objectMapper) : null)
-            .build();
+        validateRespondentDetailsTask.setGetRespondent(getRespondent);
+        return validateRespondentDetailsTask.validateRespondentDetails(callbackParams.getCaseData());
     }
 
     private CallbackResponse validateRespondentSolicitorAddress(CallbackParams callbackParams) {
@@ -753,49 +478,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     //calculate total amount for specified claim by adding up the claim break up amounts
     private CallbackResponse calculateTotalClaimAmount(CallbackParams callbackParams) {
-
-        CaseData caseData = callbackParams.getCaseData();
-
-        BigDecimal totalClaimAmount = new BigDecimal(0);
-
-        List<ClaimAmountBreakup> claimAmountBreakups = caseData.getClaimAmountBreakup();
-
-        String totalAmount = " | Description | Amount | \n |---|---| \n | ";
-        StringBuilder stringBuilder = new StringBuilder();
-        for (ClaimAmountBreakup claimAmountBreakup : claimAmountBreakups) {
-            totalClaimAmount =
-                totalClaimAmount.add(claimAmountBreakup.getValue().getClaimAmount());
-
-            stringBuilder.append(claimAmountBreakup.getValue().getClaimReason())
-                .append(" | ")
-                .append("£ ")
-                .append(MonetaryConversions.penniesToPounds(claimAmountBreakup.getValue().getClaimAmount()))
-                .append(" |\n ");
-        }
-        totalAmount = totalAmount.concat(stringBuilder.toString());
-
-        List<String> errors = new ArrayList<>();
-        if (!toggleService.isMultiOrIntermediateTrackEnabled(caseData)
-            && MonetaryConversions.penniesToPounds(totalClaimAmount).doubleValue() > 25000) {
-            errors.add("Total Claim Amount cannot exceed £ 25,000");
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(errors)
-                .build();
-        }
-
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-
-        caseDataBuilder.totalClaimAmount(
-            MonetaryConversions.penniesToPounds(totalClaimAmount));
-
-        totalAmount = totalAmount.concat(" | **Total** | £ " + MonetaryConversions
-            .penniesToPounds(totalClaimAmount) + " | ");
-
-        caseDataBuilder.claimAmountBreakupSummaryObject(totalAmount);
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
+        return calculateTotalClaimAmountTask.calculateTotalClaimAmount(callbackParams.getCaseData());
     }
 
     //calculate interest for specified claim
@@ -833,27 +516,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     //calculate fee for specified claim
     private CallbackResponse calculateSpecFee(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
-        String reference = references.map(SolicitorReferences::getApplicantSolicitor1Reference).orElse("");
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-
-        Optional<PaymentDetails> paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails());
-        String customerReference = paymentDetails.map(PaymentDetails::getCustomerReference).orElse(reference);
-        PaymentDetails updatedDetails = PaymentDetails.builder().customerReference(customerReference).build();
-        caseDataBuilder.claimIssuedPaymentDetails(updatedDetails);
-
-        BigDecimal interest = interestCalculator.calculateInterest(caseData);
-        caseDataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(interest)));
-        caseDataBuilder.paymentTypePBASpec("PBAv3");
-        List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        caseDataBuilder.applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
-            .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO)
-            .totalInterest(interest);
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
+        return calculateSpecFeeTask.calculateSpecFee(callbackParams.getCaseData(), callbackParams.getParams().get(BEARER_TOKEN).toString());
     }
 
     private String getSpecHeader() {
@@ -896,27 +559,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private CallbackResponse getAirlineList(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
-        if (toggleService.isSdoR2Enabled()) {
-            List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>(airlineEpimsDataLoader.getAirlineEpimsIDList());
-            DynamicList airlineList = DynamicList
-                .fromList(
-                    airlineEpimsIDList.stream()
-                        .map(AirlineEpimsId::getAirline).toList(),
-                    Object::toString,
-                    Object::toString,
-                    null,
-                    false
-                );
-            DynamicList dropdownAirlineList = DynamicList.builder()
-                .listItems(airlineList.getListItems()).build();
-
-            FlightDelayDetails flightDelayDetails = FlightDelayDetails.builder().airlineList(dropdownAirlineList).build();
-            caseDataBuilder.flightDelayDetails(flightDelayDetails);
-        }
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
+        return getAirlineListTask.getAirlineList(callbackParams.getCaseData());
     }
 
     private CallbackResponse validateFlightDelayDate(CallbackParams callbackParams) {
@@ -961,26 +604,5 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             || caseData.getRespondent1OrgRegistered() == NO
             || caseData.getRespondent2Represented() == NO
             || caseData.getRespondent2OrgRegistered() == NO);
-    }
-
-    private CaseLocationCivil getAirlineCaseLocation(String airline, CallbackParams callbackParams) {
-        if (airline.equals("OTHER")) {
-            return null;
-        }
-        String locationEpimmsId = airlineEpimsService.getEpimsIdForAirline(airline);
-        List<LocationRefData> locations = fetchLocationData(callbackParams);
-        var matchedLocations =  locations.stream().filter(loc -> loc.getEpimmsId().equals(locationEpimmsId)).toList();
-        if (matchedLocations.isEmpty()) {
-            throw new CallbackException(String.format(LOCATION_NOT_FOUND_MESSAGE, locationEpimmsId));
-        } else {
-            return CaseLocationCivil.builder()
-                .region(matchedLocations.get(0).getRegionId())
-                .baseLocation(matchedLocations.get(0).getEpimmsId()).build();
-        }
-    }
-
-    private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }
 }

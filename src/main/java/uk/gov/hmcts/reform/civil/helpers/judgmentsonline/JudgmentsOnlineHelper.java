@@ -192,15 +192,19 @@ public class JudgmentsOnlineHelper {
 
         RoboticsAddress roboticsAddress = addressMapper.toRoboticsAddress(newAddress);
         return JudgmentAddress.builder()
-            .defendantAddressLine1(roboticsAddress.getAddressLine1())
-            .defendantAddressLine2(roboticsAddress.getAddressLine2())
-            .defendantAddressLine3(roboticsAddress.getAddressLine3())
-            .defendantAddressLine4(roboticsAddress.getAddressLine4())
-            .defendantAddressLine5(roboticsAddress.getAddressLine5())
+            .defendantAddressLine1(trimDownTo35(roboticsAddress.getAddressLine1()))
+            .defendantAddressLine2(trimDownTo35(roboticsAddress.getAddressLine2()))
+            .defendantAddressLine3(trimDownTo35(roboticsAddress.getAddressLine3()))
+            .defendantAddressLine4(trimDownTo35(roboticsAddress.getAddressLine4()))
+            .defendantAddressLine5(trimDownTo35(roboticsAddress.getAddressLine5()))
             .defendantPostCode(roboticsAddress.getPostCode()).build();
     }
 
     public static String removeWelshCharacters(String input) {
         return input != null ? input.replaceAll(regex, "") : input;
+    }
+
+    private static String trimDownTo35(String input) {
+        return input != null && input.length() > 35 ? input.substring(0, 35) : input;
     }
 }
