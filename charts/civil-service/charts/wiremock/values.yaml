@@ -1,0 +1,90 @@
+---
+nameOverride: ""
+fullnameOverride: ""
+
+applicationPort: 4550
+imagePullPolicy: IfNotPresent
+replicas: 1
+registerAdditionalDns:
+  enabled: false
+memoryRequests: '1024Mi'
+cpuRequests: '250m'
+memoryLimits: '2048Mi'
+cpuLimits: '1500m'
+devmemoryRequests: '512Mi'
+devcpuRequests: '250m'
+devmemoryLimits: '1024Mi'
+devcpuLimits: '2500m'
+readinessPath: '/health/readiness'
+readinessDelay: 0
+readinessTimeout: 3
+readinessPeriod: 15
+livenessPath: '/health/liveness'
+livenessDelay: 0
+livenessTimeout: 3
+livenessPeriod: 15
+livenessFailureThreshold: 3
+startupPath: '/health/liveness'
+startupDelay: 10
+startupTimeout: 3
+startupPeriod: 10
+startupFailureThreshold: 20
+saEnabled: true
+spotInstances:
+  enabled: false
+devApplicationInsightsInstrumentKeyName: AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY
+devApplicationInsightsInstrumentKey: '00000000-0000-0000-0000-000000000000'
+useInterpodAntiAffinity: true
+ingressClass: traefik
+disableTraefikTls: true
+# WARNING: ingressSessionAffinity is a temporary option.
+# This is subject to removal without notice. Do NOT use for any reason!
+ingressSessionAffinity:
+  enabled: false
+  sessionCookieName: sticky
+dnsConfig:
+  ndots: "3"
+  singleRequestTcp: false
+pdb:
+  enabled: true
+  maxUnavailable: 50%
+
+## Postgres chart configuration
+## https://github.com/helm/charts/blob/master/stable/postgresql/values.yaml
+
+
+global:
+  enableKeyVaults: false
+  devMode: false
+  smoketestscron:
+    enabled: true
+  functionaltestscron:
+    enabled: true
+prometheus:
+  enabled: false
+  path: /prometheus
+
+testsConfig:
+  memoryRequests: '256Mi'
+  cpuRequests: '100m'
+  memoryLimits: '2048Mi'
+  cpuLimits: '1000m'
+  serviceAccountName: tests-service-account
+
+
+# HPA - example
+# autoscaling:
+#  enabled: true
+#  maxReplicas: 5
+#  minReplicas: 2
+#  targetCPUUtilizationPercentage: 80
+
+autoscaling:
+  enabled: true
+  cpu:
+    enabled: true
+    averageUtilization: 80
+  memory:
+    enabled: true
+    averageUtilization: 80
+useWorkloadIdentity: true
