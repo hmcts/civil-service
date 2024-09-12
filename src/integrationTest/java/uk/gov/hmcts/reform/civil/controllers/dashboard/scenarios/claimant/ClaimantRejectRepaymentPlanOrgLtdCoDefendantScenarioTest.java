@@ -83,6 +83,7 @@ public class ClaimantRejectRepaymentPlanOrgLtdCoDefendantScenarioTest extends Da
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
+            .applicant1Represented(YesOrNo.NO)
             .respondent1(Party.builder()
                              .companyName("Org one")
                              .type(Party.Type.ORGANISATION).build())
