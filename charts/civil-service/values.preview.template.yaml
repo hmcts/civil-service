@@ -274,13 +274,9 @@ aac-manage-case-assignment:
 
 wiremock:
   enabled: true
-  wiremock:
-    devcpuRequests: "100m"
-    devmemoryRequests: "256Mi"
-    devmemoryLimits: "256Mi"
-    image: "wiremock/wiremock"
-    imagePullPolicy: Always
-    releaseNameOverride : ${SERVICE_NAME}-wiremock
-    ingressHost: wiremock-${SERVICE_NAME}.preview.platform.hmcts.net
+  image: "wiremock/wiremock"
+  imagePullPolicy: Always
+  releaseNameOverride : ${SERVICE_NAME}-wiremock
+  ingressHost: wiremock-${SERVICE_NAME}.preview.platform.hmcts.net
 
 
