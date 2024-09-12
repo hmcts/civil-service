@@ -275,6 +275,7 @@ aac-manage-case-assignment:
 wiremock:
   enabled: true
   image: "wiremock/wiremock"
+  applicationPort: 8080
   imagePullPolicy: Always
   releaseNameOverride : ${SERVICE_NAME}-wiremock
   ingressHost: wiremock-${SERVICE_NAME}.preview.platform.hmcts.net
