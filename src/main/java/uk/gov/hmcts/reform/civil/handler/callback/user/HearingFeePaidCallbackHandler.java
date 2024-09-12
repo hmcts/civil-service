@@ -17,13 +17,15 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_PAID;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_HEARING_FEE_DUE;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 
 @Service
 @RequiredArgsConstructor
 public class HearingFeePaidCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(HEARING_FEE_PAID);
+    // If case is paid for, or if case has no fee due, case moves to PREPARE_FOR_HEARING_CONDUCT_HEARING
+    private static final List<CaseEvent> EVENTS = List.of(HEARING_FEE_PAID, NO_HEARING_FEE_DUE);
 
     private final ObjectMapper mapper;
     private final Time time;
