@@ -33,6 +33,7 @@ public class PartAdmitAcceptedClaimantScenarioTest extends DashboardBaseIntegrat
 
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck()
             .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
+            .respondent1Represented(YesOrNo.NO)
             .applicant1AcceptPartAdmitPaymentPlanSpec(null)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(500))
