@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
+import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
+import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -78,7 +80,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
 
         return HearingForm.builder()
             .courtName(caseManagementLocationDetails.getExternalShortName())
-            .listingOrRelisting(caseData.getListingOrRelisting().toString())
+            .listingOrRelistingWithFeeDue(listingOrRelistingWithFeeDue(caseData))
             .court(caseData.getHearingLocation().getValue().getLabel())
             .caseNumber(caseData.getCcdCaseReference().toString())
             .creationDate(getDateFormatted(LocalDate.now()))
@@ -106,6 +108,15 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
             .defendant2Reference(checkReference(caseData)
                                      ? caseData.getSolicitorReferences().getRespondentSolicitor2Reference() : null)
             .build();
+    }
+
+    public String listingOrRelistingWithFeeDue(CaseData caseData) {
+        if (caseData.getListingOrRelisting().equals(ListingOrRelisting.RELISTING)
+            && caseData.getHearingFeePaymentDetails() != null
+            && caseData.getHearingFeePaymentDetails().getStatus().equals(PaymentStatus.SUCCESS)) {
+            return "DO_NOT_SHOW";
+        }
+        return "SHOW";
     }
 
     private String getFileName(CaseData caseData, DocmosisTemplates template) {
