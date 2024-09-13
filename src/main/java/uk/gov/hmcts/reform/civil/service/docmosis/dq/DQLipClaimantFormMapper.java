@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.HearingSupportLip;
 import uk.gov.hmcts.reform.civil.model.docmosis.FixedRecoverableCostsSection;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DocumentsToBeConsideredSection;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.HearingLipSupportRequirements;
+import uk.gov.hmcts.reform.civil.model.docmosis.dq.LipExtraDQEvidenceConfirmDetails;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfElectronicDocuments;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfNonElectronicDocuments;
 
@@ -25,6 +26,11 @@ public class DQLipClaimantFormMapper extends DQLipFormMapper {
             .map(CaseDataLiP::getApplicant1LiPResponse)
             .map(ClaimantLiPResponse::getApplicant1DQHearingSupportLip);
         return toHearingSupportRequirementsList(hearingLipSupportRequirements);
+    }
+
+    @Override
+    protected LipExtraDQEvidenceConfirmDetails toEvidenceConfirmDetails(Optional<CaseDataLiP> caseDataLiPOptional) {
+        return null;
     }
 
     @Override
