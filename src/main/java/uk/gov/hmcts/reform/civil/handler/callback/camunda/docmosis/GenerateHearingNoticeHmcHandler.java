@@ -104,13 +104,7 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
                 .build()
         );
 
-        String claimTrack = null;
-
-        if (caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
-            claimTrack = caseData.getAllocatedTrack().name();
-        } else if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
-            claimTrack = caseData.getResponseClaimTrack();
-        }
+        String claimTrack = determineClaimTrack(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder
@@ -151,6 +145,15 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
             locationRefDataService);
         if (hearingLocation != null) {
             return LocationReferenceDataService.getDisplayEntry(hearingLocation);
+        }
+        return null;
+    }
+
+    private String determineClaimTrack(CaseData caseData) {
+        if (caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
+            return caseData.getAllocatedTrack().name();
+        } else if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
+            return caseData.getResponseClaimTrack();
         }
         return null;
     }
