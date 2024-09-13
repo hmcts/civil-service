@@ -468,10 +468,10 @@ public class PartyUtils {
         builder
             .applicantExperts(appendWithNewPartyIds(caseData.getApplicantExperts()))
             .respondent1Experts(appendWithNewPartyIds(caseData.getRespondent1Experts()))
-            .respondent2Experts(appendWithNewPartyIds(caseData.getRespondent1Experts()))
+            .respondent2Experts(appendWithNewPartyIds(caseData.getRespondent2Experts()))
             .applicantWitnesses(appendWithNewPartyIds(caseData.getApplicantWitnesses()))
             .respondent1Witnesses(appendWithNewPartyIds(caseData.getRespondent1Witnesses()))
-            .respondent2Witnesses(appendWithNewPartyIds(caseData.getRespondent1Witnesses()));
+            .respondent2Witnesses(appendWithNewPartyIds(caseData.getRespondent2Witnesses()));
     }
 
     @SuppressWarnings("unchecked")
