@@ -39,6 +39,7 @@ public class ClaimSettledScenarioTest extends DashboardBaseIntegrationTest {
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
+            .applicant1Represented(YesOrNo.NO)
             .caseDataLiP(caseDataLiP)
             .respondent1ClaimResponseTestForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
