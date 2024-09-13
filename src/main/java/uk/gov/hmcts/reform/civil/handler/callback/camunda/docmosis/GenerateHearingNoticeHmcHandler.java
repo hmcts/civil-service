@@ -112,7 +112,6 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
             claimTrack = caseData.getResponseClaimTrack();
         }
 
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder
                       .hearingDate(hearingStartDate.toLocalDate())
