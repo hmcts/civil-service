@@ -23,8 +23,7 @@ public class MediationScenarioTest extends DashboardBaseIntegrationTest {
 
         String caseId = "4123456789";
         CaseData caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
-        caseData = caseData.toBuilder().ccdState(CaseState.IN_MEDIATION).ccdCaseReference(Long.valueOf(caseId)).respondent1Represented(
-            YesOrNo.NO).build();
+        caseData = caseData.toBuilder().ccdState(CaseState.IN_MEDIATION).ccdCaseReference(Long.valueOf(caseId)).applicant1Represented(YesOrNo.NO).build();
 
         // When
         handler.handle(callbackParams(caseData));
