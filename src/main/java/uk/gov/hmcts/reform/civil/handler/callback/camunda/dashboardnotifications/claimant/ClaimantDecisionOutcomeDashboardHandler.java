@@ -10,9 +10,11 @@ import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_DASHBOARD_TASK_LIST_CLAIMANT_DECISION_OUTCOME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_DECISION_OUTCOME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_TRIAL_READY_DECISION_OUTCOME;
 
 @Service
 public class ClaimantDecisionOutcomeDashboardHandler extends CaseProgressionDashboardCallbackHandler {
@@ -43,7 +45,8 @@ public class ClaimantDecisionOutcomeDashboardHandler extends CaseProgressionDash
 
     @Override
     public String getScenario(CaseData caseData) {
-        return SCENARIO_AAA6_CLAIMANT_DECISION_OUTCOME.getScenario();
+        return caseData.getResponseClaimTrack().equals("SMALL_CLAIM") || Objects.nonNull(caseData.getTrialReadyApplicant())
+            ? SCENARIO_AAA6_CLAIMANT_TRIAL_READY_DECISION_OUTCOME.getScenario() : SCENARIO_AAA6_CLAIMANT_DECISION_OUTCOME.getScenario();
     }
 
 }
