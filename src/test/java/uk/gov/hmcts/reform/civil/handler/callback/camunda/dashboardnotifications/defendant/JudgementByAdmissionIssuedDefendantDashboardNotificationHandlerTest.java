@@ -174,7 +174,7 @@ class JudgementByAdmissionIssuedDefendantDashboardNotificationHandlerTest extend
     }
 
     @Test
-    public void shouldCreateDashboardNotifications_WhenLipvsLipIndividualOrSoleTraderWithJoIssued() {
+    void shouldCreateDashboardNotifications_WhenLipvsLipIndividualOrSoleTraderWithJoIssued() {
         params.put("ccdCaseReference", "123");
 
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
@@ -183,7 +183,8 @@ class JudgementByAdmissionIssuedDefendantDashboardNotificationHandlerTest extend
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
-            .respondent1Represented(YesOrNo.YES)
+            .respondent1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.NO)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.YES)
             .defendantDetailsSpec(DynamicList.builder()
@@ -202,7 +203,7 @@ class JudgementByAdmissionIssuedDefendantDashboardNotificationHandlerTest extend
             .build();
 
         handler.handle(callbackParams);
-        verify(dashboardApiClient, times(0)).recordScenario(
+        verify(dashboardApiClient, times(1)).recordScenario(
             caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA6_JUDGEMENTS_ONLINE_ISSUED_CCJ_DEFENDANT.getScenario(),
             "BEARER_TOKEN",
@@ -211,7 +212,7 @@ class JudgementByAdmissionIssuedDefendantDashboardNotificationHandlerTest extend
     }
 
     @Test
-    public void shouldCreateDashboardNotifications_WhenLipvsLipCompanyOrOrganisationWithRepaymentPlanAccepted() {
+    void shouldCreateDashboardNotifications_WhenLipvsLipCompanyOrOrganisationWithRepaymentPlanAccepted() {
         params.put("ccdCaseReference", "123");
 
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
@@ -220,7 +221,8 @@ class JudgementByAdmissionIssuedDefendantDashboardNotificationHandlerTest extend
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
-            .respondent1Represented(YesOrNo.YES)
+            .respondent1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.NO)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.YES)
             .defendantDetailsSpec(DynamicList.builder()
@@ -239,7 +241,7 @@ class JudgementByAdmissionIssuedDefendantDashboardNotificationHandlerTest extend
             .build();
 
         handler.handle(callbackParams);
-        verify(dashboardApiClient, times(0)).recordScenario(
+        verify(dashboardApiClient, times(1)).recordScenario(
             caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA6_JUDGEMENTS_ONLINE_ISSUED_CCJ_DEFENDANT.getScenario(),
             "BEARER_TOKEN",
