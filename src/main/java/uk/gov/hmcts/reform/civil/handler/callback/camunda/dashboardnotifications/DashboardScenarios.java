@@ -189,7 +189,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CP_BUNDLE_UPDATED_CLAIMANT("Scenario.AAA6.CP.Bundle.Updated.Claimant"),
     SCENARIO_AAA6_CP_BUNDLE_UPDATED_DEFENDANT("Scenario.AAA6.CP.Bundle.Updated.Defendant"),
     SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST("Scenario.AAA6.DefendantNoticeOfChange.Claimant.HearingFee.TaskList"),
-    SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_TRIAL_ARRANGEMENTS_TASK_LIST("Scenario.AAA6.DefendantNoticeOfChange.Claimant.Trial.Arrangements.TaskList");
+    SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_TRIAL_ARRANGEMENTS_TASK_LIST("Scenario.AAA6.DefendantNoticeOfChange.Claimant.Trial.Arrangements.TaskList"),
+    SCENARIO_AAA6_JUDGMENTS_ONLINE_ISSUED_CCJ_CLAIMANT("Scenario.AAA6.JudgmentsOnline.IssuedCCJ.Claimant"),;
 
     private final String scenario;
 
