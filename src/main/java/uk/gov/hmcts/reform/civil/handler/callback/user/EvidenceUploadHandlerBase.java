@@ -80,6 +80,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     private final FeatureToggleService featureToggleService;
 
     private static final String SPACE = " ";
+    private static final String HYPHEN = "-";
     private static final String END = ".";
     private static final String DATE_FORMAT = "dd-MM-yyyy";
 
@@ -420,14 +421,27 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                              "Invalid date: \"Documentary evidence for trial\" "
                                  + "date entered must not be in the future (10).");
 
-        checkDateCorrectness(time, errors, bundleEvidence, date -> date.getValue()
+        checkDateCorrectnessFuture(time, errors, bundleEvidence, date -> date.getValue()
                                  .getDocumentIssuedDate(),
                              "Invalid date: \"Bundle Hearing date\" "
-                                 + "date entered must not be in the future (11).");
+                                 + "date entered must not be in the past (11).");
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
+    }
+
+    <T> void checkDateCorrectnessFuture(Time time, List<String> errors, List<Element<T>> documentUpload,
+                                  Function<Element<T>, LocalDate> dateExtractor, String errorMessage) {
+        if (documentUpload == null) {
+            return;
+        }
+        documentUpload.forEach(date -> {
+            LocalDate dateToCheck = dateExtractor.apply(date);
+            if (dateToCheck.isBefore(time.now().toLocalDate())) {
+                errors.add(errorMessage);
+            }
+        });
     }
 
     <T> void checkDateCorrectness(Time time, List<String> errors, List<Element<T>> documentUpload,
@@ -548,7 +562,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             UploadEvidenceDocumentType type = (UploadEvidenceDocumentType) x.getValue();
             String ext = FilenameUtils.getExtension(type.getDocumentUpload().getDocumentFileName());
             String newName = type.getDocumentIssuedDate().format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK))
-                + SPACE
+                + HYPHEN
                 + type.getBundleName()
                 + END + ext;
             type.getDocumentUpload().setDocumentFileName(newName);

@@ -430,7 +430,6 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         "documentIssuedDate,documentForDisclosureRes",
         "documentIssuedDate,documentReferredInStatementRes",
         "documentIssuedDate,documentEvidenceForTrialRes",
-        "documentIssuedDate,bundleEvidence",
     })
     void shouldNotReturnError_whenDocumentTypeUploadDatePastOneRespondent(String dateField, String collectionField) {
         // Given
@@ -486,8 +485,6 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             + " date entered must not be in the future (1).",
         "documentIssuedDate,documentReferredInStatementRes, Invalid date: \"Documents referred to in the statement\""
             + " date entered must not be in the future (5).",
-        "documentIssuedDate,bundleEvidence, Invalid date: \"Bundle Hearing date\""
-            + " date entered must not be in the future (11).",
     })
     void shouldReturnError_whenDocumentTypeUploadDateFutureOneRespondent(String dateField, String collectionField,
                                                             String expectedErrorMessage) {
@@ -508,6 +505,28 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
         // Then
         assertThat(response.getErrors()).contains(expectedErrorMessage);
+    }
+
+    @Test
+    void shouldReturnError_whenBundleUploadDatePast() {
+        var documentUpload = UploadEvidenceDocumentType.builder()
+            .documentIssuedDate(LocalDate.of(2022, 2, 10))
+            .bundleName("test")
+            .documentUpload(Document.builder().build()).build();
+        List<Element<UploadEvidenceDocumentType>> documentList = new ArrayList<>();
+        documentList.add(Element.<UploadEvidenceDocumentType>builder().value(documentUpload).build());
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .addRespondent2(NO)
+            .caseTypeFlag("do_not_show")
+            .bundleEvidence(documentList)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        // Then
+        assertThat(response.getErrors()).contains("Invalid date: \"Bundle Hearing date\" date entered must not be in the past (11).");
     }
 
     @ParameterizedTest
@@ -1525,7 +1544,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         assertThat(updatedData.getDocumentEvidenceForTrialRes().get(0).getValue()
                 .getDocumentUpload().getDocumentFileName()).isEqualTo("Documentary Evidence typeForTrial 10-02-2023.pdf");
         assertThat(updatedData.getBundleEvidence().get(0).getValue()
-                       .getDocumentUpload().getDocumentFileName()).isEqualTo("10-02-2023 Bundle.pdf");
+                       .getDocumentUpload().getDocumentFileName()).isEqualTo("10-02-2023-Bundle.pdf");
         assertThat(updatedData.getDocumentDisclosureListRes().get(0).getValue()
                 .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
         assertThat(updatedData.getDocumentCaseSummaryRes().get(0).getValue()
@@ -1663,7 +1682,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         assertThat(updatedData.getDocumentEvidenceForTrialRes2().get(0).getValue()
                 .getDocumentUpload().getDocumentFileName()).isEqualTo("Documentary Evidence typeForTrial 10-02-2023.pdf");
         assertThat(updatedData.getBundleEvidence().get(0).getValue()
-                       .getDocumentUpload().getDocumentFileName()).isEqualTo("10-02-2023 Bundle.pdf");
+                       .getDocumentUpload().getDocumentFileName()).isEqualTo("10-02-2023-Bundle.pdf");
         assertThat(updatedData.getDocumentDisclosureListRes2().get(0).getValue()
                 .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
         assertThat(updatedData.getDocumentCaseSummaryRes2().get(0).getValue()

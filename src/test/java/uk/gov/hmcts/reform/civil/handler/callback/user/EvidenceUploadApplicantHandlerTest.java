@@ -276,9 +276,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         "documentIssuedDate,documentReferredInStatement, Invalid date: \"Documents referred to in the statement\""
             + " date entered must not be in the future (5).",
         "documentIssuedDate,documentEvidenceForTrial, Invalid date: \"Documentary evidence for trial\""
-            + " date entered must not be in the future (10).",
-        "documentIssuedDate,bundleEvidence, Invalid date: \"Bundle Hearing date\""
-            + " date entered must not be in the future (11).",
+            + " date entered must not be in the future (10)."
     })
     void shouldReturnError_whenDocumentTypeUploadDateFuture(String dateField, String collectionField,
                                                             String expectedErrorMessage) {
@@ -299,6 +297,26 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getErrors()).contains(expectedErrorMessage);
     }
 
+    @Test
+    void shouldReturnError_whenBundleUploadDatePast() {
+        var documentUpload = UploadEvidenceDocumentType.builder()
+            .documentIssuedDate(LocalDate.of(2022, 2, 10))
+            .bundleName("test")
+            .documentUpload(Document.builder().build()).build();
+        List<Element<UploadEvidenceDocumentType>> documentList = new ArrayList<>();
+        documentList.add(Element.<UploadEvidenceDocumentType>builder().value(documentUpload).build());
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .bundleEvidence(documentList)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        // Then
+        assertThat(response.getErrors()).contains("Invalid date: \"Bundle Hearing date\" date entered must not be in the past (11).");
+    }
+
     @ParameterizedTest
     @CsvSource({
         "documentIssuedDate,documentForDisclosureApp2, Invalid date: \"Documents for disclosure\""
@@ -306,9 +324,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         "documentIssuedDate,documentReferredInStatementApp2, Invalid date: \"Documents referred to in the statement\""
             + " date entered must not be in the future (5).",
         "documentIssuedDate,documentEvidenceForTrialApp2, Invalid date: \"Documentary evidence for trial\""
-            + " date entered must not be in the future (10).",
-        "documentIssuedDate,bundleEvidence, Invalid date: \"Bundle Hearing date\""
-            + " date entered must not be in the future (11).",
+            + " date entered must not be in the future (10)."
     })
     void shouldReturnError_whenDocumentTypeUploadDateFutureApplicant2(String dateField, String collectionField,
                                                             String expectedErrorMessage) {
@@ -985,7 +1001,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         assertThat(updatedData.getDocumentEvidenceForTrial().get(0).getValue()
                 .getDocumentUpload().getDocumentFileName()).isEqualTo("Documentary Evidence typeForTrial 10-02-2023.pdf");
         assertThat(updatedData.getBundleEvidence().get(0).getValue()
-                       .getDocumentUpload().getDocumentFileName()).isEqualTo("10-02-2023 A bundle.pdf");
+                       .getDocumentUpload().getDocumentFileName()).isEqualTo("10-02-2023-A bundle.pdf");
         assertThat(updatedData.getDocumentDisclosureList().get(0).getValue()
                 .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
         assertThat(updatedData.getDocumentCaseSummary().get(0).getValue()
@@ -1127,7 +1143,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         assertThat(updatedData.getDocumentEvidenceForTrialApp2().get(0).getValue()
                        .getDocumentUpload().getDocumentFileName()).isEqualTo("Documentary Evidence typeForTrial 10-02-2023.pdf");
         assertThat(updatedData.getBundleEvidence().get(0).getValue()
-                       .getDocumentUpload().getDocumentFileName()).isEqualTo("10-02-2023 A bundle.pdf");
+                       .getDocumentUpload().getDocumentFileName()).isEqualTo("10-02-2023-A bundle.pdf");
         assertThat(updatedData.getDocumentDisclosureListApp2().get(0).getValue()
                        .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
         assertThat(updatedData.getDocumentCaseSummaryApp2().get(0).getValue()
