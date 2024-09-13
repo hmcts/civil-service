@@ -51,7 +51,7 @@ VALUES ('Notice.AAA6.ClaimantIntent.ClaimSettleEvent.Defendant',
         'The claim is settled',
         'Mae’r hawliad wedi’i setlo',
         '<p class="govuk-body">The claimant has confirmed that this case was settled on ${applicant1ClaimSettledDateEn}.</p>'
-          '<p class="govuk-body">If you do not agree that the case is settled, please outline your objections in writing within 19 days of the settlement date, to the Civil National Business Centre using the email address at ocmcnton@justice.gov.uk</p>',
+          '<p class="govuk-body">If you do not agree that the case is settled, please outline your objections in writing within 19 days of the settlement date, to the Civil National Business Centre using the email address at {cmcCourtEmailId}</p>',
         '<p class="govuk-body">The claimant has confirmed that this case was settled on ${applicant1ClaimSettledDateEn}.</p>'
-          '<p class="govuk-body">If you do not agree that the case is settled, please outline your objections in writing within 19 days of the settlement date, to the Civil National Business Centre using the email address at ocmcnton@justice.gov.uk</p>',
+          '<p class="govuk-body">If you do not agree that the case is settled, please outline your objections in writing within 19 days of the settlement date, to the Civil National Business Centre using the email address at {cmcCourtEmailId}</p>',
         'DEFENDANT');

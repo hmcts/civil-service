@@ -65,12 +65,14 @@ public class ClaimSettledScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[0].descriptionEn")
                     .value(
                         "<p class=\"govuk-body\">The claimant has confirmed that this case was settled on 16 March 2024.</p>"
-                            + "<p class=\"govuk-body\">If you do not agree that the case is settled, please outline your objections in writing within 19 days of the settlement date, to the Civil National Business Centre using the email address at ocmcnton@justice.gov.uk</p>"),
+                            + "<p class=\"govuk-body\">If you do not agree that the case is settled, please outline your objections"
+                            + " in writing within 19 days of the settlement date, to the Civil National Business Centre using the email address at ocmcnton@justice.gov.uk</p>"),
                 jsonPath("$[0].titleCy").value("Mae’r hawliad wedi’i setlo"),
                 jsonPath("$[0].descriptionCy")
                     .value(
                         "<p class=\"govuk-body\">The claimant has confirmed that this case was settled on 16 March 2024.</p>"
-                            + "<p class=\"govuk-body\">If you do not agree that the case is settled, please outline your objections in writing within 19 days of the settlement date, to the Civil National Business Centre using the email address at ocmcnton@justice.gov.uk</p>")
+                            + "<p class=\"govuk-body\">If you do not agree that the case is settled, please outline your objections"
+                            + " in writing within 19 days of the settlement date, to the Civil National Business Centre using the email address at ocmcnton@justice.gov.uk</p>")
             );
     }
 }
