@@ -1,9 +1,8 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
-import lombok.AllArgsConstructor;
 import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -12,17 +11,33 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@AllArgsConstructor
 public abstract class CcdDashboardClaimMatcher implements Claim {
 
     protected CaseData caseData;
     protected FeatureToggleService featureToggleService;
+    /**
+     * sorted in descending order by creation date
+     */
     protected List<CaseEventDetail> eventHistory;
+
+    public CcdDashboardClaimMatcher(CaseData caseData,
+                                    FeatureToggleService featureToggleService,
+                                    List<CaseEventDetail> eventHistory) {
+        this.caseData = caseData;
+        this.featureToggleService = featureToggleService;
+        this.eventHistory = eventHistory;
+        eventHistory.sort(Comparator.comparing(
+            CaseEventDetail::getCreatedDate
+        ).reversed());
+    }
 
     public boolean hasClaimantAndDefendantSignedSettlementAgreement() {
         return caseData.hasApplicant1SignedSettlementAgreement() && caseData.isRespondentSignedSettlementAgreement() && !isSettled();
@@ -78,22 +93,27 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
             && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
     }
 
+
     @Override
-    public boolean isOrderMadeLast() {
-        return caseData.getCcdState() == CaseState.All_FINAL_ORDERS_ISSUED
-            || (caseData.getCcdState() == CaseState.CASE_PROGRESSION
-            && getTimeOfLastNonSDOOrder().isPresent()
-        );
+    public boolean isOrderMade() {
+        return (caseData.getCcdState() == CaseState.All_FINAL_ORDERS_ISSUED
+            || caseData.getCcdState() == CaseState.CASE_PROGRESSION)
+            && getTimeOfLastNonSDOOrder().isPresent();
     }
 
     @Override
     public Optional<LocalDateTime> getTimeOfLastNonSDOOrder() {
-        return Stream.concat(
-                Stream.ofNullable(caseData.getPreviewCourtOfficerOrder()),
-                caseData.getFinalOrderDocumentCollection().stream()
-                    .map(Element::getValue)
-            ).filter(Objects::nonNull).map(CaseDocument::getCreatedDatetime)
-            .max(LocalDateTime::compareTo);
+        if (caseData.getCcdState() == CaseState.CASE_PROGRESSION
+            || caseData.getCcdState() == CaseState.All_FINAL_ORDERS_ISSUED) {
+            return Stream.concat(
+                    Stream.ofNullable(caseData.getPreviewCourtOfficerOrder()),
+                    caseData.getFinalOrderDocumentCollection().stream()
+                        .map(Element::getValue)
+                ).filter(Objects::nonNull).map(CaseDocument::getCreatedDatetime)
+                .max(LocalDateTime::compareTo);
+        } else {
+            return Optional.empty();
+        }
     }
 
     protected Optional<LocalDateTime> getSDOTime() {
@@ -166,10 +186,20 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     }
 
     @Override
-    public Optional<LocalDateTime> getLastHearingFormDate() {
-        return caseData.getSystemGeneratedCaseDocuments().stream()
-            .filter(e -> e.getValue().getDocumentType() == DocumentType.HEARING_FORM)
-            .map(e -> e.getValue().getCreatedDatetime())
-            .max(LocalDateTime::compareTo);
+    public Optional<LocalDateTime> getWhenWasHearingScheduled() {
+        return eventHistory.stream().filter(e -> CaseEvent.HEARING_SCHEDULED.name()
+            .equals(e.getEventName())).findFirst().map(CaseEventDetail::getCreatedDate);
+    }
+
+    protected Optional<LocalDateTime> getTimeOfMostRecentEventOfType(Set<CaseEvent> events) {
+        return getMostRecentEventOfType(events)
+            .map(CaseEventDetail::getCreatedDate);
+    }
+
+    protected Optional<CaseEventDetail> getMostRecentEventOfType(Set<CaseEvent> events) {
+        Set<String> eventNames = events.stream().map(CaseEvent::name).collect(Collectors.toSet());
+        return eventHistory.stream()
+            .filter(e -> eventNames.contains(e.getEventName()))
+            .findFirst();
     }
 }

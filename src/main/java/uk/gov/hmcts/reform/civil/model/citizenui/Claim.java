@@ -160,9 +160,9 @@ public interface Claim {
     default boolean isHwFHearingSubmit() {
         return false;
     }
-    boolean isOrderMadeLast();
+    boolean isOrderMade();
     Optional<LocalDate> getHearingDate();
     Optional<LocalDateTime> getTimeOfLastNonSDOOrder();
     Optional<LocalDateTime> getBundleCreationDate();
-    Optional<LocalDateTime> getLastHearingFormDate();
+    Optional<LocalDateTime> getWhenWasHearingScheduled();
 }

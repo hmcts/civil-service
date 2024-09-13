@@ -83,6 +83,9 @@ public enum DashboardClaimStatus {
             }
         }
     ),
+    CLAIMANT_HWF_FEE_PAYMENT_OUTCOME(
+        Claim::isHwfPaymentOutcome
+    ),
     CLAIMANT_HWF_NO_REMISSION(
         Claim::isHwfNoRemission
     ),
@@ -101,22 +104,19 @@ public enum DashboardClaimStatus {
     HWF_MORE_INFORMATION_NEEDED(
         Claim::isHwFMoreInformationNeeded
     ),
-    CLAIMANT_HWF_FEE_PAYMENT_OUTCOME(
-        Claim::isHwfPaymentOutcome
-    ),
     HEARING_SUBMIT_HWF(
         Claim::isHwFHearingSubmit
     ),
     TRIAL_OR_HEARING_SCHEDULED(
         c -> {
-            Optional<LocalDateTime> hearingFormDate;
+            Optional<LocalDateTime> hearingScheduledDate;
             Optional<LocalDateTime> orderDate;
             if (c.isHearingScheduled()
                 && !c.isHearingLessThanDaysAway(6 * 7)
-                && ((hearingFormDate = c.getLastHearingFormDate()).isPresent())
+                && ((hearingScheduledDate = c.getWhenWasHearingScheduled()).isPresent())
             ) {
                 return ((orderDate = c.getTimeOfLastNonSDOOrder()).isEmpty()
-                    || orderDate.get().isBefore(hearingFormDate.get()));
+                    || orderDate.get().isBefore(hearingScheduledDate.get()));
             } else {
                 return false;
             }
@@ -249,7 +249,7 @@ public enum DashboardClaimStatus {
     DEFAULT_JUDGEMENT_ISSUED(Claim::isDefaultJudgementIssued),
     NO_STATUS(c -> false),
     ORDER_MADE(
-        Claim::isOrderMadeLast
+        Claim::isOrderMade
     );
 
     @Getter

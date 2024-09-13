@@ -594,7 +594,7 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public boolean isOrderMadeLast() {
+    public boolean isOrderMade() {
         return false;
     }
 
@@ -614,7 +614,7 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public Optional<LocalDateTime> getLastHearingFormDate() {
+    public Optional<LocalDateTime> getWhenWasHearingScheduled() {
         return Optional.empty();
     }
 }
