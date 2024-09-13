@@ -1,9 +1,6 @@
 /**
  * Add scenario
  */
-/**
- * Add scenario
- */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.ClaimantIntent.ClaimSettleEvent.Defendant',
         '{
@@ -44,7 +41,7 @@ VALUES ('Scenario.AAA6.ClaimantIntent.ClaimSettleEvent.Defendant',
           "Notice.AAA6.MediationUnsuccessful.Defendant1NonAttendance.CARM.Defendant",
           "Notice.AAA6.MediationUnsuccessful.TrackChange.CARM.Defendant"
         }',
-        '{"Notice.AAA6.ClaimantIntent.ClaimSettleEvent.Defendant": ["applicant1ClaimSettledDateEn", "applicant1ClaimSettledDateCy","applicant1PartyName"]}');
+        '{"Notice.AAA6.ClaimantIntent.ClaimSettleEvent.Defendant": ["applicant1ClaimSettledDateEn", "applicant1ClaimSettledDateCy"]}');
 /**
  * Add notification template
  */
@@ -53,6 +50,8 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
 VALUES ('Notice.AAA6.ClaimantIntent.ClaimSettleEvent.Defendant',
         'The claim is settled',
         'Mae’r hawliad wedi’i setlo',
-        '<p class="govuk-body">${applicant1PartyName} has confirmed that you settled on ${applicant1ClaimSettledDateEn}.</p>',
-        '<p class="govuk-body">Mae ${applicant1PartyName} wedi cadarnhau eich bod wedi talu ar ${applicant1ClaimSettledDateCy}.</p>',
+        '<p class="govuk-body">The claimant has confirmed that this case was settled on ${applicant1ClaimSettledDateEn}.</p>'
+          '<p class="govuk-body">If you do not agree that the case is settled, please outline your objections in writing within 19 days of the settlement date, to the Civil National Business Centre using the email address at ocmcnton@justice.gov.uk</p>',
+        '<p class="govuk-body">The claimant has confirmed that this case was settled on ${applicant1ClaimSettledDateEn}.</p>'
+          '<p class="govuk-body">If you do not agree that the case is settled, please outline your objections in writing within 19 days of the settlement date, to the Civil National Business Centre using the email address at ocmcnton@justice.gov.uk</p>',
         'DEFENDANT');
