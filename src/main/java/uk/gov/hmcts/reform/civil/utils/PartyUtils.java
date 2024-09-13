@@ -458,7 +458,8 @@ public class PartyUtils {
             .respondent2(appendWithNewPartyId(caseData.getRespondent2()))
             .applicant1LitigationFriend(appendWithNewPartyId(caseData.getApplicant1LitigationFriend()))
             .applicant2LitigationFriend(appendWithNewPartyId(caseData.getApplicant2LitigationFriend()))
-            .respondent1LitigationFriend(appendWithNewPartyId(caseData.getRespondent1LitigationFriend()));
+            .respondent1LitigationFriend(appendWithNewPartyId(caseData.getRespondent1LitigationFriend()))
+            .respondent2LitigationFriend(appendWithNewPartyId(caseData.getRespondent2LitigationFriend()));
     }
 
     @SuppressWarnings("unchecked")
