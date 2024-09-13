@@ -55,6 +55,7 @@ import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.VocabularyMappe
 import static uk.gov.hmcts.reform.civil.utils.HmctsServiceIDUtils.getHmctsServiceID;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWitnessAndExpertsPartyIds;
 import static uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils.copyDatesIntoListingTabFields;
 import static uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent;
 import static uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils.shouldUpdateApplicant1UnavailableDates;
@@ -178,6 +179,7 @@ public class HearingValuesService {
             // as it was created to not overwrite partyId fields if they exist.
             populateWithPartyIds(builder);
             populateDQPartyIds(builder);
+            populateWitnessAndExpertsPartyIds(builder);
             return true;
         }
         return false;

@@ -458,7 +458,13 @@ public class PartyUtils {
             .respondent2(appendWithNewPartyId(caseData.getRespondent2()))
             .applicant1LitigationFriend(appendWithNewPartyId(caseData.getApplicant1LitigationFriend()))
             .applicant2LitigationFriend(appendWithNewPartyId(caseData.getApplicant2LitigationFriend()))
-            .respondent1LitigationFriend(appendWithNewPartyId(caseData.getRespondent1LitigationFriend()))
+            .respondent1LitigationFriend(appendWithNewPartyId(caseData.getRespondent1LitigationFriend()));
+    }
+
+    @SuppressWarnings("unchecked")
+    public static void populateWitnessAndExpertsPartyIds(CaseData.CaseDataBuilder builder) {
+        CaseData caseData = builder.build();
+        builder
             .applicantExperts(appendWithNewPartyIds(caseData.getApplicantExperts()))
             .respondent1Experts(appendWithNewPartyIds(caseData.getRespondent1Experts()))
             .respondent2Experts(appendWithNewPartyIds(caseData.getRespondent1Experts()))
