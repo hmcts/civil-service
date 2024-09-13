@@ -14,11 +14,13 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.hearing.HearingNoticeHmcGenerator;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
+import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDetails;
@@ -28,18 +30,22 @@ import uk.gov.hmcts.reform.hmc.model.hearing.HearingResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.HearingDay;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_HEARING_NOTICE_HMC;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_FORM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_NOTICE_HMC;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
@@ -60,11 +66,13 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
     private HearingNoticeHmcGenerator hearingNoticeHmcGenerator;
     @Mock
     private LocationReferenceDataService locationRefDataService;
+    @Mock
+    private HearingFeesService hearingFeesService;
 
     @BeforeEach
     void setUp() {
         mapper = new ObjectMapper();
-        handler = new GenerateHearingNoticeHmcHandler(camundaService, hearingsService, hearingNoticeHmcGenerator, mapper, locationRefDataService);
+        handler = new GenerateHearingNoticeHmcHandler(camundaService, hearingsService, hearingNoticeHmcGenerator, mapper, locationRefDataService, hearingFeesService);
         mapper.registerModule(new JavaTimeModule());
 
     }
@@ -90,6 +98,11 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseData.builder()
             .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
             .ccdState(CASE_PROGRESSION)
+            .caseAccessCategory(SPEC_CLAIM)
+            .responseClaimTrack("SMALL_CLAIM")
+            .totalClaimAmount(new BigDecimal(1000))
+            .claimValue(null)
+            .totalInterest(BigDecimal.TEN)
             .build();
         HearingDay hearingDay = HearingDay.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 01, 01, 0, 0, 0))
@@ -125,6 +138,9 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
         when(hearingNoticeHmcGenerator.generate(eq(caseData), eq(hearing), anyString(), anyString(), anyString())).thenReturn(List.of(CASE_DOCUMENT));
+        Fee expectedFee = Fee.builder()
+            .calculatedAmountInPence(new BigDecimal(54500)).code("FEE0441").version("1").build();
+        given(hearingFeesService.getFeeForHearingSmallClaims(any())).willReturn(expectedFee);
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_HEARING_NOTICE_HMC.name());
@@ -158,6 +174,11 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseData.builder()
             .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
             .ccdState(CASE_PROGRESSION)
+            .caseAccessCategory(SPEC_CLAIM)
+            .responseClaimTrack("SMALL_CLAIM")
+            .totalClaimAmount(new BigDecimal(1000))
+            .claimValue(null)
+            .totalInterest(BigDecimal.TEN)
             .build();
         HearingDay hearingDay = HearingDay.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 07, 01, 9, 0, 0))
@@ -193,6 +214,9 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
         when(hearingNoticeHmcGenerator.generate(eq(caseData), eq(hearing), anyString(), anyString(), anyString())).thenReturn(List.of(CASE_DOCUMENT));
+        Fee expectedFee = Fee.builder()
+            .calculatedAmountInPence(new BigDecimal(54500)).code("FEE0441").version("1").build();
+        given(hearingFeesService.getFeeForHearingSmallClaims(any())).willReturn(expectedFee);
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_HEARING_NOTICE_HMC.name());
