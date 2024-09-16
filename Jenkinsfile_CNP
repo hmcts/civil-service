@@ -8,7 +8,7 @@ import uk.gov.hmcts.contino.GithubAPI
 def type = "java"
 def product = "civil"
 def component = "service"
-def ccdBranch = "apitestfailure"
+def ccdBranch = "master"
 def camundaBranch = "master"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
@@ -90,6 +90,7 @@ withPipeline(type, product, component) {
     enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
     env.ENVIRONMENT = "aat"
     loadVaultSecrets(secrets)
+    env.TEST_EA_COURTS = true
   }
   onDemo {
     loadVaultSecrets(secrets)
