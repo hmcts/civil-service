@@ -113,10 +113,9 @@ public abstract class BaseIntegrationTest {
     protected void setSecurityAuthorities(Authentication authenticationMock, String... authorities) {
         when(authenticationMock.getPrincipal()).thenReturn(getJwt());
 
-        Collection<? extends GrantedAuthority> authorityCollection = Stream.concat(
-            Stream.of(authorities).map(SimpleGrantedAuthority::new),
-            Stream.of(new SimpleGrantedAuthority("citizen"))
-        ).collect(Collectors.toCollection(ArrayList::new));
+        Collection<? extends GrantedAuthority> authorityCollection = Stream.of(authorities)
+            .map(SimpleGrantedAuthority::new)
+            .collect(Collectors.toCollection(ArrayList::new));
 
         when(authenticationMock.getAuthorities()).thenAnswer(invocationOnMock -> authorityCollection);
     }

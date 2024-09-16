@@ -79,8 +79,6 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     private AuthTokenGenerator authTokenGenerator;
 
     @MockBean
-    private DocumentUploadClientApi documentUploadClientApi;
-    @MockBean
     private CaseDocumentClientApi caseDocumentClientApi;
 
     @Autowired
@@ -88,9 +86,6 @@ public class DocumentControllerTest extends BaseIntegrationTest {
 
     @Mock
     private DocumentManagementService documentManagementService;
-    @Mock
-    private DocumentGeneratorService documentGeneratorService;
-
     private static final String REFERENCE_NUMBER = "000DC001";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final String FILE_NAME = format(N1.getDocumentTitle(), REFERENCE_NUMBER);
@@ -104,7 +99,6 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     private static final String GENERATE_ANY_DOC_URL = BASE_URL + "/generateAnyDoc";
     private static final LocalDate DATE = LocalDate.of(2023, 5, 1);
     private static final String DOWNLOAD_FILE_URL = BASE_URL + "/downloadDocument/{documentId}";
-    public static final String DOCUMENT_ID = "documentId";
 
     private Document document;
 
@@ -121,7 +115,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     private ResponseEntity<Resource> responseEntity;
 
     private final UserInfo userInfo = UserInfo.builder()
-        .roles(List.of("role"))
+        .roles(List.of("citizen"))
         .uid("id")
         .givenName("userFirstName")
         .familyName("userLastName")
