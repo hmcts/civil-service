@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
@@ -12,11 +13,14 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -24,6 +28,8 @@ public class ClaimantRejectRepaymentPlanOrgLtdCoDefendantScenarioTest extends Da
 
     @Autowired
     private ClaimantResponseNotificationHandler handler;
+    @Mock
+    private ClaimantResponseUtils claimantResponseUtils;
 
     @Test
     void should_create_part_admit_pay_by_setDate_scenario() throws Exception {
@@ -71,6 +77,7 @@ public class ClaimantRejectRepaymentPlanOrgLtdCoDefendantScenarioTest extends Da
 
         String caseId = "50311";
         LocalDate firstRepaymentDate = OffsetDateTime.now().toLocalDate();
+        when(claimantResponseUtils.getDefendantAdmittedAmount(any())).thenReturn(BigDecimal.valueOf(100));
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
             .toBuilder()
@@ -86,6 +93,7 @@ public class ClaimantRejectRepaymentPlanOrgLtdCoDefendantScenarioTest extends Da
                                           .build())
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
             .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(1000))
+            .totalClaimAmount(new BigDecimal(1000))
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
             .build();
 

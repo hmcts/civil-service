@@ -219,6 +219,32 @@ http://rpe-service-auth-provider-aat.service.core-compute-aat.internal/testing-s
 then use http://localhost:4000/service-request-update-claim-issued endpoint with above token and then
 update body with case id and payment reference no
 
+## Development / Debugging Environment - Preview with Mirrord
+
+  As an alternative for a development environment there is a procedure in place where after running the command
+below the required services for Civil are created in Preview under the developer's name, so these will be exclusively
+for the named developer use.
+
+While connected to the VPN simply run one of the below commands from your project's (civil-service) folder:
+Note: be sure to have Docker running
+```shell
+npx @hmcts/dev-env@latest && ./bin/setup-devuser-preview-env.sh
+```
+You can optionally specify a branch for CCD definitions and Camunda definitions like below or leave it blank to use master.
+
+```shell
+npx @hmcts/dev-env@latest && ./bin/setup-devuser-preview-env.sh ccdBranchName camundaBranchName
+```
+
+Once the pods are up and running you can connect to them using a plugin called Mirrord on Intellij.
+https://mirrord.dev
+
+If you want to clean up the environment just run:
+
+```shell
+npx @hmcts/dev-env@latest --delete
+```
+
 
 ## License
 

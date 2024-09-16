@@ -95,6 +95,7 @@ public class ClaimantRejectRepaymentPlanDefendantOrgLtdCoDefendantScenarioTest e
                         .organisationName("Org one")
                         .type(Party.Type.ORGANISATION).build())
                 .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
+                .totalClaimAmount(new BigDecimal(5000))
                 .build();
 
         handler.handle(callbackParams(caseData));

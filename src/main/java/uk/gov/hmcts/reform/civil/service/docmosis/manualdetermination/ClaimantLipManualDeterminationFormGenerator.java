@@ -29,6 +29,7 @@ public class ClaimantLipManualDeterminationFormGenerator implements TemplateData
 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
+    private final ClaimantResponseUtils claimantResponseUtils;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         ClaimantLipManualDeterminationForm templateData = getTemplateData(caseData);
@@ -52,13 +53,13 @@ public class ClaimantLipManualDeterminationFormGenerator implements TemplateData
                 .claimIssueDate(caseData.getIssueDate())
                 .claimantResponseSubmitDate(caseData.getApplicant1ResponseDate())
                 .defendantAdmittedAmount(caseData.getRespondToAdmittedClaimOwingAmountPounds())
-                .claimantRequestRepaymentBy(ClaimantResponseUtils.getClaimantRepaymentType(caseData))
+                .claimantRequestRepaymentBy(claimantResponseUtils.getClaimantRepaymentType(caseData))
                 .claimResponseType(caseData.getRespondent1ClaimResponseTypeForSpec())
                 .regularPaymentAmount(caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec())
                 .repaymentFrequency(getRepaymentFrequency(caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec()))
                 .repaymentType(caseData.getApplicant1RepaymentOptionForDefendantSpec())
                 .firstRepaymentDate(caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec())
-                .lastRepaymentDate(ClaimantResponseUtils.getClaimantFinalRepaymentDate(caseData))
+                .lastRepaymentDate(claimantResponseUtils.getClaimantFinalRepaymentDate(caseData))
                 .paymentSetDateForDefendant(getRepaymentSetByDate(caseData.getApplicant1RequestedPaymentDateForDefendantSpec()));
         return manualDeterminationForm.build();
     }

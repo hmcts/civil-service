@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -45,12 +44,12 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DE
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_FORM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_APPLICATION;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_APPLICATION_AHN;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_FAST_TRACK;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_FAST_TRACK_AHN;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_OTHER;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_OTHER_AHN;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_SMALL_CLAIMS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_SMALL_CLAIMS_AHN;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_TRIAL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_TRIAL_AHN;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
@@ -67,7 +66,7 @@ public class HearingFormGeneratorTest {
     private static final String fileName_small_claim = String.format(
         HEARING_SMALL_CLAIMS.getDocumentTitle(), REFERENCE_NUMBER);
     private static final String fileName_fast_track = String.format(
-        HEARING_FAST_TRACK.getDocumentTitle(), REFERENCE_NUMBER);
+        HEARING_TRIAL.getDocumentTitle(), REFERENCE_NUMBER);
     private static final String fileName_other_claim = String.format(
         HEARING_OTHER.getDocumentTitle(), REFERENCE_NUMBER);
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
@@ -184,8 +183,8 @@ public class HearingFormGeneratorTest {
 
     @Test
     void shouldHearingFormGeneratorOneForm_whenValidDataIsProvided_hearing_fast_track() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_FAST_TRACK)))
-            .thenReturn(new DocmosisDocument(HEARING_FAST_TRACK.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_TRIAL)))
+            .thenReturn(new DocmosisDocument(HEARING_TRIAL.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName_fast_track, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
         when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(false);
@@ -292,8 +291,8 @@ public class HearingFormGeneratorTest {
 
     @Test
     void shouldHearingFormGeneratorOneForm_whenValidDataIsProvided_hearing_fast_track_ahn() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_FAST_TRACK_AHN)))
-            .thenReturn(new DocmosisDocument(HEARING_FAST_TRACK_AHN.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_TRIAL_AHN)))
+            .thenReturn(new DocmosisDocument(HEARING_TRIAL_AHN.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName_fast_track, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
         when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(true);

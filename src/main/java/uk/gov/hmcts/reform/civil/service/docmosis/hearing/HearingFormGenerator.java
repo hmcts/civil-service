@@ -29,8 +29,8 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_APPLICATION;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_APPLICATION_AHN;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_FAST_TRACK;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_FAST_TRACK_AHN;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_TRIAL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_TRIAL_AHN;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_OTHER;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_OTHER_AHN;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_SMALL_CLAIMS;
@@ -134,7 +134,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
                 case SMALL_CLAIMS:
                     return HEARING_SMALL_CLAIMS;
                 case FAST_TRACK_TRIAL:
-                    return HEARING_FAST_TRACK;
+                    return HEARING_TRIAL;
                 case HEARING_OF_APPLICATION:
                     return HEARING_APPLICATION;
                 default:
@@ -145,7 +145,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
                 case SMALL_CLAIMS:
                     return HEARING_SMALL_CLAIMS_AHN;
                 case FAST_TRACK_TRIAL:
-                    return HEARING_FAST_TRACK_AHN;
+                    return HEARING_TRIAL_AHN;
                 case HEARING_OF_APPLICATION:
                     return HEARING_APPLICATION_AHN;
                 default:

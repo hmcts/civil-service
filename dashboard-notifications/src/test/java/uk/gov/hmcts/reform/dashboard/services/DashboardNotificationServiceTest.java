@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.dashboard.repositories.NotificationActionRepository;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -75,6 +77,21 @@ public class DashboardNotificationServiceTest {
             Optional<DashboardNotificationsEntity> actual = dashboardNotificationService.getNotification(notificationId);
 
             assertThat(actual).isPresent().isEqualTo(Optional.of(expected));
+        }
+
+        @Test
+        void should_return_all_ga_notifications() {
+            List<DashboardNotificationsEntity> expectedList = getNotificationEntityList();
+            when(dashboardNotificationsRepository.findByReferenceAndCitizenRole(any(), any())).thenReturn(expectedList);
+            List<String> gaCaseIds = new ArrayList<>();
+            gaCaseIds.add("123");
+            gaCaseIds.add("234");
+            Map<String, List<Notification>> notificationslist = dashboardNotificationService
+                .getAllCasesNotifications(gaCaseIds, "Claimant");
+
+            assertThat(notificationslist.get("123")).isEqualTo(getNotificationList());
+            assertThat(notificationslist.get("234")).isEqualTo(getNotificationList());
+            assertThat(notificationslist.size()).isEqualTo(2);
         }
 
         @Test

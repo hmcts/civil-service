@@ -19,9 +19,6 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils.getClaimantRepaymentType;
-import static uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils.getDefendantRepaymentOption;
-
 @Component
 @RequiredArgsConstructor
 public class InterlocutoryJudgementDocMapper implements MappableObject {
@@ -30,6 +27,7 @@ public class InterlocutoryJudgementDocMapper implements MappableObject {
 
     private final DeadlineExtensionCalculatorService calculatorService;
     private final RepaymentPlanDecisionCalculator repaymentPlanDecisionCalculator;
+    private final ClaimantResponseUtils claimantResponseUtils;
 
     private static String getClaimantResponseToDefendantAdmission(CaseData caseData) {
         RespondentResponseTypeSpec respondentResponseTypeSpec = caseData.getRespondent1ClaimResponseTypeForSpec();
@@ -48,11 +46,11 @@ public class InterlocutoryJudgementDocMapper implements MappableObject {
         return InterlocutoryJudgementDoc.builder()
             .claimIssueDate(caseData.getIssueDate())
             .claimNumber(caseData.getLegacyCaseReference())
-            .claimantRequestRepaymentBy(getClaimantRepaymentType(caseData))
+            .claimantRequestRepaymentBy(claimantResponseUtils.getClaimantRepaymentType(caseData))
             .claimantRequestRepaymentLastDateBy(getClaimantRequestRepaymentLastDateBy(caseData))
             .claimantResponseSubmitDateTime(caseData.getApplicant1ResponseDate())
             .claimantResponseToDefendantAdmission(getClaimantResponseToDefendantAdmission(caseData))
-            .courtDecisionRepaymentBy(getDefendantRepaymentOption(caseData))
+            .courtDecisionRepaymentBy(claimantResponseUtils.getDefendantRepaymentOption(caseData))
             .courtDecisionRepaymentLastDateBy(getDefendantRepaymentLastDateBy(caseData))
             .formalisePaymentBy(REFER_TO_JUDGE)
             .formattedDisposableIncome(getFormattedDisposableIncome(caseData))
@@ -63,7 +61,7 @@ public class InterlocutoryJudgementDocMapper implements MappableObject {
     private LocalDate getClaimantRequestRepaymentLastDateBy(CaseData caseData) {
         PaymentType claimantRepaymentOption = caseData.getApplicant1RepaymentOptionForDefendantSpec();
         if (claimantRepaymentOption == PaymentType.REPAYMENT_PLAN) {
-            return ClaimantResponseUtils.getClaimantFinalRepaymentDate(caseData);
+            return claimantResponseUtils.getClaimantFinalRepaymentDate(caseData);
         } else if (claimantRepaymentOption == PaymentType.SET_DATE) {
             var paymentDate = caseData.getApplicant1RequestedPaymentDateForDefendantSpec();
             return paymentDate != null ? paymentDate.getPaymentSetDate() : null;
@@ -76,7 +74,7 @@ public class InterlocutoryJudgementDocMapper implements MappableObject {
     private LocalDate getDefendantRepaymentLastDateBy(CaseData caseData) {
         RespondentResponsePartAdmissionPaymentTimeLRspec defendantPaymentOption = caseData.getDefenceAdmitPartPaymentTimeRouteRequired();
         if (defendantPaymentOption == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN) {
-            return ClaimantResponseUtils.getDefendantFinalRepaymentDate(caseData);
+            return claimantResponseUtils.getDefendantFinalRepaymentDate(caseData);
         } else if (defendantPaymentOption == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE) {
             return Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
                 .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(null);

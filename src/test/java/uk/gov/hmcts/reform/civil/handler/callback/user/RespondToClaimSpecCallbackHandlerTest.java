@@ -197,18 +197,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private FrcDocumentsUtils frcDocumentsUtils;
 
-    public static final String UNAVAILABLE_DATE_RANGE_MISSING = "Please provide at least one valid Date from if you "
-        + "cannot attend hearing within next 3 months.";
-    public static final String INVALID_UNAVAILABILITY_RANGE = "Unavailability Date From cannot be after "
-        + "Unavailability Date to. Please enter valid range.";
-    public static final String INVALID_UNAVAILABLE_DATE_BEFORE_TODAY = "Unavailability date must not"
-        + " be before today.";
-    public static final String INVALID_UNAVAILABLE_DATE_FROM_BEFORE_TODAY = "Unavailability date from must not"
-        + " be before today.";
-    public static final String INVALID_UNAVAILABLE_DATE_TO_WHEN_MORE_THAN_YEAR = "Unavailability date to must not"
-        + " be more than one year in the future.";
-    public static final String INVALID_UNAVAILABLE_DATE_WHEN_MORE_THAN_YEAR = "Unavailability date must not"
-        + " be more than one year in the future.";
     @Spy
     private List<RespondToClaimConfirmationTextSpecGenerator> confirmationTextGenerators = List.of(
         new FullAdmitAlreadyPaidConfirmationText(),
@@ -2655,7 +2643,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains(INVALID_UNAVAILABLE_DATE_BEFORE_TODAY);
+            assertThat(response.getErrors()).contains("Unavailability Date must not be before today.");
         }
 
         @Test
@@ -2664,7 +2652,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             List<Element<UnavailableDate>> unAvailableDates = Stream.of(
                 UnavailableDate.builder()
                     .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                    .date(LocalDate.now().plusYears(4))
+                    .date(LocalDate.now().plusMonths(4))
                     .build(),
                 UnavailableDate.builder()
                     .unavailableDateType(UnavailableDateType.DATE_RANGE)
@@ -2689,7 +2677,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains(INVALID_UNAVAILABLE_DATE_WHEN_MORE_THAN_YEAR);
+            assertThat(response.getErrors()).contains("Unavailability Date must not be more than three months in the future.");
         }
 
         @Test
@@ -2723,7 +2711,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains(INVALID_UNAVAILABILITY_RANGE);
+            assertThat(response.getErrors()).contains("Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.");
         }
 
         @Test
@@ -2757,7 +2745,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains(INVALID_UNAVAILABLE_DATE_FROM_BEFORE_TODAY);
+            assertThat(response.getErrors()).contains("Unavailability Date From must not be before today.");
         }
 
         @Test
@@ -2791,7 +2779,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains(INVALID_UNAVAILABILITY_RANGE);
+            assertThat(response.getErrors()).contains("Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.");
         }
 
         @Test
@@ -2805,7 +2793,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 UnavailableDate.builder()
                     .unavailableDateType(UnavailableDateType.DATE_RANGE)
                     .fromDate(LocalDate.now().plusDays(6))
-                    .toDate(LocalDate.now().plusYears(4))
+                    .toDate(LocalDate.now().plusMonths(4))
                     .build()
             ).map(ElementUtils::element).toList();
 
@@ -2825,7 +2813,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains(INVALID_UNAVAILABLE_DATE_TO_WHEN_MORE_THAN_YEAR);
+            assertThat(response.getErrors()).contains("Unavailability Date To must not be more than three months in the future.");
         }
 
     }

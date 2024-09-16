@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
@@ -39,6 +40,7 @@ class JudgmentByAdmissionMapperTest {
     void testIfJudgmentByAdmission() {
 
         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+            .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(140))
             .ccjPaymentPaidSomeOption(YesOrNo.YES)
             .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(10))
             .ccjJudgmentTotalStillOwed(BigDecimal.valueOf(150))
@@ -66,6 +68,7 @@ class JudgmentByAdmissionMapperTest {
         assertEquals("1000", activeJudgment.getCosts());
         assertEquals("15000", activeJudgment.getTotalAmount());
         assertEquals(YesOrNo.YES, activeJudgment.getIsRegisterWithRTL());
+        assertEquals(JudgmentRTLStatus.ISSUED.getRtlState(), activeJudgment.getRtlState());
         assertEquals(LocalDate.now(), activeJudgment.getIssueDate());
         assertEquals("0123", activeJudgment.getCourtLocation());
         assertEquals(JudgmentType.JUDGMENT_BY_ADMISSION, activeJudgment.getType());
@@ -75,12 +78,16 @@ class JudgmentByAdmissionMapperTest {
         assertNotNull(activeJudgment.getDefendant1Address());
         assertNotNull(activeJudgment.getDefendant1Dob());
 
+        assertEquals("Mr. John Rambo", caseData.getJoDefendantName1());
+        assertEquals(PaymentPlanSelection.PAY_IMMEDIATELY, caseData.getJoPaymentPlanSelected());
+
     }
 
     @Test
     void testIfJudgmentByAdmission_scenario2() {
 
         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+            .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(140))
             .ccjPaymentPaidSomeOption(YesOrNo.YES)
             .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(10))
             .ccjJudgmentTotalStillOwed(BigDecimal.valueOf(150))
@@ -113,6 +120,7 @@ class JudgmentByAdmissionMapperTest {
         assertEquals("1000", activeJudgment.getCosts());
         assertEquals("15000", activeJudgment.getTotalAmount());
         assertEquals(YesOrNo.YES, activeJudgment.getIsRegisterWithRTL());
+        assertEquals(JudgmentRTLStatus.ISSUED.getRtlState(), activeJudgment.getRtlState());
         assertEquals(LocalDate.now(), activeJudgment.getIssueDate());
         assertEquals("0123", activeJudgment.getCourtLocation());
         assertEquals(JudgmentType.JUDGMENT_BY_ADMISSION, activeJudgment.getType());
@@ -126,12 +134,19 @@ class JudgmentByAdmissionMapperTest {
         assertNotNull(activeJudgment.getDefendant1Address());
         assertNotNull(activeJudgment.getDefendant1Dob());
 
+        assertEquals("Mr. John Rambo", caseData.getJoDefendantName1());
+        assertEquals(PaymentPlanSelection.PAY_IN_INSTALMENTS, caseData.getJoPaymentPlanSelected());
+        assertEquals("1000", caseData.getJoRepaymentAmount());
+        assertNotNull(caseData.getJoRepaymentStartDate());
+        assertEquals(PaymentFrequency.WEEKLY, caseData.getJoRepaymentFrequency());
+
     }
 
     @Test
     void testIfJudgmentByAdmission_scenario3() {
 
         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+            .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(140))
             .ccjPaymentPaidSomeOption(YesOrNo.YES)
             .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(10))
             .ccjJudgmentTotalStillOwed(BigDecimal.valueOf(150))
@@ -161,6 +176,7 @@ class JudgmentByAdmissionMapperTest {
         assertEquals("1000", activeJudgment.getCosts());
         assertEquals("15000", activeJudgment.getTotalAmount());
         assertEquals(YesOrNo.YES, activeJudgment.getIsRegisterWithRTL());
+        assertEquals(JudgmentRTLStatus.ISSUED.getRtlState(), activeJudgment.getRtlState());
         assertEquals(LocalDate.now(), activeJudgment.getIssueDate());
         assertEquals("0123", activeJudgment.getCourtLocation());
         assertEquals(JudgmentType.JUDGMENT_BY_ADMISSION, activeJudgment.getType());
@@ -171,12 +187,16 @@ class JudgmentByAdmissionMapperTest {
         assertEquals(null, activeJudgment.getInstalmentDetails());
         assertEquals("The Organisation", activeJudgment.getDefendant1Name());
         assertNotNull(activeJudgment.getDefendant1Address());
+
+        assertEquals("The Organisation", caseData.getJoDefendantName1());
+        assertEquals(PaymentPlanSelection.PAY_BY_DATE, caseData.getJoPaymentPlanSelected());
     }
 
     @Test
     void testIfJudgmentByAdmission_scenario4_multi_party() {
 
         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+            .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(140))
             .ccjPaymentPaidSomeOption(YesOrNo.YES)
             .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(10))
             .ccjJudgmentTotalStillOwed(BigDecimal.valueOf(150))
@@ -208,6 +228,7 @@ class JudgmentByAdmissionMapperTest {
         assertEquals("1000", activeJudgment.getCosts());
         assertEquals("15000", activeJudgment.getTotalAmount());
         assertEquals(YesOrNo.NO, activeJudgment.getIsRegisterWithRTL());
+        assertEquals(null, activeJudgment.getRtlState());
         assertEquals(LocalDate.now(), activeJudgment.getIssueDate());
         assertEquals("0123", activeJudgment.getCourtLocation());
         assertEquals(JudgmentType.JUDGMENT_BY_ADMISSION, activeJudgment.getType());

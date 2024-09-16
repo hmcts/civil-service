@@ -144,6 +144,7 @@ public class InitiateGeneralApplicationServiceHelper {
                 GAUrgencyRequirement
                     .builder()
                     .generalAppUrgency(NO)
+                    .urgentAppConsiderationDate(caseData.getHearingDate())
                     .build());
         }
     }
