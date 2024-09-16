@@ -15,7 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
-public class GaProcessedRespondentNotification extends BaseIntegrationTest {
+public class GaProcessedRespondentNotificationTest extends BaseIntegrationTest {
 
     public static final String SCENARIO_GA_RESPONSE_SUBMITTED = "Scenario.AAA6.GeneralApps.RespondentResponseSubmitted.Respondent";
     private static final String DASHBOARD_CREATE_SCENARIO_URL
