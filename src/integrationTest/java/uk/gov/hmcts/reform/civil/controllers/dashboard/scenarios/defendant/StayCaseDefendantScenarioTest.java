@@ -36,10 +36,12 @@ public class StayCaseDefendantScenarioTest extends CaseProgressionDashboardBaseI
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("The case has been stayed"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">The case has been stayed. This could be as a result of a judge’s order. Any upcoming hearings will be cancelled.</p>"),
+                    "<p class=\"govuk-body\">The case has been stayed. This could be as a result of a judge’s order."
+                        + " Any upcoming hearings will be cancelled.</p>"),
                 jsonPath("$[0].titleCy").value("Mae’r achos wedi cael ei atal"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Mae’r achos wedi’i atal. Gallai hyn fod o ganlyniad i orchymyn a waned gan farnwr. Bydd unrhyw wrandawiadau sydd i ddod yn cael eu canslo.</p>")
+                    "<p class=\"govuk-body\">Mae’r achos wedi’i atal. Gallai hyn fod o ganlyniad i orchymyn a waned gan farnwr."
+                        + " Bydd unrhyw wrandawiadau sydd i ddod yn cael eu canslo.</p>")
             );
     }
 }
