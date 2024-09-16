@@ -4,10 +4,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.CaseProgressionDashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.StayCaseClaimantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+
+import java.math.BigDecimal;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -21,13 +24,20 @@ public class StayCaseClaimantScenarioTest extends CaseProgressionDashboardBaseIn
     @Test
     void should_create_stay_case_claimant_scenario() throws Exception {
 
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec()
-            .applicant1Represented(YesOrNo.NO).build();
+        String caseId = "72014456456456";
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(Long.valueOf(caseId))
+            .ccdState(CaseState.JUDICIAL_REFERRAL)
+            .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
+            .responseClaimMediationSpecRequired(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.NO)
+            .build();
+
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         handler.handle(callbackParams(caseData));
-
-        String caseId = "72014456456456";
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT")
