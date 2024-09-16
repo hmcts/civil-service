@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
 public class GeneralApplicationHwfRejectedScenarioTest extends BaseIntegrationTest {
+
     public static final String SCENARIO_GA_HEF_REJECTED = "Scenario.AAA6.GeneralApps.HwFRejected.Applicant";
     private static final String DASHBOARD_CREATE_SCENARIO_URL
         = "/dashboard/scenarios/{scenario_ref}/{unique_case_identifier}";
