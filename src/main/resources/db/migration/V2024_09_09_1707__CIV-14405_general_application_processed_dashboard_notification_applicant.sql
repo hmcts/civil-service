@@ -3,7 +3,7 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.GeneralApps.RespondentResponseSubmitted.Applicant',
-        '{"Notice.AAA6.GeneralApps.ApplicationSubmitted.Applicant","Notice.AAA6.GeneralApps.MoreInfoRequired.Applicant",Notice.AAA6.GeneralApps.HwF.FullRemission.Applicant","Notice.AAA6.GeneralApps.HwF.FeePaid.Applicant","Notice.AAA6.GeneralApps.OrderMade.Applicant"}',
+        '{"Notice.AAA6.GeneralApps.ApplicationSubmitted.Applicant","Notice.AAA6.GeneralApps.MoreInfoRequired.Applicant","Notice.AAA6.GeneralApps.HwF.FullRemission.Applicant","Notice.AAA6.GeneralApps.HwF.FeePaid.Applicant","Notice.AAA6.GeneralApps.OrderMade.Applicant"}',
         '{"Notice.AAA6.GeneralApps.RespondentResponseSubmitted.Applicant": []}');
 /**
  * Add notification template
