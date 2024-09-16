@@ -324,6 +324,24 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             .build();
     }
 
+    private BigDecimal getOverallTotal(CaseData caseData,
+                                       BigDecimal interest,
+                                       BigDecimal claimFeePounds,
+                                       BigDecimal fixedCost) {
+
+        BigDecimal partialPaymentPounds = getPartialPayment(caseData);
+        //calculate the relevant total, total claim value + interest if any, claim fee for case,
+        // and subtract any partial payment
+        var subTotal = caseData.getTotalClaimAmount()
+            .add(interest)
+            .add(claimFeePounds);
+        if (caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.YES) {
+            subTotal = subTotal.add(fixedCost);
+        }
+        BigDecimal theOverallTotal = subTotal.subtract(partialPaymentPounds);
+        return theOverallTotal;
+    }
+
     @NotNull
     private StringBuilder buildRepaymentBreakdown(CaseData caseData, BigDecimal interest, BigDecimal claimFeePounds,
                                                   BigDecimal fixedCost, CallbackParams callbackParams) {
@@ -339,6 +357,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         }
         theOverallTotal = subTotal.subtract(partialPaymentPounds);
         long caseId = callbackParams.getRequest().getCaseDetails().getId();
+        caseData.toBuilder();
         cache.put(caseId, theOverallTotal);
 
         //creates  the text on the page, based on calculated values
