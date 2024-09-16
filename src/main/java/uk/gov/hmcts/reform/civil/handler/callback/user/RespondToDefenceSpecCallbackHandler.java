@@ -416,77 +416,39 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         String nextState = putCaseStateInJudicialReferral(caseData);
 
         if (V_2.equals(callbackParams.getVersion())
-            && featureToggleService.isPinInPostEnabled()){
-            if (isOneVOne(caseData)) {
-                if (caseData.hasClaimantAgreedToFreeMediation()) {
-                    nextState = CaseState.IN_MEDIATION.name();
-                } else if (caseData.hasApplicantAcceptedRepaymentPlan()) {
-                    if (featureToggleService.isJudgmentOnlineLive()
-                        && (caseData.isPayByInstallment() || caseData.isPayBySetDate())
-                        && caseData.isLRvLipOneVOne()) {
-                        nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
-                        businessProcess = BusinessProcess.ready(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC);
-                    } else {
-                        nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
-                    }
-                    if (featureToggleService.isJudgmentOnlineLive()) {
-                        JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(
-                            caseData);
-                        builder.activeJudgment(activeJudgment);
-                        builder.joIsLiveJudgmentExists(YesOrNo.YES);
-                        builder.joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(
-                            activeJudgment));
-                    }
-                } else if (caseData.hasApplicantRejectedRepaymentPlan()) {
+            && featureToggleService.isPinInPostEnabled()
+            && (isOneVOne(caseData) || JudgmentsOnlineHelper.isNonDivergentForDJ(caseData))) {
+            if (caseData.hasClaimantAgreedToFreeMediation()) {
+                nextState = CaseState.IN_MEDIATION.name();
+            } else if (caseData.hasApplicantAcceptedRepaymentPlan()) {
+                if (featureToggleService.isJudgmentOnlineLive()
+                    && (caseData.isPayByInstallment() || caseData.isPayBySetDate())
+                    && (caseData.isLRvLipOneVOne() || JudgmentsOnlineHelper.isNonDivergentForDJ(caseData))) {
+                    nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
+                    businessProcess = BusinessProcess.ready(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC);
+                } else {
                     nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
-                } else if (
-                    caseData.isClaimantNotSettlePartAdmitClaim()
-                        && ((caseData.hasClaimantNotAgreedToFreeMediation()
-                        || caseData.hasDefendantNotAgreedToFreeMediation())
-                        || caseData.isFastTrackClaim())) {
-                    nextState = CaseState.JUDICIAL_REFERRAL.name();
-                } else if (caseData.isPartAdmitClaimSettled()) {
-                    nextState = CaseState.CASE_SETTLED.name();
-                } else if (featureToggleService.isLipVLipEnabled()
-                    && caseData.isLRvLipOneVOne()
-                    && caseData.isClaimantDontWantToProceedWithFulLDefenceFD()) {
-                    nextState = CaseState.CASE_STAYED.name();
                 }
-            } else {
-                if (caseData.hasClaimantAgreedToFreeMediation()) {
-                    nextState = CaseState.IN_MEDIATION.name();
-                } else if (caseData.hasApplicantAcceptedRepaymentPlan()) {
-                    if (featureToggleService.isJudgmentOnlineLive()
-                        && (caseData.isPayByInstallment() || caseData.isPayBySetDate())
-                        && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
-                        nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
-                        businessProcess = BusinessProcess.ready(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC);
-                    } else {
-                        nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
-                    }
-                    if (featureToggleService.isJudgmentOnlineLive()) {
-                        JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(
-                            caseData);
-                        builder.activeJudgment(activeJudgment);
-                        builder.joIsLiveJudgmentExists(YesOrNo.YES);
-                        builder.joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(
-                            activeJudgment));
-                    }
-                } else if (caseData.hasApplicantRejectedRepaymentPlan()) {
-                    nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
-                } else if (
-                    caseData.isClaimantNotSettlePartAdmitClaim()
-                        && ((caseData.hasClaimantNotAgreedToFreeMediation()
-                        || caseData.hasDefendantNotAgreedToFreeMediation())
-                        || caseData.isFastTrackClaim())) {
-                    nextState = CaseState.JUDICIAL_REFERRAL.name();
-                } else if (caseData.isPartAdmitClaimSettled()) {
-                    nextState = CaseState.CASE_SETTLED.name();
-                } else if (featureToggleService.isLipVLipEnabled()
-                    && caseData.isLRvLipOneVOne()
-                    && caseData.isClaimantDontWantToProceedWithFulLDefenceFD()) {
-                    nextState = CaseState.CASE_STAYED.name();
+                if (featureToggleService.isJudgmentOnlineLive()) {
+                    JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
+                    builder.activeJudgment(activeJudgment);
+                    builder.joIsLiveJudgmentExists(YesOrNo.YES);
+                    builder.joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment));
                 }
+            } else if (caseData.hasApplicantRejectedRepaymentPlan()) {
+                nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
+            } else if (
+                caseData.isClaimantNotSettlePartAdmitClaim()
+                    && ((caseData.hasClaimantNotAgreedToFreeMediation()
+                    || caseData.hasDefendantNotAgreedToFreeMediation())
+                    || caseData.isFastTrackClaim())) {
+                nextState = CaseState.JUDICIAL_REFERRAL.name();
+            } else if (caseData.isPartAdmitClaimSettled()) {
+                nextState = CaseState.CASE_SETTLED.name();
+            } else if (featureToggleService.isLipVLipEnabled()
+                && caseData.isLRvLipOneVOne()
+                && caseData.isClaimantDontWantToProceedWithFulLDefenceFD()) {
+                nextState = CaseState.CASE_STAYED.name();
             }
         }
 
