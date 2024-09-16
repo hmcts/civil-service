@@ -268,10 +268,10 @@ public class DashboardNotificationsParamsMapper {
 
     private static void updateCCJParams(CaseData caseData, HashMap<String, Object> params) {
         JudgmentDetails judgmentDetails = caseData.getActiveJudgment();
-        String judgmentAmount = judgmentDetails.getTotalAmount();
+        String totalAmount = judgmentDetails.getTotalAmount();
         params.put(
             "ccjDefendantAdmittedAmount",
-            MonetaryConversions.penniesToPounds(new BigDecimal(judgmentAmount))
+            MonetaryConversions.penniesToPounds(new BigDecimal(totalAmount))
         );
 
         if (caseData.getActiveJudgment().getPaymentPlan().getType().equals(PAY_IN_INSTALMENTS)) {
