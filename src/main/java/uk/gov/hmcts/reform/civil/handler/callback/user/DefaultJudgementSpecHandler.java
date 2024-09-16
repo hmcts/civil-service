@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -40,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -87,7 +84,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private final CaseDetailsConverter caseDetailsConverter;
     private final Time time;
     private final FeatureToggleService featureToggleService;
-    private final Cache<Long, BigDecimal> cache = Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build();
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -310,24 +306,27 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             claimFeePounds = MonetaryConversions.penniesToPounds(claimfee.getCalculatedAmountInPence());
         }
         BigDecimal fixedCost = calculateFixedCosts(caseData);
+        BigDecimal theOverallTotal = calculateOverallTotal(caseData, interest, claimFeePounds, fixedCost);
         StringBuilder repaymentBreakdown = buildRepaymentBreakdown(
             caseData,
             interest,
             claimFeePounds,
             fixedCost,
-            callbackParams
+            callbackParams,
+            theOverallTotal
         );
 
         caseDataBuilder.repaymentSummaryObject(repaymentBreakdown.toString());
+        caseDataBuilder.defaultJudgementOverallTotal(theOverallTotal);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
-    private BigDecimal getOverallTotal(CaseData caseData,
-                                       BigDecimal interest,
-                                       BigDecimal claimFeePounds,
-                                       BigDecimal fixedCost) {
+    private BigDecimal calculateOverallTotal(CaseData caseData,
+                                             BigDecimal interest,
+                                             BigDecimal claimFeePounds,
+                                             BigDecimal fixedCost) {
 
         BigDecimal partialPaymentPounds = getPartialPayment(caseData);
         //calculate the relevant total, total claim value + interest if any, claim fee for case,
@@ -343,22 +342,16 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     @NotNull
-    private StringBuilder buildRepaymentBreakdown(CaseData caseData, BigDecimal interest, BigDecimal claimFeePounds,
-                                                  BigDecimal fixedCost, CallbackParams callbackParams) {
-        BigDecimal theOverallTotal;
-        BigDecimal partialPaymentPounds = getPartialPayment(caseData);
-        //calculate the relevant total, total claim value + interest if any, claim fee for case,
-        // and subtract any partial payment
+    private StringBuilder buildRepaymentBreakdown(CaseData caseData, BigDecimal interest,
+                                                  BigDecimal claimFeePounds, BigDecimal fixedCost,
+                                                  CallbackParams callbackParams, BigDecimal theOverallTotal) {
+
         var subTotal = caseData.getTotalClaimAmount()
             .add(interest)
             .add(claimFeePounds);
         if (caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.YES) {
             subTotal = subTotal.add(fixedCost);
         }
-        theOverallTotal = subTotal.subtract(partialPaymentPounds);
-        long caseId = callbackParams.getRequest().getCaseDetails().getId();
-        caseData.toBuilder();
-        cache.put(caseId, theOverallTotal);
 
         //creates  the text on the page, based on calculated values
         StringBuilder repaymentBreakdown = new StringBuilder();
@@ -392,6 +385,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
                 "\n ## Subtotal \n £").append(subTotal.setScale(2))
             .append("\n");
 
+        BigDecimal partialPaymentPounds = getPartialPayment(caseData);
+
         if (caseData.getPartialPayment() == YesOrNo.YES) {
             repaymentBreakdown.append("\n ### Amount already paid \n").append("£").append(
                 partialPaymentPounds.setScale(2));
@@ -414,19 +409,13 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     private CallbackResponse overallTotalAndDate(CallbackParams callbackParams) {
 
-        long caseId = callbackParams.getRequest().getCaseDetails().getId();
-        BigDecimal theOverallTotal = cache.getIfPresent(caseId);
-
-        if (theOverallTotal == null) {
-            throw new IllegalStateException(String.format("overall total was not found in cache for case %s", caseId));
-        }
-
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         //Set the hint date for repayment to be 30 days in the future
         String formattedDeadline = formatLocalDateTime(LocalDateTime.now().plusDays(30), DATE);
         caseDataBuilder.currentDatebox(formattedDeadline);
         //set the calculated repayment owed
+        var theOverallTotal = caseData.getDefaultJudgementOverallTotal();
         caseDataBuilder.repaymentDue(theOverallTotal.toString());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -481,10 +470,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
         // persist party flags (ccd issue)
         persistFlagsForParties(oldCaseData, caseData, caseDataBuilder);
-
-        //invalidate cache
-        long caseId = callbackParams.getRequest().getCaseDetails().getId();
-        cache.invalidate(caseId);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
