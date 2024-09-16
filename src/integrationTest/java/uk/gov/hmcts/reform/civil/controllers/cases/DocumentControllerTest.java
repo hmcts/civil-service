@@ -242,6 +242,30 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     }
 
     @Test
+    void shouldReturnForbiddenIfUserRoleIsNotCivil() throws Exception {
+
+        //given
+        MockMultipartFile file = new MockMultipartFile(
+            "file",
+            "TestFile.png",
+            "image/png",
+            "This is a dummy file content".getBytes()
+        );
+
+        //when
+        when(userService.getUserInfo(anyString())).thenReturn(userInfo.builder().roles(List.of("role")).build());
+        when(docmosisApiClient.createDocument(any(DocmosisRequest.class)))
+            .thenReturn(bytes);
+        when(caseDocumentClientApi.uploadDocuments(anyString(), anyString(), any()))
+            .thenReturn(new UploadResponse(List.of(document)));
+
+        //then
+        doFilePost(BEARER_TOKEN, file, GENERATE_ANY_DOC_URL)
+            .andExpect(status().isForbidden()).andReturn();
+
+    }
+
+    @Test
     @SneakyThrows
     void shouldThrowExceptionAnyDocument() throws Exception {
 
