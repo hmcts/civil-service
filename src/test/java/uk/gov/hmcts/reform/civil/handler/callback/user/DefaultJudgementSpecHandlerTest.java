@@ -963,7 +963,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            assertThrows(NullPointerException.class, () -> {
+            assertThrows(IllegalStateException.class, () -> {
                 handler.handle(params);
             });
         }

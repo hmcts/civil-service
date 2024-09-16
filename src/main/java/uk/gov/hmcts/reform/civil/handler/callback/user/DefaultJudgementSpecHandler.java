@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -38,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -82,9 +85,9 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private final FeatureToggleService toggleService;
     private final DefaultJudgmentOnlineMapper djOnlineMapper;
     private final CaseDetailsConverter caseDetailsConverter;
-    BigDecimal theOverallTotal;
     private final Time time;
     private final FeatureToggleService featureToggleService;
+    private final Cache<Long, BigDecimal> cache = Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build();
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -324,7 +327,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     @NotNull
     private StringBuilder buildRepaymentBreakdown(CaseData caseData, BigDecimal interest, BigDecimal claimFeePounds,
                                                   BigDecimal fixedCost, CallbackParams callbackParams) {
-
+        BigDecimal theOverallTotal;
         BigDecimal partialPaymentPounds = getPartialPayment(caseData);
         //calculate the relevant total, total claim value + interest if any, claim fee for case,
         // and subtract any partial payment
@@ -335,6 +338,9 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             subTotal = subTotal.add(fixedCost);
         }
         theOverallTotal = subTotal.subtract(partialPaymentPounds);
+        long caseId = callbackParams.getRequest().getCaseDetails().getId();
+        cache.put(caseId, theOverallTotal);
+
         //creates  the text on the page, based on calculated values
         StringBuilder repaymentBreakdown = new StringBuilder();
         if (caseData.isLRvLipOneVOne()
@@ -388,6 +394,13 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private CallbackResponse overallTotalAndDate(CallbackParams callbackParams) {
+
+        long caseId = callbackParams.getRequest().getCaseDetails().getId();
+        BigDecimal theOverallTotal = cache.getIfPresent(caseId);
+
+        if (theOverallTotal == null) {
+            throw new IllegalStateException(String.format("overall total was not found in cache for case %s", caseId));
+        }
 
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
@@ -449,6 +462,11 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
         // persist party flags (ccd issue)
         persistFlagsForParties(oldCaseData, caseData, caseDataBuilder);
+
+        //invalidate cache
+        long caseId = callbackParams.getRequest().getCaseDetails().getId();
+        cache.invalidate(caseId);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(nextState)
