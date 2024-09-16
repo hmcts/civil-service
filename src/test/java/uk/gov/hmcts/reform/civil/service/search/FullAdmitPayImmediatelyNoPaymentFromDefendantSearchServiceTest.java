@@ -34,7 +34,7 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantSearchServiceTest extends Ela
                         .must(matchQuery("data.respondToClaimAdmitPartLRspec.whenWillThisAmountBePaid",
                                          expectedDate))
                         .must(matchQuery(
-                            "data.respondent1ClaimResponseTypeForSpec",
+                            "data.respondent1ClaimResponseTypeForLipSpec",
                             RespondentResponseType.FULL_ADMISSION
                         ))
                         .must(boolQuery().must(matchQuery("state", "AWAITING_APPLICANT_INTENTION"))));

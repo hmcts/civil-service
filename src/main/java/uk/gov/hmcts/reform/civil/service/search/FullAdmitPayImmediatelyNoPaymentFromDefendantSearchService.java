@@ -39,7 +39,7 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantSearchService extends 
                                 "data.respondToClaimAdmitPartLRspec.whenWillThisAmountBePaid",
                                 targetDateString
                             )).must(matchQuery(
-                        "data.respondent1ClaimResponseTypeForSpec",
+                        "data.respondent1ClaimResponseTypeForLipSpec",
                         RespondentResponseType.FULL_ADMISSION
                     ))
                             .must(beState(AWAITING_APPLICANT_INTENTION))

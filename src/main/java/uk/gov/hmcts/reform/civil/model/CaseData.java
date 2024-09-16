@@ -345,6 +345,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     private final RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
+    private final RespondentResponseTypeSpec respondent1ClaimResponseTypeForLipSpec;
     private final RespondentResponseTypeSpec respondent2ClaimResponseTypeForSpec;
     private final RespondentResponseTypeSpec claimant1ClaimResponseTypeForSpec;
     private final RespondentResponseTypeSpec claimant2ClaimResponseTypeForSpec;
@@ -1244,7 +1245,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public String getApplicant1Email() {
-        return getApplicant1().getPartyEmail() != null ? getApplicant1().getPartyEmail() : getClaimantUserDetails().getEmail();
+        return "civilmoneyclaimsdemo@gmail.com";
     }
 
     @JsonIgnore
