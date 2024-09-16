@@ -27,8 +27,6 @@ import uk.gov.hmcts.reform.civil.Application;
 import uk.gov.hmcts.reform.civil.TestIdamConfiguration;
 import uk.gov.hmcts.reform.civil.service.AuthorisationService;
 import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.idam.client.IdamApi;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -115,9 +113,10 @@ public abstract class BaseIntegrationTest {
     protected void setSecurityAuthorities(Authentication authenticationMock, String... authorities) {
         when(authenticationMock.getPrincipal()).thenReturn(getJwt());
 
-        Collection<? extends GrantedAuthority> authorityCollection = Stream.of(authorities)
-            .map(SimpleGrantedAuthority::new)
-            .collect(Collectors.toCollection(ArrayList::new));
+        Collection<? extends GrantedAuthority> authorityCollection = Stream.concat(
+            Stream.of(authorities).map(SimpleGrantedAuthority::new),
+            Stream.of(new SimpleGrantedAuthority("citizen"))
+        ).collect(Collectors.toCollection(ArrayList::new));
 
         when(authenticationMock.getAuthorities()).thenAnswer(invocationOnMock -> authorityCollection);
     }
