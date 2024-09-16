@@ -151,5 +151,4 @@ public class FeatureToggleService {
     public boolean isGenAppsAllowedPreSdo() {
         return featureToggleApi.isFeatureEnabled("ga-allowed-pre-sdo");
     }
-
 }
