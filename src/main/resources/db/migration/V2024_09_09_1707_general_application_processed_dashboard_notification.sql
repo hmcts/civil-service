@@ -3,12 +3,12 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.GeneralApps.RespondentResponseSubmitted.Applicant',
-        '{"Notice.AAA6.GeneralApps.ApplicationSubmitted.Applicant","Notice.AAA6.GeneralApps.HwF.FullRemission.Applicant","Notice.AAA6.GeneralApps.HwF.FeePaid.Applicant","Notice.AAA6.GeneralApps.OrderMade.Applicant"}',
+        '{"Notice.AAA6.GeneralApps.ApplicationSubmitted.Applicant","Notice.AAA6.GeneralApps.MoreInfoRequired.Applicant",Notice.AAA6.GeneralApps.HwF.FullRemission.Applicant","Notice.AAA6.GeneralApps.HwF.FeePaid.Applicant","Notice.AAA6.GeneralApps.OrderMade.Applicant"}',
         '{"Notice.AAA6.GeneralApps.RespondentResponseSubmitted.Applicant": []}');
 
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.GeneralApps.RespondentResponseSubmitted.Respondent',
-        '{"Notice.AAA6.GeneralApps.UrgentApplicationMade.Respondent","Notice.AAA6.GeneralApps.NonUrgentApplicationMade.Respondent","Notice.AAA6.GeneralApps.OrderMade.Respondent"}',
+        '{"Notice.AAA6.GeneralApps.UrgentApplicationMade.Respondent","Notice.AAA6.GeneralApps.NonUrgentApplicationMade.Respondent","Notice.AAA6.GeneralApps.MoreInfoRequired.Respondent","Notice.AAA6.GeneralApps.OrderMade.Respondent"}',
         '{"Notice.AAA6.GeneralApps.RespondentResponseSubmitted.Respondent": []}');
 
 /**
@@ -34,4 +34,4 @@ VALUES ('Notice.AAA6.GeneralApps.RespondentResponseSubmitted.Respondent',
         '<p class="govuk-body"> You’ll receive an update with information about next steps.</p>',
         '<p class="govuk-body"> Bydd barnwr yn ystyried y cais. </p>' ||
         '<p class="govuk-body">Fe gewch diweddariad gyda gwybodaeth am y camau nesaf.</p>',
-        'APPLICANT');
+        'RESPONDENT');
