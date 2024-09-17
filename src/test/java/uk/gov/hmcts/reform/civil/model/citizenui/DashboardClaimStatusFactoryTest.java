@@ -115,54 +115,44 @@ public class DashboardClaimStatusFactoryTest {
     @MethodSource("awaitingJudgmentArguments")
     void shouldReturnCorrectStatus_awaitingJudgment(int orderPosition, boolean isOfficerOrder) {
         List<CaseEventDetail> eventHistory = new ArrayList<>();
-        CaseData caseData = fastClaim(LocalDateTime.now().minusDays(10 * 7), eventHistory);
+        CaseData caseData = fastClaim(eventHistory);
         caseData = applyOrderIfPosition(1, orderPosition, isOfficerOrder,
-                                        LocalDateTime.now().minusDays(10 * 7 - 1), caseData,
-                                        eventHistory
+                                        caseData, eventHistory
         );
-        caseData = scheduleHearingDays(caseData, 6 * 7 + 1, eventHistory);
-        // TODO use Claim.getLastHearingFormDate() to get when we scheduled the hearing
-//        caseData = applyOrderIfPosition(2, orderPosition, isOfficerOrder,
-//                                        LocalDateTime.now().minusDays(6 * 7), caseData
-//        );
-        caseData = requestHwF(caseData, eventHistory, LocalDateTime.now().minusDays(6 * 7));
-        // TODO use Claim.getLastHearingFormDate() to get when we scheduled the hearing
-//        caseData = applyOrderIfPosition(3, orderPosition, isOfficerOrder,
-//                                        LocalDateTime.now().minusDays(6 * 7 - 1), caseData
-//        );
-        caseData = hwfFull(caseData, eventHistory);
-        // TODO use Claim.getLastHearingFormDate() to get when we scheduled the hearing
-//        caseData = applyOrderIfPosition(4, orderPosition, isOfficerOrder,
-//                                        LocalDateTime.now().minusDays(6 * 7 - 2), caseData
-//        );
-        caseData = scheduleHearingDays(caseData, 6 * 7, eventHistory);
+        caseData = scheduleHearing(caseData, eventHistory);
+        caseData = applyOrderIfPosition(2, orderPosition, isOfficerOrder,
+                                        caseData, eventHistory
+        );
+        // 56 days to hearing
+        caseData = requestHwF(caseData, eventHistory);
+        caseData = applyOrderIfPosition(3, orderPosition, isOfficerOrder,
+                                        caseData, eventHistory
+        );
+        caseData = hwfFull(caseData, eventHistory, DashboardClaimStatus.TRIAL_OR_HEARING_SCHEDULED);
+        caseData = applyOrderIfPosition(4, orderPosition, isOfficerOrder,
+                                        caseData, eventHistory
+        );
+
+        // wait until 6 weeks to hearing
+        caseData = passDays(caseData, eventHistory, 14);
         caseData = applyOrderIfPosition(5, orderPosition, isOfficerOrder,
-                                        caseData.getHearingDate()
-                                            .atTime(LocalTime.now())
-                                            .minusDays(6 * 7 - 1), caseData,
-                                        eventHistory
+                                        caseData, eventHistory
         );
         caseData = submitClaimantHearingArrangements(caseData, eventHistory);
-        // TODO use Claim.getTrialArrangementsSubmittedDate
-//        caseData = applyOrderIfPosition(6, orderPosition, isOfficerOrder,
-//                                        caseData.getHearingDate()
-//                                            .atTime(LocalTime.now())
-//                                            .minusDays(6 * 7 - 2), caseData
-//        );
+        caseData = applyOrderIfPosition(6, orderPosition, isOfficerOrder,
+                                        caseData, eventHistory
+        );
         caseData = submitDefendantHearingArrangements(caseData, eventHistory);
-        // TODO use Claim.getTrialArrangementsSubmittedDate
-//        caseData = applyOrderIfPosition(7, orderPosition, isOfficerOrder,
-//                                        caseData.getHearingDate()
-//                                            .atTime(LocalTime.now())
-//                                            .minusDays(6 * 7 - 3), caseData
-//        );
-        caseData = scheduleHearingDays(caseData, 3 * 7, eventHistory);
-        // TODO use Claim.getTrialArrangementsSubmittedDate
-//        caseData = applyOrderIfPosition(8, orderPosition, isOfficerOrder,
-//                                        caseData.getHearingDate()
-//                                            .atTime(LocalTime.now().plusHours(1))
-//                                            .minusDays(3 * 7 - 1), caseData
-//        );
+        caseData = applyOrderIfPosition(7, orderPosition, isOfficerOrder,
+                                        caseData, eventHistory
+        );
+
+        // wait until 3 weeks to hearing
+        caseData = passDays(caseData, eventHistory, 21);
+        caseData = createBundle(caseData, eventHistory);
+        caseData = applyOrderIfPosition(8, orderPosition, isOfficerOrder,
+                                        caseData, eventHistory
+        );
         awaitingJudgment(caseData, eventHistory);
     }
 
@@ -174,26 +164,22 @@ public class DashboardClaimStatusFactoryTest {
     @MethodSource("feeNotPaidArguments")
     void shouldReturnCorrectStatus_feeNotPaid(int orderPosition, boolean isOfficerOrder) {
         List<CaseEventDetail> eventHistory = new ArrayList<>();
-        CaseData caseData = smallClaim(LocalDateTime.now().minusDays(10 * 7), eventHistory);
+        CaseData caseData = smallClaim(eventHistory);
         caseData = applyOrderIfPosition(1, orderPosition, isOfficerOrder,
-                                        LocalDateTime.now().minusDays(10 * 7 - 1), caseData,
-                                        eventHistory
+                                        caseData, eventHistory
         );
-        caseData = scheduleHearingDays(caseData, 6 * 7 + 1, eventHistory);
-        // TODO use Claim.getLastHearingFormDate() to get when we scheduled the hearing
-//        caseData = applyOrderIfPosition(2, orderPosition, isOfficerOrder,
-//                                        LocalDateTime.now().minusDays(6 * 7), caseData
-//        );
-        caseData = requestHwF(caseData, eventHistory, LocalDateTime.now().minusDays(6 * 7 - 1));
-        // TODO use Claim.getLastHearingFormDate() to get when we scheduled the hearing
-//        caseData = applyOrderIfPosition(3, orderPosition, isOfficerOrder,
-//                                        LocalDateTime.now().minusDays(6 * 7 - 1), caseData
-//        );
-        caseData = hwfPartial(caseData, eventHistory);
-        // TODO use Claim.getLastHearingFormDate() to get when we scheduled the hearing
-//        caseData = applyOrderIfPosition(4, orderPosition, isOfficerOrder,
-//                                        LocalDateTime.now().minusDays(6 * 7 - 2), caseData
-//        );
+        caseData = scheduleHearing(caseData, eventHistory);
+        caseData = applyOrderIfPosition(2, orderPosition, isOfficerOrder,
+                                        caseData, eventHistory
+        );
+        caseData = requestHwF(caseData, eventHistory);
+        caseData = applyOrderIfPosition(3, orderPosition, isOfficerOrder,
+                                        caseData, eventHistory
+        );
+        caseData = hwfPartial(caseData, eventHistory, DashboardClaimStatus.TRIAL_OR_HEARING_SCHEDULED);
+        caseData = applyOrderIfPosition(4, orderPosition, isOfficerOrder,
+                                        caseData, eventHistory
+        );
         doNotPayHearingFee(caseData, eventHistory);
     }
 
@@ -350,6 +336,36 @@ public class DashboardClaimStatusFactoryTest {
         );
         Assertions.assertEquals(
             DashboardClaimStatus.TRIAL_ARRANGEMENTS_REQUIRED,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                caseData,
+                toggleService, eventHistory
+            ))
+        );
+
+        return caseData;
+    }
+
+    private CaseData createBundle(CaseData previous, List<CaseEventDetail> eventHistory) {
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = previous.toBuilder()
+            .caseBundles(List.of(new IdValue<>(
+                "bundle1",
+                Bundle.builder()
+                    .bundleHearingDate(Optional.of(previous.getHearingDate()))
+                    .createdOn(Optional.of(LocalDateTime.now()))
+                    .build()
+            )));
+
+        DashboardClaimStatus expectedStatus = DashboardClaimStatus.BUNDLE_CREATED;
+        CaseData caseData = caseDataBuilder.build();
+        Assertions.assertEquals(
+            expectedStatus,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+                caseData,
+                toggleService, eventHistory
+            ))
+        );
+        Assertions.assertEquals(
+            expectedStatus,
             claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
                 caseData,
                 toggleService, eventHistory
@@ -558,6 +574,7 @@ public class DashboardClaimStatusFactoryTest {
         );
         return caseData;
     }
+
     private CaseData invalidHwFReferenceNumber(CaseData previous, List<CaseEventDetail> eventHistory,
                                                LocalDateTime when) {
         eventHistory.add(CaseEventDetail.builder()
@@ -835,6 +852,35 @@ public class DashboardClaimStatusFactoryTest {
         return caseData;
     }
 
+    private CaseData smallClaim(List<CaseEventDetail> eventHistory) {
+        CaseDocument sdoDocument = CaseDocument.builder()
+            .documentType(DocumentType.SDO_ORDER)
+            .createdDatetime(LocalDateTime.now())
+            .build();
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.CASE_PROGRESSION)
+            .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+            .totalClaimAmount(BigDecimal.valueOf(999))
+            .systemGeneratedCaseDocuments(List.of(Element.<CaseDocument>builder()
+                                                      .value(sdoDocument).build()))
+            .build();
+        Assertions.assertEquals(
+            DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+                caseData,
+                toggleService, eventHistory
+            ))
+        );
+        Assertions.assertEquals(
+            DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED,
+            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                caseData,
+                toggleService, eventHistory
+            ))
+        );
+        return caseData;
+    }
+
     private CaseData smallClaim(LocalDateTime sdoTime, List<CaseEventDetail> eventHistory) {
         CaseDocument sdoDocument = CaseDocument.builder()
             .documentType(DocumentType.SDO_ORDER)
@@ -864,10 +910,13 @@ public class DashboardClaimStatusFactoryTest {
         return caseData;
     }
 
-    private CaseData hwfPartial(CaseData previous, List<CaseEventDetail> eventHistory) {
-        DashboardClaimStatus defendantStatus = claimStatusFactory.getDashboardClaimStatus(
-            new CcdDashboardDefendantClaimMatcher(previous, toggleService, eventHistory)
-        );
+    private CaseData hwfPartial(CaseData previous, List<CaseEventDetail> eventHistory,
+                                // ccd state changes so order made is not valid
+                                DashboardClaimStatus defendantStatus) {
+        eventHistory.add(CaseEventDetail.builder()
+                             .eventName(CaseEvent.PARTIAL_REMISSION_HWF_GRANTED.name())
+                             .createdDate(LocalDateTime.now())
+                             .build());
         CaseData caseData = previous.toBuilder()
             .ccdState(CaseState.HEARING_READINESS)
             .hwfFeeType(FeeType.HEARING)
@@ -913,10 +962,13 @@ public class DashboardClaimStatusFactoryTest {
         return caseData;
     }
 
-    private CaseData hwfFull(CaseData previous, List<CaseEventDetail> eventHistory) {
-        DashboardClaimStatus defendantStatus = claimStatusFactory.getDashboardClaimStatus(
-            new CcdDashboardDefendantClaimMatcher(previous, toggleService, eventHistory)
-        );
+    private CaseData hwfFull(CaseData previous, List<CaseEventDetail> eventHistory,
+                             // status changes, so it can't be order made
+                             DashboardClaimStatus defendantStatus) {
+        eventHistory.add(CaseEventDetail.builder()
+                             .eventName(CaseEvent.FEE_PAYMENT_OUTCOME.name())
+                             .createdDate(LocalDateTime.now())
+                             .build());
         CaseData caseData = previous.toBuilder()
             .ccdState(CaseState.HEARING_READINESS)
             .hwfFeeType(FeeType.HEARING)
@@ -947,6 +999,14 @@ public class DashboardClaimStatusFactoryTest {
                 previous,
                 toggleService, eventHistory
             ));
+        eventHistory.add(CaseEventDetail.builder()
+                             .createdDate(LocalDateTime.now())
+                             .eventName(CaseEvent.TRIAL_READINESS.name())
+                             .build());
+        eventHistory.add(CaseEventDetail.builder()
+                             .createdDate(LocalDateTime.now())
+                             .eventName(CaseEvent.GENERATE_TRIAL_READY_FORM_APPLICANT.name())
+                             .build());
         CaseData caseData = previous.toBuilder()
             .trialReadyApplicant(YesOrNo.YES)
             .build();
@@ -973,6 +1033,14 @@ public class DashboardClaimStatusFactoryTest {
                 previous,
                 toggleService, eventHistory
             ));
+        eventHistory.add(CaseEventDetail.builder()
+                             .createdDate(LocalDateTime.now())
+                             .eventName(CaseEvent.TRIAL_READINESS.name())
+                             .build());
+        eventHistory.add(CaseEventDetail.builder()
+                             .createdDate(LocalDateTime.now())
+                             .eventName(CaseEvent.GENERATE_TRIAL_READY_FORM_RESPONDENT1.name())
+                             .build());
         CaseData caseData = previous.toBuilder()
             .trialReadyRespondent1(YesOrNo.YES)
             .build();

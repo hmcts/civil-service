@@ -2,22 +2,20 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public abstract class CcdDashboardClaimMatcher implements Claim {
 
@@ -105,12 +103,10 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     public Optional<LocalDateTime> getTimeOfLastNonSDOOrder() {
         if (caseData.getCcdState() == CaseState.CASE_PROGRESSION
             || caseData.getCcdState() == CaseState.All_FINAL_ORDERS_ISSUED) {
-            return Stream.concat(
-                    Stream.ofNullable(caseData.getPreviewCourtOfficerOrder()),
-                    caseData.getFinalOrderDocumentCollection().stream()
-                        .map(Element::getValue)
-                ).filter(Objects::nonNull).map(CaseDocument::getCreatedDatetime)
-                .max(LocalDateTime::compareTo);
+            return getTimeOfMostRecentEventOfType(EnumSet.of(
+                CaseEvent.COURT_OFFICER_ORDER,
+                CaseEvent.GENERATE_DIRECTIONS_ORDER
+            ));
         } else {
             return Optional.empty();
         }

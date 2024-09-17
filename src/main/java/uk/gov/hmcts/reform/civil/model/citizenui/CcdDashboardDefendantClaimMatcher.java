@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -434,7 +436,12 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean trialArrangementsSubmitted() {
-        return caseData.getTrialReadyRespondent1() == YesOrNo.YES;
+        Optional<LocalDateTime> eventTime;
+        Optional<LocalDateTime> orderTime;
+        return caseData.getTrialReadyRespondent1() == YesOrNo.YES
+            && ((eventTime = getTimeOfMostRecentEventOfType(EnumSet.of(CaseEvent.GENERATE_TRIAL_READY_FORM_RESPONDENT1)))
+            .isPresent())
+            && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get().isAfter(orderTime.get()));
     }
 
     @Override

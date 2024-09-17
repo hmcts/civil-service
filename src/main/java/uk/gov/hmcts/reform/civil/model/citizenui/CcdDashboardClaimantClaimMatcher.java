@@ -422,7 +422,12 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean trialArrangementsSubmitted() {
-        return caseData.getTrialReadyApplicant() == YesOrNo.YES;
+        Optional<LocalDateTime> eventTime;
+        Optional<LocalDateTime> orderTime;
+        return caseData.getTrialReadyApplicant() == YesOrNo.YES
+            && ((eventTime = getTimeOfMostRecentEventOfType(EnumSet.of(CaseEvent.GENERATE_TRIAL_READY_FORM_APPLICANT)))
+            .isPresent())
+            && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get().isAfter(orderTime.get()));
     }
 
     @Override
@@ -439,8 +444,9 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     public boolean isHwFHearingSubmit() {
         Optional<LocalDateTime> eventTime;
         Optional<LocalDateTime> orderTime;
-        return caseData.isHWFTypeHearing() && caseData.getHwFEvent() == null && ((eventTime = getTimeOfMostRecentEventOfType(
-            EnumSet.of(CaseEvent.APPLY_HELP_WITH_HEARING_FEE))).isPresent()) && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get().isAfter(
-            orderTime.get()));
+        return caseData.isHWFTypeHearing() && caseData.getHwFEvent() == null
+            && ((eventTime = getTimeOfMostRecentEventOfType(EnumSet.of(CaseEvent.APPLY_HELP_WITH_HEARING_FEE)))
+            .isPresent())
+            && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get().isAfter(orderTime.get()));
     }
 }
