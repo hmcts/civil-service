@@ -729,7 +729,7 @@ class CcdClaimStatusDashboardFactoryTest {
             .build();
 
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-            claim, featureToggleService));
+            claim, featureToggleService, Collections.emptyList()));
         assertThat(status).isEqualTo(DashboardClaimStatus.CASE_DISMISSED);
     }
 }

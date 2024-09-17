@@ -27,6 +27,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -862,8 +863,12 @@ public class DashboardClaimStatusFactoryTest {
         CaseData caseData = CaseData.builder()
             .ccdState(CaseState.CASE_STAYED)
             .build();
-        CcdDashboardDefendantClaimMatcher defendant = new CcdDashboardDefendantClaimMatcher(caseData, toggleService);
-        CcdDashboardClaimantClaimMatcher claimant = new CcdDashboardClaimantClaimMatcher(caseData, toggleService);
+        CcdDashboardDefendantClaimMatcher defendant = new CcdDashboardDefendantClaimMatcher(caseData, toggleService,
+                                                                                            Collections.emptyList()
+        );
+        CcdDashboardClaimantClaimMatcher claimant = new CcdDashboardClaimantClaimMatcher(caseData, toggleService,
+                                                                                         Collections.emptyList()
+        );
 
         argumentList.add(Arguments.arguments(defendant, DashboardClaimStatus.CASE_STAYED));
         argumentList.add(Arguments.arguments(claimant, DashboardClaimStatus.CASE_STAYED));
@@ -873,8 +878,11 @@ public class DashboardClaimStatusFactoryTest {
         CaseData caseData = CaseData.builder()
             .ccdState(CaseState.CASE_DISMISSED)
             .build();
-        CcdDashboardDefendantClaimMatcher defendant = new CcdDashboardDefendantClaimMatcher(caseData, toggleService);
-        CcdDashboardClaimantClaimMatcher claimant = new CcdDashboardClaimantClaimMatcher(caseData, toggleService);
+        CcdDashboardDefendantClaimMatcher defendant = new CcdDashboardDefendantClaimMatcher(
+            caseData, toggleService, Collections.emptyList());
+        CcdDashboardClaimantClaimMatcher claimant = new CcdDashboardClaimantClaimMatcher(caseData, toggleService,
+                                                                                         Collections.emptyList()
+        );
 
         argumentList.add(Arguments.arguments(defendant, DashboardClaimStatus.CASE_DISMISSED));
         argumentList.add(Arguments.arguments(claimant, DashboardClaimStatus.CASE_DISMISSED));
