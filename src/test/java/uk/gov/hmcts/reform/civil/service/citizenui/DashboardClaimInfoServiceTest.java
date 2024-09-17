@@ -113,7 +113,7 @@ public class DashboardClaimInfoServiceTest {
             eventDataService
         );
 
-        when(eventDataService.getEventsForCase(ArgumentMatchers.anyString())).thenReturn(Collections.emptyList());
+        when(eventDataService.getEventsForCase(ArgumentMatchers.nullable(String.class))).thenReturn(Collections.emptyList());
         given(claimStoreService.getClaimsForClaimant(any(), any())).willReturn(CLAIM_STORE_SERVICE_RESULTS);
         given(claimStoreService.getClaimsForDefendant(any(), any())).willReturn(CLAIM_STORE_SERVICE_RESULTS);
 

@@ -195,8 +195,9 @@ public class DashboardClaimInfoService {
     }
 
     private DashboardClaimStatus getStatus(boolean isClaimant, CaseData caseData) {
-        List<CaseEventDetail> events = eventDataService
-            .getEventsForCase(caseData.getCcdCaseReference().toString());
+        List<CaseEventDetail> events = Optional.ofNullable(caseData.getCcdCaseReference())
+                .map(s -> eventDataService.getEventsForCase(s.toString()))
+                    .orElse(Collections.emptyList());
         return isClaimant
             ? dashboardClaimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
             caseData,
