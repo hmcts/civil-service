@@ -8,8 +8,8 @@ import uk.gov.hmcts.contino.GithubAPI
 def type = "java"
 def product = "civil"
 def component = "service"
-def ccdBranch = "master"
-def camundaBranch = "master"
+def ccdBranch = "feature/CIV-5858-Refactor-DJ-Camunda-to-Notify-2-Defendants-Separately"
+def camundaBranch = "feature/CIV-5858Refactor-DJ-Camunda-to-Notify-2-Defendants-Separately"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
 AppPipelineConfig pipelineConf
