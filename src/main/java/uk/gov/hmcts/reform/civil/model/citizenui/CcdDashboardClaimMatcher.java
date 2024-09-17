@@ -22,7 +22,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     protected CaseData caseData;
     protected FeatureToggleService featureToggleService;
     /**
-     * sorted in descending order by creation date
+     * sorted in descending order by creation date.
      */
     protected List<CaseEventDetail> eventHistory;
 
@@ -90,7 +90,6 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
         return caseData.getRespondent1TimeExtensionDate() != null
             && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
     }
-
 
     @Override
     public boolean isOrderMade() {

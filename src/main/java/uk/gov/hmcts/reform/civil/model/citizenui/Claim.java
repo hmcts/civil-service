@@ -184,7 +184,7 @@ public interface Claim {
             && (
             (lastOrderDate = getTimeOfLastNonSDOOrder()).isEmpty()
                 || lastOrderDate.get().isBefore(bundleDate.get())
-        );
+            );
     }
 
     default boolean isTrialArrangementStatusActive() {

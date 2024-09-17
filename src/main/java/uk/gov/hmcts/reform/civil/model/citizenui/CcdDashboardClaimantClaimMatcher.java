@@ -37,35 +37,44 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isClaimSubmittedNotPaidOrFailedNotHwF() {
-        return caseData.isApplicantNotRepresented() && !caseData.isHWFTypeClaimIssued() && ((caseData.getClaimIssuedPaymentDetails() == null && caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED) || (caseData.getClaimIssuedPaymentDetails() != null && caseData.getClaimIssuedPaymentDetails().getStatus() == FAILED));
+        return caseData.isApplicantNotRepresented() && !caseData.isHWFTypeClaimIssued()
+            && ((caseData.getClaimIssuedPaymentDetails() == null
+            && caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED)
+            || (caseData.getClaimIssuedPaymentDetails() != null
+            && caseData.getClaimIssuedPaymentDetails().getStatus() == FAILED));
     }
 
     @Override
     public boolean isClaimSubmittedWaitingTranslatedDocuments() {
-        return caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED && caseData.isClaimantBilingual() && (caseData.getIssueDate() != null || caseData.isHWFOutcomeReady());
+        return caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED && caseData.isClaimantBilingual()
+            && (caseData.getIssueDate() != null || caseData.isHWFOutcomeReady());
     }
 
     @Override
     public boolean hasResponsePending() {
-        return caseData.getRespondent1ResponseDate() == null && !isPaperResponse() && caseData.getRespondent1ResponseDeadline() != null && caseData.getRespondent1ResponseDeadline().isAfter(
-            LocalDate.now().atTime(FOUR_PM));
+        return caseData.getRespondent1ResponseDate() == null && !isPaperResponse()
+            && caseData.getRespondent1ResponseDeadline() != null
+            && caseData.getRespondent1ResponseDeadline().isAfter(LocalDate.now().atTime(FOUR_PM));
     }
 
     @Override
     public boolean hasResponsePendingOverdue() {
-        return caseData.getRespondent1ResponseDeadline() != null && caseData.getRespondent1ResponseDeadline().isBefore(
-            LocalDate.now().atTime(FOUR_PM)) && caseData.hasBreathingSpace();
+        return caseData.getRespondent1ResponseDeadline() != null
+            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
+            && caseData.hasBreathingSpace();
     }
 
     @Override
     public boolean hasResponseDueToday() {
-        return caseData.getRespondent1ResponseDeadline() != null && caseData.getRespondent1ResponseDeadline().toLocalDate().isEqual(
-            LocalDate.now()) && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM));
+        return caseData.getRespondent1ResponseDeadline() != null
+            && caseData.getRespondent1ResponseDeadline().toLocalDate().isEqual(LocalDate.now())
+            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM));
     }
 
     @Override
     public boolean hasResponseFullAdmit() {
-        return caseData.getRespondent1ClaimResponseTypeForSpec() != null && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION;
+        return caseData.getRespondent1ClaimResponseTypeForSpec() != null
+            && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION;
     }
 
     @Override
@@ -81,7 +90,8 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         if (isClaimProceedInCaseMan()) {
             return false;
         }
-        return hasResponseFullAdmit() && caseData.isPayBySetDate() && (Objects.isNull(caseData.getApplicant1AcceptFullAdmitPaymentPlanSpec()));
+        return hasResponseFullAdmit() && caseData.isPayBySetDate()
+            && (Objects.isNull(caseData.getApplicant1AcceptFullAdmitPaymentPlanSpec()));
     }
 
     @Override
@@ -89,13 +99,15 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         if (isClaimProceedInCaseMan()) {
             return false;
         }
-        return hasResponseFullAdmit() && caseData.isPayByInstallment() && (Objects.isNull(caseData.getApplicant1AcceptFullAdmitPaymentPlanSpec()));
+        return hasResponseFullAdmit() && caseData.isPayByInstallment()
+            && (Objects.isNull(caseData.getApplicant1AcceptFullAdmitPaymentPlanSpec()));
     }
 
     @Override
     public boolean isEligibleForCCJ() {
-        return caseData.getRespondent1ResponseDeadline() != null && caseData.getRespondent1ResponseDeadline().isBefore(
-            LocalDate.now().atTime(FOUR_PM)) && caseData.getPaymentTypeSelection() == null;
+        return caseData.getRespondent1ResponseDeadline() != null
+            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
+            && caseData.getPaymentTypeSelection() == null;
     }
 
     @Override
@@ -110,7 +122,8 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean claimantRequestedCountyCourtJudgement() {
-        return (null != caseData.getCcjPaymentDetails() && null != caseData.getCcjPaymentDetails().getCcjJudgmentStatement());
+        return (null != caseData.getCcjPaymentDetails()
+            && null != caseData.getCcjPaymentDetails().getCcjJudgmentStatement());
     }
 
     @Override
@@ -118,7 +131,8 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         if (isClaimProceedInCaseMan()) {
             return false;
         }
-        return RespondentResponseTypeSpec.FULL_DEFENCE == caseData.getRespondent1ClaimResponseTypeForSpec() && caseData.getApplicant1ResponseDate() == null;
+        return RespondentResponseTypeSpec.FULL_DEFENCE == caseData.getRespondent1ClaimResponseTypeForSpec()
+            && caseData.getApplicant1ResponseDate() == null;
     }
 
     @Override
@@ -132,8 +146,8 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
             return false;
         }
 
-        return Objects.nonNull(caseData.getTakenOfflineDate()) && Objects.nonNull(caseData.getCcdState()) && caseData.getCcdState().equals(
-            CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
+        return Objects.nonNull(caseData.getTakenOfflineDate()) && Objects.nonNull(caseData.getCcdState())
+            && caseData.getCcdState().equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
     }
 
     @Override
@@ -173,11 +187,14 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean hasDefendantStatedTheyPaid() {
-        return defendantRespondedWithPartAdmit() && isPayImmediately() && !caseData.getApplicant1ResponseDeadlinePassed() && !(caseData.hasApplicantRejectedRepaymentPlan() || caseData.isPartAdmitClaimNotSettled());
+        return defendantRespondedWithPartAdmit() && isPayImmediately()
+            && !caseData.getApplicant1ResponseDeadlinePassed()
+            && !(caseData.hasApplicantRejectedRepaymentPlan() || caseData.isPartAdmitClaimNotSettled());
     }
 
     private boolean isPayImmediately() {
-        return RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY == caseData.getDefenceAdmitPartPaymentTimeRouteRequired();
+        return RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY
+            == caseData.getDefenceAdmitPartPaymentTimeRouteRequired();
     }
 
     @Override
@@ -185,7 +202,9 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         if (isClaimProceedInCaseMan()) {
             return false;
         }
-        return RespondentResponseTypeSpec.PART_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec() && !caseData.getApplicant1ResponseDeadlinePassed() && !(caseData.hasApplicantRejectedRepaymentPlan() || caseData.isPartAdmitClaimNotSettled());
+        return RespondentResponseTypeSpec.PART_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec()
+            && !caseData.getApplicant1ResponseDeadlinePassed()
+            && !(caseData.hasApplicantRejectedRepaymentPlan() || caseData.isPartAdmitClaimNotSettled());
     }
 
     @Override
@@ -220,33 +239,40 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isMediationSuccessful() {
-        return !hasSdoBeenDrawn() && Objects.nonNull(caseData.getMediation()) && Objects.nonNull(caseData.getMediation().getMediationSuccessful()) && Objects.nonNull(
-            caseData.getMediation().getMediationSuccessful().getMediationAgreement());
+        return !hasSdoBeenDrawn() && Objects.nonNull(caseData.getMediation())
+            && Objects.nonNull(caseData.getMediation().getMediationSuccessful())
+            && Objects.nonNull(caseData.getMediation().getMediationSuccessful().getMediationAgreement());
     }
 
     @Override
     public boolean isMediationUnsuccessful() {
-        return !hasSdoBeenDrawn() && Objects.nonNull(caseData.getMediation()) && ((Objects.nonNull(caseData.getMediation().getUnsuccessfulMediationReason()) && !caseData.getMediation().getUnsuccessfulMediationReason().isEmpty()) || (Objects.nonNull(
-            caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect()) && !caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect().isEmpty()));
+        return !hasSdoBeenDrawn() && Objects.nonNull(caseData.getMediation())
+            && ((Objects.nonNull(caseData.getMediation().getUnsuccessfulMediationReason())
+            && !caseData.getMediation().getUnsuccessfulMediationReason().isEmpty())
+            || (Objects.nonNull(caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect())
+            && !caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect().isEmpty()));
     }
 
     @Override
     public boolean isMediationPending() {
-        return Objects.nonNull(caseData.getCcdState()) && caseData.getCcdState().equals(CaseState.IN_MEDIATION) && Objects.nonNull(
-            caseData.getMediation()) && Objects.nonNull(caseData.getMediation().getMediationSuccessful()) && Objects.isNull(
-            caseData.getMediation().getMediationSuccessful().getMediationAgreement());
+        return Objects.nonNull(caseData.getCcdState()) && caseData.getCcdState().equals(CaseState.IN_MEDIATION)
+            && Objects.nonNull(caseData.getMediation())
+            && Objects.nonNull(caseData.getMediation().getMediationSuccessful())
+            && Objects.isNull(caseData.getMediation().getMediationSuccessful().getMediationAgreement());
     }
 
     @Override
     public boolean isCourtReviewing() {
-        return (!hasSdoBeenDrawn() && (caseData.isRespondentResponseFullDefence() || caseData.isPartAdmitClaimSpec()) && CaseState.JUDICIAL_REFERRAL.equals(
-            caseData.getCcdState())) || (caseData.hasApplicantRejectedRepaymentPlan());
+        return (!hasSdoBeenDrawn() && (caseData.isRespondentResponseFullDefence() || caseData.isPartAdmitClaimSpec())
+            && CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState()))
+            || (caseData.hasApplicantRejectedRepaymentPlan());
     }
 
     @Override
     public boolean hasClaimEnded() {
-        return (Objects.nonNull(caseData.getApplicant1ProceedsWithClaimSpec()) && caseData.getApplicant1ProceedsWithClaimSpec().equals(
-            YesOrNo.NO) && caseData.isRespondentResponseFullDefence()) || caseData.getApplicant1ResponseDeadlinePassed();
+        return (Objects.nonNull(caseData.getApplicant1ProceedsWithClaimSpec())
+            && caseData.getApplicant1ProceedsWithClaimSpec().equals(YesOrNo.NO)
+            && caseData.isRespondentResponseFullDefence()) || caseData.getApplicant1ResponseDeadlinePassed();
     }
 
     @Override
@@ -266,21 +292,24 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isPartialAdmissionRejected() {
-        return CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState()) && caseData.isPartAdmitClaimSpec() && NO.equals(
-            caseData.getApplicant1AcceptAdmitAmountPaidSpec());
+        return CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState())
+            && caseData.isPartAdmitClaimSpec() && NO.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec());
     }
 
 
     @Override
     public boolean isSDOOrderInReview() {
-        return featureToggleService.isCaseProgressionEnabled() && isSDOMadeByLegalAdviser() && nonNull(caseData.getOrderRequestedForReviewClaimant()) && caseData.getOrderRequestedForReviewClaimant().equals(
-            YES) && !isDecisionForReconsiderationMade();
+        return featureToggleService.isCaseProgressionEnabled() && isSDOMadeByLegalAdviser()
+            && nonNull(caseData.getOrderRequestedForReviewClaimant())
+            && caseData.getOrderRequestedForReviewClaimant().equals(YES) && !isDecisionForReconsiderationMade();
     }
 
     @Override
     public boolean isSDOOrderInReviewOtherParty() {
-        return featureToggleService.isCaseProgressionEnabled() && isSDOMadeByLegalAdviser() && nonNull(caseData.getOrderRequestedForReviewDefendant()) && caseData.getOrderRequestedForReviewDefendant().equals(
-            YES) && !isSDOOrderInReview() && !isDecisionForReconsiderationMade();
+        return featureToggleService.isCaseProgressionEnabled() && isSDOMadeByLegalAdviser()
+            && nonNull(caseData.getOrderRequestedForReviewDefendant())
+            && caseData.getOrderRequestedForReviewDefendant().equals(YES)
+            && !isSDOOrderInReview() && !isDecisionForReconsiderationMade();
     }
 
     @Override
@@ -290,30 +319,36 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isClaimantDefaultJudgement() {
-        return caseData.getRespondent1ResponseDeadline() != null && caseData.getRespondent1ResponseDeadline().isBefore(
-            LocalDate.now().atTime(FOUR_PM)) && caseData.getPaymentTypeSelection() != null;
+        return caseData.getRespondent1ResponseDeadline() != null
+            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
+            && caseData.getPaymentTypeSelection() != null;
     }
 
     @Override
     public boolean isPartialAdmissionAccepted() {
-        return caseData.isPartAdmitClaimSpec() && caseData.isPartAdmitClaimNotSettled() && caseData.isPayImmediately() && YES == caseData.getApplicant1AcceptAdmitAmountPaidSpec();
+        return caseData.isPartAdmitClaimSpec() && caseData.isPartAdmitClaimNotSettled()
+            && caseData.isPayImmediately() && YES == caseData.getApplicant1AcceptAdmitAmountPaidSpec();
     }
 
     @Override
     public boolean isPaymentPlanRejected() {
-        return ((caseData.isPartAdmitClaimSpec() || caseData.isFullAdmitClaimSpec()) && (caseData.isPayBySetDate() || caseData.isPayByInstallment()) && caseData.hasApplicantRejectedRepaymentPlan() && !isIndividualORSoleTrader());
+        return ((caseData.isPartAdmitClaimSpec() || caseData.isFullAdmitClaimSpec())
+            && (caseData.isPayBySetDate() || caseData.isPayByInstallment())
+            && caseData.hasApplicantRejectedRepaymentPlan() && !isIndividualORSoleTrader());
     }
 
     @Override
     public boolean isPaymentPlanRejectedRequestedJudgeDecision() {
-        return ((caseData.isPartAdmitClaimSpec() || caseData.isFullAdmitClaimSpec()) && (caseData.isPayBySetDate() || caseData.isPayByInstallment()) && caseData.hasApplicantRejectedRepaymentPlan() && isIndividualORSoleTrader() && isCourtDecisionRejected());
+        return ((caseData.isPartAdmitClaimSpec() || caseData.isFullAdmitClaimSpec())
+            && (caseData.isPayBySetDate() || caseData.isPayByInstallment())
+            && caseData.hasApplicantRejectedRepaymentPlan() && isIndividualORSoleTrader() && isCourtDecisionRejected());
     }
 
     private boolean isCourtDecisionRejected() {
-        ClaimantLiPResponse applicant1Response = Optional.ofNullable(caseData.getCaseDataLiP()).map(CaseDataLiP::getApplicant1LiPResponse).orElse(
-            null);
-
-        return applicant1Response != null && applicant1Response.hasClaimantRejectedCourtDecision();
+        return Optional.ofNullable(caseData.getCaseDataLiP())
+            .map(CaseDataLiP::getApplicant1LiPResponse)
+            .map(ClaimantLiPResponse::hasClaimantRejectedCourtDecision)
+            .orElse(Boolean.FALSE);
     }
 
     private boolean isIndividualORSoleTrader() {
@@ -322,33 +357,37 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isHwFClaimSubmit() {
-        return caseData.isHWFTypeClaimIssued() && caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED && null == caseData.getHwFEvent();
+        return caseData.isHWFTypeClaimIssued()
+            && caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED
+            && null == caseData.getHwFEvent();
     }
 
     @Override
     public boolean isHwFMoreInformationNeeded() {
         Optional<LocalDateTime> eventTime;
         Optional<LocalDateTime> orderTime;
-        return caseData.isHWFTypeHearing() && caseData.getHwFEvent() == CaseEvent.MORE_INFORMATION_HWF && ((eventTime = getTimeOfMostRecentEventOfType(
-            EnumSet.of(CaseEvent.MORE_INFORMATION_HWF))).isPresent()) && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get().isAfter(
-            orderTime.get()));
+        return caseData.isHWFTypeHearing() && caseData.getHwFEvent() == CaseEvent.MORE_INFORMATION_HWF
+            && ((eventTime = getTimeOfMostRecentEventOfType(EnumSet.of(CaseEvent.MORE_INFORMATION_HWF))).isPresent())
+            && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get().isAfter(orderTime.get()));
     }
 
     @Override
     public boolean isHwfNoRemission() {
         Optional<LocalDateTime> eventTime;
         Optional<LocalDateTime> orderTime;
-        return caseData.isHWFTypeHearing() && caseData.getHwFEvent() == CaseEvent.NO_REMISSION_HWF && ((eventTime = getTimeOfMostRecentEventOfType(
-            EnumSet.of(CaseEvent.NO_REMISSION_HWF))).isPresent()) && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get().isAfter(
-            orderTime.get()));
+        return caseData.isHWFTypeHearing() && caseData.getHwFEvent() == CaseEvent.NO_REMISSION_HWF
+            && ((eventTime = getTimeOfMostRecentEventOfType(EnumSet.of(CaseEvent.NO_REMISSION_HWF))).isPresent())
+            && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get().isAfter(orderTime.get()));
     }
 
     @Override
     public boolean isHwfPartialRemission() {
         Optional<LocalDateTime> eventTime;
         Optional<LocalDateTime> orderTime;
-        return caseData.isHWFTypeHearing() && caseData.getHwFEvent() == CaseEvent.PARTIAL_REMISSION_HWF_GRANTED && ((eventTime = getTimeOfMostRecentEventOfType(
-            EnumSet.of(CaseEvent.PARTIAL_REMISSION_HWF_GRANTED))).isPresent()) && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get().isAfter(
+        return caseData.isHWFTypeHearing() && caseData.getHwFEvent() == CaseEvent.PARTIAL_REMISSION_HWF_GRANTED
+            && ((eventTime = getTimeOfMostRecentEventOfType(
+                EnumSet.of(CaseEvent.PARTIAL_REMISSION_HWF_GRANTED))).isPresent())
+            && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get().isAfter(
             orderTime.get()));
     }
 
@@ -356,18 +395,19 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     public boolean isHwfUpdatedRefNumber() {
         Optional<LocalDateTime> eventTime;
         Optional<LocalDateTime> orderTime;
-        return caseData.isHWFTypeHearing() && caseData.getHwFEvent() == CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER && ((eventTime = getTimeOfMostRecentEventOfType(
-            EnumSet.of(CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER))).isPresent()) && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get().isAfter(
-            orderTime.get()));
+        return caseData.isHWFTypeHearing() && caseData.getHwFEvent() == CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER
+            && ((eventTime = getTimeOfMostRecentEventOfType(EnumSet.of(CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER)))
+            .isPresent())
+            && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get().isAfter(orderTime.get()));
     }
 
     @Override
     public boolean isHwfInvalidRefNumber() {
         Optional<LocalDateTime> eventTime;
         Optional<LocalDateTime> orderTime;
-        return caseData.isHWFTypeHearing() && caseData.getHwFEvent() == CaseEvent.INVALID_HWF_REFERENCE && ((eventTime = getTimeOfMostRecentEventOfType(
-            EnumSet.of(CaseEvent.INVALID_HWF_REFERENCE))).isPresent()) && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get().isAfter(
-            orderTime.get()));
+        return caseData.isHWFTypeHearing() && caseData.getHwFEvent() == CaseEvent.INVALID_HWF_REFERENCE
+            && ((eventTime = getTimeOfMostRecentEventOfType(EnumSet.of(CaseEvent.INVALID_HWF_REFERENCE))).isPresent())
+            && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get().isAfter(orderTime.get()));
     }
 
     @Override
@@ -391,16 +431,19 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean defendantRespondedWithPreferredLanguageWelsh() {
-        return caseData.isRespondentResponseBilingual() && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+        return caseData.isRespondentResponseBilingual()
+            && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
     }
 
     public boolean isWaitingForClaimantIntentDocUpload() {
-        return caseData.isRespondentResponseFullDefence() && caseData.getApplicant1ResponseDate() != null && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION && caseData.isClaimantBilingual();
+        return caseData.isRespondentResponseFullDefence() && caseData.getApplicant1ResponseDate() != null
+            && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION && caseData.isClaimantBilingual();
     }
 
     public boolean isNocForDefendant() {
-        return isPaperResponse() && (caseData.getBusinessProcess() != null && CaseEvent.APPLY_NOC_DECISION_DEFENDANT_LIP.name().equals(
-            caseData.getBusinessProcess().getCamundaEvent()));
+        return isPaperResponse() && (caseData.getBusinessProcess() != null
+            && CaseEvent.APPLY_NOC_DECISION_DEFENDANT_LIP.name()
+            .equals(caseData.getBusinessProcess().getCamundaEvent()));
     }
 
     public boolean isDefaultJudgementIssued() {
