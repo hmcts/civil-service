@@ -42,11 +42,11 @@ public class GeneralApplicationHwfRejectedScenarioTest extends BaseIntegrationTe
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">We’ve rejected your application for help with the ${applicationFeeTypeEn} fee. See email for further details.</p>" +
                         "<p class=\"govuk-body\">To progress your application, you must <a href={GA_VIEW_APPLICATION_URL} rel=\"noopener noreferrer\" class=\"govuk-link\">pay the full fee</a> of ${applicationFee}.</p>" +
-                        "<p class=\"govuk-body\">You can pay by phone by calling 0300 123 7050.</p>"),
+                        "<p class=\"govuk-body\">You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Rydym wedi gwrthod eich cais am help i dalu’r ffi gwneud ${applicationFeeTypeCy}. Gweler yr e-bost am ragor o fanylion.</p>" +
                         "<p class=\"govuk-body\">I symud eich cais yn ei flaen, rhaid i chi <a href={GA_VIEW_APPLICATION_URL} rel=\"noopener noreferrer\" class=\"govuk-link\">dalu’r ffi lawn</a> o ${applicationFee}.</p>" +
-                        "<p class=\"govuk-body\">Gallwch dalu dros y ffôn drwy ffonio 0300 123 7050.</p>")
+                        "<p class=\"govuk-body\">Gallwch dalu dros y ffôn drwy ffonio {civilMoneyClaimsTelephone}.</p>")
             );
     }
 }
