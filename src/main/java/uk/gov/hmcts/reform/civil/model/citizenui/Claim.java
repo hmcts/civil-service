@@ -164,9 +164,54 @@ public interface Claim {
     default boolean isHwFHearingSubmit() {
         return false;
     }
+
     boolean isOrderMade();
+
     Optional<LocalDate> getHearingDate();
+
     Optional<LocalDateTime> getTimeOfLastNonSDOOrder();
+
     Optional<LocalDateTime> getBundleCreationDate();
+
     Optional<LocalDateTime> getWhenWasHearingScheduled();
+
+    default boolean isBundleCreatedStatusActive() {
+        Optional<LocalDateTime> bundleDate;
+        Optional<LocalDateTime> lastOrderDate;
+        return isHearingScheduled()
+            && isHearingLessThanDaysAway(3 * 7)
+            && (bundleDate = getBundleCreationDate()).isPresent()
+            && (
+            (lastOrderDate = getTimeOfLastNonSDOOrder()).isEmpty()
+                || lastOrderDate.get().isBefore(bundleDate.get())
+        );
+    }
+
+    default boolean isTrialArrangementStatusActive() {
+        int dayLimit = 6 * 7;
+        Optional<LocalDate> hearingDate = getHearingDate();
+        if (hearingDate.isPresent()
+            && LocalDate.now().plusDays(dayLimit + 1).isAfter(hearingDate.get())) {
+            Optional<LocalDateTime> lastOrder = getTimeOfLastNonSDOOrder();
+            return lastOrder.isEmpty()
+                || hearingDate.get().minusDays(dayLimit)
+                .isAfter(lastOrder.get().toLocalDate());
+        } else {
+            return false;
+        }
+    }
+
+    default boolean isTrialScheduledStatusActive() {
+        Optional<LocalDateTime> hearingScheduledDate;
+        Optional<LocalDateTime> orderDate;
+        if (isHearingScheduled()
+            && !isHearingLessThanDaysAway(6 * 7)
+            && ((hearingScheduledDate = getWhenWasHearingScheduled()).isPresent())
+        ) {
+            return ((orderDate = getTimeOfLastNonSDOOrder()).isEmpty()
+                || orderDate.get().isBefore(hearingScheduledDate.get()));
+        } else {
+            return false;
+        }
+    }
 }

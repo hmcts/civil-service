@@ -2,9 +2,6 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import lombok.Getter;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
@@ -56,39 +53,13 @@ public enum DashboardClaimStatus {
         Claim::isAwaitingJudgment
     ),
     BUNDLE_CREATED(
-        c -> {
-            Optional<LocalDateTime> bundleDate;
-            Optional<LocalDateTime> lastOrderDate;
-            return c.isHearingScheduled()
-                && c.isHearingLessThanDaysAway(3 * 7)
-                && (bundleDate = c.getBundleCreationDate()).isPresent()
-                && (
-                (lastOrderDate = c.getTimeOfLastNonSDOOrder()).isEmpty()
-                    || lastOrderDate.get().isBefore(bundleDate.get())
-            );
-        }
+        Claim::isBundleCreatedStatusActive
     ),
     TRIAL_ARRANGEMENTS_SUBMITTED(
         Claim::trialArrangementsSubmitted
     ),
     TRIAL_ARRANGEMENTS_REQUIRED(
-        c -> {
-            // same day amount than TRIAL_OR_HEARING_SCHEDULED
-            int dayLimit = 6 * 7;
-            Optional<LocalDate> hearingDate = c.getHearingDate();
-            if (hearingDate.isPresent()
-                && LocalDate.now().plusDays(dayLimit + 1).isAfter(hearingDate.get())) {
-                Optional<LocalDateTime> lastOrder = c.getTimeOfLastNonSDOOrder();
-                if (lastOrder.isPresent()) {
-                    LocalDate trigger = hearingDate.get().minusDays(dayLimit);
-                    return trigger.isAfter(lastOrder.get().toLocalDate());
-                } else {
-                    return true;
-                }
-            } else {
-                return false;
-            }
-        }
+        Claim::isTrialArrangementStatusActive
     ),
     CLAIMANT_HWF_FEE_PAYMENT_OUTCOME(
         Claim::isHwfPaymentOutcome
@@ -115,19 +86,7 @@ public enum DashboardClaimStatus {
         Claim::isHwFHearingSubmit
     ),
     TRIAL_OR_HEARING_SCHEDULED(
-        c -> {
-            Optional<LocalDateTime> hearingScheduledDate;
-            Optional<LocalDateTime> orderDate;
-            if (c.isHearingScheduled()
-                && !c.isHearingLessThanDaysAway(6 * 7)
-                && ((hearingScheduledDate = c.getWhenWasHearingScheduled()).isPresent())
-            ) {
-                return ((orderDate = c.getTimeOfLastNonSDOOrder()).isEmpty()
-                    || orderDate.get().isBefore(hearingScheduledDate.get()));
-            } else {
-                return false;
-            }
-        }
+        Claim::isTrialScheduledStatusActive
     ),
     MORE_DETAILS_REQUIRED(
         Claim::isMoreDetailsRequired
