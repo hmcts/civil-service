@@ -32,6 +32,9 @@ import java.util.Optional;
 import java.util.UUID;
 import static org.springframework.http.MediaType.ALL_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
+import static uk.gov.hmcts.reform.civil.constants.DocumentManagementConstants.CASE_TYPE_ID;
+import static uk.gov.hmcts.reform.civil.constants.DocumentManagementConstants.CREATED_BY;
+import static uk.gov.hmcts.reform.civil.constants.DocumentManagementConstants.JURISDICTION_ID;
 
 @Slf4j
 @Service("documentManagementService")
@@ -40,7 +43,6 @@ import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 public class SecuredDocumentManagementService implements DocumentManagementService {
 
     protected static final int DOC_UUID_LENGTH = 36;
-    public static final String CREATED_BY = "Civil";
     protected static final String FILES_NAME = "files";
 
     private final DocumentDownloadClientApi documentDownloadClientApi;
@@ -61,8 +63,8 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
 
             DocumentUploadRequest documentUploadRequest = new DocumentUploadRequest(
                 Classification.RESTRICTED.toString(),
-                "CIVIL",
-                "CIVIL",
+                CASE_TYPE_ID,
+                JURISDICTION_ID,
                 Collections.singletonList(file)
             );
 
