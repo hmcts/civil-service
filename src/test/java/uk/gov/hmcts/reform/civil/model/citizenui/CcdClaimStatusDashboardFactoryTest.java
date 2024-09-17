@@ -282,6 +282,7 @@ class CcdClaimStatusDashboardFactoryTest {
         Element<CaseDocument> document = new Element<>(
             UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
             CaseDocument.builder()
+                .createdDatetime(LocalDateTime.now())
                 .documentType(DocumentType.SDO_ORDER)
                 .build()
         );
