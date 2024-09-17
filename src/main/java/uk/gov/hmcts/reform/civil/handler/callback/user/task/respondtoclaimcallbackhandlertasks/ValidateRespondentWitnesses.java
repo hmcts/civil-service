@@ -34,7 +34,6 @@ public class ValidateRespondentWitnesses implements CaseTask, WitnessesValidator
         this.userService = userService;
     }
 
-    @Override
     public CallbackResponse execute(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
