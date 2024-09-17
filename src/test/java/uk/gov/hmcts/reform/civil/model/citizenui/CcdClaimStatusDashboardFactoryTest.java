@@ -406,13 +406,12 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     private static CaseData getClaimWithFullAdmitResponse(RespondentResponsePartAdmissionPaymentTimeLRspec paymentMethod) {
-        CaseData claim = CaseData.builder()
+        return CaseData.builder()
             .respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(paymentMethod)
             .build();
-        return claim;
     }
 
     @Test

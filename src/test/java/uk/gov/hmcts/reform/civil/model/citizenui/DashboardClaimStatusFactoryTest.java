@@ -272,7 +272,7 @@ public class DashboardClaimStatusFactoryTest {
         return caseData;
     }
 
-    private CaseData shouldRequireTrialArrangements(CaseData caseData, List<CaseEventDetail> eventHistory) {
+    private void shouldRequireTrialArrangements(CaseData caseData, List<CaseEventDetail> eventHistory) {
         Assertions.assertEquals(
             DashboardClaimStatus.TRIAL_ARRANGEMENTS_REQUIRED,
             claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
@@ -287,8 +287,6 @@ public class DashboardClaimStatusFactoryTest {
                 toggleService, eventHistory
             ))
         );
-
-        return caseData;
     }
 
     private CaseData createBundle(CaseData previous, List<CaseEventDetail> eventHistory) {
@@ -561,7 +559,7 @@ public class DashboardClaimStatusFactoryTest {
         return caseData;
     }
 
-    private CaseData doNotPayHearingFee(CaseData previous, List<CaseEventDetail> eventHistory) {
+    private void doNotPayHearingFee(CaseData previous, List<CaseEventDetail> eventHistory) {
         CaseData caseData = previous.toBuilder()
             .caseDismissedHearingFeeDueDate(LocalDateTime.now())
             .build();
@@ -579,7 +577,6 @@ public class DashboardClaimStatusFactoryTest {
                 toggleService, eventHistory
             ))
         );
-        return caseData;
     }
 
     private CaseData hwfFull(CaseData previous, List<CaseEventDetail> eventHistory,
@@ -681,7 +678,7 @@ public class DashboardClaimStatusFactoryTest {
         return caseData;
     }
 
-    private CaseData awaitingJudgment(CaseData previous, List<CaseEventDetail> eventHistory) {
+    private void awaitingJudgment(CaseData previous, List<CaseEventDetail> eventHistory) {
         CaseData caseData = previous.toBuilder()
             .ccdState(CaseState.DECISION_OUTCOME)
             .build();
@@ -699,7 +696,6 @@ public class DashboardClaimStatusFactoryTest {
                 toggleService, eventHistory
             ))
         );
-        return caseData;
     }
 
     /**
