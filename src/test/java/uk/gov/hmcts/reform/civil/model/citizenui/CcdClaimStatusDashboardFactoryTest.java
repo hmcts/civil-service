@@ -422,6 +422,7 @@ class CcdClaimStatusDashboardFactoryTest {
         Element<CaseDocument> document = new Element<>(
             UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
             CaseDocument.builder()
+                .createdDatetime(LocalDateTime.now())
                 .documentType(DocumentType.SDO_ORDER)
                 .build()
         );
@@ -600,7 +601,12 @@ class CcdClaimStatusDashboardFactoryTest {
             .build();
 
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-            caseData, featureToggleService, Collections.emptyList()));
+            caseData, featureToggleService, Collections.singletonList(
+            CaseEventDetail.builder()
+                .createdDate(LocalDateTime.now())
+                .eventName(UPDATE_HELP_WITH_FEE_NUMBER.name())
+                .build()
+        )));
 
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_HWF_UPDATED_REF_NUMBER);
     }
@@ -617,7 +623,12 @@ class CcdClaimStatusDashboardFactoryTest {
             .build();
 
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-            caseData, featureToggleService, Collections.emptyList()));
+            caseData, featureToggleService, Collections.singletonList(
+            CaseEventDetail.builder()
+                .createdDate(LocalDateTime.now())
+                .eventName(INVALID_HWF_REFERENCE.name())
+                .build()
+        )));
 
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_HWF_INVALID_REF_NUMBER);
     }
@@ -634,7 +645,12 @@ class CcdClaimStatusDashboardFactoryTest {
             .build();
 
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-            caseData, featureToggleService, Collections.emptyList()));
+            caseData, featureToggleService, Collections.singletonList(
+                CaseEventDetail.builder()
+                    .createdDate(LocalDateTime.now())
+                    .eventName(INVALID_HWF_REFERENCE.name())
+                    .build()
+        )));
 
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_HWF_INVALID_REF_NUMBER);
     }
@@ -651,7 +667,12 @@ class CcdClaimStatusDashboardFactoryTest {
             .build();
 
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-            caseData, featureToggleService, Collections.emptyList()));
+            caseData, featureToggleService, Collections.singletonList(
+                CaseEventDetail.builder()
+                    .createdDate(LocalDateTime.now())
+                    .eventName(FEE_PAYMENT_OUTCOME.name())
+                    .build()
+        )));
 
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_HWF_FEE_PAYMENT_OUTCOME);
     }

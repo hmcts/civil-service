@@ -236,7 +236,6 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
             hearingFromDate -> hearingFromDate.isAfter(LocalDate.now())).orElse(false);
     }
 
-
     @Override
     public boolean isMediationSuccessful() {
         return !hasSdoBeenDrawn() && Objects.nonNull(caseData.getMediation())
@@ -295,7 +294,6 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         return CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState())
             && caseData.isPartAdmitClaimSpec() && NO.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec());
     }
-
 
     @Override
     public boolean isSDOOrderInReview() {
