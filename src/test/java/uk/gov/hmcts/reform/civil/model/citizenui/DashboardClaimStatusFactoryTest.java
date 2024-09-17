@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -716,7 +715,9 @@ class DashboardClaimStatusFactoryTest {
             return previous;
         }
         List<Element<CaseDocument>> orderList = Optional.ofNullable(
-            previous.getFinalOrderDocumentCollection()).orElseGet(ArrayList::new);
+            previous.getFinalOrderDocumentCollection())
+            .map(ArrayList::new)
+            .orElseGet(ArrayList::new);
         int daysDelta = -orderList.stream().map(e -> e.getValue().getCreatedDatetime())
             .max(LocalDateTime::compareTo)
             .map(max -> Math.abs(ChronoUnit.DAYS.between(created, max)) + 2)

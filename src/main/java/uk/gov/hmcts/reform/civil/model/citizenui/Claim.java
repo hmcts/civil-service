@@ -182,8 +182,7 @@ public interface Claim {
             && isHearingLessThanDaysAway(3 * 7)
             && bundleDate.isPresent()
             && (lastOrderDate.isEmpty()
-            || lastOrderDate.get().isBefore(bundleDate.get())
-        );
+            || lastOrderDate.get().isBefore(bundleDate.get()));
     }
 
     default boolean isTrialArrangementStatusActive() {
