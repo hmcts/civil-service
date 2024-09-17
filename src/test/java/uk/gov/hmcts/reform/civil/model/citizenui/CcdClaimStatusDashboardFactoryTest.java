@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
@@ -304,6 +305,7 @@ class CcdClaimStatusDashboardFactoryTest {
         Element<CaseDocument> document = new Element<>(
             UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
             CaseDocument.builder()
+                .createdDatetime(LocalDateTime.now())
                 .documentType(DocumentType.SDO_ORDER)
                 .build()
         );
@@ -486,8 +488,14 @@ class CcdClaimStatusDashboardFactoryTest {
                 FeeType.CLAIMISSUED)
             .build();
 
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-            caseData, featureToggleService, Collections.emptyList()));
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(
+            new CcdDashboardClaimantClaimMatcher(
+                caseData, featureToggleService, Collections.singletonList(
+                CaseEventDetail.builder()
+                    .createdDate(LocalDateTime.now())
+                    .eventName(NO_REMISSION_HWF.name())
+                    .build()
+        )));
 
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_HWF_NO_REMISSION);
     }
@@ -504,7 +512,12 @@ class CcdClaimStatusDashboardFactoryTest {
             .build();
 
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-            caseData, featureToggleService, Collections.emptyList()));
+            caseData, featureToggleService, Collections.singletonList(
+            CaseEventDetail.builder()
+                .createdDate(LocalDateTime.now())
+                .eventName(NO_REMISSION_HWF.name())
+                .build()
+        )));
 
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_HWF_NO_REMISSION);
     }
@@ -521,7 +534,12 @@ class CcdClaimStatusDashboardFactoryTest {
             .build();
 
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-            caseData, featureToggleService, Collections.emptyList()));
+            caseData, featureToggleService, Collections.singletonList(
+            CaseEventDetail.builder()
+                .createdDate(LocalDateTime.now())
+                .eventName(PARTIAL_REMISSION_HWF_GRANTED.name())
+                .build()
+        )));
 
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_HWF_PARTIAL_REMISSION);
     }
@@ -538,7 +556,12 @@ class CcdClaimStatusDashboardFactoryTest {
             .build();
 
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-            caseData, featureToggleService, Collections.emptyList()));
+            caseData, featureToggleService, Collections.singletonList(
+            CaseEventDetail.builder()
+                .createdDate(LocalDateTime.now())
+                .eventName(PARTIAL_REMISSION_HWF_GRANTED.name())
+                .build()
+        )));
 
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_HWF_PARTIAL_REMISSION);
     }
@@ -555,7 +578,12 @@ class CcdClaimStatusDashboardFactoryTest {
             .build();
 
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-            caseData, featureToggleService, Collections.emptyList()));
+            caseData, featureToggleService, Collections.singletonList(
+            CaseEventDetail.builder()
+                .createdDate(LocalDateTime.now())
+                .eventName(UPDATE_HELP_WITH_FEE_NUMBER.name())
+                .build()
+        )));
 
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_HWF_UPDATED_REF_NUMBER);
     }

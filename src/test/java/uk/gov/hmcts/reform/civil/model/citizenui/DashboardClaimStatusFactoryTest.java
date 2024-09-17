@@ -41,8 +41,7 @@ public class DashboardClaimStatusFactoryTest {
      * Generates arguments to interweave order creation in paths followed by cases.
      *
      * @param howManyPositions how many positions we are going to insert the order creation in
-     * @return a list of arguments with all numbers in [0, howManyPositions] combined with both
-     * true and false for court order
+     * @return a list of arguments with all numbers in [0, howManyPositions] combined with both true and false
      */
     static Stream<Arguments> positionAndOrderTypeArguments(int howManyPositions) {
         List<Arguments> argumentsList = new ArrayList<>();
@@ -645,11 +644,6 @@ public class DashboardClaimStatusFactoryTest {
     }
 
     private CaseData submitDefendantHearingArrangements(CaseData previous, List<CaseEventDetail> eventHistory) {
-        DashboardClaimStatus otherPartyStatus = claimStatusFactory.getDashboardClaimStatus(
-            new CcdDashboardClaimantClaimMatcher(
-                previous,
-                toggleService, eventHistory
-            ));
         eventHistory.add(CaseEventDetail.builder()
                              .createdDate(LocalDateTime.now())
                              .eventName(CaseEvent.TRIAL_READINESS.name())
@@ -668,6 +662,11 @@ public class DashboardClaimStatusFactoryTest {
                 toggleService, eventHistory
             ))
         );
+        DashboardClaimStatus otherPartyStatus = claimStatusFactory.getDashboardClaimStatus(
+            new CcdDashboardClaimantClaimMatcher(
+                previous,
+                toggleService, eventHistory
+            ));
         Assertions.assertEquals(
             otherPartyStatus,
             claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
