@@ -136,6 +136,12 @@ public interface Claim {
 
     boolean isDefaultJudgementIssued();
 
+    default boolean isCaseDismissed() {
+        return false;
+    }
+
+    boolean isCaseStayed();
+
     /**
      * Hearing scheduled implies at least that hearing date is defined.
      *

@@ -569,6 +569,11 @@ public class CmcClaim implements Claim {
     }
 
     @Override
+    public boolean isCaseStayed() {
+        return false;
+    }
+
+    @Override
     public boolean isHearingScheduled() {
         return false;
     }

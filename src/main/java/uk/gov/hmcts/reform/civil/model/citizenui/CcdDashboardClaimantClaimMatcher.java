@@ -408,6 +408,16 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     }
 
     @Override
+    public boolean isCaseDismissed() {
+        return caseData.getCcdState() == CaseState.CASE_DISMISSED;
+    }
+
+    @Override
+    public boolean isCaseStayed() {
+        return caseData.getCcdState() == CaseState.CASE_STAYED;
+    }
+
+    @Override
     public boolean isHearingScheduled() {
         return caseData.getHearingDate() != null;
     }
