@@ -4,6 +4,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.DQExtraDetailsLip;
+import uk.gov.hmcts.reform.civil.model.citizenui.EvidenceConfirmDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.ExpertLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.HearingSupportLip;
 import uk.gov.hmcts.reform.civil.model.docmosis.FixedRecoverableCostsSection;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.model.docmosis.dq.HearingLipSupportRequirements.toHearingSupportRequirementsList;
+import static uk.gov.hmcts.reform.civil.model.docmosis.dq.LipExtraDQEvidenceConfirmDetails.toLipExtraDQEvidenceConfirmDetails;
 
 public class DQLipClaimantFormMapper extends DQLipFormMapper {
 
@@ -30,7 +32,9 @@ public class DQLipClaimantFormMapper extends DQLipFormMapper {
 
     @Override
     protected LipExtraDQEvidenceConfirmDetails toEvidenceConfirmDetails(Optional<CaseDataLiP> caseDataLiPOptional) {
-        return null;
+        Optional<EvidenceConfirmDetails> evidenceConfirmDetails = caseDataLiPOptional.map(CaseDataLiP::getApplicant1LiPResponse)
+            .map(ClaimantLiPResponse::getApplicant1DQEvidenceConfirmDetails);
+        return toLipExtraDQEvidenceConfirmDetails(evidenceConfirmDetails);
     }
 
     @Override
