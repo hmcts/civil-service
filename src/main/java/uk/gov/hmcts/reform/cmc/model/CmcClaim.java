@@ -589,11 +589,6 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public Optional<LocalDateTime> getTrialArrangementsSubmittedDate() {
-        return Optional.empty();
-    }
-
-    @Override
     public boolean isOrderMade() {
         return false;
     }

@@ -155,8 +155,6 @@ public interface Claim {
 
     boolean trialArrangementsSubmitted();
 
-    Optional<LocalDateTime> getTrialArrangementsSubmittedDate();
-
     default boolean isHwFHearingSubmit() {
         return false;
     }

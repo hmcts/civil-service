@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -187,29 +186,6 @@ public class DashboardClaimStatusFactoryTest {
         return positionAndOrderTypeArguments(4);
     }
 
-    /**
-     * If position == valueToApply, modifies caseData to include an order.
-     *
-     * @param position          one side for the active check
-     * @param valueToApply      the other side for the active check
-     * @param officerOrder      true to create an officer order, false to create a directions order
-     * @param documentCreatedOn date for the document to be created on
-     * @param caseData          the caseData
-     * @return
-     */
-    private CaseData applyOrderIfPosition(int position, int valueToApply, boolean officerOrder,
-                                          LocalDateTime documentCreatedOn, CaseData caseData,
-                                          List<CaseEventDetail> eventHistory) {
-        if (position == valueToApply) {
-            if (officerOrder) {
-                return courtOfficerOrder(caseData, documentCreatedOn, eventHistory);
-            } else {
-                return generateDirectionOrder(caseData, documentCreatedOn, eventHistory);
-            }
-        }
-        return caseData;
-    }
-
     private CaseData applyOrderIfPosition(int position, int valueToApply, boolean officerOrder,
                                           CaseData caseData,
                                           List<CaseEventDetail> eventHistory) {
@@ -220,39 +196,6 @@ public class DashboardClaimStatusFactoryTest {
                 return generateDirectionOrder(caseData, LocalDateTime.now(), eventHistory);
             }
         }
-        return caseData;
-    }
-
-    private CaseData fastClaim(LocalDateTime sdoTime, List<CaseEventDetail> eventHistory) {
-        eventHistory.add(CaseEventDetail.builder()
-                             .createdDate(LocalDateTime.now())
-                             .eventName(CaseEvent.CREATE_SDO.name())
-                             .build());
-        CaseDocument sdoDocument = CaseDocument.builder()
-            .documentType(DocumentType.SDO_ORDER)
-            .createdDatetime(sdoTime)
-            .build();
-        CaseData caseData = CaseData.builder()
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .systemGeneratedCaseDocuments(List.of(Element.<CaseDocument>builder()
-                                                      .value(sdoDocument).build()))
-            .build();
-        Assertions.assertEquals(
-            DashboardClaimStatus.SDO_ORDER_CREATED,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        Assertions.assertEquals(
-            DashboardClaimStatus.SDO_ORDER_CREATED,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
         return caseData;
     }
 
@@ -375,150 +318,10 @@ public class DashboardClaimStatusFactoryTest {
         return caseData;
     }
 
-    private CaseData scheduleHearingDays(CaseData previous, int days, List<CaseEventDetail> eventHistory) {
-        LocalDate hearingDate = LocalDate.now().plusDays(days);
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder;
-        if (previous.getHearingDate() != null) {
-            // to pretend time has passed, we have to modify the dates of the relevant documents
-            caseDataBuilder = previous.toBuilder()
-                .caseBundles(
-                    previous.getCaseBundles().stream()
-                        .map(idValue ->
-                                 new IdValue<>(
-                                     idValue.getId(),
-                                     idValue.getValue().toBuilder()
-                                         .createdOn(Optional.of(
-                                             hearingDate
-                                                 .minusDays(3 * 7)
-                                                 .atTime(LocalTime.now())))
-                                         .bundleHearingDate(Optional.of(hearingDate))
-                                         .build()
-                                 )
-                        ).collect(Collectors.toList()));
-            int deltaDays = (int) (-Math.abs(ChronoUnit.DAYS.between(hearingDate, previous.getHearingDate())));
-            List<Element<CaseDocument>> updatedDocuments = previous.getFinalOrderDocumentCollection().stream()
-                .map(e -> Element.<CaseDocument>builder()
-                    .id(e.getId())
-                    .value(e.getValue().toBuilder()
-                               .createdDatetime(e.getValue().getCreatedDatetime().plusDays(deltaDays))
-                               .build())
-                    .build())
-                .collect(Collectors.toList());
-            caseDataBuilder.finalOrderDocumentCollection(updatedDocuments);
-            caseDataBuilder.systemGeneratedCaseDocuments(
-                previous.getSystemGeneratedCaseDocuments().stream()
-                    .map(e -> Element.<CaseDocument>builder()
-                        .id(e.getId())
-                        .value(e.getValue().toBuilder()
-                                   .createdDatetime(e.getValue().getCreatedDatetime().plusDays(deltaDays))
-                                   .build())
-                        .build())
-                    .collect(Collectors.toList())
-            );
-            if (previous.getPreviewCourtOfficerOrder() != null) {
-                caseDataBuilder.previewCourtOfficerOrder(
-                    previous.getPreviewCourtOfficerOrder().toBuilder()
-                        .createdDatetime(previous.getPreviewCourtOfficerOrder().getCreatedDatetime()
-                                             .plusDays(deltaDays))
-                        .build()
-                );
-            }
-        } else {
-            caseDataBuilder = previous.toBuilder();
-        }
-        caseDataBuilder.hearingDate(hearingDate);
-        DashboardClaimStatus expectedStatus;
-        if (days > 6 * 7) {
-            eventHistory.add(CaseEventDetail.builder()
-                                 .createdDate(LocalDateTime.now())
-                                 .eventName(CaseEvent.HEARING_SCHEDULED.name())
-                                 .build());
-            expectedStatus = DashboardClaimStatus.TRIAL_OR_HEARING_SCHEDULED;
-        } else if (days <= 3 * 7) {
-            CaseEventDetail caseEvent = CaseEventDetail.builder()
-                .createdDate(hearingDate.minusDays(6 * 7 + 1).atTime(LocalTime.now()))
-                .eventName(CaseEvent.HEARING_SCHEDULED.name())
-                .build();
-            eventHistory.removeIf(e -> e.getEventName().equals(CaseEvent.HEARING_SCHEDULED.name()));
-            eventHistory.add(caseEvent);
-            caseDataBuilder.caseBundles(List.of(new IdValue<>(
-                "bundle1",
-                Bundle.builder()
-                    .bundleHearingDate(Optional.of(hearingDate))
-                    .createdOn(Optional.of(hearingDate
-                                               .minusDays(3 * 7)
-                                               .atTime(LocalTime.now())))
-                    .build()
-            )));
-            expectedStatus = DashboardClaimStatus.BUNDLE_CREATED;
-        } else {
-            CaseEventDetail caseEvent = CaseEventDetail.builder()
-                .createdDate(hearingDate.minusDays(6 * 7 + 1).atTime(LocalTime.now()))
-                .eventName(CaseEvent.HEARING_SCHEDULED.name())
-                .build();
-            eventHistory.removeIf(e -> e.getEventName().equals(CaseEvent.HEARING_SCHEDULED.name()));
-            eventHistory.add(caseEvent);
-            expectedStatus = DashboardClaimStatus.TRIAL_ARRANGEMENTS_REQUIRED;
-        }
-        CaseDocument hearingForm = CaseDocument.builder()
-            .createdDatetime(LocalDateTime.now())
-            .documentType(DocumentType.HEARING_FORM)
-            .build();
-        List<Element<CaseDocument>> systemGenerated = new ArrayList<>(caseDataBuilder.build()
-                                                                          .getSystemGeneratedCaseDocuments());
-        systemGenerated.add(Element.<CaseDocument>builder().value(hearingForm).build());
-        caseDataBuilder.systemGeneratedCaseDocuments(systemGenerated);
-        CaseData caseData = caseDataBuilder.build();
-        Assertions.assertEquals(
-            expectedStatus,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        Assertions.assertEquals(
-            expectedStatus,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-
-        return caseData;
-    }
-
     private CaseData requestHwF(CaseData previous, List<CaseEventDetail> eventHistory) {
         eventHistory.add(CaseEventDetail.builder()
                              .eventName(CaseEvent.APPLY_HELP_WITH_HEARING_FEE.name())
                              .createdDate(LocalDateTime.now())
-                             .build());
-        CaseData caseData = previous.toBuilder()
-            .hwfFeeType(FeeType.HEARING)
-            .build();
-        DashboardClaimStatus defendantStatus = claimStatusFactory.getDashboardClaimStatus(
-            new CcdDashboardDefendantClaimMatcher(previous, toggleService, eventHistory)
-        );
-        Assertions.assertEquals(
-            defendantStatus,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        Assertions.assertEquals(
-            DashboardClaimStatus.HEARING_SUBMIT_HWF,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        return caseData;
-    }
-
-    private CaseData requestHwF(CaseData previous, List<CaseEventDetail> eventHistory, LocalDateTime when) {
-        eventHistory.add(CaseEventDetail.builder()
-                             .eventName(CaseEvent.APPLY_HELP_WITH_HEARING_FEE.name())
-                             .createdDate(when)
                              .build());
         CaseData caseData = previous.toBuilder()
             .hwfFeeType(FeeType.HEARING)
@@ -567,70 +370,6 @@ public class DashboardClaimStatusFactoryTest {
         );
         Assertions.assertEquals(
             DashboardClaimStatus.CLAIMANT_HWF_INVALID_REF_NUMBER,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        return caseData;
-    }
-
-    private CaseData invalidHwFReferenceNumber(CaseData previous, List<CaseEventDetail> eventHistory,
-                                               LocalDateTime when) {
-        eventHistory.add(CaseEventDetail.builder()
-                             .eventName(CaseEvent.INVALID_HWF_REFERENCE.name())
-                             .createdDate(when)
-                             .build());
-        DashboardClaimStatus defendantStatus = claimStatusFactory.getDashboardClaimStatus(
-            new CcdDashboardDefendantClaimMatcher(previous, toggleService, eventHistory)
-        );
-        CaseData caseData = previous.toBuilder()
-            .hwfFeeType(FeeType.HEARING)
-            .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                   .hwfCaseEvent(CaseEvent.INVALID_HWF_REFERENCE)
-                                   .build())
-            .build();
-
-        Assertions.assertEquals(
-            defendantStatus,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        Assertions.assertEquals(
-            DashboardClaimStatus.CLAIMANT_HWF_INVALID_REF_NUMBER,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        return caseData;
-    }
-
-    private CaseData updatedHwFReferenceNumber(CaseData previous, List<CaseEventDetail> eventHistory,
-                                               LocalDateTime when) {
-        eventHistory.add(CaseEventDetail.builder()
-                             .eventName(CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER.name())
-                             .createdDate(when)
-                             .build());
-        DashboardClaimStatus defendantStatus = claimStatusFactory.getDashboardClaimStatus(
-            new CcdDashboardDefendantClaimMatcher(previous, toggleService, eventHistory)
-        );
-        CaseData caseData = previous.toBuilder()
-            .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                   .hwfCaseEvent(CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER)
-                                   .build())
-            .build();
-        Assertions.assertEquals(
-            defendantStatus,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        Assertions.assertEquals(
-            DashboardClaimStatus.CLAIMANT_HWF_UPDATED_REF_NUMBER,
             claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
                 caseData,
                 toggleService, eventHistory
@@ -699,68 +438,6 @@ public class DashboardClaimStatusFactoryTest {
         return caseData;
     }
 
-    private CaseData moreInformationRequiredHwF(CaseData previous, List<CaseEventDetail> eventHistory,
-                                                LocalDateTime when) {
-        eventHistory.add(CaseEventDetail.builder()
-                             .eventName(CaseEvent.MORE_INFORMATION_HWF.name())
-                             .createdDate(when)
-                             .build());
-        DashboardClaimStatus defendantStatus = claimStatusFactory.getDashboardClaimStatus(
-            new CcdDashboardDefendantClaimMatcher(previous, toggleService, eventHistory)
-        );
-        CaseData caseData = previous.toBuilder()
-            .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                   .hwfCaseEvent(CaseEvent.MORE_INFORMATION_HWF)
-                                   .build())
-            .build();
-        Assertions.assertEquals(
-            defendantStatus,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        Assertions.assertEquals(
-            DashboardClaimStatus.HWF_MORE_INFORMATION_NEEDED,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        return caseData;
-    }
-
-    private CaseData hwfRejected(CaseData previous, List<CaseEventDetail> eventHistory,
-                                 LocalDateTime when) {
-        eventHistory.add(CaseEventDetail.builder()
-                             .eventName(CaseEvent.NO_REMISSION_HWF.name())
-                             .createdDate(when)
-                             .build());
-        DashboardClaimStatus defendantStatus = claimStatusFactory.getDashboardClaimStatus(
-            new CcdDashboardDefendantClaimMatcher(previous, toggleService, eventHistory)
-        );
-        CaseData caseData = previous.toBuilder()
-            .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                   .hwfCaseEvent(CaseEvent.NO_REMISSION_HWF)
-                                   .build())
-            .build();
-        Assertions.assertEquals(
-            defendantStatus,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        Assertions.assertEquals(
-            DashboardClaimStatus.CLAIMANT_HWF_NO_REMISSION,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        return caseData;
-    }
-
     private CaseData hwfRejected(CaseData previous, List<CaseEventDetail> eventHistory) {
         eventHistory.add(CaseEventDetail.builder()
                              .eventName(CaseEvent.NO_REMISSION_HWF.name())
@@ -783,37 +460,6 @@ public class DashboardClaimStatusFactoryTest {
         );
         Assertions.assertEquals(
             DashboardClaimStatus.CLAIMANT_HWF_NO_REMISSION,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        return caseData;
-    }
-
-    private CaseData payHearingFee(CaseData previous, List<CaseEventDetail> eventHistory, LocalDateTime when) {
-        eventHistory.add(CaseEventDetail.builder()
-                             .eventName(CaseEvent.CITIZEN_HEARING_FEE_PAYMENT.name())
-                             .createdDate(when)
-                             .build());
-        DashboardClaimStatus defendantStatus = claimStatusFactory.getDashboardClaimStatus(
-            new CcdDashboardDefendantClaimMatcher(previous, toggleService, eventHistory)
-        );
-        CaseData caseData = previous.toBuilder()
-            .hwfFeeType(FeeType.HEARING)
-            .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                   .hwfCaseEvent(CaseEvent.FEE_PAYMENT_OUTCOME)
-                                   .build())
-            .build();
-        Assertions.assertEquals(
-            defendantStatus,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        Assertions.assertEquals(
-            DashboardClaimStatus.CLAIMANT_HWF_FEE_PAYMENT_OUTCOME,
             claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
                 caseData,
                 toggleService, eventHistory
@@ -856,35 +502,6 @@ public class DashboardClaimStatusFactoryTest {
         CaseDocument sdoDocument = CaseDocument.builder()
             .documentType(DocumentType.SDO_ORDER)
             .createdDatetime(LocalDateTime.now())
-            .build();
-        CaseData caseData = CaseData.builder()
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-            .totalClaimAmount(BigDecimal.valueOf(999))
-            .systemGeneratedCaseDocuments(List.of(Element.<CaseDocument>builder()
-                                                      .value(sdoDocument).build()))
-            .build();
-        Assertions.assertEquals(
-            DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        Assertions.assertEquals(
-            DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        return caseData;
-    }
-
-    private CaseData smallClaim(LocalDateTime sdoTime, List<CaseEventDetail> eventHistory) {
-        CaseDocument sdoDocument = CaseDocument.builder()
-            .documentType(DocumentType.SDO_ORDER)
-            .createdDatetime(sdoTime)
             .build();
         CaseData caseData = CaseData.builder()
             .ccdState(CaseState.CASE_PROGRESSION)

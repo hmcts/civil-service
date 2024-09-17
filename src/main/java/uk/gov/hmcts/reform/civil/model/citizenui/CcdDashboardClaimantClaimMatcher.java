@@ -3,15 +3,12 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -428,16 +425,6 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
             && ((eventTime = getTimeOfMostRecentEventOfType(EnumSet.of(CaseEvent.GENERATE_TRIAL_READY_FORM_APPLICANT)))
             .isPresent())
             && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get().isAfter(orderTime.get()));
-    }
-
-    @Override
-    public Optional<LocalDateTime> getTrialArrangementsSubmittedDate() {
-        if (caseData.getTrialReadyApplicant() == YesOrNo.YES) {
-            return caseData.getTrialReadyDocuments().stream().filter(e -> e.getValue().getDocumentType() == DocumentType.TRIAL_READY_DOCUMENT && DocCategory.DQ_APP1.name().equals(
-                e.getValue().getDocumentLink().getCategoryID())).map(e -> e.getValue().getCreatedDatetime()).max(
-                LocalDateTime::compareTo);
-        }
-        return Optional.empty();
     }
 
     @Override
