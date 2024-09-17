@@ -362,66 +362,65 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isHwFMoreInformationNeeded() {
-        Optional<LocalDateTime> eventTime;
-        Optional<LocalDateTime> orderTime;
+        Optional<LocalDateTime> eventTime = getTimeOfMostRecentEventOfType(EnumSet.of(CaseEvent.MORE_INFORMATION_HWF));
+        Optional<LocalDateTime> orderTime = getTimeOfLastNonSDOOrder();
         return (caseData.isHWFTypeHearing()
             || (caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED && caseData.isHWFTypeClaimIssued()))
             && caseData.getHwFEvent() == CaseEvent.MORE_INFORMATION_HWF
-            && ((eventTime = getTimeOfMostRecentEventOfType(EnumSet.of(CaseEvent.MORE_INFORMATION_HWF))).isPresent())
-            && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get().isAfter(orderTime.get()));
+            && (eventTime.isPresent())
+            && (orderTime.isEmpty() || eventTime.get().isAfter(orderTime.get()));
     }
 
     @Override
     public boolean isHwfNoRemission() {
-        Optional<LocalDateTime> eventTime;
-        Optional<LocalDateTime> orderTime;
+        Optional<LocalDateTime> eventTime = getTimeOfMostRecentEventOfType(EnumSet.of(CaseEvent.NO_REMISSION_HWF));
+        Optional<LocalDateTime> orderTime = getTimeOfLastNonSDOOrder();
         return (caseData.isHWFTypeHearing()
             || (caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED && caseData.isHWFTypeClaimIssued()))
             && caseData.getHwFEvent() == CaseEvent.NO_REMISSION_HWF
-            && ((eventTime = getTimeOfMostRecentEventOfType(EnumSet.of(CaseEvent.NO_REMISSION_HWF))).isPresent())
-            && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get().isAfter(orderTime.get()));
+            && (eventTime.isPresent())
+            && (orderTime.isEmpty() || eventTime.get().isAfter(orderTime.get()));
     }
 
     @Override
     public boolean isHwfPartialRemission() {
-        Optional<LocalDateTime> eventTime;
-        Optional<LocalDateTime> orderTime;
+        Optional<LocalDateTime> eventTime = getTimeOfMostRecentEventOfType(
+            EnumSet.of(CaseEvent.PARTIAL_REMISSION_HWF_GRANTED));
+        Optional<LocalDateTime> orderTime = getTimeOfLastNonSDOOrder();
         return (caseData.isHWFTypeHearing()
             || (caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED && caseData.isHWFTypeClaimIssued()))
             && caseData.getHwFEvent() == CaseEvent.PARTIAL_REMISSION_HWF_GRANTED
-            && ((eventTime = getTimeOfMostRecentEventOfType(
-                EnumSet.of(CaseEvent.PARTIAL_REMISSION_HWF_GRANTED))).isPresent())
-            && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get().isAfter(
-            orderTime.get()));
+            && (eventTime).isPresent()
+            && (orderTime.isEmpty() || eventTime.get().isAfter(orderTime.get()));
     }
 
     @Override
     public boolean isHwfUpdatedRefNumber() {
-        Optional<LocalDateTime> eventTime;
-        Optional<LocalDateTime> orderTime;
+        Optional<LocalDateTime> eventTime = getTimeOfMostRecentEventOfType(
+            EnumSet.of(CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER));
+        Optional<LocalDateTime> orderTime = getTimeOfLastNonSDOOrder();
         return (caseData.isHWFTypeHearing()
             || (caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED && caseData.isHWFTypeClaimIssued()))
             && caseData.getHwFEvent() == CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER
-            && ((eventTime = getTimeOfMostRecentEventOfType(EnumSet.of(CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER)))
-            .isPresent())
-            && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get().isAfter(orderTime.get()));
+            && (eventTime.isPresent())
+            && (orderTime.isEmpty() || eventTime.get().isAfter(orderTime.get()));
     }
 
     @Override
     public boolean isHwfInvalidRefNumber() {
-        Optional<LocalDateTime> eventTime;
-        Optional<LocalDateTime> orderTime;
+        Optional<LocalDateTime> eventTime = getTimeOfMostRecentEventOfType(EnumSet.of(CaseEvent.INVALID_HWF_REFERENCE));
+        Optional<LocalDateTime> orderTime = getTimeOfLastNonSDOOrder();
         return (caseData.isHWFTypeHearing()
             || (caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED && caseData.isHWFTypeClaimIssued()))
             && caseData.getHwFEvent() == CaseEvent.INVALID_HWF_REFERENCE
-            && ((eventTime = getTimeOfMostRecentEventOfType(EnumSet.of(CaseEvent.INVALID_HWF_REFERENCE))).isPresent())
-            && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get().isAfter(orderTime.get()));
+            && (eventTime.isPresent())
+            && (orderTime.isEmpty() || eventTime.get().isAfter(orderTime.get()));
     }
 
     @Override
     public boolean isHwfPaymentOutcome() {
-        Optional<LocalDateTime> eventTime;
-        Optional<LocalDateTime> orderTime;
+        Optional<LocalDateTime> eventTime = getTimeOfMostRecentEventOfType(EnumSet.of(CaseEvent.FEE_PAYMENT_OUTCOME));
+        Optional<LocalDateTime> orderTime = getTimeOfLastNonSDOOrder();
         if (Optional.ofNullable(caseData.getHearingFeePaymentDetails())
             .map(p -> p.getStatus() == PaymentStatus.SUCCESS).orElse(
                 Boolean.FALSE)) {
@@ -433,10 +432,8 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         return (caseData.isHWFTypeHearing()
             || (caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED && caseData.isHWFTypeClaimIssued()))
             && caseData.getHwFEvent() == CaseEvent.FEE_PAYMENT_OUTCOME
-            && ((eventTime = getTimeOfMostRecentEventOfType(
-            EnumSet.of(CaseEvent.FEE_PAYMENT_OUTCOME))).isPresent())
-            && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get().isAfter(
-            orderTime.get()));
+            && (eventTime.isPresent())
+            && (orderTime.isEmpty() || eventTime.get().isAfter(orderTime.get()));
     }
 
     @Override
@@ -482,21 +479,21 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean trialArrangementsSubmitted() {
-        Optional<LocalDateTime> eventTime;
-        Optional<LocalDateTime> orderTime;
+        Optional<LocalDateTime> eventTime = getTimeOfMostRecentEventOfType(
+            EnumSet.of(CaseEvent.GENERATE_TRIAL_READY_FORM_APPLICANT));
+        Optional<LocalDateTime> orderTime = getTimeOfLastNonSDOOrder();
         return caseData.getTrialReadyApplicant() == YesOrNo.YES
-            && ((eventTime = getTimeOfMostRecentEventOfType(EnumSet.of(CaseEvent.GENERATE_TRIAL_READY_FORM_APPLICANT)))
-            .isPresent())
-            && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get().isAfter(orderTime.get()));
+            && (eventTime.isPresent())
+            && (orderTime.isEmpty() || eventTime.get().isAfter(orderTime.get()));
     }
 
     @Override
     public boolean isHwFHearingSubmit() {
-        Optional<LocalDateTime> eventTime;
-        Optional<LocalDateTime> orderTime;
+        Optional<LocalDateTime> eventTime = getTimeOfMostRecentEventOfType(
+            EnumSet.of(CaseEvent.APPLY_HELP_WITH_HEARING_FEE));
+        Optional<LocalDateTime> orderTime = getTimeOfLastNonSDOOrder();
         return caseData.isHWFTypeHearing() && caseData.getHwFEvent() == null
-            && ((eventTime = getTimeOfMostRecentEventOfType(EnumSet.of(CaseEvent.APPLY_HELP_WITH_HEARING_FEE)))
-            .isPresent())
-            && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get().isAfter(orderTime.get()));
+            && (eventTime.isPresent())
+            && (orderTime.isEmpty() || eventTime.get().isAfter(orderTime.get()));
     }
 }

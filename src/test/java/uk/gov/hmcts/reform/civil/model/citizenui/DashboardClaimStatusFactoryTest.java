@@ -35,7 +35,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class DashboardClaimStatusFactoryTest {
+class DashboardClaimStatusFactoryTest {
 
     /**
      * Generates arguments to interweave order creation in paths followed by cases.
@@ -103,7 +103,7 @@ public class DashboardClaimStatusFactoryTest {
         // times passes until there's only 6 weeks to hearing
         caseData = passDays(caseData, eventHistory, 14);
         shouldRequireTrialArrangements(caseData, eventHistory);
-        caseData = applyOrderIfPosition(9, orderPosition, isOfficerOrder,
+        applyOrderIfPosition(9, orderPosition, isOfficerOrder,
                                         caseData, eventHistory
         );
     }
@@ -821,7 +821,7 @@ public class DashboardClaimStatusFactoryTest {
                     return Element.<CaseDocument>builder()
                         .value(moveToThePast(old, deltaDays))
                         .build();
-                }).collect(Collectors.toList()));
+                }).toList());
         builder.previewCourtOfficerOrder(
             Optional.ofNullable(previous.getPreviewCourtOfficerOrder())
                 .map(c -> c.toBuilder().createdDatetime(c.getCreatedDatetime().minusDays(deltaDays)).build())
@@ -830,7 +830,7 @@ public class DashboardClaimStatusFactoryTest {
             previous.getFinalOrderDocumentCollection().stream()
                 .map(e -> Element.<CaseDocument>builder()
                     .value(moveToThePast(e.getValue(), deltaDays))
-                    .build()).collect(Collectors.toList())
+                    .build()).toList()
         );
         return builder.build();
     }

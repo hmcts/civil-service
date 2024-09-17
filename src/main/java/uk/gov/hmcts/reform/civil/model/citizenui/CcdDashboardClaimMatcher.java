@@ -26,9 +26,9 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
      */
     protected List<CaseEventDetail> eventHistory;
 
-    public CcdDashboardClaimMatcher(CaseData caseData,
-                                    FeatureToggleService featureToggleService,
-                                    List<CaseEventDetail> eventHistory) {
+    protected CcdDashboardClaimMatcher(CaseData caseData,
+                                       FeatureToggleService featureToggleService,
+                                       List<CaseEventDetail> eventHistory) {
         this.caseData = caseData;
         this.featureToggleService = featureToggleService;
         this.eventHistory = eventHistory;
@@ -117,49 +117,49 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isSDOOrderCreated() {
-        Optional<LocalDateTime> lastNonSdoOrderTime;
-        Optional<LocalDateTime> sdoTime;
+        Optional<LocalDateTime> lastNonSdoOrderTime = getTimeOfLastNonSDOOrder();
+        Optional<LocalDateTime> sdoTime = getSDOTime();
         return caseData.getHearingDate() == null
             && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && !isSDOOrderLegalAdviserCreated()
             && !isSDOOrderInReview()
             && !isSDOOrderInReviewOtherParty()
             && !isDecisionForReconsiderationMade()
-            && (sdoTime = getSDOTime()).isPresent()
-            && ((lastNonSdoOrderTime = getTimeOfLastNonSDOOrder()).isEmpty()
+            && sdoTime.isPresent()
+            && (lastNonSdoOrderTime.isEmpty()
             || sdoTime.get().isAfter(lastNonSdoOrderTime.get()));
     }
 
     @Override
     public boolean isSDOOrderLegalAdviserCreated() {
-        Optional<LocalDateTime> lastNonSdoOrderTime;
-        Optional<LocalDateTime> sdoTime;
+        Optional<LocalDateTime> lastNonSdoOrderTime = getTimeOfLastNonSDOOrder();
+        Optional<LocalDateTime> sdoTime = getSDOTime();
         return featureToggleService.isCaseProgressionEnabled()
             && caseData.getHearingDate() == null
             && isSDOMadeByLegalAdviser()
             && !isSDOOrderInReview()
             && !isSDOOrderInReviewOtherParty()
             && !isDecisionForReconsiderationMade()
-            && (sdoTime = getSDOTime()).isPresent()
-            && ((lastNonSdoOrderTime = getTimeOfLastNonSDOOrder()).isEmpty()
+            && sdoTime.isPresent()
+            && (lastNonSdoOrderTime.isEmpty()
             || sdoTime.get().isAfter(lastNonSdoOrderTime.get()));
     }
 
     @Override
     public boolean isMoreDetailsRequired() {
-        Optional<LocalDateTime> lastOrder;
-        Optional<LocalDateTime> sdoTime;
-        return (sdoTime = getSDOTime()).isPresent()
+        Optional<LocalDateTime> lastOrder = getTimeOfLastNonSDOOrder();
+        Optional<LocalDateTime> sdoTime = getSDOTime();
+        return sdoTime.isPresent()
             && isBeforeHearing()
             && featureToggleService.isCaseProgressionEnabled()
-            && ((lastOrder = getTimeOfLastNonSDOOrder()).isEmpty()
+            && (lastOrder.isEmpty()
             || lastOrder.get().isBefore(sdoTime.get()));
     }
 
     @Override
     public boolean isHearingLessThanDaysAway(int i) {
         return caseData.getHearingDate() != null
-            && LocalDate.now().plusDays(i + 1).isAfter(caseData.getHearingDate());
+            && LocalDate.now().plusDays(i + 1L).isAfter(caseData.getHearingDate());
     }
 
     @Override

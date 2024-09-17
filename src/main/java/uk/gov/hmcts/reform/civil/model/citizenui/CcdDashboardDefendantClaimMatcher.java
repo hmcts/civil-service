@@ -444,11 +444,11 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean trialArrangementsSubmitted() {
-        Optional<LocalDateTime> eventTime;
-        Optional<LocalDateTime> orderTime;
+        Optional<LocalDateTime> eventTime = getTimeOfMostRecentEventOfType(
+            EnumSet.of(CaseEvent.GENERATE_TRIAL_READY_FORM_RESPONDENT1));
+        Optional<LocalDateTime> orderTime = getTimeOfLastNonSDOOrder();
         return caseData.getTrialReadyRespondent1() == YesOrNo.YES
-            && ((eventTime = getTimeOfMostRecentEventOfType(EnumSet.of(CaseEvent.GENERATE_TRIAL_READY_FORM_RESPONDENT1)))
-            .isPresent())
-            && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get().isAfter(orderTime.get()));
+            && (eventTime.isPresent())
+            && (orderTime.isEmpty() || eventTime.get().isAfter(orderTime.get()));
     }
 }
