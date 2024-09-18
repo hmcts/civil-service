@@ -38,7 +38,7 @@ public class GeneralApplicationMoreInfoRequiredScenarioTest extends BaseIntegrat
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("You must provide more information"),
-                jsonPath("$[0].titleCy").value("Mae bwndel yr achos wedi'i ddiweddaru"),
+                jsonPath("$[0].titleCy").value("Rhaid i chi ddarparu mwy o wybodaeth"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">The court has responded to the application. You must upload a document<a href=\"{GA_RESPONSE_VIEW_APPLICATION_URL}\" class=\"govuk-link\">" +
                         " providing more information</a> to the court by 4pm on ${judgeRequestMoreInfoByDateEn}.</p>"),

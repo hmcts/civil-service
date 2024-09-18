@@ -135,4 +135,6 @@ public interface Claim {
     default boolean isCaseDismissed() {
         return false;
     }
+
+    boolean isCaseStayed();
 }
