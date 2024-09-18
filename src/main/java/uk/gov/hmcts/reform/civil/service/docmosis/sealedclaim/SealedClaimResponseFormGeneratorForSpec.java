@@ -114,7 +114,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
 
         if (isRespondent2(caseData) && !YesOrNo.YES.equals(caseData.getRespondentResponseIsSame())) {
             Optional.ofNullable(caseData.getRespondent2ClaimResponseTypeForSpec())
-                .map(RespondentResponseTypeSpec::getDisplayedValue)
+                .map(RespondentResponseTypeSpec::getDisplayedSingularValue)
                 .ifPresent(builder::defendantResponse);
             builder.submittedOn(caseData.getRespondent2ResponseDate().toLocalDate());
         } else {
