@@ -419,8 +419,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         if (V_2.equals(callbackParams.getVersion())
             && featureToggleService.isPinInPostEnabled()
-            && (isOneVOne(caseData)
-            || (featureToggleService.isJudgmentOnlineLive() && isNonDivergentAndLrVLr(caseData)))) {
+            && (isOneVOne(caseData) && isNonDivergentAndLrVLr(caseData))) {
             if (caseData.hasClaimantAgreedToFreeMediation()) {
                 nextState = CaseState.IN_MEDIATION.name();
             } else if (caseData.hasApplicantAcceptedRepaymentPlan()) {
@@ -478,26 +477,28 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     }
 
-    private static boolean isNonDivergentAndLrVLr(CaseData caseData) {
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-        //1v1LR
-        if (caseData.getApplicant1() != null
-            && (caseData.getApplicant1Represented() != null && caseData.getApplicant1Represented().equals(YES))
-            && caseData.getRespondent1() != null && caseData.getRespondent1Represented().equals(YES)
-            && !MultiPartyScenario.isTwoVOne(caseData)
-            && ofNullable(caseData.getRespondent2()).isEmpty()) {
-            return true;
-        } else if (caseData.getRespondent2() != null        //1LRv2LR
-            && MultiPartyScenario.isOneVTwoLegalRep(caseData)
-            && caseData.getRespondent2SameLegalRepresentative().equals(YES)
-            && ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
-            && ofNullable(caseData.getDefendantDetailsSpec().getValue()).isPresent()
-            && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")) {
-            return true;
-        } else if (MultiPartyScenario.isTwoVOne(caseData)
-            && (ofNullable(caseData.getApplicant2()).isPresent()
-            && caseData.isMultiPartyClaimant(multiPartyScenario))) {
-            return true;
+    private boolean isNonDivergentAndLrVLr(CaseData caseData) {
+        if (featureToggleService.isJudgmentOnlineLive()){
+            MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+            //1v1LR
+            if (caseData.getApplicant1() != null
+                && (caseData.getApplicant1Represented() != null && caseData.getApplicant1Represented().equals(YES))
+                && caseData.getRespondent1() != null && caseData.getRespondent1Represented().equals(YES)
+                && !MultiPartyScenario.isTwoVOne(caseData)
+                && ofNullable(caseData.getRespondent2()).isEmpty()) {
+                return true;
+            } else if (caseData.getRespondent2() != null        //1LRv2LR
+                && MultiPartyScenario.isOneVTwoLegalRep(caseData)
+                && caseData.getRespondent2SameLegalRepresentative().equals(YES)
+                && ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+                && ofNullable(caseData.getDefendantDetailsSpec().getValue()).isPresent()
+                && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")) {
+                return true;
+            } else if (MultiPartyScenario.isTwoVOne(caseData)
+                && (ofNullable(caseData.getApplicant2()).isPresent()
+                && caseData.isMultiPartyClaimant(multiPartyScenario))) {
+                return true;
+            }
         }
         return false;
     }
