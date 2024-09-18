@@ -23,25 +23,3 @@ VALUES ('Notice.AAA6.CP.Case.Stayed.Claimant', 'The case has been stayed', 'Mae�
         '<p class="govuk-body">Mae’r achos wedi’i atal. Gallai hyn fod o ganlyniad i orchymyn a waned gan farnwr. Bydd unrhyw wrandawiadau sydd i ddod yn cael eu canslo.</p>',
         'DEFENDANT');
 
-/**
- * Add task list items
- */
-INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
-                                    scenario_name, task_status_sequence, role,task_order)
-values ('<a>Pay the hearing fee</a>', 'Hearing' ,'<a>Talu ffi''r gwrandawiad</a>',
-        'Gwrandawiad', 'Hearing.Fee.Pay', 'Scenario.AAA6.CP.Case.Stayed.Claimant', '{2, 2}', 'CLAIMANT', 9),
-       ('<a>Upload hearing documents</a>', 'Hearing' ,'<a>Llwytho dogfennau''r gwrandawiad</a>',
-        'Gwrandawiad', 'Hearing.Document.Upload', 'Scenario.AAA6.CP.Case.Stayed.Claimant', '{2, 2}', 'CLAIMANT', 10),
-       ('<a>Pay the hearing fee</a>', 'Hearing' ,'<a>Talu ffi''r gwrandawiad</a>',
-        'Gwrandawiad', 'Hearing.Fee.Pay', 'Scenario.AAA6.CP.Case.Stayed.Claimant', '{2, 2}', 'CLAIMANT', 9),
-       ('<a>Upload hearing documents</a>', 'Hearing' ,'<a>Llwytho dogfennau''r gwrandawiad</a>',
-        'Gwrandawiad', 'Hearing.Document.Upload', 'Scenario.AAA6.CP.Case.Stayed.Claimant', '{2, 2}', 'CLAIMANT', 10),
-       ('<a>Add the trial arrangements</a>', 'Hearing' ,'<a>Ychwanegu trefniadau''r treial</a>',
-        'Gwrandawiad', 'Hearing.Arrangements.Add', 'Scenario.AAA6.CP.Case.Stayed.Claimant', '{2, 2}', 'CLAIMANT', 11),
-       ('<a>Upload hearing documents</a>', 'Hearing' ,'<a>Llwytho dogfennau''r gwrandawiad</a>',
-        'Gwrandawiad', 'Hearing.Document.Upload', 'Scenario.AAA6.CP.Case.Stayed.Defendant', '{2, 2}', 'DEFENDANT', 10),
-       ('<a>Upload hearing documents</a>', 'Hearing' ,'<a>Llwytho dogfennau''r gwrandawiad</a>',
-        'Gwrandawiad', 'Hearing.Document.Upload', 'Scenario.AAA6.CP.Case.Stayed.Defendant', '{2, 2}', 'DEFENDANT', 10),
-       ('<a>Add the trial arrangements</a>', 'Hearing' ,'<a>Ychwanegu trefniadau''r treial</a>',
-        'Gwrandawiad', 'Hearing.Arrangements.Add', 'Scenario.AAA6.CP.Case.Stayed.Defendant', '{2, 2}', 'DEFENDANT', 11);
-
