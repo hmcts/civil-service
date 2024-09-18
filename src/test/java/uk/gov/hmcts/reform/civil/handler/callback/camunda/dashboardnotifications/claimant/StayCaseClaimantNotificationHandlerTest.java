@@ -62,12 +62,12 @@ public class StayCaseClaimantNotificationHandlerTest extends BaseCallbackHandler
     }
 
     @Test
-    void configureDashboardNotificationsStayCase() {
+    void shouldConfigureDashboardNotificationsStayCase() {
 
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
             .toBuilder().applicant1Represented(YesOrNo.NO)
@@ -78,6 +78,12 @@ public class StayCaseClaimantNotificationHandlerTest extends BaseCallbackHandler
             .build();
 
         handler.handle(callbackParams);
+
+        verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "CLAIMANT",
+            "BEARER_TOKEN"
+        );
 
         verify(dashboardApiClient, times(1)).recordScenario(
             caseData.getCcdCaseReference().toString(),
