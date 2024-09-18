@@ -20,8 +20,10 @@ public class UncaughtExceptionHandler {
     public ResponseEntity<Object> runtimeException(Exception exception) {
         log.debug(exception.getMessage(), exception);
         String errorMessage = "Runtime exception of type %s occurred with message: %s for case %s run by user %s";
-        log.error(errorMessage.formatted(exception.getClass().getName(), exception.getMessage(),
-                                         requestData.caseId(), requestData.userId()));
+        final String formattedMessage = errorMessage.formatted(exception.getClass().getName(), exception.getMessage(),
+                                                        requestData.caseId(), requestData.userId()
+        );
+        log.error(formattedMessage, exception);
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
