@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -28,6 +27,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_DASHBOARD_TASK_LIST_DEFENDANT_DECISION_OUTCOME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_DECISION_OUTCOME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_TRIAL_READY_DECISION_OUTCOME;
 
 @ExtendWith(MockitoExtension.class)
 public class DefendantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHandlerTest {
@@ -61,8 +61,34 @@ public class DefendantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHa
         void shouldRecordScenario_whenInvokedWhenCaseProgressionSmallClaims() {
             CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
-                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .responseClaimTrack("SMALL_CLAIM")
                 .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(UPDATE_DASHBOARD_TASK_LIST_DEFENDANT_DECISION_OUTCOME.name()).build()
+            ).build();
+
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
+
+            handler.handle(params);
+
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_DEFENDANT_TRIAL_READY_DECISION_OUTCOME.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
+        void shouldRecordScenario_whenInvokedWhenCaseProgressionFastTrack() {
+            CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .responseClaimTrack("FAST_CLAIM")
+                .build();
+
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(UPDATE_DASHBOARD_TASK_LIST_DEFENDANT_DECISION_OUTCOME.name()).build()
             ).build();
@@ -83,11 +109,13 @@ public class DefendantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHa
         }
 
         @Test
-        void shouldRecordScenario_whenInvokedWhenCaseProgressionFastTrack() {
+        void shouldRecordScenario_whenInvokedWhenCaseProgressionFastTrack_TrialReadinessDone() {
             CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
+                .responseClaimTrack("FAST_CLAIM")
+                .trialReadyRespondent1(YesOrNo.YES)
                 .build();
+
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(UPDATE_DASHBOARD_TASK_LIST_DEFENDANT_DECISION_OUTCOME.name()).build()
             ).build();
@@ -101,7 +129,7 @@ public class DefendantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHa
 
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_DEFENDANT_DECISION_OUTCOME.getScenario(),
+                SCENARIO_AAA6_DEFENDANT_TRIAL_READY_DECISION_OUTCOME.getScenario(),
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
