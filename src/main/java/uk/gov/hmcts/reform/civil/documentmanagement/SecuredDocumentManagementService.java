@@ -39,7 +39,6 @@ import static uk.gov.hmcts.reform.civil.constants.DocumentManagementConstants.JU
 @Slf4j
 @Service("documentManagementService")
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "document_management", name = "secured", havingValue = "true")
 public class SecuredDocumentManagementService implements DocumentManagementService {
 
     protected static final int DOC_UUID_LENGTH = 36;
