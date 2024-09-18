@@ -7,6 +7,12 @@ VALUES ('Scenario.AAA6.GeneralApps.WrittenRepresentationRequired.Applicant', '{"
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.GeneralApps.WrittenRepresentationRequired.Respondent', '{"Notice.AAA6.GeneralApps.RespondentResponseSubmitted.Respondent","Notice.AAA6.GeneralApps.UrgentApplicationMade.Respondent","Notice.AAA6.GeneralApps.NonUrgentApplicationMade.Respondent"}', '{"Notice.AAA6.GeneralApps.WrittenRepresentationRequired.Respondent": ["writtenRepRespondentDeadlineDateEn", "writtenRepRespondentDeadlineDateCy"]}');
 
+INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
+VALUES ('Scenario.AAA6.GeneralApps.DeleteWrittenRepresentationRequired.Applicant', '{"Notice.AAA6.GeneralApps.WrittenRepresentationRequired.Applicant"}', '{}');
+
+INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
+VALUES ('Scenario.AAA6.GeneralApps.DeleteWrittenRepresentationRequired.Respondent', '{"Notice.AAA6.GeneralApps.WrittenRepresentationRequired.Respondent"}', '{}');
+
 
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
