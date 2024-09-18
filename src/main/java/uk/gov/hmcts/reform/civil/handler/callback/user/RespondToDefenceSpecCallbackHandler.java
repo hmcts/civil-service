@@ -14,7 +14,13 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
-import uk.gov.hmcts.reform.civil.enums.*;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
@@ -413,7 +419,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         if (V_2.equals(callbackParams.getVersion())
             && featureToggleService.isPinInPostEnabled()
-            && (isOneVOne(caseData) || isNonDivergentAndLrVLr(caseData) )) {
+            && (isOneVOne(caseData) || isNonDivergentAndLrVLr(caseData))) {
             if (caseData.hasClaimantAgreedToFreeMediation()) {
                 nextState = CaseState.IN_MEDIATION.name();
             } else if (caseData.hasApplicantAcceptedRepaymentPlan()) {
@@ -485,13 +491,13 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             && caseData.getRespondent2SameLegalRepresentative().equals(YES)
             && ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
             && ofNullable(caseData.getDefendantDetailsSpec().getValue()).isPresent()
-            && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")){
+            && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")) {
             return true;
         } else if (!MultiPartyScenario.isOneVOne(caseData) //2LR v 1LR
              && !MultiPartyScenario.isOneVTwoLegalRep(caseData)
              && MultiPartyScenario.isTwoVOne(caseData)
             && (ofNullable(caseData.getApplicant2()).isPresent()
-            && caseData.isMultiPartyClaimant(multiPartyScenario))){
+            && caseData.isMultiPartyClaimant(multiPartyScenario))) {
             return true;
         }
         return false;
