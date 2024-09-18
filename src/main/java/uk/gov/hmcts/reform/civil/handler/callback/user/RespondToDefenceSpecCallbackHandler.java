@@ -419,7 +419,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         if (V_2.equals(callbackParams.getVersion())
             && featureToggleService.isPinInPostEnabled()
-            && (isOneVOne(caseData) || isNonDivergentAndLrVLr(caseData))) {
+            && (isOneVOne(caseData)
+            || (featureToggleService.isJudgmentOnlineLive() && isNonDivergentAndLrVLr(caseData)))) {
             if (caseData.hasClaimantAgreedToFreeMediation()) {
                 nextState = CaseState.IN_MEDIATION.name();
             } else if (caseData.hasApplicantAcceptedRepaymentPlan()) {
@@ -493,9 +494,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             && ofNullable(caseData.getDefendantDetailsSpec().getValue()).isPresent()
             && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")) {
             return true;
-        } else if (!MultiPartyScenario.isOneVOne(caseData) //2LR v 1LR
-             && !MultiPartyScenario.isOneVTwoLegalRep(caseData)
-             && MultiPartyScenario.isTwoVOne(caseData)
+        } else if (MultiPartyScenario.isTwoVOne(caseData)
             && (ofNullable(caseData.getApplicant2()).isPresent()
             && caseData.isMultiPartyClaimant(multiPartyScenario))) {
             return true;
