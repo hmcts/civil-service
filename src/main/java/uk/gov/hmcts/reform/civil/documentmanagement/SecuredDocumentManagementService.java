@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.documentmanagement;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -25,11 +24,13 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
 import uk.gov.hmcts.reform.document.utils.InMemoryMultipartFile;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+
 import java.net.URI;
 import java.time.ZoneId;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
+
 import static org.springframework.http.MediaType.ALL_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static uk.gov.hmcts.reform.civil.constants.DocumentManagementConstants.CASE_TYPE_ID;
