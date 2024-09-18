@@ -44,8 +44,5 @@ public class GeneralApplicationHwfFeePaidTest extends BaseIntegrationTest {
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae‘r ffi gwneud ${applicationFeeTypeCy} wedi cael ei thalu’n llawn.</p>")
             );
-
-
-
     }
 }
