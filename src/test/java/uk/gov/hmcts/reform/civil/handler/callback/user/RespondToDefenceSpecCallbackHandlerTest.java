@@ -1411,8 +1411,14 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
                 .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
                 .applicant2(Party.builder().type(COMPANY).companyName("Applicant2").build())
+                .applicant1DQ(Applicant1DQ.builder()
+                                  .build())
+                .applicant2DQ(Applicant2DQ.builder()
+                                  .build())
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .defendantSingleResponseToBothClaimants(YES)
                 .defenceAdmitPartPaymentTimeRouteRequired(SUGGESTION_OF_REPAYMENT_PLAN)
+                .applicant1ProceedWithClaimSpec2v1(YES)
                 .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
                                          .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
                                          .firstRepaymentDate(LocalDate.now().plusDays(5))
@@ -1461,7 +1467,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             assertThat(response.getState())
-                .isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+                .isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
         }
 
         @Test

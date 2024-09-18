@@ -14,12 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.CaseCategory;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.*;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
@@ -74,6 +69,7 @@ import java.util.Optional;
 import static java.lang.String.format;
 import static java.math.BigDecimal.ZERO;
 import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -417,13 +413,13 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         if (V_2.equals(callbackParams.getVersion())
             && featureToggleService.isPinInPostEnabled()
-            && (isOneVOne(caseData) || JudgmentsOnlineHelper.isNonDivergentForDJ(caseData))) {
+            && (isOneVOne(caseData) || isNonDivergentAndLrVLr(caseData) )) {
             if (caseData.hasClaimantAgreedToFreeMediation()) {
                 nextState = CaseState.IN_MEDIATION.name();
             } else if (caseData.hasApplicantAcceptedRepaymentPlan()) {
                 if (featureToggleService.isJudgmentOnlineLive()
                     && (caseData.isPayByInstallment() || caseData.isPayBySetDate())
-                    && (caseData.isLRvLipOneVOne() || JudgmentsOnlineHelper.isNonDivergentForDJ(caseData))) {
+                    && (caseData.isLRvLipOneVOne() || isNonDivergentAndLrVLr(caseData))) {
                     nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
                     businessProcess = BusinessProcess.ready(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC);
                 } else {
@@ -473,6 +469,32 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .state(nextState)
             .build();
 
+    }
+
+    private static boolean isNonDivergentAndLrVLr(CaseData caseData) {
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+        //1v1LR
+        if (caseData.getApplicant1() != null
+            && (caseData.getApplicant1Represented() != null && caseData.getApplicant1Represented().equals(YES))
+            && caseData.getRespondent1() != null && caseData.getRespondent1Represented().equals(YES)
+            && !MultiPartyScenario.isTwoVOne(caseData)
+            && ofNullable(caseData.getRespondent2()).isEmpty()) {
+            return true;
+        } else if (caseData.getRespondent2() != null        //1LRv2LR
+            && MultiPartyScenario.isOneVTwoLegalRep(caseData)
+            && caseData.getRespondent2SameLegalRepresentative().equals(YES)
+            && ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+            && ofNullable(caseData.getDefendantDetailsSpec().getValue()).isPresent()
+            && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")){
+            return true;
+        } else if (!MultiPartyScenario.isOneVOne(caseData) //2LR v 1LR
+             && !MultiPartyScenario.isOneVTwoLegalRep(caseData)
+             && MultiPartyScenario.isTwoVOne(caseData)
+            && (ofNullable(caseData.getApplicant2()).isPresent()
+            && caseData.isMultiPartyClaimant(multiPartyScenario))){
+            return true;
+        }
+        return false;
     }
 
     private void updateDQCourtLocations(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder,
