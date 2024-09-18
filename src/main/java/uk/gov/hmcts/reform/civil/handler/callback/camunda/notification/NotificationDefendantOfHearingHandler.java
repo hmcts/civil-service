@@ -182,12 +182,14 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
     }
 
     private String getReferenceTemplate(CaseData caseData, boolean isRespondent1Lip, boolean isDefendant1, boolean isHmc) {
+        String hearingId = isHmc ? camundaService
+            .getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId()).getHearingId() : caseData.getHearingReferenceNumber();
+
         if (isHmc && !(isRespondent1Lip && isDefendant1)) {
-            return String.format(REFERENCE_TEMPLATE_HEARING, camundaService
-            .getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId()).getHearingId());
+            return String.format(REFERENCE_TEMPLATE_HEARING, hearingId);
         } else {
-            return isRespondent1Lip ? String.format(REFERENCE_TEMPLATE_HEARING_LIP, caseData.getHearingReferenceNumber())
-                : String.format(REFERENCE_TEMPLATE_HEARING, caseData.getHearingReferenceNumber());
+            return isRespondent1Lip ? String.format(REFERENCE_TEMPLATE_HEARING_LIP, hearingId)
+                : String.format(REFERENCE_TEMPLATE_HEARING, hearingId);
         }
     }
 

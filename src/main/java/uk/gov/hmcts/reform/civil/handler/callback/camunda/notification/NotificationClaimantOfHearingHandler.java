@@ -81,12 +81,13 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
     private CallbackResponse notifyClaimantHearing(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         boolean isApplicantLip = isApplicantLip(caseData);
+        boolean isHmcEvent = isEvent(callbackParams, NOTIFY_CLAIMANT_HEARING_HMC);
 
-        if (isEvent(callbackParams, NOTIFY_CLAIMANT_HEARING_HMC) && !isApplicantLip) {
+        if (isHmcEvent && !isApplicantLip) {
             String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
             sendEmailHMC(caseData, recipient);
         } else {
-            sendEmail(caseData, getRecipient(caseData, isApplicantLip), getReferenceTemplate(caseData, isApplicantLip), isApplicantLip);
+            sendEmail(caseData, getRecipient(caseData, isApplicantLip), getReferenceTemplate(caseData, isApplicantLip, isHmcEvent), isApplicantLip);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -161,9 +162,17 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
             : caseData.getApplicantSolicitor1UserDetails().getEmail();
     }
 
-    private String getReferenceTemplate(CaseData caseData, boolean isApplicantLip) {
-        return isApplicantLip ? String.format(REFERENCE_TEMPLATE_HEARING_LIP, caseData.getHearingReferenceNumber())
-            : String.format(REFERENCE_TEMPLATE_HEARING, caseData.getHearingReferenceNumber());
+    private String getReferenceTemplate(CaseData caseData, boolean isApplicantLip, boolean isHmcEvent) {
+
+        String hearingId = caseData.getHearingReferenceNumber();
+
+        if (isHmcEvent) {
+            HearingNoticeVariables camundaVars = camundaService.getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId());
+            hearingId = camundaVars.getHearingId();
+        }
+
+        return isApplicantLip ? String.format(REFERENCE_TEMPLATE_HEARING_LIP, hearingId)
+            : String.format(REFERENCE_TEMPLATE_HEARING, hearingId);
     }
 
     private String getEmailTemplate(CaseData caseData, boolean isApplicantLip) {

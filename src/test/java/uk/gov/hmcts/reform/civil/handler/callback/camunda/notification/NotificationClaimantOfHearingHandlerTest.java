@@ -617,7 +617,7 @@ class NotificationClaimantOfHearingHandlerTest {
                 "applicant1@example.com",
                 "test-template-claimant-lip-id",
                 getNotificationLipDataMap(caseData),
-                "notification-of-hearing-lip-000HN001"
+                "notification-of-hearing-lip-HER1234"
             );
         }
 

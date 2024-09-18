@@ -310,7 +310,7 @@ public class NotificationDefendantOfHearingHandlerTest {
                 "respondent1@example.com",
                 "test-template-defendant-lip-id",
                 getNotificationLipDataMap(caseData),
-                "notification-of-hearing-lip-000HN001"
+                "notification-of-hearing-lip-123456"
             );
         }
 
