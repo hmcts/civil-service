@@ -13,6 +13,7 @@ public enum RespondentResponseTypeSpec {
 
     private final String displayedValue;
     private final String displayedSingularValue;
+
     public RespondentResponseType translate() {
         switch (this) {
             case PART_ADMISSION:
