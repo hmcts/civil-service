@@ -17,6 +17,9 @@ import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
@@ -39,6 +42,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed.REQUEST_A_CCJ;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -300,6 +304,10 @@ public class DashboardClaimInfoServiceTest {
                                              .type(Party.Type.INDIVIDUAL)
                                              .build())
                             .applicant1ResponseDate(DATE_IN_2025)
+                            .caseDataLiP(CaseDataLiP.builder()
+                                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
+                                                                        .applicant1ChoosesHowToProceed(REQUEST_A_CCJ).build())
+                                             .build())
                             .ccjPaymentDetails(CCJPaymentDetails.builder()
                                                    .ccjPaymentPaidSomeOption(YesOrNo.NO)
                                                    .build())
