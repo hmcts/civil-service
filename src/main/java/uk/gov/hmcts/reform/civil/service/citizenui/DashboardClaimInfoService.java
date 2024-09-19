@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CcdDashboardClaimantClaimMatcher;
@@ -167,7 +168,15 @@ public class DashboardClaimInfoService {
             && caseData.getActiveJudgment().getType().equals(JudgmentType.DEFAULT_JUDGMENT)
             && caseData.getActiveJudgment().getIssueDate() != null) {
             item.setDefaultJudgementIssuedDate(caseData.getActiveJudgment().getIssueDate());
+        } else if (caseData.getActiveJudgment() == null && caseData.getDefaultJudgmentDocuments() != null) {
+            caseData.getDefaultJudgmentDocuments().stream()
+                .map(el -> el.getValue())
+                .filter(doc -> doc.getDocumentType().equals(DocumentType.DEFAULT_JUDGMENT))
+                .map(doc -> doc.getCreatedDatetime().toLocalDate())
+                .findFirst()
+                .ifPresent(item::setDefaultJudgementIssuedDate);
         }
+
         return item;
     }
 

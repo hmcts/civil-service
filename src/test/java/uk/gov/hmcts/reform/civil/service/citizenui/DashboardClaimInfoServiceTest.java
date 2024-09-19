@@ -10,6 +10,8 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -22,6 +24,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
@@ -464,6 +467,24 @@ public class DashboardClaimInfoServiceTest {
             .willReturn(CaseData.builder().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1)).activeJudgment(
                     JudgmentDetails.builder().issueDate(LocalDate.now()).state(JudgmentState.ISSUED)
                         .type(JudgmentType.DEFAULT_JUDGMENT).build())
+                            .build());
+        DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
+            "authorisation",
+            "123",
+            CURRENT_PAGE_NO
+        );
+        assertThat(claimsForDefendant.getClaims().size()).isEqualTo(3);
+        assertThat(claimsForDefendant.getClaims().get(0).getDefaultJudgementIssuedDate()).isEqualTo(LocalDate.now());
+    }
+
+    @Test
+    void shouldIncludeDefaultJudgementIssuedDate_WhenJOFlagIsOff() {
+        given(caseDetailsConverter.toCaseData(CASE_DETAILS))
+            .willReturn(CaseData.builder().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
+                            .defaultJudgmentDocuments(List.of(
+                                Element.<CaseDocument>builder()
+                                    .value(CaseDocument.builder().documentType(DocumentType.DEFAULT_JUDGMENT)
+                                               .createdDatetime(LocalDateTime.now()).build()).build()))
                             .build());
         DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
