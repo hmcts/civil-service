@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -53,8 +52,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeOrderDown
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -73,8 +70,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_ORDER_NOTIFICATION;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument.toCaseDocument;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
@@ -538,25 +533,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         UserDetails userDetails = userService.getUserDetails(authorisation);
         CaseDocument finalDocument = caseData.getFinalOrderDocument();
 
-        if (DOWNLOAD_ORDER_TEMPLATE.equals(caseData.getFinalOrderSelection())) {
-            CaseDocument caseDocumentFromUploadedOrder = toCaseDocument(
-                caseData.getUploadOrderDocumentFromTemplate(),
-                JUDGE_FINAL_ORDER);
-            DownloadedDocumentResponse downloadedDocumentResponse = getDocument(
-                authorisation,
-                caseDocumentFromUploadedOrder);
-            byte[] bytes = new byte[0];
-            try {
-                InputStream inputStream = downloadedDocumentResponse.file().getInputStream();
-                bytes = IOUtils.toByteArray(inputStream);
-            } catch (IOException e) {
-                log.error("Unable to stream downloadedDocumentResponse from case %s : %s".formatted(caseData.getCcdCaseReference(), e.getMessage()));
-            }
-            String updatedDocumentFilename = getUploadedFromTemplateDocumentName(
-                caseData,
-                caseDocumentFromUploadedOrder);
-            finalDocument = reuploadDownloadedTemplate(authorisation, bytes, updatedDocumentFilename);
-        } else {
+        if (!DOWNLOAD_ORDER_TEMPLATE.equals(caseData.getFinalOrderSelection())) {
             String judgeName = userDetails.getFullName();
             String updatedDocumentFilename = getDocumentFilename(finalDocument, judgeName);
             finalDocument.getDocumentLink().setDocumentFileName(updatedDocumentFilename);

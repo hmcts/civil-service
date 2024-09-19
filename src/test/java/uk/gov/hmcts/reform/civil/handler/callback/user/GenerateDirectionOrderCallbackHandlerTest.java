@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.ComplexityBand;
@@ -1316,43 +1315,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Then
             String fileName = LocalDate.now() + "_Judge Judy" + ".pdf";
             assertThat(updatedData).extracting("finalOrderFurtherHearingToggle").isNull();
-            assertThat(response.getData()).extracting("finalOrderDocumentCollection").isNotNull();
-            assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
-                           .getValue().getDocumentLink().getCategoryID()).isEqualTo("caseManagementOrders");
-            assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
-                           .getValue().getDocumentLink().getDocumentFileName()).isEqualTo(fileName);
-        }
-
-        @Test
-        void shouldAddTemplateDocumentToCollection_onAboutToSubmit() {
-            String fileName = LocalDate.now() + "_order.docx";
-            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
-                                                                            .forename("Judge")
-                                                                            .surname("Judy")
-                                                                            .roles(Collections.emptyList()).build());
-            when(documentManagementService
-                     .downloadDocumentWithMetaData(BEARER_TOKEN, "documents/fake-url"))
-                .thenReturn(downloadedDocumentResponse);
-            when(documentManagementService
-                     .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, JUDGE_FINAL_ORDER)))
-                .thenReturn(CASE_DOCUMENT.documentName(fileName).build());
-            // Given
-            List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
-            finalCaseDocuments.add(element(finalOrder));
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE)
-                .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                       .value(DynamicListElement.builder()
-                                                                  .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
-                                                                  .build()).build())
-                .finalOrderDocumentCollection(finalCaseDocuments)
-                .uploadOrderDocumentFromTemplate(uploadedDocument)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            // Then
             assertThat(response.getData()).extracting("finalOrderDocumentCollection").isNotNull();
             assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
                            .getValue().getDocumentLink().getCategoryID()).isEqualTo("caseManagementOrders");
