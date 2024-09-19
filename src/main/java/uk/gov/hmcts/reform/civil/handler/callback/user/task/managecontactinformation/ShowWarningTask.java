@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.managecontactinformation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -31,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFE
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_LITIGATION_FRIEND_ID;
 
+@Slf4j
 @Component
 public class ShowWarningTask {
 
@@ -60,6 +62,7 @@ public class ShowWarningTask {
         ArrayList<String> warnings = new ArrayList<>();
         List<String> errors = new ArrayList<>();
         CaseData oldCaseData = caseDetailsConverter.toCaseData(caseDetailsBefore);
+        log.info("Show warning for case ID {}", caseData.getCcdCaseReference());
 
         // oldCaseData needed because Litigation friend gets nullified in mid event
         if (partyHasLitigationFriend(partyChosen, oldCaseData)) {

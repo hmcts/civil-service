@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.managecontactinformation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -60,6 +62,8 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populatePartyIndividual
 import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForLitigationFriendParties;
 import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
 
+@Component
+@Slf4j
 public class SubmitChangesTask {
 
     private final CaseDetailsConverter caseDetailsConverter;
@@ -83,6 +87,7 @@ public class SubmitChangesTask {
 
     public CallbackResponse submitChanges(CaseData caseData, CaseDetails caseDetailsBefore, String authToken) {
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
+        log.info("Submit changes for case ID {}", caseData.getCcdCaseReference());
         CaseData oldCaseData = caseDetailsConverter.toCaseData(caseDetailsBefore);
 
         // persist party flags (ccd issue)
