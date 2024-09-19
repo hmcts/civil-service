@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -26,7 +25,6 @@ import uk.gov.hmcts.reform.civil.utils.PartyDetailsChangedUtil;
 import java.util.List;
 
 import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -73,7 +71,9 @@ public class SubmitChangesTask {
     private static final List<String> ADMIN_ROLES = List.of(
         "caseworker-civil-admin", "caseworker-civil-staff");
 
-    public SubmitChangesTask(CaseDetailsConverter caseDetailsConverter, ObjectMapper objectMapper, UserService userService, CaseFlagsInitialiser caseFlagsInitialiser, PartyDetailsChangedUtil partyDetailsChangedUtil) {
+    public SubmitChangesTask(CaseDetailsConverter caseDetailsConverter, ObjectMapper objectMapper,
+                             UserService userService, CaseFlagsInitialiser caseFlagsInitialiser,
+                             PartyDetailsChangedUtil partyDetailsChangedUtil) {
         this.caseDetailsConverter = caseDetailsConverter;
         this.objectMapper = objectMapper;
         this.userService = userService;
@@ -81,7 +81,7 @@ public class SubmitChangesTask {
         this.partyDetailsChangedUtil = partyDetailsChangedUtil;
     }
 
-    public CallbackResponse submitChanges(CaseData caseData, CaseDetails caseDetailsBefore, String authToken ) {
+    public CallbackResponse submitChanges(CaseData caseData, CaseDetails caseDetailsBefore, String authToken) {
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
         CaseData oldCaseData = caseDetailsConverter.toCaseData(caseDetailsBefore);
 

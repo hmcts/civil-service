@@ -191,7 +191,6 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                                                callbackParams.getParams().get(BEARER_TOKEN).toString());
     }
 
-
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         return SubmittedCallbackResponse.builder()
             .confirmationHeader("# Contact information changed")

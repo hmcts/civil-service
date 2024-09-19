@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -17,7 +16,6 @@ import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -47,7 +45,9 @@ public class ShowWarningTask {
     private static final String CHECK_LITIGATION_FRIEND_WARNING = "There is another litigation friend on this case. "
         + "If the parties are using the same litigation friend you must update the other litigation friend's details too.";
 
-    public ShowWarningTask(CaseDetailsConverter caseDetailsConverter, ObjectMapper objectMapper, PartyValidator partyValidator, FeatureToggleService featureToggleService, PostcodeValidator postcodeValidator) {
+    public ShowWarningTask(CaseDetailsConverter caseDetailsConverter, ObjectMapper objectMapper,
+                           PartyValidator partyValidator, FeatureToggleService featureToggleService,
+                           PostcodeValidator postcodeValidator) {
         this.caseDetailsConverter = caseDetailsConverter;
         this.objectMapper = objectMapper;
         this.partyValidator = partyValidator;

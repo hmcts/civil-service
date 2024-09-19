@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.managecontactinformation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -30,7 +31,7 @@ import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
 
-
+@Slf4j
 @Component
 public class PrepareEventTask {
 
@@ -51,6 +52,7 @@ public class PrepareEventTask {
 
     public CallbackResponse prepareEvent(CaseData caseData, String authToken) {
 
+        log.info("Prepare event for case ID {}", caseData.getCcdCaseReference());
         UserInfo userInfo = userService.getUserInfo(authToken);
         boolean isAdmin = isAdmin(authToken);
 
