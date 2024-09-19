@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
@@ -22,6 +23,7 @@ import java.util.UUID;
 
 import static java.lang.String.format;
 
+@Slf4j
 public abstract class DocumentHandler<T> {
 
     private static final String SPACE = " ";

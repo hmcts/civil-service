@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.resp
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.EvidenceUploadConstants;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.LegalRepresentativeOneDocumentHandler;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -19,7 +20,7 @@ public class RespondentOneExpertAnswersDocumentHandler extends
     protected static final String RESPONDENT_TWO_EXPERT_ANSWERS_CATEGORY_ID = "RespondentTwoExpertAnswers";
 
     public RespondentOneExpertAnswersDocumentHandler(DocumentTypeBuilder<UploadEvidenceExpert> documentTypeBuilder) {
-        super(RESPONDENT_ONE_EXPERT_ANSWERS_CATEGORY_ID, RESPONDENT_TWO_EXPERT_ANSWERS_CATEGORY_ID, "%s - Answer to questions asked",
+        super(RESPONDENT_ONE_EXPERT_ANSWERS_CATEGORY_ID, RESPONDENT_TWO_EXPERT_ANSWERS_CATEGORY_ID, EvidenceUploadConstants.EXPERT_ANSWERS_TEXT,
             documentTypeBuilder);
     }
 

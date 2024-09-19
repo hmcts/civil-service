@@ -1,8 +1,7 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.respondentsolicitorone;
+package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.applicantsolcitorone;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.EvidenceUploadConstants;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.LegalRepresentativeOneDocumentHandler;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -13,14 +12,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
-public class RespondentOneDisclosureDocumentHandler extends
+public class ApplicantOneDisclosureDocumentHandler extends
     LegalRepresentativeOneDocumentHandler<UploadEvidenceDocumentType> {
 
-    protected static final String RESPONDENT_ONE_DISCLOSURE_CATEGORY_ID = "RespondentOneDisclosure";
-    protected static final String RESPONDENT_TWO_DISCLOSURE_CATEGORY_ID = "RespondentTwoDisclosure";
+    protected static final String APPLICANT_ONE_DISCLOSURE_CATEGORY_ID = "ApplicantDisclosure";
+    protected static final String APPLICANT_TWO_DISCLOSURE_CATEGORY_ID = "ApplicantTwoDisclosure";
 
-    public RespondentOneDisclosureDocumentHandler(DocumentTypeBuilder<UploadEvidenceDocumentType> documentTypeBuilder) {
-        super(RESPONDENT_ONE_DISCLOSURE_CATEGORY_ID, RESPONDENT_TWO_DISCLOSURE_CATEGORY_ID, EvidenceUploadConstants.DISCLOSURE_TEXT, documentTypeBuilder);
+    public ApplicantOneDisclosureDocumentHandler(DocumentTypeBuilder<UploadEvidenceDocumentType> documentTypeBuilder) {
+        super(APPLICANT_ONE_DISCLOSURE_CATEGORY_ID, APPLICANT_TWO_DISCLOSURE_CATEGORY_ID, "%s - Disclosure list", documentTypeBuilder);
     }
 
     @Override
