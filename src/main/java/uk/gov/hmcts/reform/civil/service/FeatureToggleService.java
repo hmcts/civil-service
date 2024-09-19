@@ -152,7 +152,4 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("ga-allowed-pre-sdo");
     }
 
-    public boolean isManageContactInformationEnabled() {
-        return featureToggleApi.isFeatureEnabled("mci");
-    }
 }

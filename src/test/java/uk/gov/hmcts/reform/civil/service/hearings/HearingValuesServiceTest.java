@@ -131,7 +131,7 @@ public class HearingValuesServiceTest {
     void prepare() {
         ReflectionTestUtils.setField(hearingValuesService, "mapper", mapper);
         when(earlyAdoptersService.isPartOfHmcEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
-        when(featuretoggleService.isManageContactInformationEnabled()).thenReturn(true);
+        when(featuretoggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
     }
 
     @Test
@@ -331,7 +331,7 @@ public class HearingValuesServiceTest {
             .data(caseData.toMap(mapper))
             .id(caseId).build();
 
-        when(featuretoggleService.isManageContactInformationEnabled()).thenReturn(false);
+        when(featuretoggleService.isUpdateContactDetailsEnabled()).thenReturn(false);
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))

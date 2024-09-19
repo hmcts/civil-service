@@ -143,7 +143,7 @@ public class HearingValuesService {
     private void populateMissingFields(Long caseId, CaseData caseData) throws Exception {
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         boolean partyIdsUpdated = populateMissingPartyIds(builder, caseData);
-        boolean unavailableDatesUpdated = featuretoggleService.isManageContactInformationEnabled()
+        boolean unavailableDatesUpdated = featuretoggleService.isUpdateContactDetailsEnabled()
             ? populateMissingUnavailableDatesFields(builder) : false;
         boolean caseFlagsUpdated = initialiseMissingCaseFlags(builder);
 

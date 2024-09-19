@@ -288,12 +288,4 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isDashboardEnabledForCase(caseData)).isEqualTo(toggleStat);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsManageContactInformationEnabled(Boolean toggleStat) {
-        var key = "mci";
-        givenToggle(key, toggleStat);
-
-        assertThat(featureToggleService.isManageContactInformationEnabled()).isEqualTo(toggleStat);
-    }
 }
