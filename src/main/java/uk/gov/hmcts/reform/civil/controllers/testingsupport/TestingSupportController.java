@@ -222,6 +222,7 @@ public class TestingSupportController {
         try {
             trialReadyNotificationHandler.sendTrialReadyNotification(event);
         } catch (Exception e) {
+            log.error("Error triggering trial arrangement notification for case {}: {}", caseId, e.getMessage(), e);
             responseMsg = FAILED;
         }
         return new ResponseEntity<>(responseMsg, HttpStatus.OK);
