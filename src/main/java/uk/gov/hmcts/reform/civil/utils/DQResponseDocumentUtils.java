@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
@@ -21,6 +22,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument
 public class DQResponseDocumentUtils {
 
     private static final String CLAIMANT = "Claimant";
+    private static final String DEFENDANT_1 = "Defendant 1";
+    private static final String DEFENDANT_2 = "Defendant 2";
 
     private final AssignCategoryId assignCategoryId;
 
@@ -29,10 +32,36 @@ public class DQResponseDocumentUtils {
                 caseData.getApplicant1DQ(),
                 CLAIMANT,
                 DocCategory.DQ_APP1,
+                DocumentType.CLAIMANT_DRAFT_DIRECTIONS,
                 caseData.getApplicant1ResponseDate());
     }
 
-    private List<Element<CaseDocument>> buildDQResponseDocuments(DQ dq, String createdBy, DocCategory docCategory, LocalDateTime date) {
+    public List<Element<CaseDocument>> buildDefendantResponseDocuments(CaseData caseData) {
+        return Stream.concat(
+            buildDefendant1ResponseDocuments(caseData).stream(),
+            buildDefendant2ResponseDocuments(caseData).stream()
+        ).toList();
+    }
+
+    public List<Element<CaseDocument>> buildDefendant1ResponseDocuments(CaseData caseData) {
+        return buildDQResponseDocuments(
+                caseData.getRespondent1DQ(),
+                DEFENDANT_1,
+                DocCategory.DQ_DEF1,
+                DocumentType.DEFENDANT_DRAFT_DIRECTIONS,
+                caseData.getRespondent1ResponseDate());
+    }
+
+    public List<Element<CaseDocument>> buildDefendant2ResponseDocuments(CaseData caseData) {
+        return buildDQResponseDocuments(
+            caseData.getRespondent2DQ(),
+            DEFENDANT_2,
+            DocCategory.DQ_DEF2,
+            DocumentType.DEFENDANT_DRAFT_DIRECTIONS,
+            caseData.getRespondent2ResponseDate());
+    }
+
+    private List<Element<CaseDocument>> buildDQResponseDocuments(DQ dq, String createdBy, DocCategory docCategory, DocumentType documentType, LocalDateTime date) {
         List<Element<CaseDocument>> documents = new ArrayList<>();
 
         if (!nonNull(dq)) {
@@ -40,7 +69,7 @@ public class DQResponseDocumentUtils {
         }
 
         if (nonNull(dq.getDraftDirections())) {
-            documents.add(buildElemCaseDocument(dq.getDraftDirections(), createdBy, date, DocumentType.CLAIMANT_DRAFT_DIRECTIONS));
+            documents.add(buildElemCaseDocument(dq.getDraftDirections(), createdBy, date, documentType));
         }
 
         if (!documents.isEmpty()) {
