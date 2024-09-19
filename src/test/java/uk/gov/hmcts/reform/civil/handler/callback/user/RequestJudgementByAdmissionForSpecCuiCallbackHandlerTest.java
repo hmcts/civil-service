@@ -31,6 +31,8 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
@@ -58,7 +60,9 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
     JudgementService.class,
-    JudgmentByAdmissionOnlineMapper.class
+    JudgmentByAdmissionOnlineMapper.class,
+    RoboticsAddressMapper.class,
+    AddressLinesMapper.class
 })
 public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -76,6 +80,12 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
     @MockBean
     private CaseDetailsConverter caseDetailsConverter;
+
+    @Autowired
+    RoboticsAddressMapper addressMapper;
+
+    @Autowired
+    AddressLinesMapper addressLineMapper;
 
     @Nested
     class AboutToStartCallback {

@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
@@ -31,6 +32,7 @@ import java.time.LocalDateTime;
 public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
 
     boolean isNonDivergent = false;
+    private final RoboticsAddressMapper addressMapper;
 
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
@@ -45,7 +47,7 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
         PaymentPlanSelection paymentPlan = getPaymentPlan(caseData);
 
         JudgmentDetails activeJudgment = super.addUpdateActiveJudgment(caseData);
-        activeJudgment = super.updateDefendantDetails(activeJudgment, caseData);
+        activeJudgment = super.updateDefendantDetails(activeJudgment, caseData, addressMapper);
         JudgmentDetails activeJudgmentDetails = activeJudgment.toBuilder()
             .createdTimestamp(LocalDateTime.now())
             .state(getJudgmentState(caseData))

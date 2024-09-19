@@ -30,6 +30,8 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -41,8 +43,8 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @ExtendWith(MockitoExtension.class)
 class JudgmentByAdmissionMapperTest {
 
-    @InjectMocks
-    private JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
+    private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
+    private JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper = new JudgmentByAdmissionOnlineMapper(addressMapper);
 
     @Test
     void testIfJudgmentByAdmission() {
