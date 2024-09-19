@@ -62,7 +62,7 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
         }
 
         @Test
-        void shouldNotifyClaimantSolicitor_whenInvoked() {
+        void shouldNotifyDefendantSolicitor_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
@@ -85,7 +85,7 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
         }
 
         @Test
-        void shouldNotifyClaimantSolicitor2Defendants_whenInvoked() {
+        void shouldNotifyDefendantSolicitor2Defendants_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
                 .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()

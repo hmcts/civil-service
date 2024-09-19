@@ -121,27 +121,27 @@ public class StandardDirectionOrderDJDefendantNotificationHandler extends Callba
     }
 
     private String getLegalOrganizationName(final CaseData caseData) {
-        if (nonNull(caseData.getApplicant1OrganisationPolicy().getOrganisation())) {
+        if (nonNull(caseData.getRespondent1OrganisationPolicy().getOrganisation())) {
             Optional<Organisation> organisation = organisationService
-                .findOrganisationById(caseData.getApplicant1OrganisationPolicy()
+                .findOrganisationById(caseData.getRespondent1OrganisationPolicy()
                                           .getOrganisation().getOrganisationID());
             if (organisation.isPresent()) {
                 return organisation.get().getName();
             }
         }
-        return caseData.getApplicant1().getPartyName();
+        return caseData.getRespondent1().getPartyName();
     }
 
     private String getLegalOrganizationDef2Name(final CaseData caseData) {
         Optional<Organisation> organisation = organisationService
-            .findOrganisationById(caseData.getApplicant2OrganisationPolicy() != null
-                                      ? caseData.getApplicant2OrganisationPolicy()
-                .getOrganisation().getOrganisationID() : caseData.getApplicant1OrganisationPolicy()
+            .findOrganisationById(caseData.getRespondent2OrganisationPolicy() != null
+                                      ? caseData.getRespondent2OrganisationPolicy()
+                .getOrganisation().getOrganisationID() : caseData.getRespondent1OrganisationPolicy()
                 .getOrganisation().getOrganisationID());
         if (organisation.isPresent()) {
             return organisation.get().getName();
         }
-        return caseData.getApplicant2().getPartyName();
+        return caseData.getRespondent2().getPartyName();
     }
 
     private Boolean checkIfBothDefendants(CaseData caseData) {
