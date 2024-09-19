@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +35,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DashboardClaimStatusFactoryTest {
 
+    enum OrderType {
+        OFFICER_ORDER,
+        /**
+         * directions order ending in Case_Progression
+         */
+        DIRECTIONS_ORDER_CP,
+        /**
+         * Directions order ending in All_final_orders_issued
+         */
+        DIRECTIONS_ORDER_ALL
+    }
+
     /**
      * Generates arguments to interweave order creation in paths followed by cases.
      *
@@ -45,8 +56,9 @@ class DashboardClaimStatusFactoryTest {
     static Stream<Arguments> positionAndOrderTypeArguments(int howManyPositions) {
         List<Arguments> argumentsList = new ArrayList<>();
         for (int i = 0; i < howManyPositions + 1; i++) {
-            argumentsList.add(Arguments.arguments(i, false));
-            argumentsList.add(Arguments.arguments(i, true));
+            for (OrderType ot : OrderType.values()) {
+                argumentsList.add(Arguments.arguments(i, ot));
+            }
         }
         return argumentsList.stream();
     }
@@ -61,49 +73,49 @@ class DashboardClaimStatusFactoryTest {
 
     @ParameterizedTest
     @MethodSource("hearingFeePaidArguments")
-    void shouldReturnCorrectStatus_hearingFeePaid(int orderPosition, boolean isOfficerOrder) {
+    void shouldReturnCorrectStatus_hearingFeePaid(int orderPosition, OrderType orderType) {
         List<CaseEventDetail> eventHistory = new ArrayList<>();
         CaseData caseData = fastClaim(eventHistory);
         caseData = passDays(caseData, eventHistory, 1);
-        caseData = applyOrderIfPosition(1, orderPosition, isOfficerOrder,
+        caseData = applyOrderIfPosition(1, orderPosition, orderType,
                                         caseData, eventHistory
         );
 
         caseData = passDays(caseData, eventHistory, 1);
         caseData = scheduleHearing(caseData, eventHistory);
         // 56 days to hearing
-        caseData = applyOrderIfPosition(2, orderPosition, isOfficerOrder,
+        caseData = applyOrderIfPosition(2, orderPosition, orderType,
                                         caseData, eventHistory
         );
         caseData = requestHwF(caseData, eventHistory);
-        caseData = applyOrderIfPosition(3, orderPosition, isOfficerOrder,
+        caseData = applyOrderIfPosition(3, orderPosition, orderType,
                                         caseData, eventHistory
         );
         caseData = invalidHwFReferenceNumber(caseData, eventHistory);
-        caseData = applyOrderIfPosition(4, orderPosition, isOfficerOrder,
+        caseData = applyOrderIfPosition(4, orderPosition, orderType,
                                         caseData, eventHistory
         );
         caseData = updatedHwFReferenceNumber(caseData, eventHistory);
-        caseData = applyOrderIfPosition(5, orderPosition, isOfficerOrder,
+        caseData = applyOrderIfPosition(5, orderPosition, orderType,
                                         caseData, eventHistory
         );
         caseData = moreInformationRequiredHwF(caseData, eventHistory);
-        caseData = applyOrderIfPosition(6, orderPosition, isOfficerOrder,
+        caseData = applyOrderIfPosition(6, orderPosition, orderType,
                                         caseData, eventHistory
         );
         caseData = hwfRejected(caseData, eventHistory);
-        caseData = applyOrderIfPosition(7, orderPosition, isOfficerOrder,
+        caseData = applyOrderIfPosition(7, orderPosition, orderType,
                                         caseData, eventHistory
         );
         caseData = payHearingFee(caseData, eventHistory);
-        caseData = applyOrderIfPosition(8, orderPosition, isOfficerOrder,
+        caseData = applyOrderIfPosition(8, orderPosition, orderType,
                                         caseData, eventHistory
         );
         // times passes until there's only 6 weeks to hearing
         caseData = passDays(caseData, eventHistory, 14);
         shouldRequireTrialArrangements(caseData, eventHistory);
-        applyOrderIfPosition(9, orderPosition, isOfficerOrder,
-                                        caseData, eventHistory
+        applyOrderIfPosition(9, orderPosition, orderType,
+                             caseData, eventHistory
         );
     }
 
@@ -113,44 +125,44 @@ class DashboardClaimStatusFactoryTest {
 
     @ParameterizedTest
     @MethodSource("awaitingJudgmentArguments")
-    void shouldReturnCorrectStatus_awaitingJudgment(int orderPosition, boolean isOfficerOrder) {
+    void shouldReturnCorrectStatus_awaitingJudgment(int orderPosition, OrderType orderType) {
         List<CaseEventDetail> eventHistory = new ArrayList<>();
         CaseData caseData = fastClaim(eventHistory);
-        caseData = applyOrderIfPosition(1, orderPosition, isOfficerOrder,
+        caseData = applyOrderIfPosition(1, orderPosition, orderType,
                                         caseData, eventHistory
         );
         caseData = scheduleHearing(caseData, eventHistory);
-        caseData = applyOrderIfPosition(2, orderPosition, isOfficerOrder,
+        caseData = applyOrderIfPosition(2, orderPosition, orderType,
                                         caseData, eventHistory
         );
         // 56 days to hearing
         caseData = requestHwF(caseData, eventHistory);
-        caseData = applyOrderIfPosition(3, orderPosition, isOfficerOrder,
+        caseData = applyOrderIfPosition(3, orderPosition, orderType,
                                         caseData, eventHistory
         );
         caseData = hwfFull(caseData, eventHistory, DashboardClaimStatus.TRIAL_OR_HEARING_SCHEDULED);
-        caseData = applyOrderIfPosition(4, orderPosition, isOfficerOrder,
+        caseData = applyOrderIfPosition(4, orderPosition, orderType,
                                         caseData, eventHistory
         );
 
         // wait until 6 weeks to hearing
         caseData = passDays(caseData, eventHistory, 14);
-        caseData = applyOrderIfPosition(5, orderPosition, isOfficerOrder,
+        caseData = applyOrderIfPosition(5, orderPosition, orderType,
                                         caseData, eventHistory
         );
         caseData = submitClaimantHearingArrangements(caseData, eventHistory);
-        caseData = applyOrderIfPosition(6, orderPosition, isOfficerOrder,
+        caseData = applyOrderIfPosition(6, orderPosition, orderType,
                                         caseData, eventHistory
         );
         caseData = submitDefendantHearingArrangements(caseData, eventHistory);
-        caseData = applyOrderIfPosition(7, orderPosition, isOfficerOrder,
+        caseData = applyOrderIfPosition(7, orderPosition, orderType,
                                         caseData, eventHistory
         );
 
         // wait until 3 weeks to hearing
         caseData = passDays(caseData, eventHistory, 21);
         caseData = createBundle(caseData, eventHistory);
-        caseData = applyOrderIfPosition(8, orderPosition, isOfficerOrder,
+        caseData = applyOrderIfPosition(8, orderPosition, orderType,
                                         caseData, eventHistory
         );
         awaitingJudgment(caseData, eventHistory);
@@ -162,22 +174,22 @@ class DashboardClaimStatusFactoryTest {
 
     @ParameterizedTest
     @MethodSource("feeNotPaidArguments")
-    void shouldReturnCorrectStatus_feeNotPaid(int orderPosition, boolean isOfficerOrder) {
+    void shouldReturnCorrectStatus_feeNotPaid(int orderPosition, OrderType orderType) {
         List<CaseEventDetail> eventHistory = new ArrayList<>();
         CaseData caseData = smallClaim(eventHistory);
-        caseData = applyOrderIfPosition(1, orderPosition, isOfficerOrder,
+        caseData = applyOrderIfPosition(1, orderPosition, orderType,
                                         caseData, eventHistory
         );
         caseData = scheduleHearing(caseData, eventHistory);
-        caseData = applyOrderIfPosition(2, orderPosition, isOfficerOrder,
+        caseData = applyOrderIfPosition(2, orderPosition, orderType,
                                         caseData, eventHistory
         );
         caseData = requestHwF(caseData, eventHistory);
-        caseData = applyOrderIfPosition(3, orderPosition, isOfficerOrder,
+        caseData = applyOrderIfPosition(3, orderPosition, orderType,
                                         caseData, eventHistory
         );
         caseData = hwfPartial(caseData, eventHistory, DashboardClaimStatus.TRIAL_OR_HEARING_SCHEDULED);
-        caseData = applyOrderIfPosition(4, orderPosition, isOfficerOrder,
+        caseData = applyOrderIfPosition(4, orderPosition, orderType,
                                         caseData, eventHistory
         );
         doNotPayHearingFee(caseData, eventHistory);
@@ -187,14 +199,14 @@ class DashboardClaimStatusFactoryTest {
         return positionAndOrderTypeArguments(4);
     }
 
-    private CaseData applyOrderIfPosition(int position, int valueToApply, boolean officerOrder,
+    private CaseData applyOrderIfPosition(int position, int valueToApply, OrderType orderType,
                                           CaseData caseData,
                                           List<CaseEventDetail> eventHistory) {
         if (position == valueToApply) {
-            if (officerOrder) {
+            if (orderType == OrderType.OFFICER_ORDER) {
                 return courtOfficerOrder(caseData, LocalDateTime.now(), eventHistory);
             } else {
-                return generateDirectionOrder(caseData, LocalDateTime.now(), eventHistory);
+                return generateDirectionOrder(caseData, LocalDateTime.now(), eventHistory, orderType);
             }
         }
         return caseData;
@@ -704,39 +716,38 @@ class DashboardClaimStatusFactoryTest {
      * @return updated caseData
      */
     private CaseData generateDirectionOrder(CaseData previous, LocalDateTime created,
-                                            List<CaseEventDetail> eventHistory) {
+                                            List<CaseEventDetail> eventHistory,
+                                            OrderType orderType) {
         eventHistory.add(CaseEventDetail.builder()
                              .createdDate(created)
                              .eventName(CaseEvent.GENERATE_DIRECTIONS_ORDER.name())
                              .build());
-        if (previous.getCcdState() != CaseState.CASE_PROGRESSION
-            && previous.getCcdState() != CaseState.All_FINAL_ORDERS_ISSUED) {
-            // GENERATE_DIRECTIONS_ORDER does not change state, and ORDER_MADE requires one of those states
-            return previous;
-        }
+
         List<Element<CaseDocument>> orderList = Optional.ofNullable(
-            previous.getFinalOrderDocumentCollection())
+                previous.getFinalOrderDocumentCollection())
             .map(ArrayList::new)
             .orElseGet(ArrayList::new);
-        int daysDelta = -orderList.stream().map(e -> e.getValue().getCreatedDatetime())
-            .max(LocalDateTime::compareTo)
-            .map(max -> Math.abs(ChronoUnit.DAYS.between(created, max)) + 2)
-            .orElse(0L).intValue();
-        for (int i = 0; i < orderList.size(); i++) {
-            CaseDocument document = orderList.get(i).getValue();
-            document = document.toBuilder()
-                .createdDatetime(document.getCreatedDatetime().plusDays(daysDelta))
-                .build();
-            orderList.set(i, Element.<CaseDocument>builder()
-                .value(document)
-                .build());
-        }
+//        int daysDelta = -orderList.stream().map(e -> e.getValue().getCreatedDatetime())
+//            .max(LocalDateTime::compareTo)
+//            .map(max -> Math.abs(ChronoUnit.DAYS.between(created, max)) + 2)
+//            .orElse(0L).intValue();
+//        for (int i = 0; i < orderList.size(); i++) {
+//            CaseDocument document = orderList.get(i).getValue();
+//            document = document.toBuilder()
+//                .createdDatetime(document.getCreatedDatetime().plusDays(daysDelta))
+//                .build();
+//            orderList.set(i, Element.<CaseDocument>builder()
+//                .value(document)
+//                .build());
+//        }
         CaseDocument document = CaseDocument.builder()
             .createdDatetime(created)
             .build();
         orderList.add(Element.<CaseDocument>builder().value(document).build());
         CaseData caseData = previous.toBuilder()
             .finalOrderDocumentCollection(orderList)
+            .ccdState(orderType == OrderType.DIRECTIONS_ORDER_ALL ? CaseState.All_FINAL_ORDERS_ISSUED
+                          : CaseState.CASE_PROGRESSION)
             .build();
         Assertions.assertEquals(
             DashboardClaimStatus.ORDER_MADE,
