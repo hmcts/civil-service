@@ -38,11 +38,11 @@ class DashboardClaimStatusFactoryTest {
     enum OrderType {
         OFFICER_ORDER,
         /**
-         * directions order ending in Case_Progression
+         * directions order ending in Case_Progression.
          */
         DIRECTIONS_ORDER_CP,
         /**
-         * Directions order ending in All_final_orders_issued
+         * Directions order ending in All_final_orders_issued.
          */
         DIRECTIONS_ORDER_ALL
     }
@@ -727,19 +727,6 @@ class DashboardClaimStatusFactoryTest {
                 previous.getFinalOrderDocumentCollection())
             .map(ArrayList::new)
             .orElseGet(ArrayList::new);
-//        int daysDelta = -orderList.stream().map(e -> e.getValue().getCreatedDatetime())
-//            .max(LocalDateTime::compareTo)
-//            .map(max -> Math.abs(ChronoUnit.DAYS.between(created, max)) + 2)
-//            .orElse(0L).intValue();
-//        for (int i = 0; i < orderList.size(); i++) {
-//            CaseDocument document = orderList.get(i).getValue();
-//            document = document.toBuilder()
-//                .createdDatetime(document.getCreatedDatetime().plusDays(daysDelta))
-//                .build();
-//            orderList.set(i, Element.<CaseDocument>builder()
-//                .value(document)
-//                .build());
-//        }
         CaseDocument document = CaseDocument.builder()
             .createdDatetime(created)
             .build();
