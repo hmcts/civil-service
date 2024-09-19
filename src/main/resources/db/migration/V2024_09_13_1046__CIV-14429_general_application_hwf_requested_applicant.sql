@@ -16,5 +16,5 @@ VALUES ('Notice.AAA6.GeneralApps.HwFRequested.Applicant',
         'We’re reviewing your help with fees application',
         'Rydym yn adolygu eich cais am help i dalu ffioedd',
         '<p class="govuk-body">You’ve applied for help with the ${applicationFeeTypeEn} fee. You’ll receive an update in 5 to 10 working days.</p>',
-        '<p class="govuk-body">Fe wnaethoch gais am help i dalu’r ffi gwneud cais. Byddwch yn cael diweddariad mewn 5 i 10 diwrnod gwaith.</p>',
+        '<p class="govuk-body">Fe wnaethoch gais am help i dalu’r ffi gwneud ${applicationFeeTypeCy}. Byddwch yn cael diweddariad mewn 5 i 10 diwrnod gwaith.</p>',
         'APPLICANT');
