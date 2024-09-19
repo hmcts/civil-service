@@ -419,7 +419,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         if (V_2.equals(callbackParams.getVersion())
             && featureToggleService.isPinInPostEnabled()
-            && (isOneVOne(caseData) && isNonDivergentAndLrVLr(caseData))) {
+            && (isOneVOne(caseData) || isNonDivergentAndLrVLr(caseData))) {
             if (caseData.hasClaimantAgreedToFreeMediation()) {
                 nextState = CaseState.IN_MEDIATION.name();
             } else if (caseData.hasApplicantAcceptedRepaymentPlan()) {
@@ -478,7 +478,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private boolean isNonDivergentAndLrVLr(CaseData caseData) {
-        if (featureToggleService.isJudgmentOnlineLive()){
+        if (featureToggleService.isJudgmentOnlineLive()) {
             MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
             //1v1LR
             if (caseData.getApplicant1() != null
