@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploadhandlerbasetask;
+package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;

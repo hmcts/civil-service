@@ -1,12 +1,8 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploadhandlerbasetask;
+package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
-import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -16,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 
@@ -34,8 +29,6 @@ public abstract class SetOptionsTask {
     public SetOptionsTask(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
-
-    abstract List<String> setPartyOptions(CaseData caseData);
 
     public CallbackResponse setOptions(CaseData caseData) {
         List<String> dynamicListOptions = setPartyOptions(caseData);
@@ -59,4 +52,6 @@ public abstract class SetOptionsTask {
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
+
+    abstract List<String> setPartyOptions(CaseData caseData);
 }

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Objects;
 
@@ -10,11 +9,8 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadFiles;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploadhandlerbasetask.ApplicantDocumentUploadTimeTask;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploadhandlerbasetask.ApplicantSetOptionsTask;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploadhandlerbasetask.DocumentUploadTimeTask;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploadhandlerbasetask.SetOptionsTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.ApplicantDocumentUploadTimeTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.ApplicantSetOptionsTask;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;

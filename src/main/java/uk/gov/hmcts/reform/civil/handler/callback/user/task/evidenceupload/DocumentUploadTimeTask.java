@@ -1,11 +1,10 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploadhandlerbasetask;
+package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
-import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -18,10 +17,8 @@ import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDate;
@@ -123,7 +120,6 @@ public abstract class DocumentUploadTimeTask {
     protected static final String APPLICANT_TWO_TRIAL_SKELETON = "ApplicantTwoTrialSkeleton";
     protected static final String APPLICANT_TWO_SCHEDULE_OF_COSTS = "ApplicantTwoSchedulesOfCost";
     // Notification Strings used for email
-    protected static StringBuilder notificationString = new StringBuilder();
     private static final String SPACE = " ";
     private static final String END = ".";
     private static final String DATE_FORMAT = "dd-MM-yyyy";
@@ -146,11 +142,12 @@ public abstract class DocumentUploadTimeTask {
     abstract void applyDocumentUploadDate(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, LocalDateTime now);
 
     abstract void updateDocumentListUploadedAfterBundle(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseData caseData);
-    static void getNotificationText(CaseData caseData) {
-        notificationString = new StringBuilder();
+    private StringBuilder initiateNotificationTextBuilder(CaseData caseData) {
+        StringBuilder notificationString = new StringBuilder();
         if (caseData.getNotificationText() != null) {
             notificationString = new StringBuilder(caseData.getNotificationText());
         }
+        return notificationString;
     }
 
     private void updateDocumentListUploadedAfterBundle(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
@@ -159,11 +156,11 @@ public abstract class DocumentUploadTimeTask {
         }
     }
 
-    public CallbackResponse documentUploadTime(CaseData caseData, String selectedRole) {
+    public CallbackResponse documentUploadTime(CaseData caseData, CaseData caseDataBefore, String selectedRole) {
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         // If notification has already been populated in current day, we want to append to that existing notification
-        getNotificationText(caseData);
+        StringBuilder notificationTextBuilder = initiateNotificationTextBuilder(caseData);
         applyDocumentUploadDate(caseDataBuilder, time.now());
         updateDocumentListUploadedAfterBundle(caseData, caseDataBuilder);
 
@@ -177,108 +174,108 @@ public abstract class DocumentUploadTimeTask {
                                       RESPONDENT_ONE_DISCLOSURE_LIST,
                                       DISCLOSURE_LIST_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentForDisclosureRes(),
                                       document -> document.getValue().getDocumentUpload(),
                                       RESPONDENT_ONE_DISCLOSURE,
                                       DISCLOSURE_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentWitnessStatementRes(),
                                       document -> document.getValue().getWitnessOptionDocument(),
                                       RESPONDENT_ONE_WITNESS_STATEMENT,
                                       WITNESS_STATEMENT_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentWitnessSummaryRes(),
                                       document -> document.getValue().getWitnessOptionDocument(),
                                       RESPONDENT_ONE_WITNESS_SUMMARY,
                                       WITNESS_SUMMARY_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentHearsayNoticeRes(),
                                       document -> document.getValue().getWitnessOptionDocument(),
                                       RESPONDENT_ONE_WITNESS_HEARSAY,
                                       WITNESS_HEARSAY_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentReferredInStatementRes(),
                                       document -> document.getValue().getDocumentUpload(),
                                       RESPONDENT_ONE_WITNESS_REFERRED,
                                       WITNESS_REFERRED_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentExpertReportRes(),
                                       document -> document.getValue().getExpertDocument(),
                                       RESPONDENT_ONE_EXPERT_REPORT,
                                       EXPERT_REPORT_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentJointStatementRes(),
                                       document -> document.getValue().getExpertDocument(),
                                       RESPONDENT_ONE_EXPERT_JOINT_STATEMENT,
                                       EXPERT_JOINT_STATEMENT_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentQuestionsRes(),
                                       document -> document.getValue().getExpertDocument(),
                                       RESPONDENT_ONE_EXPERT_QUESTIONS,
                                       EXPERT_QUESTIONS_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentAnswersRes(),
                                       document -> document.getValue().getExpertDocument(),
                                       RESPONDENT_ONE_EXPERT_ANSWERS,
                                       EXPERT_ANSWERS_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentCaseSummaryRes(),
                                       document -> document.getValue().getDocumentUpload(),
                                       RESPONDENT_ONE_PRE_TRIAL_SUMMARY,
                                       PRE_TRIAL_SUMMARY_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentSkeletonArgumentRes(),
                                       document -> document.getValue().getDocumentUpload(),
                                       RESPONDENT_ONE_TRIAL_SKELETON,
                                       TRIAL_SKELETON_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentAuthoritiesRes(),
                                       document -> document.getValue().getDocumentUpload(),
                                       RESPONDENT_ONE_TRIAL_SKELETON,
                                       TRIAL_AUTHORITIES_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentCostsRes(),
                                       document -> document.getValue().getDocumentUpload(),
                                       RESPONDENT_ONE_SCHEDULE_OF_COSTS,
                                       TRIAL_COSTS_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentEvidenceForTrialRes(),
                                       document -> document.getValue().getDocumentUpload(),
                                       RESPONDENT_ONE_TRIAL_DOC_CORRESPONDENCE,
                                       TRIAL_DOC_CORRESPONDENCE_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             if (selectedRole.equals(SELECTED_VALUE_DEF_BOTH)) {
-                caseData = copyResp1ChangesToResp2(caseData, caseDataBuilder);
+                caseData = copyResp1ChangesToResp2(caseData, caseDataBefore, caseDataBuilder);
             }
         }
         if (selectedRole.equals(RESPONDENTSOLICITORTWO.name())) {
@@ -288,105 +285,105 @@ public abstract class DocumentUploadTimeTask {
                                       RESPONDENT_TWO_DISCLOSURE_LIST,
                                       DISCLOSURE_LIST_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentForDisclosureRes2(),
                                       document -> document.getValue().getDocumentUpload(),
                                       RESPONDENT_TWO_DISCLOSURE,
                                       DISCLOSURE_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentWitnessStatementRes2(),
                                       document -> document.getValue().getWitnessOptionDocument(),
                                       RESPONDENT_TWO_WITNESS_STATEMENT,
                                       WITNESS_STATEMENT_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentWitnessSummaryRes2(),
                                       document -> document.getValue().getWitnessOptionDocument(),
                                       RESPONDENT_TWO_WITNESS_SUMMARY,
                                       WITNESS_SUMMARY_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentHearsayNoticeRes2(),
                                       document -> document.getValue().getWitnessOptionDocument(),
                                       RESPONDENT_TWO_WITNESS_HEARSAY,
                                       WITNESS_HEARSAY_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentReferredInStatementRes2(),
                                       document -> document.getValue().getDocumentUpload(),
                                       RESPONDENT_TWO_WITNESS_REFERRED,
                                       WITNESS_REFERRED_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentExpertReportRes2(),
                                       document -> document.getValue().getExpertDocument(),
                                       RESPONDENT_TWO_EXPERT_REPORT,
                                       EXPERT_REPORT_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentJointStatementRes2(),
                                       document -> document.getValue().getExpertDocument(),
                                       RESPONDENT_TWO_EXPERT_JOINT_STATEMENT,
                                       EXPERT_JOINT_STATEMENT_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentQuestionsRes2(),
                                       document -> document.getValue().getExpertDocument(),
                                       RESPONDENT_TWO_EXPERT_QUESTIONS,
                                       EXPERT_QUESTIONS_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentAnswersRes2(),
                                       document -> document.getValue().getExpertDocument(),
                                       RESPONDENT_TWO_EXPERT_ANSWERS,
                                       EXPERT_ANSWERS_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentCaseSummaryRes2(),
                                       document -> document.getValue().getDocumentUpload(),
                                       RESPONDENT_TWO_PRE_TRIAL_SUMMARY,
                                       PRE_TRIAL_SUMMARY_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentSkeletonArgumentRes2(),
                                       document -> document.getValue().getDocumentUpload(),
                                       RESPONDENT_TWO_TRIAL_SKELETON,
                                       TRIAL_SKELETON_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentAuthoritiesRes2(),
                                       document -> document.getValue().getDocumentUpload(),
                                       RESPONDENT_TWO_TRIAL_SKELETON,
                                       TRIAL_AUTHORITIES_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentCostsRes2(),
                                       document -> document.getValue().getDocumentUpload(),
                                       RESPONDENT_TWO_SCHEDULE_OF_COSTS,
                                       TRIAL_COSTS_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentEvidenceForTrialRes2(),
                                       document -> document.getValue().getDocumentUpload(),
                                       RESPONDENT_TWO_TRIAL_DOC_CORRESPONDENCE,
                                       TRIAL_DOC_CORRESPONDENCE_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      defendantString
+                                      defendantString, notificationTextBuilder
             );
         }
 
@@ -400,105 +397,105 @@ public abstract class DocumentUploadTimeTask {
                                       APPLICANT_DISCLOSURE_LIST,
                                       DISCLOSURE_LIST_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentForDisclosure(),
                                       document -> document.getValue().getDocumentUpload(),
                                       APPLICANT_DISCLOSURE,
                                       DISCLOSURE_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentWitnessStatement(),
                                       document -> document.getValue().getWitnessOptionDocument(),
                                       APPLICANT_WITNESS_STATEMENT,
                                       WITNESS_STATEMENT_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentWitnessSummary(),
                                       document -> document.getValue().getWitnessOptionDocument(),
                                       APPLICANT_WITNESS_SUMMARY,
                                       WITNESS_SUMMARY_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentHearsayNotice(),
                                       document -> document.getValue().getWitnessOptionDocument(),
                                       APPLICANT_WITNESS_HEARSAY,
                                       WITNESS_HEARSAY_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentReferredInStatement(),
                                       document -> document.getValue().getDocumentUpload(),
                                       APPLICANT_WITNESS_REFERRED,
                                       WITNESS_REFERRED_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentExpertReport(),
                                       document -> document.getValue().getExpertDocument(),
                                       APPLICANT_EXPERT_REPORT,
                                       EXPERT_REPORT_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentJointStatement(),
                                       document -> document.getValue().getExpertDocument(),
                                       APPLICANT_EXPERT_JOINT_STATEMENT,
                                       EXPERT_JOINT_STATEMENT_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentQuestions(),
                                       document -> document.getValue().getExpertDocument(),
                                       APPLICANT_EXPERT_QUESTIONS,
                                       EXPERT_QUESTIONS_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentAnswers(),
                                       document -> document.getValue().getExpertDocument(),
                                       APPLICANT_EXPERT_ANSWERS,
                                       EXPERT_ANSWERS_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentCaseSummary(),
                                       document -> document.getValue().getDocumentUpload(),
                                       APPLICANT_PRE_TRIAL_SUMMARY,
                                       PRE_TRIAL_SUMMARY_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentSkeletonArgument(),
                                       document -> document.getValue().getDocumentUpload(),
                                       APPLICANT_TRIAL_SKELETON,
                                       TRIAL_SKELETON_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentAuthorities(),
                                       document -> document.getValue().getDocumentUpload(),
                                       APPLICANT_TRIAL_SKELETON,
                                       TRIAL_AUTHORITIES_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentCosts(),
                                       document -> document.getValue().getDocumentUpload(),
                                       APPLICANT_SCHEDULE_OF_COSTS,
                                       TRIAL_COSTS_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentEvidenceForTrial(),
                                       document -> document.getValue().getDocumentUpload(),
                                       APPLICANT_TRIAL_DOC_CORRESPONDENCE,
                                       TRIAL_DOC_CORRESPONDENCE_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             if (selectedRole.equals(SELECTED_VALUE_APP_BOTH)) {
                 caseData = copyApp1ChangesToApp2(caseData, caseDataBuilder);
@@ -512,105 +509,105 @@ public abstract class DocumentUploadTimeTask {
                                       APPLICANT_TWO_DISCLOSURE_LIST,
                                       DISCLOSURE_LIST_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentForDisclosureApp2(),
                                       document -> document.getValue().getDocumentUpload(),
                                       APPLICANT_TWO_DISCLOSURE,
                                       DISCLOSURE_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentWitnessStatementApp2(),
                                       document -> document.getValue().getWitnessOptionDocument(),
                                       APPLICANT_TWO_WITNESS_STATEMENT,
                                       WITNESS_STATEMENT_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentWitnessSummaryApp2(),
                                       document -> document.getValue().getWitnessOptionDocument(),
                                       APPLICANT_TWO_WITNESS_SUMMARY,
                                       WITNESS_SUMMARY_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentHearsayNoticeApp2(),
                                       document -> document.getValue().getWitnessOptionDocument(),
                                       APPLICANT_TWO_WITNESS_HEARSAY,
                                       WITNESS_HEARSAY_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentReferredInStatementApp2(),
                                       document -> document.getValue().getDocumentUpload(),
                                       APPLICANT_TWO_WITNESS_REFERRED,
                                       WITNESS_REFERRED_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentExpertReportApp2(),
                                       document -> document.getValue().getExpertDocument(),
                                       APPLICANT_TWO_EXPERT_REPORT,
                                       EXPERT_REPORT_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentJointStatementApp2(),
                                       document -> document.getValue().getExpertDocument(),
                                       APPLICANT_TWO_EXPERT_JOINT_STATEMENT,
                                       EXPERT_JOINT_STATEMENT_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentQuestionsApp2(),
                                       document -> document.getValue().getExpertDocument(),
                                       APPLICANT_TWO_EXPERT_QUESTIONS,
                                       EXPERT_QUESTIONS_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentAnswersApp2(),
                                       document -> document.getValue().getExpertDocument(),
                                       APPLICANT_TWO_EXPERT_ANSWERS,
                                       EXPERT_ANSWERS_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentCaseSummaryApp2(),
                                       document -> document.getValue().getDocumentUpload(),
                                       APPLICANT_TWO_PRE_TRIAL_SUMMARY,
                                       PRE_TRIAL_SUMMARY_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentSkeletonArgumentApp2(),
                                       document -> document.getValue().getDocumentUpload(),
                                       APPLICANT_TWO_TRIAL_SKELETON,
                                       TRIAL_SKELETON_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentAuthoritiesApp2(),
                                       document -> document.getValue().getDocumentUpload(),
                                       APPLICANT_TWO_TRIAL_SKELETON,
                                       TRIAL_AUTHORITIES_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentCostsApp2(),
                                       document -> document.getValue().getDocumentUpload(),
                                       APPLICANT_TWO_SCHEDULE_OF_COSTS,
                                       TRIAL_COSTS_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
             setCategoryIdAndRenameDoc(caseData.getDocumentEvidenceForTrialApp2(),
                                       document -> document.getValue().getDocumentUpload(),
                                       APPLICANT_TWO_TRIAL_DOC_CORRESPONDENCE,
                                       TRIAL_DOC_CORRESPONDENCE_TEXT,
                                       documentDateTime -> documentDateTime.getValue().getCreatedDatetime(),
-                                      claimantString
+                                      claimantString, notificationTextBuilder
             );
         }
 
@@ -629,7 +626,7 @@ public abstract class DocumentUploadTimeTask {
         caseDataBuilder.trialSelectionEvidenceSmallClaim(null);
         caseDataBuilder.trialSelectionEvidenceRes(null);
         caseDataBuilder.trialSelectionEvidenceSmallClaimRes(null);
-        caseDataBuilder.notificationText(notificationString.toString());
+        caseDataBuilder.notificationText(notificationTextBuilder.toString());
 
         if (featureToggleService.isCaseProgressionEnabled()) {
             caseDataBuilder.businessProcess(BusinessProcess.ready(EVIDENCE_UPLOADED));
@@ -642,7 +639,7 @@ public abstract class DocumentUploadTimeTask {
 
     public <T> void setCategoryIdAndRenameDoc(List<Element<T>> documentUpload, Function<Element<T>,
         Document> documentExtractor, String theID, String docNotificationText, Function<Element<T>,
-        LocalDateTime> documentDateTimeExtractor, String claimantDefendantString) {
+        LocalDateTime> documentDateTimeExtractor, String claimantDefendantString, StringBuilder notificationStringBuilder) {
         if (documentUpload == null || documentUpload.isEmpty()) {
             return;
         }
@@ -654,16 +651,14 @@ public abstract class DocumentUploadTimeTask {
             LocalDateTime dateTime = documentDateTimeExtractor.apply(document);
             if (dateTime.isAfter(halfFivePmYesterday)) {
                 String updateNotificationText = format(docNotificationText, claimantDefendantString);
-                if (!notificationString.toString().contains(updateNotificationText)) {
-                    notificationString.append("\n").append(updateNotificationText);
+                if (!notificationStringBuilder.toString().contains(updateNotificationText)) {
+                    notificationStringBuilder.append("\n").append(updateNotificationText);
                 }
             }
         });
     }
 
-    private CaseData copyResp1ChangesToResp2(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
-        CaseData caseDataBefore = caseDetailsConverter
-            .toCaseData(coreCaseDataService.getCase(caseData.getCcdCaseReference()));
+    private CaseData copyResp1ChangesToResp2(CaseData caseData, CaseData caseDataBefore, CaseData.CaseDataBuilder<?, ?> builder) {
         List<Element<UploadEvidenceDocumentType>> evidenceDocToCopy =
             compareAndCopy(caseDataBefore.getDocumentDisclosureListRes(),
                            caseData.getDocumentDisclosureListRes(),

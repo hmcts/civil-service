@@ -55,6 +55,7 @@ public class CallbackController {
         @PathVariable("page-id") Optional<String> pageId
     ) {
         final CaseDetails caseDetails = callback.getCaseDetails();
+        final CaseDetails caseDetailsBefore = callback.getCaseDetailsBefore();
         MDC.put("caseId", Objects.toString(caseDetails.getId(), ""));
         log.info("Received callback from CCD, eventId: {}, callback type: {}, page id: {}, version: {}",
                  callback.getEventId(), callbackType, pageId, version
@@ -67,6 +68,7 @@ public class CallbackController {
             .version(version.orElse(null))
             .pageId(pageId.orElse(null))
             .caseData(caseDetailsConverter.toCaseData(caseDetails))
+            .caseDataBefore(caseDetailsConverter.toCaseData(caseDetailsBefore))
             .build();
 
         return callbackHandlerFactory.dispatch(callbackParams);

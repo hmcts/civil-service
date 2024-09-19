@@ -15,11 +15,10 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploadhandlerbasetask.DocumentUploadTimeTask;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploadhandlerbasetask.SetOptionsTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.DocumentUploadTimeTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.SetOptionsTask;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Bundle;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
@@ -31,12 +30,10 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -57,10 +54,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOADED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
-import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -378,162 +373,10 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         });
     }
 
-    private <T> void renameDocuments(List<Element<T>> documentUpload, String theId) {
-        String prefix = null;
-        switch (theId) {
-            case APPLICANT_DISCLOSURE,
-                    APPLICANT_TWO_DISCLOSURE,
-                    RESPONDENT_ONE_DISCLOSURE,
-                    RESPONDENT_TWO_DISCLOSURE:
-                prefix = "Document for disclosure";
-                renameUploadEvidenceDocumentType(documentUpload, prefix);
-                break;
-            case RESPONDENT_ONE_WITNESS_REFERRED,
-                    RESPONDENT_TWO_WITNESS_REFERRED,
-                    APPLICANT_WITNESS_REFERRED,
-                    APPLICANT_TWO_WITNESS_REFERRED:
-                prefix = " referred to in the statement of ";
-                renameUploadEvidenceDocumentTypeWithName(documentUpload, prefix);
-                break;
-            case RESPONDENT_ONE_TRIAL_DOC_CORRESPONDENCE,
-                    RESPONDENT_TWO_TRIAL_DOC_CORRESPONDENCE,
-                    APPLICANT_TRIAL_DOC_CORRESPONDENCE,
-                    APPLICANT_TWO_TRIAL_DOC_CORRESPONDENCE:
-                prefix = "Documentary Evidence";
-                renameUploadEvidenceDocumentType(documentUpload, prefix);
-                break;
-            case RESPONDENT_ONE_EXPERT_QUESTIONS,
-                    RESPONDENT_TWO_EXPERT_QUESTIONS,
-                    APPLICANT_EXPERT_QUESTIONS,
-                    APPLICANT_TWO_EXPERT_QUESTIONS:
-                renameUploadEvidenceExpert(documentUpload, true);
-                break;
-            case RESPONDENT_ONE_EXPERT_ANSWERS,
-                    RESPONDENT_TWO_EXPERT_ANSWERS,
-                    APPLICANT_EXPERT_ANSWERS,
-                    APPLICANT_TWO_EXPERT_ANSWERS:
-                renameUploadEvidenceExpert(documentUpload, false);
-                break;
-            case APPLICANT_EXPERT_REPORT,
-                    APPLICANT_TWO_EXPERT_REPORT,
-                    RESPONDENT_TWO_EXPERT_REPORT,
-                    RESPONDENT_ONE_EXPERT_REPORT:
-                prefix = "Experts report";
-                renameUploadReportExpert(documentUpload, prefix, true);
-                break;
-            case APPLICANT_EXPERT_JOINT_STATEMENT,
-                    APPLICANT_TWO_EXPERT_JOINT_STATEMENT,
-                    RESPONDENT_TWO_EXPERT_JOINT_STATEMENT,
-                    RESPONDENT_ONE_EXPERT_JOINT_STATEMENT:
-                prefix = "Joint report";
-                renameUploadReportExpert(documentUpload, prefix, false);
-                break;
-            case APPLICANT_WITNESS_STATEMENT,
-                    APPLICANT_TWO_WITNESS_STATEMENT,
-                    RESPONDENT_ONE_WITNESS_STATEMENT,
-                    RESPONDENT_TWO_WITNESS_STATEMENT:
-                prefix = "Witness Statement of";
-                renameUploadEvidenceWitness(documentUpload, prefix, true);
-                break;
-            case APPLICANT_WITNESS_SUMMARY,
-                    APPLICANT_TWO_WITNESS_SUMMARY,
-                    RESPONDENT_ONE_WITNESS_SUMMARY,
-                    RESPONDENT_TWO_WITNESS_SUMMARY:
-                prefix = "Witness Summary of";
-                renameUploadEvidenceWitness(documentUpload, prefix, true);
-                break;
-            case APPLICANT_WITNESS_HEARSAY,
-                    APPLICANT_TWO_WITNESS_HEARSAY,
-                    RESPONDENT_ONE_WITNESS_HEARSAY,
-                    RESPONDENT_TWO_WITNESS_HEARSAY:
-                prefix = "Hearsay evidence";
-                renameUploadEvidenceWitness(documentUpload, prefix, true);
-                break;
-            default:
-                break;
-        }
-    }
-
-    private <T> void renameUploadEvidenceWitness(final List<Element<T>> documentUpload,
-                                              String prefix, boolean date) {
-        documentUpload.forEach(x -> {
-            UploadEvidenceWitness type = (UploadEvidenceWitness) x.getValue();
-            String ext = FilenameUtils.getExtension(type.getWitnessOptionDocument().getDocumentFileName());
-            String newName = prefix
-                    + SPACE
-                    + type.getWitnessOptionName()
-                    + (date ? SPACE + type.getWitnessOptionUploadDate()
-                        .format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK)) : "")
-                    + END + ext;
-            type.getWitnessOptionDocument().setDocumentFileName(newName);
-        });
-    }
-
-    private <T> void renameUploadReportExpert(final List<Element<T>> documentUpload,
-                                              String prefix, boolean single) {
-        documentUpload.forEach(x -> {
-            UploadEvidenceExpert type = (UploadEvidenceExpert) x.getValue();
-            String ext = FilenameUtils.getExtension(type.getExpertDocument().getDocumentFileName());
-            String newName = prefix
-                    + SPACE
-                    + type.getExpertOptionName()
-                    + SPACE
-                    + (single ? type.getExpertOptionExpertise() : type.getExpertOptionExpertises())
-                    + SPACE
-                    + type.getExpertOptionUploadDate()
-                        .format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK))
-                    + END + ext;
-            type.getExpertDocument().setDocumentFileName(newName);
-        });
-    }
-
-    private <T> void renameUploadEvidenceExpert(final List<Element<T>> documentUpload, boolean question) {
-        documentUpload.forEach(x -> {
-            UploadEvidenceExpert type = (UploadEvidenceExpert) x.getValue();
-            String ext = FilenameUtils.getExtension(type.getExpertDocument().getDocumentFileName());
-            String newName = type.getExpertOptionName()
-                    + SPACE
-                    + type.getExpertOptionOtherParty()
-                    + SPACE
-                    + (question ? type.getExpertDocumentQuestion() : type.getExpertDocumentAnswer())
-                    + END + ext;
-            type.getExpertDocument().setDocumentFileName(newName);
-        });
-    }
-
-    private <T> void renameUploadEvidenceDocumentTypeWithName(final List<Element<T>> documentUpload, String body) {
-        documentUpload.forEach(x -> {
-            UploadEvidenceDocumentType type = (UploadEvidenceDocumentType) x.getValue();
-            String ext = FilenameUtils.getExtension(type.getDocumentUpload().getDocumentFileName());
-            String newName = type.getTypeOfDocument()
-                    + body
-                    + type.getWitnessOptionName()
-                    + SPACE
-                    + type.getDocumentIssuedDate()
-                    .format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK))
-                    + END + ext;
-            type.getDocumentUpload().setDocumentFileName(newName);
-        });
-    }
-
-    private <T> void renameUploadEvidenceDocumentType(final List<Element<T>> documentUpload, String prefix) {
-        documentUpload.forEach(x -> {
-            UploadEvidenceDocumentType type = (UploadEvidenceDocumentType) x.getValue();
-            String ext = FilenameUtils.getExtension(type.getDocumentUpload().getDocumentFileName());
-            String newName = prefix
-                    + SPACE
-                    + type.getTypeOfDocument()
-                    + SPACE
-                    + type.getDocumentIssuedDate()
-                        .format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK))
-                    + END + ext;
-            type.getDocumentUpload().setDocumentFileName(newName);
-        });
-    }
 
     CallbackResponse documentUploadTime(CallbackParams callbackParams) {
         String selectedRole = getSelectedRole(callbackParams);
-        return documentUploadTimeTask.documentUploadTime(callbackParams.getCaseData(), selectedRole);
+        return documentUploadTimeTask.documentUploadTime(callbackParams.getCaseData(), callbackParams.getCaseDataBefore(), selectedRole);
     }
 
     protected static <T> List<Element<T>> compareAndCopy(List<Element<T>> before,
@@ -598,89 +441,4 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             .build();
     }
 
-    <T> void addUploadDocList(List<Element<T>> documentUploaded, Function<Element<T>, Document> documentExtractor, Function<Element<T>,
-        LocalDateTime> documentUploadTimeExtractor, CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseData caseData,
-                              String documentTypeDisplayName, String respondentOrApplicant) {
-
-        if (null == documentUploaded) {
-            return;
-        }
-        Optional<Bundle> bundleDetails = caseData.getCaseBundles().stream().map(IdValue::getValue)
-                .max(Comparator.comparing(bundle -> bundle.getCreatedOn().orElse(null)));
-        LocalDateTime trialBundleDate = null;
-        if (bundleDetails.isPresent()) {
-            Optional<LocalDateTime> createdOn = bundleDetails.get().getCreatedOn();
-            if (createdOn.isPresent()) {
-                trialBundleDate = createdOn.get();
-            }
-        }
-        if (Objects.equals(respondentOrApplicant, "applicant")) {
-            populateBundleCollection(
-                documentUploaded,
-                documentExtractor,
-                documentUploadTimeExtractor,
-                caseData::getApplicantDocsUploadedAfterBundle,
-                caseDataBuilder::applicantDocsUploadedAfterBundle,
-                documentTypeDisplayName,
-                trialBundleDate
-            );
-        } else {
-            populateBundleCollection(
-                documentUploaded,
-                documentExtractor,
-                documentUploadTimeExtractor,
-                caseData::getRespondentDocsUploadedAfterBundle,
-                caseDataBuilder::respondentDocsUploadedAfterBundle,
-                documentTypeDisplayName,
-                trialBundleDate
-            );
-        }
-    }
-
-    private <T> void populateBundleCollection(List<Element<T>> documentUploaded,
-                                              Function<Element<T>, Document> documentExtractor,
-                                              Function<Element<T>, LocalDateTime> documentUploadTimeExtractor,
-                                              Supplier<List<Element<UploadEvidenceDocumentType>>> existingDocsSupplier,
-                                              Consumer<List<Element<UploadEvidenceDocumentType>>> docsUpdater,
-                                              String documentTypeDisplayName,
-                                              LocalDateTime trialBundleDate) {
-        // If either claimant or respondent additional bundle doc collection exists, we add to that
-        if (existingDocsSupplier.get() != null) {
-            additionalBundleDocs = existingDocsSupplier.get();
-        }
-        documentUploaded.forEach(uploadEvidenceDocumentType -> {
-            Document documentToAdd = documentExtractor.apply(uploadEvidenceDocumentType);
-            LocalDateTime documentCreatedDateTime = documentUploadTimeExtractor.apply(uploadEvidenceDocumentType);
-            // If document was uploaded after the trial bundle was created, it is added to additional bundle documents
-            // via applicant or respondent collections
-            if (documentCreatedDateTime != null
-                && documentCreatedDateTime.isAfter(trialBundleDate)
-            ) {
-                // If a document already exists in the collection, it cannot be re-added.
-                boolean containsValue = additionalBundleDocs.stream()
-                    .map(Element::getValue)
-                    .map(upload -> upload != null ? upload.getDocumentUpload() : null)
-                    .filter(Objects::nonNull)
-                    .map(Document::getDocumentUrl)
-                    .anyMatch(docUrl -> docUrl.equals(documentToAdd.getDocumentUrl()));
-                // When a bundle is created, applicantDocsUploadedAfterBundle and respondentDocsUploadedAfterBundle
-                // are assigned as empty lists, in actuality they contain a single element (default builder) we remove
-                // this as it is not required.
-                additionalBundleDocs.removeIf(element -> {
-                    UploadEvidenceDocumentType upload = element.getValue();
-                    return upload == null || upload.getDocumentUpload() == null
-                        || upload.getDocumentUpload().getDocumentUrl() == null;
-                });
-                if (!containsValue) {
-                    var newDocument = UploadEvidenceDocumentType.builder()
-                        .typeOfDocument(documentTypeDisplayName)
-                        .createdDatetime(documentCreatedDateTime)
-                        .documentUpload(documentToAdd)
-                        .build();
-                    additionalBundleDocs.add(element(newDocument));
-                    docsUpdater.accept(additionalBundleDocs);
-                }
-            }
-        });
-    }
 }
