@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.search;
 
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -16,28 +17,33 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTEN
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
 
 @Service
+@Slf4j
 public class TakeCaseOfflineSearchService extends ElasticSearchService {
 
     public TakeCaseOfflineSearchService(CoreCaseDataService coreCaseDataService) {
         super(coreCaseDataService);
     }
 
+    private static final String DATE_FORMATTER = "yyyy-MM-dd'T'HH:mm:ss||yyyy-MM-dd";
+
     public Query query(int startIndex) {
-        return new Query(
+        Query query = new Query(
             boolQuery()
                 .minimumShouldMatch(1)
                 .should(boolQuery()
-                    .must(rangeQuery("data.applicant1ResponseDeadline").lt("now"))
+                    .must(rangeQuery("data.applicant1ResponseDeadline").lt("now").format(DATE_FORMATTER))
                     .must(beState(AWAITING_APPLICANT_INTENTION)))
                 .should(boolQuery()
-                    .must(rangeQuery("data.addLegalRepDeadlineRes1").lt("now"))
+                    .must(rangeQuery("data.addLegalRepDeadlineRes1").lt("now").format(DATE_FORMATTER))
                     .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)))
                 .should(boolQuery()
-                    .must(rangeQuery("data.addLegalRepDeadlineRes2").lt("now"))
+                    .must(rangeQuery("data.addLegalRepDeadlineRes2").lt("now").format(DATE_FORMATTER))
                     .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))),
             List.of("reference"),
             startIndex
         );
+        log.info("Query to take case offline {}", query);
+        return query;
     }
 
     @Override

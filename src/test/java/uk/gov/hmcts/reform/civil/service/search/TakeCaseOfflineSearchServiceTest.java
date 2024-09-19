@@ -13,6 +13,8 @@ import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
 class TakeCaseOfflineSearchServiceTest extends ElasticSearchServiceTest {
 
+    private static final String DATE_FORMATTER = "yyyy-MM-dd'T'HH:mm:ss||yyyy-MM-dd";
+
     @BeforeEach
     void setup() {
         searchService = new TakeCaseOfflineSearchService(coreCaseDataService);
@@ -23,13 +25,13 @@ class TakeCaseOfflineSearchServiceTest extends ElasticSearchServiceTest {
         BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)
             .should(boolQuery()
-                        .must(rangeQuery("data.applicant1ResponseDeadline").lt("now"))
+                        .must(rangeQuery("data.applicant1ResponseDeadline").lt("now").format(DATE_FORMATTER))
                         .must(boolQuery().must(matchQuery("state", "AWAITING_APPLICANT_INTENTION"))))
             .should(boolQuery()
-                        .must(rangeQuery("data.addLegalRepDeadlineRes1").lt("now"))
+                        .must(rangeQuery("data.addLegalRepDeadlineRes1").lt("now").format(DATE_FORMATTER))
                         .must(boolQuery().must(matchQuery("state", "AWAITING_RESPONDENT_ACKNOWLEDGEMENT"))))
             .should(boolQuery()
-                        .must(rangeQuery("data.addLegalRepDeadlineRes2").lt("now"))
+                        .must(rangeQuery("data.addLegalRepDeadlineRes2").lt("now").format(DATE_FORMATTER))
                         .must(boolQuery().must(matchQuery("state", "AWAITING_RESPONDENT_ACKNOWLEDGEMENT"))));
 
         return new Query(query, List.of("reference"), fromValue);
