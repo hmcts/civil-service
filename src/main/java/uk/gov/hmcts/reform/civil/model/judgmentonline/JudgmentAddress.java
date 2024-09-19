@@ -1,11 +1,11 @@
-package uk.gov.hmcts.reform.civil.model.judgmentonline.cjes;
+package uk.gov.hmcts.reform.civil.model.judgmentonline;
 
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class JudgementAddress {
+public class JudgmentAddress {
 
     private String defendantAddressLine1;
     private String defendantAddressLine2;
