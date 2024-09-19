@@ -61,18 +61,15 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
         @BeforeEach
         void setup() {
             when(notificationsProperties.getStandardDirectionOrderDJTemplate()).thenReturn("template-id-sdo");
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
         }
 
         @Test
         void shouldNotifyDefendantSolicitor_whenInvoked() {
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
-
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -92,6 +89,8 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
 
         @Test
         void shouldNotifyDefendantSolicitor2Defendants_whenInvoked() {
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
                 .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
@@ -112,6 +111,8 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
 
         @Test
         void shouldNotNotifyDefendantSolicitor2Defendants_whenInvokedAndNo2Defendant() {
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
                 .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
@@ -128,9 +129,67 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
             verifyNoInteractions(notificationService);
         }
 
+        @Test
+        void shouldReturnRespondent1name_whenInvokedAndNoOrgPolicy() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT.name())
+                             .build())
+                .build();
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "respondentsolicitor@example.com",
+                "template-id-sdo",
+                getNotificationDataMapRes1(),
+                "sdo-dj-order-notification-defendant-000DC001"
+            );
+        }
+
+        @Test
+        void shouldReturnRespondent2name_whenInvokedAndNoOrgPolicy() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
+                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2.name())
+                             .build())
+                .build();
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "respondentsolicitor2@example.com",
+                "template-id-sdo",
+                getNotificationDataMapRes2(),
+                "sdo-dj-order-notification-defendant-000DC001"
+            );
+        }
+
         private Map<String, String> getNotificationDataMap() {
             return Map.of(
                 "legalOrgName", "Test Org Name",
+                "claimReferenceNumber", "000DC001"
+            );
+        }
+
+        private Map<String, String> getNotificationDataMapRes1() {
+            return Map.of(
+                "legalOrgName", "Mr. Sole Trader",
+                "claimReferenceNumber", "000DC001"
+            );
+        }
+
+        private Map<String, String> getNotificationDataMapRes2() {
+            return Map.of(
+                "legalOrgName", "Mr. John Rambo",
                 "claimReferenceNumber", "000DC001"
             );
         }
