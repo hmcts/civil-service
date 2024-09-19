@@ -5,6 +5,8 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
@@ -17,6 +19,13 @@ public class ApplicationsProceedOfflineNotificationRespondentCallbackHandler ext
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_RESPONDENT);
     public static final String TASK_ID = "respondentLipApplicationOfflineDashboardNotification";
+
+    private static final List<String> NON_LIVE_STATES = List.of(
+        "Application Closed",
+        "Proceeds In Heritage",
+        "Order Made",
+        "Application Dismissed"
+    );
 
     public ApplicationsProceedOfflineNotificationRespondentCallbackHandler(DashboardApiClient dashboardApiClient,
                                                                            DashboardNotificationsParamsMapper mapper,
@@ -36,6 +45,17 @@ public class ApplicationsProceedOfflineNotificationRespondentCallbackHandler ext
 
     @Override
     protected String getScenario(CaseData caseData) {
-        return SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_RESPONDENT.getScenario();
+        List<Element<GeneralApplication>> generalApplications = caseData.getGeneralApplications();
+        if (caseData.getGeneralApplications() != null
+            && !caseData.getGeneralApplications().isEmpty()) {
+            Element<GeneralApplication> liveApp = generalApplications.stream().filter(
+                generalApp -> isLive(generalApp.getValue().getGeneralApplicationState())).findFirst().orElse(null);
+            return liveApp != null ? SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_RESPONDENT.getScenario() : "";
+        }
+        return "";
+    }
+
+    private boolean isLive(String applicationState) {
+        return !NON_LIVE_STATES.contains(applicationState);
     }
 }
