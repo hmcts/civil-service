@@ -287,5 +287,4 @@ class FeatureToggleServiceTest {
 
         assertThat(featureToggleService.isDashboardEnabledForCase(caseData)).isEqualTo(toggleStat);
     }
-
 }
