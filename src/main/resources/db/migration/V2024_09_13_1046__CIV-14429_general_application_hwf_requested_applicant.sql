@@ -5,7 +5,7 @@ INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create
 VALUES ('Scenario.AAA6.GeneralApps.HwFRequested.Applicant',
         '{"Notice.AAA6.GeneralApps.ApplicationFeeRequired.Applicant",
         "Notice.AAA6.GeneralApps.AdditionalApplicationFeeRequired.Applicant"}',
-        '{"Notice.AAA6.GeneralApps.HwFRequested.Applicant": ["applicationFeeTypeEn"]}');
+        '{"Notice.AAA6.GeneralApps.HwFRequested.Applicant": ["applicationFeeTypeEn", "applicationFeeTypeCy"]}');
 
 /**
  * Add notification template
