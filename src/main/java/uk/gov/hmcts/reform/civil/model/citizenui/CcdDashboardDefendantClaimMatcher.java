@@ -90,9 +90,6 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isEligibleForCCJ() {
-        caseData.getDefaultJudgmentDocuments().stream()
-            .map(el -> el.getValue())
-            .forEach(doc -> System.out.println("Document Type: " + doc.getDocumentType()));
         return (caseData.getRespondent1ResponseDeadline() != null
             && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
             && caseData.getPaymentTypeSelection() == null
