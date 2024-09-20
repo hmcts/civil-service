@@ -56,7 +56,7 @@ public class GoToHearingDefendantPartAdmitScenarioTest extends DashboardBaseInte
                                " Bydd yr achos yn cael ei gyfeirio at farnwr a fydd yn penderfynu beth ddylai ddigwydd nesaf.</p>" +
                                "<p class=\"govuk-body\">Gallwch <a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">weld eich ymateb</a>" +
                                " neu <a href={VIEW_CLAIMANT_HEARING_REQS} target=\"_blank\" class=\"govuk-link\">" +
-                               "weld gofynion ar gyfer y gwrandawiad yr hawlydd (yn agor mewn tab newydd)</a>.</p>")
+                               "weld y gofynion ar gyfer gwrandawiad yr hawlydd (yn agor mewn tab newydd)</a>.</p>")
             );
     }
 }
