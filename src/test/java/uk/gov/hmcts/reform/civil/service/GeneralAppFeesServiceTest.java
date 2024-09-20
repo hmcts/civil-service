@@ -54,7 +54,7 @@ class GeneralAppFeesServiceTest {
     private static final BigDecimal TEST_FEE_AMOUNT_POUNDS_15 = new BigDecimal("15.00");
     private static final BigDecimal TEST_FEE_AMOUNT_PENCE_15 = new BigDecimal("1500");
     private static final String AppnToVaryOrSuspend = "AppnToVaryOrSuspend";
-    private static final String CertificateOfSatisfactionOrCancel = "CertificateOfSatisfactionOrCancel";
+    private static final String CERT_OF_SATISFACTION_OR_CANCEL = "CertificateOfSorC";
     private static final String WithoutNotice = "GeneralAppWithoutNotice";
     private static final String GAOnNotice = "GAOnNotice";
     private static final FeeLookupResponseDto FEE_POUNDS_108 = FeeLookupResponseDto.builder()
@@ -750,11 +750,11 @@ class GeneralAppFeesServiceTest {
     }
 
     @Test
-    void shouldReturnFeeData_whenConfirmYouHavePaidCCJDebtSelectedForCertificateOfSatisfactionOrCancel() {
+    void shouldReturnFeeData_whenCertificateOfSatisfactionOrCancelRequested() {
         when(feesConfiguration.getChannel()).thenReturn("default");
         when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
         when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
-        when(feesConfiguration.getCertificateOfSatisfaction()).thenReturn("CertificateOfSatisfactionOrCancel");
+        when(feesConfiguration.getCertificateOfSatisfaction()).thenReturn("CertificateOfSorC");
 
         when(feesApiClient.lookupFee(
             anyString(),
@@ -766,10 +766,10 @@ class GeneralAppFeesServiceTest {
         ))
             .thenReturn(FEE_POUNDS_15);
 
-        Fee feeDto = feesService.getFeeForGA(feesConfiguration.getCertificateOfSatisfaction(), "miscellaneous", "other");
+        Fee feeDto = feesService.getFeeForGALiP(GeneralAppFeesService.CONFIRM_YOU_PAID_CCJ_DEBT, false, false, null);
 
         assertThat(feeDto).isEqualTo(FEE_PENCE_15);
         assertThat(keywordCaptor.getValue())
-            .hasToString(CertificateOfSatisfactionOrCancel);
+            .hasToString(CERT_OF_SATISFACTION_OR_CANCEL);
     }
 }
