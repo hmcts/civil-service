@@ -117,6 +117,7 @@ genApp:
       withNotice: GAOnNotice
       consentedOrWithoutNotice: GeneralAppWithoutNotice
       appnToVaryOrSuspend: AppnToVaryOrSuspend
+      certificateOfSatisfaction: CoS
   lrd:
     endpoint: /refdata/location/court-venues
     ccmcc:
@@ -464,7 +465,7 @@ os-postcode-lookup:
 stitching:
   api:
     url: "${EM_CCD_ORCHESTRATOR_URL:http://localhost:8084}/api/stitch-ccd-bundles"
-  enabled: ${STITCHING_API_ENABLED:true}
+  enabled: ${STITCHING_API_ENABLED:false}
 
 case-flags:
   logging:

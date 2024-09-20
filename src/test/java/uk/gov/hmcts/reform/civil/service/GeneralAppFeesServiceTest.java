@@ -51,7 +51,10 @@ class GeneralAppFeesServiceTest {
 
     private static final BigDecimal TEST_FEE_AMOUNT_POUNDS_14 = new BigDecimal("14.00");
     private static final BigDecimal TEST_FEE_AMOUNT_PENCE_14 = new BigDecimal("1400");
+    private static final BigDecimal TEST_FEE_AMOUNT_POUNDS_15 = new BigDecimal("15.00");
+    private static final BigDecimal TEST_FEE_AMOUNT_PENCE_15 = new BigDecimal("1500");
     private static final String AppnToVaryOrSuspend = "AppnToVaryOrSuspend";
+    private static final String CertificateOfSatisfactionOrCancel = "CertificateOfSatisfactionOrCancel";
     private static final String WithoutNotice = "GeneralAppWithoutNotice";
     private static final String GAOnNotice = "GAOnNotice";
     private static final FeeLookupResponseDto FEE_POUNDS_108 = FeeLookupResponseDto.builder()
@@ -68,6 +71,10 @@ class GeneralAppFeesServiceTest {
         .calculatedAmountInPence(TEST_FEE_AMOUNT_PENCE_14).code("test_fee_code").version("2").build();
     private static final FeeLookupResponseDto FEE_POUNDS_0 = FeeLookupResponseDto.builder()
         .feeAmount(BigDecimal.ZERO).code("test_fee_code").version(2).build();
+    private static final FeeLookupResponseDto FEE_POUNDS_15 = FeeLookupResponseDto.builder()
+        .feeAmount(TEST_FEE_AMOUNT_POUNDS_15).code("test_fee_code").version(1).build();
+    private static final Fee FEE_PENCE_15 = Fee.builder()
+        .calculatedAmountInPence(TEST_FEE_AMOUNT_PENCE_15).code("test_fee_code").version("1").build();
     public static final String FREE_REF = "FREE";
     private static final Fee FEE_PENCE_0 = Fee.builder()
         .calculatedAmountInPence(BigDecimal.ZERO).code(FREE_REF).version("1").build();
@@ -736,5 +743,29 @@ class GeneralAppFeesServiceTest {
             }
             return builder.build();
         }
+    }
+
+    @Test
+    void shouldReturnFeeData_whenConfirmYouHavePaidCCJDebtSelectedForCertificateOfSatisfactionOrCancel() {
+        when(feesConfiguration.getChannel()).thenReturn("default");
+        when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
+        when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
+        when(feesConfiguration.getCertificateOfSatisfaction()).thenReturn("CertificateOfSatisfactionOrCancel");
+
+        when(feesApiClient.lookupFee(
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            keywordCaptor.capture()
+        ))
+            .thenReturn(FEE_POUNDS_15);
+
+        Fee feeDto = feesService.getFeeForGA(feesConfiguration.getCertificateOfSatisfaction(), "miscellaneous", "other");
+
+        assertThat(feeDto).isEqualTo(FEE_PENCE_15);
+        assertThat(keywordCaptor.getValue())
+            .hasToString(CertificateOfSatisfactionOrCancel);
     }
 }

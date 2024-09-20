@@ -56,6 +56,8 @@ public class GeneralAppFeesService {
         = List.of(GeneralApplicationTypes.ADJOURN_HEARING);
     protected static final List<GeneralApplicationTypes> SD_CONSENT_TYPES
         = List.of(GeneralApplicationTypes.SETTLE_BY_CONSENT);
+    protected static final List<GeneralApplicationTypes> CONFIRM_YOU_PAID_CCJ_DEBT
+        = List.of(GeneralApplicationTypes.CONFIRM_YOU_PAID_CCJ_DEBT);
 
     public Fee getFeeForGALiP(List<GeneralApplicationTypes> applicationTypes, Boolean withConsent,
                               Boolean withNotice, LocalDate hearingDate) {
@@ -95,6 +97,15 @@ public class GeneralAppFeesService {
             if (setAsideFeeForGA.getCalculatedAmountInPence()
                 .compareTo(result.getCalculatedAmountInPence()) < 0) {
                 result = setAsideFeeForGA;
+            }
+        }
+        if (typeSize > 0
+            && CollectionUtils.containsAny(types, CONFIRM_YOU_PAID_CCJ_DEBT)) {
+            typeSize--;
+            Fee certOfSatisfactionOrCancel = getFeeForGA(feesConfiguration.getCertificateOfSatisfaction(), "miscellaneous", "other");
+            if (certOfSatisfactionOrCancel.getCalculatedAmountInPence()
+                .compareTo(result.getCalculatedAmountInPence()) < 0) {
+                result = certOfSatisfactionOrCancel;
             }
         }
         if (typeSize > 0) {
