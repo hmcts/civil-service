@@ -326,6 +326,7 @@ class GeneralAppFeesServiceTest {
             allTypes.removeAll(GeneralAppFeesService.SET_ASIDE);
             allTypes.removeAll(GeneralAppFeesService.ADJOURN_TYPES);
             allTypes.removeAll(GeneralAppFeesService.SD_CONSENT_TYPES);
+            allTypes.removeAll(GeneralAppFeesService.CONFIRM_YOU_PAID_CCJ_DEBT);
             //single
             for (GeneralApplicationTypes generalApplicationType : allTypes) {
                 CaseData caseData = getFeeCase(
@@ -364,6 +365,7 @@ class GeneralAppFeesServiceTest {
             allTypes.removeAll(GeneralAppFeesService.SET_ASIDE);
             allTypes.removeAll(GeneralAppFeesService.ADJOURN_TYPES);
             allTypes.removeAll(GeneralAppFeesService.SD_CONSENT_TYPES);
+            allTypes.removeAll(GeneralAppFeesService.CONFIRM_YOU_PAID_CCJ_DEBT);
             //single
             for (GeneralApplicationTypes generalApplicationType : allTypes) {
                 Fee feeDto = feesService.getFeeForGALiP(List.of(generalApplicationType), false, true, null);
@@ -397,6 +399,7 @@ class GeneralAppFeesServiceTest {
             allTypes.removeAll(GeneralAppFeesService.SET_ASIDE);
             allTypes.removeAll(GeneralAppFeesService.ADJOURN_TYPES);
             allTypes.removeAll(GeneralAppFeesService.SD_CONSENT_TYPES);
+            allTypes.removeAll(GeneralAppFeesService.CONFIRM_YOU_PAID_CCJ_DEBT);
             //single
             for (GeneralApplicationTypes generalApplicationType : allTypes) {
                 CaseData caseData = getFeeCase(
@@ -434,6 +437,7 @@ class GeneralAppFeesServiceTest {
             allTypes.removeAll(GeneralAppFeesService.SET_ASIDE);
             allTypes.removeAll(GeneralAppFeesService.ADJOURN_TYPES);
             allTypes.removeAll(GeneralAppFeesService.SD_CONSENT_TYPES);
+            allTypes.removeAll(GeneralAppFeesService.CONFIRM_YOU_PAID_CCJ_DEBT);
             //single
             for (GeneralApplicationTypes generalApplicationType : allTypes) {
                 Fee feeDto = feesService.getFeeForGALiP(List.of(generalApplicationType), false, false, null);
@@ -717,7 +721,7 @@ class GeneralAppFeesServiceTest {
             allTypes.removeAll(GeneralAppFeesService.VARY_TYPES);
             allTypes.removeAll(GeneralAppFeesService.SET_ASIDE);
             allTypes.removeAll(GeneralAppFeesService.ADJOURN_TYPES);
-            allTypes.removeAll(GeneralAppFeesService.SD_CONSENT_TYPES);
+            allTypes.removeAll(GeneralAppFeesService.CONFIRM_YOU_PAID_CCJ_DEBT);
             Collections.shuffle(allTypes);
             Random rand = new Random();
             int min = 1;
