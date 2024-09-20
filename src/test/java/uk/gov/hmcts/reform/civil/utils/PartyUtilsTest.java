@@ -1071,4 +1071,79 @@ class PartyUtilsTest {
             assertEquals(res2OrgIndividual.getLastName(), "orgindividual");
         }
     }
+
+    @Nested
+    class PopulateWitnessAndExpertsPartyIds {
+
+        @Test
+        void shouldPopulateWitnessAndExpertsPartyIds_withinGivenCaseDataBuilder() {
+            CaseData.CaseDataBuilder builder = CaseData.builder()
+                .applicantExperts(wrapElements(PartyFlagStructure.builder().partyID("app1-expert-id").firstName("app1").lastName("expert").build()))
+                .respondent1Experts(wrapElements(PartyFlagStructure.builder().partyID("res1-expert-id").firstName("res1").lastName("expert").build()))
+                .respondent2Experts(wrapElements(PartyFlagStructure.builder().partyID("res2-expert-id").firstName("res2").lastName("expert").build()))
+                .applicantWitnesses(wrapElements(PartyFlagStructure.builder().partyID("app1-witness-id").firstName("app1").lastName("witness").build()))
+                .respondent1Witnesses(wrapElements(PartyFlagStructure.builder().partyID("res1-witness-id").firstName("res1").lastName("witness").build()))
+                .respondent2Witnesses(wrapElements(PartyFlagStructure.builder().partyID("res2-witness-id").firstName("res2").lastName("witness").build()));
+
+            PartyUtils.populateWitnessAndExpertsPartyIds(builder);
+
+            CaseData actual = builder.build();
+
+            assertNotNull(actual.getApplicantExperts().get(0).getValue().getPartyID());
+            assertEquals("app1-expert-id", actual.getApplicantExperts().get(0).getValue().getPartyID());
+
+            assertNotNull(actual.getRespondent1Experts().get(0).getValue().getPartyID());
+            assertEquals("res1-expert-id", actual.getRespondent1Experts().get(0).getValue().getPartyID());
+
+            assertNotNull(actual.getRespondent2Experts().get(0).getValue().getPartyID());
+            assertEquals("res2-expert-id", actual.getRespondent2Experts().get(0).getValue().getPartyID());
+
+            assertNotNull(actual.getApplicantWitnesses().get(0).getValue().getPartyID());
+            assertEquals("app1-witness-id", actual.getApplicantWitnesses().get(0).getValue().getPartyID());
+
+            assertNotNull(actual.getRespondent1Witnesses().get(0).getValue().getPartyID());
+            assertEquals("res1-witness-id", actual.getRespondent1Witnesses().get(0).getValue().getPartyID());
+
+            assertNotNull(actual.getRespondent2Witnesses().get(0).getValue().getPartyID());
+            assertEquals("res2-witness-id", actual.getRespondent2Witnesses().get(0).getValue().getPartyID());
+        }
+
+        @Test
+        void shouldNotOverWriteExistingWitnessAndExpertsPartyIds() {
+            CaseData.CaseDataBuilder builder = CaseData.builder()
+                .applicantExperts(wrapElements(PartyFlagStructure.builder().partyID("existingAppExpertPartyId").firstName("app1").lastName("expert").build()))
+                .respondent1Experts(wrapElements(PartyFlagStructure.builder().partyID("existingRes1ExpertPartyId").firstName("res1").lastName("expert").build()))
+                .respondent2Experts(wrapElements(PartyFlagStructure.builder().partyID("existingRes2ExpertPartyId").firstName("res2").lastName("expert").build()))
+                .applicantWitnesses(wrapElements(PartyFlagStructure.builder().partyID("existingAppWitnessPartyId").firstName("app1").lastName("witness").build()))
+                .respondent1Witnesses(wrapElements(PartyFlagStructure.builder().partyID("existingRes1WitnessPartyId").firstName("res1").lastName("witness").build()))
+                .respondent2Witnesses(wrapElements(PartyFlagStructure.builder().partyID("existingRes2WitnessPartyId").firstName("res2").lastName("witness").build()));
+
+            PartyUtils.populateWitnessAndExpertsPartyIds(builder);
+
+            CaseData actual = builder.build();
+
+            assertEquals("existingAppExpertPartyId", actual.getApplicantExperts().get(0).getValue().getPartyID());
+            assertEquals("existingRes1ExpertPartyId", actual.getRespondent1Experts().get(0).getValue().getPartyID());
+            assertEquals("existingRes2ExpertPartyId", actual.getRespondent2Experts().get(0).getValue().getPartyID());
+            assertEquals("existingAppWitnessPartyId", actual.getApplicantWitnesses().get(0).getValue().getPartyID());
+            assertEquals("existingRes1WitnessPartyId", actual.getRespondent1Witnesses().get(0).getValue().getPartyID());
+            assertEquals("existingRes2WitnessPartyId", actual.getRespondent2Witnesses().get(0).getValue().getPartyID());
+        }
+
+        @Test
+        void shouldReturnNull_whenCaseDataBuilderHasNullWitnessAndExperts() {
+            CaseData.CaseDataBuilder builder = CaseData.builder();
+
+            PartyUtils.populateWitnessAndExpertsPartyIds(builder);
+            CaseData actual = builder.build();
+
+            assertNull(actual.getApplicantExperts());
+            assertNull(actual.getRespondent1Experts());
+            assertNull(actual.getRespondent2Experts());
+            assertNull(actual.getApplicantWitnesses());
+            assertNull(actual.getRespondent1Witnesses());
+            assertNull(actual.getRespondent2Witnesses());
+        }
+
+    }
 }
