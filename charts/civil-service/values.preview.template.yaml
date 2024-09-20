@@ -129,8 +129,8 @@ xui-webapp:
       SERVICES_CCD_DATA_STORE_API: http://${SERVICE_NAME}-ccd-data-store-api
       SERVICES_TERMS_AND_CONDITIONS: http://xui-terms-and-conditions-${SERVICE_FQDN}.service.core-compute-preview.internal
       JURISDICTIONS: CIVIL
-      LAUNCH_DARKLY_CLIENT_ID: ~
       SERVICES_CCD_CASE_ASSIGNMENT_API: http://${SERVICE_NAME}-aac-manage-case-assignment
+      LAUNCH_DARKLY_CLIENT_ID: 5de6610b23ce5408280f2268
 
 ccd:
   enabled: true
