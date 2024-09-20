@@ -189,12 +189,10 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
 
     private void updateApplicant1DQ(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
         if (caseData.hasApplicantProceededWithClaim() || (caseData.isPartAdmitClaimSpec() && caseData.isPartAdmitClaimNotSettled())) {
-            // moving statement of truth value to correct field, this was not possible in mid event.
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Applicant1DQ.Applicant1DQBuilder dq = caseData.getApplicant1DQ().toBuilder()
                 .applicant1DQStatementOfTruth(statementOfTruth);
 
-            // When a case has been transferred, we do not update the location using claimant/defendant preferred location logic
             if (notTransferredOnline(caseData) && (!isFlightDelayAndSmallClaim(caseData)
                 || isFlightDelaySmallClaimAndOther(caseData))) {
                 updateDQCourtLocations(callbackParams, caseData, builder, dq, isFlightDelaySmallClaimAndOther(caseData));
@@ -206,7 +204,6 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             }
 
             builder.applicant1DQ(dq.build());
-            // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             builder.uiStatementOfTruth(StatementOfTruth.builder().build());
         }
     }
@@ -241,12 +238,9 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
 
     private void updateCaseManagementLocation(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> builder) {
         CaseData caseData = callbackParams.getCaseData();
-        //Update the caseManagement location to the flight location if
-        //Small claim & Flight Delay &Airline is not OTHER
         if (isFlightDelaySmallClaimAndAirline(caseData)) {
             builder.caseManagementLocation(caseData.getFlightDelayDetails().getFlightCourtLocation());
         } else if (!isFlightDelayAndSmallClaim(caseData)) {
-            // 1. It is a Fast_Claim 2. Small claim and not Flight Delay
             locationHelper.getCaseManagementLocation(caseData)
                 .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
                     builder,
@@ -264,14 +258,12 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     }
 
     private boolean isFlightDelaySmallClaimAndAirline(CaseData caseData) {
-        //Update the Case Management Location when the Airline  is not Other
         return (isFlightDelayAndSmallClaim(caseData) && caseData.getFlightDelayDetails() != null
             && !caseData.getFlightDelayDetails().getAirlineList()
             .getValue().getCode().equals("OTHER"));
     }
 
     private boolean isFlightDelaySmallClaimAndOther(CaseData caseData) {
-        //Update the Case Management Location with Claimant preferred court when Airlines is Other
         return (isFlightDelayAndSmallClaim(caseData) && caseData.getFlightDelayDetails() != null
             && caseData.getFlightDelayDetails().getAirlineList()
             .getValue().getCode().equals("OTHER"));
@@ -280,10 +272,9 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     private void updateDQCourtLocations(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder,
                                         Applicant1DQ.Applicant1DQBuilder dq, boolean forceClaimantCourt) {
         handleCourtLocationData(caseData, builder, dq, callbackParams);
-        Optional<RequestedCourt> newCourt = Optional.empty();
+        Optional<RequestedCourt> newCourt;
 
         if (forceClaimantCourt) {
-            //This will be true only if its Small Claim & Flight Delay & Airline is OTHER
             newCourt = locationHelper.getClaimantRequestedCourt(builder.applicant1DQ(dq.build()).build());
         } else {
             newCourt = locationHelper.getCaseManagementLocation(builder.applicant1DQ(dq.build()).build());

@@ -95,8 +95,6 @@ public class PopulateCaseDataTask implements CaseTask {
                                                                                 null, null, featureToggleService, caseData
             ).name());
         }
-        // add direction questionaire document from system generated documents, to placeholder field for preview during event.
-        // Or add sealed response form  from system generated documents, to placeholder field for preview during event.
         populatePreviewDocuments(caseData, updatedCaseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -136,7 +134,6 @@ public class PopulateCaseDataTask implements CaseTask {
     }
 
     private void populatePreviewDocuments(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
-        // add direction questionaire document from system generated documents, to placeholder field for preview during event.
         if (caseData.getRespondent2DocumentURL() == null) {
             caseData.getSystemGeneratedCaseDocuments().forEach(document -> {
                 if (document.getValue().getDocumentName().contains("defendant_directions_questionnaire_form")) {
@@ -153,7 +150,6 @@ public class PopulateCaseDataTask implements CaseTask {
                 }
             });
         }
-        // add sealed response form  from system generated documents, to placeholder field for preview during event.
         if (featureToggleService.isPinInPostEnabled()) {
             caseData.getSystemGeneratedCaseDocuments().forEach(document -> {
                 if (document.getValue().getDocumentName().contains("response_sealed_form.pdf")) {
