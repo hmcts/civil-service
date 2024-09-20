@@ -48,8 +48,7 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SE
 @SpringBootTest(classes = {
     SecuredDocumentManagementService.class,
     JacksonAutoConfiguration.class,
-    DocumentManagementConfiguration.class},
-    properties = {"document_management.secured=true"})
+    DocumentManagementConfiguration.class})
 class SecuredDocumentManagementServiceTest {
 
     private static final String USER_ROLES_JOINED = "caseworker-civil,caseworker-civil-solicitor";
