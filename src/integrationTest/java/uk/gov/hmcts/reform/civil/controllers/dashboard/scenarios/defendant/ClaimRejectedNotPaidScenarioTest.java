@@ -59,7 +59,7 @@ public class ClaimRejectedNotPaidScenarioTest extends DashboardBaseIntegrationTe
                             + " Maent yn dweud nad ydych wedi talu £1000 sef y swm rydych yn cyfaddef sy’n ddyledus gennych."
                             + " Bydd yr achos yn cael ei gyfeirio at farnwr a fydd yn penderfynu beth ddylai ddigwydd nesaf.</p>"
                             + "<p class=\"govuk-body\">Gallwch <a href=\"{VIEW_RESPONSE_TO_CLAIM}\" rel=\"noopener noreferrer\" class=\"govuk-link\">weld eich ymateb</a> neu "
-                            + "<a target=\"_blank\" href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\">weld gofynion ar gyfer y gwrandawiad yr hawlydd (yn agor mewn tab newydd)</a>.</p>")
+                            + "<a target=\"_blank\" href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\">weld y gofynion ar gyfer gwrandawiad yr hawlydd (yn agor mewn tab newydd)</a>.</p>")
             );
     }
 }
