@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.reform.civil.constants.DocumentManagementConstants.CREATED_BY;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
-import static uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService.CREATED_BY;
 
 @Service
 @RequiredArgsConstructor
