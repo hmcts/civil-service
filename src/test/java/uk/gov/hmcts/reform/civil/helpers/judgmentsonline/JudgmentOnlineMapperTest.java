@@ -9,6 +9,8 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 
 import java.time.LocalDate;
 
@@ -19,7 +21,8 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 class JudgmentOnlineMapperTest {
 
-    private RecordJudgmentOnlineMapper recordJudgmentMapper = new RecordJudgmentOnlineMapper();
+    private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
+    private RecordJudgmentOnlineMapper recordJudgmentMapper = new RecordJudgmentOnlineMapper(addressMapper);
     private SetAsideJudgmentOnlineMapper setAsideJudgmentOnlineMapper = new SetAsideJudgmentOnlineMapper();
 
     @Test
