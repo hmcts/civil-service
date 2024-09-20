@@ -52,12 +52,12 @@ public class HearingFeeDueHandler implements BaseExternalTaskHandler {
                                 && hearingFeePaymentDetails.getStatus() == PaymentStatus.SUCCESS)
                                 && caseData.getHearingDueDate().isBefore(LocalDate.now())
                                 || caseData.hearingFeePaymentDoneWithHWF()) {
-                                log.info("new success");
+                                log.info("Current case status '{}'", caseDetails.getState());
                                 applicationEventPublisher.publishEvent(new HearingFeePaidEvent(caseDetails.getId()));
                             } else if ((hearingFeePaymentDetails == null
                                 || hearingFeePaymentDetails.getStatus() == PaymentStatus.FAILED)
                                 && caseData.getHearingDueDate().isBefore(LocalDate.now())) {
-                                log.info("new failed");
+                                log.info("Current case status '{}'", caseDetails.getState());
                                 applicationEventPublisher.publishEvent(new HearingFeeUnpaidEvent(caseDetails.getId()));
                             }
                         }
@@ -80,11 +80,11 @@ public class HearingFeeDueHandler implements BaseExternalTaskHandler {
         if ((hearingFeePaymentDetails != null
             && hearingFeePaymentDetails.getStatus() == PaymentStatus.SUCCESS)
             || caseData.hearingFeePaymentDoneWithHWF()) {
-            log.info(" OLD SUCCESSS");
+            log.info("Current case status '{}'", caseDetails.getState());
             applicationEventPublisher.publishEvent(new HearingFeePaidEvent(caseDetails.getId()));
         } else if (hearingFeePaymentDetails == null
             || hearingFeePaymentDetails.getStatus() == PaymentStatus.FAILED) {
-            log.info("OLD failed");
+            log.info("Current case status '{}'", caseDetails.getState());
             applicationEventPublisher.publishEvent(new HearingFeeUnpaidEvent(caseDetails.getId()));
         }
     }
