@@ -146,7 +146,7 @@ public class HearingScheduledClaimantScenarioTest extends CaseProgressionDashboa
                     "<a href={PAY_HEARING_FEE} class=\"govuk-link\">Talu ffi'r gwrandawiad</a>"),
                 jsonPath("$[1].currentStatusCy").value(TaskStatus.ACTION_NEEDED.getWelshName()),
                 jsonPath("$[1].hintTextEn").value("Deadline is 12am on 1 April 2024"),
-                jsonPath("$[1].hintTextCy").value("Deadline is 12am on 1 Ebrill 2024")
+                jsonPath("$[1].hintTextCy").value("y dyddiad cau yw 12am ar 1 Ebrill 2024")
             );
     }
 }
