@@ -721,6 +721,7 @@ class GeneralAppFeesServiceTest {
             allTypes.removeAll(GeneralAppFeesService.VARY_TYPES);
             allTypes.removeAll(GeneralAppFeesService.SET_ASIDE);
             allTypes.removeAll(GeneralAppFeesService.ADJOURN_TYPES);
+            allTypes.removeAll(GeneralAppFeesService.SD_CONSENT_TYPES);
             allTypes.removeAll(GeneralAppFeesService.CONFIRM_YOU_PAID_CCJ_DEBT);
             Collections.shuffle(allTypes);
             Random rand = new Random();
