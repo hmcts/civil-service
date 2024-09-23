@@ -28,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE;
@@ -160,7 +161,7 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
             .build();
 
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
-        handler.handle(callbackParamsTest(caseData));
+        handler.handle(callbackParamsTestFinalOrders(caseData));
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
@@ -203,6 +204,17 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
             .of(ABOUT_TO_SUBMIT, caseData)
             .request(CallbackRequest.builder().eventId(
                 CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.name()).build())
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
+            .build();
+    }
+
+    private static CallbackParams callbackParamsTestFinalOrders(CaseData caseData) {
+        return CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .request(CallbackRequest.builder()
+                         .eventId(CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name())
+                         .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build())
+                         .build())
             .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
             .build();
     }
