@@ -147,7 +147,7 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
     }
 
     @Test
-    void should_create_order_made_defendant_all_orders_issued_scenari() throws Exception {
+    void should_create_order_made_defendant_all_orders_issued_scenario() throws Exception {
 
         String caseId = "720134354545416";
 
@@ -160,7 +160,7 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
                 CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
             .build();
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         handler.handle(callbackParamsTestFinalOrders(caseData));
 
         //Verify Notification is created
