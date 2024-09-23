@@ -46,4 +46,7 @@ VALUES ('<a>View hearings</a>', 'Hearing',
         'Order.View', 'Scenario.AAA6.JudgmentsOnline.IssuedCCJ.Defendant', '{3, 3}', 'DEFENDANT', 14),
        ('<a href={VIEW_JUDGEMENT} class="govuk-link">View the judgment</a>', 'Judgments from the court',
         '<a href={VIEW_JUDGEMENT} class="govuk-link">Gweld y Dyfarniad</a>', 'Dyfarniadau gan y llys',
-        'Judgment.View', 'Scenario.AAA6.JudgmentsOnline.IssuedCCJ.Defendant', '{3, 3}', 'DEFENDANT', 15);
+        'Judgment.View', 'Scenario.AAA6.JudgmentsOnline.IssuedCCJ.Defendant', '{3, 3}', 'DEFENDANT', 15),
+       ('<a>Confirm you have paid a judgment (CCJ) debt</a>', 'Judgments from the court',
+        '<a>Confirm you have paid a judgment (CCJ) debt</a>', 'Judgments from the court',
+        'Judgment.View', 'Scenario.AAA6.JudgmentsOnline.IssuedCCJ.Defendant', '{1, 1}', 'DEFENDANT', 16);
