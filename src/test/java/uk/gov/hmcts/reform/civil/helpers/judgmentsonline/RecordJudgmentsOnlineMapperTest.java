@@ -9,15 +9,20 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 
 import java.time.LocalDate;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class RecordJudgmentsOnlineMapperTest {
 
-    private RecordJudgmentOnlineMapper judgmentOnlineMapper = new RecordJudgmentOnlineMapper();
+    private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
+
+    private RecordJudgmentOnlineMapper judgmentOnlineMapper = new RecordJudgmentOnlineMapper(addressMapper);
 
     @Test
     void testIfActiveJudgmentIsAddedPayDate() {
@@ -125,5 +130,14 @@ public class RecordJudgmentsOnlineMapperTest {
         assertEquals("Mr. John Rambo", activeJudgment.getDefendant2Name());
         assertNotNull(activeJudgment.getDefendant2Address());
         assertNotNull(activeJudgment.getDefendant2Dob());
+    }
+
+    @Test
+    void testIfActiveJudgmentHasPartyNameInLimit() {
+        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediatelyWithOldAddress();
+        JudgmentDetails activeJudgment = judgmentOnlineMapper.addUpdateActiveJudgment(caseData);
+        assertNotNull(activeJudgment);
+        assertThat(activeJudgment.getDefendant1Name().length()).isLessThanOrEqualTo(70);
+        assertThat(activeJudgment.getDefendant1Address().getDefendantAddressLine1().length()).isLessThanOrEqualTo(35);
     }
 }
