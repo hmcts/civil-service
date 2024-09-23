@@ -4,14 +4,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.CCJRequestedDashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -97,6 +101,10 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
             .legacyCaseReference("reference")
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
             .ccdCaseReference(Long.valueOf(caseId))
+            .defaultJudgmentDocuments(List.of(
+                Element.<CaseDocument>builder()
+                    .value(CaseDocument.builder().documentType(DocumentType.DEFAULT_JUDGMENT)
+                               .createdDatetime(LocalDateTime.now()).build()).build()))
             .build();
 
         handler.handle(callbackParams(caseData));
