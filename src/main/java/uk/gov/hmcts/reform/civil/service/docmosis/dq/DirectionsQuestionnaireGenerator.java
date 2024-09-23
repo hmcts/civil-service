@@ -196,17 +196,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         DocmosisTemplates templateId = isFastTrackOrMinti ? DQ_RESPONSE_1V1_FAST_TRACK_INT : DQ_RESPONSE_1V1;
 
         String fileName = getFileName(caseData, templateId);
-        LocalDateTime responseDate;
-        if ("ONE".equals(respondent)) {
-            responseDate = caseData.getRespondent1ResponseDate();
-        } else if ("TWO".equals(respondent)) {
-            responseDate = caseData.getRespondent2ResponseDate();
-        } else {
-            throw new IllegalArgumentException("Respondent argument is expected to be one of ONE or TWO");
-        }
-        if (responseDate == null) {
-            throw new NullPointerException("Response date should not be null");
-        }
+        LocalDateTime responseDate = getResponseDate(caseData, respondent);
 
         // Check if the DQ is already generated for this response date and file name
         if (isDQAlreadyGenerated(caseData, responseDate, fileName)) {
@@ -214,14 +204,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             return Optional.empty();
         }
 
-        // Generate DQ based on respondent and template data
-        DirectionsQuestionnaireForm templateData;
-        if (respondent.equals("ONE")) {
-            templateData = getRespondent1TemplateData(caseData, "ONE", authorisation);
-        } else {
-            // TWO
-            templateData = getRespondent2TemplateData(caseData, "TWO", authorisation);
-        }
+        DirectionsQuestionnaireForm templateData =
+            getDirectionsQuestionnaireForm(caseData, authorisation, respondent);
 
         // Generate docmosis document and upload it
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
@@ -235,6 +219,34 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
 
         // set the create date time equal to the response date time, so we can check it afterwards
         return Optional.of(document.toBuilder().createdDatetime(responseDate).build());
+    }
+
+    private DirectionsQuestionnaireForm getDirectionsQuestionnaireForm(CaseData caseData, String authorisation, String respondent) {
+        // Generate DQ based on respondent and template data
+        DirectionsQuestionnaireForm templateData;
+        if (respondent.equals("ONE")) {
+            templateData = getRespondent1TemplateData(caseData, "ONE", authorisation);
+        } else {
+            // TWO
+            templateData = getRespondent2TemplateData(caseData, "TWO", authorisation);
+        }
+        return templateData;
+    }
+
+    @NotNull
+    private static LocalDateTime getResponseDate(CaseData caseData, String respondent) {
+        LocalDateTime responseDate;
+        if ("ONE".equals(respondent)) {
+            responseDate = caseData.getRespondent1ResponseDate();
+        } else if ("TWO".equals(respondent)) {
+            responseDate = caseData.getRespondent2ResponseDate();
+        } else {
+            throw new IllegalArgumentException("Respondent argument is expected to be one of ONE or TWO");
+        }
+        if (responseDate == null) {
+            throw new NullPointerException("Response date should not be null");
+        }
+        return responseDate;
     }
 
     // Method to check if DQ is already generated for the given response date and file name

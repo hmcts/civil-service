@@ -31,8 +31,8 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOne
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
-import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesForTab;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -59,21 +59,22 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsClaimantExpert;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsToEntExpert;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ScheduleOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Settlement;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsAddNewDirection;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsImpNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsMediation;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsPPI;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsUploadDoc;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2UploadOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2VariationOfDirections;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsAddNewDirection;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.NotSuitableSdoOptions;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.TocTransferCaseReason;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsJudgesRecital;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsUploadDoc;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsPPI;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsImpNotes;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -259,15 +260,9 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private final Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer2;
     private final YesOrNo respondent2DQCarerAllowanceCredit;
 
-    /**
-     * This field is not used.
-     *
-     * @deprecated this field is not used and it was in a screen no longer presented to the user.
-     *     It is kept here to devote a single jira to its removal, to ensure said removal won't cause
-     *     any problem when bringing info from db.
-     */
     @Deprecated
     private final YesOrNo respondent2DQCarerAllowanceCreditFullAdmission;
+    @Deprecated
     private final String responseToClaimAdmitPartWhyNotPayLRspec2;
     private final YesOrNo neitherCompanyNorOrganisation;
     private final RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteGeneric;
@@ -553,7 +548,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     @JsonIgnore
     public boolean isClaimantBilingual() {
         return null != claimantBilingualLanguagePreference
-                && !claimantBilingualLanguagePreference.equalsIgnoreCase(Language.ENGLISH.toString());
+            && !claimantBilingualLanguagePreference.equalsIgnoreCase(Language.ENGLISH.toString());
     }
 
     @JsonIgnore

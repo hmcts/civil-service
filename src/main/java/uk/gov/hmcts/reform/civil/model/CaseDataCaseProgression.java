@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadDisclosure;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
@@ -35,6 +37,7 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderReasons;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderAppeal;
+import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrdersComplexityBand;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRecitalsRecorded;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRepresentation;
@@ -138,6 +141,7 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private final HearingNotes hearingNotes;
     private final List<Element<UploadEvidenceDocumentType>> applicantDocsUploadedAfterBundle;
     private final List<Element<UploadEvidenceDocumentType>> respondentDocsUploadedAfterBundle;
+    private final List<Element<UploadEvidenceDocumentType>> bundleEvidence;
 
     /* Final Orders */
     private YesOrNo finalOrderMadeSelection;
@@ -163,6 +167,13 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private OrderMadeOnDetailsOrderWithoutNotice orderMadeOnDetailsOrderWithoutNotice;
     private YesOrNo finalOrderGiveReasonsYesNo;
     private AssistedOrderReasons finalOrderGiveReasonsComplex;
+    private YesOrNo finalOrderAllocateToTrack;
+    private AllocatedTrack finalOrderTrackAllocation;
+    private FinalOrdersComplexityBand finalOrderFastTrackComplexityBand;
+    private FinalOrdersComplexityBand finalOrderIntermediateTrackComplexityBand;
+    private DynamicList finalOrderDownloadTemplateOptions;
+    private CaseDocument finalOrderDownloadTemplateDocument;
+    private Document uploadOrderDocumentFromTemplate;
 
     // judge final freeform orders
     private final FinalOrderSelection finalOrderSelection;

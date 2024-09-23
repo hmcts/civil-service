@@ -1,10 +1,7 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
@@ -15,12 +12,15 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
@@ -29,23 +29,16 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DefaultJudgmentsOnlineMapperTest {
 
     @MockBean
     private Time time;
-    @Mock
-    private InterestCalculator interestCalculator;
-    @InjectMocks
-    private DefaultJudgmentOnlineMapper defaultJudgmentOnlineMapper;
+    private InterestCalculator interestCalculator = new InterestCalculator(time);
+    private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
 
-    @BeforeEach
-    void setup() {
-        when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(BigDecimal.ZERO);
-    }
+    private DefaultJudgmentOnlineMapper defaultJudgmentOnlineMapper  = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
 
     @Test
     void testIfDefaultJudgmentIsMarkedActive_1v1() {
@@ -59,6 +52,7 @@ class DefaultJudgmentsOnlineMapperTest {
         assertEquals("0", activeJudgment.getCosts());
         assertEquals("100990", activeJudgment.getTotalAmount());
         assertEquals(YesOrNo.YES, activeJudgment.getIsRegisterWithRTL());
+        assertEquals(JudgmentRTLStatus.ISSUED.getRtlState(), activeJudgment.getRtlState());
         assertEquals(LocalDate.now(), activeJudgment.getIssueDate());
         assertEquals("0123", activeJudgment.getCourtLocation());
         assertEquals(JudgmentType.DEFAULT_JUDGMENT, activeJudgment.getType());
@@ -67,7 +61,6 @@ class DefaultJudgmentsOnlineMapperTest {
         assertEquals("Mr. Sole Trader", activeJudgment.getDefendant1Name());
         assertNotNull(activeJudgment.getDefendant1Address());
         assertNotNull(activeJudgment.getDefendant1Dob());
-
     }
 
     @Test
@@ -136,6 +129,7 @@ class DefaultJudgmentsOnlineMapperTest {
         assertEquals(activeJudgment.getDefendant1Name(), "Mr. Sole Trader");
         assertNotNull(activeJudgment.getDefendant1Address());
         assertNotNull(activeJudgment.getDefendant1Dob());
+
     }
 
     @Test
@@ -175,5 +169,6 @@ class DefaultJudgmentsOnlineMapperTest {
         assertEquals(activeJudgment.getDefendant1Name(), "Mr. Sole Trader");
         assertNotNull(activeJudgment.getDefendant1Address());
         assertNotNull(activeJudgment.getDefendant1Dob());
+
     }
 }

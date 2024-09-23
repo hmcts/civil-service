@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -28,6 +27,15 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.CalculateFeeTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.CalculateSpecFeeTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.CalculateTotalClaimAmountTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.GetAirlineListTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.SpecValidateClaimInterestDateTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.SpecValidateClaimTimelineDateTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.SubmitClaimTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.ValidateClaimantDetailsTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.ValidateRespondentDetailsTask;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
@@ -40,6 +48,7 @@ import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.Party.Type;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
@@ -107,14 +116,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.CONFIRMATION_SUMMARY;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.CONFIRMATION_SUMMARY_PBA_V3;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.LIP_CONFIRMATION_BODY;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.SPEC_CONFIRMATION_SUMMARY;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.SPEC_CONFIRMATION_SUMMARY_PBA_V3;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.SPEC_LIP_CONFIRMATION_BODY_PBAV3;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @ExtendWith(SpringExtension.class)
@@ -137,6 +141,15 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
     TransitionsTestConfiguration.class,
     ValidateEmailService.class,
     PartyValidator.class,
+    CalculateFeeTask.class,
+    CalculateSpecFeeTask.class,
+    CalculateTotalClaimAmountTask.class,
+    GetAirlineListTask.class,
+    SpecValidateClaimInterestDateTask.class,
+    SpecValidateClaimTimelineDateTask.class,
+    ValidateRespondentDetailsTask.class,
+    ValidateClaimantDetailsTask.class,
+    SubmitClaimTask.class
 },
     properties = {"reference.database.enabled=false"})
 class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -422,6 +435,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .individualFirstName("This is very long name")
                                 .individualTitle("MR")
                                 .individualLastName("exceeds 70 characters to throw error for max length allowed")
+                                .primaryAddress(Address.builder().addressLine1("Address line 1").build())
                                 .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -444,6 +458,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .soleTraderFirstName("This is very long name")
                                 .soleTraderTitle("MR")
                                 .soleTraderLastName("exceeds 70 characters to throw error for max length allowed")
+                                .primaryAddress(Address.builder().addressLine1("Address line 1").build())
                                 .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -465,6 +480,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .type(Party.Type.ORGANISATION)
                                 .organisationName("This is very long name exceeds 70 characters "
                                                       + " to throw error for max length allowed")
+                                .primaryAddress(Address.builder().addressLine1("Address line 1").build())
                                 .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -630,6 +646,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .individualFirstName("This is very long name")
                                 .individualTitle("MR")
                                 .individualLastName("exceeds 70 characters to throw error for max length allowed")
+                                .primaryAddress(Address.builder().addressLine1("Address line 1").build())
                                 .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -648,10 +665,11 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant2(Party.builder()
-                                .type(Party.Type.SOLE_TRADER)
+                                .type(Type.SOLE_TRADER)
                                 .soleTraderFirstName("This is very long name")
                                 .soleTraderTitle("MR")
                                 .soleTraderLastName("exceeds 70 characters to throw error for max length allowed")
+                                .primaryAddress(Address.builder().addressLine1("Address line 1").build())
                                 .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -673,6 +691,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .type(Party.Type.ORGANISATION)
                                 .organisationName("This is very long name exceeds 70 characters "
                                                       + " to throw error for max length allowed")
+                                .primaryAddress(Address.builder().addressLine1("Address line 1").build())
                                 .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -821,7 +840,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetPBAv3SpecFlagOn_whenPBAv3IsActivated() {
             // Given
             given(organisationService.findOrganisation(any())).willReturn(Optional.empty());
-            when(toggleService.isPbaV3Enabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
@@ -1161,7 +1179,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     class MidAmountBreakup {
 
         @Test
-        void shouldCalculateAmoutBreakup_whenCalled() {
+        void shouldCalculateAmountBreakup_whenCalled() {
             // Given
             List<ClaimAmountBreakup> claimAmountBreakup = new ArrayList<>();
             claimAmountBreakup.add(ClaimAmountBreakup.builder()
@@ -1184,8 +1202,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsEntry("claimAmountBreakupSummaryObject", " | Description | Amount | \n" +
                     " |---|---| \n" +
                     " | Test reason1 | £ 10.00 |\n" +
-                    " Test reason2 | £ 20.00 |\n" +
-                    "  | **Total** | £ 30.00 | ");
+                    " | Test reason2 | £ 20.00 |\n" +
+                    " | **Total** | £ 30.00 | ");
         }
 
         @Test
@@ -2559,111 +2577,11 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     class SubmittedCallback {
 
         @Nested
-        class Respondent1DoesNotHaveLegalRepresentation {
-
-            @Test
-            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1DoesNotHaveRepresentation() {
-                // Given
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants()
-                    .legacyCaseReference("000MC001")
-                    .build();
-                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-
-                // When
-                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-                LocalDateTime serviceDeadline = now().plusDays(112).atTime(23, 59);
-
-                String body = format(
-                    LIP_CONFIRMATION_BODY,
-                    format("/cases/case-details/%s#CaseDocuments", CASE_ID),
-                    responsePackLink,
-                    formatLocalDateTime(serviceDeadline, DATE_TIME_AT)
-                ) + exitSurveyContentService.applicantSurvey();
-
-                // Then
-                assertThat(response).usingRecursiveComparison().isEqualTo(
-                    SubmittedCallbackResponse.builder()
-                        .confirmationHeader(format(
-                            "# Your claim has been received and will progress offline%n## Claim number: %s",
-                            REFERENCE_NUMBER
-                        ))
-                        .confirmationBody(body)
-                        .build());
-            }
-
-            @Test
-            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1DoesNotHaveRepresentationAndPinPostEnabled() {
-                // Given
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants()
-                    .legacyCaseReference("000MC001")
-                    .addRespondent2(NO)
-                    .addApplicant2(NO)
-                    .build();
-                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-                Mockito.when(toggleService.isPinInPostEnabled()).thenReturn(true);
-
-                // When
-                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-                LocalDateTime serviceDeadline = now().plusDays(112).atTime(23, 59);
-
-                String body = format(
-                    CONFIRMATION_SUMMARY,
-                    format("/cases/case-details/%s#CaseDocuments", CASE_ID),
-                    responsePackLink,
-                    formatLocalDateTime(serviceDeadline, DATE_TIME_AT)
-                ) + exitSurveyContentService.applicantSurvey();
-
-                // Then
-                assertThat(response).usingRecursiveComparison().isEqualTo(
-                    SubmittedCallbackResponse.builder()
-                        .confirmationHeader(format(
-                            "# Your claim has been received%n## Claim number: %s",
-                            REFERENCE_NUMBER
-                        ))
-                        .confirmationBody(body)
-                        .build());
-            }
-        }
-
-        @Nested
         class Respondent1HasLegalRepresentation {
-
-            @Test
-            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentation() {
-                // Given
-                Mockito.when(toggleService.isPbaV3Enabled()).thenReturn(false);
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                    .legacyCaseReference("000MC001")
-                    .build();
-                CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).request(
-                        CallbackRequest.builder().eventId(CREATE_CLAIM_SPEC.name()).build())
-                    .build();
-
-                // When
-                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-                String body = format(
-                    SPEC_CONFIRMATION_SUMMARY,
-                    format("/cases/case-details/%s#CaseDocuments", CASE_ID)
-                ) + exitSurveyContentService.applicantSurvey();
-
-                // Then
-                assertThat(response).usingRecursiveComparison().isEqualTo(
-                    SubmittedCallbackResponse.builder()
-                        .confirmationHeader(format(
-                            "# Your claim has been received%n## Claim number: %s",
-                            REFERENCE_NUMBER
-                        ))
-                        .confirmationBody(body)
-                        .build());
-            }
 
             @Test
             void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentationAndPBAv3IsOn() {
                 // Given
-                Mockito.when(toggleService.isPbaV3Enabled()).thenReturn(true);
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                     .legacyCaseReference("000MC001")
                     .build();
@@ -2689,36 +2607,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             }
 
             @Test
-            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentationAndEventIdMissing() {
-                // Given
-                Mockito.when(toggleService.isPbaV3Enabled()).thenReturn(false);
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                    .legacyCaseReference("000MC001")
-                    .build();
-                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-
-                // When
-                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-                String body = format(
-                    CONFIRMATION_SUMMARY,
-                    format("/cases/case-details/%s#CaseDocuments", CASE_ID)
-                ) + exitSurveyContentService.applicantSurvey();
-
-                // Then
-                assertThat(response).usingRecursiveComparison().isEqualTo(
-                    SubmittedCallbackResponse.builder()
-                        .confirmationHeader(format(
-                            "# Your claim has been received%n## Claim number: %s",
-                            REFERENCE_NUMBER
-                        ))
-                        .confirmationBody(body)
-                        .build());
-            }
-
-            @Test
             void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentationAndPBAv3IsOnAndEventIdMissing() {
                 // Given
-                Mockito.when(toggleService.isPbaV3Enabled()).thenReturn(true);
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                     .legacyCaseReference("000MC001")
                     .build();
@@ -2743,67 +2633,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             }
         }
 
-        @Nested
-        class Respondent1SolicitorOrgNotRegisteredInMyHmcts {
-
-            @Test
-            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1SolicitorNotRegisteredInMyHmcts() {
-                // Given
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                    .respondent1Represented(YES)
-                    .respondent1OrgRegistered(NO)
-                    .legacyCaseReference("000MC001")
-                    .build();
-                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-
-                // When
-                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-                // Then
-                assertThat(response).usingRecursiveComparison().isEqualTo(
-                    SubmittedCallbackResponse.builder()
-                        .confirmationHeader(format("# Your claim has been received and will progress offline%n## "
-                                                       + "Claim number: %s", REFERENCE_NUMBER))
-                        .confirmationBody(format(
-                            LIP_CONFIRMATION_SCREEN,
-                            format("/cases/case-details/%s#CaseDocuments", CASE_ID),
-                            responsePackLink
-                        ) + exitSurveyContentService.applicantSurvey())
-                        .build());
-            }
-        }
-
-        @Test
-        void shouldReturnExpectedConfirmationPage() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .respondent1Represented(YES)
-                .respondent1OrgRegistered(NO)
-                .legacyCaseReference("000MC001")
-                .build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).request(
-                    CallbackRequest.builder().eventId(CREATE_CLAIM_SPEC.name()).build())
-                .build();
-
-            // When
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-            // Then
-            assertThat(response).usingRecursiveComparison().isEqualTo(
-                SubmittedCallbackResponse.builder()
-                    .confirmationHeader(format("# Your claim has been received and will progress offline%n## "
-                                                   + "Claim number: %s", REFERENCE_NUMBER))
-                    .confirmationBody(format(
-                        SPEC_LIP_CONFIRMATION_SCREEN,
-                        format("/cases/case-details/%s#CaseDocuments", CASE_ID),
-                        responsePackLink,
-                        n9aLink,
-                        n9bLink,
-                        n215Link
-                    ) + exitSurveyContentService.applicantSurvey())
-                    .build());
-        }
-
         @Test
         void shouldReturnExpectedConfirmationPageForPBAV3AndNotRegisteredOrg() {
             // Given
@@ -2815,7 +2644,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_CLAIM_SPEC.name()).build())
                 .build();
-            when(toggleService.isPbaV3Enabled()).thenReturn(true);
             // When
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 

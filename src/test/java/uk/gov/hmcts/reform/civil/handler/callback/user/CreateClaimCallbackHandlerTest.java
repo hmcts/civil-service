@@ -130,7 +130,6 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String REFERENCE_NUMBER = "000DC001";
-    private static final String BEARER_TOKEN = "Bearer Token";
 
     @Autowired
     private ObjectMapper objMapper;
@@ -862,7 +861,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetPBAv3FlagOn_whenPBAv3IsActivated() {
             // Given
             given(organisationService.findOrganisation(any())).willReturn(Optional.empty());
-            when(featureToggleService.isPbaV3Enabled()).thenReturn(true);
             // When
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
@@ -1550,7 +1548,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateBusinessProcess_whenInvoked() {
-            when(featureToggleService.isPbaV3Enabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())
