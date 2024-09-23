@@ -67,6 +67,7 @@ public class GeneralApplication implements MappableObject {
     private final YesOrNo isGaRespondentOneLip;
     private final YesOrNo isGaRespondentTwoLip;
     private final HelpWithFees generalAppHelpWithFees;
+    private final GAJudicialRequestMoreInfo judicialDecisionRequestMoreInfo;
 
     @JsonCreator
     GeneralApplication(@JsonProperty("generalApplicationState") String generalApplicationState,
@@ -114,7 +115,8 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("isGaApplicantLip") YesOrNo isGaApplicantLip,
                        @JsonProperty("isGaRespondentOneLip") YesOrNo isGaRespondentOneLip,
                        @JsonProperty("isGaRespondentTwoLip") YesOrNo isGaRespondentTwoLip,
-                       @JsonProperty("generalAppHelpWithFees") HelpWithFees generalAppHelpWithFees) {
+                       @JsonProperty("generalAppHelpWithFees") HelpWithFees generalAppHelpWithFees,
+                       @JsonProperty("judicialDecisionRequestMoreInfo") GAJudicialRequestMoreInfo judicialDecisionRequestMoreInfo) {
 
         this.generalApplicationState = generalApplicationState;
         this.generalAppType = generalAppType;
@@ -160,5 +162,6 @@ public class GeneralApplication implements MappableObject {
         this.isGaRespondentOneLip = isGaRespondentOneLip;
         this.isGaRespondentTwoLip = isGaRespondentTwoLip;
         this.generalAppHelpWithFees = generalAppHelpWithFees;
+        this.judicialDecisionRequestMoreInfo = judicialDecisionRequestMoreInfo;
     }
 }
