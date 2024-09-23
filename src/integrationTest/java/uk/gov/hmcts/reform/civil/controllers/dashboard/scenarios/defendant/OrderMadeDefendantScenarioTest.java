@@ -145,6 +145,49 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
             );
     }
 
+    @Test
+    void should_create_order_made_defendant_all_orders_issued_scenari() throws Exception {
+
+        String caseId = "720134354545416";
+
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
+            .toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(Long.valueOf(caseId))
+            .respondent1Represented(YesOrNo.NO)
+            .finalOrderDocumentCollection(List.of(ElementUtils.element(
+                CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
+            .build();
+
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
+        handler.handle(callbackParamsTest(caseData));
+
+        //Verify Notification is created
+        doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
+            .andExpect(status().isOk())
+            .andExpectAll(
+                status().is(HttpStatus.OK.value()),
+                jsonPath("$[0].titleEn").value("An order has been issued by the court"),
+                jsonPath("$[0].descriptionEn").value(
+                    "<p class=\"govuk-body\">Please follow instructions in the order and comply with the deadlines. " +
+                        "Please send any documents to the court named in the order if required. " +
+                        "The claim will now proceed offline, you will receive further updates by post.</p>"),
+                jsonPath("$[0].titleCy").value("Mae gorchymyn wedi’i gyhoeddi gan y llys"),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">Dilynwch y cyfarwyddiadau sydd yn y gorchymyn a chydymffurfiwch " +
+                        "â’r dyddiadau terfyn. Anfonwch unrhyw ddogfennau i’r llys a enwir yn y gorchymyn os oes angen. " +
+                        "Bydd yr hawliad nawr yn parhau all-lein a byddwch yn cael unrhyw ddiweddariadau pellach drwy’r post.</p>")
+            );
+
+        doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "DEFENDANT")
+            .andExpectAll(
+                status().is(HttpStatus.OK.value()),
+                jsonPath("$[1].reference").value(caseId.toString()),
+                jsonPath("$[1].taskNameEn").value("<a>Add the trial arrangements</a>"),
+                jsonPath("$[1].currentStatusEn").value("Inactive")
+            );
+    }
+
     private static CallbackParams callbackParamsTest(CaseData caseData) {
         return CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
