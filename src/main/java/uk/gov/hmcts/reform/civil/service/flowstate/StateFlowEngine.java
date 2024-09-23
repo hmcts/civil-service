@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.BULK_CLAIM_EN
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.CASE_PROGRESSION_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.DASHBOARD_SERVICE_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.GENERAL_APPLICATION_ENABLED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.JO_ONLINE_LIVE_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.agreedToMediation;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.ccjRequestJudgmentByAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.declinedMediation;
@@ -218,6 +219,7 @@ public class StateFlowEngine implements IStateFlowEngine {
                     flags.put(DASHBOARD_SERVICE_ENABLED.name(), (featureToggleService.isDashboardEnabledForCase(c) && caseContainsLiP.test(c)));
                     flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
                     flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
+                    flags.put(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive());
                 })
             .transitionTo(CLAIM_SUBMITTED)
                 .onlyIf(claimSubmittedTwoRegisteredRespondentRepresentatives
@@ -232,6 +234,7 @@ public class StateFlowEngine implements IStateFlowEngine {
                     flags.put(DASHBOARD_SERVICE_ENABLED.name(), (featureToggleService.isDashboardEnabledForCase(c) && caseContainsLiP.test(c)));
                     flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
                     flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
+                    flags.put(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive());
                 })
             // Only one unrepresented defendant
             .transitionTo(CLAIM_SUBMITTED)
@@ -242,6 +245,7 @@ public class StateFlowEngine implements IStateFlowEngine {
                     flags.put(DASHBOARD_SERVICE_ENABLED.name(), (featureToggleService.isDashboardEnabledForCase(c) && caseContainsLiP.test(c)));
                     flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
                     flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
+                    flags.put(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive());
                 })
             // Unrepresented defendant 1
             .transitionTo(CLAIM_SUBMITTED)
@@ -255,6 +259,7 @@ public class StateFlowEngine implements IStateFlowEngine {
                     flags.put(DASHBOARD_SERVICE_ENABLED.name(), (featureToggleService.isDashboardEnabledForCase(c) && caseContainsLiP.test(c)));
                     flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
                     flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
+                    flags.put(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive());
                 })
             // Unrepresented defendant 2
             .transitionTo(CLAIM_SUBMITTED)
@@ -267,6 +272,7 @@ public class StateFlowEngine implements IStateFlowEngine {
                     flags.put(DASHBOARD_SERVICE_ENABLED.name(), (featureToggleService.isDashboardEnabledForCase(c) && caseContainsLiP.test(c)));
                     flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
                     flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
+                    flags.put(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive());
                 })
             // Unrepresented defendants
             .transitionTo(CLAIM_SUBMITTED)
@@ -279,6 +285,7 @@ public class StateFlowEngine implements IStateFlowEngine {
                     flags.put(DASHBOARD_SERVICE_ENABLED.name(), (featureToggleService.isDashboardEnabledForCase(c) && caseContainsLiP.test(c)));
                     flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
                     flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
+                    flags.put(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive());
                 })
             .state(CLAIM_SUBMITTED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)

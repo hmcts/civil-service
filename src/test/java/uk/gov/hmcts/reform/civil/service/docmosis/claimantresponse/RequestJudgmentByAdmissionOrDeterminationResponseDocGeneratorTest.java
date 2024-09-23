@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
@@ -37,7 +37,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGM
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_ADMISSION_OR_DETERMINATION;
 
 @ExtendWith(MockitoExtension.class)
-public class RequestJudgmentByAdmissionOrDeterminationResponseDocGeneratorTest {
+class RequestJudgmentByAdmissionOrDeterminationResponseDocGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String REFERENCE_NUMBER = "000DC001";
@@ -47,7 +47,7 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGeneratorTest {
     private JudgmentByAdmissionOrDeterminationMapper judgmentByAdmissionOrDeterminationMapper;
 
     @Mock
-    private UnsecuredDocumentManagementService documentManagementService;
+    private SecuredDocumentManagementService documentManagementService;
 
     @Mock
     private DocumentGeneratorService documentGeneratorService;
