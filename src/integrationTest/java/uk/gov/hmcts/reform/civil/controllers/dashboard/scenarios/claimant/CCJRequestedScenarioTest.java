@@ -35,6 +35,10 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
             .toBuilder().respondent1ResponseDeadline(responseDeadline)
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
+            .defaultJudgmentDocuments(List.of(
+                Element.<CaseDocument>builder()
+                    .value(CaseDocument.builder().documentType(DocumentType.DEFAULT_JUDGMENT)
+                               .createdDatetime(LocalDateTime.now()).build()).build()))
             .build();
 
         handler.handle(callbackParams(caseData));
@@ -101,10 +105,6 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
             .legacyCaseReference("reference")
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
             .ccdCaseReference(Long.valueOf(caseId))
-            .defaultJudgmentDocuments(List.of(
-                Element.<CaseDocument>builder()
-                    .value(CaseDocument.builder().documentType(DocumentType.DEFAULT_JUDGMENT)
-                               .createdDatetime(LocalDateTime.now()).build()).build()))
             .build();
 
         handler.handle(callbackParams(caseData));
