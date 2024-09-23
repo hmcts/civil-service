@@ -1542,11 +1542,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         dataBuilder.hearingNotes(getHearingNotes(caseData));
 
         // LiP check ensures any LiP cases will always create takeCaseOffline WA task until CP goes live
-        if (!sdoSubmittedPreCPForLiPCase(caseData)
-            && featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
+        if (!sdoSubmittedPreCPForLiPCase(caseData)) {
             log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
             dataBuilder.eaCourtLocation(YES);
-
             if (featureToggleService.isHmcEnabled()) {
                 dataBuilder.hmcEaCourtLocation(featureToggleService.isLocationWhiteListedForCaseProgression(
                     caseData.getCaseManagementLocation().getBaseLocation()) ? YES : NO);
