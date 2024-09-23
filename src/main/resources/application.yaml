@@ -174,8 +174,8 @@ civil:
   n215-url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/952023/n215-eng.pdf
   n225-url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/961368/n225-eng.pdf
   system-update:
-    username: ${CIVIL_SYSTEM_UPDATE_USERNAME:civil-system-update@mailnesia.com}
-    password: ${CIVIL_SYSTEM_UPDATE_PASSWORD:Password12!}
+    username: "civil-test-caseworker@mailinator.com"
+    password: "Password12"
   prd-admin:
     username: ${CIVIL_PRD_ADMIN_USERNAME:civil.prd.admin@example.com}
     password: ${CIVIL_PRD_ADMIN_PASSWORD:Password12!}
