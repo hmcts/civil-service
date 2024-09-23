@@ -168,16 +168,16 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
             .andExpect(status().isOk())
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].titleEn").value("An order has been issued by the court"),
+                jsonPath("$[0].titleEn").value("An order has been made"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">Please follow instructions in the order and comply with the deadlines. " +
-                        "Please send any documents to the court named in the order if required. " +
-                        "The claim will now proceed offline, you will receive further updates by post.</p>"),
-                jsonPath("$[0].titleCy").value("Mae gorchymyn wedi’i gyhoeddi gan y llys"),
+                    "<p class=\"govuk-body\">The judge has made an order on your claim.</p>" +
+                        "<p class=\"govuk-body\"><a href=\"{VIEW_FINAL_ORDER}\" rel=\"noopener noreferrer\" " +
+                        "target=\"_blank\" class=\"govuk-link\">View the order</a></p>"),
+                jsonPath("$[0].titleCy").value("Mae gorchymyn wedi’i wneud"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Dilynwch y cyfarwyddiadau sydd yn y gorchymyn a chydymffurfiwch " +
-                        "â’r dyddiadau terfyn. Anfonwch unrhyw ddogfennau i’r llys a enwir yn y gorchymyn os oes angen. " +
-                        "Bydd yr hawliad nawr yn parhau all-lein a byddwch yn cael unrhyw ddiweddariadau pellach drwy’r post.</p>")
+                    "<p class=\"govuk-body\">Mae'r Barnwr wedi gwneud gorchymyn ar eich hawliad.</p>" +
+                        "<p class=\"govuk-body\"><a href=\"{VIEW_FINAL_ORDER}\" rel=\"noopener noreferrer\" " +
+                        "target=\"_blank\" class=\"govuk-link\">Gweld y gorchymyn</a></p>")
             );
 
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "DEFENDANT")
