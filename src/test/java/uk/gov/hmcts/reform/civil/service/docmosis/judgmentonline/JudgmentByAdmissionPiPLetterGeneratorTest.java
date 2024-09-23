@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ByteArrayResource;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
-import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
@@ -76,7 +76,7 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
     private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
 
     @Mock
-    private UnsecuredDocumentManagementService documentManagementService;
+    private SecuredDocumentManagementService documentManagementService;
 
     @Mock
     private DocumentGeneratorService documentGeneratorService;
