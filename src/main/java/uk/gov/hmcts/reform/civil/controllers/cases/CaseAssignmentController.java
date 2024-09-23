@@ -100,6 +100,7 @@ public class CaseAssignmentController {
                 status = defendantPinToPostLRspecService.isDefendantLinked(caseDetails);
             }
         }
+        log.info("case {}, isOcmcCase {}, status {}", caseReference, isOcmcCase, status);
         DefendantLinkStatus defendantLinkStatus = new DefendantLinkStatus(isOcmcCase, status);
         return new ResponseEntity<>(defendantLinkStatus, HttpStatus.OK);
     }
