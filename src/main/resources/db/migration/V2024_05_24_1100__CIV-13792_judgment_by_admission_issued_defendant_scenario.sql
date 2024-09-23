@@ -45,5 +45,5 @@ VALUES ('<a>View hearings</a>', 'Hearing',
         '<a href={VIEW_ORDERS_AND_NOTICES} rel="noopener noreferrer" class="govuk-link">Gweld gorchmynion a rhybuddion</a>', 'Gorchmynion a rhybuddion gan y llys',
         'Order.View', 'Scenario.AAA6.JudgmentsOnline.IssuedCCJ.Defendant', '{3, 3}', 'DEFENDANT', 14),
        ('<a href={VIEW_JUDGEMENT} class="govuk-link">View the judgment</a>', 'Judgments from the court',
-        '<a href={VIEW_JUDGEMENT} class="govuk-link">Gweld y Dyfarniad</a>', 'Dyfarniad gan y llys',
+        '<a href={VIEW_JUDGEMENT} class="govuk-link">Gweld y Dyfarniad</a>', 'Dyfarniadau gan y llys',
         'Judgment.View', 'Scenario.AAA6.JudgmentsOnline.IssuedCCJ.Defendant', '{3, 3}', 'DEFENDANT', 15);

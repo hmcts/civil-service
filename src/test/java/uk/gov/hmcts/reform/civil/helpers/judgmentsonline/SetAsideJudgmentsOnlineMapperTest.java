@@ -1,18 +1,24 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddress;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
@@ -25,7 +31,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class SetAsideJudgmentsOnlineMapperTest {
+class SetAsideJudgmentsOnlineMapperTest {
 
     @InjectMocks
     private SetAsideJudgmentOnlineMapper judgmentOnlineMapper;
@@ -37,6 +43,13 @@ public class SetAsideJudgmentsOnlineMapperTest {
     private InterestCalculator interestCalculator;
     @InjectMocks
     private DefaultJudgmentOnlineMapper defaultJudgmentOnlineMapper;
+    @Mock
+    private RoboticsAddressMapper addressMapper;
+
+    @BeforeEach
+    void setUp() {
+        when(addressMapper.toRoboticsAddress(any())).thenReturn(RoboticsAddress.builder().build());
+    }
 
     @Test
     void testIfActiveJudgmentIsHistoricSetAsideApplication() {
@@ -111,6 +124,25 @@ public class SetAsideJudgmentsOnlineMapperTest {
         JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
         assertEquals(JudgmentState.SET_ASIDE_ERROR, historicJudgment.getState());
         assertEquals(LocalDate.now(), historicJudgment.getSetAsideDate());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"R", "M", "S"})
+    void testIfRTLIsUpdatedCorrectly(String rtlState) {
+        //Given
+        when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(BigDecimal.ZERO);
+        CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case();
+        caseData.setActiveJudgment(defaultJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
+        caseData.getActiveJudgment().setRtlState(rtlState);
+        //When
+        SetAsideJudgmentOnlineMapper setAsideJudgmentOnlineMapper = new SetAsideJudgmentOnlineMapper();
+        caseData.setActiveJudgment(setAsideJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
+        //Then
+        if (rtlState.equals("S")) {
+            assertEquals(caseData.getActiveJudgment().getRtlState(), JudgmentRTLStatus.SATISFIED.getRtlState());
+        } else {
+            assertEquals(caseData.getActiveJudgment().getRtlState(), JudgmentRTLStatus.CANCELLED.getRtlState());
+        }
     }
 
 }
