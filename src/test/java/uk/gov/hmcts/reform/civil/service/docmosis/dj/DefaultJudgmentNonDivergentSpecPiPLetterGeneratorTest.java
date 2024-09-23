@@ -10,7 +10,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
-import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
@@ -52,7 +52,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFAU
     DefaultJudgmentNonDivergentSpecPiPLetterGenerator.class,
     JacksonAutoConfiguration.class
 })
-public class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
+class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
@@ -92,7 +92,7 @@ public class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
     private static final String DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER_REF = "default-judgment-non-divergent-spec-pin_in_letter";
 
     @MockBean
-    private UnsecuredDocumentManagementService documentManagementService;
+    private SecuredDocumentManagementService documentManagementService;
 
     @MockBean
     private DocumentGeneratorService documentGeneratorService;

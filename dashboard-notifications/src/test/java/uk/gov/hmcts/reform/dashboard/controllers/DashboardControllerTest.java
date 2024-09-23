@@ -193,4 +193,28 @@ class DashboardControllerTest {
         //then
         assertThrows(RuntimeException.class, () -> dashboardController.deleteNotification(ID, AUTHORISATION));
     }
+
+    @Test
+    void shouldReturnOkWhenMakeProgressAbleTasksInactiveForCaseIdentifierAndRoleInvoked() {
+
+        //when
+        final ResponseEntity responseEntity = dashboardController
+            .makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant", AUTHORISATION);
+
+        //then
+        assertEquals(OK, responseEntity.getStatusCode());
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant");
+    }
+
+    @Test
+    void shouldReturn401WhenMakeProgressAbleTasksInactiveForCaseIdentifierAndRoleUnauthorised() {
+
+        //given
+        doThrow(new RuntimeException()).when(taskListService)
+            .makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant");
+
+        //then
+        assertThrows(RuntimeException.class, () -> dashboardController
+            .makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant", AUTHORISATION));
+    }
 }
