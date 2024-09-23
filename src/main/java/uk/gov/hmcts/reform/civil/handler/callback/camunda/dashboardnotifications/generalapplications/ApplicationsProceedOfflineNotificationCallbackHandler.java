@@ -79,7 +79,8 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
 
     private CallbackResponse configureScenarioForProceedOffline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (!caseData.getCcdState().equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)) {
+        if (!caseData.getCcdState().equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+            || caseData.getGeneralApplications() != null && !caseData.getGeneralApplications().isEmpty()) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
@@ -124,23 +125,21 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
 
     // Get all applications
     private boolean getLatestStatusOfGeneralApplication(CaseData caseData, String notificationType) {
-        if (caseData.getGeneralApplications() != null && !caseData.getGeneralApplications().isEmpty()) {
-            for (Element<GeneralApplication> element : caseData.getGeneralApplications()) {
-                Long caseReference = parseLong(element.getValue().getCaseLink().getCaseReference());
-                GeneralApplication application = caseDetailsConverter.toGeneralApplication(coreCaseDataService
-                                                                                               .getCase(caseReference));
-                System.out.println(application.getGeneralApplicationState());
-                System.out.println(application);
-                if (notificationType.equals(CLAIMANT)
-                    && (isClaimantApplicantApplicationValid(application)
-                    || isClaimantRespondentApplicationValid(application))) {
-                    return true;
-                }
-                if (notificationType.equals(DEFENDANT)
-                    && (isDefendantApplicantApplicationValid(application)
-                    || isDefendantRespondentApplicationValid(application))) {
-                    return true;
-                }
+        for (Element<GeneralApplication> element : caseData.getGeneralApplications()) {
+            Long caseReference = parseLong(element.getValue().getCaseLink().getCaseReference());
+            GeneralApplication application = caseDetailsConverter.toGeneralApplication(coreCaseDataService
+                                                                                           .getCase(caseReference));
+            System.out.println(application.getGeneralApplicationState());
+            System.out.println(application);
+            if (notificationType.equals(CLAIMANT)
+                && (isClaimantApplicantApplicationValid(application)
+                || isClaimantRespondentApplicationValid(application))) {
+                return true;
+            }
+            if (notificationType.equals(DEFENDANT)
+                && (isDefendantApplicantApplicationValid(application)
+                || isDefendantRespondentApplicationValid(application))) {
+                return true;
             }
         }
         return false;
