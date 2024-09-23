@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -28,6 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_DEFENDANT;
@@ -97,6 +99,7 @@ public class HearingScheduledDefendantNotificationHandlerTest extends BaseCallba
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
+            .respondent1Represented(YesOrNo.NO)
             .build().toBuilder().hearingLocation(list).build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -110,5 +113,28 @@ public class HearingScheduledDefendantNotificationHandlerTest extends BaseCallba
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );
+    }
+
+    @Test
+    void doNotCreateDashboardNotifications() {
+        List<LocationRefData> locations = new ArrayList<>();
+        locations.add(LocationRefData.builder().siteName("Name").courtAddress("Loc").postcode("1").build());
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+
+        DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();
+        DynamicList list = DynamicList.builder().value(location).listItems(List.of(location)).build();
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .respondent1Represented(YesOrNo.YES)
+            .build().toBuilder().hearingLocation(list).build();
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+
+        handler.handle(callbackParams);
+        verifyNoInteractions(dashboardApiClient);
     }
 }
