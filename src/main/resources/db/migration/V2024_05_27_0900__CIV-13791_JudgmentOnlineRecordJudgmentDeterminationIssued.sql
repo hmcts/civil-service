@@ -53,8 +53,6 @@ VALUES ('<a href={VIEW_CLAIM_URL} class="govuk-link">View the claim</a>', 'The c
        ('<a>View the judgment</a>', 'Judgments from the court',
         '<a>View the judgment</a>', 'Judgments from the court',
         'Judgment.View', 'Scenario.AAA6.JudgmentsOnline.JudgmentDeterminationIssued.Defendant', '{1, 1}', 'DEFENDANT', 14),
-       ('<a href={VIEW_ORDERS_AND_NOTICES} class="govuk-link">View orders and notices</a>', 'Orders and notices from the court' ,
-        '<a href={VIEW_ORDERS_AND_NOTICES} class="govuk-link">View orders and notices</a>', 'Orders and notices from the court',
-        'Order.View', 'Scenario.AAA6.JudgmentsOnline.JudgmentDeterminationIssued.Defendant', '{3, 3}', 'DEFENDANT', 13),
-       ('<a>View applications</a>', 'Applications' ,'<a>View applications</a>',
-        'Applications', 'Application.View', 'Scenario.AAA6.JudgmentsOnline.JudgmentDeterminationIssued.Defendant', '{3, 3}', 'DEFENDANT', 15);
+       ('<a>Confirm you have paid a judgment (CCJ) debt</a>', 'Judgments from the court',
+        '<a>Confirm you have paid a judgment (CCJ) debt</a>', 'Judgments from the court',
+        'Judgment.View', 'Scenario.AAA6.JudgmentsOnline.JudgmentDeterminationIssued.Defendant', '{1, 1}', 'DEFENDANT', 15);
