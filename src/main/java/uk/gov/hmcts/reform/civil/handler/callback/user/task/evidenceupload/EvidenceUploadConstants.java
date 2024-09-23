@@ -5,21 +5,32 @@ public final class EvidenceUploadConstants {
     public static final String RESPONDENT_ONE_DISCLOSURE_LIST = "RespondentOneDisclosureList";
     public static final String DISCLOSURE_LIST_TEXT = "%s - Disclosure list";
     public static final String RESPONDENT_ONE_DISCLOSURE = "RespondentOneDisclosure";
+    public static final String DOCUMENT_FOR_DISCLOSURE = "Document for disclosure";
+
     public static final String DISCLOSURE_TEXT = "%s - Documents for disclosure";
     public static final String RESPONDENT_ONE_WITNESS_STATEMENT = "RespondentOneWitnessStatement";
     public static final String WITNESS_STATEMENT_TEXT = "%s - Witness statement";
+
+    public static final String WITNESS_STATEMENT_OF = "Witness Statement of";
     public static final String WITNESS_SUMMARY_TEXT = "%s - Witness summary";
+    public static final String WITNESS_SUMMARY_OF = "Witness Summary of";
     public static final String RESPONDENT_ONE_WITNESS_HEARSAY = "RespondentOneWitnessHearsay";
     public static final String RESPONDENT_ONE_WITNESS_SUMMARY = "RespondentOneWitnessSummary";
     public static final String WITNESS_HEARSAY_TEXT = "%s - Notice of the intention to rely on hearsay evidence";
+
+    public static final String HEARSAY_EVIDENCE = "Hearsay evidence";
     public static final String RESPONDENT_ONE_WITNESS_REFERRED = "RespondentOneWitnessReferred";
     public static final String WITNESS_REFERRED_TEXT = "%s - Documents referred to in the statement";
+
+    public static final String REFERRED_TO_IN_THE_STATEMENT_OF = " referred to in the statement of ";
     public static final String RESPONDENT_ONE_EXPERT_REPORT = "RespondentOneExpertReport";
     public static final String EXPERT_REPORT_TEXT = "%s - Expert's report";
     public static final String RESPONDENT_ONE_EXPERT_JOINT_STATEMENT = "RespondentOneExpertJointStatement";
     public static final String EXPERT_JOINT_STATEMENT_TEXT = "%s - Joint Statement of Experts / Single Joint Expert Report";
+    public static final String JOINT_REPORT = "Joint report";
     public static final String RESPONDENT_ONE_EXPERT_QUESTIONS = "RespondentOneExpertQuestions";
     public static final String EXPERT_QUESTIONS_TEXT = "%s - Questions for other party's expert or joint experts";
+    public static final String EXPERTS_REPORT = "Experts report";
     public static final String RESPONDENT_ONE_EXPERT_ANSWERS = "RespondentOneExpertAnswers";
     public static final String EXPERT_ANSWERS_TEXT = "%s - Answer to questions asked";
     public static final String RESPONDENT_ONE_PRE_TRIAL_SUMMARY = "RespondentOnePreTrialSummary";
@@ -31,6 +42,7 @@ public final class EvidenceUploadConstants {
     public static final String TRIAL_COSTS_TEXT = "%s - Costs";
     public static final String RESPONDENT_ONE_TRIAL_DOC_CORRESPONDENCE = "RespondentOneTrialDocCorrespondence";
     public static final String TRIAL_DOC_CORRESPONDENCE_TEXT = "%s - Documentary evidence for trial";
+    public static final String DOCUMENTARY_EVIDENCE = "Documentary Evidence";
     public static final String RESPONDENT_TWO_DISCLOSURE_LIST = "RespondentTwoDisclosureList";
     public static final String RESPONDENT_TWO_DISCLOSURE = "RespondentTwoDisclosure";
     public static final String RESPONDENT_TWO_WITNESS_STATEMENT = "RespondentTwoWitnessStatement";
