@@ -258,7 +258,9 @@ For that you should have such file as this:
     },
     "fs": "read",
     "env": {
-      "exclude": "REFERENCE_DATABASE_MIGRATION"
+      "override": {
+        "REFERENCE_DATABASE_MIGRATION": "false"
+      }
     }
   },
   "target": {
@@ -273,9 +275,6 @@ For that you should have such file as this:
   }
 }
 ```
-
-You will also want to change the Run configuration on IntelliJ to set the Flyway ENV-VAR (REFERENCE_DATABASE_MIGRATION) to false.
-
 
 ## License
 
