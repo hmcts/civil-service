@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
@@ -44,11 +45,15 @@ public class SubmitChangesTaskTest {
     private CaseFlagsInitialiser caseFlagsInitialiser;
     @Mock
     private PartyDetailsChangedUtil partyDetailsChangedUtil;
+    @Mock
+    private CoreCaseDataService coreCaseDataService;
 
     @BeforeEach
     void setup() {
         mapper = new ObjectMapper();
-        handler = new SubmitChangesTask(caseDetailsConverter, mapper, userService, caseFlagsInitialiser, partyDetailsChangedUtil);
+        handler = new SubmitChangesTask(caseDetailsConverter, mapper, userService, caseFlagsInitialiser, partyDetailsChangedUtil,
+                                        coreCaseDataService
+        );
         mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
     }
 

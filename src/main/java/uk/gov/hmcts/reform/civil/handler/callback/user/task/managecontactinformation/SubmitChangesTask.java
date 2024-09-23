@@ -19,15 +19,18 @@ import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CaseNameUtils;
 import uk.gov.hmcts.reform.civil.utils.PartyDetailsChangedUtil;
 
 import java.util.List;
+import java.util.Map;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_GA_CASE_DATA;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseName;
@@ -71,18 +74,20 @@ public class SubmitChangesTask {
     private final UserService userService;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final PartyDetailsChangedUtil partyDetailsChangedUtil;
+    private final CoreCaseDataService coreCaseDataService;
 
     private static final List<String> ADMIN_ROLES = List.of(
         "caseworker-civil-admin", "caseworker-civil-staff");
 
     public SubmitChangesTask(CaseDetailsConverter caseDetailsConverter, ObjectMapper objectMapper,
                              UserService userService, CaseFlagsInitialiser caseFlagsInitialiser,
-                             PartyDetailsChangedUtil partyDetailsChangedUtil) {
+                             PartyDetailsChangedUtil partyDetailsChangedUtil, CoreCaseDataService coreCaseDataService) {
         this.caseDetailsConverter = caseDetailsConverter;
         this.objectMapper = objectMapper;
         this.userService = userService;
         this.caseFlagsInitialiser = caseFlagsInitialiser;
         this.partyDetailsChangedUtil = partyDetailsChangedUtil;
+        this.coreCaseDataService = coreCaseDataService;
     }
 
     public CallbackResponse submitChanges(CaseData caseData, CaseDetails caseDetailsBefore, String authToken) {
@@ -100,6 +105,7 @@ public class SubmitChangesTask {
         updateWitnesses(partyChosenId, caseData, builder);
         updateLRIndividuals(partyChosenId, caseData, builder);
         updateOrgIndividuals(partyChosenId, caseData, builder);
+        updateGaCaseName(caseData);
 
         if (isParty(partyChosenId) || isLitigationFriend(partyChosenId)) {
             // update case name for hmc if applicant/respondent/litigation friend was updated
@@ -138,6 +144,15 @@ public class SubmitChangesTask {
                               .build())
                       .build().toMap(objectMapper))
             .build();
+    }
+
+    private void updateGaCaseName(CaseData caseData) {
+        if (ofNullable(caseData.getGeneralApplications()).isPresent()) {
+            caseData.getGeneralApplications().forEach(app -> coreCaseDataService
+                .triggerGeneralApplicationEvent(Long.parseLong(app.getValue().getCaseLink().getCaseReference()),
+                                                UPDATE_GA_CASE_DATA,
+                                                Map.of("caseNameGaInternal", CaseNameUtils.buildCaseName(caseData))));
+        }
     }
 
     private boolean isAdmin(String userAuthToken) {
