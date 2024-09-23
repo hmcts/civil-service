@@ -42,8 +42,8 @@ VALUES ('<a>View the response to the claim</a>', 'The response',
         '<a>View the bundle</a>', 'Hearing',
         'Hearing.Bundle.View', 'Scenario.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Defendant', '{2, 2}', 'DEFENDANT', 10),
        ('<a href={VIEW_JUDGEMENT} class="govuk-link">View the judgment</a>', 'Judgments from the court',
-        '<a href={VIEW_JUDGEMENT} class="govuk-link">View the judgment</a>', 'Judgments from the court',
-        'Judgment.View', 'Scenario.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Defendant', '{3, 3}', 'DEFENDANT', 12),
+        '<a href={VIEW_JUDGEMENT} class="govuk-link">Gweld y Dyfarniad</a>', 'Dyfarniadau gan y llys',
+        'Judgment.View', 'Scenario.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Defendant', '{3, 3}', 'DEFENDANT', 14),
        ('<a>Confirm you have paid a judgment (CCJ) debt</a>', 'Judgments from the court',
         '<a>Confirm you have paid a judgment (CCJ) debt</a>', 'Judgments from the court',
-        'Judgment.View', 'Scenario.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Defendant', '{1, 1}', 'DEFENDANT', 13);
+        'Judgment.Cosc', 'Scenario.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Defendant', '{1, 1}', 'DEFENDANT', 15);

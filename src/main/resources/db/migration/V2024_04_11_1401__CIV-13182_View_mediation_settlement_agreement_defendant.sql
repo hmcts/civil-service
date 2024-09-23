@@ -42,9 +42,9 @@ values ('<a href={VIEW_MEDIATION_SETTLEMENT_AGREEMENT} class="govuk-link">View m
 ('<a>View the judgment</a>',
   'Judgment from the court',
   '<a>Gweld y Dyfarniad</a>',
-  'Dyfarniadau gan y llys', 'Judgment.View', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 13),
+  'Dyfarniadau gan y llys', 'Judgment.View', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 14),
 
 ('<a>View applications</a>',
   'Applications',
   '<a>Gweld y cais i gyd</a>',
-  'Ceisiadau', 'Application.View', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 14);
+  'Ceisiadau', 'Application.Cosc', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 16);
