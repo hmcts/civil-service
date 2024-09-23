@@ -245,6 +245,37 @@ If you want to clean up the environment just run:
 npx @hmcts/dev-env@latest --delete
 ```
 
+The script should create a /.mirrord/.mirrord.json config file under the project's root directory.
+Specifically for civil-service you might need to exclude a flyway environment variable to allow the startup process to run without errors.
+For that you should have such file as this:
+
+```json
+{
+  "feature": {
+    "network": {
+      "incoming": "steal",
+      "outgoing": true
+    },
+    "fs": "read",
+    "env": {
+      "exclude": "REFERENCE_DATABASE_MIGRATION"
+    }
+  },
+  "target": {
+    "path": {
+      "pod": "Your civil-service pod ID"
+    },
+    "namespace": "civil"
+  },
+  "operator": false,
+  "agent": {
+    "flush_connections": false
+  }
+}
+```
+
+You will also want to change the Run configuration on IntelliJ to set the Flyway ENV-VAR (REFERENCE_DATABASE_MIGRATION) to false.
+
 
 ## License
 
