@@ -419,13 +419,13 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         if (V_2.equals(callbackParams.getVersion())
             && featureToggleService.isPinInPostEnabled()
-            && (isOneVOne(caseData) || isNonDivergentAndLrVLr(caseData))) {
+            && (isOneVOne(caseData))) {
             if (caseData.hasClaimantAgreedToFreeMediation()) {
                 nextState = CaseState.IN_MEDIATION.name();
             } else if (caseData.hasApplicantAcceptedRepaymentPlan()) {
                 if (featureToggleService.isJudgmentOnlineLive()
                     && (caseData.isPayByInstallment() || caseData.isPayBySetDate())
-                    && (caseData.isLRvLipOneVOne() || isNonDivergentAndLrVLr(caseData))) {
+                    && (caseData.isLRvLipOneVOne())) {
                     nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
                     businessProcess = BusinessProcess.ready(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC);
                 } else {
@@ -451,6 +451,22 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 && caseData.isLRvLipOneVOne()
                 && caseData.isClaimantDontWantToProceedWithFulLDefenceFD()) {
                 nextState = CaseState.CASE_STAYED.name();
+            }
+        }
+
+        //Scenarios LRvLR 2v1 or 1v2 Nondivergent
+        if (V_2.equals(callbackParams.getVersion())
+            && featureToggleService.isPinInPostEnabled()
+            && isNonDivergentAndLrVLr(caseData)) {
+            if (caseData.hasApplicantAcceptedRepaymentPlan()) {
+                if (featureToggleService.isJudgmentOnlineLive()
+                    && (caseData.isPayByInstallment() || caseData.isPayBySetDate())
+                    && (isNonDivergentAndLrVLr(caseData))) {
+                    nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
+                    businessProcess = BusinessProcess.ready(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC);
+                } else {
+                    nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
+                }
             }
         }
 
