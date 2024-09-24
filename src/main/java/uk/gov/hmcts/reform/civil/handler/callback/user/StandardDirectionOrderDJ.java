@@ -770,8 +770,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         assignCategoryId.assignCategoryIdToCollection(caseData.getOrderSDODocumentDJCollection(),
                                                       document -> document.getValue().getDocumentLink(), "caseManagementOrders");
         caseDataBuilder.businessProcess(BusinessProcess.ready(STANDARD_DIRECTION_ORDER_DJ));
-
-        var state = "CASE_PROGRESSION";
         caseDataBuilder.hearingNotes(getHearingNotes(caseData));
 
         caseDataBuilder.eaCourtLocation(YES);
@@ -780,6 +778,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                 caseData.getCaseManagementLocation().getBaseLocation()) ? YES : NO);
         }
 
+        var state = "CASE_PROGRESSION";
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(state)
