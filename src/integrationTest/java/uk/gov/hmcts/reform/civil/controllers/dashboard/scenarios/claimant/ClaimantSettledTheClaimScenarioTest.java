@@ -43,10 +43,12 @@ public class ClaimantSettledTheClaimScenarioTest extends DashboardBaseIntegratio
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("The claim is settled"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You have confirmed that Mr. Sole Trader paid  on 19 March 2024.</p>"),
+                    "<p class=\"govuk-body\">You have confirmed that the claim against Mr. Sole Trader was settled on 19 March 2024.</p>"
+                        + "<p class=\"govuk-body\">The defendant has 19 days from the date of settlement to notify the court of any objection.</p>"),
                 jsonPath("$[0].titleCy").value("Mae’r hawliad wedi’i setlo"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Rydych wedi cadarnhau bod Mr. Sole Trader wedi talu ar 19 Mawrth 2024.</p>")
+                    "<p class=\"govuk-body\">You have confirmed that the claim against Mr. Sole Trader was settled on 19 March 2024.</p>"
+                        + "<p class=\"govuk-body\">The defendant has 19 days from the date of settlement to notify the court of any objection.</p>")
             );
     }
 }
