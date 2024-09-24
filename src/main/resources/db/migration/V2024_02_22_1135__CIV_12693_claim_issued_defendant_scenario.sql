@@ -54,7 +54,7 @@ values ('<a href={VIEW_CLAIM_URL} rel="noopener noreferrer" class="govuk-link">V
        ('<a>View the judgment</a>', 'Judgments from the court' ,'<a>Gweld y Dyfarniad</a>',
         'Dyfarniadau gan y llys', 'Judgment.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 14),
        ('<a>Confirm you''ve paid a judgment (CCJ) debt</a>', 'Judgments from the court','<a>Confirm you''ve paid a judgment (CCJ) debt</a>',
-        'Judgments from the court', 'Judgment.Cosc', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 15),
+        'Dyfarniadau gan y llys', 'Judgment.Cosc', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 15),
        ('<a href={GENERAL_APPLICATIONS_INITIATION_PAGE_URL} rel="noopener noreferrer" class="govuk-link">Contact the court to request a change to my case</a>',
         'Applications', '<a href={GENERAL_APPLICATIONS_INITIATION_PAGE_URL} rel="noopener noreferrer" class="govuk-link">Contact the court to request a change to my case</a>',
         'Ceisiadau', 'Application.Create', 'Scenario.AAA6.ClaimIssue.Response.Required', '{4, 4}', 'DEFENDANT', 16),

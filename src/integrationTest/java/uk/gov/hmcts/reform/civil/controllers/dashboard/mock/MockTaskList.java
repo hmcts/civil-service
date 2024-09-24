@@ -264,7 +264,7 @@ public class MockTaskList {
                 .reference(reference)
                 .taskNameCy("<a>Confirm you've paid a judgment (CCJ) debt</a>")
                 .taskNameEn("<a>Confirm you've paid a judgment (CCJ) debt</a>")
-                .categoryCy("Judgment from the court")
+                .categoryCy("Dyfarniadau gan y llys")
                 .categoryEn("Judgment from the court")
                 .role(role)
                 .currentStatusEn(TaskStatus.INACTIVE.getName())

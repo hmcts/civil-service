@@ -47,7 +47,7 @@ values ('<a href={VIEW_MEDIATION_SETTLEMENT_AGREEMENT} class="govuk-link">View m
 ('<a>Confirm you''ve paid a judgment (CCJ) debt</a>',
 'Judgment from the court',
 '<a>Confirm you''ve paid a judgment (CCJ) debt</a>',
-'Judgment from the court', 'Judgment.Cosc', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 14),
+'Dyfarniadau gan y llys', 'Judgment.Cosc', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 14),
 
 ('<a>View applications</a>',
   'Applications',
