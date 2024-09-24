@@ -121,12 +121,11 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
         }
 
         if (nonNull(newCourtLocation)) {
+            caseDataBuilder.eaCourtLocation(YesOrNo.YES);
             if (featureToggleService.isHmcEnabled()) {
                 caseDataBuilder.hmcEaCourtLocation(
                     featureToggleService.isLocationWhiteListedForCaseProgression(newCourtLocation.getEpimmsId())
                         ? YesOrNo.YES : YesOrNo.NO);
-            } else {
-                caseDataBuilder.eaCourtLocation(YesOrNo.YES);
             }
         }
 
