@@ -425,7 +425,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             } else if (caseData.hasApplicantAcceptedRepaymentPlan()) {
                 if (featureToggleService.isJudgmentOnlineLive()
                     && (caseData.isPayByInstallment() || caseData.isPayBySetDate())
-                    && (caseData.isLRvLipOneVOne())) {
+                    && caseData.isLRvLipOneVOne()) {
                     nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
                     businessProcess = BusinessProcess.ready(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC);
                 } else {
