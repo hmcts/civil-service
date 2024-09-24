@@ -31,6 +31,6 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: aac-manage-case-assignment.enabled
   - name: wiremock
-    version: 0.2.5
-    repository: file://charts/wiremock
+    version: 0.0.4
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: wiremock.enabled
