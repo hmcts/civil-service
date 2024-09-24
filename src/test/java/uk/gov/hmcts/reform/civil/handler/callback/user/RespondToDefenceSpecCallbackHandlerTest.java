@@ -88,6 +88,8 @@ import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
@@ -169,7 +171,9 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     ResponseOneVOneShowTagService.class,
     JudgmentByAdmissionOnlineMapper.class,
     AssignCategoryId.class,
-    FrcDocumentsUtils.class
+    FrcDocumentsUtils.class,
+    RoboticsAddressMapper.class,
+    AddressLinesMapper.class
 })
 class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -225,6 +229,10 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private WorkingDayIndicator workingDayIndicator;
     @MockBean
     private DeadlineExtensionCalculatorService deadlineCalculatorService;
+    @Autowired
+    private RoboticsAddressMapper addressMapper;
+    @Autowired
+    private AddressLinesMapper linesMapper;
 
     @Nested
     class AboutToStart {
