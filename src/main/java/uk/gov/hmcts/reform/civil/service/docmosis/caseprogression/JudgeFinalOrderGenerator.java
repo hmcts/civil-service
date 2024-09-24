@@ -10,13 +10,11 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
-import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantDefendantNotAttending;
-import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantRepresentationList;
-import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersDefendantRepresentationList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
+import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderAppeal;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -25,6 +23,15 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.builders.ClaimantAttendsOrRepresentedTextBuilder;
+import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.builders.DefendantAttendsOrRepresentedTextBuilder;
+import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.AppealInitiativeGroup;
+import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.AttendeesRepresentationGroup;
+import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.CaseInfoGroup;
+import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.CostsDetailsGroup;
+import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.HearingDetailsGroup;
+import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.JudgeCourtDetailsGroup;
+import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.OrderDetailsGroup;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -58,11 +65,17 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     private final FeatureToggleService featureToggleService;
     private final DocumentHearingLocationHelper documentHearingLocationHelper;
     private LocationRefData caseManagementLocationDetails;
-    private static final String NOTICE_RECIEVED_CAN_PROCEED = "received notice of the trial and determined that it was reasonable to proceed in their absence.";
-    private static final String NOTICE_RECIEVED_CANNOT_PROCEED =     "received notice of the trial, the Judge was not satisfied that it was "
-        + "reasonable to proceed in their absence.";
-    private static final String NOTICE_NOT_RECIEVED_CANNOT_PROCEED =     "The Judge was not satisfied that they had received notice of the hearing "
-        + "and it was not reasonable to proceed in their absence.";
+    private DefendantAttendsOrRepresentedTextBuilder defendantAttendsOrRepresentedTextBuilder;
+    private ClaimantAttendsOrRepresentedTextBuilder claimantAttendsOrRepresentedTextBuilder;
+
+    private AppealInitiativeGroup appealInitiativeGroup;
+    private AttendeesRepresentationGroup attendeesRepresentationGroup;
+    private CaseInfoGroup caseInfoGroup;
+    private CostsDetailsGroup costsDetailsGroup;
+    private HearingDetailsGroup hearingDetailsGroup;
+    private JudgeCourtDetailsGroup judgeCourtDetailsGroup;
+    private OrderDetailsGroup orderDetailsGroup;
+
     private static final String DATE_FORMAT = "dd/MM/yyyy";
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
@@ -101,33 +114,13 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         caseManagementLocationDetails = documentHearingLocationHelper
             .getCaseManagementLocationDetailsNro(caseData, locationRefDataService, authorisation);
 
-        var freeFormOrderBuilder = JudgeFinalOrderForm.builder()
-            .caseNumber(caseData.getCcdCaseReference().toString())
-            .claimant1Name(caseData.getApplicant1().getPartyName())
-            .claimant2Name(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
-            .defendant1Name(caseData.getRespondent1().getPartyName())
-            .defendant2Name(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
-            .claimantNum(nonNull(caseData.getApplicant2()) ? "Claimant 1" : "Claimant")
-            .defendantNum(nonNull(caseData.getRespondent2()) ? "Defendant 1" : "Defendant")
-            .caseName(caseData.getCaseNameHmctsInternal())
-            .claimantReference(nonNull(caseData.getSolicitorReferences())
-                                   ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
-            .defendantReference(nonNull(caseData.getSolicitorReferences())
-                                    ? caseData.getSolicitorReferences().getRespondentSolicitor1Reference() : null)
-            .freeFormRecordedText(caseData.getFreeFormRecordedTextArea())
-            .freeFormOrderedText(caseData.getFreeFormOrderedTextArea())
-            .orderOnCourtsList(caseData.getOrderOnCourtsList())
-            .onInitiativeSelectionText(nonNull(caseData.getOrderOnCourtInitiative())
-                                           ? caseData.getOrderOnCourtInitiative().getOnInitiativeSelectionTextArea() : null)
-            .onInitiativeSelectionDate(nonNull(caseData.getOrderOnCourtInitiative())
-                                           ? caseData.getOrderOnCourtInitiative().getOnInitiativeSelectionDate() : null)
-            .withoutNoticeSelectionText(nonNull(caseData.getOrderWithoutNotice())
-                                            ? caseData.getOrderWithoutNotice().getWithoutNoticeSelectionTextArea() : null)
-            .withoutNoticeSelectionDate(nonNull(caseData.getOrderWithoutNotice())
-                                            ? caseData.getOrderWithoutNotice().getWithoutNoticeSelectionDate() : null)
-            .judgeNameTitle(userDetails.getFullName())
-            .courtName(caseManagementLocationDetails.getExternalShortName())
-            .courtLocation(getHearingLocationText(caseData));
+        var freeFormOrderBuilder = JudgeFinalOrderForm.builder();
+
+        caseInfoGroup.populateCaseInfo(freeFormOrderBuilder, caseData);
+        judgeCourtDetailsGroup.populateJudgeCourtDetails(freeFormOrderBuilder, userDetails,
+                                                         caseManagementLocationDetails, getHearingLocationText(caseData));
+        orderDetailsGroup.populateOrderDetails(freeFormOrderBuilder, caseData);
+
         return freeFormOrderBuilder.build();
     }
 
@@ -136,60 +129,17 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         caseManagementLocationDetails = documentHearingLocationHelper
             .getCaseManagementLocationDetailsNro(caseData, locationRefDataService, authorisation);
 
-        var assistedFormOrderBuilder = JudgeFinalOrderForm.builder()
-            .caseNumber(caseData.getCcdCaseReference().toString())
-            .claimant1Name(caseData.getApplicant1().getPartyName())
-            .claimant2Name(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
-            .defendant1Name(caseData.getRespondent1().getPartyName())
-            .defendant2Name(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
-            .claimantNum(nonNull(caseData.getApplicant2()) ? "Claimant 1" : "Claimant")
-            .defendantNum(nonNull(caseData.getRespondent2()) ? "Defendant 1" : "Defendant")
-            .courtName(caseManagementLocationDetails.getExternalShortName())
-            .finalOrderMadeSelection(caseData.getFinalOrderMadeSelection())
-            .orderMadeDate(orderMadeDateBuilder(caseData))
-            .courtLocation(getHearingLocationText(caseData))
-            .judgeNameTitle(userDetails.getFullName())
-            .recordedToggle(nonNull(caseData.getFinalOrderRecitals()))
-            .recordedText(nonNull(caseData.getFinalOrderRecitalsRecorded()) ? caseData.getFinalOrderRecitalsRecorded().getText() : "")
-            .orderedText(caseData.getFinalOrderOrderedThatText())
-            .finalOrderJudgeHeardFrom(nonNull(caseData.getFinalOrderJudgeHeardFrom()))
-            .claimantAttendsOrRepresented(claimantAttendsOrRepresentedTextBuilder(caseData, false))
-            .claimantTwoAttendsOrRepresented(nonNull(caseData.getApplicant2()) ? claimantAttendsOrRepresentedTextBuilder(caseData, true) : null)
-            .defendantAttendsOrRepresented(defendantAttendsOrRepresentedTextBuilder(caseData, false))
-            .defendantTwoAttendsOrRepresented(nonNull(caseData.getRespondent2()) ? defendantAttendsOrRepresentedTextBuilder(caseData, true) : null)
-            .otherRepresentedText(getOtherRepresentedText(caseData))
-            .judgeConsideredPapers(isJudgeConsideredPapers(caseData))
-            .furtherHearingToggle(nonNull(caseData.getFinalOrderFurtherHearingToggle()))
-            .furtherHearingToToggle(nonNull(getFurtherHearingDate(caseData, false)))
-            .furtherHearingFromDate(getFurtherHearingDate(caseData, true))
-            .furtherHearingToDate(getFurtherHearingDate(caseData, false))
-            .furtherHearingLength(getFurtherHearingLength(caseData))
-            .datesToAvoid(getDatesToAvoid(caseData))
-            .showFurtherHearingLocationAlt(isDefaultCourt(caseData))
-            .furtherHearingLocationDefault(LocationReferenceDataService.getDisplayEntry(caseManagementLocationDetails))
-            .furtherHearingLocationAlt(getFurtherHearingLocationAlt(caseData))
-            .furtherHearingMethod(getFurtherHearingMethod(caseData))
-            .hearingNotes(getHearingNotes(caseData))
-            .costSelection(caseData.getAssistedOrderCostList().name())
-            .costsReservedText(nonNull(caseData.getAssistedOrderCostsReserved()) ? caseData.getAssistedOrderCostsReserved().getDetailsRepresentationText() : null)
-            .bespokeCostText(nonNull(caseData.getAssistedOrderCostsBespoke()) ? caseData.getAssistedOrderCostsBespoke().getBesPokeCostDetailsText() : null)
-            .summarilyAssessed(getSummarilyAssessed(caseData))
-            .summarilyAssessedDate(getSummarilyAssessedDate(caseData))
-            .detailedAssessment(getDetailedAssessment(caseData))
-            .interimPayment(getInterimPayment(caseData))
-            .interimPaymentDate(getInterimPaymentDate(caseData))
-            .qcosProtection(getQcosProtection(caseData))
-            .costsProtection(caseData.getPublicFundingCostsProtection().equals(YES) ? "true" : null)
-            //appeal section
-            .claimantOrDefendantAppeal(getAppealFor(caseData))
-            .appealGranted(isAppealGranted(caseData))
-            .tableAorB(circuitOrHighCourt(caseData))
-            .appealDate(getAppealDate(caseData))
-            // InitiativeOrWithoutNotice section
-            .showInitiativeOrWithoutNotice(getInitiativeOrWithoutNotice(caseData))
-            .initiativeDate(getInitiativeDate(caseData))
-            .withoutNoticeDate(getWithoutNoticeDate(caseData))
-            .reasonsText(getReasonsText(caseData));
+        var assistedFormOrderBuilder = JudgeFinalOrderForm.builder();
+
+        caseInfoGroup.populateCaseInfo(assistedFormOrderBuilder, caseData);
+        judgeCourtDetailsGroup.populateJudgeCourtDetails(assistedFormOrderBuilder, userDetails,
+                                                         caseManagementLocationDetails, getHearingLocationText(caseData));
+        orderDetailsGroup.populateAssistedOrderDetails(assistedFormOrderBuilder, caseData);
+        attendeesRepresentationGroup.populateAttendeesDetails(assistedFormOrderBuilder, caseData);
+        hearingDetailsGroup.populateHearingDetails(assistedFormOrderBuilder, caseData, caseManagementLocationDetails);
+        costsDetailsGroup.populateCostsDetails(assistedFormOrderBuilder, caseData);
+        appealInitiativeGroup.populateAppealDetails(assistedFormOrderBuilder, caseData);
+        appealInitiativeGroup.populateInitiativeOrWithoutNoticeDetails(assistedFormOrderBuilder, caseData);
 
         return assistedFormOrderBuilder.build();
     }
@@ -308,39 +258,42 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     }
 
     public LocalDate getAppealDate(CaseData caseData) {
-        if (caseData.getFinalOrderAppealComplex() != null
-            && caseData.getFinalOrderAppealComplex().getApplicationList() == GRANTED) {
-            if (caseData.getFinalOrderAppealComplex().getAppealGrantedDropdown().getCircuitOrHighCourtList().equals(
-                CIRCUIT_COURT)) {
-                return caseData.getFinalOrderAppealComplex().getAppealGrantedDropdown().getAppealChoiceSecondDropdownA().getAppealGrantedRefusedDate();
-            } else {
-                return caseData.getFinalOrderAppealComplex().getAppealGrantedDropdown().getAppealChoiceSecondDropdownB().getAppealGrantedRefusedDate();
+        FinalOrderAppeal appealComplex = caseData.getFinalOrderAppealComplex();
+
+        if (appealComplex != null) {
+            boolean isGranted = appealComplex.getApplicationList() == GRANTED;
+            boolean isCircuitCourt = isGranted
+                ? CIRCUIT_COURT.equals(appealComplex.getAppealGrantedDropdown().getCircuitOrHighCourtList())
+                : CIRCUIT_COURT.equals(appealComplex.getAppealRefusedDropdown().getCircuitOrHighCourtListRefuse());
+
+            if (isGranted) {
+                return isCircuitCourt
+                    ? appealComplex.getAppealGrantedDropdown().getAppealChoiceSecondDropdownA().getAppealGrantedRefusedDate()
+                    : appealComplex.getAppealGrantedDropdown().getAppealChoiceSecondDropdownB().getAppealGrantedRefusedDate();
+            } else if (appealComplex.getApplicationList() == REFUSED) {
+                return isCircuitCourt
+                    ? appealComplex.getAppealRefusedDropdown().getAppealChoiceSecondDropdownA().getAppealGrantedRefusedDate()
+                    : appealComplex.getAppealRefusedDropdown().getAppealChoiceSecondDropdownB().getAppealGrantedRefusedDate();
             }
         }
-        if (caseData.getFinalOrderAppealComplex() != null
-            && caseData.getFinalOrderAppealComplex().getApplicationList() == REFUSED) {
-            if (caseData.getFinalOrderAppealComplex().getAppealRefusedDropdown().getCircuitOrHighCourtListRefuse().equals(CIRCUIT_COURT)) {
-                return caseData.getFinalOrderAppealComplex().getAppealRefusedDropdown().getAppealChoiceSecondDropdownA().getAppealGrantedRefusedDate();
-            } else {
-                return caseData.getFinalOrderAppealComplex().getAppealRefusedDropdown().getAppealChoiceSecondDropdownB().getAppealGrantedRefusedDate();
-            }
-        }
+
         return null;
     }
 
+
     public String circuitOrHighCourt(CaseData caseData) {
-        if (caseData.getFinalOrderAppealComplex() != null
-            && caseData.getFinalOrderAppealComplex().getApplicationList() == GRANTED
-            && caseData.getFinalOrderAppealComplex().getAppealGrantedDropdown().getCircuitOrHighCourtList().equals(CIRCUIT_COURT)) {
-            return "a";
+        FinalOrderAppeal appealComplex = caseData.getFinalOrderAppealComplex();
+        if (appealComplex != null) {
+            if (appealComplex.getApplicationList() == GRANTED
+                && CIRCUIT_COURT.equals(appealComplex.getAppealGrantedDropdown().getCircuitOrHighCourtList())) {
+                return "a";
+            }
+            if (appealComplex.getApplicationList() == REFUSED
+                && CIRCUIT_COURT.equals(appealComplex.getAppealRefusedDropdown().getCircuitOrHighCourtListRefuse())) {
+                return "a";
+            }
         }
-        if (caseData.getFinalOrderAppealComplex() != null
-            && caseData.getFinalOrderAppealComplex().getApplicationList() == REFUSED
-            && caseData.getFinalOrderAppealComplex().getAppealRefusedDropdown().getCircuitOrHighCourtListRefuse().equals(CIRCUIT_COURT)) {
-            return "a";
-        } else {
-            return "b";
-        }
+        return "b";
     }
 
     public String populateInterimPaymentText(CaseData caseData) {
@@ -476,144 +429,12 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         return null;
     }
 
-    public String claimantAttendsOrRepresentedTextBuilder(CaseData caseData, Boolean isClaimant2) {
-        String name;
-        if (isClaimant2 != null && !isClaimant2) {
-            name = caseData.getApplicant1().getPartyName();
-            if (caseData.getFinalOrderRepresentation() != null && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex() != null
-                && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTypeRepresentationClaimantList() != null) {
-                FinalOrdersClaimantRepresentationList type =
-                    caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTypeRepresentationClaimantList();
-                return switch (type) {
-                    case COUNSEL_FOR_CLAIMANT -> format("Counsel for %s, the claimant.", name);
-                    case SOLICITOR_FOR_CLAIMANT -> format("Solicitor for %s, the claimant.", name);
-                    case COST_DRAFTSMAN_FOR_THE_CLAIMANT -> format("Costs draftsman for %s, the claimant.", name);
-                    case THE_CLAIMANT_IN_PERSON -> format("%s, the claimant, in person.", name);
-                    case LAY_REPRESENTATIVE_FOR_THE_CLAIMANT -> format("A lay representative for %s, the claimant.", name);
-                    case LEGAL_EXECUTIVE_FOR_THE_CLAIMANT -> format("Legal Executive for %s, the claimant.", name);
-                    case SOLICITORS_AGENT_FOR_THE_CLAIMANT -> format("Solicitor's Agent for %s, the claimant.", name);
-                    case CLAIMANT_NOT_ATTENDING -> claimantNotAttendingText(caseData, isClaimant2, name);
-                };
-            }
-        } else  {
-            name = caseData.getApplicant2().getPartyName();
-            if (caseData.getFinalOrderRepresentation() != null && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex() != null
-                && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTypeRepresentationClaimantListTwo() != null) {
-                FinalOrdersClaimantRepresentationList type =
-                    caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTypeRepresentationClaimantListTwo();
-                return switch (type) {
-                    case COUNSEL_FOR_CLAIMANT -> format("Counsel for %s, the claimant.", name);
-                    case SOLICITOR_FOR_CLAIMANT -> format("Solicitor for %s, the claimant.", name);
-                    case COST_DRAFTSMAN_FOR_THE_CLAIMANT -> format("Costs draftsman for %s, the claimant.", name);
-                    case THE_CLAIMANT_IN_PERSON -> format("%s, the claimant, in person.", name);
-                    case LAY_REPRESENTATIVE_FOR_THE_CLAIMANT -> format("A lay representative for %s, the claimant.", name);
-                    case LEGAL_EXECUTIVE_FOR_THE_CLAIMANT -> format("Legal Executive for %s, the claimant.", name);
-                    case SOLICITORS_AGENT_FOR_THE_CLAIMANT -> format("Solicitor's Agent for %s, the claimant.", name);
-                    case CLAIMANT_NOT_ATTENDING -> claimantNotAttendingText(caseData, isClaimant2, name);
-                };
-            }
-        }
-        return "";
+    public String generateClaimantAttendsOrRepresentedText(CaseData caseData, Boolean isClaimant2) {
+        return claimantAttendsOrRepresentedTextBuilder.claimantBuilder(caseData, isClaimant2);
     }
 
-    public String defendantAttendsOrRepresentedTextBuilder(CaseData caseData, Boolean isDefendant2) {
-        String name;
-        if (isDefendant2 != null && !isDefendant2) {
-            name = caseData.getRespondent1().getPartyName();
-            if (caseData.getFinalOrderRepresentation() != null && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex() != null
-                && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTypeRepresentationDefendantList() != null) {
-                FinalOrdersDefendantRepresentationList type =
-                    caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTypeRepresentationDefendantList();
-                return switch (type) {
-                    case COUNSEL_FOR_DEFENDANT -> format("Counsel for %s, the defendant.", name);
-                    case SOLICITOR_FOR_DEFENDANT -> format("Solicitor for %s, the defendant.", name);
-                    case COST_DRAFTSMAN_FOR_THE_DEFENDANT -> format("Costs draftsman for %s, the defendant.", name);
-                    case THE_DEFENDANT_IN_PERSON -> format("%s, the defendant, in person.", name);
-                    case LAY_REPRESENTATIVE_FOR_THE_DEFENDANT -> format("A lay representative for %s, the defendant.", name
-                    );
-                    case LEGAL_EXECUTIVE_FOR_THE_DEFENDANT -> format("Legal Executive for %s, the defendant.", name);
-                    case SOLICITORS_AGENT_FOR_THE_DEFENDANT -> format("Solicitor's Agent for %s, the defendant.", name);
-                    case DEFENDANT_NOT_ATTENDING -> defendantNotAttendingText(caseData, isDefendant2, name);
-                };
-            }
-        } else {
-            name = caseData.getRespondent2().getPartyName();
-            if (caseData.getFinalOrderRepresentation() != null && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex() != null
-                && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTypeRepresentationDefendantTwoList() != null) {
-                FinalOrdersDefendantRepresentationList type =
-                    caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTypeRepresentationDefendantTwoList();
-                return switch (type) {
-                    case COUNSEL_FOR_DEFENDANT -> format("Counsel for %s, the defendant.", name);
-                    case SOLICITOR_FOR_DEFENDANT -> format("Solicitor for %s, the defendant.", name);
-                    case COST_DRAFTSMAN_FOR_THE_DEFENDANT -> format("Costs draftsman for %s, the defendant.", name);
-                    case THE_DEFENDANT_IN_PERSON -> format("%s, the defendant, in person.", name);
-                    case LAY_REPRESENTATIVE_FOR_THE_DEFENDANT -> format("A lay representative for %s, the defendant.", name);
-                    case LEGAL_EXECUTIVE_FOR_THE_DEFENDANT -> format("Legal Executive for %s, the defendant.", name);
-                    case SOLICITORS_AGENT_FOR_THE_DEFENDANT -> format("Solicitor's Agent for %s, the defendant.", name);
-                    case DEFENDANT_NOT_ATTENDING -> defendantNotAttendingText(caseData, isDefendant2, name);
-                };
-            }
-        }
-        return "";
-    }
-
-    public String claimantNotAttendingText(CaseData caseData, Boolean isClaimant2, String name) {
-        if (isClaimant2 != null && !isClaimant2 && (caseData.getFinalOrderRepresentation().getTypeRepresentationComplex() != null
-            && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureClaimantComplex() != null
-            && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureClaimantComplex().getList() != null)) {
-            FinalOrdersClaimantDefendantNotAttending notAttendingType =
-                caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureClaimantComplex().getList();
-            return switch (notAttendingType) {
-                case SATISFIED_REASONABLE_TO_PROCEED -> format(
-                    "%s, the claimant, did not attend the trial. The Judge was satisfied that they had %s", name, NOTICE_RECIEVED_CAN_PROCEED);
-                case SATISFIED_NOTICE_OF_TRIAL -> format(
-                    "%s, the claimant, did not attend the trial and, whilst the Judge was satisfied that they had %s", name, NOTICE_RECIEVED_CANNOT_PROCEED);
-                case NOT_SATISFIED_NOTICE_OF_TRIAL -> format(
-                    "%s, the claimant, did not attend the trial. %s", name, NOTICE_NOT_RECIEVED_CANNOT_PROCEED);
-            };
-        } else if (caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedClaimTwoComplex() != null
-            && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedClaimTwoComplex().getListClaimTwo() != null) {
-            FinalOrdersClaimantDefendantNotAttending notAttendingType =
-                caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedClaimTwoComplex().getListClaimTwo();
-            return switch (notAttendingType) {
-                case SATISFIED_REASONABLE_TO_PROCEED -> format(
-                    "%s, the claimant, did not attend the trial. The Judge was satisfied that they had %s", name, NOTICE_RECIEVED_CAN_PROCEED);
-                case SATISFIED_NOTICE_OF_TRIAL -> format(
-                    "%s, the claimant, did not attend the trial and, whilst the Judge was satisfied that they had %s", name, NOTICE_RECIEVED_CANNOT_PROCEED);
-                case NOT_SATISFIED_NOTICE_OF_TRIAL -> format("%s, the claimant, did not attend the trial. %s", name, NOTICE_NOT_RECIEVED_CANNOT_PROCEED
-                );
-            };
-        }
-        return "";
-    }
-
-    public String defendantNotAttendingText(CaseData caseData, Boolean isDefendant2, String name) {
-        if (isDefendant2 != null && !isDefendant2 && (caseData.getFinalOrderRepresentation().getTypeRepresentationComplex() != null
-            && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureComplex() != null
-            && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureComplex().getListDef() != null)) {
-            FinalOrdersClaimantDefendantNotAttending notAttendingType =
-                caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureComplex().getListDef();
-            return switch (notAttendingType) {
-                case SATISFIED_REASONABLE_TO_PROCEED -> format("%s, the defendant, did not attend the trial. "
-                                                                   + "The Judge was satisfied that they had %s", name, NOTICE_RECIEVED_CAN_PROCEED);
-                case SATISFIED_NOTICE_OF_TRIAL -> format("%s, the defendant, did not attend the trial and, whilst the "
-                                                             + "Judge was satisfied that they had %s", name, NOTICE_RECIEVED_CANNOT_PROCEED);
-                case NOT_SATISFIED_NOTICE_OF_TRIAL -> format("%s, the defendant, did not attend the trial. %s", name, NOTICE_NOT_RECIEVED_CANNOT_PROCEED);
-            };
-
-        } else if (caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureDefTwoComplex() != null
-            && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureDefTwoComplex().getListDefTwo() != null) {
-            FinalOrdersClaimantDefendantNotAttending notAttendingType =
-                caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureDefTwoComplex().getListDefTwo();
-            return switch (notAttendingType) {
-                case SATISFIED_REASONABLE_TO_PROCEED -> format("%s, the defendant, did not attend the trial."
-                                                                   + " The Judge was satisfied that they had %s", name, NOTICE_RECIEVED_CAN_PROCEED);
-                case SATISFIED_NOTICE_OF_TRIAL -> format("%s, the defendant, did not attend the trial and, "
-                                                             + "whilst the Judge was satisfied that they had %s", name, NOTICE_RECIEVED_CANNOT_PROCEED);
-                case NOT_SATISFIED_NOTICE_OF_TRIAL -> format("%s, the defendant, did not attend the trial. %s", name, NOTICE_NOT_RECIEVED_CANNOT_PROCEED);
-            };
-        }
-        return "";
+    public String generateDefendantAttendsOrRepresentedText(CaseData caseData, Boolean isDefendant2) {
+        return defendantAttendsOrRepresentedTextBuilder.defendantBuilder(caseData, isDefendant2);
     }
 
     private String getHearingLocationText(CaseData caseData) {

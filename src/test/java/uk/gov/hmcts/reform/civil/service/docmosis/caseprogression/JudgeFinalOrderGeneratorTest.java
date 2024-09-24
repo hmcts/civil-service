@@ -58,6 +58,8 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
+import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.builders.ClaimantAttendsOrRepresentedTextBuilder;
+import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.builders.DefendantAttendsOrRepresentedTextBuilder;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -95,7 +97,9 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FREE_
 
 @SpringBootTest(classes = {
     JudgeFinalOrderGenerator.class,
-    JacksonAutoConfiguration.class})
+    ClaimantAttendsOrRepresentedTextBuilder.class,
+    DefendantAttendsOrRepresentedTextBuilder.class,
+    JacksonAutoConfiguration.class,})
 class JudgeFinalOrderGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
@@ -636,7 +640,7 @@ class JudgeFinalOrderGeneratorTest {
                         finalOrdersDefendantRepresentationList).build()).build())
                 .build();
             String name = caseData.getRespondent1().getPartyName();
-            String response = generator.defendantAttendsOrRepresentedTextBuilder(caseData, false);
+            String response = generator.generateDefendantAttendsOrRepresentedText(caseData, false);
             switch (finalOrdersDefendantRepresentationList) {
                 case COUNSEL_FOR_DEFENDANT -> assertEquals(format("Counsel for %s, the defendant.", name), response);
                 case SOLICITOR_FOR_DEFENDANT -> assertEquals(format("Solicitor for %s, the defendant.", name), response);
@@ -663,7 +667,7 @@ class JudgeFinalOrderGeneratorTest {
                         finalOrdersDefendantRepresentationList).build()).build())
                 .build();
             String name = caseData.getRespondent2().getPartyName();
-            String response = generator.defendantAttendsOrRepresentedTextBuilder(caseData, true);
+            String response = generator.generateDefendantAttendsOrRepresentedText(caseData, true);
             switch (finalOrdersDefendantRepresentationList) {
                 case COUNSEL_FOR_DEFENDANT -> assertEquals(format("Counsel for %s, the defendant.", name), response);
                 case SOLICITOR_FOR_DEFENDANT -> assertEquals(format("Solicitor for %s, the defendant.", name), response);
@@ -687,7 +691,7 @@ class JudgeFinalOrderGeneratorTest {
                         finalOrdersClaimantRepresentationList).build()).build())
                 .build();
             String name = caseData.getApplicant1().getPartyName();
-            String response = generator.claimantAttendsOrRepresentedTextBuilder(caseData, false);
+            String response = generator.generateClaimantAttendsOrRepresentedText(caseData, false);
             switch (finalOrdersClaimantRepresentationList) {
                 case COUNSEL_FOR_CLAIMANT -> assertEquals(format("Counsel for %s, the claimant.", name), response);
                 case SOLICITOR_FOR_CLAIMANT -> assertEquals(format("Solicitor for %s, the claimant.", name), response);
@@ -713,7 +717,7 @@ class JudgeFinalOrderGeneratorTest {
                         finalOrdersClaimantRepresentationList).build()).build())
                 .build();
             String name = caseData.getApplicant2().getPartyName();
-            String response = generator.claimantAttendsOrRepresentedTextBuilder(caseData, true);
+            String response = generator.generateClaimantAttendsOrRepresentedText(caseData, true);
             switch (finalOrdersClaimantRepresentationList) {
                 case COUNSEL_FOR_CLAIMANT -> assertEquals(format("Counsel for %s, the claimant.", name), response);
                 case SOLICITOR_FOR_CLAIMANT -> assertEquals(format("Solicitor for %s, the claimant.", name), response);
