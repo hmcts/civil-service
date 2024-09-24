@@ -65,10 +65,13 @@ public class HearingScheduledDefendantNotificationHandler extends CallbackHandle
             caseData = caseData.toBuilder().hearingLocationCourtName(locationRefData.getSiteName()).build();
         }
 
-        dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
-                                          SCENARIO_AAA6_CP_HEARING_SCHEDULED_DEFENDANT.getScenario(), authToken,
-                                          ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
-        );
+        if (caseData.isRespondent1NotRepresented()) {
+            dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
+                                              SCENARIO_AAA6_CP_HEARING_SCHEDULED_DEFENDANT.getScenario(), authToken,
+                                              ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
+            );
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 }
