@@ -20,7 +20,7 @@ public enum GeneralApplicationTypes {
     UNLESS_ORDER("Unless order"),
     OTHER("Other"),
     VARY_PAYMENT_TERMS_OF_JUDGMENT("Vary payment terms of judgment"),
-    CONFIRM_YOU_PAID_CCJ_DEBT("Confirm you've paid a judgement (CCJ) debt");
+    CONFIRM_YOU_PAID_CCJ_DEBT("Confirm you've paid a judgment (CCJ) debt");
 
     private final String displayedValue;
 }
