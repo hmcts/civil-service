@@ -144,109 +144,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         return assistedFormOrderBuilder.build();
     }
 
-    private String getOtherRepresentedText(CaseData caseData) {
-        return nonNull(caseData.getFinalOrderRepresentation())
-            && nonNull(caseData.getFinalOrderRepresentation().getTypeRepresentationOtherComplex())
-            ? caseData.getFinalOrderRepresentation().getTypeRepresentationOtherComplex().getDetailsRepresentationText() : "";
-    }
-
-    private String isJudgeConsideredPapers(CaseData caseData) {
-        return nonNull(caseData.getFinalOrderJudgePapers()) ? "true" : null;
-    }
-
-    private LocalDate getDatesToAvoid(CaseData caseData) {
-        return nonNull(caseData.getFinalOrderFurtherHearingToggle())
-            && nonNull(caseData.getFinalOrderFurtherHearingComplex().getDatesToAvoidDateDropdown())
-            ? caseData.getFinalOrderFurtherHearingComplex().getDatesToAvoidDateDropdown().getDatesToAvoidDates() : null;
-    }
-
-    private String getFurtherHearingLocationAlt(CaseData caseData) {
-        return nonNull(caseData.getFinalOrderFurtherHearingToggle())
-            && nonNull(caseData.getFinalOrderFurtherHearingComplex().getAlternativeHearingList())
-            ? caseData.getFinalOrderFurtherHearingComplex().getAlternativeHearingList().getValue().getLabel() : null;
-    }
-
-    private String getFurtherHearingMethod(CaseData caseData) {
-        return nonNull(caseData.getFinalOrderFurtherHearingComplex()) && nonNull(caseData.getFinalOrderFurtherHearingComplex().getHearingMethodList())
-            ? caseData.getFinalOrderFurtherHearingComplex().getHearingMethodList().name() : "";
-    }
-
-    private String getHearingNotes(CaseData caseData) {
-        return nonNull(caseData.getFinalOrderFurtherHearingToggle())
-            && nonNull(caseData.getFinalOrderFurtherHearingComplex().getHearingNotesText())
-            ? caseData.getFinalOrderFurtherHearingComplex().getHearingNotesText() : null;
-    }
-
-    private String getSummarilyAssessed(CaseData caseData) {
-        return nonNull(caseData.getAssistedOrderMakeAnOrderForCosts())
-            && nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList())
-            && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderClaimantDefendantFirstDropdown().equals(
-            CostEnums.COSTS)
-            ? populateSummarilyAssessedText(caseData) : null;
-    }
-
-    private LocalDate getSummarilyAssessedDate(CaseData caseData) {
-        return nonNull(caseData.getAssistedOrderMakeAnOrderForCosts())
-            && nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList())
-            && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderClaimantDefendantFirstDropdown().equals(
-            CostEnums.COSTS)
-            ? caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownDate() : null;
-    }
-
-    private String getDetailedAssessment(CaseData caseData) {
-        return nonNull(caseData.getAssistedOrderMakeAnOrderForCosts())
-            && nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList())
-            && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderClaimantDefendantFirstDropdown().equals(
-            CostEnums.SUBJECT_DETAILED_ASSESSMENT)
-            ? populateDetailedAssessmentText(caseData) : null;
-    }
-
-    private String getInterimPayment(CaseData caseData) {
-        return nonNull(caseData.getAssistedOrderMakeAnOrderForCosts())
-            && nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList())
-            && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderClaimantDefendantFirstDropdown().equals(
-            CostEnums.SUBJECT_DETAILED_ASSESSMENT)
-            && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentSecondDropdownList2().equals(
-            CostEnums.YES)
-            ? populateInterimPaymentText(caseData) : null;
-    }
-
-    private LocalDate getInterimPaymentDate(CaseData caseData) {
-        return nonNull(caseData.getAssistedOrderMakeAnOrderForCosts())
-            && nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList())
-            && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderClaimantDefendantFirstDropdown().equals(
-            CostEnums.SUBJECT_DETAILED_ASSESSMENT)
-            ? caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentThirdDropdownDate() : null;
-    }
-
-    private String getQcosProtection(CaseData caseData) {
-        return nonNull(caseData.getAssistedOrderMakeAnOrderForCosts())
-            && nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsYesOrNo())
-            && caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsYesOrNo().equals(
-            YES) ? "true" : null;
-    }
-
-    private String getReasonsText(CaseData caseData) {
-        return nonNull(caseData.getFinalOrderGiveReasonsComplex())
-            ? caseData.getFinalOrderGiveReasonsComplex().getReasonsText() : null;
-    }
-
-    private LocalDate getWithoutNoticeDate(CaseData caseData) {
-        return caseData.getOrderMadeOnDetailsList().equals(OrderMadeOnTypes.WITHOUT_NOTICE)
-            ? caseData.getOrderMadeOnDetailsOrderWithoutNotice().getWithOutNoticeDate() : null;
-    }
-
-    private LocalDate getInitiativeDate(CaseData caseData) {
-        return caseData.getOrderMadeOnDetailsList().equals(OrderMadeOnTypes.COURTS_INITIATIVE)
-            ? caseData.getOrderMadeOnDetailsOrderCourt().getOwnInitiativeDate() : null;
-    }
-
-    private String isAppealGranted(CaseData caseData) {
-        return nonNull(caseData.getFinalOrderAppealComplex())
-            && caseData.getFinalOrderAppealComplex().getApplicationList().name().equals(ApplicationAppealList.GRANTED.name())
-            ? "true" : null;
-    }
-
     public String getInitiativeOrWithoutNotice(CaseData caseData) {
         if (caseData.getOrderMadeOnDetailsList().equals(OrderMadeOnTypes.COURTS_INITIATIVE)) {
             return caseData.getOrderMadeOnDetailsOrderCourt().getOwnInitiativeText();
@@ -260,23 +157,23 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     public LocalDate getAppealDate(CaseData caseData) {
         FinalOrderAppeal appealComplex = caseData.getFinalOrderAppealComplex();
 
-        if (appealComplex != null) {
-            boolean isGranted = appealComplex.getApplicationList() == GRANTED;
-            boolean isCircuitCourt = isGranted
-                ? CIRCUIT_COURT.equals(appealComplex.getAppealGrantedDropdown().getCircuitOrHighCourtList())
-                : CIRCUIT_COURT.equals(appealComplex.getAppealRefusedDropdown().getCircuitOrHighCourtListRefuse());
-
-            if (isGranted) {
-                return isCircuitCourt
-                    ? appealComplex.getAppealGrantedDropdown().getAppealChoiceSecondDropdownA().getAppealGrantedRefusedDate()
-                    : appealComplex.getAppealGrantedDropdown().getAppealChoiceSecondDropdownB().getAppealGrantedRefusedDate();
-            } else if (appealComplex.getApplicationList() == REFUSED) {
-                return isCircuitCourt
-                    ? appealComplex.getAppealRefusedDropdown().getAppealChoiceSecondDropdownA().getAppealGrantedRefusedDate()
-                    : appealComplex.getAppealRefusedDropdown().getAppealChoiceSecondDropdownB().getAppealGrantedRefusedDate();
+        if (appealComplex != null
+            && appealComplex.getApplicationList() == GRANTED) {
+            if (appealComplex.getAppealGrantedDropdown().getCircuitOrHighCourtList().equals(
+                CIRCUIT_COURT)) {
+                return appealComplex.getAppealGrantedDropdown().getAppealChoiceSecondDropdownA().getAppealGrantedRefusedDate();
+            } else {
+                return appealComplex.getAppealGrantedDropdown().getAppealChoiceSecondDropdownB().getAppealGrantedRefusedDate();
             }
         }
-
+        if (appealComplex != null
+            && appealComplex.getApplicationList() == REFUSED) {
+            if (appealComplex.getAppealRefusedDropdown().getCircuitOrHighCourtListRefuse().equals(CIRCUIT_COURT)) {
+                return appealComplex.getAppealRefusedDropdown().getAppealChoiceSecondDropdownA().getAppealGrantedRefusedDate();
+            } else {
+                return appealComplex.getAppealRefusedDropdown().getAppealChoiceSecondDropdownB().getAppealGrantedRefusedDate();
+            }
+        }
         return null;
     }
 
@@ -285,11 +182,11 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         FinalOrderAppeal appealComplex = caseData.getFinalOrderAppealComplex();
         if (appealComplex != null) {
             if (appealComplex.getApplicationList() == GRANTED
-                && CIRCUIT_COURT.equals(appealComplex.getAppealGrantedDropdown().getCircuitOrHighCourtList())) {
+                && appealComplex.getAppealGrantedDropdown().getCircuitOrHighCourtList().equals(CIRCUIT_COURT)) {
                 return "a";
             }
             if (appealComplex.getApplicationList() == REFUSED
-                && CIRCUIT_COURT.equals(appealComplex.getAppealRefusedDropdown().getCircuitOrHighCourtListRefuse())) {
+                && appealComplex.getAppealRefusedDropdown().getCircuitOrHighCourtListRefuse().equals(CIRCUIT_COURT)) {
                 return "a";
             }
         }
