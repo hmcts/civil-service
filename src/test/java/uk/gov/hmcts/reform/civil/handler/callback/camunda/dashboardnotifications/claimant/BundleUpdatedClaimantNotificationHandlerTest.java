@@ -51,7 +51,7 @@ public class BundleUpdatedClaimantNotificationHandlerTest extends BaseCallbackHa
 
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
-            when(toggleService.isCaseEventsEnabled()).thenReturn(true);
+            when(toggleService.isAmendBundleEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .applicant1Represented(YesOrNo.NO)
                 .build();
@@ -76,7 +76,7 @@ public class BundleUpdatedClaimantNotificationHandlerTest extends BaseCallbackHa
         @Test
         void shouldNotRecordScenario_whenApplicantRepresented() {
 
-            when(toggleService.isCaseEventsEnabled()).thenReturn(true);
+            when(toggleService.isAmendBundleEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .applicant1Represented(YesOrNo.YES)
                 .build();

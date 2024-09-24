@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.CaseEventsDashboardCallbackHandler;
+import uk.gov.hmcts.reform.civil.callback.DocumentBundleDashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -16,7 +17,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTI
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_BUNDLE_UPDATED_DEFENDANT;
 
 @Service
-public class BundleUpdatedDefendantNotificationHandler extends CaseEventsDashboardCallbackHandler {
+public class BundleUpdatedDefendantNotificationHandler extends DocumentBundleDashboardCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_AMEND_RESTITCH_BUNDLE_DEFENDANT);
     public static final String TASK_ID = "CreateAmendRestitchBundleDashboardNotificationsForDefendant";

@@ -51,7 +51,7 @@ public class BundleUpdatedDefendantNotificationHandlerTest extends BaseCallbackH
 
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
-            when(toggleService.isCaseEventsEnabled()).thenReturn(true);
+            when(toggleService.isAmendBundleEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
@@ -77,7 +77,7 @@ public class BundleUpdatedDefendantNotificationHandlerTest extends BaseCallbackH
         @Test
         void shouldNotRecordScenario_whenRespondentRepresented() {
 
-            when(toggleService.isCaseEventsEnabled()).thenReturn(true);
+            when(toggleService.isAmendBundleEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .respondent1Represented(YesOrNo.YES)
