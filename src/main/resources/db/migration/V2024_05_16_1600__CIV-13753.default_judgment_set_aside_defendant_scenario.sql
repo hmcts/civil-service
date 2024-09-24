@@ -47,6 +47,6 @@ VALUES ('<a href={VIEW_RESPONSE_TO_CLAIM} class="govuk-link">View the response t
        ('<a>View the judgment</a>', 'Judgments from the court',
         '<a>Gweld y Dyfarniad</a>','Dyfarniadau gan y llys',
         'Judgment.View', 'Scenario.AAA6.JudgmentsOnline.SetAsideError.Defendant', '{1,1}', 'DEFENDANT', 14),
-       ('<a>Confirm you have paid a judgment (CCJ) debt</a>', 'Judgments from the court',
-        '<a>Confirm you have paid a judgment (CCJ) debt</a>', 'Judgments from the court',
+       ('<a>Confirm you''ve paid a judgment (CCJ) debt</a>', 'Judgments from the court',
+        '<a>Confirm you''ve paid a judgment (CCJ) debt</a>', 'Judgments from the court',
         'Judgment.Cosc', 'Scenario.AAA6.JudgmentsOnline.SetAsideError.Defendant', '{1, 1}', 'DEFENDANT', 15);

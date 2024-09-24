@@ -42,9 +42,14 @@ values ('<a href={VIEW_MEDIATION_SETTLEMENT_AGREEMENT} class="govuk-link">View m
 ('<a>View the judgment</a>',
   'Judgment from the court',
   '<a>Gweld y Dyfarniad</a>',
-  'Dyfarniadau gan y llys', 'Judgment.View', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 14),
+  'Dyfarniadau gan y llys', 'Judgment.View', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 13),
+
+('<a>Confirm you''ve paid a judgment (CCJ) debt</a>',
+'Judgment from the court',
+'<a>Confirm you''ve paid a judgment (CCJ) debt</a>',
+'Judgment from the court', 'Judgment.Cosc', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 14),
 
 ('<a>View applications</a>',
   'Applications',
   '<a>Gweld y cais i gyd</a>',
-  'Ceisiadau', 'Application.Cosc', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 16);
+  'Ceisiadau', 'Application.View', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 15);
