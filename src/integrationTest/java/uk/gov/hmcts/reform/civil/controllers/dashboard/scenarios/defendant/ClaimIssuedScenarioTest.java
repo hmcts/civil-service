@@ -164,7 +164,7 @@ public class ClaimIssuedScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[12].currentStatusEn").value("Available"),
                 jsonPath("$[13].taskNameEn").value("<a>View the judgment</a>"),
                 jsonPath("$[13].currentStatusEn").value("Not available yet"),
-                jsonPath("$[14].taskNameEn").value("<a>Confirm you''ve paid a judgment (CCJ) debt</a>"),
+                jsonPath("$[14].taskNameEn").value("<a>Confirm you've paid a judgment (CCJ) debt</a>"),
                 jsonPath("$[14].currentStatusEn").value("Not available yet"),
                 jsonPath("$[15].taskNameEn").value("<a href={GENERAL_APPLICATIONS_INITIATION_PAGE_URL} rel=\"noopener noreferrer\" class=\"govuk-link\">Contact the court to request a change to my case</a>"),
                 jsonPath("$[15].currentStatusEn").value("Optional"),
