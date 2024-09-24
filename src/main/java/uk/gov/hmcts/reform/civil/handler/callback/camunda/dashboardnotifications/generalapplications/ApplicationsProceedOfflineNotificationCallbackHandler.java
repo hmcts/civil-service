@@ -23,8 +23,8 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_APPLICANT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_RESPONDENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_APPLICANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_RESPONDENT;
 
@@ -33,9 +33,10 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 public class ApplicationsProceedOfflineNotificationCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS =
-        List.of(CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_APPLICANT,
-                CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_RESPONDENT);
-    public static final String TASK_ID = "applicantLipApplicationOfflineDashboardNotification";
+        List.of(CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_CLAIMANT,
+                CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_DEFENDANT);
+    public static final String TASK_ID_CLAIMANT = "claimantLipApplicationOfflineDashboardNotification";
+    public static final String TASK_ID_DEFENENDANT = "defendantLipApplicationOfflineDashboardNotification";
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper mapper;
     private final FeatureToggleService featureToggleService;
@@ -58,7 +59,11 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+        if (callbackParams.getRequest().getEventId().equals(CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_CLAIMANT.name())) {
+            return TASK_ID_CLAIMANT;
+        } else {
+            return TASK_ID_DEFENENDANT;
+        }
     }
 
     @Override
@@ -69,7 +74,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
     private CallbackResponse configureScenarioForProceedOffline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (!caseData.getCcdState().equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
-            || caseData.getGeneralApplications() != null && !caseData.getGeneralApplications().isEmpty()) {
+            || (caseData.getGeneralApplications() == null || caseData.getGeneralApplications().isEmpty())) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
@@ -92,10 +97,10 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
     private String notificationType(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String eventId = callbackParams.getRequest().getEventId();
-        if (eventId.equals(CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_APPLICANT.name())
+        if (eventId.equals(CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_CLAIMANT.name())
             && caseData.isApplicantLiP()) {
             return CLAIMANT;
-        } else if (eventId.equals(CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_RESPONDENT.name())
+        } else if (eventId.equals(CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_DEFENDANT.name())
             && caseData.isRespondent1LiP()) {
             return DEFENDANT;
         }
