@@ -45,5 +45,5 @@ VALUES ('<a>View the response to the claim</a>', 'The response',
         '<a href={VIEW_JUDGEMENT} class="govuk-link">Gweld y Dyfarniad</a>', 'Dyfarniadau gan y llys',
         'Judgment.View', 'Scenario.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Defendant', '{3, 3}', 'DEFENDANT', 14),
        ('<a href={COMFIRM_YOU_PAID_JUDGMENT_DEBT} class="govuk-link">Confirm you''ve paid a judgment (CCJ) debt</a>', 'Judgments from the court',
-        '<a href={COMFIRM_YOU_PAID_JUDGMENT_DEBT} class="govuk-link">Confirm you''ve paid a judgment (CCJ) debt</a>', 'Dyfarniadau gan y llys',
+        '<a href={COMFIRM_YOU_PAID_JUDGMENT_DEBT} class="govuk-link">Cadarnhewch eich bod wedi talu dyled dyfarniad (CCJ)</a>', 'Dyfarniadau gan y llys',
         'Judgment.Cosc', 'Scenario.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Defendant', '{3, 3}', 'DEFENDANT', 15);

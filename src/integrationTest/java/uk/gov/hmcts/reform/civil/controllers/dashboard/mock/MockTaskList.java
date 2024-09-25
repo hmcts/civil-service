@@ -262,7 +262,7 @@ public class MockTaskList {
                 .build(),
             TaskList.builder()
                 .reference(reference)
-                .taskNameCy("<a>Confirm you've paid a judgment (CCJ) debt</a>")
+                .taskNameCy("<a>Cadarnhewch eich bod wedi talu dyled dyfarniad (CCJ)</a>")
                 .taskNameEn("<a>Confirm you've paid a judgment (CCJ) debt</a>")
                 .categoryCy("Dyfarniadau gan y llys")
                 .categoryEn("Judgment from the court")
