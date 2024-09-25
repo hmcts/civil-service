@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -46,7 +45,6 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DefaultJudgementHandler extends CallbackHandler {
@@ -254,10 +252,6 @@ public class DefaultJudgementHandler extends CallbackHandler {
                 .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ);
             String code = list.getValue().getCode();
             final String epimId = code.substring(code.lastIndexOf("-") + 1).trim();
-            log.info("TempHearingLocation: {}", formatLocationList(caseData.getHearingSupportRequirementsDJ()
-                                                                       .getHearingTemporaryLocation()));
-            log.info("CODE: {}", code);
-            log.info("epimId: {}", epimId);
             List<LocationRefData> locations = (locationRefDataService
                 .getCourtLocationsByEpimmsIdAndCourtType(authToken, epimId));
 
