@@ -11,6 +11,4 @@ INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, cat
                                     scenario_name, task_status_sequence, role, task_order)
 VALUES ('<a>Upload hearing documents</a>', 'Hearing',
         '<a>Llwytho dogfennau''r gwrandawiad</a>', 'Gwrandawiad',
-        'Hearing.Document.Upload', 'Scenario.AAA6.Update.Claimant.TaskList.UploadDocuments.FinalOrders', '{2, 2}', 'CLAIMANT', 10),
-       ('<a>Add the trial arrangements</a>', 'Hearing' ,'<a>Ychwanegu trefniadau''r treial</a>',
-        'Gwrandawiad', 'Hearing.Arrangements.Add', 'Scenario.AAA6.Update.Claimant.TaskList.UploadDocuments.FinalOrders', '{2, 2}', 'CLAIMANT', 12);
+        'Hearing.Document.Upload', 'Scenario.AAA6.Update.Claimant.TaskList.UploadDocuments.FinalOrders', '{2, 2}', 'CLAIMANT', 10);
