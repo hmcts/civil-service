@@ -78,6 +78,7 @@ class HearingFeeDueHandlerTest {
         Map<String, Object> data = Map.of("data", caseData);
         List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
 
+        when(featureToggleService.isMintiEnabled()).thenReturn(true);
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         when(searchService.getCases()).thenReturn(caseDetails);
         when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.get(0));
@@ -97,6 +98,7 @@ class HearingFeeDueHandlerTest {
         Map<String, Object> data = Map.of("data", caseData);
         List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
 
+        when(featureToggleService.isMintiEnabled()).thenReturn(toggle);
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(toggle);
         when(searchService.getCases()).thenReturn(caseDetails);
         when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.get(0));
@@ -123,6 +125,7 @@ class HearingFeeDueHandlerTest {
         Map<String, Object> data = Map.of("data", caseData);
         List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
 
+        when(featureToggleService.isMintiEnabled()).thenReturn(toggle);
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(toggle);
         when(searchService.getCases()).thenReturn(caseDetails);
         when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.get(0));
@@ -142,6 +145,7 @@ class HearingFeeDueHandlerTest {
         Map<String, Object> data = Map.of("data", caseData);
         List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
 
+        when(featureToggleService.isMintiEnabled()).thenReturn(toggle);
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(toggle);
         when(searchService.getCases()).thenReturn(caseDetails);
         when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.get(0));
