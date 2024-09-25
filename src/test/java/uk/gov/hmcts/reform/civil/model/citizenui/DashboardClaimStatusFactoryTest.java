@@ -228,21 +228,38 @@ class DashboardClaimStatusFactoryTest {
             .systemGeneratedCaseDocuments(List.of(Element.<CaseDocument>builder()
                                                       .value(sdoDocument).build()))
             .build();
+        checkStatus(caseData, eventHistory,
+                    DashboardClaimStatus.SDO_ORDER_CREATED,
+                    DashboardClaimStatus.SDO_ORDER_CREATED
+        );
+        return caseData;
+    }
+
+    /**
+     * Used because sometimes tests fail because of run conditions, when the times are equal
+     *
+     * @param caseData                case data to test
+     * @param eventHistory            events from case data
+     * @param claimantExpectedStatus  status for claimant
+     * @param defendantExpectedStatus status for defendant
+     */
+    private void checkStatus(CaseData caseData, List<CaseEventDetail> eventHistory,
+                             DashboardClaimStatus claimantExpectedStatus,
+                             DashboardClaimStatus defendantExpectedStatus) {
         Assertions.assertEquals(
-            DashboardClaimStatus.SDO_ORDER_CREATED,
+            defendantExpectedStatus,
             claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
                 caseData,
                 toggleService, eventHistory
             ))
         );
         Assertions.assertEquals(
-            DashboardClaimStatus.SDO_ORDER_CREATED,
+            claimantExpectedStatus,
             claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
                 caseData,
                 toggleService, eventHistory
             ))
         );
-        return caseData;
     }
 
     private CaseData scheduleHearing(CaseData previous, List<CaseEventDetail> eventHistory) {
@@ -264,39 +281,16 @@ class DashboardClaimStatusFactoryTest {
         systemGenerated.add(Element.<CaseDocument>builder().value(hearingForm).build());
         caseDataBuilder.systemGeneratedCaseDocuments(systemGenerated);
         CaseData caseData = caseDataBuilder.build();
-        Assertions.assertEquals(
-            DashboardClaimStatus.HEARING_FORM_GENERATED,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        Assertions.assertEquals(
-            DashboardClaimStatus.HEARING_FORM_GENERATED,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
+        checkStatus(caseData, eventHistory,
+                    DashboardClaimStatus.HEARING_FORM_GENERATED, DashboardClaimStatus.HEARING_FORM_GENERATED);
 
         return caseData;
     }
 
     private void shouldRequireTrialArrangements(CaseData caseData, List<CaseEventDetail> eventHistory) {
-        Assertions.assertEquals(
-            DashboardClaimStatus.TRIAL_ARRANGEMENTS_REQUIRED,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        Assertions.assertEquals(
-            DashboardClaimStatus.TRIAL_ARRANGEMENTS_REQUIRED,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
+        checkStatus(caseData, eventHistory,
+                    DashboardClaimStatus.TRIAL_ARRANGEMENTS_REQUIRED,
+                    DashboardClaimStatus.TRIAL_ARRANGEMENTS_REQUIRED);
     }
 
     private CaseData createBundle(CaseData previous, List<CaseEventDetail> eventHistory) {
@@ -311,20 +305,9 @@ class DashboardClaimStatusFactoryTest {
 
         DashboardClaimStatus expectedStatus = DashboardClaimStatus.BUNDLE_CREATED;
         CaseData caseData = caseDataBuilder.build();
-        Assertions.assertEquals(
-            expectedStatus,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        Assertions.assertEquals(
-            expectedStatus,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
+        checkStatus(caseData, eventHistory,
+                    expectedStatus,
+                    expectedStatus);
 
         return caseData;
     }
@@ -340,20 +323,9 @@ class DashboardClaimStatusFactoryTest {
         DashboardClaimStatus defendantStatus = claimStatusFactory.getDashboardClaimStatus(
             new CcdDashboardDefendantClaimMatcher(previous, toggleService, eventHistory)
         );
-        Assertions.assertEquals(
-            defendantStatus,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        Assertions.assertEquals(
-            DashboardClaimStatus.HEARING_SUBMIT_HWF,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
+        checkStatus(caseData, eventHistory,
+                    DashboardClaimStatus.HEARING_SUBMIT_HWF,
+                    defendantStatus);
         return caseData;
     }
 
@@ -371,21 +343,9 @@ class DashboardClaimStatusFactoryTest {
                                    .hwfCaseEvent(CaseEvent.INVALID_HWF_REFERENCE)
                                    .build())
             .build();
-
-        Assertions.assertEquals(
-            defendantStatus,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        Assertions.assertEquals(
-            DashboardClaimStatus.CLAIMANT_HWF_INVALID_REF_NUMBER,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
+        checkStatus(caseData, eventHistory,
+                    DashboardClaimStatus.CLAIMANT_HWF_INVALID_REF_NUMBER,
+                    defendantStatus);
         return caseData;
     }
 
@@ -402,20 +362,9 @@ class DashboardClaimStatusFactoryTest {
                                    .hwfCaseEvent(CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER)
                                    .build())
             .build();
-        Assertions.assertEquals(
-            defendantStatus,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        Assertions.assertEquals(
-            DashboardClaimStatus.CLAIMANT_HWF_UPDATED_REF_NUMBER,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
+        checkStatus(caseData, eventHistory,
+                    DashboardClaimStatus.CLAIMANT_HWF_UPDATED_REF_NUMBER,
+                    defendantStatus);
         return caseData;
     }
 
@@ -432,20 +381,9 @@ class DashboardClaimStatusFactoryTest {
                                    .hwfCaseEvent(CaseEvent.MORE_INFORMATION_HWF)
                                    .build())
             .build();
-        Assertions.assertEquals(
-            defendantStatus,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        Assertions.assertEquals(
-            DashboardClaimStatus.HWF_MORE_INFORMATION_NEEDED,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
+        checkStatus(caseData, eventHistory,
+                    DashboardClaimStatus.HWF_MORE_INFORMATION_NEEDED,
+                    defendantStatus);
         return caseData;
     }
 
@@ -462,20 +400,9 @@ class DashboardClaimStatusFactoryTest {
                                    .hwfCaseEvent(CaseEvent.NO_REMISSION_HWF)
                                    .build())
             .build();
-        Assertions.assertEquals(
-            defendantStatus,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        Assertions.assertEquals(
-            DashboardClaimStatus.CLAIMANT_HWF_NO_REMISSION,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
+        checkStatus(caseData, eventHistory,
+                    DashboardClaimStatus.CLAIMANT_HWF_NO_REMISSION,
+                    defendantStatus);
         return caseData;
     }
 
@@ -492,20 +419,9 @@ class DashboardClaimStatusFactoryTest {
                                           .status(PaymentStatus.SUCCESS)
                                           .build())
             .build();
-        Assertions.assertEquals(
-            defendantStatus,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        Assertions.assertEquals(
-            DashboardClaimStatus.CLAIMANT_HWF_FEE_PAYMENT_OUTCOME,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
+        checkStatus(caseData, eventHistory,
+                    DashboardClaimStatus.CLAIMANT_HWF_FEE_PAYMENT_OUTCOME,
+                    defendantStatus);
         return caseData;
     }
 
@@ -521,20 +437,9 @@ class DashboardClaimStatusFactoryTest {
             .systemGeneratedCaseDocuments(List.of(Element.<CaseDocument>builder()
                                                       .value(sdoDocument).build()))
             .build();
-        Assertions.assertEquals(
-            DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        Assertions.assertEquals(
-            DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
+        checkStatus(caseData, eventHistory,
+                    DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED,
+                    DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED);
         return caseData;
     }
 
@@ -552,20 +457,9 @@ class DashboardClaimStatusFactoryTest {
                                    .hwfCaseEvent(CaseEvent.PARTIAL_REMISSION_HWF_GRANTED)
                                    .build())
             .build();
-        Assertions.assertEquals(
-            defendantStatus,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        Assertions.assertEquals(
-            DashboardClaimStatus.CLAIMANT_HWF_PARTIAL_REMISSION,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
+        checkStatus(caseData, eventHistory,
+                    DashboardClaimStatus.CLAIMANT_HWF_PARTIAL_REMISSION,
+                    defendantStatus);
         return caseData;
     }
 
@@ -573,50 +467,28 @@ class DashboardClaimStatusFactoryTest {
         CaseData caseData = previous.toBuilder()
             .caseDismissedHearingFeeDueDate(LocalDateTime.now())
             .build();
-        Assertions.assertEquals(
-            DashboardClaimStatus.HEARING_FEE_UNPAID,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        Assertions.assertEquals(
-            DashboardClaimStatus.HEARING_FEE_UNPAID,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
+        checkStatus(caseData, eventHistory,
+                    DashboardClaimStatus.HEARING_FEE_UNPAID,
+                    DashboardClaimStatus.HEARING_FEE_UNPAID);
     }
 
     private CaseData hwfFull(CaseData previous, List<CaseEventDetail> eventHistory,
                              // status changes, so it can't be order made
                              DashboardClaimStatus defendantStatus) {
         eventHistory.add(CaseEventDetail.builder()
-                             .id(CaseEvent.FEE_PAYMENT_OUTCOME.name())
+                             .id(CaseEvent.FULL_REMISSION_HWF.name())
                              .createdDate(LocalDateTime.now())
                              .build());
         CaseData caseData = previous.toBuilder()
             .ccdState(CaseState.HEARING_READINESS)
             .hwfFeeType(FeeType.HEARING)
             .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                   .hwfCaseEvent(CaseEvent.FEE_PAYMENT_OUTCOME)
+                                   .hwfCaseEvent(CaseEvent.FULL_REMISSION_HWF)
                                    .build())
             .build();
-        Assertions.assertEquals(
-            defendantStatus,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        Assertions.assertEquals(
-            DashboardClaimStatus.CLAIMANT_HWF_FEE_PAYMENT_OUTCOME,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
+        checkStatus(caseData, eventHistory,
+                    DashboardClaimStatus.CLAIMANT_HWF_FEE_PAYMENT_OUTCOME,
+                    defendantStatus);
         return caseData;
     }
 
@@ -637,20 +509,9 @@ class DashboardClaimStatusFactoryTest {
         CaseData caseData = previous.toBuilder()
             .trialReadyApplicant(YesOrNo.YES)
             .build();
-        Assertions.assertEquals(
-            otherPartyStatus,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        Assertions.assertEquals(
-            DashboardClaimStatus.TRIAL_ARRANGEMENTS_SUBMITTED,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
+        checkStatus(caseData, eventHistory,
+                    DashboardClaimStatus.TRIAL_ARRANGEMENTS_SUBMITTED,
+                    otherPartyStatus);
         return caseData;
     }
 
@@ -666,25 +527,14 @@ class DashboardClaimStatusFactoryTest {
         CaseData caseData = previous.toBuilder()
             .trialReadyRespondent1(YesOrNo.YES)
             .build();
-        Assertions.assertEquals(
-            DashboardClaimStatus.TRIAL_ARRANGEMENTS_SUBMITTED,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
         DashboardClaimStatus otherPartyStatus = claimStatusFactory.getDashboardClaimStatus(
             new CcdDashboardClaimantClaimMatcher(
                 previous,
                 toggleService, eventHistory
             ));
-        Assertions.assertEquals(
-            otherPartyStatus,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
+        checkStatus(caseData, eventHistory,
+                    otherPartyStatus,
+                    DashboardClaimStatus.TRIAL_ARRANGEMENTS_SUBMITTED);
         return caseData;
     }
 
@@ -692,20 +542,9 @@ class DashboardClaimStatusFactoryTest {
         CaseData caseData = previous.toBuilder()
             .ccdState(CaseState.DECISION_OUTCOME)
             .build();
-        Assertions.assertEquals(
-            DashboardClaimStatus.AWAITING_JUDGMENT,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        Assertions.assertEquals(
-            DashboardClaimStatus.AWAITING_JUDGMENT,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
+        checkStatus(caseData, eventHistory,
+                    DashboardClaimStatus.AWAITING_JUDGMENT,
+                    DashboardClaimStatus.AWAITING_JUDGMENT);
     }
 
     /**
@@ -736,20 +575,9 @@ class DashboardClaimStatusFactoryTest {
             .ccdState(orderType == OrderType.DIRECTIONS_ORDER_ALL ? CaseState.All_FINAL_ORDERS_ISSUED
                           : CaseState.CASE_PROGRESSION)
             .build();
-        Assertions.assertEquals(
-            DashboardClaimStatus.ORDER_MADE,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        Assertions.assertEquals(
-            DashboardClaimStatus.ORDER_MADE,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
+        checkStatus(caseData, eventHistory,
+                    DashboardClaimStatus.ORDER_MADE,
+                    DashboardClaimStatus.ORDER_MADE);
         return caseData;
     }
 
@@ -772,20 +600,9 @@ class DashboardClaimStatusFactoryTest {
             .ccdState(CaseState.CASE_PROGRESSION)
             .previewCourtOfficerOrder(document)
             .build();
-        Assertions.assertEquals(
-            DashboardClaimStatus.ORDER_MADE,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
-        Assertions.assertEquals(
-            DashboardClaimStatus.ORDER_MADE,
-            claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                caseData,
-                toggleService, eventHistory
-            ))
-        );
+        checkStatus(caseData, eventHistory,
+                    DashboardClaimStatus.ORDER_MADE,
+                    DashboardClaimStatus.ORDER_MADE);
         return caseData;
     }
 

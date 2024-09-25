@@ -790,7 +790,7 @@ class CcdClaimStatusDashboardFactoryTest {
         DashboardClaimStatus status =
             ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
                 claim,
-                featureToggleService
+                featureToggleService, Collections.emptyList()
             ));
         assertThat(status).isEqualTo(DashboardClaimStatus.DEFAULT_JUDGEMENT_ISSUED);
     }
