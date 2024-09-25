@@ -25,6 +25,10 @@ public class MoreTimeRequestedDashboardNotificationDefendantHandler extends Dash
                                                     FeatureToggleService featureToggleService) {
         super(dashboardApiClient, mapper, featureToggleService);
     }
+    @Override
+    public boolean shouldRecordScenario(CaseData caseData) {
+        return caseData.isRespondent1NotRepresented();
+    }
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
