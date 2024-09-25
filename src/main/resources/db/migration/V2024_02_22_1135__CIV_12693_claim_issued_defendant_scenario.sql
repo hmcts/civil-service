@@ -52,7 +52,7 @@ values ('<a href={VIEW_CLAIM_URL} rel="noopener noreferrer" class="govuk-link">V
         '<a href={VIEW_ORDERS_AND_NOTICES} rel="noopener noreferrer" class="govuk-link">Gweld gorchmynion a rhybuddion</a>',
         'Gorchmynion a rhybuddion gan y llys', 'Order.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{3, 3}', 'DEFENDANT', 13),
        ('<a>View the judgment</a>', 'Judgments from the court' ,'<a>Gweld y Dyfarniad</a>',
-        'Dyfarniad gan y llys', 'Judgment.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 14),
+        'Dyfarniadau gan y llys', 'Judgment.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 14),
        ('<a href={GENERAL_APPLICATIONS_INITIATION_PAGE_URL} rel="noopener noreferrer" class="govuk-link">Contact the court to request a change to my case</a>',
         'Applications', '<a href={GENERAL_APPLICATIONS_INITIATION_PAGE_URL} rel="noopener noreferrer" class="govuk-link">Contact the court to request a change to my case</a>',
         'Ceisiadau', 'Application.Create', 'Scenario.AAA6.ClaimIssue.Response.Required', '{4, 4}', 'DEFENDANT', 15),
