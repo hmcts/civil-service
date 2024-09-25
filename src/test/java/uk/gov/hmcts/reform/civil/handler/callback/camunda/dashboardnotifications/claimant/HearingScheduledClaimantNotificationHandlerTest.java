@@ -416,6 +416,7 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
+            .request(CallbackRequest.builder().eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT").build())
             .build();
 
         handler.handle(callbackParams);
