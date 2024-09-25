@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.hearing.HearingNoticeHmcGenerator;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
@@ -70,11 +71,14 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
     private LocationReferenceDataService locationRefDataService;
     @Mock
     private HearingFeesService hearingFeesService;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @BeforeEach
     void setUp() {
         mapper = new ObjectMapper();
-        handler = new GenerateHearingNoticeHmcHandler(camundaService, hearingsService, hearingNoticeHmcGenerator, mapper, locationRefDataService, hearingFeesService);
+        handler = new GenerateHearingNoticeHmcHandler(camundaService, hearingsService, hearingNoticeHmcGenerator,
+                                                      mapper, locationRefDataService, hearingFeesService, featureToggleService);
         mapper.registerModule(new JavaTimeModule());
 
     }
@@ -140,6 +144,7 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
         when(hearingNoticeHmcGenerator.generate(eq(caseData), eq(hearing), anyString(), anyString(), anyString())).thenReturn(List.of(CASE_DOCUMENT));
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         Fee expectedFee = Fee.builder()
             .calculatedAmountInPence(new BigDecimal(54500)).code("FEE0441").version("1").build();
         given(hearingFeesService.getFeeForHearingSmallClaims(any())).willReturn(expectedFee);
@@ -217,6 +222,7 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
         when(hearingNoticeHmcGenerator.generate(eq(caseData), eq(hearing), anyString(), anyString(), anyString())).thenReturn(List.of(CASE_DOCUMENT));
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         Fee expectedFee = Fee.builder()
             .calculatedAmountInPence(new BigDecimal(54500)).code("FEE0441").version("1").build();
         given(hearingFeesService.getFeeForHearingSmallClaims(any())).willReturn(expectedFee);

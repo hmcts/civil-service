@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.hearing.HearingNoticeHmcGenerator;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
@@ -56,6 +57,7 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final LocationReferenceDataService locationRefDataService;
     private final HearingFeesService hearingFeesService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -113,7 +115,9 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
                       .hearingLocation(DynamicList.builder().value(DynamicListElement.builder()
                                                                        .label(hearingLocation)
                                                                        .build()).build())
-                      .hearingFee(calculateAndApplyFee(hearingFeesService, caseData, claimTrack))
+                      .hearingFee(featureToggleService.isCaseProgressionEnabled()
+                                      ? calculateAndApplyFee(hearingFeesService, caseData, claimTrack)
+                                      : null)
                       .build().toMap(objectMapper))
             .build();
     }
