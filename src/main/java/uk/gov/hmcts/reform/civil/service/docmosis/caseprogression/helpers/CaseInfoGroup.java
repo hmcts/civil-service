@@ -2,13 +2,14 @@ package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
+import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm.JudgeFinalOrderFormBuilder;
 
 import static java.util.Objects.nonNull;
 
 public class CaseInfoGroup {
 
-    public void populateCaseInfo(JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder, CaseData caseData) {
-        builder.caseNumber(caseData.getCcdCaseReference().toString())
+    public JudgeFinalOrderForm.JudgeFinalOrderFormBuilder populateCaseInfo(JudgeFinalOrderFormBuilder builder, CaseData caseData) {
+        return builder.caseNumber(caseData.getCcdCaseReference().toString())
             .claimant1Name(caseData.getApplicant1().getPartyName())
             .claimant2Name(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
             .defendant1Name(caseData.getRespondent1().getPartyName())

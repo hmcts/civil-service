@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
+import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm.JudgeFinalOrderFormBuilder;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -12,8 +13,8 @@ import static java.util.Objects.nonNull;
 
 public class OrderDetailsGroup {
 
-    public void populateOrderDetails(JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder, CaseData caseData) {
-        builder.freeFormRecordedText(caseData.getFreeFormRecordedTextArea())
+    public JudgeFinalOrderForm.JudgeFinalOrderFormBuilder populateOrderDetails(JudgeFinalOrderFormBuilder builder, CaseData caseData) {
+        return builder.freeFormRecordedText(caseData.getFreeFormRecordedTextArea())
             .freeFormOrderedText(caseData.getFreeFormOrderedTextArea())
             .orderOnCourtsList(caseData.getOrderOnCourtsList())
             .onInitiativeSelectionText(nonNull(caseData.getOrderOnCourtInitiative())
@@ -26,8 +27,8 @@ public class OrderDetailsGroup {
                                             ? caseData.getOrderWithoutNotice().getWithoutNoticeSelectionDate() : null);
     }
 
-    public void populateAssistedOrderDetails(JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder, CaseData caseData) {
-        builder.finalOrderMadeSelection(caseData.getFinalOrderMadeSelection())
+    public JudgeFinalOrderFormBuilder populateAssistedOrderDetails(JudgeFinalOrderFormBuilder builder, CaseData caseData) {
+        return builder.finalOrderMadeSelection(caseData.getFinalOrderMadeSelection())
             .orderMadeDate(orderMadeDateBuilder(caseData))
             .recordedToggle(nonNull(caseData.getFinalOrderRecitals()))
             .recordedText(nonNull(caseData.getFinalOrderRecitalsRecorded())

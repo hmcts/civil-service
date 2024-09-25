@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers;
 import uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
+import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm.JudgeFinalOrderFormBuilder;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.time.LocalDate;
@@ -13,8 +14,8 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 public class CostsDetailsGroup {
 
-    public void populateCostsDetails(JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder, CaseData caseData) {
-        builder.costSelection(caseData.getAssistedOrderCostList().name())
+    public JudgeFinalOrderForm.JudgeFinalOrderFormBuilder populateCostsDetails(JudgeFinalOrderFormBuilder builder, CaseData caseData) {
+        return builder.costSelection(caseData.getAssistedOrderCostList().name())
             .costsReservedText(nonNull(caseData.getAssistedOrderCostsReserved())
                                    ? caseData.getAssistedOrderCostsReserved().getDetailsRepresentationText() : null)
             .bespokeCostText(nonNull(caseData.getAssistedOrderCostsBespoke())

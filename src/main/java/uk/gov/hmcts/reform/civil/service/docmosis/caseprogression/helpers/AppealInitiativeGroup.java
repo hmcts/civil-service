@@ -4,6 +4,7 @@ import uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
+import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm.JudgeFinalOrderFormBuilder;
 
 import java.time.LocalDate;
 
@@ -15,15 +16,15 @@ import static uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList.
 
 public class AppealInitiativeGroup {
 
-    public void populateAppealDetails(JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder, CaseData caseData) {
-        builder.claimantOrDefendantAppeal(getAppealFor(caseData))
+    public JudgeFinalOrderForm.JudgeFinalOrderFormBuilder populateAppealDetails(JudgeFinalOrderFormBuilder builder, CaseData caseData) {
+        return builder.claimantOrDefendantAppeal(getAppealFor(caseData))
             .appealGranted(isAppealGranted(caseData))
             .tableAorB(circuitOrHighCourt(caseData))
             .appealDate(getAppealDate(caseData));
     }
 
-    public void populateInitiativeOrWithoutNoticeDetails(JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder, CaseData caseData) {
-        builder.showInitiativeOrWithoutNotice(getInitiativeOrWithoutNotice(caseData))
+    public JudgeFinalOrderFormBuilder populateInitiativeOrWithoutNoticeDetails(JudgeFinalOrderFormBuilder builder, CaseData caseData) {
+        return builder.showInitiativeOrWithoutNotice(getInitiativeOrWithoutNotice(caseData))
             .initiativeDate(getInitiativeDate(caseData))
             .withoutNoticeDate(getWithoutNoticeDate(caseData))
             .reasonsText(getReasonsText(caseData));

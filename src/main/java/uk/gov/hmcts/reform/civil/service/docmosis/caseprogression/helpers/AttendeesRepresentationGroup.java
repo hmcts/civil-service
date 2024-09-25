@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
+import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm.JudgeFinalOrderFormBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.builders.ClaimantAttendsOrRepresentedTextBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.builders.DefendantAttendsOrRepresentedTextBuilder;
 
@@ -14,8 +14,8 @@ public class AttendeesRepresentationGroup {
 
 
 
-    public void populateAttendeesDetails(JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder, CaseData caseData) {
-        builder.claimantAttendsOrRepresented(generateClaimantAttendsOrRepresentedText(caseData, false))
+    public JudgeFinalOrderFormBuilder populateAttendeesDetails(JudgeFinalOrderFormBuilder builder, CaseData caseData) {
+        return builder.claimantAttendsOrRepresented(generateClaimantAttendsOrRepresentedText(caseData, false))
             .claimantTwoAttendsOrRepresented(nonNull(caseData.getApplicant2()) ?
                                                  generateClaimantAttendsOrRepresentedText(caseData, true) : null)
             .defendantAttendsOrRepresented(generateDefendantAttendsOrRepresentedText(caseData, false))

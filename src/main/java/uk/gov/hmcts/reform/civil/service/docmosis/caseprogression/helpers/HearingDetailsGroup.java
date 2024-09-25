@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
+import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm.JudgeFinalOrderFormBuilder;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
@@ -19,9 +20,9 @@ public class HearingDetailsGroup {
         this.locationRefDataService = locationRefDataService;
     }
 
-    public void populateHearingDetails(JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder, CaseData caseData,
-                                       LocationRefData caseManagementLocationDetails) {
-        builder.furtherHearingToggle(nonNull(caseData.getFinalOrderFurtherHearingToggle()))
+    public JudgeFinalOrderForm.JudgeFinalOrderFormBuilder populateHearingDetails(JudgeFinalOrderFormBuilder builder, CaseData caseData,
+                                                                                 LocationRefData caseManagementLocationDetails) {
+        return builder.furtherHearingToggle(nonNull(caseData.getFinalOrderFurtherHearingToggle()))
             .furtherHearingToToggle(nonNull(getFurtherHearingDate(caseData, false)))
             .furtherHearingFromDate(getFurtherHearingDate(caseData, true))
             .furtherHearingToDate(getFurtherHearingDate(caseData, false))
