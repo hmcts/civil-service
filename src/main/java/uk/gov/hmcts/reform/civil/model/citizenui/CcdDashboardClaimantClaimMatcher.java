@@ -208,11 +208,6 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     }
 
     @Override
-    public boolean isHearingFormGenerated() {
-        return !caseData.getHearingDocuments().isEmpty() && !isPaperResponse();
-    }
-
-    @Override
     public boolean hasSdoBeenDrawn() {
         return caseData.getSDODocument().isPresent();
     }
@@ -419,7 +414,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isHwfPaymentOutcome() {
-        Optional<LocalDateTime> eventTime = getTimeOfMostRecentEventOfType(EnumSet.of(CaseEvent.FEE_PAYMENT_OUTCOME));
+        Optional<LocalDateTime> eventTime;
         Optional<LocalDateTime> orderTime = getTimeOfLastNonSDOOrder();
         if (Optional.ofNullable(caseData.getHearingFeePaymentDetails())
             .map(p -> p.getStatus() == PaymentStatus.SUCCESS).orElse(
@@ -431,8 +426,8 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         }
         return (caseData.isHWFTypeHearing()
             || (caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED && caseData.isHWFTypeClaimIssued()))
-            && caseData.getHwFEvent() == CaseEvent.FEE_PAYMENT_OUTCOME
-            && (eventTime.isPresent())
+            && caseData.getHwFEvent() == CaseEvent.FULL_REMISSION_HWF
+            && ((eventTime = getTimeOfMostRecentEventOfType(EnumSet.of(CaseEvent.FULL_REMISSION_HWF))).isPresent())
             && (orderTime.isEmpty() || eventTime.get().isAfter(orderTime.get()));
     }
 

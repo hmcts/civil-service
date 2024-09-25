@@ -182,8 +182,8 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public Optional<LocalDateTime> getWhenWasHearingScheduled() {
-        return eventHistory.stream().filter(e -> CaseEvent.HEARING_SCHEDULED.name()
-            .equals(e.getEventName())).findFirst().map(CaseEventDetail::getCreatedDate);
+        return getMostRecentEventOfType(EnumSet.of(CaseEvent.HEARING_SCHEDULED))
+            .map(CaseEventDetail::getCreatedDate);
     }
 
     protected Optional<LocalDateTime> getTimeOfMostRecentEventOfType(Set<CaseEvent> events) {
@@ -194,7 +194,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     protected Optional<CaseEventDetail> getMostRecentEventOfType(Set<CaseEvent> events) {
         Set<String> eventNames = events.stream().map(CaseEvent::name).collect(Collectors.toSet());
         return eventHistory.stream()
-            .filter(e -> eventNames.contains(e.getEventName()))
+            .filter(e -> eventNames.contains(e.getId()))
             .findFirst();
     }
 }

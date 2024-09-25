@@ -48,6 +48,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FULL_REMISSION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HWF_REFERENCE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
@@ -269,12 +270,16 @@ class CcdClaimStatusDashboardFactoryTest {
     void given_hearingNoticeDocumentIssued_whenGetStatus_thenReturnHearingFormGenerated() {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())
+            .hearingDate(LocalDate.now().plusDays(6*7+1))
             .hearingDocuments(List.of(Element.<CaseDocument>builder().value(CaseDocument.builder()
                                                                                 .documentName("testDoc")
                                                                                 .build()).build()))
             .build();
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-            claim, featureToggleService, Collections.emptyList()));
+            claim, featureToggleService, Collections.singletonList(CaseEventDetail.builder()
+                                                                       .id(CaseEvent.HEARING_SCHEDULED.name())
+                                                                       .createdDate(LocalDateTime.now())
+                                                                       .build())));
         assertThat(status).isEqualTo(DashboardClaimStatus.HEARING_FORM_GENERATED);
     }
 
@@ -494,7 +499,7 @@ class CcdClaimStatusDashboardFactoryTest {
                 caseData, featureToggleService, Collections.singletonList(
                 CaseEventDetail.builder()
                     .createdDate(LocalDateTime.now())
-                    .eventName(NO_REMISSION_HWF.name())
+                    .id(NO_REMISSION_HWF.name())
                     .build()
         )));
 
@@ -516,7 +521,7 @@ class CcdClaimStatusDashboardFactoryTest {
             caseData, featureToggleService, Collections.singletonList(
             CaseEventDetail.builder()
                 .createdDate(LocalDateTime.now())
-                .eventName(NO_REMISSION_HWF.name())
+                .id(NO_REMISSION_HWF.name())
                 .build()
         )));
 
@@ -538,7 +543,7 @@ class CcdClaimStatusDashboardFactoryTest {
             caseData, featureToggleService, Collections.singletonList(
             CaseEventDetail.builder()
                 .createdDate(LocalDateTime.now())
-                .eventName(PARTIAL_REMISSION_HWF_GRANTED.name())
+                .id(PARTIAL_REMISSION_HWF_GRANTED.name())
                 .build()
         )));
 
@@ -560,7 +565,7 @@ class CcdClaimStatusDashboardFactoryTest {
             caseData, featureToggleService, Collections.singletonList(
             CaseEventDetail.builder()
                 .createdDate(LocalDateTime.now())
-                .eventName(PARTIAL_REMISSION_HWF_GRANTED.name())
+                .id(PARTIAL_REMISSION_HWF_GRANTED.name())
                 .build()
         )));
 
@@ -582,7 +587,7 @@ class CcdClaimStatusDashboardFactoryTest {
             caseData, featureToggleService, Collections.singletonList(
             CaseEventDetail.builder()
                 .createdDate(LocalDateTime.now())
-                .eventName(UPDATE_HELP_WITH_FEE_NUMBER.name())
+                .id(UPDATE_HELP_WITH_FEE_NUMBER.name())
                 .build()
         )));
 
@@ -604,7 +609,7 @@ class CcdClaimStatusDashboardFactoryTest {
             caseData, featureToggleService, Collections.singletonList(
             CaseEventDetail.builder()
                 .createdDate(LocalDateTime.now())
-                .eventName(UPDATE_HELP_WITH_FEE_NUMBER.name())
+                .id(UPDATE_HELP_WITH_FEE_NUMBER.name())
                 .build()
         )));
 
@@ -626,7 +631,7 @@ class CcdClaimStatusDashboardFactoryTest {
             caseData, featureToggleService, Collections.singletonList(
             CaseEventDetail.builder()
                 .createdDate(LocalDateTime.now())
-                .eventName(INVALID_HWF_REFERENCE.name())
+                .id(INVALID_HWF_REFERENCE.name())
                 .build()
         )));
 
@@ -648,7 +653,7 @@ class CcdClaimStatusDashboardFactoryTest {
             caseData, featureToggleService, Collections.singletonList(
                 CaseEventDetail.builder()
                     .createdDate(LocalDateTime.now())
-                    .eventName(INVALID_HWF_REFERENCE.name())
+                    .id(INVALID_HWF_REFERENCE.name())
                     .build()
         )));
 
@@ -658,7 +663,7 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void givenClaimStatusInHearingReadinessAndHWFFeePaymentOutcome_WhenGetStatus_thenReturnHearingFeePaidStatus() {
         HelpWithFeesDetails hwfDetails = HelpWithFeesDetails.builder()
-            .hwfCaseEvent(FEE_PAYMENT_OUTCOME).build();
+            .hwfCaseEvent(FULL_REMISSION_HWF).build();
         CaseData caseData = CaseData.builder()
             .ccdState(CaseState.HEARING_READINESS)
             .hearingHwfDetails(hwfDetails)
@@ -670,7 +675,7 @@ class CcdClaimStatusDashboardFactoryTest {
             caseData, featureToggleService, Collections.singletonList(
                 CaseEventDetail.builder()
                     .createdDate(LocalDateTime.now())
-                    .eventName(FEE_PAYMENT_OUTCOME.name())
+                    .id(FULL_REMISSION_HWF.name())
                     .build()
         )));
 

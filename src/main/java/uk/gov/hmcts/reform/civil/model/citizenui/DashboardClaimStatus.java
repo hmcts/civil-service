@@ -85,7 +85,7 @@ public enum DashboardClaimStatus {
     HEARING_SUBMIT_HWF(
         Claim::isHwFHearingSubmit
     ),
-    TRIAL_OR_HEARING_SCHEDULED(
+    HEARING_FORM_GENERATED(
         Claim::isTrialScheduledStatusActive
     ),
     MORE_DETAILS_REQUIRED(
@@ -148,7 +148,6 @@ public enum DashboardClaimStatus {
     CLAIMANT_ASKED_FOR_SETTLEMENT(
         Claim::hasClaimantAskedToSignSettlementAgreement
     ),
-    HEARING_FORM_GENERATED(Claim::isHearingFormGenerated),
     REQUESTED_CCJ_BY_REDETERMINATION(
         Claim::hasCCJByRedetermination
     ),

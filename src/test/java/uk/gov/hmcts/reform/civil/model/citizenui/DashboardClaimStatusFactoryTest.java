@@ -140,7 +140,7 @@ class DashboardClaimStatusFactoryTest {
         caseData = applyOrderIfPosition(3, orderPosition, orderType,
                                         caseData, eventHistory
         );
-        caseData = hwfFull(caseData, eventHistory, DashboardClaimStatus.TRIAL_OR_HEARING_SCHEDULED);
+        caseData = hwfFull(caseData, eventHistory, DashboardClaimStatus.HEARING_FORM_GENERATED);
         caseData = applyOrderIfPosition(4, orderPosition, orderType,
                                         caseData, eventHistory
         );
@@ -188,7 +188,7 @@ class DashboardClaimStatusFactoryTest {
         caseData = applyOrderIfPosition(3, orderPosition, orderType,
                                         caseData, eventHistory
         );
-        caseData = hwfPartial(caseData, eventHistory, DashboardClaimStatus.TRIAL_OR_HEARING_SCHEDULED);
+        caseData = hwfPartial(caseData, eventHistory, DashboardClaimStatus.HEARING_FORM_GENERATED);
         caseData = applyOrderIfPosition(4, orderPosition, orderType,
                                         caseData, eventHistory
         );
@@ -215,7 +215,7 @@ class DashboardClaimStatusFactoryTest {
     private CaseData fastClaim(List<CaseEventDetail> eventHistory) {
         eventHistory.add(CaseEventDetail.builder()
                              .createdDate(LocalDateTime.now())
-                             .eventName(CaseEvent.CREATE_SDO.name())
+                             .id(CaseEvent.CREATE_SDO.name())
                              .build());
         CaseDocument sdoDocument = CaseDocument.builder()
             .documentType(DocumentType.SDO_ORDER)
@@ -252,7 +252,7 @@ class DashboardClaimStatusFactoryTest {
 
         eventHistory.add(CaseEventDetail.builder()
                              .createdDate(LocalDateTime.now())
-                             .eventName(CaseEvent.HEARING_SCHEDULED.name())
+                             .id(CaseEvent.HEARING_SCHEDULED.name())
                              .build());
 
         CaseDocument hearingForm = CaseDocument.builder()
@@ -265,14 +265,14 @@ class DashboardClaimStatusFactoryTest {
         caseDataBuilder.systemGeneratedCaseDocuments(systemGenerated);
         CaseData caseData = caseDataBuilder.build();
         Assertions.assertEquals(
-            DashboardClaimStatus.TRIAL_OR_HEARING_SCHEDULED,
+            DashboardClaimStatus.HEARING_FORM_GENERATED,
             claimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
                 caseData,
                 toggleService, eventHistory
             ))
         );
         Assertions.assertEquals(
-            DashboardClaimStatus.TRIAL_OR_HEARING_SCHEDULED,
+            DashboardClaimStatus.HEARING_FORM_GENERATED,
             claimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
                 caseData,
                 toggleService, eventHistory
@@ -331,7 +331,7 @@ class DashboardClaimStatusFactoryTest {
 
     private CaseData requestHwF(CaseData previous, List<CaseEventDetail> eventHistory) {
         eventHistory.add(CaseEventDetail.builder()
-                             .eventName(CaseEvent.APPLY_HELP_WITH_HEARING_FEE.name())
+                             .id(CaseEvent.APPLY_HELP_WITH_HEARING_FEE.name())
                              .createdDate(LocalDateTime.now())
                              .build());
         CaseData caseData = previous.toBuilder()
@@ -359,7 +359,7 @@ class DashboardClaimStatusFactoryTest {
 
     private CaseData invalidHwFReferenceNumber(CaseData previous, List<CaseEventDetail> eventHistory) {
         eventHistory.add(CaseEventDetail.builder()
-                             .eventName(CaseEvent.INVALID_HWF_REFERENCE.name())
+                             .id(CaseEvent.INVALID_HWF_REFERENCE.name())
                              .createdDate(LocalDateTime.now())
                              .build());
         DashboardClaimStatus defendantStatus = claimStatusFactory.getDashboardClaimStatus(
@@ -391,7 +391,7 @@ class DashboardClaimStatusFactoryTest {
 
     private CaseData updatedHwFReferenceNumber(CaseData previous, List<CaseEventDetail> eventHistory) {
         eventHistory.add(CaseEventDetail.builder()
-                             .eventName(CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER.name())
+                             .id(CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER.name())
                              .createdDate(LocalDateTime.now())
                              .build());
         DashboardClaimStatus defendantStatus = claimStatusFactory.getDashboardClaimStatus(
@@ -421,7 +421,7 @@ class DashboardClaimStatusFactoryTest {
 
     private CaseData moreInformationRequiredHwF(CaseData previous, List<CaseEventDetail> eventHistory) {
         eventHistory.add(CaseEventDetail.builder()
-                             .eventName(CaseEvent.MORE_INFORMATION_HWF.name())
+                             .id(CaseEvent.MORE_INFORMATION_HWF.name())
                              .createdDate(LocalDateTime.now())
                              .build());
         DashboardClaimStatus defendantStatus = claimStatusFactory.getDashboardClaimStatus(
@@ -451,7 +451,7 @@ class DashboardClaimStatusFactoryTest {
 
     private CaseData hwfRejected(CaseData previous, List<CaseEventDetail> eventHistory) {
         eventHistory.add(CaseEventDetail.builder()
-                             .eventName(CaseEvent.NO_REMISSION_HWF.name())
+                             .id(CaseEvent.NO_REMISSION_HWF.name())
                              .createdDate(LocalDateTime.now())
                              .build());
         DashboardClaimStatus defendantStatus = claimStatusFactory.getDashboardClaimStatus(
@@ -481,7 +481,7 @@ class DashboardClaimStatusFactoryTest {
 
     private CaseData payHearingFee(CaseData previous, List<CaseEventDetail> eventHistory) {
         eventHistory.add(CaseEventDetail.builder()
-                             .eventName(CaseEvent.CITIZEN_HEARING_FEE_PAYMENT.name())
+                             .id(CaseEvent.CITIZEN_HEARING_FEE_PAYMENT.name())
                              .createdDate(LocalDateTime.now())
                              .build());
         DashboardClaimStatus defendantStatus = claimStatusFactory.getDashboardClaimStatus(
@@ -542,7 +542,7 @@ class DashboardClaimStatusFactoryTest {
                                 // ccd state changes so order made is not valid
                                 DashboardClaimStatus defendantStatus) {
         eventHistory.add(CaseEventDetail.builder()
-                             .eventName(CaseEvent.PARTIAL_REMISSION_HWF_GRANTED.name())
+                             .id(CaseEvent.PARTIAL_REMISSION_HWF_GRANTED.name())
                              .createdDate(LocalDateTime.now())
                              .build());
         CaseData caseData = previous.toBuilder()
@@ -593,7 +593,7 @@ class DashboardClaimStatusFactoryTest {
                              // status changes, so it can't be order made
                              DashboardClaimStatus defendantStatus) {
         eventHistory.add(CaseEventDetail.builder()
-                             .eventName(CaseEvent.FEE_PAYMENT_OUTCOME.name())
+                             .id(CaseEvent.FEE_PAYMENT_OUTCOME.name())
                              .createdDate(LocalDateTime.now())
                              .build());
         CaseData caseData = previous.toBuilder()
@@ -628,11 +628,11 @@ class DashboardClaimStatusFactoryTest {
             ));
         eventHistory.add(CaseEventDetail.builder()
                              .createdDate(LocalDateTime.now())
-                             .eventName(CaseEvent.TRIAL_READINESS.name())
+                             .id(CaseEvent.TRIAL_READINESS.name())
                              .build());
         eventHistory.add(CaseEventDetail.builder()
                              .createdDate(LocalDateTime.now())
-                             .eventName(CaseEvent.GENERATE_TRIAL_READY_FORM_APPLICANT.name())
+                             .id(CaseEvent.GENERATE_TRIAL_READY_FORM_APPLICANT.name())
                              .build());
         CaseData caseData = previous.toBuilder()
             .trialReadyApplicant(YesOrNo.YES)
@@ -657,11 +657,11 @@ class DashboardClaimStatusFactoryTest {
     private CaseData submitDefendantHearingArrangements(CaseData previous, List<CaseEventDetail> eventHistory) {
         eventHistory.add(CaseEventDetail.builder()
                              .createdDate(LocalDateTime.now())
-                             .eventName(CaseEvent.TRIAL_READINESS.name())
+                             .id(CaseEvent.TRIAL_READINESS.name())
                              .build());
         eventHistory.add(CaseEventDetail.builder()
                              .createdDate(LocalDateTime.now())
-                             .eventName(CaseEvent.GENERATE_TRIAL_READY_FORM_RESPONDENT1.name())
+                             .id(CaseEvent.GENERATE_TRIAL_READY_FORM_RESPONDENT1.name())
                              .build());
         CaseData caseData = previous.toBuilder()
             .trialReadyRespondent1(YesOrNo.YES)
@@ -720,7 +720,7 @@ class DashboardClaimStatusFactoryTest {
                                             OrderType orderType) {
         eventHistory.add(CaseEventDetail.builder()
                              .createdDate(created)
-                             .eventName(CaseEvent.GENERATE_DIRECTIONS_ORDER.name())
+                             .id(CaseEvent.GENERATE_DIRECTIONS_ORDER.name())
                              .build());
 
         List<Element<CaseDocument>> orderList = Optional.ofNullable(
@@ -763,7 +763,7 @@ class DashboardClaimStatusFactoryTest {
     private CaseData courtOfficerOrder(CaseData previous, LocalDateTime created, List<CaseEventDetail> eventHistory) {
         eventHistory.add(CaseEventDetail.builder()
                              .createdDate(created)
-                             .eventName(CaseEvent.COURT_OFFICER_ORDER.name())
+                             .id(CaseEvent.COURT_OFFICER_ORDER.name())
                              .build());
         CaseDocument document = CaseDocument.builder()
             .createdDatetime(created)

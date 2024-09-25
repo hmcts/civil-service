@@ -64,8 +64,6 @@ public interface Claim {
 
     boolean defendantRespondedWithPartAdmit();
 
-    boolean isHearingFormGenerated();
-
     boolean hasSdoBeenDrawn();
 
     boolean isBeforeHearing();
