@@ -2,10 +2,7 @@ package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
@@ -23,6 +20,8 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
@@ -31,25 +30,18 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
 public class EditJudgmentsOnlineMapperTest {
 
-    @InjectMocks
-    private EditJudgmentOnlineMapper editJudgmentOnlineMapper;
-    @InjectMocks
-    private RecordJudgmentOnlineMapper recordJudgmentMapper;
-    @InjectMocks
-    private JudgmentByAdmissionOnlineMapper judgmentByAdmissionMapper;
-    @MockBean
+    private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
+    private EditJudgmentOnlineMapper editJudgmentOnlineMapper = new EditJudgmentOnlineMapper();
+    private RecordJudgmentOnlineMapper recordJudgmentMapper = new RecordJudgmentOnlineMapper(addressMapper);
+    private JudgmentByAdmissionOnlineMapper judgmentByAdmissionMapper = new JudgmentByAdmissionOnlineMapper(addressMapper);
     private Time time;
-    @Mock
-    private InterestCalculator interestCalculator;
-    @InjectMocks
-    private DefaultJudgmentOnlineMapper defaultJudgmentMapper;
+    private InterestCalculator interestCalculator = new InterestCalculator(time);
+    private DefaultJudgmentOnlineMapper defaultJudgmentMapper = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
 
     @Test
     void testIfActiveJudgmentIsnullIfnotSet() {
@@ -179,7 +171,6 @@ public class EditJudgmentsOnlineMapperTest {
     @Test
     void testIfDefaultActiveJudgmentIsUpdated_scenario2() {
 
-        when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(BigDecimal.ZERO);
         CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case();
         caseData.setJoAmountCostOrdered(null);
         caseData.setActiveJudgment(defaultJudgmentMapper.addUpdateActiveJudgment(caseData));

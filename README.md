@@ -235,16 +235,49 @@ You can optionally specify a branch for CCD definitions and Camunda definitions 
 ```shell
 npx @hmcts/dev-env@latest && ./bin/setup-devuser-preview-env.sh ccdBranchName camundaBranchName
 ```
-
-Once the pods are up and running you can connect to them using a plugin called Mirrord on Intellij.
-https://mirrord.dev
-
 If you want to clean up the environment just run:
 
 ```shell
 npx @hmcts/dev-env@latest --delete
 ```
 
+Once the pods are up and running you can connect to them using a plugin called Mirrord on Intellij.
+https://mirrord.dev
+
+Most times, by just enabling the Mirrord plugin and running the application in debug mode a popup will come for you to select the target pod running civil-service.
+In some setups you will need a mirrord config file specifying the pod as below.
+
+The script should create a /.mirrord/.mirrord.json config file under the project's root directory.
+
+Specifically for civil-service you might need to exclude a flyway environment variable to allow the startup process to run without errors.
+For that you should have such file as this:
+
+```json
+{
+  "feature": {
+    "network": {
+      "incoming": "steal",
+      "outgoing": true
+    },
+    "fs": "read",
+    "env": {
+      "override": {
+        "REFERENCE_DATABASE_MIGRATION": "false"
+      }
+    }
+  },
+  "target": {
+    "path": {
+      "pod": "Your civil-service pod ID"
+    },
+    "namespace": "civil"
+  },
+  "operator": false,
+  "agent": {
+    "flush_connections": false
+  }
+}
+```
 
 ## License
 
