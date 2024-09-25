@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers;
 
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
@@ -12,6 +13,7 @@ import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
+@Component
 public class CostsDetailsGroup {
 
     public JudgeFinalOrderForm.JudgeFinalOrderFormBuilder populateCostsDetails(JudgeFinalOrderFormBuilder builder, CaseData caseData) {

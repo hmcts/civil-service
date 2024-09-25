@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers;
 
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -14,6 +15,7 @@ import static uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList.
 import static uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList.GRANTED;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList.REFUSED;
 
+@Component
 public class AppealInitiativeGroup {
 
     public JudgeFinalOrderForm.JudgeFinalOrderFormBuilder populateAppealDetails(JudgeFinalOrderFormBuilder builder, CaseData caseData) {

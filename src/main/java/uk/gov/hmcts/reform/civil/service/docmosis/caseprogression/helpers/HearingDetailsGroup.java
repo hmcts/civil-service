@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers;
 
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
@@ -12,6 +13,7 @@ import java.util.Objects;
 
 import static java.util.Objects.nonNull;
 
+@Component
 public class HearingDetailsGroup {
 
     private final LocationReferenceDataService locationRefDataService;

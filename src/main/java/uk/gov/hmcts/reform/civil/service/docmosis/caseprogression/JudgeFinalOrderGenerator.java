@@ -65,16 +65,16 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     private final FeatureToggleService featureToggleService;
     private final DocumentHearingLocationHelper documentHearingLocationHelper;
     private LocationRefData caseManagementLocationDetails;
-    private DefendantAttendsOrRepresentedTextBuilder defendantAttendsOrRepresentedTextBuilder;
-    private ClaimantAttendsOrRepresentedTextBuilder claimantAttendsOrRepresentedTextBuilder;
+    private final DefendantAttendsOrRepresentedTextBuilder defendantAttendsOrRepresentedTextBuilder;
+    private final ClaimantAttendsOrRepresentedTextBuilder claimantAttendsOrRepresentedTextBuilder;
 
-    private AppealInitiativeGroup appealInitiativeGroup;
-    private AttendeesRepresentationGroup attendeesRepresentationGroup;
-    private CaseInfoGroup caseInfoGroup;
-    private CostsDetailsGroup costsDetailsGroup;
-    private HearingDetailsGroup hearingDetailsGroup;
-    private JudgeCourtDetailsGroup judgeCourtDetailsGroup;
-    private OrderDetailsGroup orderDetailsGroup;
+    private final AppealInitiativeGroup appealInitiativeGroup;
+    private final AttendeesRepresentationGroup attendeesRepresentationGroup;
+    private final CaseInfoGroup caseInfoGroup;
+    private final CostsDetailsGroup costsDetailsGroup;
+    private final HearingDetailsGroup hearingDetailsGroup;
+    private final JudgeCourtDetailsGroup judgeCourtDetailsGroup;
+    private final OrderDetailsGroup orderDetailsGroup;
 
     private static final String DATE_FORMAT = "dd/MM/yyyy";
 
@@ -116,10 +116,10 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
 
         var freeFormOrderBuilder = JudgeFinalOrderForm.builder();
 
-        caseInfoGroup.populateCaseInfo(freeFormOrderBuilder, caseData);
-        judgeCourtDetailsGroup.populateJudgeCourtDetails(freeFormOrderBuilder, userDetails,
+        freeFormOrderBuilder = caseInfoGroup.populateCaseInfo(freeFormOrderBuilder, caseData);
+        freeFormOrderBuilder = judgeCourtDetailsGroup.populateJudgeCourtDetails(freeFormOrderBuilder, userDetails,
                                                          caseManagementLocationDetails, getHearingLocationText(caseData));
-        orderDetailsGroup.populateOrderDetails(freeFormOrderBuilder, caseData);
+        freeFormOrderBuilder = orderDetailsGroup.populateOrderDetails(freeFormOrderBuilder, caseData);
 
         return freeFormOrderBuilder.build();
     }
@@ -131,15 +131,15 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
 
         var assistedFormOrderBuilder = JudgeFinalOrderForm.builder();
 
-        caseInfoGroup.populateCaseInfo(assistedFormOrderBuilder, caseData);
-        judgeCourtDetailsGroup.populateJudgeCourtDetails(assistedFormOrderBuilder, userDetails,
+        assistedFormOrderBuilder = caseInfoGroup.populateCaseInfo(assistedFormOrderBuilder, caseData);
+        assistedFormOrderBuilder = judgeCourtDetailsGroup.populateJudgeCourtDetails(assistedFormOrderBuilder, userDetails,
                                                          caseManagementLocationDetails, getHearingLocationText(caseData));
-        orderDetailsGroup.populateAssistedOrderDetails(assistedFormOrderBuilder, caseData);
-        attendeesRepresentationGroup.populateAttendeesDetails(assistedFormOrderBuilder, caseData);
-        hearingDetailsGroup.populateHearingDetails(assistedFormOrderBuilder, caseData, caseManagementLocationDetails);
-        costsDetailsGroup.populateCostsDetails(assistedFormOrderBuilder, caseData);
-        appealInitiativeGroup.populateAppealDetails(assistedFormOrderBuilder, caseData);
-        appealInitiativeGroup.populateInitiativeOrWithoutNoticeDetails(assistedFormOrderBuilder, caseData);
+        assistedFormOrderBuilder = orderDetailsGroup.populateAssistedOrderDetails(assistedFormOrderBuilder, caseData);
+        assistedFormOrderBuilder = attendeesRepresentationGroup.populateAttendeesDetails(assistedFormOrderBuilder, caseData);
+        assistedFormOrderBuilder = hearingDetailsGroup.populateHearingDetails(assistedFormOrderBuilder, caseData, caseManagementLocationDetails);
+        assistedFormOrderBuilder = costsDetailsGroup.populateCostsDetails(assistedFormOrderBuilder, caseData);
+        assistedFormOrderBuilder = appealInitiativeGroup.populateAppealDetails(assistedFormOrderBuilder, caseData);
+        assistedFormOrderBuilder = appealInitiativeGroup.populateInitiativeOrWithoutNoticeDetails(assistedFormOrderBuilder, caseData);
 
         return assistedFormOrderBuilder.build();
     }
@@ -150,178 +150,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         }
         if (caseData.getOrderMadeOnDetailsList().equals(OrderMadeOnTypes.WITHOUT_NOTICE)) {
             return caseData.getOrderMadeOnDetailsOrderWithoutNotice().getWithOutNoticeText();
-        }
-        return null;
-    }
-
-    public LocalDate getAppealDate(CaseData caseData) {
-        FinalOrderAppeal appealComplex = caseData.getFinalOrderAppealComplex();
-
-        if (appealComplex != null
-            && appealComplex.getApplicationList() == GRANTED) {
-            if (appealComplex.getAppealGrantedDropdown().getCircuitOrHighCourtList().equals(
-                CIRCUIT_COURT)) {
-                return appealComplex.getAppealGrantedDropdown().getAppealChoiceSecondDropdownA().getAppealGrantedRefusedDate();
-            } else {
-                return appealComplex.getAppealGrantedDropdown().getAppealChoiceSecondDropdownB().getAppealGrantedRefusedDate();
-            }
-        }
-        if (appealComplex != null
-            && appealComplex.getApplicationList() == REFUSED) {
-            if (appealComplex.getAppealRefusedDropdown().getCircuitOrHighCourtListRefuse().equals(CIRCUIT_COURT)) {
-                return appealComplex.getAppealRefusedDropdown().getAppealChoiceSecondDropdownA().getAppealGrantedRefusedDate();
-            } else {
-                return appealComplex.getAppealRefusedDropdown().getAppealChoiceSecondDropdownB().getAppealGrantedRefusedDate();
-            }
-        }
-        return null;
-    }
-
-
-    public String circuitOrHighCourt(CaseData caseData) {
-        FinalOrderAppeal appealComplex = caseData.getFinalOrderAppealComplex();
-        if (appealComplex != null) {
-            if (appealComplex.getApplicationList() == GRANTED
-                && appealComplex.getAppealGrantedDropdown().getCircuitOrHighCourtList().equals(CIRCUIT_COURT)) {
-                return "a";
-            }
-            if (appealComplex.getApplicationList() == REFUSED
-                && appealComplex.getAppealRefusedDropdown().getCircuitOrHighCourtListRefuse().equals(CIRCUIT_COURT)) {
-                return "a";
-            }
-        }
-        return "b";
-    }
-
-    public String populateInterimPaymentText(CaseData caseData) {
-        return format(
-            "An interim payment of £%s on account of costs shall be paid by 4pm on ",
-            MonetaryConversions.penniesToPounds(caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentThirdDropdownAmount()));
-    }
-
-    public String populateSummarilyAssessedText(CaseData caseData) {
-        if (caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList().equals(CostEnums.CLAIMANT)) {
-            return format(
-                "The claimant shall pay the defendant's costs (both fixed and summarily assessed as appropriate) "
-                    + "in the sum of £%s. Such sum shall be paid by 4pm on",
-                MonetaryConversions.penniesToPounds(caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownAmount()));
-        } else {
-            return format(
-                "The defendant shall pay the claimant's costs (both fixed and summarily assessed as appropriate) "
-                    + "in the sum of £%s. Such sum shall be paid by 4pm on",
-                MonetaryConversions.penniesToPounds(caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownAmount()));
-        }
-    }
-
-    public String populateDetailedAssessmentText(CaseData caseData) {
-        String standardOrIndemnity;
-        if (caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentSecondDropdownList1().equals(
-            CostEnums.INDEMNITY_BASIS)) {
-            standardOrIndemnity = "on the indemnity basis if not agreed";
-        } else {
-            standardOrIndemnity = "on the standard basis if not agreed";
-        }
-
-        if (caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList().equals(CostEnums.CLAIMANT)) {
-            return format(
-                "The claimant shall pay the defendant's costs to be subject to a detailed assessment %s",
-                standardOrIndemnity
-            );
-        }
-        return format(
-            "The defendant shall pay the claimant's costs to be subject to a detailed assessment %s",
-            standardOrIndemnity
-        );
-    }
-
-    public Boolean isDefaultCourt(CaseData caseData) {
-        if (caseData.getFinalOrderFurtherHearingToggle() != null
-            && caseData.getFinalOrderFurtherHearingComplex() != null
-            && caseData.getFinalOrderFurtherHearingComplex().getHearingLocationList() != null) {
-            return caseData.getFinalOrderFurtherHearingComplex()
-                .getHearingLocationList().getValue().getCode().equals("LOCATION_LIST");
-        }
-        return false;
-    }
-
-    public String getAppealFor(CaseData caseData) {
-        if (caseData.getFinalOrderAppealComplex() != null && caseData.getFinalOrderAppealComplex().getList() != null) {
-            if (caseData.getFinalOrderAppealComplex().getList().name().equals(OTHER.name())) {
-                return caseData.getFinalOrderAppealComplex().getOtherText();
-            } else {
-                return caseData.getFinalOrderAppealComplex().getList().name().toLowerCase() + "'s";
-            }
-        }
-        return "";
-    }
-
-    public LocalDate getFurtherHearingDate(CaseData caseData, boolean isFromDate) {
-        if (caseData.getFinalOrderFurtherHearingToggle() != null
-            && caseData.getFinalOrderFurtherHearingToggle().stream().anyMatch(finalOrderToggle -> finalOrderToggle.equals(
-            FinalOrderToggle.SHOW)) && caseData.getFinalOrderFurtherHearingComplex() != null) {
-            if (isFromDate) {
-                return caseData.getFinalOrderFurtherHearingComplex().getListFromDate();
-            } else {
-                return caseData.getFinalOrderFurtherHearingComplex().getDateToDate();
-            }
-        }
-        return null;
-    }
-
-    public String getFurtherHearingLength(CaseData caseData) {
-        if (caseData.getFinalOrderFurtherHearingComplex() != null && caseData.getFinalOrderFurtherHearingComplex().getLengthList() != null) {
-            switch (caseData.getFinalOrderFurtherHearingComplex().getLengthList()) {
-                case MINUTES_15:
-                    return "15 minutes";
-                case MINUTES_30:
-                    return "30 minutes";
-                case HOUR_1:
-                    return "1 hour";
-                case HOUR_1_5:
-                    return "1.5 hours";
-                case HOUR_2:
-                    return "2 hours";
-                case OTHER:
-                    return getOtherLength(caseData);
-                default:
-                    return "";
-            }
-        }
-        return "";
-    }
-
-    private String getOtherLength(CaseData caseData) {
-        StringBuilder otherLength = new StringBuilder();
-        if (Objects.nonNull(caseData.getFinalOrderFurtherHearingComplex().getLengthListOther())) {
-            String otherDay = caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherDays();
-            String otherHour = caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherHours();
-            String otherMinute = caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherMinutes();
-            otherLength.append(Objects.nonNull(otherDay) ? (otherDay + " days ") : "")
-                    .append(Objects.nonNull(otherHour) ? (otherHour + " hours ") : "")
-                    .append(Objects.nonNull(otherMinute) ? (otherMinute + " minutes") : "");
-        }
-        return otherLength.toString();
-    }
-
-    public String orderMadeDateBuilder(CaseData caseData) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
-        if (caseData.getFinalOrderDateHeardComplex() != null) {
-            if (caseData.getFinalOrderDateHeardComplex().getSingleDateSelection() != null) {
-                LocalDate date1 = caseData.getFinalOrderDateHeardComplex().getSingleDateSelection().getSingleDate();
-                return format("on %s", date1.format(formatter));
-
-            }
-            if (caseData.getFinalOrderDateHeardComplex().getDateRangeSelection() != null) {
-                LocalDate date1 = caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeFrom();
-                LocalDate date2 = caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeTo();
-                return format("between %s and %s", date1.format(formatter), date2.format(formatter));
-            }
-            if (caseData.getFinalOrderDateHeardComplex().getBespokeRangeSelection() != null) {
-                return format(
-                    "on %s",
-                    caseData.getFinalOrderDateHeardComplex().getBespokeRangeSelection().getBespokeRangeTextArea()
-                );
-            }
         }
         return null;
     }

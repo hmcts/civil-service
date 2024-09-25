@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers;
 
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm.JudgeFinalOrderFormBuilder;
@@ -11,6 +12,7 @@ import java.util.Locale;
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 
+@Component
 public class OrderDetailsGroup {
 
     public JudgeFinalOrderForm.JudgeFinalOrderFormBuilder populateOrderDetails(JudgeFinalOrderFormBuilder builder, CaseData caseData) {

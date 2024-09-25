@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.builders;
 
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantDefendantNotAttending;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantRepresentationList;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import static java.lang.String.format;
 
+@Component
 public class ClaimantAttendsOrRepresentedTextBuilder {
 
     private static final String NOTICE_RECEIVED_CAN_PROCEED = "received notice of the trial and determined that it was reasonable to proceed in their absence.";
