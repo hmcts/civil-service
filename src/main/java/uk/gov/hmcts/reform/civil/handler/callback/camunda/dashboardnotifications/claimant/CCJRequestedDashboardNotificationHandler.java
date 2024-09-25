@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
@@ -66,7 +67,8 @@ public class CCJRequestedDashboardNotificationHandler extends DashboardCallbackH
         return (nonNull(whenWillThisAmountBePaid)
             && whenWillThisAmountBePaid.isBefore(LocalDate.now())
             && caseData.isFullAdmitPayImmediatelyClaimSpec())
-            || (caseData.getRespondent1ResponseDeadline().isBefore(LocalDateTime.now())
-            && CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT == caseData.getCcdState());
+            || (!caseData.getDefaultJudgmentDocuments().isEmpty() && caseData.getDefaultJudgmentDocuments().stream()
+            .map(el -> el.getValue())
+            .anyMatch(doc -> doc.getDocumentType().equals(DocumentType.DEFAULT_JUDGMENT)));
     }
 }
