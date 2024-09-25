@@ -251,7 +251,7 @@ task runNonProdApiTestsByGroups(description: 'Runs Non Prod features in function
     for (ftGroup in ftGroups.toLowerCase().split(",")) {
       exec {
         logger.info('Running FT group: ' + ftGroup)
-        commandLine '/usr/bin/yarn', 'run', 'test:AHN'
+        commandLine '/usr/bin/yarn', 'run', 'test:api-' + ftGroup
       }
     }
   }
