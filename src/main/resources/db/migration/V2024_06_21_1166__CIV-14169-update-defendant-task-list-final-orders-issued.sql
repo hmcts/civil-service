@@ -2,7 +2,7 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA6.Update.Defendant.TaskList.UploadDocuments.FinalOrders', '{"Notice.AAA6.CP.Trial.Arrangements.Required.Defendant"}', '{"Notice.AAA6.CP.OrderMade.Defendant" : ["orderDocument"]}');
+VALUES ('Scenario.AAA6.Update.Defendant.TaskList.UploadDocuments.FinalOrders', '{}', '{"Notice.AAA6.CP.OrderMade.Defendant" : ["orderDocument"]}');
 
 /**
  * Add task list items claimant
