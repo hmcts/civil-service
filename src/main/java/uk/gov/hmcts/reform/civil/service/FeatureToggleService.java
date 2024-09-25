@@ -128,7 +128,7 @@ public class FeatureToggleService {
     }
 
     public boolean isDashboardEnabledForCase(CaseData caseData) {
-        log.info("CaseData",caseData);
+        log.info("CaseData", caseData);
         return true;
     }
 
