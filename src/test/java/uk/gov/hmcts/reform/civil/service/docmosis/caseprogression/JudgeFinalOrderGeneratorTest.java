@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -96,7 +96,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FREE_
 @SpringBootTest(classes = {
     JudgeFinalOrderGenerator.class,
     JacksonAutoConfiguration.class})
-public class JudgeFinalOrderGeneratorTest {
+class JudgeFinalOrderGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
@@ -114,7 +114,7 @@ public class JudgeFinalOrderGeneratorTest {
         .documentType(JUDGE_FINAL_ORDER)
         .build();
     @MockBean
-    private UnsecuredDocumentManagementService documentManagementService;
+    private SecuredDocumentManagementService documentManagementService;
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
     @MockBean

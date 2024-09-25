@@ -61,6 +61,7 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataServ
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.DQResponseDocumentUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -88,6 +89,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static java.lang.String.format;
+import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -169,6 +171,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private final AssignCategoryId assignCategoryId;
     private final DeadlineExtensionCalculatorService deadlineCalculatorService;
     private final FrcDocumentsUtils frcDocumentsUtils;
+    private final DQResponseDocumentUtils dqResponseDocumentUtils;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -1553,6 +1556,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
             && isAwaitingAnotherDefendantResponse(caseData)) {
 
+            if (isDefending(caseData)) {
+                assembleResponseDocumentsSpec(caseData, updatedData);
+            }
+
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedData.build().toMap(objectMapper))
                 .build();
@@ -1577,12 +1584,19 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .build();
         }
         assembleResponseDocumentsSpec(caseData, updatedData);
-        frcDocumentsUtils.assembleDefendantsFRCDocuments(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .state(CaseState.AWAITING_APPLICANT_INTENTION.name())
             .build();
+    }
+
+    private boolean isDefending(CaseData caseData) {
+        return FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+            || PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()
+        );
     }
 
     private boolean ifResponseTypeIsPartOrFullAdmission(CaseData caseData) {
@@ -1616,7 +1630,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     }
 
     private void assembleResponseDocumentsSpec(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
-        List<Element<CaseDocument>> defendantUploads = new ArrayList<>();
+        List<Element<CaseDocument>> defendantUploads = nonNull(caseData.getDefendantResponseDocuments())
+            ? caseData.getDefendantResponseDocuments() : new ArrayList<>();
+
         ResponseDocument respondent1SpecDefenceResponseDocument = caseData.getRespondent1SpecDefenceResponseDocument();
         if (respondent1SpecDefenceResponseDocument != null) {
             uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1ClaimDocument = respondent1SpecDefenceResponseDocument.getFile();
@@ -1635,20 +1651,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         }
         Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
         if (respondent1DQ != null) {
-            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1DQDraftDirections = respondent1DQ.getRespondent1DQDraftDirections();
-            if (respondent1DQDraftDirections != null) {
-                Element<CaseDocument> documentElement = buildElemCaseDocument(
-                        respondent1DQDraftDirections,
-                        "Defendant",
-                        updatedCaseData.build().getRespondent1ResponseDate(),
-                        DocumentType.DEFENDANT_DRAFT_DIRECTIONS
-                );
-                assignCategoryId.assignCategoryIdToDocument(
-                    respondent1DQDraftDirections,
-                    DocCategory.DQ_DEF1.getValue()
-                );
-                defendantUploads.add(documentElement);
-            }
             ResponseDocument respondent2SpecDefenceResponseDocument = caseData.getRespondent2SpecDefenceResponseDocument();
             if (respondent2SpecDefenceResponseDocument != null) {
                 uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2ClaimDocument = respondent2SpecDefenceResponseDocument.getFile();
@@ -1688,31 +1690,16 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 }
             }
         }
-        Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
-        if (respondent2DQ != null) {
-            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2DQDraftDirections = respondent2DQ.getRespondent2DQDraftDirections();
-            if (respondent2DQDraftDirections != null) {
-                Element<CaseDocument> documentElement = buildElemCaseDocument(
-                        respondent2DQDraftDirections,
-                        DEF2,
-                        updatedCaseData.build().getRespondent2ResponseDate(),
-                        DocumentType.DEFENDANT_DRAFT_DIRECTIONS
-                );
-                assignCategoryId.assignCategoryIdToDocument(
-                    respondent2DQDraftDirections,
-                    DocCategory.DQ_DEF2.getValue()
-                );
-                defendantUploads.add(documentElement);
-            }
-        }
+
+        List<Element<CaseDocument>> additionalDocuments = dqResponseDocumentUtils.buildDefendantResponseDocuments(updatedCaseData.build());
+        defendantUploads.addAll(additionalDocuments);
+
         if (!defendantUploads.isEmpty()) {
             updatedCaseData.defendantResponseDocuments(defendantUploads);
         }
-        // these documents are added to defendantUploads, if we do not remove/null the original,
-        // case file view will show duplicate documents
-        updatedCaseData.respondent1SpecDefenceResponseDocument(null);
-        updatedCaseData.respondent2SpecDefenceResponseDocument(null);
 
+        frcDocumentsUtils.assembleDefendantsFRCDocuments(caseData);
+        clearTempDocuments(updatedCaseData);
     }
 
     private boolean isAwaitingAnotherDefendantResponse(CaseData caseData) {
@@ -1953,6 +1940,21 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         }
 
         return false;
+    }
+
+    private void clearTempDocuments(CaseData.CaseDataBuilder<?, ?> builder) {
+        CaseData caseData = builder.build();
+        // these documents are added to defendantUploads, if we do not remove/null the original,
+        // case file view will show duplicate documents
+        builder.respondent1SpecDefenceResponseDocument(null);
+        builder.respondent2SpecDefenceResponseDocument(null);
+
+        if (nonNull(caseData.getRespondent1DQ())) {
+            builder.respondent1DQ(builder.build().getRespondent1DQ().toBuilder().respondent1DQDraftDirections(null).build());
+        }
+        if (nonNull(caseData.getRespondent2DQ())) {
+            builder.respondent2DQ(builder.build().getRespondent2DQ().toBuilder().respondent2DQDraftDirections(null).build());
+        }
     }
 
 }
