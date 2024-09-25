@@ -190,6 +190,10 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CP_BUNDLE_UPDATED_DEFENDANT("Scenario.AAA6.CP.Bundle.Updated.Defendant"),
     SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST("Scenario.AAA6.DefendantNoticeOfChange.Claimant.HearingFee.TaskList"),
     SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_TRIAL_ARRANGEMENTS_TASK_LIST("Scenario.AAA6.DefendantNoticeOfChange.Claimant.Trial.Arrangements.TaskList"),
+    SCENARIO_AAA6_DISMISS_CASE_CLAIMANT("Scenario.AAA6.CP.Case.Dismissed.Claimant"),
+    SCENARIO_AAA6_DISMISS_CASE_DEFENDANT("Scenario.AAA6.CP.Case.Dismissed.Defendant"),
+    SCENARIO_AAA6_CP_CASE_STAYED_CLAIMANT("Scenario.AAA6.CP.Case.Stayed.Claimant"),
+    SCENARIO_AAA6_CP_CASE_STAYED_DEFENDANT("Scenario.AAA6.CP.Case.Stayed.Defendant"),
     SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_APPLICANT("Scenario.AAA6.GeneralApps.ApplicationProceedsOffline.Applicant"),
     SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_RESPONDENT("Scenario.AAA6.GeneralApps.ApplicationProceedsOffline.Respondent");
 

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.CaseProgressionDashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.HearingScheduledClaimantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -46,6 +47,7 @@ public class HearingScheduledClaimantScenarioTest extends CaseProgressionDashboa
             .ccdCaseReference(Long.valueOf(caseId))
             .hearingDueDate(LocalDate.of(2024, 4, 1))
             .hearingDate(LocalDate.of(2024, 4, 1))
+            .applicant1Represented(YesOrNo.NO)
             .hearingLocation(list).build();
 
         // When
@@ -113,6 +115,7 @@ public class HearingScheduledClaimantScenarioTest extends CaseProgressionDashboa
             .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(20000)).build())
             .ccdState(HEARING_READINESS)
             .listingOrRelisting(LISTING)
+            .applicant1Represented(YesOrNo.NO)
             .hearingLocation(list).build();
 
         // When

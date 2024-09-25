@@ -19,7 +19,6 @@ java:
     TESTING_SUPPORT_ENABLED: true
     POLLING_EVENT_EMITTER_ENABLED: true
     CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-aat.service.core-compute-aat.internal
-    DOCUMENT_MANAGEMENT_SECURED: true
     STITCHING_API_ENABLED: true
     ACA_SERVICE_API_BASEURL: http://${SERVICE_NAME}-aac-manage-case-assignment
     HMC_HEARINGS_SUBSCRIPTION_ENABLED: false
