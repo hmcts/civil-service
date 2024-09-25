@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -57,6 +58,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DefaultJudgementSpecHandler extends CallbackHandler {
@@ -432,6 +434,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             caseData.setActiveJudgment(activeJudgment);
             caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment));
             caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
+            log.info("ACTIVE JUDGEMENT, {}", activeJudgment);
         }
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
