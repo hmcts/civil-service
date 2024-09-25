@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler;
 
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -16,8 +17,8 @@ public abstract class LegalRepresentativeOneDocumentHandler<T> extends DocumentH
     protected final DocumentTypeBuilder<T> documentTypeBuilder;
 
     public LegalRepresentativeOneDocumentHandler(DocumentCategory documentCategory, DocumentCategory legalRepresentativeTwoDocumentCategory,
-                                                 String documentNotificationText, DocumentTypeBuilder<T> documentTypeBuilder) {
-        super(documentCategory, documentNotificationText);
+                                                 EvidenceUploadType evidenceUploadType, DocumentTypeBuilder<T> documentTypeBuilder) {
+        super(documentCategory, evidenceUploadType);
         this.legalRepresentativeTwoDocumentCategory = legalRepresentativeTwoDocumentCategory;
         this.documentTypeBuilder = documentTypeBuilder;
     }
@@ -27,7 +28,7 @@ public abstract class LegalRepresentativeOneDocumentHandler<T> extends DocumentH
         List<Element<T>> evidenceDocsToCopy =
             compareAndCopy(getDocumentList(caseDataBefore),
                 getDocumentList(caseData),
-                getCorrepsondingLegalRep2DocumentList(caseData));
+                getCorrespondingLegalRep2DocumentList(caseData));
         List<Element<T>> evidenceDocsToAdd =
             deepCopyUploadEvidenceDocumentType(evidenceDocsToCopy, legalRepresentativeTwoDocumentCategory.getCategoryId());
         addDocumentsToCopyToCaseData(builder, evidenceDocsToAdd);
@@ -74,5 +75,7 @@ public abstract class LegalRepresentativeOneDocumentHandler<T> extends DocumentH
 
     protected abstract void addDocumentsToCopyToCaseData(CaseData.CaseDataBuilder<?, ?> builder, List<Element<T>> evidenceDocsToAdd);
 
-    protected abstract List<Element<T>> getCorrepsondingLegalRep2DocumentList(CaseData caseData);
+    protected abstract List<Element<T>> getCorrespondingLegalRep2DocumentList(CaseData caseData);
+
+
 }

@@ -128,15 +128,20 @@ public abstract class DocumentUploadTimeTask {
     private final ObjectMapper objectMapper;
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
+    private final ApplicantDocumentUploadTimeTask applicantDocumentUploadTimeTask;
+    private final RespondentDocumentUploadTimeTask respondentDocumentUploadTimeTask;
 
     public DocumentUploadTimeTask(Time time, FeatureToggleService featureToggleService,
                                   ObjectMapper objectMapper, CaseDetailsConverter caseDetailsConverter,
-                                  CoreCaseDataService coreCaseDataService) {
+                                  CoreCaseDataService coreCaseDataService, ApplicantDocumentUploadTimeTask applicantDocumentUploadTimeTask,
+                                  RespondentDocumentUploadTimeTask respondentDocumentUploadTimeTask) {
         this.time = time;
         this.featureToggleService = featureToggleService;
         this.objectMapper = objectMapper;
         this.caseDetailsConverter = caseDetailsConverter;
         this.coreCaseDataService = coreCaseDataService;
+        this.applicantDocumentUploadTimeTask = applicantDocumentUploadTimeTask;
+        this.respondentDocumentUploadTimeTask = respondentDocumentUploadTimeTask;
     }
 
     abstract void applyDocumentUploadDate(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, LocalDateTime now);

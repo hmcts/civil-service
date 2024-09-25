@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum DocumentCategory {
 
-    APPLICANT_ONE_DISCLOSURE ("ApplicantDisclosure"),
+    APPLICANT_ONE_DISCLOSURE("ApplicantDisclosure"),
     APPLICANT_TWO_DISCLOSURE("ApplicantTwoDisclosure"),
     APPLICANT_ONE_DISCLOSURE_LIST("ApplicantDisclosureList"),
     APPLICANT_TWO_DISCLOSURE_LIST("ApplicantTwoDisclosureList"),

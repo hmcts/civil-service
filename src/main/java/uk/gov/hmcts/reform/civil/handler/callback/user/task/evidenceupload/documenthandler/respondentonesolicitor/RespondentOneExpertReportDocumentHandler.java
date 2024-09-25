@@ -2,8 +2,9 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.docu
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.RespondentSolicitorOneDocumentHandler;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.RespondentSolicitorOneDocumentHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -11,8 +12,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.EvidenceUploadConstants.EXPERTS_REPORT;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.EvidenceUploadConstants.EXPERT_REPORT_TEXT;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_ONE_EXPERT_REPORT;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_TWO_EXPERT_REPORT;
 
@@ -21,7 +20,7 @@ public class RespondentOneExpertReportDocumentHandler extends
     RespondentSolicitorOneDocumentHandler<UploadEvidenceExpert> {
 
     public RespondentOneExpertReportDocumentHandler(DocumentTypeBuilder<UploadEvidenceExpert> documentTypeBuilder) {
-        super(RESPONDENT_ONE_EXPERT_REPORT, RESPONDENT_TWO_EXPERT_REPORT, EXPERT_REPORT_TEXT, documentTypeBuilder);
+        super(RESPONDENT_ONE_EXPERT_REPORT, RESPONDENT_TWO_EXPERT_REPORT, EvidenceUploadType.EXPERT_REPORT, documentTypeBuilder);
     }
 
     @Override
@@ -40,17 +39,12 @@ public class RespondentOneExpertReportDocumentHandler extends
     }
 
     @Override
-    protected void renameDocuments(List<Element<UploadEvidenceExpert>> documentUploads) {
-        renameUploadReportExpert(documentUploads, EXPERTS_REPORT, true);
-    }
-
-    @Override
     protected void addDocumentsToCopyToCaseData(CaseData.CaseDataBuilder<?, ?> builder, List<Element<UploadEvidenceExpert>> evidenceDocsToAdd) {
         builder.documentExpertReportRes2(evidenceDocsToAdd);
     }
 
     @Override
-    protected List<Element<UploadEvidenceExpert>> getCorrepsondingLegalRep2DocumentList(CaseData caseData) {
+    protected List<Element<UploadEvidenceExpert>> getCorrespondingLegalRep2DocumentList(CaseData caseData) {
         return caseData.getDocumentExpertReportRes2();
     }
 }

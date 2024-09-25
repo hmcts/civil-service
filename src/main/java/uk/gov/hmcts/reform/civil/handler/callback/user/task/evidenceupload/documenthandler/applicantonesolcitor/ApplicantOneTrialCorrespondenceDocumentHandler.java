@@ -3,9 +3,9 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.docu
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.ApplicantSolicitorOneDocumentHandler;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.LegalRepresentativeOneDocumentHandler;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.ApplicantSolicitorOneDocumentHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -13,8 +13,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.EvidenceUploadConstants.DOCUMENTARY_EVIDENCE;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.EvidenceUploadConstants.TRIAL_DOC_CORRESPONDENCE_TEXT;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_ONE_TRIAL_DOC_CORRESPONDENCE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_TWO_TRIAL_DOC_CORRESPONDENCE;
 
@@ -25,7 +23,7 @@ public class ApplicantOneTrialCorrespondenceDocumentHandler extends
 
     public ApplicantOneTrialCorrespondenceDocumentHandler(DocumentTypeBuilder<UploadEvidenceDocumentType> documentTypeBuilder) {
         super(APPLICANT_ONE_TRIAL_DOC_CORRESPONDENCE, APPLICANT_TWO_TRIAL_DOC_CORRESPONDENCE,
-            TRIAL_DOC_CORRESPONDENCE_TEXT, documentTypeBuilder);
+            EvidenceUploadType.TRIAL_CORRESPONDENCE, documentTypeBuilder);
     }
 
     @Override
@@ -45,7 +43,7 @@ public class ApplicantOneTrialCorrespondenceDocumentHandler extends
 
     @Override
     protected void renameDocuments(List<Element<UploadEvidenceDocumentType>> documentUploads) {
-        renameUploadEvidenceDocumentType(documentUploads, DOCUMENTARY_EVIDENCE);
+        renameUploadEvidenceDocumentType(documentUploads, evidenceUploadType.getDocumentTypeDisplayName());
     }
 
     @Override
@@ -55,7 +53,7 @@ public class ApplicantOneTrialCorrespondenceDocumentHandler extends
     }
 
     @Override
-    protected List<Element<UploadEvidenceDocumentType>> getCorrepsondingLegalRep2DocumentList(CaseData caseData) {
+    protected List<Element<UploadEvidenceDocumentType>> getCorrespondingLegalRep2DocumentList(CaseData caseData) {
         return caseData.getDocumentEvidenceForTrialApp2();
     }
 }

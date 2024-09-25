@@ -7,20 +7,20 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 
 import java.util.List;
 
-public abstract class ApplicantSolicitorTwoDocumentHandler<T> extends DocumentHandler<T> {
-    public ApplicantSolicitorTwoDocumentHandler(DocumentCategory documentCategory, EvidenceUploadType evidenceUploadType) {
+public abstract class RespondentSolicitorTwoDocumentHandler<T> extends DocumentHandler<T> {
+    public RespondentSolicitorTwoDocumentHandler(DocumentCategory documentCategory, EvidenceUploadType evidenceUploadType) {
         super(documentCategory, evidenceUploadType);
     }
 
     @Override
     protected List<Element<UploadEvidenceDocumentType>> getDocsUploadedAfterBundle(CaseData caseData) {
-        return caseData.getApplicantDocsUploadedAfterBundle();
+        return caseData.getRespondentDocsUploadedAfterBundle();
     }
 
     @Override
     protected void applyDocumentUpdateToCollection(CaseData.CaseDataBuilder<?, ?> caseDetailsBuilder,
                                                    List<Element<UploadEvidenceDocumentType>> finalAdditionalBundleDoc) {
-        caseDetailsBuilder.applicantDocsUploadedAfterBundle(finalAdditionalBundleDoc);
+        caseDetailsBuilder.respondentDocsUploadedAfterBundle(finalAdditionalBundleDoc);
 
     }
 }

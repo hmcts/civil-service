@@ -3,9 +3,9 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.docu
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.EvidenceUploadConstants;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.RespondentSolicitorOneDocumentHandler;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.RespondentSolicitorOneDocumentHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.EvidenceUploadConstants.DOCUMENT_FOR_DISCLOSURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_ONE_DISCLOSURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_TWO_DISCLOSURE;
 
@@ -23,7 +22,7 @@ public class RespondentOneDisclosureDocumentHandler extends
     RespondentSolicitorOneDocumentHandler<UploadEvidenceDocumentType> {
 
     public RespondentOneDisclosureDocumentHandler(DocumentTypeBuilder<UploadEvidenceDocumentType> documentTypeBuilder) {
-        super(RESPONDENT_ONE_DISCLOSURE, RESPONDENT_TWO_DISCLOSURE, EvidenceUploadConstants.DISCLOSURE_TEXT, documentTypeBuilder);
+        super(RESPONDENT_ONE_DISCLOSURE, RESPONDENT_TWO_DISCLOSURE, EvidenceUploadType.DOCUMENTS_FOR_DISCLOSURE, documentTypeBuilder);
     }
 
     @Override
@@ -42,7 +41,7 @@ public class RespondentOneDisclosureDocumentHandler extends
     }
 
     @Override
-    protected List<Element<UploadEvidenceDocumentType>> getCorrepsondingLegalRep2DocumentList(CaseData caseData) {
+    protected List<Element<UploadEvidenceDocumentType>> getCorrespondingLegalRep2DocumentList(CaseData caseData) {
         return caseData.getDocumentDisclosureListRes2();
     }
 
@@ -51,9 +50,5 @@ public class RespondentOneDisclosureDocumentHandler extends
         return element.getValue().getCreatedDatetime();
     }
 
-    @Override
-    protected void renameDocuments(List<Element<UploadEvidenceDocumentType>> documentUploads) {
-        renameUploadEvidenceDocumentType(documentUploads, DOCUMENT_FOR_DISCLOSURE);
-    }
 
 }

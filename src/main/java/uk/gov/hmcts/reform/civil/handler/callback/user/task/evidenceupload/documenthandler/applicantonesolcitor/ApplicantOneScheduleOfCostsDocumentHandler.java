@@ -3,9 +3,9 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.docu
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.ApplicantSolicitorOneDocumentHandler;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.LegalRepresentativeOneDocumentHandler;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.ApplicantSolicitorOneDocumentHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.EvidenceUploadConstants.TRIAL_COSTS_TEXT;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_SCHEDULES_OF_COSTS;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_TWO_SCHEDULE_OF_COSTS;
 
@@ -23,7 +22,7 @@ public class ApplicantOneScheduleOfCostsDocumentHandler extends
     ApplicantSolicitorOneDocumentHandler<UploadEvidenceDocumentType> {
 
     public ApplicantOneScheduleOfCostsDocumentHandler(DocumentTypeBuilder<UploadEvidenceDocumentType> documentTypeBuilder) {
-        super(APPLICANT_SCHEDULES_OF_COSTS, APPLICANT_TWO_SCHEDULE_OF_COSTS, TRIAL_COSTS_TEXT, documentTypeBuilder);
+        super(APPLICANT_SCHEDULES_OF_COSTS, APPLICANT_TWO_SCHEDULE_OF_COSTS, EvidenceUploadType.COSTS, documentTypeBuilder);
     }
 
     @Override
@@ -54,7 +53,7 @@ public class ApplicantOneScheduleOfCostsDocumentHandler extends
     }
 
     @Override
-    protected List<Element<UploadEvidenceDocumentType>> getCorrepsondingLegalRep2DocumentList(CaseData caseData) {
+    protected List<Element<UploadEvidenceDocumentType>> getCorrespondingLegalRep2DocumentList(CaseData caseData) {
         return caseData.getDocumentCostsApp2();
     }
 }

@@ -3,9 +3,8 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.docu
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.ApplicantSolicitorTwoDocumentHandler;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.LegalRepresentativeOneDocumentHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -13,8 +12,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.EvidenceUploadConstants.DOCUMENTARY_EVIDENCE;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.EvidenceUploadConstants.TRIAL_DOC_CORRESPONDENCE_TEXT;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_TWO_TRIAL_DOC_CORRESPONDENCE;
 
 @Component
@@ -24,7 +21,7 @@ public class ApplicantTwoTrialCorrespondenceDocumentHandler extends
 
     public ApplicantTwoTrialCorrespondenceDocumentHandler() {
         super(APPLICANT_TWO_TRIAL_DOC_CORRESPONDENCE,
-            TRIAL_DOC_CORRESPONDENCE_TEXT);
+            EvidenceUploadType.TRIAL_CORRESPONDENCE);
     }
 
     @Override
@@ -44,7 +41,7 @@ public class ApplicantTwoTrialCorrespondenceDocumentHandler extends
 
     @Override
     protected void renameDocuments(List<Element<UploadEvidenceDocumentType>> documentUploads) {
-        renameUploadEvidenceDocumentType(documentUploads, DOCUMENTARY_EVIDENCE);
+        renameUploadEvidenceDocumentType(documentUploads, evidenceUploadType.getDocumentTypeDisplayName());
     }
 
 }

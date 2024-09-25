@@ -2,8 +2,9 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.docu
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.RespondentSolicitorOneDocumentHandler;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.RespondentSolicitorOneDocumentHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -11,8 +12,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.EvidenceUploadConstants.WITNESS_STATEMENT_OF;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.EvidenceUploadConstants.WITNESS_STATEMENT_TEXT;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_ONE_WITNESS_STATEMENT;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_TWO_WITNESS_STATEMENT;
 
@@ -21,7 +20,7 @@ public class RespondentOneWitnessStatementDocumentHandler extends
     RespondentSolicitorOneDocumentHandler<UploadEvidenceWitness> {
 
     public RespondentOneWitnessStatementDocumentHandler(DocumentTypeBuilder<UploadEvidenceWitness> documentTypeBuilder) {
-        super(RESPONDENT_ONE_WITNESS_STATEMENT, RESPONDENT_TWO_WITNESS_STATEMENT, WITNESS_STATEMENT_TEXT,
+        super(RESPONDENT_ONE_WITNESS_STATEMENT, RESPONDENT_TWO_WITNESS_STATEMENT, EvidenceUploadType.WITNESS_STATEMENT,
             documentTypeBuilder);
     }
 
@@ -40,11 +39,6 @@ public class RespondentOneWitnessStatementDocumentHandler extends
         return element.getValue().getCreatedDatetime();
     }
 
-    @Override
-    protected void renameDocuments(List<Element<UploadEvidenceWitness>> documentUploads) {
-        renameUploadEvidenceDocumentTypeWithName(documentUploads, WITNESS_STATEMENT_OF);
-
-    }
 
     @Override
     protected void addDocumentsToCopyToCaseData(CaseData.CaseDataBuilder<?, ?> builder, List<Element<UploadEvidenceWitness>> evidenceDocsToAdd) {
@@ -52,7 +46,7 @@ public class RespondentOneWitnessStatementDocumentHandler extends
     }
 
     @Override
-    protected List<Element<UploadEvidenceWitness>> getCorrepsondingLegalRep2DocumentList(CaseData caseData) {
+    protected List<Element<UploadEvidenceWitness>> getCorrespondingLegalRep2DocumentList(CaseData caseData) {
         return caseData.getDocumentWitnessStatementRes2();
     }
 }

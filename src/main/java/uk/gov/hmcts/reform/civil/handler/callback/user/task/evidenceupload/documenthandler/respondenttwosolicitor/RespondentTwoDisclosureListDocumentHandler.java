@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.docu
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.EvidenceUploadConstants;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentHandler;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.RespondentSolicitorTwoDocumentHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -17,10 +17,10 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploa
 @Component
 @Slf4j
 public class RespondentTwoDisclosureListDocumentHandler extends
-    DocumentHandler<UploadEvidenceDocumentType> {
+    RespondentSolicitorTwoDocumentHandler<UploadEvidenceDocumentType> {
 
     public RespondentTwoDisclosureListDocumentHandler() {
-        super(RESPONDENT_TWO_DISCLOSURE_LIST, EvidenceUploadConstants.DISCLOSURE_LIST_TEXT);
+        super(RESPONDENT_TWO_DISCLOSURE_LIST, EvidenceUploadType.DISCLOSURE_LIST);
     }
 
     @Override

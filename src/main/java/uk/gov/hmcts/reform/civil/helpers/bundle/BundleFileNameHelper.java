@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.helpers.bundle;
 
-import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadFiles;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
@@ -17,7 +17,7 @@ public class BundleFileNameHelper {
 
     protected static List<Element<UploadEvidenceWitness>> getWitnessDocsByPartyAndDocType(
         BundleRequestMapper.PartyType partyType,
-        EvidenceUploadFiles evidenceUploadFiles, CaseData caseData) {
+        EvidenceUploadType evidenceUploadFiles, CaseData caseData) {
         switch (evidenceUploadFiles) {
             case WITNESS_STATEMENT : {
                 return switch (partyType) {
@@ -61,7 +61,7 @@ public class BundleFileNameHelper {
 
     protected static List<Element<UploadEvidenceExpert>> getExpertDocsByPartyAndDocType(
         BundleRequestMapper.PartyType partyType,
-        EvidenceUploadFiles evidenceUploadFiles, CaseData caseData) {
+        EvidenceUploadType evidenceUploadFiles, CaseData caseData) {
         switch (evidenceUploadFiles) {
             case EXPERT_REPORT : {
                 return switch (partyType) {
@@ -117,7 +117,7 @@ public class BundleFileNameHelper {
 
     protected static List<Element<UploadEvidenceDocumentType>> getEvidenceUploadDocsByPartyAndDocType(
         BundleRequestMapper.PartyType partyType,
-        EvidenceUploadFiles evidenceUploadFiles, CaseData caseData) {
+        EvidenceUploadType evidenceUploadFiles, CaseData caseData) {
         switch (evidenceUploadFiles) {
             case DOCUMENTS_FOR_DISCLOSURE: {
                 return switch (partyType) {

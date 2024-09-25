@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.docu
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.ApplicantSolicitorOneDocumentHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -12,8 +13,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.EvidenceUploadConstants.DISCLOSURE_LIST_TEXT;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.EvidenceUploadConstants.DOCUMENT_FOR_DISCLOSURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_ONE_DISCLOSURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_TWO_DISCLOSURE;
 
@@ -23,7 +22,7 @@ public class ApplicantOneDisclosureDocumentHandler extends
     ApplicantSolicitorOneDocumentHandler<UploadEvidenceDocumentType> {
 
     public ApplicantOneDisclosureDocumentHandler(DocumentTypeBuilder<UploadEvidenceDocumentType> documentTypeBuilder) {
-        super(APPLICANT_ONE_DISCLOSURE, APPLICANT_TWO_DISCLOSURE, DISCLOSURE_LIST_TEXT, documentTypeBuilder);
+        super(APPLICANT_ONE_DISCLOSURE, APPLICANT_TWO_DISCLOSURE, EvidenceUploadType.DOCUMENTS_FOR_DISCLOSURE, documentTypeBuilder);
     }
 
     @Override
@@ -43,7 +42,7 @@ public class ApplicantOneDisclosureDocumentHandler extends
     }
 
     @Override
-    protected List<Element<UploadEvidenceDocumentType>> getCorrepsondingLegalRep2DocumentList(CaseData caseData) {
+    protected List<Element<UploadEvidenceDocumentType>> getCorrespondingLegalRep2DocumentList(CaseData caseData) {
         return caseData.getDocumentForDisclosureApp2();
     }
 
@@ -52,8 +51,10 @@ public class ApplicantOneDisclosureDocumentHandler extends
         return element.getValue().getCreatedDatetime();
     }
 
+
     @Override
     protected void renameDocuments(List<Element<UploadEvidenceDocumentType>> documentUploads) {
-        renameUploadEvidenceDocumentType(documentUploads, DOCUMENT_FOR_DISCLOSURE);
+        renameUploadEvidenceDocumentType(documentUploads, evidenceUploadType.getDocumentTypeDisplayName());
     }
+
 }

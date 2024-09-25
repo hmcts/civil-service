@@ -2,10 +2,8 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.docu
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.EvidenceUploadConstants;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.ApplicantSolicitorTwoDocumentHandler;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.LegalRepresentativeOneDocumentHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -20,7 +18,7 @@ public class ApplicantTwoExpertAnswersDocumentHandler extends
     ApplicantSolicitorTwoDocumentHandler<UploadEvidenceExpert> {
 
     public ApplicantTwoExpertAnswersDocumentHandler() {
-        super(APPLICANT_TWO_EXPERT_ANSWERS, EvidenceUploadConstants.EXPERT_ANSWERS_TEXT);
+        super(APPLICANT_TWO_EXPERT_ANSWERS, EvidenceUploadType.ANSWERS_FOR_EXPERTS);
     }
 
     @Override

@@ -2,9 +2,9 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.docu
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.ApplicantSolicitorOneDocumentHandler;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.LegalRepresentativeOneDocumentHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -12,8 +12,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.EvidenceUploadConstants.REFERRED_TO_IN_THE_STATEMENT_OF;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.EvidenceUploadConstants.WITNESS_REFERRED_TEXT;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_ONE_WITNESS_REFERRED;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_TWO_WITNESS_REFERRED;
 
@@ -22,7 +20,7 @@ public class ApplicantOneWitnessReferredDocumentHandler extends
     ApplicantSolicitorOneDocumentHandler<UploadEvidenceDocumentType> {
 
     public ApplicantOneWitnessReferredDocumentHandler(DocumentTypeBuilder<UploadEvidenceDocumentType> documentTypeBuilder) {
-        super(APPLICANT_ONE_WITNESS_REFERRED, APPLICANT_TWO_WITNESS_REFERRED, WITNESS_REFERRED_TEXT,
+        super(APPLICANT_ONE_WITNESS_REFERRED, APPLICANT_TWO_WITNESS_REFERRED, EvidenceUploadType.WITNESS_REFERRED,
             documentTypeBuilder);
     }
 
@@ -43,7 +41,7 @@ public class ApplicantOneWitnessReferredDocumentHandler extends
 
     @Override
     protected void renameDocuments(List<Element<UploadEvidenceDocumentType>> documentUploads) {
-        renameUploadEvidenceDocumentTypeWithName(documentUploads, REFERRED_TO_IN_THE_STATEMENT_OF);
+        renameUploadEvidenceDocumentTypeWithName(documentUploads, evidenceUploadType.getDocumentTypeDisplayName());
 
     }
 
@@ -53,7 +51,7 @@ public class ApplicantOneWitnessReferredDocumentHandler extends
     }
 
     @Override
-    protected List<Element<UploadEvidenceDocumentType>> getCorrepsondingLegalRep2DocumentList(CaseData caseData) {
+    protected List<Element<UploadEvidenceDocumentType>> getCorrespondingLegalRep2DocumentList(CaseData caseData) {
         return caseData.getDocumentReferredInStatementApp2();
     }
 }

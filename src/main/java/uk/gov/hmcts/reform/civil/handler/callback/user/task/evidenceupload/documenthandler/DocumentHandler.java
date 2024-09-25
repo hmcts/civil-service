@@ -3,25 +3,27 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.docu
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
+import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.UUID;
+import java.util.Optional;
 
 import static java.lang.String.format;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Slf4j
 public abstract class DocumentHandler<T> {
@@ -30,11 +32,11 @@ public abstract class DocumentHandler<T> {
     protected static final String END = ".";
     protected static final String DATE_FORMAT = "dd-MM-yyyy";
     protected final DocumentCategory documentCategory;
-    protected final String documentNotificationText;
+    protected final EvidenceUploadType evidenceUploadType;
 
-    public DocumentHandler(DocumentCategory documentCategory, String documentNotificationText) {
+    public DocumentHandler(DocumentCategory documentCategory, EvidenceUploadType evidenceUploadType) {
         this.documentCategory = documentCategory;
-        this.documentNotificationText = documentNotificationText;
+        this.evidenceUploadType = evidenceUploadType;
     }
 
     public <T> void handleDocuments(CaseData caseData, String litigantType, StringBuilder notificationStringBuilder) {
@@ -53,7 +55,7 @@ public abstract class DocumentHandler<T> {
     private void buildNotificationText(String litigantType, StringBuilder notificationStringBuilder, LocalDateTime dateTime,
                                        LocalDateTime halfFivePmYesterday) {
         if (dateTime.isAfter(halfFivePmYesterday)) {
-            String updateNotificationText = format(documentNotificationText, litigantType);
+            String updateNotificationText = format(evidenceUploadType.getNotifictationTextRegEx(), litigantType);
             if (!notificationStringBuilder.toString().contains(updateNotificationText)) {
                 notificationStringBuilder.append("\n").append(updateNotificationText);
             }
@@ -64,16 +66,6 @@ public abstract class DocumentHandler<T> {
         Document documentToAddId = getDocument(document);
         documentToAddId.setCategoryID(documentCategory.getCategoryId());
     }
-
-    abstract protected List<Element<T>> getDocumentList(CaseData caseData);
-
-
-    abstract protected Document getDocument(Element<T> element);
-
-    abstract protected LocalDateTime getDocumentDateTime(Element<T> element);
-
-    abstract protected void renameDocuments(List<Element<T>> documentUploads);
-
 
     protected <T> void renameUploadEvidenceDocumentType(final List<Element<T>> documentUpload, String prefix) {
         documentUpload.forEach(x -> {
@@ -105,7 +97,7 @@ public abstract class DocumentHandler<T> {
     }
 
     protected <T> void renameUploadReportExpert(final List<Element<T>> documentUpload,
-                                              String prefix, boolean single) {
+                                                String prefix, boolean single) {
         documentUpload.forEach(x -> {
             UploadEvidenceExpert type = (UploadEvidenceExpert) x.getValue();
             String ext = FilenameUtils.getExtension(type.getExpertDocument().getDocumentFileName());
@@ -123,7 +115,7 @@ public abstract class DocumentHandler<T> {
     }
 
     protected <T> void renameUploadEvidenceWitness(final List<Element<T>> documentUpload,
-                                                 String prefix, boolean date) {
+                                                   String prefix, boolean date) {
         documentUpload.forEach(x -> {
             UploadEvidenceWitness type = (UploadEvidenceWitness) x.getValue();
             String ext = FilenameUtils.getExtension(type.getWitnessOptionDocument().getDocumentFileName());
@@ -152,4 +144,82 @@ public abstract class DocumentHandler<T> {
         });
     }
 
+    protected void renameDocuments(List<Element<T>> documentUploads) {
+        renameUploadEvidenceDocumentType(documentUploads, evidenceUploadType.getDocumentTypeDisplayName());
+    }
+
+    public <T> void addUploadDocList(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseData caseData) {
+
+        if (getDocumentList(caseData) == null || getDocumentList(caseData).isEmpty()){
+            return;
+        }
+        Optional<Bundle> bundleDetails = caseData.getCaseBundles().stream().map(IdValue::getValue)
+            .max(Comparator.comparing(bundle -> bundle.getCreatedOn().orElse(null)));
+        LocalDateTime trialBundleDate = null;
+        if (bundleDetails.isPresent()) {
+            Optional<LocalDateTime> createdOn = bundleDetails.get().getCreatedOn();
+            if (createdOn.isPresent()) {
+                trialBundleDate = createdOn.get();
+            }
+        }
+        populateBundleCollection(
+            caseData,
+            caseDataBuilder,
+            trialBundleDate
+        );
+    }
+
+    private <T> void populateBundleCollection(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
+                                              LocalDateTime trialBundleDate) {
+        //List<Element<UploadEvidenceDocumentType>> additionalBundleDocs = null;
+        // If either claimant or respondent additional bundle doc collection exists, we add to that
+        List<Element<UploadEvidenceDocumentType>> additionalBundleDocs = getDocsUploadedAfterBundle(caseData);
+        List<Element<UploadEvidenceDocumentType>> finalAdditionalBundleDocs = additionalBundleDocs;
+        getDocumentList(caseData).forEach(uploadEvidenceDocumentType -> {
+            Document documentToAdd = getDocument(uploadEvidenceDocumentType);
+            LocalDateTime documentCreatedDateTime = getDocumentDateTime(uploadEvidenceDocumentType);
+            // If document was uploaded after the trial bundle was created, it is added to additional bundle documents
+            // via applicant or respondent collections
+            if (documentCreatedDateTime != null
+                && documentCreatedDateTime.isAfter(trialBundleDate)
+            ) {
+                // If a document already exists in the collection, it cannot be re-added.
+                boolean containsValue = finalAdditionalBundleDocs.stream()
+                    .map(Element::getValue)
+                    .map(upload -> upload != null ? upload.getDocumentUpload() : null)
+                    .filter(Objects::nonNull)
+                    .map(Document::getDocumentUrl)
+                    .anyMatch(docUrl -> docUrl.equals(documentToAdd.getDocumentUrl()));
+                // When a bundle is created, applicantDocsUploadedAfterBundle and respondentDocsUploadedAfterBundle
+                // are assigned as empty lists, in actuality they contain a single element (default builder) we remove
+                // this as it is not required.
+                finalAdditionalBundleDocs.removeIf(element -> {
+                    UploadEvidenceDocumentType upload = element.getValue();
+                    return upload == null || upload.getDocumentUpload() == null
+                        || upload.getDocumentUpload().getDocumentUrl() == null;
+                });
+                if (!containsValue) {
+                    var newDocument = UploadEvidenceDocumentType.builder()
+                        .typeOfDocument(evidenceUploadType.getDocumentTypeDisplayName())
+                        .createdDatetime(documentCreatedDateTime)
+                        .documentUpload(documentToAdd)
+                        .build();
+                    finalAdditionalBundleDocs.add(element(newDocument));
+                    applyDocumentUpdateToCollection(caseDataBuilder, finalAdditionalBundleDocs);
+                }
+            }
+        });
+    }
+
+    abstract protected List<Element<T>> getDocumentList(CaseData caseData);
+
+
+    abstract protected Document getDocument(Element<T> element);
+
+    abstract protected LocalDateTime getDocumentDateTime(Element<T> element);
+
+    abstract protected List<Element<UploadEvidenceDocumentType>> getDocsUploadedAfterBundle(CaseData caseData);
+
+    abstract protected void applyDocumentUpdateToCollection(CaseData.CaseDataBuilder<?, ?> caseDetailsBuilder,
+                                                            List<Element<UploadEvidenceDocumentType>> finalAdditionalBundleDoc);
 }

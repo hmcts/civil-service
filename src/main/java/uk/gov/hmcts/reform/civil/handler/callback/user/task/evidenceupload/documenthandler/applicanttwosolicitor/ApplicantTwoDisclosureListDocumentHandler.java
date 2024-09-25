@@ -3,10 +3,8 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.docu
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.EvidenceUploadConstants;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.ApplicantSolicitorTwoDocumentHandler;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.LegalRepresentativeOneDocumentHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -23,7 +21,7 @@ public class ApplicantTwoDisclosureListDocumentHandler extends
     protected static final String APPLICANT_TWO_DISCLOSURE_LIST_CATEGORY_ID = "ApplicantTwoDisclosureList";
 
     public ApplicantTwoDisclosureListDocumentHandler() {
-        super(APPLICANT_TWO_DISCLOSURE_LIST, EvidenceUploadConstants.DISCLOSURE_LIST_TEXT);
+        super(APPLICANT_TWO_DISCLOSURE_LIST, EvidenceUploadType.DISCLOSURE_LIST);
     }
 
     @Override
