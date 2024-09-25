@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.controllers.CaseProgressionDashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.HearingScheduledClaimantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -61,6 +62,7 @@ public class HearingScheduledClaimantScenarioTest extends CaseProgressionDashboa
             .ccdCaseReference(Long.valueOf(caseId))
             .hearingDueDate(LocalDate.of(2024, 4, 1))
             .hearingDate(LocalDate.of(2024, 4, 1))
+            .applicant1Represented(YesOrNo.NO)
             .hearingLocation(list).build();
 
         CallbackParams callbackParams = callbackParams(caseData);
@@ -211,6 +213,7 @@ public class HearingScheduledClaimantScenarioTest extends CaseProgressionDashboa
             .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(20000)).build())
             .ccdState(HEARING_READINESS)
             .listingOrRelisting(LISTING)
+            .applicant1Represented(YesOrNo.NO)
             .hearingLocation(list).build();
 
         // When
@@ -250,7 +253,7 @@ public class HearingScheduledClaimantScenarioTest extends CaseProgressionDashboa
                     "<a href={PAY_HEARING_FEE} class=\"govuk-link\">Talu ffi'r gwrandawiad</a>"),
                 jsonPath("$[1].currentStatusCy").value(TaskStatus.ACTION_NEEDED.getWelshName()),
                 jsonPath("$[1].hintTextEn").value("Deadline is 12am on 1 April 2024"),
-                jsonPath("$[1].hintTextCy").value("Deadline is 12am on 1 Ebrill 2024")
+                jsonPath("$[1].hintTextCy").value("y dyddiad cau yw 12am ar 1 Ebrill 2024")
             );
     }
 

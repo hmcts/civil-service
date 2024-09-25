@@ -121,6 +121,7 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
+            .applicant1Represented(YesOrNo.NO)
             .build().toBuilder().hearingLocation(list).build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -148,6 +149,7 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
             .ccdCaseReference(1234L)
             .ccdState(HEARING_READINESS)
             .listingOrRelisting(LISTING)
+            .applicant1Represented(YesOrNo.NO)
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -187,6 +189,7 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
             .ccdCaseReference(1234L)
             .totalClaimAmount(new BigDecimal(100))
             .responseClaimTrack("SMALL_CLAIM")
+            .applicant1Represented(YesOrNo.NO)
             .hearingFeePaymentDetails(PaymentDetails.builder().status(PaymentStatus.FAILED).build())
             .businessProcess(BusinessProcess.builder().processInstanceId("").build())
             .build();
@@ -229,6 +232,7 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
             .ccdCaseReference(1234L)
             .totalClaimAmount(new BigDecimal(100))
             .responseClaimTrack("SMALL_CLAIM")
+            .applicant1Represented(YesOrNo.NO)
             .businessProcess(BusinessProcess.builder().processInstanceId("").build())
             .build();
 
@@ -266,6 +270,7 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
+            .applicant1Represented(YesOrNo.NO)
             .hearingFeePaymentDetails(PaymentDetails.builder().status(PaymentStatus.SUCCESS).build())
             .businessProcess(BusinessProcess.builder().processInstanceId("").build())
             .build();
@@ -299,6 +304,7 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
+            .applicant1Represented(YesOrNo.NO)
             .businessProcess(BusinessProcess.builder().processInstanceId("").build())
             .build();
 
@@ -394,5 +400,25 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
             ScenarioRequestParams.builder().params(params).build()
         );
         verify(hearingFeesService).getFeeForHearingSmallClaims(new BigDecimal(100).setScale(2, RoundingMode.UNNECESSARY));
+    }
+
+    @Test
+    void shouldNotCreateDashboardNotificationsForHearingFeeIfCaseInHRAndListing_butApplicantLR() {
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .ccdState(HEARING_READINESS)
+            .listingOrRelisting(LISTING)
+            .applicant1Represented(YesOrNo.YES)
+            .build();
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+
+        handler.handle(callbackParams);
+        verifyNoInteractions(dashboardApiClient);
     }
 }

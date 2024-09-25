@@ -55,7 +55,7 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
     private final HearingFeesService hearingFeesService;
 
     @Override
-    protected Map<String, Callback> callbacks() {
+    protected Map<String, Callback> callbacks() { 
         return toggleService.isCaseProgressionEnabled()
             ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForHearingScheduled)
             : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
@@ -81,11 +81,13 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
             caseData = caseData.toBuilder().hearingLocationCourtName(locationRefData.getSiteName()).build();
         }
 
-        dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
-                                          SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario(), authToken,
-                                          ScenarioRequestParams.builder().params(
-                                              mapper.mapCaseDataToParams(caseData)).build()
-        );
+        if (caseData.isApplicant1NotRepresented()) {
+            dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
+                                              SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario(), authToken,
+                                              ScenarioRequestParams.builder().params(
+                                                  mapper.mapCaseDataToParams(caseData)).build()
+            );
+        }
 
         boolean isAutoHearingNotice = isEvent(callbackParams, CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC);
         boolean requiresHearingFee = false;
@@ -101,9 +103,8 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
             }
         }
 
-        if ((!isAutoHearingNotice && caseData.getCcdState() == HEARING_READINESS && caseData.getListingOrRelisting() == LISTING)
-            || (isAutoHearingNotice && requiresHearingFee && !hasPaidFee)) {
-
+        if (caseData.isApplicant1NotRepresented() && ((!isAutoHearingNotice && caseData.getCcdState() == HEARING_READINESS && caseData.getListingOrRelisting() == LISTING)
+            || (isAutoHearingNotice && requiresHearingFee && !hasPaidFee))) {
             dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
                                               SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT.getScenario(), authToken,
                                               ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()

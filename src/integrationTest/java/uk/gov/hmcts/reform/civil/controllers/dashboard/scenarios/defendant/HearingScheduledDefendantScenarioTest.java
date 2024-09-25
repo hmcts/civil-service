@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.controllers.CaseProgressionDashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.HearingScheduledDefendantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -44,6 +45,7 @@ public class HearingScheduledDefendantScenarioTest extends CaseProgressionDashbo
             .ccdCaseReference(Long.valueOf(caseId))
             .hearingDueDate(LocalDate.of(2024, 4, 1))
             .hearingDate(LocalDate.of(2024, 4, 1))
+            .respondent1Represented(YesOrNo.NO)
             .hearingLocation(list).build();
 
         CallbackParams callbackParams = callbackParams(caseData);
