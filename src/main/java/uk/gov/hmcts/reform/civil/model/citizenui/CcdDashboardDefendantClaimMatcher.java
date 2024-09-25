@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -94,9 +95,10 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isEligibleForCCJ() {
-        return caseData.getRespondent1ResponseDeadline() != null
+        return (caseData.getRespondent1ResponseDeadline() != null
             && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
-            && caseData.getPaymentTypeSelection() == null && null == caseData.getActiveJudgment();
+            && caseData.getPaymentTypeSelection() == null
+            && caseData.getDefaultJudgmentDocuments().isEmpty());
     }
 
     @Override
@@ -414,7 +416,10 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     public boolean isDefaultJudgementIssued() {
         return nonNull(caseData.getActiveJudgment())
             && DEFAULT_JUDGMENT.equals(caseData.getActiveJudgment().getType())
-            && JudgmentState.ISSUED.equals(caseData.getActiveJudgment().getState());
+            && JudgmentState.ISSUED.equals(caseData.getActiveJudgment().getState())
+            || (!caseData.getDefaultJudgmentDocuments().isEmpty() && caseData.getDefaultJudgmentDocuments().stream()
+            .map(el -> el.getValue())
+            .anyMatch(doc -> doc.getDocumentType().equals(DocumentType.DEFAULT_JUDGMENT)));
     }
 
     @Override
