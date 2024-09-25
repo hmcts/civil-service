@@ -47,7 +47,6 @@ import java.util.UUID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FULL_REMISSION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HWF_REFERENCE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
@@ -270,7 +269,7 @@ class CcdClaimStatusDashboardFactoryTest {
     void given_hearingNoticeDocumentIssued_whenGetStatus_thenReturnHearingFormGenerated() {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())
-            .hearingDate(LocalDate.now().plusDays(6*7+1))
+            .hearingDate(LocalDate.now().plusDays(6 * 7 + 1))
             .hearingDocuments(List.of(Element.<CaseDocument>builder().value(CaseDocument.builder()
                                                                                 .documentName("testDoc")
                                                                                 .build()).build()))
@@ -501,7 +500,7 @@ class CcdClaimStatusDashboardFactoryTest {
                     .createdDate(LocalDateTime.now())
                     .id(NO_REMISSION_HWF.name())
                     .build()
-        )));
+            )));
 
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_HWF_NO_REMISSION);
     }
@@ -651,10 +650,10 @@ class CcdClaimStatusDashboardFactoryTest {
 
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
             caseData, featureToggleService, Collections.singletonList(
-                CaseEventDetail.builder()
-                    .createdDate(LocalDateTime.now())
-                    .id(INVALID_HWF_REFERENCE.name())
-                    .build()
+            CaseEventDetail.builder()
+                .createdDate(LocalDateTime.now())
+                .id(INVALID_HWF_REFERENCE.name())
+                .build()
         )));
 
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_HWF_INVALID_REF_NUMBER);
@@ -673,10 +672,10 @@ class CcdClaimStatusDashboardFactoryTest {
 
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
             caseData, featureToggleService, Collections.singletonList(
-                CaseEventDetail.builder()
-                    .createdDate(LocalDateTime.now())
-                    .id(FULL_REMISSION_HWF.name())
-                    .build()
+            CaseEventDetail.builder()
+                .createdDate(LocalDateTime.now())
+                .id(FULL_REMISSION_HWF.name())
+                .build()
         )));
 
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_HWF_FEE_PAYMENT_OUTCOME);

@@ -236,7 +236,7 @@ class DashboardClaimStatusFactoryTest {
     }
 
     /**
-     * Used because sometimes tests fail because of run conditions, when the times are equal
+     * Common code.
      *
      * @param caseData                case data to test
      * @param eventHistory            events from case data
