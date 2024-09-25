@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -88,6 +89,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.RESPOND
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
+@Slf4j
 @Service
 @Getter
 @RequiredArgsConstructor
@@ -579,7 +581,10 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
 
     protected RequestedCourt getRequestedCourt(DQ dq, String authorisation) {
         RequestedCourt rc = dq.getRequestedCourt();
+
         if (rc != null && null !=  rc.getCaseLocation()) {
+            log.info("Requested court: {}", rc);
+            log.info("Base Case location: {}", rc.getCaseLocation().getBaseLocation());
             List<LocationRefData> courtLocations = (locationRefDataService
                 .getCourtLocationsByEpimmsIdAndCourtType(authorisation,
                     rc.getCaseLocation().getBaseLocation()

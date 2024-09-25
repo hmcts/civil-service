@@ -254,8 +254,8 @@ public class DefaultJudgementHandler extends CallbackHandler {
                 .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ);
             String code = list.getValue().getCode();
             final String epimId = code.substring(code.lastIndexOf("-") + 1).trim();
-            log.info("TempHearingLocation: {}", caseData.getHearingSupportRequirementsDJ()
-                .getHearingTemporaryLocation());
+            log.info("TempHearingLocation: {}", formatLocationList(caseData.getHearingSupportRequirementsDJ()
+                                                                       .getHearingTemporaryLocation()));
             log.info("CODE: {}", code);
             log.info("epimId: {}", epimId);
             List<LocationRefData> locations = (locationRefDataService
