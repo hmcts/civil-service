@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Mediation;
@@ -484,6 +485,31 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA6.Update.Defendant.TaskList.UploadDocuments.FinalOrders",
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
+        void shouldRecordScenarioDefendantFinalOrderFastTrackNotReadyTrial_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name())
+                    .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
+
+            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
+            when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
+
+            handler.handle(params);
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                "Scenario.AAA6.Update.Defendant.TaskList.TrialReady.FinalOrders",
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );

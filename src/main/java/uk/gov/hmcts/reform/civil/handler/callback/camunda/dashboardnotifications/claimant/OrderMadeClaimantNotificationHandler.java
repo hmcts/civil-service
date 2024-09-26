@@ -10,6 +10,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.OrderCallbackHandler;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -30,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_SDO_MADE_BY_LA_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_CLAIMANT_CARM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_CLAIMANT_WITHOUT_UPLOAD_FILES_CARM;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_DASHBOARD_CLAIMANT_TASK_LIST_TRIAL_READY_FINAL_ORDERS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_DASHBOARD_CLAIMANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS;
 import static uk.gov.hmcts.reform.civil.utils.MediationUtils.findMediationUnsuccessfulReason;
 
@@ -112,6 +115,9 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
             return SCENARIO_AAA6_CLAIMANT_SDO_DRAWN_PRE_CASE_PROGRESSION.getScenario();
         }
         if (isFinalOrderIssued(callbackParams)) {
+            if (isOrderMadeFastTrackTrialNotReady(caseData)) {
+                return SCENARIO_AAA6_UPDATE_DASHBOARD_CLAIMANT_TASK_LIST_TRIAL_READY_FINAL_ORDERS.getScenario();
+            }
             return SCENARIO_AAA6_UPDATE_DASHBOARD_CLAIMANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS.getScenario();
         }
         return SCENARIO_AAA6_CP_ORDER_MADE_CLAIMANT.getScenario();
@@ -144,5 +150,10 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
     private boolean isSDOEvent(CallbackParams callbackParams) {
         return CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT
             .equals(CaseEvent.valueOf(callbackParams.getRequest().getEventId()));
+    }
+
+    private boolean isOrderMadeFastTrackTrialNotReady(CaseData caseData) {
+        return SdoHelper.isFastTrack(caseData)
+            && (isNull(caseData.getTrialReadyApplicant()) || caseData.getTrialReadyApplicant().equals(YesOrNo.NO));
     }
 }

@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Mediation;
@@ -423,6 +424,32 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
             );
             String capturedSecondParam = secondParamCaptor.getValue();
             Assertions.assertNotEquals("Scenario.AAA6.CP.SDOMadebyLA.Claimant", capturedSecondParam);
+        }
+
+        @Test
+        void shouldRecordScenarioClaimantFinalOrderFastTrackNotReadyTrial_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
+                .applicant1Represented(YesOrNo.NO)
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .build();
+
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT.name())
+                    .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
+
+            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
+
+            handler.handle(params);
+
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                "Scenario.AAA6.Update.Claimant.TaskList.TrialReady.FinalOrders",
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
         }
     }
 }
