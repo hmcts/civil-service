@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +40,7 @@ import static org.mockito.Mockito.never;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_APPLICANT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
@@ -123,7 +125,10 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
         void shouldEmptyResponse_whenMainCaseIsNotOffline() {
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
-                .build().toBuilder().ccdState(CASE_ISSUED).build();
+                .build().toBuilder()
+                .ccdCaseReference(1234L)
+                .ccdState(CASE_ISSUED)
+                .build();
             // WHEN
             CallbackParams callbackParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(EVENT_ID_CLAIMANT).build())
@@ -139,6 +144,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()
+                .ccdCaseReference(1234L)
                 .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
                 .generalApplications(null)
                 .build();
@@ -157,6 +163,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()
+                .ccdCaseReference(1234L)
                 .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
                 .generalApplications(new ArrayList<>())
                 .build();
@@ -179,6 +186,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()
+                .ccdCaseReference(1234L)
                 .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
                 .generalApplications(gaApplications)
                 .applicant1Represented(YesOrNo.YES)
@@ -202,6 +210,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()
+                .ccdCaseReference(1234L)
                 .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
                 .generalApplications(gaApplications)
                 .respondent1Represented(YesOrNo.YES)
@@ -225,6 +234,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()
+                .ccdCaseReference(1234L)
                 .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
                 .generalApplications(gaApplications)
                 .applicant1Represented(YesOrNo.NO)
@@ -249,6 +259,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()
+                .ccdCaseReference(1234L)
                 .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
                 .generalApplications(gaApplications)
                 .applicant1Represented(YesOrNo.NO)
@@ -279,6 +290,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()
+                .ccdCaseReference(1234L)
                 .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
                 .generalApplications(gaApplications)
                 .applicant1Represented(YesOrNo.NO)
@@ -290,8 +302,12 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
                 .build();
             // THEN
             handler.handle(callbackParams);
-            verify(dashboardApiClient, never())
-                .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_APPLICANT.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            );
         }
 
         @Test
@@ -303,6 +319,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()
+                .ccdCaseReference(1234L)
                 .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
                 .generalApplications(gaApplications)
                 .respondent1Represented(YesOrNo.NO)
@@ -327,6 +344,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()
+                .ccdCaseReference(1234L)
                 .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
                 .generalApplications(gaApplications)
                 .respondent1Represented(YesOrNo.NO)
