@@ -89,7 +89,7 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
         if (isHmc && !(isRespondent1Lip && isDefendant1)) {
             properties = addPropertiesHmc(caseData);
         } else {
-            properties = addProperties(caseData);
+            properties = addPropertiesHearing(caseData, isHmc);
         }
         if (!isRespondent1Lip) {
             properties.put(DEFENDANT_REFERENCE_NUMBER, getDefRefNumber(caseData, isDefendant1));
@@ -105,10 +105,14 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
 
     @Override
     public Map<String, String> addProperties(final CaseData caseData) {
+        return null;
+    }
+
+    public Map<String, String> addPropertiesHearing(final CaseData caseData, boolean isHmc) {
         String legacyCaseRef = caseData.getLegacyCaseReference();
         String hearingDate = NotificationUtils.getFormattedHearingDate(caseData.getHearingDate());
         String hearingTime;
-        if (Objects.nonNull(caseData.getHearingTimeHourMinute())) {
+        if (!isHmc) {
             hearingTime = NotificationUtils.getFormattedHearingTime(caseData.getHearingTimeHourMinute());
         } else {
             LocalDateTime hearingStartDateTime = camundaService

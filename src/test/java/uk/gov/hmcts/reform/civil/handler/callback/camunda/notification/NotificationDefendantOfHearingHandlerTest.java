@@ -298,7 +298,7 @@ public class NotificationDefendantOfHearingHandlerTest {
                 .thenReturn(uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables.builder()
                                 .hearingStartDateTime(java.time.LocalDateTime.of(
                                     LocalDate.of(2022, 10, 7),
-                                    java.time.LocalTime.of(11, 0)
+                                    java.time.LocalTime.of(13, 0)
                                 ))
                                 .hearingId("123456")
                                 .build());
@@ -309,7 +309,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             verify(notificationService).sendMail(
                 "respondent1@example.com",
                 "test-template-defendant-lip-id",
-                getNotificationLipDataMap(caseData),
+                getNotificationLipHmcDataMap(caseData),
                 "notification-of-hearing-lip-123456"
             );
         }
@@ -566,6 +566,14 @@ public class NotificationDefendantOfHearingHandlerTest {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 "hearingDate", "17-05-2023", "hearingTime", "11:00am"
+            );
+        }
+
+        @NotNull
+        private Map<String, String> getNotificationLipHmcDataMap(CaseData caseData) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                "hearingDate", "17-05-2023", "hearingTime", "01:00pm"
             );
         }
 
