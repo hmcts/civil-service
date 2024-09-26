@@ -22,9 +22,11 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
@@ -46,6 +48,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -73,7 +76,7 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     OrganisationService organisationService;
     @MockBean
-    UpdateCaseManagementDetailsService updateCaseManagementDetailsService;
+    UpdateCaseManagementDetailsService updateCaseManagementLocationDetailsService;
     @Autowired
     private RespondToClaimCuiCallbackHandler handler;
     @Autowired
@@ -322,6 +325,31 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(expert.getEventAdded()).isEqualTo(DEFENDANT_RESPONSE_EVENT.getValue());
             assertThat(witness.getDateAdded()).isEqualTo(LocalDateTime.now().toLocalDate());
             assertThat(witness.getEventAdded()).isEqualTo(DEFENDANT_RESPONSE_EVENT.getValue());
+        }
+
+        @Test
+        void shouldUpdateCorrectCaseManagementLocationForDefendantResponse() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
+                .respondent1(Party.builder()
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .partyName("CLAIMANT_NAME")
+                                 .build())
+                .respondent1DQ(Respondent1DQ.builder()
+                                   .respondent1DQRequestedCourt(RequestedCourt.builder()
+                                                                    .caseLocation(CaseLocationCivil.builder()
+                                                                                      .region("LONDON COURT")
+                                                                                      .baseLocation("LONDON COURT")
+                                                                                      .build())
+                                                                    .build())
+                                   .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            verify(updateCaseManagementLocationDetailsService).updateCaseManagementDetails(any(), any(), any());
         }
     }
 }
