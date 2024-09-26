@@ -7,6 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -17,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
@@ -39,6 +42,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYS
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
@@ -249,6 +253,36 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
                 .generalApplications(gaApplications)
                 .applicant1Represented(YesOrNo.NO)
                 .claimantGaAppDetails(new ArrayList<>())
+                .build();
+            // WHEN
+            CallbackParams callbackParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId(EVENT_ID_CLAIMANT).build())
+                .build();
+            // THEN
+            handler.handle(callbackParams);
+            verify(dashboardApiClient, never())
+                .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
+        }
+
+        @Test
+        void shouldReturnResponse_whenGeneralApplicationsForClaimantExist() {
+            List<Element<GeneralApplication>> gaApplications = wrapElements(
+                GeneralApplication.builder()
+                    .caseLink(CaseLink.builder().caseReference("12345678").build())
+                    .build());
+
+            List<Element<GeneralApplicationsDetails>> gaApplicationsClaimant = wrapElements(
+                GeneralApplicationsDetails.builder()
+                    .caseLink(CaseLink.builder().caseReference("12345678").build())
+                    .caseState("Awaiting Respondent Response")
+                    .build());
+            // GIVEN
+            CaseData caseData = CaseDataBuilder.builder()
+                .build().toBuilder()
+                .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
+                .generalApplications(gaApplications)
+                .applicant1Represented(YesOrNo.NO)
+                .claimantGaAppDetails(gaApplicationsClaimant)
                 .build();
             // WHEN
             CallbackParams callbackParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
