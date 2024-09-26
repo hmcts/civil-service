@@ -96,11 +96,11 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder().build();
             // WHEN
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackParams callbackParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(EVENT_ID_CLAIMANT).build())
                 .build();
             // THEN
-            assertThat(handler.camundaActivityId(params)).isEqualTo(TASK_ID_CLAIMANT);
+            assertThat(handler.camundaActivityId(callbackParams)).isEqualTo(TASK_ID_CLAIMANT);
         }
 
         @Test
@@ -108,11 +108,11 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder().build();
             // WHEN
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackParams callbackParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(EVENT_ID_DEFENDANT).build())
                 .build();
             // THEN
-            assertThat(handler.camundaActivityId(params)).isEqualTo(TASK_ID_DEFENDANT);
+            assertThat(handler.camundaActivityId(callbackParams)).isEqualTo(TASK_ID_DEFENDANT);
         }
 
         @Test
@@ -121,10 +121,11 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder().ccdState(CASE_ISSUED).build();
             // WHEN
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackParams callbackParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(EVENT_ID_CLAIMANT).build())
                 .build();
             // THEN
+            handler.handle(callbackParams);
             verify(dashboardApiClient, never())
                 .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
         }
@@ -138,10 +139,11 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
                 .generalApplications(null)
                 .build();
             // WHEN
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackParams callbackParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(EVENT_ID_CLAIMANT).build())
                 .build();
             // THEN
+            handler.handle(callbackParams);
             verify(dashboardApiClient, never())
                 .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
         }
@@ -155,10 +157,11 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
                 .generalApplications(new ArrayList<>())
                 .build();
             // WHEN
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackParams callbackParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(EVENT_ID_CLAIMANT).build())
                 .build();
             // THEN
+            handler.handle(callbackParams);
             verify(dashboardApiClient, never())
                 .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
         }
@@ -177,10 +180,11 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
                 .applicant1Represented(YesOrNo.YES)
                 .build();
             // WHEN
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackParams callbackParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(EVENT_ID_CLAIMANT).build())
                 .build();
             // THEN
+            handler.handle(callbackParams);
             verify(dashboardApiClient, never())
                 .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
         }
@@ -199,10 +203,11 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
                 .respondent1Represented(YesOrNo.YES)
                 .build();
             // WHEN
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackParams callbackParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(EVENT_ID_DEFENDANT).build())
                 .build();
             // THEN
+            handler.handle(callbackParams);
             verify(dashboardApiClient, never())
                 .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
         }
@@ -222,10 +227,11 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
                 .claimantGaAppDetails(null)
                 .build();
             // WHEN
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackParams callbackParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(EVENT_ID_CLAIMANT).build())
                 .build();
             // THEN
+            handler.handle(callbackParams);
             verify(dashboardApiClient, never())
                 .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
         }
@@ -245,10 +251,11 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
                 .claimantGaAppDetails(new ArrayList<>())
                 .build();
             // WHEN
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackParams callbackParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(EVENT_ID_CLAIMANT).build())
                 .build();
             // THEN
+            handler.handle(callbackParams);
             verify(dashboardApiClient, never())
                 .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
         }
