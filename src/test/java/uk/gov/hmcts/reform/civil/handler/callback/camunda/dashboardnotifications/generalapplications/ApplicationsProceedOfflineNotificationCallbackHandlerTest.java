@@ -13,11 +13,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -150,12 +148,11 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
 
         @Test
         void shouldEmptyResponse_whenGeneralApplicationsIsEmpty() {
-            List<Element<GeneralApplication>> gaApplications = new ArrayList<>();
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()
                 .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
-                .generalApplications(gaApplications)
+                .generalApplications(new ArrayList<>())
                 .build();
             // WHEN
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -204,6 +201,52 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
             // WHEN
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(EVENT_ID_DEFENDANT).build())
+                .build();
+            // THEN
+            verify(dashboardApiClient, never())
+                .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
+        }
+
+        @Test
+        void shouldEmptyResponse_whenGeneralApplicationsForClaimantNull() {
+            List<Element<GeneralApplication>> gaApplications = wrapElements(
+                GeneralApplication.builder()
+                    .caseLink(CaseLink.builder().caseReference("12345678").build())
+                    .build());
+            // GIVEN
+            CaseData caseData = CaseDataBuilder.builder()
+                .build().toBuilder()
+                .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
+                .generalApplications(gaApplications)
+                .respondent1Represented(YesOrNo.NO)
+                .claimantGaAppDetails(null)
+                .build();
+            // WHEN
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId(EVENT_ID_CLAIMANT).build())
+                .build();
+            // THEN
+            verify(dashboardApiClient, never())
+                .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
+        }
+
+        @Test
+        void shouldEmptyResponse_whenGeneralApplicationsForClaimantEmpty() {
+            List<Element<GeneralApplication>> gaApplications = wrapElements(
+                GeneralApplication.builder()
+                    .caseLink(CaseLink.builder().caseReference("12345678").build())
+                    .build());
+            // GIVEN
+            CaseData caseData = CaseDataBuilder.builder()
+                .build().toBuilder()
+                .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
+                .generalApplications(gaApplications)
+                .respondent1Represented(YesOrNo.NO)
+                .claimantGaAppDetails(new ArrayList<>())
+                .build();
+            // WHEN
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId(EVENT_ID_CLAIMANT).build())
                 .build();
             // THEN
             verify(dashboardApiClient, never())

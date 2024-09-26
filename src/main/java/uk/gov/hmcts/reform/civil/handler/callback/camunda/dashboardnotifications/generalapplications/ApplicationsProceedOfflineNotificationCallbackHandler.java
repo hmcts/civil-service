@@ -40,8 +40,8 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper mapper;
     private final FeatureToggleService featureToggleService;
-    private final String CLAIMANT = "CLAIMANT";
-    private final String DEFENDANT = "DEFENDANT";
+    private static final String CLAIMANT = "Claimant";
+    private static final String DEFENDANT = "Defendant";
 
     private static final List<String> NON_LIVE_STATES = List.of(
         "Application Closed",
