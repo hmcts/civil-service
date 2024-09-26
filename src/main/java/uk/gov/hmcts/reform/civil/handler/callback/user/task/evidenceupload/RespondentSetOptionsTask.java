@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class RespondentSetOptionsTask extends SetOptionsTask{
+public class RespondentSetOptionsTask extends SetOptionsTask {
     public RespondentSetOptionsTask(ObjectMapper objectMapper) {
         super(objectMapper);
     }

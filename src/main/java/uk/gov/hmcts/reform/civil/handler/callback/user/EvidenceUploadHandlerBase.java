@@ -15,16 +15,12 @@ import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.DocumentUploadTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.SetOptionsTask;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -37,7 +33,6 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 
-import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -54,66 +49,8 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     private final String pageId;
     private final String createShowCondition;
     protected final ObjectMapper objectMapper;
-    private final Time time;
     private final CoreCaseUserService coreCaseUserService;
     private final UserService userService;
-    private final CaseDetailsConverter caseDetailsConverter;
-    private final CoreCaseDataService coreCaseDataService;
-    private final FeatureToggleService featureToggleService;
-
-    private static final String SPACE = " ";
-    private static final String END = ".";
-    private static final String DATE_FORMAT = "dd-MM-yyyy";
-
-    protected static final String APPLICANT_DISCLOSURE = "ApplicantDisclosure";
-    protected static final String APPLICANT_TWO_DISCLOSURE = "ApplicantTwoDisclosure";
-    protected static final String RESPONDENT_ONE_DISCLOSURE = "RespondentOneDisclosure";
-    protected static final String RESPONDENT_TWO_DISCLOSURE = "RespondentTwoDisclosure";
-    protected static final String RESPONDENT_ONE_WITNESS_REFERRED = "RespondentOneWitnessReferred";
-    protected static final String RESPONDENT_TWO_WITNESS_REFERRED = "RespondentTwoWitnessReferred";
-    protected static final String APPLICANT_WITNESS_REFERRED = "ApplicantWitnessReferred";
-    protected static final String APPLICANT_TWO_WITNESS_REFERRED = "ApplicantTwoWitnessReferred";
-    protected static final String RESPONDENT_ONE_TRIAL_DOC_CORRESPONDENCE = "RespondentOneTrialDocCorrespondence";
-    protected static final String RESPONDENT_TWO_TRIAL_DOC_CORRESPONDENCE = "RespondentTwoTrialDocCorrespondence";
-    protected static final String APPLICANT_TRIAL_DOC_CORRESPONDENCE = "ApplicantTrialDocCorrespondence";
-    protected static final String APPLICANT_TWO_TRIAL_DOC_CORRESPONDENCE = "ApplicantTwoTrialDocCorrespondence";
-    protected static final String RESPONDENT_ONE_EXPERT_QUESTIONS = "RespondentOneExpertQuestions";
-    protected static final String RESPONDENT_TWO_EXPERT_QUESTIONS = "RespondentTwoExpertQuestions";
-    protected static final String APPLICANT_EXPERT_QUESTIONS = "ApplicantExpertQuestions";
-    protected static final String APPLICANT_TWO_EXPERT_QUESTIONS = "ApplicantTwoExpertQuestions";
-    protected static final String RESPONDENT_ONE_EXPERT_ANSWERS = "RespondentOneExpertAnswers";
-    protected static final String RESPONDENT_TWO_EXPERT_ANSWERS = "RespondentTwoExpertAnswers";
-    protected static final String APPLICANT_EXPERT_ANSWERS = "ApplicantExpertAnswers";
-    protected static final String APPLICANT_TWO_EXPERT_ANSWERS = "ApplicantTwoExpertAnswers";
-    protected static final String APPLICANT_EXPERT_REPORT = "ApplicantExpertReport";
-    protected static final String APPLICANT_TWO_EXPERT_REPORT = "ApplicantTwoExpertReport";
-    protected static final String RESPONDENT_TWO_EXPERT_REPORT = "RespondentTwoExpertReport";
-    protected static final String RESPONDENT_ONE_EXPERT_REPORT = "RespondentOneExpertReport";
-    protected static final String APPLICANT_EXPERT_JOINT_STATEMENT = "ApplicantExpertJointStatement";
-    protected static final String APPLICANT_TWO_EXPERT_JOINT_STATEMENT = "ApplicantTwoExpertJointStatement";
-    protected static final String RESPONDENT_TWO_EXPERT_JOINT_STATEMENT = "RespondentTwoExpertJointStatement";
-    protected static final String RESPONDENT_ONE_EXPERT_JOINT_STATEMENT = "RespondentOneExpertJointStatement";
-    protected static final String APPLICANT_WITNESS_STATEMENT = "ApplicantWitnessStatement";
-    protected static final String APPLICANT_TWO_WITNESS_STATEMENT = "ApplicantTwoWitnessStatement";
-    protected static final String RESPONDENT_ONE_WITNESS_STATEMENT = "RespondentOneWitnessStatement";
-    protected static final String RESPONDENT_TWO_WITNESS_STATEMENT = "RespondentTwoWitnessStatement";
-    protected static final String APPLICANT_WITNESS_SUMMARY = "ApplicantWitnessSummary";
-    protected static final String APPLICANT_TWO_WITNESS_SUMMARY = "ApplicantTwoWitnessSummary";
-    protected static final String RESPONDENT_ONE_WITNESS_SUMMARY = "RespondentOneWitnessSummary";
-    protected static final String RESPONDENT_TWO_WITNESS_SUMMARY = "RespondentTwoWitnessSummary";
-    protected static final String APPLICANT_WITNESS_HEARSAY = "ApplicantWitnessHearsay";
-    protected static final String APPLICANT_TWO_WITNESS_HEARSAY = "ApplicantTwoWitnessHearsay";
-    protected static final String RESPONDENT_ONE_WITNESS_HEARSAY = "RespondentOneWitnessHearsay";
-    protected static final String RESPONDENT_TWO_WITNESS_HEARSAY = "RespondentTwoWitnessHearsay";
-    protected static final String RESPONDENT_TWO_DISCLOSURE_LIST = "RespondentTwoDisclosureList";
-    protected static final String RESPONDENT_TWO_PRE_TRIAL_SUMMARY = "RespondentTwoPreTrialSummary";
-    protected static final String RESPONDENT_TWO_TRIAL_SKELETON = "RespondentTwoTrialSkeleton";
-    protected static final String RESPONDENT_TWO_SCHEDULE_OF_COSTS = "RespondentTwoSchedulesOfCost";
-    protected static final String APPLICANT_TWO_DISCLOSURE_LIST = "ApplicantTwoDisclosureList";
-    protected static final String APPLICANT_TWO_PRE_TRIAL_SUMMARY = "ApplicantTwoPreTrialSummary";
-    protected static final String APPLICANT_TWO_TRIAL_SKELETON = "ApplicantTwoTrialSkeleton";
-    protected static final String APPLICANT_TWO_SCHEDULE_OF_COSTS = "ApplicantTwoSchedulesOfCost";
-
     protected static final String OPTION_APP1 = "Claimant 1 - ";
     protected static final String OPTION_APP2 = "Claimant 2 - ";
     protected static final String OPTION_APP_BOTH = "Claimants 1 and 2";
@@ -124,27 +61,20 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     private static final String SELECTED_VALUE_DEF_BOTH = "RESPONDENTBOTH";
     private static final String SELECTED_VALUE_APP_BOTH = "APPLICANTBOTH";
-    private List<Element<UploadEvidenceDocumentType>> additionalBundleDocs;
 
     private final SetOptionsTask setOptionsTask;
     private final DocumentUploadTask documentUploadTask;
 
     @SuppressWarnings("java:S107")
     protected EvidenceUploadHandlerBase(UserService userService, CoreCaseUserService coreCaseUserService,
-                                        CaseDetailsConverter caseDetailsConverter,
-                                        CoreCaseDataService coreCaseDataService,
-                                        ObjectMapper objectMapper, Time time, List<CaseEvent> events, String pageId,
-                                        String createShowCondition, FeatureToggleService featureToggleService, SetOptionsTask setOptionsTask, DocumentUploadTask documentUploadTask) {
+                                        ObjectMapper objectMapper, List<CaseEvent> events, String pageId,
+                                        String createShowCondition, SetOptionsTask setOptionsTask, DocumentUploadTask documentUploadTask) {
         this.objectMapper = objectMapper;
-        this.time = time;
         this.createShowCondition = createShowCondition;
         this.events = events;
         this.pageId = pageId;
         this.coreCaseUserService = coreCaseUserService;
         this.userService = userService;
-        this.caseDetailsConverter = caseDetailsConverter;
-        this.coreCaseDataService = coreCaseDataService;
-        this.featureToggleService = featureToggleService;
         this.setOptionsTask = setOptionsTask;
         this.documentUploadTask = documentUploadTask;
     }
@@ -201,7 +131,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                    List<EvidenceUploadTrial> trialCostsSmallTrack,
                                    List<EvidenceUploadTrial> trialDocumentaryFastTrack,
                                    List<EvidenceUploadTrial> trialDocumentarySmallTrack
-                                   ) {
+    ) {
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         //For case which are 1v1, 2v1  we show respondent fields for documents to be uploaded,
@@ -212,12 +142,12 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         caseDataBuilder.caseTypeFlag(CASE_TYPE_FLAG_NO);
 
         boolean multiParts = Objects.nonNull(caseData.getEvidenceUploadOptions())
-                && !caseData.getEvidenceUploadOptions().getListItems().isEmpty();
+            && !caseData.getEvidenceUploadOptions().getListItems().isEmpty();
         if (events.get(0).equals(EVIDENCE_UPLOAD_APPLICANT)) {
             //2v1, app2 selected
             if (multiParts
-                    && caseData.getEvidenceUploadOptions()
-                    .getValue().getLabel().startsWith(OPTION_APP2)) {
+                && caseData.getEvidenceUploadOptions()
+                .getValue().getLabel().startsWith(OPTION_APP2)) {
                 caseDataBuilder.caseTypeFlag("ApplicantTwoFields");
             }
         } else if (events.get(0).equals(EVIDENCE_UPLOAD_RESPONDENT)
@@ -298,51 +228,51 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         List<String> errors = new ArrayList<>();
 
         checkDateCorrectness(errors, uploadEvidenceDocumentType, date -> date.getValue()
-                                 .getDocumentIssuedDate(),
-                             "Invalid date: \"Documents for disclosure\" "
-                                 + "date entered must not be in the future (1).");
+                .getDocumentIssuedDate(),
+            "Invalid date: \"Documents for disclosure\" "
+                + "date entered must not be in the future (1).");
 
         checkDateCorrectness(errors, uploadEvidenceWitness1, date -> date.getValue()
-                                 .getWitnessOptionUploadDate(),
-                             "Invalid date: \"witness statement\" "
-                                 + "date entered must not be in the future (2).");
+                .getWitnessOptionUploadDate(),
+            "Invalid date: \"witness statement\" "
+                + "date entered must not be in the future (2).");
 
         checkDateCorrectness(errors, uploadEvidenceWitness2, date -> date.getValue()
-                                 .getWitnessOptionUploadDate(),
-                             "Invalid date: \"witness summary\" "
-                                 + "date entered must not be in the future (3).");
+                .getWitnessOptionUploadDate(),
+            "Invalid date: \"witness summary\" "
+                + "date entered must not be in the future (3).");
 
         checkDateCorrectness(errors, uploadEvidenceWitness3, date -> date.getValue()
-                                 .getWitnessOptionUploadDate(),
-                             "Invalid date: \"Notice of the intention to rely on hearsay evidence\" "
-                                 + "date entered must not be in the future (4).");
+                .getWitnessOptionUploadDate(),
+            "Invalid date: \"Notice of the intention to rely on hearsay evidence\" "
+                + "date entered must not be in the future (4).");
 
         checkDateCorrectness(errors, witnessDocumentReferred, date -> date.getValue()
-                                 .getDocumentIssuedDate(),
-                             "Invalid date: \"Documents referred to in the statement\" "
-                                 + "date entered must not be in the future (5).");
+                .getDocumentIssuedDate(),
+            "Invalid date: \"Documents referred to in the statement\" "
+                + "date entered must not be in the future (5).");
 
         checkDateCorrectness(errors, uploadEvidenceExpert1, date -> date.getValue()
-                                 .getExpertOptionUploadDate(),
-                             "Invalid date: \"Expert's report\""
-                                 + " date entered must not be in the future (6).");
+                .getExpertOptionUploadDate(),
+            "Invalid date: \"Expert's report\""
+                + " date entered must not be in the future (6).");
         checkDateCorrectness(errors, uploadEvidenceExpert2, date -> date.getValue()
-                                 .getExpertOptionUploadDate(),
-                             "Invalid date: \"Joint statement of experts\" "
-                                 + "date entered must not be in the future (7).");
+                .getExpertOptionUploadDate(),
+            "Invalid date: \"Joint statement of experts\" "
+                + "date entered must not be in the future (7).");
         checkDateCorrectness(errors, uploadEvidenceExpert3, date -> date.getValue()
-                                 .getExpertOptionUploadDate(),
-                             "Invalid date: \"Questions for other party's expert or joint experts\" "
-                                 + "expert statement date entered must not be in the future (8).");
+                .getExpertOptionUploadDate(),
+            "Invalid date: \"Questions for other party's expert or joint experts\" "
+                + "expert statement date entered must not be in the future (8).");
         checkDateCorrectness(errors, uploadEvidenceExpert4, date -> date.getValue()
-                                 .getExpertOptionUploadDate(),
-                             "Invalid date: \"Answers to questions asked by the other party\" "
-                                 + "date entered must not be in the future (9).");
+                .getExpertOptionUploadDate(),
+            "Invalid date: \"Answers to questions asked by the other party\" "
+                + "date entered must not be in the future (9).");
 
         checkDateCorrectness(errors, trialDocumentEvidence, date -> date.getValue()
-                                 .getDocumentIssuedDate(),
-                             "Invalid date: \"Documentary evidence for trial\" "
-                                 + "date entered must not be in the future (10).");
+                .getDocumentIssuedDate(),
+            "Invalid date: \"Documentary evidence for trial\" "
+                + "date entered must not be in the future (10).");
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -369,7 +299,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     }
 
     protected static <T> List<Element<T>> compareAndCopy(List<Element<T>> before,
-                                    List<Element<T>> after, List<Element<T>> target) {
+                                                         List<Element<T>> after, List<Element<T>> target) {
         if (Objects.isNull(after) || after.isEmpty()) {
             return null;
         }
@@ -395,38 +325,39 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     private String getSelectedRole(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         boolean multiParts = Objects.nonNull(caseData.getEvidenceUploadOptions())
-                && !caseData.getEvidenceUploadOptions().getListItems().isEmpty();
+            && !caseData.getEvidenceUploadOptions().getListItems().isEmpty();
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         if (events.get(0).equals(EVIDENCE_UPLOAD_APPLICANT)) {
             if (multiParts && caseData.getEvidenceUploadOptions()
-                    .getValue().getLabel().startsWith(OPTION_APP2)) {
+                .getValue().getLabel().startsWith(OPTION_APP2)) {
                 return "APPLICANTSOLICITORTWO";
             }
             if (multiParts && caseData.getEvidenceUploadOptions()
-                    .getValue().getLabel().equals(OPTION_APP_BOTH)) {
+                .getValue().getLabel().equals(OPTION_APP_BOTH)) {
                 return SELECTED_VALUE_APP_BOTH;
             }
             return CaseRole.APPLICANTSOLICITORONE.name();
         } else {
             if ((multiParts && caseData.getEvidenceUploadOptions()
-                    .getValue().getLabel().startsWith(OPTION_DEF2))
+                .getValue().getLabel().startsWith(OPTION_DEF2))
                 || (!multiParts
-                    && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(),
-                    userInfo.getUid(), RESPONDENTSOLICITORTWO))) {
+                && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(),
+                userInfo.getUid(), RESPONDENTSOLICITORTWO))) {
                 return CaseRole.RESPONDENTSOLICITORTWO.name();
             }
             if (multiParts && caseData.getEvidenceUploadOptions()
-                    .getValue().getLabel().equals(OPTION_DEF_BOTH)) {
+                .getValue().getLabel().equals(OPTION_DEF_BOTH)) {
                 return SELECTED_VALUE_DEF_BOTH;
             }
             return CaseRole.RESPONDENTSOLICITORONE.name();
         }
     }
+
     SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         return SubmittedCallbackResponse.builder()
             .confirmationHeader("# Documents uploaded")
             .confirmationBody("You can continue uploading documents or return later. To upload more "
-                                  + "documents, go to Next step and select \"Document Upload\".")
+                + "documents, go to Next step and select \"Document Upload\".")
             .build();
     }
 

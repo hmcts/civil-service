@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.respondenttwosolicitor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @Component
 @Slf4j
+@Order(9)
 public class RespondentTwoTrialSkeletonDocumentHandler extends
     RespondentSolicitorTwoDocumentHandler<UploadEvidenceDocumentType> {
 

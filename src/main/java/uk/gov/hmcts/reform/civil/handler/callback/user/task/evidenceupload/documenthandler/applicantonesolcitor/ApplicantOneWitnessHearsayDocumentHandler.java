@@ -42,7 +42,7 @@ public class ApplicantOneWitnessHearsayDocumentHandler extends
 
     @Override
     protected void renameDocuments(List<Element<UploadEvidenceWitness>> documentUploads) {
-        renameUploadEvidenceWitness(documentUploads, HEARSAY_EVIDENCE, true);
+        renameUploadEvidenceWitness(documentUploads, evidenceUploadType.getDocumentTypeDisplayName(), true);
 
     }
 

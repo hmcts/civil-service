@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.respondenttwosolicitor;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
@@ -14,6 +15,7 @@ import java.util.List;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_TWO_EXPERT_JOINT_STATEMENT;
 
 @Component
+@Order(5)
 public class RespondentTwoExpertJointStatmementDocumentHandler extends
     RespondentSolicitorTwoDocumentHandler<UploadEvidenceExpert> {
 
@@ -37,5 +39,8 @@ public class RespondentTwoExpertJointStatmementDocumentHandler extends
         return element.getValue().getCreatedDatetime();
     }
 
-
+    @Override
+    protected void renameDocuments(List<Element<UploadEvidenceExpert>> documentUploads) {
+        renameUploadReportExpert(documentUploads, evidenceUploadType.getDocumentTypeDisplayName(),  false);
+    }
 }

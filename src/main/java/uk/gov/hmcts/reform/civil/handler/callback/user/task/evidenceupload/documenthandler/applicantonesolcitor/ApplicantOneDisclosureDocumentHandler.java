@@ -53,10 +53,4 @@ public class ApplicantOneDisclosureDocumentHandler extends
         return element.getValue().getCreatedDatetime();
     }
 
-
-    @Override
-    protected void renameDocuments(List<Element<UploadEvidenceDocumentType>> documentUploads) {
-        renameUploadEvidenceDocumentType(documentUploads, evidenceUploadType.getDocumentTypeDisplayName());
-    }
-
 }

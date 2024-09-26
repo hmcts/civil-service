@@ -1,39 +1,32 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import java.util.Collections;
-import java.util.Objects;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
-
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.ApplicantDocumentUploadTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.ApplicantSetOptionsTask;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+
+import java.util.Collections;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
 
 @Service
 public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
 
-    public EvidenceUploadApplicantHandler(UserService userService, CoreCaseUserService coreCaseUserService,
-                                          CaseDetailsConverter caseDetailsConverter,
-                                          CoreCaseDataService coreCaseDataService,
-                                          ObjectMapper objectMapper, Time time, FeatureToggleService featureToggleService,
-                                          ApplicantSetOptionsTask setOptionsTask, ApplicantDocumentUploadTask documentUploadTimeTask) {
-        super(userService, coreCaseUserService, caseDetailsConverter, coreCaseDataService,
-              objectMapper, time, Collections.singletonList(EVIDENCE_UPLOAD_APPLICANT),
-              "validateValuesApplicant", "createShowCondition", featureToggleService, setOptionsTask,
-              documentUploadTimeTask
+    public EvidenceUploadApplicantHandler(UserService userService, CoreCaseUserService coreCaseUserService, ObjectMapper objectMapper,
+                                          ApplicantSetOptionsTask setOptionsTask,
+                                          ApplicantDocumentUploadTask documentUploadTimeTask) {
+        super(userService, coreCaseUserService,
+            objectMapper, Collections.singletonList(EVIDENCE_UPLOAD_APPLICANT),
+            "validateValuesApplicant", "createShowCondition", setOptionsTask,
+            documentUploadTimeTask
         );
     }
 
@@ -48,42 +41,42 @@ public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
         caseDataBuilder.caseTypeFlag("do_not_show");
 
         boolean multiParts = Objects.nonNull(caseData.getEvidenceUploadOptions())
-                && !caseData.getEvidenceUploadOptions().getListItems().isEmpty();
+            && !caseData.getEvidenceUploadOptions().getListItems().isEmpty();
         if (multiParts
-                && caseData.getEvidenceUploadOptions()
-                .getValue().getLabel().startsWith("Claimant 2 - ")) {
+            && caseData.getEvidenceUploadOptions()
+            .getValue().getLabel().startsWith("Claimant 2 - ")) {
             caseDataBuilder.caseTypeFlag("ApplicantTwoFields");
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseDataBuilder.build().toMap(this.objectMapper))
-                .build();
+            .data(caseDataBuilder.build().toMap(this.objectMapper))
+            .build();
     }
 
     @Override
     CallbackResponse validateValues(CallbackParams callbackParams, CaseData caseData) {
         if (Objects.nonNull(caseData.getCaseTypeFlag())
-                && caseData.getCaseTypeFlag().equals("ApplicantTwoFields")) {
+            && caseData.getCaseTypeFlag().equals("ApplicantTwoFields")) {
             return validateValuesParty(caseData.getDocumentForDisclosureRes2(),
-                    caseData.getDocumentWitnessStatementApp2(),
-                    caseData.getDocumentWitnessSummaryApp2(),
-                    caseData.getDocumentHearsayNoticeApp2(),
-                    caseData.getDocumentReferredInStatementApp2(),
-                    caseData.getDocumentExpertReportApp2(),
-                    caseData.getDocumentJointStatementApp2(),
-                    caseData.getDocumentQuestionsApp2(),
-                    caseData.getDocumentAnswersApp2(),
-                    caseData.getDocumentEvidenceForTrialApp2());
+                caseData.getDocumentWitnessStatementApp2(),
+                caseData.getDocumentWitnessSummaryApp2(),
+                caseData.getDocumentHearsayNoticeApp2(),
+                caseData.getDocumentReferredInStatementApp2(),
+                caseData.getDocumentExpertReportApp2(),
+                caseData.getDocumentJointStatementApp2(),
+                caseData.getDocumentQuestionsApp2(),
+                caseData.getDocumentAnswersApp2(),
+                caseData.getDocumentEvidenceForTrialApp2());
         } else {
             return validateValuesParty(caseData.getDocumentForDisclosure(),
-                    caseData.getDocumentWitnessStatement(),
-                    caseData.getDocumentWitnessSummary(),
-                    caseData.getDocumentHearsayNotice(),
-                    caseData.getDocumentReferredInStatement(),
-                    caseData.getDocumentExpertReport(),
-                    caseData.getDocumentJointStatement(),
-                    caseData.getDocumentQuestions(),
-                    caseData.getDocumentAnswers(),
-                    caseData.getDocumentEvidenceForTrial());
+                caseData.getDocumentWitnessStatement(),
+                caseData.getDocumentWitnessSummary(),
+                caseData.getDocumentHearsayNotice(),
+                caseData.getDocumentReferredInStatement(),
+                caseData.getDocumentExpertReport(),
+                caseData.getDocumentJointStatement(),
+                caseData.getDocumentQuestions(),
+                caseData.getDocumentAnswers(),
+                caseData.getDocumentEvidenceForTrial());
         }
     }
 }

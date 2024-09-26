@@ -48,4 +48,10 @@ public class RespondentOneWitnessSummaryDocumentHandler extends
     protected List<Element<UploadEvidenceWitness>> getCorrespondingLegalRep2DocumentList(CaseData caseData) {
         return caseData.getDocumentWitnessSummaryRes2();
     }
+
+    @Override
+    protected void renameDocuments(List<Element<UploadEvidenceWitness>> documentUploads) {
+        renameUploadEvidenceWitness(documentUploads, evidenceUploadType.getDocumentTypeDisplayName(), true);
+
+    }
 }

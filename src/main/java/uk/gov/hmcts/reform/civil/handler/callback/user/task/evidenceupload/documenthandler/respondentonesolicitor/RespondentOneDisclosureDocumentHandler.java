@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.respondentonesolicitor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
@@ -18,6 +19,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploa
 
 @Component
 @Slf4j
+@Order(2)
 public class RespondentOneDisclosureDocumentHandler extends
     RespondentSolicitorOneDocumentHandler<UploadEvidenceDocumentType> {
 
@@ -27,7 +29,7 @@ public class RespondentOneDisclosureDocumentHandler extends
 
     @Override
     protected List<Element<UploadEvidenceDocumentType>> getDocumentList(CaseData caseData) {
-        return caseData.getDocumentDisclosureListRes();
+        return caseData.getDocumentForDisclosureRes();
     }
 
     @Override
@@ -37,12 +39,12 @@ public class RespondentOneDisclosureDocumentHandler extends
 
     @Override
     protected void addDocumentsToCopyToCaseData(CaseData.CaseDataBuilder<?, ?> builder, List<Element<UploadEvidenceDocumentType>> evidenceDocsToAdd) {
-        builder.documentDisclosureListRes2(evidenceDocsToAdd);
+        builder.documentForDisclosureRes2(evidenceDocsToAdd);
     }
 
     @Override
     protected List<Element<UploadEvidenceDocumentType>> getCorrespondingLegalRep2DocumentList(CaseData caseData) {
-        return caseData.getDocumentDisclosureListRes2();
+        return caseData.getDocumentForDisclosureRes2();
     }
 
     @Override

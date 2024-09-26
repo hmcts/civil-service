@@ -19,7 +19,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploa
 
 @Component
 @Slf4j
-@Order(11)
+@Order(12)
 public class ApplicantOneTrialCorrespondenceDocumentHandler extends
     ApplicantSolicitorOneDocumentHandler<UploadEvidenceDocumentType> {
 

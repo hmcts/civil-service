@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.respondenttwosolicitor;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
@@ -19,6 +20,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploa
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.EvidenceUploadConstants.EXPERT_REPORT_TEXT;
 
 @Component
+@Order(4)
 public class RespondentTwoExpertReportDocumentHandler extends
     RespondentSolicitorTwoDocumentHandler<UploadEvidenceExpert> {
 
@@ -28,7 +30,7 @@ public class RespondentTwoExpertReportDocumentHandler extends
 
     @Override
     protected List<Element<UploadEvidenceExpert>> getDocumentList(CaseData caseData) {
-        return caseData.getDocumentExpertReport();
+        return caseData.getDocumentExpertReportRes2();
     }
 
     @Override
@@ -41,4 +43,8 @@ public class RespondentTwoExpertReportDocumentHandler extends
         return element.getValue().getCreatedDatetime();
     }
 
+    @Override
+    protected void renameDocuments(List<Element<UploadEvidenceExpert>> documentUploads) {
+        renameUploadReportExpert(documentUploads, evidenceUploadType.getDocumentTypeDisplayName(),  true);
+    }
 }

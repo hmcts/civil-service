@@ -36,5 +36,10 @@ public class RespondentTwoWitnessHearsayDocumentHandler extends
         return element.getValue().getCreatedDatetime();
     }
 
+    @Override
+    protected void renameDocuments(List<Element<UploadEvidenceWitness>> documentUploads) {
+        renameUploadEvidenceWitness(documentUploads, evidenceUploadType.getDocumentTypeDisplayName(), true);
+
+    }
 
 }
