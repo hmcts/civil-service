@@ -27,4 +27,4 @@ values ('<a>Pay the hearing fee</a>', 'Hearing',
         '<a>Talu ffi''r gwrandawiad</a>', 'Gwrandawiad',
         'Hearing.Fee.Pay', 'Scenario.AAA6.CP.HearingFee.HWF.AppliedFor.Claimant',
         '{6, 6}', 'CLAIMANT', 9,
-        'Deadline is 12am on ${hearingDueDateEn}', 'Deadline is 12am on ${hearingDueDateCy}');
+        'Deadline is 12am on ${hearingDueDateEn}', 'y dyddiad cau yw 12am ar ${hearingDueDateCy}');
