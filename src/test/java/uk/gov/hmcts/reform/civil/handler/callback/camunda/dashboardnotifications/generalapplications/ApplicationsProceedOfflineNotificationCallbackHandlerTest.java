@@ -11,9 +11,13 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -34,6 +38,7 @@ import static org.mockito.Mockito.never;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
 public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -155,6 +160,50 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
             // WHEN
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(EVENT_ID_CLAIMANT).build())
+                .build();
+            // THEN
+            verify(dashboardApiClient, never())
+                .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
+        }
+
+        @Test
+        void shouldEmptyResponse_whenEventIsLrClaimant() {
+            List<Element<GeneralApplication>> gaApplications = wrapElements(
+                GeneralApplication.builder()
+                    .caseLink(CaseLink.builder().caseReference("12345678").build())
+                    .build());
+            // GIVEN
+            CaseData caseData = CaseDataBuilder.builder()
+                .build().toBuilder()
+                .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
+                .generalApplications(gaApplications)
+                .applicant1Represented(YesOrNo.YES)
+                .build();
+            // WHEN
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId(EVENT_ID_CLAIMANT).build())
+                .build();
+            // THEN
+            verify(dashboardApiClient, never())
+                .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
+        }
+
+        @Test
+        void shouldEmptyResponse_whenEventIsLrDefendant() {
+            List<Element<GeneralApplication>> gaApplications = wrapElements(
+                GeneralApplication.builder()
+                    .caseLink(CaseLink.builder().caseReference("12345678").build())
+                    .build());
+            // GIVEN
+            CaseData caseData = CaseDataBuilder.builder()
+                .build().toBuilder()
+                .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
+                .generalApplications(gaApplications)
+                .respondent1Represented(YesOrNo.YES)
+                .build();
+            // WHEN
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId(EVENT_ID_DEFENDANT).build())
                 .build();
             // THEN
             verify(dashboardApiClient, never())
