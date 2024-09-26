@@ -47,6 +47,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -329,6 +332,8 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateCorrectCaseManagementLocationForDefendantResponse() {
+            doNothing().when(updateCaseManagementLocationDetailsService).updateCaseManagementDetails(any(), any(), anyString());
+
             CaseData caseData = CaseDataBuilder.builder()
                 .totalClaimAmount(BigDecimal.valueOf(1000))
                 .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
@@ -349,7 +354,8 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            verify(updateCaseManagementLocationDetailsService).updateCaseManagementDetails(any(), any(), any());
+            verify(updateCaseManagementLocationDetailsService)
+                .updateCaseManagementDetails(any(CaseData.CaseDataBuilder.class), any(CallbackParams.class), eq("respondent"));
         }
     }
 }
