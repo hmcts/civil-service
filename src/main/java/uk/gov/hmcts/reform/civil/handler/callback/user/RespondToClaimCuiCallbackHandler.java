@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
@@ -49,6 +50,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     @Value("${case-flags.logging.enabled:false}")
     private boolean caseFlagsLoggingEnabled;
+    private final UpdateCaseManagementDetailsService updateCaseManagementLocationDetailsService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -104,6 +106,8 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
                 caseData.getRespondent1().getFlags()
             );
         }
+
+        updateCaseManagementLocationDetailsService.updateCaseManagementDetails(builder, callbackParams, "respondent");
 
         return responseBuilder.build();
     }

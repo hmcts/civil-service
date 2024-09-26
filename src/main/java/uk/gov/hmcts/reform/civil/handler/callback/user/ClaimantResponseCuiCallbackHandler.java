@@ -105,7 +105,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
                 applicant1ResponseDate
             ));
 
-        updateCaseManagementLocationDetailsService.updateCaseManagementDetails(builder, callbackParams);
+        updateCaseManagementLocationDetailsService.updateCaseManagementDetails(builder, callbackParams, "claimant");
 
         if (caseData.hasClaimantAgreedToFreeMediation() && caseData.hasDefendantAgreedToFreeMediation()
             || (featureToggleService.isCarmEnabledForCase(caseData)
