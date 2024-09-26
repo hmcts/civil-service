@@ -56,6 +56,8 @@ public class GeneralAppFeesService {
         = List.of(GeneralApplicationTypes.ADJOURN_HEARING);
     protected static final List<GeneralApplicationTypes> SD_CONSENT_TYPES
         = List.of(GeneralApplicationTypes.SETTLE_BY_CONSENT);
+    protected static final List<GeneralApplicationTypes> CONFIRM_YOU_PAID_CCJ_DEBT
+        = List.of(GeneralApplicationTypes.CONFIRM_YOU_PAID_CCJ_DEBT);
 
     public Fee getFeeForGALiP(List<GeneralApplicationTypes> applicationTypes, Boolean withConsent,
                               Boolean withNotice, LocalDate hearingDate) {
@@ -96,6 +98,11 @@ public class GeneralAppFeesService {
                 .compareTo(result.getCalculatedAmountInPence()) < 0) {
                 result = setAsideFeeForGA;
             }
+        }
+        if (shouldUpdateGATypeSize(typeSize, types)) {
+            typeSize--;
+            Fee certOfSatisfactionOrCancel = getFeeForGA(feesConfiguration.getCertificateOfSatisfaction(), "miscellaneous", "other");
+            result = getCoScFeeResult(result, certOfSatisfactionOrCancel);
         }
         if (typeSize > 0) {
             Fee defaultFee = getDefaultFee(types, respondentAgreed, informOtherParty, hearingScheduledDate);
@@ -195,5 +202,16 @@ public class GeneralAppFeesService {
         return Optional.ofNullable(caseData.getGeneralAppHearingDate())
             .map(GAHearingDateGAspec::getHearingScheduledDate)
             .orElse(null);
+    }
+
+    private boolean shouldUpdateGATypeSize(int typeSize, List<GeneralApplicationTypes> types) {
+        return typeSize > 0 && CollectionUtils.containsAny(types, CONFIRM_YOU_PAID_CCJ_DEBT);
+    }
+
+    private Fee getCoScFeeResult(Fee existingResult, Fee certOfSatisfactionOrCancel) {
+        if (certOfSatisfactionOrCancel.getCalculatedAmountInPence().compareTo(existingResult.getCalculatedAmountInPence()) < 0) {
+            return certOfSatisfactionOrCancel;
+        }
+        return existingResult;
     }
 }

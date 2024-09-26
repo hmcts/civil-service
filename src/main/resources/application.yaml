@@ -117,6 +117,7 @@ genApp:
       withNotice: GAOnNotice
       consentedOrWithoutNotice: GeneralAppWithoutNotice
       appnToVaryOrSuspend: AppnToVaryOrSuspend
+      certificateOfSatisfaction: CoS
   lrd:
     endpoint: /refdata/location/court-venues
     ccmcc:
