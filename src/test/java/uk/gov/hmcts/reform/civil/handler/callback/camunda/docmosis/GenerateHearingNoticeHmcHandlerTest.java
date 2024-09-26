@@ -261,4 +261,62 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         assertThat(updatedData.getHearingFee()).isEqualTo(expectedFee);
 
     }
+
+    @Test
+    void shouldNotReturnHearingFee_WhenCaseProgressionFeatureToggleIsDisabled() {
+        CaseData caseData = CaseData.builder()
+            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
+            .ccdState(CASE_PROGRESSION)
+            .caseAccessCategory(UNSPEC_CLAIM)
+            .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+            .totalClaimAmount(new BigDecimal(1000))
+            .claimValue(null)
+            .totalInterest(BigDecimal.TEN)
+            .build();
+        HearingDay hearingDay = HearingDay.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 07, 01, 9, 0, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 07, 01, 11, 0, 0))
+            .build();
+        LocalDateTime hearingResponseDate = LocalDateTime.of(2023, 06, 02, 0, 0, 0);
+        HearingGetResponse hearing = HearingGetResponse.builder()
+            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
+                    List.of(
+                        HearingDaySchedule.builder()
+                            .hearingVenueId(EPIMS)
+                            .hearingStartDateTime(hearingDay.getHearingStartDateTime())
+                            .hearingEndDateTime(hearingDay.getHearingEndDateTime())
+                            .build()))
+                                 .receivedDateTime(hearingResponseDate)
+                                 .build())
+            .requestDetails(HearingRequestDetails.builder()
+                                .versionNumber(VERSION_NUMBER)
+                                .build())
+            .hearingDetails(HearingDetails.builder()
+                                .hearingType(TRIAL_HEARING_TYPE)
+                                .build())
+            .build();
+        HearingNoticeVariables inputVariables = HearingNoticeVariables.builder()
+            .hearingId(HEARING_ID)
+            .caseId(CASE_ID)
+            .build();
+
+        List<LocationRefData> locations = List.of(LocationRefData.builder()
+                                                      .epimmsId(EPIMS).build());
+        when(locationRefDataService.getHearingCourtLocations(anyString()))
+            .thenReturn(locations);
+        when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
+        when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
+        when(hearingNoticeHmcGenerator.generate(eq(caseData), eq(hearing), anyString(), anyString(), anyString())).thenReturn(List.of(CASE_DOCUMENT));
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        params.getRequest().setEventId(GENERATE_HEARING_NOTICE_HMC.name());
+
+        var actual = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        CaseData updatedData = mapper.convertValue(actual.getData(), CaseData.class);
+        assertThat(updatedData.getHearingDocuments()).hasSize(1);
+        assertThat(updatedData.getHearingFee()).isNull();
+
+    }
 }
