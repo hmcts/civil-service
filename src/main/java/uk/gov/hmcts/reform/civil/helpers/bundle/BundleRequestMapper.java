@@ -568,10 +568,20 @@ public class BundleRequestMapper {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         bundlingRequestDocuments.addAll(getDqByCategoryId(caseData,
                                                           DocCategory.APP1_DQ.getValue(), PartyType.CLAIMANT1));
+        if (featureToggleService.isCaseProgressionEnabled()) {
+            bundlingRequestDocuments.addAll(getDqByCategoryId(caseData,
+                                                              DocCategory.DQ_APP1.getValue(), PartyType.CLAIMANT1));
+        }
         bundlingRequestDocuments.addAll(getDqByCategoryId(caseData,
                                                           DocCategory.DEF1_DEFENSE_DQ.getValue(), PartyType.DEFENDANT1));
+        if (featureToggleService.isCaseProgressionEnabled()) {
+            bundlingRequestDocuments.addAll(getDqByCategoryId(caseData,
+                                                              DocCategory.DQ_DEF1.getValue(), PartyType.DEFENDANT1));
+        }
         bundlingRequestDocuments.addAll(getDqByCategoryId(caseData,
                                                           DocCategory.DEF2_DEFENSE_DQ.getValue(), PartyType.DEFENDANT2));
+
+
 
         bundlingRequestDocuments.addAll(getDqWithNoCategoryId(caseData));
         return ElementUtils.wrapElements(bundlingRequestDocuments);
@@ -607,8 +617,9 @@ public class BundleRequestMapper {
     private List<Element<BundlingRequestDocument>> mapStatementOfcaseDocs(CaseData caseData) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         bundlingRequestDocuments.addAll(mapSystemGeneratedCaseDocument(caseData.getSystemGeneratedCaseDocuments().stream()
-                                                                           .filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
-                                                                           .equals(DocumentType.SEALED_CLAIM)
+                                                                           .filter(caseDocumentElement -> (
+                                                                               caseDocumentElement.getValue().getDocumentType()
+                                                                                    .equals(DocumentType.SEALED_CLAIM))
                                                                                && null != caseDocumentElement.getValue().getDocumentLink().getCategoryID()
                                                                                && caseDocumentElement.getValue().getDocumentLink().getCategoryID().equals("detailsOfClaim"))
                                                                            .collect(Collectors.toList()),
