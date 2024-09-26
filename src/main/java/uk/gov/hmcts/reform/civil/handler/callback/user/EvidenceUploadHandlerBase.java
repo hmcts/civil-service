@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
-import org.apache.commons.io.FilenameUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -10,17 +9,14 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.DocumentUploadTimeTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.DocumentUploadTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.SetOptionsTask;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
@@ -34,18 +30,12 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -57,7 +47,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
@@ -138,14 +127,14 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     private List<Element<UploadEvidenceDocumentType>> additionalBundleDocs;
 
     private final SetOptionsTask setOptionsTask;
-    private final DocumentUploadTimeTask documentUploadTimeTask;
+    private final DocumentUploadTask documentUploadTask;
 
     @SuppressWarnings("java:S107")
     protected EvidenceUploadHandlerBase(UserService userService, CoreCaseUserService coreCaseUserService,
                                         CaseDetailsConverter caseDetailsConverter,
                                         CoreCaseDataService coreCaseDataService,
                                         ObjectMapper objectMapper, Time time, List<CaseEvent> events, String pageId,
-                                        String createShowCondition, FeatureToggleService featureToggleService, SetOptionsTask setOptionsTask, DocumentUploadTimeTask documentUploadTimeTask) {
+                                        String createShowCondition, FeatureToggleService featureToggleService, SetOptionsTask setOptionsTask, DocumentUploadTask documentUploadTask) {
         this.objectMapper = objectMapper;
         this.time = time;
         this.createShowCondition = createShowCondition;
@@ -157,7 +146,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         this.coreCaseDataService = coreCaseDataService;
         this.featureToggleService = featureToggleService;
         this.setOptionsTask = setOptionsTask;
-        this.documentUploadTimeTask = documentUploadTimeTask;
+        this.documentUploadTask = documentUploadTask;
     }
 
     abstract CallbackResponse validateValues(CallbackParams callbackParams, CaseData caseData);
@@ -308,49 +297,49 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                          List<Element<UploadEvidenceDocumentType>> trialDocumentEvidence) {
         List<String> errors = new ArrayList<>();
 
-        checkDateCorrectness(time, errors, uploadEvidenceDocumentType, date -> date.getValue()
+        checkDateCorrectness(errors, uploadEvidenceDocumentType, date -> date.getValue()
                                  .getDocumentIssuedDate(),
                              "Invalid date: \"Documents for disclosure\" "
                                  + "date entered must not be in the future (1).");
 
-        checkDateCorrectness(time, errors, uploadEvidenceWitness1, date -> date.getValue()
+        checkDateCorrectness(errors, uploadEvidenceWitness1, date -> date.getValue()
                                  .getWitnessOptionUploadDate(),
                              "Invalid date: \"witness statement\" "
                                  + "date entered must not be in the future (2).");
 
-        checkDateCorrectness(time, errors, uploadEvidenceWitness2, date -> date.getValue()
+        checkDateCorrectness(errors, uploadEvidenceWitness2, date -> date.getValue()
                                  .getWitnessOptionUploadDate(),
                              "Invalid date: \"witness summary\" "
                                  + "date entered must not be in the future (3).");
 
-        checkDateCorrectness(time, errors, uploadEvidenceWitness3, date -> date.getValue()
+        checkDateCorrectness(errors, uploadEvidenceWitness3, date -> date.getValue()
                                  .getWitnessOptionUploadDate(),
                              "Invalid date: \"Notice of the intention to rely on hearsay evidence\" "
                                  + "date entered must not be in the future (4).");
 
-        checkDateCorrectness(time, errors, witnessDocumentReferred, date -> date.getValue()
+        checkDateCorrectness(errors, witnessDocumentReferred, date -> date.getValue()
                                  .getDocumentIssuedDate(),
                              "Invalid date: \"Documents referred to in the statement\" "
                                  + "date entered must not be in the future (5).");
 
-        checkDateCorrectness(time, errors, uploadEvidenceExpert1, date -> date.getValue()
+        checkDateCorrectness(errors, uploadEvidenceExpert1, date -> date.getValue()
                                  .getExpertOptionUploadDate(),
                              "Invalid date: \"Expert's report\""
                                  + " date entered must not be in the future (6).");
-        checkDateCorrectness(time, errors, uploadEvidenceExpert2, date -> date.getValue()
+        checkDateCorrectness(errors, uploadEvidenceExpert2, date -> date.getValue()
                                  .getExpertOptionUploadDate(),
                              "Invalid date: \"Joint statement of experts\" "
                                  + "date entered must not be in the future (7).");
-        checkDateCorrectness(time, errors, uploadEvidenceExpert3, date -> date.getValue()
+        checkDateCorrectness(errors, uploadEvidenceExpert3, date -> date.getValue()
                                  .getExpertOptionUploadDate(),
                              "Invalid date: \"Questions for other party's expert or joint experts\" "
                                  + "expert statement date entered must not be in the future (8).");
-        checkDateCorrectness(time, errors, uploadEvidenceExpert4, date -> date.getValue()
+        checkDateCorrectness(errors, uploadEvidenceExpert4, date -> date.getValue()
                                  .getExpertOptionUploadDate(),
                              "Invalid date: \"Answers to questions asked by the other party\" "
                                  + "date entered must not be in the future (9).");
 
-        checkDateCorrectness(time, errors, trialDocumentEvidence, date -> date.getValue()
+        checkDateCorrectness(errors, trialDocumentEvidence, date -> date.getValue()
                                  .getDocumentIssuedDate(),
                              "Invalid date: \"Documentary evidence for trial\" "
                                  + "date entered must not be in the future (10).");
@@ -360,14 +349,14 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             .build();
     }
 
-    <T> void checkDateCorrectness(Time time, List<String> errors, List<Element<T>> documentUpload,
+    <T> void checkDateCorrectness(List<String> errors, List<Element<T>> documentUpload,
                                   Function<Element<T>, LocalDate> dateExtractor, String errorMessage) {
         if (documentUpload == null) {
             return;
         }
         documentUpload.forEach(date -> {
             LocalDate dateToCheck = dateExtractor.apply(date);
-            if (dateToCheck.isAfter(time.now().toLocalDate())) {
+            if (dateToCheck.isAfter(LocalDateTime.now().toLocalDate())) {
                 errors.add(errorMessage);
             }
         });
@@ -376,7 +365,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     CallbackResponse documentUploadTime(CallbackParams callbackParams) {
         String selectedRole = getSelectedRole(callbackParams);
-        return documentUploadTimeTask.documentUploadTime(callbackParams.getCaseData(), callbackParams.getCaseDataBefore(), selectedRole);
+        return documentUploadTask.uploadDocuments(callbackParams.getCaseData(), callbackParams.getCaseDataBefore(), selectedRole);
     }
 
     protected static <T> List<Element<T>> compareAndCopy(List<Element<T>> before,

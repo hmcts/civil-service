@@ -36,7 +36,7 @@ import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.DocumentUploadTimeTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.DocumentUploadTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.SetOptionsTask;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Bundle;
@@ -94,7 +94,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
     EvidenceUploadRespondentHandler.class,
     JacksonAutoConfiguration.class,
     SetOptionsTask.class,
-    DocumentUploadTimeTask.class
+    DocumentUploadTask.class
 })
 class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
@@ -118,7 +118,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private SetOptionsTask setOptionsTask;
     @MockBean
-    private DocumentUploadTimeTask documentUploadTimeTask;
+    private DocumentUploadTask documentUploadTask;
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();

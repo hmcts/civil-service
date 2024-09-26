@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.applicantonesolcitor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
@@ -18,6 +19,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploa
 
 @Component
 @Slf4j
+@Order(11)
 public class ApplicantOneScheduleOfCostsDocumentHandler extends
     ApplicantSolicitorOneDocumentHandler<UploadEvidenceDocumentType> {
 

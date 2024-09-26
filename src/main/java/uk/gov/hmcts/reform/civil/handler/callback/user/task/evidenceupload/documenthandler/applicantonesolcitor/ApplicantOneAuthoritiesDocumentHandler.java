@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.ApplicantSolicitorOneDocumentHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -14,22 +13,25 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_ONE_DISCLOSURE_LIST;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_TWO_DISCLOSURE_LIST;
+import static uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType.AUTHORITIES;
+import static uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType.TRIAL_SKELETON;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_ONE_TRIAL_SKELETON;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_TWO_TRIAL_SKELETON;
 
 @Component
 @Slf4j
-@Order(1)
-public class ApplicantOneDisclosureListDocumentHandler extends
+@Order(10)
+public class ApplicantOneAuthoritiesDocumentHandler extends
     ApplicantSolicitorOneDocumentHandler<UploadEvidenceDocumentType> {
 
-    public ApplicantOneDisclosureListDocumentHandler(DocumentTypeBuilder<UploadEvidenceDocumentType> documentTypeBuilder) {
-        super(APPLICANT_ONE_DISCLOSURE_LIST, APPLICANT_TWO_DISCLOSURE_LIST, EvidenceUploadType.DISCLOSURE_LIST, documentTypeBuilder);
+
+    public ApplicantOneAuthoritiesDocumentHandler(DocumentTypeBuilder<UploadEvidenceDocumentType> documentTypeBuilder) {
+        super(APPLICANT_ONE_TRIAL_SKELETON, APPLICANT_TWO_TRIAL_SKELETON, AUTHORITIES, documentTypeBuilder);
     }
 
     @Override
     protected List<Element<UploadEvidenceDocumentType>> getDocumentList(CaseData caseData) {
-        return caseData.getDocumentDisclosureList();
+        return caseData.getDocumentAuthorities();
     }
 
     @Override
@@ -49,12 +51,11 @@ public class ApplicantOneDisclosureListDocumentHandler extends
 
     @Override
     protected void addDocumentsToCopyToCaseData(CaseData.CaseDataBuilder<?, ?> builder, List<Element<UploadEvidenceDocumentType>> evidenceDocsToAdd) {
-        builder.documentDisclosureListApp2(evidenceDocsToAdd);
+        builder.documentAuthoritiesApp2(evidenceDocsToAdd);
     }
 
     @Override
     protected List<Element<UploadEvidenceDocumentType>> getCorrespondingLegalRep2DocumentList(CaseData caseData) {
-        return caseData.getDocumentDisclosureListApp2();
+        return caseData.getDocumentAuthoritiesApp2();
     }
-
 }

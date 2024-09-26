@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.DocumentUploadTimeTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.DocumentUploadTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.SetOptionsTask;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -27,11 +27,11 @@ public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
                                            CaseDetailsConverter caseDetailsConverter,
                                            CoreCaseDataService coreCaseDataService,
                                            ObjectMapper objectMapper, Time time, FeatureToggleService featureToggleService,
-                                           SetOptionsTask setOptionsTask, DocumentUploadTimeTask documentUploadTimeTask) {
+                                           SetOptionsTask setOptionsTask, DocumentUploadTask documentUploadTask) {
         super(userService, coreCaseUserService, caseDetailsConverter, coreCaseDataService,
               objectMapper, time, Collections.singletonList(EVIDENCE_UPLOAD_RESPONDENT),
               "validateValuesRespondent", "createShowCondition", featureToggleService, setOptionsTask,
-              documentUploadTimeTask
+            documentUploadTask
         );
     }
 

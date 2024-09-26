@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.ApplicantDocumentUploadTimeTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.ApplicantDocumentUploadTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.ApplicantSetOptionsTask;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -29,7 +29,7 @@ public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
                                           CaseDetailsConverter caseDetailsConverter,
                                           CoreCaseDataService coreCaseDataService,
                                           ObjectMapper objectMapper, Time time, FeatureToggleService featureToggleService,
-                                          ApplicantSetOptionsTask setOptionsTask, ApplicantDocumentUploadTimeTask documentUploadTimeTask) {
+                                          ApplicantSetOptionsTask setOptionsTask, ApplicantDocumentUploadTask documentUploadTimeTask) {
         super(userService, coreCaseUserService, caseDetailsConverter, coreCaseDataService,
               objectMapper, time, Collections.singletonList(EVIDENCE_UPLOAD_APPLICANT),
               "validateValuesApplicant", "createShowCondition", featureToggleService, setOptionsTask,

@@ -11,7 +11,7 @@ import java.util.List;
 public abstract class RespondentSolicitorOneDocumentHandler<T> extends LegalRepresentativeOneDocumentHandler<T> {
     public RespondentSolicitorOneDocumentHandler(DocumentCategory documentCategory, DocumentCategory legalRepresentativeTwoDocumentCategory,
                                                  EvidenceUploadType evidenceUploadType,
-                                                 DocumentTypeBuilder documentTypeBuilder) {
+                                                 DocumentTypeBuilder<T> documentTypeBuilder) {
         super(documentCategory, legalRepresentativeTwoDocumentCategory, evidenceUploadType, documentTypeBuilder);
     }
 

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.applicanttwosolicitor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
@@ -16,6 +17,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploa
 
 @Component
 @Slf4j
+@Order(1)
 public class ApplicantTwoDisclosureListDocumentHandler extends
     ApplicantSolicitorTwoDocumentHandler<UploadEvidenceDocumentType> {
     protected static final String APPLICANT_TWO_DISCLOSURE_LIST_CATEGORY_ID = "ApplicantTwoDisclosureList";
@@ -26,7 +28,7 @@ public class ApplicantTwoDisclosureListDocumentHandler extends
 
     @Override
     protected List<Element<UploadEvidenceDocumentType>> getDocumentList(CaseData caseData) {
-        return caseData.getDocumentDisclosureList();
+        return caseData.getDocumentDisclosureListApp2();
     }
 
     @Override

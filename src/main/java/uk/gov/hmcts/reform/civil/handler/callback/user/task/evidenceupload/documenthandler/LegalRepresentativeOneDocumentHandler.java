@@ -24,7 +24,7 @@ public abstract class LegalRepresentativeOneDocumentHandler<T> extends DocumentH
     }
 
 
-    private CaseData copyLegalRep1ChangesToLegalRep2(CaseData caseData, CaseData caseDataBefore, CaseData.CaseDataBuilder<?, ?> builder) {
+    public CaseData copyLegalRep1ChangesToLegalRep2(CaseData caseData, CaseData caseDataBefore, CaseData.CaseDataBuilder builder) {
         List<Element<T>> evidenceDocsToCopy =
             compareAndCopy(getDocumentList(caseDataBefore),
                 getDocumentList(caseData),

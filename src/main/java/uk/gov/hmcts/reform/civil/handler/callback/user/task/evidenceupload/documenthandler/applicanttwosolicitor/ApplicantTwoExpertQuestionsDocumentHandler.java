@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.applicanttwosolicitor;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
@@ -14,6 +15,7 @@ import java.util.List;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_TWO_EXPERT_QUESTIONS;
 
 @Component
+@Order(5)
 public class ApplicantTwoExpertQuestionsDocumentHandler extends
     ApplicantSolicitorTwoDocumentHandler<UploadEvidenceExpert> {
 

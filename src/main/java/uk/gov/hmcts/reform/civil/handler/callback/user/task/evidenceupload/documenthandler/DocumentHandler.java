@@ -148,7 +148,7 @@ public abstract class DocumentHandler<T> {
         renameUploadEvidenceDocumentType(documentUploads, evidenceUploadType.getDocumentTypeDisplayName());
     }
 
-    public <T> void addUploadDocList(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseData caseData) {
+    public  void addUploadDocList(CaseData.CaseDataBuilder caseDataBuilder, CaseData caseData) {
 
         if (getDocumentList(caseData) == null || getDocumentList(caseData).isEmpty()){
             return;

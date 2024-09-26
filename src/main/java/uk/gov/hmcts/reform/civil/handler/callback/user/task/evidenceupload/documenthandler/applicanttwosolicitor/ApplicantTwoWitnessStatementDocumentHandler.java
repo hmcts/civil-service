@@ -38,8 +38,7 @@ public class ApplicantTwoWitnessStatementDocumentHandler extends
 
     @Override
     protected void renameDocuments(List<Element<UploadEvidenceWitness>> documentUploads) {
-        renameUploadEvidenceDocumentTypeWithName(documentUploads, evidenceUploadType.getDocumentTypeDisplayName());
-
+        renameUploadEvidenceWitness(documentUploads, evidenceUploadType.getDocumentTypeDisplayName(), true);
     }
 
 }

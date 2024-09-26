@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.applicanttwosolicitor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -12,21 +13,21 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.EvidenceUploadConstants.REFERRED_TO_IN_THE_STATEMENT_OF;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_TWO_WITNESS_REFERRED;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_TWO_TRIAL_SKELETON;
 
 @Component
-@Order(3)
-public class ApplicantTwoWitnessReferredDocumentHandler extends
+@Slf4j
+@Order(9)
+public class ApplicantTwoAuthoritiesDocumentHandler extends
     ApplicantSolicitorTwoDocumentHandler<UploadEvidenceDocumentType> {
 
-    public ApplicantTwoWitnessReferredDocumentHandler() {
-        super(APPLICANT_TWO_WITNESS_REFERRED, EvidenceUploadType.WITNESS_REFERRED);
+    public ApplicantTwoAuthoritiesDocumentHandler() {
+        super(APPLICANT_TWO_TRIAL_SKELETON, EvidenceUploadType.AUTHORITIES);
     }
 
     @Override
     protected List<Element<UploadEvidenceDocumentType>> getDocumentList(CaseData caseData) {
-        return caseData.getDocumentReferredInStatementApp2();
+        return caseData.getDocumentAuthoritiesApp2();
     }
 
     @Override
@@ -41,8 +42,7 @@ public class ApplicantTwoWitnessReferredDocumentHandler extends
 
     @Override
     protected void renameDocuments(List<Element<UploadEvidenceDocumentType>> documentUploads) {
-        renameUploadEvidenceDocumentTypeWithName(documentUploads, REFERRED_TO_IN_THE_STATEMENT_OF);
-
+        log.info("No rename required");
     }
 
 }

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.applicantonesolcitor;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
+@Order(5)
 public class ApplicantOneExpertJointStatmementDocumentHandler extends
     ApplicantSolicitorOneDocumentHandler<UploadEvidenceExpert> {
 
@@ -39,7 +41,7 @@ public class ApplicantOneExpertJointStatmementDocumentHandler extends
 
     @Override
     protected void renameDocuments(List<Element<UploadEvidenceExpert>> documentUploads) {
-        renameUploadEvidenceDocumentType(documentUploads, evidenceUploadType.getDocumentTypeDisplayName());
+        renameUploadReportExpert(documentUploads, evidenceUploadType.getDocumentTypeDisplayName(),  false);
     }
 
     @Override
