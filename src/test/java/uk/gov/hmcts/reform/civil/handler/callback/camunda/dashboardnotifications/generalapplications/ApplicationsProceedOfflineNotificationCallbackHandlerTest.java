@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
+import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -41,6 +42,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_APPLICANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
@@ -358,6 +360,41 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
             handler.handle(callbackParams);
             verify(dashboardApiClient, never())
                 .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
+        }
+
+        @Test
+        void shouldReturnResponse_whenGeneralApplicationsForDefendantExist() {
+            List<Element<GeneralApplication>> gaApplications = wrapElements(
+                GeneralApplication.builder()
+                    .caseLink(CaseLink.builder().caseReference("12345678").build())
+                    .build());
+
+            List<Element<GADetailsRespondentSol>> respondentSolGaAppDetails = wrapElements(
+                GADetailsRespondentSol.builder()
+                    .caseLink(CaseLink.builder().caseReference("12345678").build())
+                    .caseState("Awaiting Respondent Response")
+                    .build());
+            // GIVEN
+            CaseData caseData = CaseDataBuilder.builder()
+                .build().toBuilder()
+                .ccdCaseReference(1234L)
+                .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
+                .generalApplications(gaApplications)
+                .respondent1Represented(YesOrNo.NO)
+                .respondentSolGaAppDetails(respondentSolGaAppDetails)
+                .build();
+            // WHEN
+            CallbackParams callbackParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId(EVENT_ID_DEFENDANT).build())
+                .build();
+            // THEN
+            handler.handle(callbackParams);
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_RESPONDENT.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            );
         }
     }
 }
