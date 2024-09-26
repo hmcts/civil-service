@@ -36,7 +36,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
         List.of(CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_CLAIMANT,
                 CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_DEFENDANT);
     public static final String TASK_ID_CLAIMANT = "claimantLipApplicationOfflineDashboardNotification";
-    public static final String TASK_ID_DEFENENDANT = "defendantLipApplicationOfflineDashboardNotification";
+    public static final String TASK_ID_DEFENDANT = "defendantLipApplicationOfflineDashboardNotification";
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper mapper;
     private final FeatureToggleService featureToggleService;
@@ -62,7 +62,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
         if (callbackParams.getRequest().getEventId().equals(CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_CLAIMANT.name())) {
             return TASK_ID_CLAIMANT;
         } else {
-            return TASK_ID_DEFENENDANT;
+            return TASK_ID_DEFENDANT;
         }
     }
 
