@@ -17,11 +17,13 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -46,6 +48,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
+    private final FeatureToggleService featureToggleService;
 
     private CaseData generalAppCaseData;
     private CaseData civilCaseData;
@@ -122,6 +125,14 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             }
             newGaAddlDoc.addAll(generalAppCaseData.getGaAddlDocBundle());
             return generalAppCaseData.toBuilder().gaAddlDoc(newGaAddlDoc).build();
+        }
+        if (featureToggleService.isGaForLipsEnabled() && (civilCaseData.isRespondent1LiP() || civilCaseData.isRespondent2LiP()
+            || civilCaseData.isApplicantNotRepresented()) && (Objects.nonNull(generalAppCaseData.getGaDraftDocument()) && generalAppCaseData.getGaDraftDocument().size()>1)) {
+            generalAppCaseData.getGaDraftDocument().sort(Comparator.comparing(gaDocElement -> gaDocElement.getValue().getCreatedDatetime(), Comparator.reverseOrder()));
+            generalAppCaseData.getGaDraftDocument().remove(1);
+            List<Element<CaseDocument>> draftApplicationList = newArrayList();
+            draftApplicationList.addAll(generalAppCaseData.getGaDraftDocument());
+            generalAppCaseData.toBuilder().gaDraftDocument(draftApplicationList).build();
         }
         return generalAppCaseData;
     }
@@ -236,10 +247,38 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
                     civilDocs.add(gaDoc);
                 }
             }
-        } else if (gaDocs != null && gaDocs.size() == 1 && checkIfDocumentExists(civilDocs, gaDocs) < 1) {
-            civilDocs.addAll(gaDocs);
+        } else  if (featureToggleService.isGaForLipsEnabled() && (civilCaseData.isRespondent1LiP() || civilCaseData.isRespondent2LiP()
+            || civilCaseData.isApplicantNotRepresented()) && (gaDocs != null && (fromGaList.equals("gaDraftDocument")))) {
+
+            checkDraftDocumentsInMainCase(civilDocs, gaDocs);
+        }
+        else  {
+            if (gaDocs != null && gaDocs.size() == 1 && checkIfDocumentExists(civilDocs, gaDocs) < 1) {
+                civilDocs.addAll(gaDocs);
+            }
         }
         output.put(toCivilList, civilDocs.isEmpty() ? null : civilDocs);
+    }
+
+    private List<Element<?>> checkDraftDocumentsInMainCase(List<Element<?>> civilDocs, List<Element<?>> gaDocs) {
+
+        List<UUID> ids = gaDocs.stream().map(Element::getId).toList();
+        List<Element<?>> civilDocsCopy = newArrayList();
+        for (Element<?> civilDoc : civilDocs) {
+            if (!ids.contains(civilDoc.getId())) {
+                civilDocsCopy.add(civilDoc);
+            }
+        }
+        List<UUID> civilIds = civilDocs.stream().map(Element::getId).toList();
+        for (Element<?> gaDoc : gaDocs) {
+            if (!civilIds.contains(gaDoc.getId())) {
+                civilDocsCopy.add(gaDoc);
+            }
+        }
+        civilDocs.clear();
+        civilDocs.addAll(civilDocsCopy);
+        civilDocsCopy.clear();
+        return civilDocs;
     }
 
     protected boolean canViewClaimant(CaseData civilCaseData, CaseData generalAppCaseData) {
