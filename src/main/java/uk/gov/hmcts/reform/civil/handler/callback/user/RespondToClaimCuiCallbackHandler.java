@@ -91,7 +91,9 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(
             builder, featureToggleService.isUpdateContactDetailsEnabled());
 
-        updateCaseManagementLocationDetailsService.updateCaseManagementDetails(builder, callbackParams, "respondent");
+        updateCaseManagementLocationDetailsService.updateRespondent1RequestedCourtDetails(caseData, builder,
+                                                                                          updateCaseManagementLocationDetailsService
+                                                                                              .fetchLocationData(callbackParams));
 
         CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =

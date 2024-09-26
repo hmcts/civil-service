@@ -38,16 +38,11 @@ public class UpdateCaseManagementDetailsService {
     private final AirlineEpimsService airlineEpimsService;
     private static final String LIVERPOOL_SITE_NAME = "Liverpool Civil and Family Court";
 
-    public void updateCaseManagementDetails(CaseData.CaseDataBuilder<?, ?> builder, CallbackParams callbackParams, String claimantOrRespondent) {
+    public void updateCaseManagementDetails(CaseData.CaseDataBuilder<?, ?> builder, CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         final List<LocationRefData> availableLocations = fetchLocationData(callbackParams);
 
-        if (claimantOrRespondent.equals("respondent")) {
-            updateRespondent1RequestedCourtDetails(caseData, builder, availableLocations);
-            return;
-        } else {
-            updateApplicant1RequestedCourtDetails(caseData, builder, availableLocations);
-        }
+        updateApplicant1RequestedCourtDetails(caseData, builder, availableLocations);
 
         caseData = builder.build();
         if (caseData.getIsFlightDelayClaim() == YesOrNo.YES && caseData.isSmallClaim()) {
@@ -117,7 +112,7 @@ public class UpdateCaseManagementDetailsService {
                         .build())));
     }
 
-    private void updateRespondent1RequestedCourtDetails(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> availableLocations) {
+    public void updateRespondent1RequestedCourtDetails(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> availableLocations) {
         if (caseData.isRespondent1LiP()) {
             Optional.ofNullable(caseData.getRespondent1DQ())
                 .ifPresent(dq -> Optional.ofNullable(dq.getRespondent1DQRequestedCourt())
@@ -141,7 +136,7 @@ public class UpdateCaseManagementDetailsService {
             .build();
     }
 
-    private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
+    public List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }
