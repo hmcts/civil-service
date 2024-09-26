@@ -136,6 +136,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             && (YES.equals(caseData.getApplicant1ProceedWithClaim())
             || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())))) {
             builder.claimMovedToMediationOn(LocalDate.now());
+            log.info("Moved Claim to mediation for Case : {}", caseData.getCcdCaseReference());
         }
     }
 
@@ -219,6 +220,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     }
 
     private static void setResponseDocumentNull(CaseData.CaseDataBuilder<?, ?> builder) {
+        log.info("Resetting Documents");
         builder.respondent1GeneratedResponseDocument(null);
         builder.respondent2GeneratedResponseDocument(null);
         builder.respondent1ClaimResponseDocumentSpec(null);

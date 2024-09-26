@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtodefencespeccallbackhandlertask;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -21,6 +22,7 @@ import static uk.gov.hmcts.reform.civil.utils.CaseStateUtils.shouldMoveToInMedia
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class DetermineNextState  {
 
     private final FeatureToggleService featureToggleService;
@@ -32,10 +34,12 @@ public class DetermineNextState  {
                                      String nextState,
                                      BusinessProcess businessProcess) {
 
+        log.info("Determining next state for Case : {}", caseData.getCcdCaseReference());
         if (V_2.equals(callbackParams.getVersion())
             && featureToggleService.isPinInPostEnabled()
             && isOneVOne(caseData)) {
 
+            log.debug("Pin in Post enabled for Case : {}", caseData.getCcdCaseReference());
             if (caseData.hasClaimantAgreedToFreeMediation()) {
                 nextState = CaseState.IN_MEDIATION.name();
             } else if (caseData.hasApplicantAcceptedRepaymentPlan()) {

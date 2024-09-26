@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtodefencespe
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -42,6 +43,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class PopulateCaseDataTask implements CaseTask {
 
     private final LocationReferenceDataService locationRefDataService;
@@ -57,6 +59,8 @@ public class PopulateCaseDataTask implements CaseTask {
         CaseData caseData = callbackParams.getCaseData();
 
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
+
+        log.info("Populating Case Data for Case : {}", caseData.getCcdCaseReference());
 
         if (isDefendantFullAdmitPayImmediately(caseData)) {
             LocalDate whenBePaid = paymentDateService.getPaymentDateAdmittedClaim(caseData);

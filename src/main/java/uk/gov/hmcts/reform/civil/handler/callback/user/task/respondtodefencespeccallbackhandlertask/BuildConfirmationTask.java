@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtodefencespeccallbackhandlertask;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -20,6 +21,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_AD
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class BuildConfirmationTask implements CaseTask {
 
     public static final String DOWNLOAD_URL_CLAIM_DOCUMENTS = "/cases/case-details/%s#Claim documents";
@@ -29,6 +31,7 @@ public class BuildConfirmationTask implements CaseTask {
     public SubmittedCallbackResponse execute(CallbackParams callbackParams) {
 
         CaseData caseData = callbackParams.getCaseData();
+        log.info("Executing SubmittedCallbackResponse for Case : {} ", caseData.getCcdCaseReference());
 
         if (!AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
             caseData.toBuilder().ccdState(CaseState.JUDICIAL_REFERRAL).build();
@@ -39,6 +42,7 @@ public class BuildConfirmationTask implements CaseTask {
         SubmittedCallbackResponse.SubmittedCallbackResponseBuilder responseBuilder =
             SubmittedCallbackResponse.builder();
 
+        log.debug("Setting confirmation Body & Header for Case : {} ", caseData.getCcdCaseReference());
         responseBuilder.confirmationBody(
                 CaseDataToTextGenerator.getTextFor(
                     confirmationTextGenerators.stream(),
