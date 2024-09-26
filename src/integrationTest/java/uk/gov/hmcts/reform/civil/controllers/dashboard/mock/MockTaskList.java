@@ -262,6 +262,19 @@ public class MockTaskList {
                 .build(),
             TaskList.builder()
                 .reference(reference)
+                .taskNameCy("<a>Cadarnhewch eich bod wedi talu dyled dyfarniad (CCJ)</a>")
+                .taskNameEn("<a>Confirm you've paid a judgment (CCJ) debt</a>")
+                .categoryCy("Dyfarniadau gan y llys")
+                .categoryEn("Judgment from the court")
+                .role(role)
+                .currentStatusEn(TaskStatus.INACTIVE.getName())
+                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
+                .nextStatusEn(TaskStatus.INACTIVE.getName())
+                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
+                .taskOrder(14)
+                .build(),
+            TaskList.builder()
+                .reference(reference)
                 .taskNameCy("<a>Gweld y cais i gyd</a>")
                 .taskNameEn("<a>View applications</a>")
                 .categoryCy("Ceisiadau")
@@ -271,7 +284,7 @@ public class MockTaskList {
                 .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
                 .nextStatusEn(TaskStatus.INACTIVE.getName())
                 .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(14)
+                .taskOrder(15)
                 .build()
         );
     }
