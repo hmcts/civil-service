@@ -223,7 +223,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
                 .build().toBuilder()
                 .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
                 .generalApplications(gaApplications)
-                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
                 .claimantGaAppDetails(null)
                 .build();
             // WHEN
@@ -247,12 +247,60 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
                 .build().toBuilder()
                 .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
                 .generalApplications(gaApplications)
-                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
                 .claimantGaAppDetails(new ArrayList<>())
                 .build();
             // WHEN
             CallbackParams callbackParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(EVENT_ID_CLAIMANT).build())
+                .build();
+            // THEN
+            handler.handle(callbackParams);
+            verify(dashboardApiClient, never())
+                .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
+        }
+
+        @Test
+        void shouldEmptyResponse_whenGeneralApplicationsForDefendantNull() {
+            List<Element<GeneralApplication>> gaApplications = wrapElements(
+                GeneralApplication.builder()
+                    .caseLink(CaseLink.builder().caseReference("12345678").build())
+                    .build());
+            // GIVEN
+            CaseData caseData = CaseDataBuilder.builder()
+                .build().toBuilder()
+                .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
+                .generalApplications(gaApplications)
+                .respondent1Represented(YesOrNo.NO)
+                .respondentSolGaAppDetails(null)
+                .build();
+            // WHEN
+            CallbackParams callbackParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId(EVENT_ID_DEFENDANT).build())
+                .build();
+            // THEN
+            handler.handle(callbackParams);
+            verify(dashboardApiClient, never())
+                .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
+        }
+
+        @Test
+        void shouldEmptyResponse_whenGeneralApplicationsForDefendantEmpty() {
+            List<Element<GeneralApplication>> gaApplications = wrapElements(
+                GeneralApplication.builder()
+                    .caseLink(CaseLink.builder().caseReference("12345678").build())
+                    .build());
+            // GIVEN
+            CaseData caseData = CaseDataBuilder.builder()
+                .build().toBuilder()
+                .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
+                .generalApplications(gaApplications)
+                .respondent1Represented(YesOrNo.NO)
+                .respondentSolGaAppDetails(new ArrayList<>())
+                .build();
+            // WHEN
+            CallbackParams callbackParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId(EVENT_ID_DEFENDANT).build())
                 .build();
             // THEN
             handler.handle(callbackParams);
