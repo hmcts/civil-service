@@ -43,9 +43,8 @@ public class UpdateCaseManagementDetailsService {
         final List<LocationRefData> availableLocations = fetchLocationData(callbackParams);
 
         if (claimantOrRespondent.equals("respondent")) {
-
-            System.out.println("HERRRREEEEEEEEEEEEEEE");
             updateRespondent1RequestedCourtDetails(caseData, builder, availableLocations);
+            return;
         } else {
             updateApplicant1RequestedCourtDetails(caseData, builder, availableLocations);
         }
@@ -118,7 +117,7 @@ public class UpdateCaseManagementDetailsService {
                         .build())));
     }
 
-    public void updateRespondent1RequestedCourtDetails(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> availableLocations) {
+    private void updateRespondent1RequestedCourtDetails(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> availableLocations) {
         if (caseData.isRespondent1LiP()) {
             Optional.ofNullable(caseData.getRespondent1DQ())
                 .ifPresent(dq -> Optional.ofNullable(dq.getRespondent1DQRequestedCourt())
