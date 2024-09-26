@@ -109,7 +109,6 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             );
         }
 
-
         return responseBuilder.build();
     }
 
