@@ -141,6 +141,7 @@ public class HearingScheduledClaimantScenarioTest extends CaseProgressionDashboa
             .hearingDate(LocalDate.of(2024, 4, 1))
             .businessProcess(BusinessProcess.builder().processInstanceId("").build())
             .hearingFeePaymentDetails(PaymentDetails.builder().status(PaymentStatus.SUCCESS).build())
+            .applicant1Represented(YesOrNo.NO)
             .hearingLocation(list).build();
 
         CallbackParams callbackParams = callbackParams(caseData);
@@ -284,6 +285,7 @@ public class HearingScheduledClaimantScenarioTest extends CaseProgressionDashboa
             .totalClaimAmount(new BigDecimal(10))
             .responseClaimTrack("SMALL_CLAIM")
             .allocatedTrack(null)
+            .applicant1Represented(YesOrNo.NO)
             .hearingLocation(list).build();
 
         CallbackParams callbackParams = callbackParams(caseData);
@@ -321,7 +323,6 @@ public class HearingScheduledClaimantScenarioTest extends CaseProgressionDashboa
                     "<a href={PAY_HEARING_FEE} class=\"govuk-link\">Talu ffi'r gwrandawiad</a>"),
                 jsonPath("$[1].currentStatusCy").value(TaskStatus.ACTION_NEEDED.getWelshName()),
                 jsonPath("$[1].hintTextEn").value("Deadline is 12am on 1 April 2024"),
-                jsonPath("$[1].hintTextCy").value("Deadline is 12am on 1 Ebrill 2024")
-            );
+                jsonPath("$[1].hintTextCy").value("y dyddiad cau yw 12am ar 1 Ebrill 2024"));
     }
 }

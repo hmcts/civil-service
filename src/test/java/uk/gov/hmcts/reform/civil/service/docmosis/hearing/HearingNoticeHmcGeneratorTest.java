@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.hearing;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.HearingIndividual;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -92,6 +93,8 @@ class HearingNoticeHmcGeneratorTest {
     private HearingFeesService hearingFeesService;
     @MockBean
     private AssignCategoryId assignCategoryId;
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @BeforeEach
     void setupTest() {
@@ -141,8 +144,11 @@ class HearingNoticeHmcGeneratorTest {
                 .build();
     }
 
-    @Test
-    void shouldGenerateHearingNoticeHmc_1v1_whenHearingFeeHasBeenPaid() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldGenerateHearingNoticeHmc_1v1_whenHearingFeeHasBeenPaid(boolean isCaseProgressionEnabled) {
+
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
 
         var hearing = baseHearing.toBuilder()
                     .hearingDetails(HearingDetails.builder()
@@ -200,8 +206,10 @@ class HearingNoticeHmcGeneratorTest {
         assertEquals(expected, actual);
     }
 
-    @Test
-    void shouldGenerateHearingNoticeHmc_1v1_whenHearingFeeHasBeenPaidThroughHwF() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldOnlyIgnoreFeeDetails_1v1_whenHearingFeeHasBeenPaidThroughHwFAndCPToggleEnabled(boolean isCaseProgressionEnabled) {
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
 
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
@@ -246,13 +254,13 @@ class HearingNoticeHmcGeneratorTest {
             .defendant(caseData.getRespondent1().getPartyName())
             .claimantReference(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())
             .defendantReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
-            .feeAmount(null)
+            .feeAmount(isCaseProgressionEnabled ? null : "£1")
             .hearingSiteName("VenueName")
             .hearingLocation("SiteName - CourtAddress - Postcode")
             .hearingDays("01 January 2023 at 00:00 for 12 hours")
             .totalHearingDuration("2 days")
             .hearingType("trial")
-            .hearingDueDate(null)
+            .hearingDueDate(isCaseProgressionEnabled ? null : LocalDate.of(2023, 1, 1))
             .partiesAttendingInPerson("Chloe Landale")
             .partiesAttendingByVideo("Michael Carver")
             .partiesAttendingByTelephone("Jenny Harper")
@@ -261,8 +269,10 @@ class HearingNoticeHmcGeneratorTest {
         assertEquals(expected, actual);
     }
 
-    @Test
-    void shouldGenerateHearingNoticeHmc_1v1_whenHearingFeeHasNotBeenPaid() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldGenerateHearingNoticeHmc_1v1_whenHearingFeeHasNotBeenPaid(boolean isCaseProgressionEnabled) {
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
 
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
@@ -319,8 +329,10 @@ class HearingNoticeHmcGeneratorTest {
         assertEquals(expected, actual);
     }
 
-    @Test
-    void shouldGenerateHearingNoticeHmc_1v2DS_whenHearingFeeHasBeenPaid() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldGenerateHearingNoticeHmc_1v2DS_whenHearingFeeHasBeenPaid(boolean isCaseProgressionEnabled) {
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
 
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
@@ -381,10 +393,13 @@ class HearingNoticeHmcGeneratorTest {
 
     @ParameterizedTest
     @CsvSource({
-        "AAA7-DIS, disposal hearing",
-        "AAA7-DRH, dispute resolution hearing"
+        "AAA7-DIS, disposal hearing, true",
+        "AAA7-DIS, disposal hearing, false",
+        "AAA7-DRH, dispute resolution hearing, true",
+        "AAA7-DRH, dispute resolution hearing, false"
     })
-    void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid_whenHearingType(String hearingType, String expectedTitle) {
+    void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid_whenHearingType(String hearingType, String expectedTitle, boolean isCaseProgressionEnabled) {
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
 
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
@@ -445,8 +460,10 @@ class HearingNoticeHmcGeneratorTest {
         assertEquals(expected, actual);
     }
 
-    @Test
-    void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid_noSolicitorReferences() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid_noSolicitorReferences(boolean isCaseProgressionEnabled) {
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
 
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
@@ -505,8 +522,10 @@ class HearingNoticeHmcGeneratorTest {
         assertEquals(expected, actual);
     }
 
-    @Test
-    void shouldReturnListOfExpectedCaseDocuments() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnListOfExpectedCaseDocuments(boolean isCaseProgressionEnabled) {
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
 
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
@@ -547,8 +566,10 @@ class HearingNoticeHmcGeneratorTest {
         assertEquals(expected, actual);
     }
 
-    @Test
-    void shouldReturnListOfExpectedCaseDocumentsSpec() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnListOfExpectedCaseDocumentsSpec(boolean isCaseProgressionEnabled) {
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
 
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()

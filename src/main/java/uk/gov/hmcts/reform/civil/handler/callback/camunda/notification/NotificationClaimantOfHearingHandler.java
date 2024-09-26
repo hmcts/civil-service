@@ -29,7 +29,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -87,15 +86,15 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
             String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
             sendEmailHMC(caseData, recipient);
         } else {
-            sendEmail(caseData, getRecipient(caseData, isApplicantLip), getReferenceTemplate(caseData, isApplicantLip, isHmcEvent), isApplicantLip);
+            sendEmail(caseData, getRecipient(caseData, isApplicantLip), getReferenceTemplate(caseData, isApplicantLip, isHmcEvent), isApplicantLip, isHmcEvent);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
     }
 
-    private void sendEmail(CaseData caseData, String recipient, String reference, boolean isApplicantLip) {
-        notificationService.sendMail(recipient, getEmailTemplate(caseData, isApplicantLip), addProperties(caseData), reference);
+    private void sendEmail(CaseData caseData, String recipient, String reference, boolean isApplicantLip, boolean isHmcEvent) {
+        notificationService.sendMail(recipient, getEmailTemplate(caseData, isApplicantLip), addPropertiesHearing(caseData, isHmcEvent), reference);
     }
 
     private void sendEmailHMC(CaseData caseData, String recipient) {
@@ -121,10 +120,14 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
 
     @Override
     public Map<String, String> addProperties(final CaseData caseData) {
+        return null;
+    }
+
+    public Map<String, String> addPropertiesHearing(final CaseData caseData, boolean isHmcEvent) {
         String reference = "";
         String legacyCaseRef = caseData.getLegacyCaseReference();
         String hearingTime;
-        if (Objects.nonNull(caseData.getHearingTimeHourMinute())) {
+        if (!isHmcEvent) {
             hearingTime = NotificationUtils.getFormattedHearingTime(caseData.getHearingTimeHourMinute());
         } else {
             LocalDateTime hearingStartDateTime = camundaService
