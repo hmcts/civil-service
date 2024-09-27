@@ -3,16 +3,16 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.CP.Bundle.Ready.Claimant',
-        '{"Notice.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Defendant", "Notice.AAA6.CP.Trial.Arrangements.Required.Claimant"}',
+        '{"Notice.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Claimant", "Notice.AAA6.CP.Trial.Arrangements.Required.Claimant"}',
         '{"Notice.AAA6.CP.Bundle.Ready.Claimant" : []}'),
        ('Scenario.AAA6.CP.Bundle.Ready.Defendant',
-        '{"Notice.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Claimant", "Notice.AAA6.CP.Trial.Arrangements.Required.Defendant"}',
+        '{"Notice.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Defendant", "Notice.AAA6.CP.Trial.Arrangements.Required.Defendant"}',
         '{"Notice.AAA6.CP.Bundle.Ready.Defendant" : []}'),
        ('Scenario.AAA6.CP.Bundle.Ready.TrialReady.Claimant',
-        '{"Notice.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Defendant", "Notice.AAA6.CP.Trial.Arrangements.Required.Claimant"}',
+        '{"Notice.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Claimant", "Notice.AAA6.CP.Trial.Arrangements.Required.Claimant"}',
         '{"Notice.AAA6.CP.Bundle.Ready.Claimant" : []}'),
        ('Scenario.AAA6.CP.Bundle.Ready.TrialReady.Defendant',
-        '{"Notice.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Claimant", "Notice.AAA6.CP.Trial.Arrangements.Required.Defendant"}',
+        '{"Notice.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Defendant", "Notice.AAA6.CP.Trial.Arrangements.Required.Defendant"}',
         '{"Notice.AAA6.CP.Bundle.Ready.Defendant" : []}');
 
 /**
