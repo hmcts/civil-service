@@ -115,7 +115,7 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
             return SCENARIO_AAA6_CLAIMANT_SDO_DRAWN_PRE_CASE_PROGRESSION.getScenario();
         }
         if (isFinalOrderIssued(callbackParams)) {
-            if (isOrderMadeFastTrackTrialNotReady(caseData)) {
+            if (isOrderMadeFastTrackTrialNotResponded(caseData)) {
                 return SCENARIO_AAA6_UPDATE_DASHBOARD_CLAIMANT_TASK_LIST_TRIAL_READY_FINAL_ORDERS.getScenario();
             }
             return SCENARIO_AAA6_UPDATE_DASHBOARD_CLAIMANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS.getScenario();
@@ -152,8 +152,7 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
             .equals(CaseEvent.valueOf(callbackParams.getRequest().getEventId()));
     }
 
-    private boolean isOrderMadeFastTrackTrialNotReady(CaseData caseData) {
-        return SdoHelper.isFastTrack(caseData)
-            && (isNull(caseData.getTrialReadyApplicant()) || caseData.getTrialReadyApplicant().equals(YesOrNo.NO));
+    private boolean isOrderMadeFastTrackTrialNotResponded(CaseData caseData) {
+        return SdoHelper.isFastTrack(caseData) && isNull(caseData.getTrialReadyApplicant());
     }
 }

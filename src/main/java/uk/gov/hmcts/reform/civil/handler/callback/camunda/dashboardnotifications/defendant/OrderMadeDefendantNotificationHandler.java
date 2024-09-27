@@ -116,7 +116,7 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
         }
 
         if (isFinalOrderIssued(callbackParams)) {
-            if (isOrderMadeFastTrackTrialNotReady(caseData)) {
+            if (isOrderMadeFastTrackTrialNotResponded(caseData)) {
                 return SCENARIO_AAA6_UPDATE_DASHBOARD_DEFENDANT_TASK_LIST_TRIAL_READY_FINAL_ORDERS.getScenario();
             }
             return SCENARIO_AAA6_UPDATE_DASHBOARD_DEFENDANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS.getScenario();
@@ -154,8 +154,7 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
         return !getFeatureToggleService().isCaseProgressionEnabled();
     }
 
-    private boolean isOrderMadeFastTrackTrialNotReady(CaseData caseData) {
-        return SdoHelper.isFastTrack(caseData)
-            && (isNull(caseData.getTrialReadyRespondent1()) || caseData.getTrialReadyRespondent1().equals(YesOrNo.NO));
+    private boolean isOrderMadeFastTrackTrialNotResponded(CaseData caseData) {
+        return SdoHelper.isFastTrack(caseData) && isNull(caseData.getTrialReadyRespondent1());
     }
 }
