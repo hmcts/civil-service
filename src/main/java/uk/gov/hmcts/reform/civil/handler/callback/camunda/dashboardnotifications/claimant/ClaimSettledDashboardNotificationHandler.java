@@ -5,10 +5,10 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_SETTLED_FOR_CLAIMANT1;
@@ -24,6 +24,11 @@ public class ClaimSettledDashboardNotificationHandler extends DashboardCallbackH
                                                                 DashboardNotificationsParamsMapper mapper,
                                                                 FeatureToggleService featureToggleService) {
         super(dashboardApiClient, mapper, featureToggleService);
+    }
+
+    @Override
+    public boolean shouldRecordScenario(CaseData caseData) {
+        return YesOrNo.NO.equals(caseData.getApplicant1Represented());
     }
 
     @Override
