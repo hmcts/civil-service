@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -61,6 +62,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class SubmitClaimTask {
 
@@ -102,7 +104,10 @@ public class SubmitClaimTask {
 
         addOrgPolicy2ForSameLegalRepresentative(dataBuilder.build(), dataBuilder);
 
-        if (isPinInPostCaseMatched(caseData)) {
+        boolean pinInPostCaseMatched = isPinInPostCaseMatched(caseData);
+        log.info("Pin In Post Case Matched {} for caseId {}", pinInPostCaseMatched, caseData.getCcdCaseReference());
+        if (pinInPostCaseMatched) {
+            log.info("Pin In Post Matched for caseId {}", caseData.getCcdCaseReference());
             dataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
         }
 
@@ -269,6 +274,9 @@ public class SubmitClaimTask {
     }
 
     private boolean isPinInPostCaseMatched(CaseData caseData) {
+        log.info("Respondent1Represented =={}== AddRespondent2 =={}== AddApplicant2 =={}== and isPinInPostEnabled {} for caseId ={}=",
+                 caseData.getRespondent1Represented(), caseData.getAddRespondent2(), caseData.getAddApplicant2(),
+                 featureToggleService.isPinInPostEnabled(), caseData.getCcdCaseReference());
         return (caseData.getRespondent1Represented() == NO
             && caseData.getAddRespondent2() == NO
             && caseData.getAddApplicant2() == NO
