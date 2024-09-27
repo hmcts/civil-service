@@ -12,7 +12,7 @@ echo "Importing CCD definitions"
 ./bin/pull-latest-ccd-files.sh ${ccdBranch}
 ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json,AuthorisationCaseType-shuttered.json"
 
-rm -rf $(pwd)/ccd-definitions
+rm -rf $(pwd)/ccd-definition
 rm -rf $(pwd)/build/ccd-development-config
 rm -rf $(pwd)/camunda
 
