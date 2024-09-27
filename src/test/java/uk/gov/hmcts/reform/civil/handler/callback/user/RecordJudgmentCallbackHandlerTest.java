@@ -25,6 +25,8 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 
 import java.time.LocalDate;
 
@@ -38,7 +40,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RECORD_JUDGMENT;
 @SpringBootTest(classes = {
     RecordJudgmentOnlineMapper.class,
     RecordJudgmentCallbackHandler.class,
-    JacksonAutoConfiguration.class
+    JacksonAutoConfiguration.class,
+    RoboticsAddressMapper.class,
+    AddressLinesMapper.class
 })
 class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -48,8 +52,11 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private RoboticsAddressMapper addressMapper;
+
     @Test
-    void handleEventsReturnsTheExpectedCallbackEvents() {
+    public void handleEventsReturnsTheExpectedCallbackEvents() {
         assertThat(handler.handledEvents()).containsOnly(RECORD_JUDGMENT);
     }
 

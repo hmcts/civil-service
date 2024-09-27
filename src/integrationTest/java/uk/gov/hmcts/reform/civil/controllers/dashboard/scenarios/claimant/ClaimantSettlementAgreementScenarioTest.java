@@ -34,6 +34,7 @@ public class ClaimantSettlementAgreementScenarioTest extends DashboardBaseIntegr
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimantFullDefence().build()
             .toBuilder()
+            .applicant1Represented(YesOrNo.NO)
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .caseDataLiP(caseDataLiP)
