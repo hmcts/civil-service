@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -59,6 +60,7 @@ class ClaimantCCJResponseNotificationHandlerTest extends BaseCallbackHandlerTest
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()
                 .ccdCaseReference(1234L)
+                .applicant1Represented(YesOrNo.NO)
                 .build();
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
