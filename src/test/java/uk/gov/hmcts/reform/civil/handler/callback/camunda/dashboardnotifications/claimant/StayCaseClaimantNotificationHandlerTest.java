@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -20,17 +21,18 @@ import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_MORE_TIME_REQUEST_FOR_RESPONDENT1;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFRESPONSE_MORETIMEREQUESTED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_STAY_CASE_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_CASE_STAYED_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
-class MoreTimeRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTest {
+public class StayCaseClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
-    private MoreTimeRequestedDashboardNotificationDefendantHandler handler;
+    private StayCaseClaimantNotificationHandler handler;
 
     @Mock
     private DashboardApiClient dashboardApiClient;
@@ -41,13 +43,11 @@ class MoreTimeRequestedDashboardNotificationHandlerTest extends BaseCallbackHand
     @Mock
     private FeatureToggleService featureToggleService;
 
-    public static final String TASK_ID = "GenerateDashboardNotificationMoreTimeRequestedForRespondent1";
-
-    HashMap<String, Object> params = new HashMap<>();
+    public static final String TASK_ID = "GenerateDashboardNotificationStayCaseClaimant";
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
-        assertThat(handler.handledEvents()).contains(CREATE_DASHBOARD_NOTIFICATION_MORE_TIME_REQUEST_FOR_RESPONDENT1);
+        assertThat(handler.handledEvents()).contains(CREATE_DASHBOARD_NOTIFICATION_STAY_CASE_CLAIMANT);
     }
 
     @Test
@@ -55,24 +55,22 @@ class MoreTimeRequestedDashboardNotificationHandlerTest extends BaseCallbackHand
         assertThat(handler.camundaActivityId(
             CallbackParamsBuilder.builder()
                 .request(CallbackRequest.builder()
-                             .eventId(CREATE_DASHBOARD_NOTIFICATION_MORE_TIME_REQUEST_FOR_RESPONDENT1.name())
+                             .eventId(CREATE_DASHBOARD_NOTIFICATION_STAY_CASE_CLAIMANT.name())
                              .build())
                 .build()))
             .isEqualTo(TASK_ID);
     }
 
     @Test
-    void createDashboardNotifications() {
+    void shouldConfigureDashboardNotificationsStayCase() {
 
-        params.put("ccdCaseReference", "123");
+        HashMap<String, Object> params = new HashMap<>();
 
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .respondent1Represented(YesOrNo.NO)
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
+            .toBuilder().applicant1Represented(YesOrNo.NO)
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -80,9 +78,16 @@ class MoreTimeRequestedDashboardNotificationHandlerTest extends BaseCallbackHand
             .build();
 
         handler.handle(callbackParams);
-        verify(dashboardApiClient).recordScenario(
+
+        verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_DEFRESPONSE_MORETIMEREQUESTED_DEFENDANT.getScenario(),
+            "CLAIMANT",
+            "BEARER_TOKEN"
+        );
+
+        verify(dashboardApiClient, times(1)).recordScenario(
+            caseData.getCcdCaseReference().toString(),
+            SCENARIO_AAA6_CP_CASE_STAYED_CLAIMANT.getScenario(),
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );
