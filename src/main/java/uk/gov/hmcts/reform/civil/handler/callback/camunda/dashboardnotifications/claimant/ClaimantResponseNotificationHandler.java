@@ -47,6 +47,11 @@ public class ClaimantResponseNotificationHandler extends DashboardCallbackHandle
     }
 
     @Override
+    public boolean shouldRecordScenario(CaseData caseData) {
+        return caseData.isApplicantNotRepresented();
+    }
+
+    @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
     }
