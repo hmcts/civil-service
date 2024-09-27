@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
@@ -73,6 +74,7 @@ import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.DocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -89,6 +91,7 @@ import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.DQResponseDocumentUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -105,6 +108,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
@@ -116,6 +120,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -200,6 +205,9 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private CaseFlagsInitialiser caseFlagsInitialiser;
     @MockBean
     private DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
+    @MockBean
+    private DQResponseDocumentUtils dqResponseDocumentUtils;
+
     @Autowired
     private FrcDocumentsUtils frcDocumentsUtils;
 
@@ -232,6 +240,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         ReflectionTestUtils.setField(handler, "confirmationHeaderGenerators",
                                      confirmationHeaderSpecGenerators
         );
+
+        when(dqResponseDocumentUtils.buildClaimantResponseDocuments(any(CaseData.class))).thenReturn(new ArrayList<>());
     }
 
     @Test
@@ -1244,6 +1254,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(completePreferredLocation.getCourtLocationCode());
             sent1.extracting("reasonForHearingAtSpecificCourt")
                 .isEqualTo("Reason");
+
+            verify(dqResponseDocumentUtils, times(1)).buildDefendantResponseDocuments(any(CaseData.class));
         }
 
         @Test
@@ -1331,6 +1343,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(completePreferredLocation.getCourtLocationCode());
             sent2.extracting("reasonForHearingAtSpecificCourt")
                 .isEqualTo("Reason123");
+
+            verify(dqResponseDocumentUtils, times(1)).buildDefendantResponseDocuments(any(CaseData.class));
         }
 
         @Test
@@ -1413,6 +1427,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(completePreferredLocation.getCourtLocationCode());
             sent2.extracting("reasonForHearingAtSpecificCourt")
                 .isEqualTo("Reason123");
+
+            verify(dqResponseDocumentUtils, times(1)).buildDefendantResponseDocuments(any(CaseData.class));
         }
     }
 
@@ -1461,6 +1477,177 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .extracting("frcSupportingDocument")
             .extracting("categoryID")
             .isEqualTo(DQ_DEF2.getValue());
+    }
+
+    @Test
+    void shouldAssignCategoryId_frc_whenInvokedFor1v2DiffFirstResponse() {
+        LocalDateTime responseDate = LocalDateTime.now();
+        LocalDateTime deadline = LocalDateTime.now().plusDays(4);
+        //Given
+        when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+        when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+        when(time.now()).thenReturn(responseDate);
+        when(deadlinesCalculator.calculateApplicantResponseDeadline(
+            any(LocalDateTime.class),
+            any(AllocatedTrack.class)
+        )).thenReturn(deadline);
+
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .setIntermediateTrackClaim()
+            .multiPartyClaimTwoDefendantSolicitors()
+            .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
+            .atStateRespondentFullDefence()
+            .respondent1DQWithFixedRecoverableCostsIntermediate()
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        //Then
+        assertThat(response.getData())
+            .extracting("respondent1DQFixedRecoverableCostsIntermediate")
+            .extracting("frcSupportingDocument")
+            .extracting("categoryID")
+            .isEqualTo(DQ_DEF1.getValue());
+    }
+
+    @Test
+    void shouldPopulateDefendantResponseDocuments_whenInvokedFor1v2DiffBothResponded() {
+        LocalDateTime responseDate = LocalDateTime.now();
+        LocalDateTime deadline = LocalDateTime.now().plusDays(4);
+        //Given
+        when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+        when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+        when(time.now()).thenReturn(responseDate);
+        when(deadlinesCalculator.calculateApplicantResponseDeadline(
+            any(LocalDateTime.class),
+            any(AllocatedTrack.class)
+        )).thenReturn(deadline);
+
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        Document document = DocumentBuilder.builder().build();
+        List<Element<CaseDocument>> existingResponseDocuments = new ArrayList<>();
+        existingResponseDocuments.add(
+            Element.<CaseDocument>builder()
+                .id(UUID.randomUUID())
+                .value(CaseDocument.builder()
+                           .documentLink(document)
+                           .documentName("doc-1")
+                           .createdBy("Defendant 1")
+                           .createdDatetime(LocalDateTime.now())
+                           .build())
+                .build());
+
+        var newResponseDocuments = List.of(
+            Element.<CaseDocument>builder()
+                .id(UUID.randomUUID())
+                .value(CaseDocument.builder()
+                           .documentLink(document)
+                           .documentName("doc-2")
+                           .createdBy("Defendant 2")
+                           .createdDatetime(LocalDateTime.now())
+                           .build())
+                .build());
+
+        when(dqResponseDocumentUtils.buildDefendantResponseDocuments(any(CaseData.class))).thenReturn(newResponseDocuments);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .setIntermediateTrackClaim()
+            .multiPartyClaimTwoDefendantSolicitors()
+            .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
+            .respondent2ClaimResponseTypeForSpec(FULL_DEFENCE)
+            .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+            .respondent1DQWithFixedRecoverableCostsIntermediate()
+            .respondent2DQWithFixedRecoverableCostsIntermediate()
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent2Copy(PartyBuilder.builder().individual().build())
+            .build().toBuilder()
+            .defendantResponseDocuments(existingResponseDocuments)
+            .build();
+        caseData = caseData.toBuilder()
+            .respondent2DQ(caseData.getRespondent2DQ().toBuilder()
+                               .respondent2DQDraftDirections(document).build()
+            ).build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        //Then
+        var actualCaseData = getCaseData(response);
+
+        assertThat(actualCaseData.getDefendantResponseDocuments().size()).isEqualTo(2);
+        assertThat(actualCaseData.getDefendantResponseDocuments().get(0).getValue().getDocumentName()).isEqualTo("doc-1");
+        assertThat(actualCaseData.getDefendantResponseDocuments().get(1).getValue().getDocumentName()).isEqualTo("doc-2");
+        assertThat(actualCaseData.getRespondent2DQ().getRespondent2DQDraftDirections()).isEqualTo(null);
+
+        verify(dqResponseDocumentUtils, times(1)).buildDefendantResponseDocuments(any(CaseData.class));
+    }
+
+    @Test
+    void shouldAppendDefendantResponseDocuments_whenInvokedFor1v2DiffFirstResponse() {
+        LocalDateTime responseDate = LocalDateTime.now();
+        LocalDateTime deadline = LocalDateTime.now().plusDays(4);
+        //Given
+        when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+        when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+        when(time.now()).thenReturn(responseDate);
+        when(deadlinesCalculator.calculateApplicantResponseDeadline(
+            any(LocalDateTime.class),
+            any(AllocatedTrack.class)
+        )).thenReturn(deadline);
+
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        Document document = DocumentBuilder.builder().build();
+        var expectedResponseDocuments = List.of(
+            Element.<CaseDocument>builder()
+                .id(UUID.randomUUID())
+                .value(CaseDocument.builder()
+                           .documentLink(document)
+                           .documentName("doc-name")
+                           .createdBy("Defendant")
+                           .createdDatetime(LocalDateTime.now())
+                           .build())
+                .build());
+        when(dqResponseDocumentUtils.buildDefendantResponseDocuments(any(CaseData.class))).thenReturn(expectedResponseDocuments);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .setIntermediateTrackClaim()
+            .multiPartyClaimTwoDefendantSolicitors()
+            .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
+            .atStateRespondentFullDefence()
+            .respondent1DQWithFixedRecoverableCostsIntermediate()
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .build();
+        caseData = caseData.toBuilder()
+            .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                               .respondent1DQDraftDirections(document).build()
+            ).build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        //Then
+        var actualCaseData = getCaseData(response);
+
+        assertThat(actualCaseData.getDefendantResponseDocuments().size()).isEqualTo(1);
+        assertThat(actualCaseData.getDefendantResponseDocuments().get(0).getValue().getDocumentName()).isEqualTo("doc-name");
+        assertThat(actualCaseData.getRespondent1DQ().getRespondent1DQDraftDirections()).isEqualTo(null);
+
+        verify(dqResponseDocumentUtils, times(1)).buildDefendantResponseDocuments(any(CaseData.class));
     }
 
     @Test
