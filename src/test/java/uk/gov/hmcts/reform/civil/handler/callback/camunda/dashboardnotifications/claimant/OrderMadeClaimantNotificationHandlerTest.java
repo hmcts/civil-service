@@ -451,5 +451,32 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
+
+        @Test
+        void shouldRecordScenarioClaimantFinalOrderFastTrackTrialReady_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
+                .applicant1Represented(YesOrNo.NO)
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .trialReadyApplicant(YesOrNo.YES)
+                .build();
+
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT.name())
+                    .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
+
+            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
+
+            handler.handle(params);
+
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                "Scenario.AAA6.Update.Claimant.TaskList.UploadDocuments.FinalOrders",
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
     }
 }
