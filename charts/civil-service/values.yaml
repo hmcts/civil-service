@@ -134,3 +134,6 @@ java:
           alias: mediation.emails.jsonRecipient
         - name: hmc-servicebus-shared-access-key-tf
           alias: HMC_HEARINGS_TOPIC_ACCESS_KEY
+
+wiremock:
+  enabled: false
