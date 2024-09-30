@@ -581,8 +581,6 @@ public class BundleRequestMapper {
         bundlingRequestDocuments.addAll(getDqByCategoryId(caseData,
                                                           DocCategory.DEF2_DEFENSE_DQ.getValue(), PartyType.DEFENDANT2));
 
-
-
         bundlingRequestDocuments.addAll(getDqWithNoCategoryId(caseData));
         return ElementUtils.wrapElements(bundlingRequestDocuments);
     }
