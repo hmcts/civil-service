@@ -1583,13 +1583,27 @@ public class GeneralApplicationDetailsBuilder {
                                                       .value(pdfDocument).build()))
             .build();
     }
-
-    public CaseData getTestCaseDataWithDraftApplicationPDFDocument(CaseData caseData) {
+    public CaseData getTestCaseDataWithDraftApplicationPDFDocumentLip(CaseData caseData) {
         String uid = "f000aa01-0451-4000-b000-000000000111";
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
         List<Element<CaseDocument>> draftDocs = newArrayList();
         draftDocs.add(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
                           .value(pdfDocument).build());
+        draftDocs.add(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
+                          .value(pdfDocument).build());
+        return caseData.toBuilder()
+            .ccdCaseReference(1234L)
+            .generalAppType(GAApplicationType.builder()
+                                .types(singletonList(EXTEND_TIME))
+                                .build())
+            .gaDraftDocument(draftDocs)
+            .build();
+    }
+
+    public CaseData getTestCaseDataWithDraftApplicationPDFDocument(CaseData caseData) {
+        String uid = "f000aa01-0451-4000-b000-000000000111";
+        String uid1 = "f000aa01-0451-4000-b000-000000000000";
+        List<Element<CaseDocument>> draftDocs = newArrayList();
         draftDocs.add(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
                           .value(pdfDocument).build());
         return caseData.toBuilder()

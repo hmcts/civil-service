@@ -522,7 +522,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
         CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDraftApplicationPDFDocument(CaseData.builder().build());
+            .getTestCaseDataWithDraftApplicationPDFDocumentLip(CaseData.builder().build());
 
         CaseData updatedCaseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataWithDraftStaffPDFDocument(CaseData.builder().build());
@@ -563,7 +563,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
         CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDraftApplicationPDFDocument(CaseData.builder().build());
+            .getTestCaseDataWithDraftApplicationPDFDocumentLip(CaseData.builder().build());
 
         CaseData updatedCaseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataWithDraftStaffPDFDocument(CaseData.builder().build());
@@ -604,7 +604,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
         CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDraftApplicationPDFDocument(CaseData.builder().build());
+            .getTestCaseDataWithDraftApplicationPDFDocumentLip(CaseData.builder().build());
 
         CaseData updatedCaseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataWithDraftStaffPDFDocument(CaseData.builder().build());
@@ -645,7 +645,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
         CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDraftApplicationPDFDocument(CaseData.builder().build());
+            .getTestCaseDataWithDraftApplicationPDFDocumentLip(CaseData.builder().build());
 
         CaseData updatedCaseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataWithDraftStaffPDFDocument(CaseData.builder().build());
