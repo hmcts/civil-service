@@ -127,7 +127,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             return generalAppCaseData.toBuilder().gaAddlDoc(newGaAddlDoc).build();
         }
         if (featureToggleService.isGaForLipsEnabled() && (civilCaseData.isRespondent1LiP() || civilCaseData.isRespondent2LiP()
-            || civilCaseData.isApplicantNotRepresented()) && (Objects.nonNull(generalAppCaseData.getGaDraftDocument()) && generalAppCaseData.getGaDraftDocument().size()>1)) {
+            || civilCaseData.isApplicantNotRepresented()) && (Objects.nonNull(generalAppCaseData.getGaDraftDocument()) && generalAppCaseData.getGaDraftDocument().size() > 1)) {
             generalAppCaseData.getGaDraftDocument().sort(Comparator.comparing(gaDocElement -> gaDocElement.getValue().getCreatedDatetime(), Comparator.reverseOrder()));
             generalAppCaseData.getGaDraftDocument().remove(1);
             List<Element<CaseDocument>> draftApplicationList = newArrayList();
@@ -251,8 +251,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             || civilCaseData.isApplicantNotRepresented()) && (gaDocs != null && (fromGaList.equals("gaDraftDocument")))) {
 
             checkDraftDocumentsInMainCase(civilDocs, gaDocs);
-        }
-        else  {
+        } else  {
             if (gaDocs != null && gaDocs.size() == 1 && checkIfDocumentExists(civilDocs, gaDocs) < 1) {
                 civilDocs.addAll(gaDocs);
             }

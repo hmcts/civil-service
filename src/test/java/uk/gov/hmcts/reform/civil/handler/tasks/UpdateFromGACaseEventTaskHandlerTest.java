@@ -504,7 +504,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
     @Test
     void testShouldAddGaDraftApplicationDocument_Lip() {
         when(mockExternalTask.getTopicName()).thenReturn("test");
-when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
+        when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
         when(mockExternalTask.getAllVariables())
             .thenReturn(Map.of(
                 "caseId", GENERAL_APP_CASE_ID,
