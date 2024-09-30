@@ -629,6 +629,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
     void testShouldAddGaDraftApplicationDocument_LipApplicant() {
         when(mockExternalTask.getTopicName()).thenReturn("test");
         when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
+        String uid1 = "f000aa01-0451-4000-b000-000000000000";
         when(mockExternalTask.getAllVariables())
             .thenReturn(Map.of(
                 "caseId", GENERAL_APP_CASE_ID,
@@ -638,6 +639,8 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
         CaseData caseData = new CaseDataBuilder().atStateClaimDraftLip()
             .applicant1Represented(YesOrNo.NO)
+            .gaDraftDocument(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
+                                               .value(pdfDocument).build()))
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
             .build();
 

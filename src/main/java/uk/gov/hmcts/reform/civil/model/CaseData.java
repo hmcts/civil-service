@@ -590,6 +590,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> gaAddlDocRespondentSol;
     private final List<Element<CaseDocument>> gaAddlDocRespondentSolTwo;
     private final List<Element<CaseDocument>> gaAddlDocBundle;
+    private final List<Element<CaseDocument>> gaDraftDocument;
+    private final List<Element<CaseDocument>> gaDraftDocStaff;
+    private final List<Element<CaseDocument>> gaDraftDocClaimant;
+    private final List<Element<CaseDocument>> gaDraftDocRespondentSol;
+    private final List<Element<CaseDocument>> gaDraftDocRespondentSolTwo;
 
     private final List<Element<CaseDocument>> gaRespondDoc;
 

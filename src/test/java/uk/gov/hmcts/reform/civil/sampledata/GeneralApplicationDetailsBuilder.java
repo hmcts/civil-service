@@ -1583,14 +1583,14 @@ public class GeneralApplicationDetailsBuilder {
                                                       .value(pdfDocument).build()))
             .build();
     }
-    
+
     public CaseData getTestCaseDataWithDraftApplicationPDFDocumentLip(CaseData caseData) {
         String uid = "f000aa01-0451-4000-b000-000000000111";
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
         List<Element<CaseDocument>> draftDocs = newArrayList();
         draftDocs.add(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
                           .value(pdfDocument).build());
-        draftDocs.add(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
+        draftDocs.add(Element.<CaseDocument>builder().id(UUID.fromString(uid))
                           .value(pdfDocument).build());
         return caseData.toBuilder()
             .ccdCaseReference(1234L)

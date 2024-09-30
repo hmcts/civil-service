@@ -362,6 +362,7 @@ public class CaseDataBuilder {
     protected String responseClaimTrack;
     protected CaseState ccdState;
     protected List<Element<CaseDocument>> systemGeneratedCaseDocuments;
+    protected List<Element<CaseDocument>> gaDraftDocument;
     protected PaymentDetails claimIssuedPaymentDetails;
     protected PaymentDetails paymentDetails;
     protected PaymentDetails hearingFeePaymentDetails;
@@ -7880,6 +7881,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder judgmentPaidInFull(JudgmentPaidInFull judgmentPaidInFull) {
         this.judgmentPaidInFull = judgmentPaidInFull;
+        return this;
+    }
+
+    public CaseDataBuilder gaDraftDocument(List<Element<CaseDocument>> singletonList) {
+        this.gaDraftDocument = singletonList;
         return this;
     }
 }
