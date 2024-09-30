@@ -281,7 +281,7 @@ wiremock:
   volumes:
     - name: wiremock-mocks
       configMap:
-        name: chart-wiremock-mocks
+        name: ${SERVICE_NAME}-wm
   volumeMounts:
     - name: wiremock-mocks
       mountPath: /home/wiremock/mappings
