@@ -100,7 +100,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
 import static uk.gov.hmcts.reform.civil.utils.MediationUnavailableDatesUtils.checkUnavailable;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
-import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
 import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistPartyAddress;
 import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToApplicantWitnesses;
 
@@ -304,9 +303,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
             .applicant1ResponseDate(time.now());
-
-        // persist party flags (ccd issue)
-        persistFlagsForParties(oldCaseData, caseData, builder);
 
         // null/delete the document used for preview, otherwise it will show as duplicate within case file view
         builder.respondent1GeneratedResponseDocument(null);

@@ -67,7 +67,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
-import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
 import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToApplicantWitnesses;
 
 @Service
@@ -234,16 +233,12 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
 
         LocalDateTime currentTime = time.now();
 
         CaseData.CaseDataBuilder builder = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE))
             .applicant1ResponseDate(currentTime);
-
-        // persist party flags (ccd issue)
-        persistFlagsForParties(oldCaseData, caseData, builder);
 
         log.debug(
             "Case management location for {} is {}",
