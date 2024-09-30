@@ -54,6 +54,9 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionsQuestionnaireGeneratorTasks.DQGeneratorFormBuilderTask;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionsQuestionnaireGeneratorTasks.GetRespondentsForDQGeneratorTask;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionsQuestionnaireGeneratorTasks.SetApplicantsForDQGeneratorTask;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
@@ -104,7 +107,10 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
     SimpleStateFlowEngine.class,
     SimpleStateFlowBuilder.class,
     TransitionsTestConfiguration.class,
-    CaseDetailsConverter.class
+    CaseDetailsConverter.class,
+    SetApplicantsForDQGeneratorTask.class,
+    GetRespondentsForDQGeneratorTask.class,
+    DQGeneratorFormBuilderTask.class
 })
 class DirectionsQuestionnaireGeneratorTest {
 

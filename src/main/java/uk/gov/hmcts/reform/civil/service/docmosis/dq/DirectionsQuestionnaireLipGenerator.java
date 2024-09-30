@@ -18,6 +18,9 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionsQuestionnaireGeneratorTasks.DQGeneratorFormBuilderTask;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionsQuestionnaireGeneratorTasks.GetRespondentsForDQGeneratorTask;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionsQuestionnaireGeneratorTasks.SetApplicantsForDQGeneratorTask;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
@@ -39,20 +42,28 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
                                                IStateFlowEngine stateFlowEngine,
                                                RepresentativeService representativeService,
                                                FeatureToggleService featureToggleService,
-                                               LocationReferenceDataService locationRefDataService) {
+                                               LocationReferenceDataService locationRefDataService,
+                                               GetRespondentsForDQGeneratorTask respondentsForDQGeneratorTask,
+                                               SetApplicantsForDQGeneratorTask setApplicantsForDQGeneratorTask,
+                                               DQGeneratorFormBuilderTask dqGeneratorFormBuilderTask
+    ) {
+
         super(
             documentManagementService,
             documentGeneratorService,
             stateFlowEngine,
             representativeService,
             featureToggleService,
-            locationRefDataService
+            locationRefDataService,
+            respondentsForDQGeneratorTask,
+            setApplicantsForDQGeneratorTask,
+            dqGeneratorFormBuilderTask
         );
     }
 
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData, String authorisation) {
-        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = getDirectionsQuestionnaireFormBuilder(
+        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = getDqGeneratorFormBuilderTask().getDirectionsQuestionnaireFormBuilder(
             caseData,
             authorisation
         );
@@ -112,7 +123,6 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
         return super.getTemplateId(caseData);
     }
 
-    @Override
     protected List<Party> getRespondents(CaseData caseData, String defendantIdentifier) {
         return List.of(Party.builder()
             .name(caseData.getRespondent1().getPartyName())
