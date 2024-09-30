@@ -57,7 +57,7 @@ public class GeneralAppFeesService {
     protected static final List<GeneralApplicationTypes> SD_CONSENT_TYPES
         = List.of(GeneralApplicationTypes.SETTLE_BY_CONSENT);
     protected static final List<GeneralApplicationTypes> CONFIRM_YOU_PAID_CCJ_DEBT
-        = List.of(GeneralApplicationTypes.CONFIRM_YOU_PAID_CCJ_DEBT);
+        = List.of(GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID);
 
     public Fee getFeeForGALiP(List<GeneralApplicationTypes> applicationTypes, Boolean withConsent,
                               Boolean withNotice, LocalDate hearingDate) {
