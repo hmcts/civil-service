@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
@@ -20,18 +19,18 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STAY_CASE;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_STAY;
 
 @Service
 @RequiredArgsConstructor
-public class StayCaseCallbackHandler extends CallbackHandler {
+public class ManageStayCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(STAY_CASE);
+    private static final List<CaseEvent> EVENTS = List.of(MANAGE_STAY);
 
     private final FeatureToggleService featureToggleService;
 
-    private static final String HEADER_CONFIRMATION = "# Stay added to the case \n\n ## All parties have been notified and any upcoming hearings must be cancelled";
+    private static final String HEADER_CONFIRMATION_LIFT_STAY = "# You have lifted the stay from this \n\n # case \n\n ## All parties have been notified";
+    private static final String HEADER_CONFIRMATION_REQUEST_UPDATE = "# You have requested an update on \n\n # this case \n\n ## All parties have been notified";
     private static final String BODY_CONFIRMATION = "&nbsp;";
 
     private final ObjectMapper mapper;
@@ -46,23 +45,20 @@ public class StayCaseCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse handleAboutToSubmit(CallbackParams params) {
-        return featureToggleService.isCaseEventsEnabled() ? stayCase(params) : emptyCallbackResponse(params);
+        return featureToggleService.isCaseEventsEnabled() ? manageStay(params) : emptyCallbackResponse(params);
     }
 
     private CallbackResponse handleSubmitted(CallbackParams params) {
         return featureToggleService.isCaseEventsEnabled() ? addConfirmationScreen(params) : emptyCallbackResponse(params);
     }
 
-    private CallbackResponse stayCase(CallbackParams callbackParams) {
+    private CallbackResponse manageStay(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        caseDataBuilder.businessProcess(BusinessProcess.ready(STAY_CASE));
-        caseDataBuilder.preStayState(callbackParams.getRequest().getCaseDetails().getState());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(mapper))
-            .state(CASE_STAYED.name())
             .build();
     }
 
@@ -74,7 +70,7 @@ public class StayCaseCallbackHandler extends CallbackHandler {
     private SubmittedCallbackResponse addConfirmationScreen(CallbackParams callbackParams) {
 
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(HEADER_CONFIRMATION)
+            .confirmationHeader(HEADER_CONFIRMATION_LIFT_STAY)
             .confirmationBody(BODY_CONFIRMATION)
             .build();
 
