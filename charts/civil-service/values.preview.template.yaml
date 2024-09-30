@@ -272,7 +272,7 @@ aac-manage-case-assignment:
       enabled: false
 
 wiremock:
-  enabled: false
+  enabled: true
   image: "wiremock/wiremock"
   applicationPort: 8080
   imagePullPolicy: Always
