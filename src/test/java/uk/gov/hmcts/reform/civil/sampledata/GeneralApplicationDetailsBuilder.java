@@ -46,6 +46,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static java.time.LocalDate.EPOCH;
 import static java.time.LocalDateTime.now;
 import static java.util.Collections.singletonList;
@@ -1586,13 +1587,17 @@ public class GeneralApplicationDetailsBuilder {
     public CaseData getTestCaseDataWithDraftApplicationPDFDocument(CaseData caseData) {
         String uid = "f000aa01-0451-4000-b000-000000000111";
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
+        List<Element<CaseDocument>> draftDocs = newArrayList();
+        draftDocs.add(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
+                          .value(pdfDocument).build());
+        draftDocs.add(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
+                          .value(pdfDocument).build());
         return caseData.toBuilder()
             .ccdCaseReference(1234L)
             .generalAppType(GAApplicationType.builder()
                                 .types(singletonList(EXTEND_TIME))
                                 .build())
-            .gaDraftDocument(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
-                                                    .value(pdfDocument).build()))
+            .gaDraftDocument(draftDocs)
             .build();
     }
 

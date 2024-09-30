@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -502,7 +503,48 @@ public class UpdateFromGACaseEventTaskHandlerTest {
     }
 
     @Test
-    void testShouldAddGaDraftApplicationDocument_Lip() {
+    void testShouldAddGaDraftApplicationDocument_LipApplicantGANotEnabled() {
+        when(mockExternalTask.getTopicName()).thenReturn("test");
+        when(featureToggleService.isGaForLipsEnabled()).thenReturn(false);
+        when(mockExternalTask.getAllVariables())
+            .thenReturn(Map.of(
+                "caseId", GENERAL_APP_CASE_ID,
+                "caseEvent", ADD_PDF_TO_MAIN_CASE,
+                "generalAppParentCaseLink", CIVIL_CASE_ID
+            ));
+
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraftLip()
+            .applicant1Represented(YesOrNo.NO)
+            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .build();
+
+        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        StartEventResponse startEventResponse = startEventResponse(caseDetails);
+
+        CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithDraftApplicationPDFDocument(CaseData.builder().build());
+
+        CaseData updatedCaseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithDraftStaffPDFDocument(CaseData.builder().build());
+
+        when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
+            .thenReturn(generalCaseData);
+
+        when(coreCaseDataService.startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE)).thenReturn(startEventResponse);
+
+        when(caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails())).thenReturn(caseData);
+
+        when(coreCaseDataService.submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class))).thenReturn(updatedCaseData);
+
+        handler.execute(mockExternalTask, externalTaskService);
+
+        verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
+        verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
+        verify(externalTaskService).complete(mockExternalTask, null);
+    }
+
+    @Test
+    void testShouldAddGaDraftApplicationDocument_LipRespondent() {
         when(mockExternalTask.getTopicName()).thenReturn("test");
         when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
         when(mockExternalTask.getAllVariables())
@@ -512,7 +554,49 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                 "generalAppParentCaseLink", CIVIL_CASE_ID
             ));
 
-        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraftLip()
+            .respondent1Represented(YesOrNo.NO)
+            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .build();
+
+        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        StartEventResponse startEventResponse = startEventResponse(caseDetails);
+
+        CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithDraftApplicationPDFDocument(CaseData.builder().build());
+
+        CaseData updatedCaseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithDraftStaffPDFDocument(CaseData.builder().build());
+
+        when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
+            .thenReturn(generalCaseData);
+
+        when(coreCaseDataService.startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE)).thenReturn(startEventResponse);
+
+        when(caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails())).thenReturn(caseData);
+
+        when(coreCaseDataService.submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class))).thenReturn(updatedCaseData);
+
+        handler.execute(mockExternalTask, externalTaskService);
+
+        verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
+        verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
+        verify(externalTaskService).complete(mockExternalTask, null);
+    }
+
+    @Test
+    void testShouldAddGaDraftApplicationDocument_LipApplicant() {
+        when(mockExternalTask.getTopicName()).thenReturn("test");
+        when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
+        when(mockExternalTask.getAllVariables())
+            .thenReturn(Map.of(
+                "caseId", GENERAL_APP_CASE_ID,
+                "caseEvent", ADD_PDF_TO_MAIN_CASE,
+                "generalAppParentCaseLink", CIVIL_CASE_ID
+            ));
+
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraftLip()
+            .applicant1Represented(YesOrNo.NO)
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
             .build();
 
