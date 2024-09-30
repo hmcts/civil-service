@@ -31,8 +31,10 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGeneratorWithAuth;
+import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.helpers.ReferenceNumberPopulator;
+import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.helpers.SealedClaimResponseFormForSpecPopulator;
+import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.helpers.StatementOfTruthPopulator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
-import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.util.ArrayList;
@@ -57,6 +59,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     private final DocumentManagementService documentManagementService;
     private final LocationReferenceDataService locationRefDataService;
     private final FeatureToggleService featureToggleService;
+    private final SealedClaimResponseFormForSpecPopulator sealedClaimResponseFormForSpecPopulator;
 
     @Override
     public SealedClaimResponseFormForSpec getTemplateData(CaseData caseData, String authorisation) {
@@ -81,16 +84,8 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
             .map(LocationRefData::getCourtName)
             .orElse(null);
         SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder
-            = SealedClaimResponseFormForSpec.builder()
-            .referenceNumber(caseData.getLegacyCaseReference())
-            .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
-            .whyDisputeTheClaim(isRespondent2(caseData) ? caseData.getDetailsOfWhyDoesYouDisputeTheClaim2() : caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
-            .hearingCourtLocation(hearingCourtLocation)
-            .statementOfTruth(statementOfTruth)
-            .allocatedTrack(caseData.getResponseClaimTrack())
-            .responseType(caseData.getRespondentClaimResponseTypeForSpecGeneric())
-            .checkCarmToggle(featureToggleService.isCarmEnabledForCase(caseData))
-            .mediation(caseData.getResponseClaimMediationSpecRequired());
+            = SealedClaimResponseFormForSpec.builder();
+        sealedClaimResponseFormForSpecPopulator.populateForm(caseData, authorisation);
         addCarmMediationDetails(builder, caseData);
         addRepaymentPlanDetails(builder, caseData);
         if (MultiPartyScenario.getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
