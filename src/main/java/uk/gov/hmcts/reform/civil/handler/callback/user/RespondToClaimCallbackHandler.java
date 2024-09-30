@@ -356,7 +356,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         // persist respondent address (ccd issue)
         var updatedRespondent1 = caseData.getRespondent1().toBuilder()
             .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
-            .flags(caseData.getRespondent1Copy().getFlags())
             .build();
 
         CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder = caseData.toBuilder()
@@ -368,7 +367,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
             var updatedRespondent2 = caseData.getRespondent2().toBuilder()
                 .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
-                .flags(caseData.getRespondent2Copy().getFlags())
                 .build();
 
             updatedCaseDataBuilder.respondent2(updatedRespondent2).respondent2Copy(null);

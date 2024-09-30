@@ -1363,11 +1363,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .build();
         }
 
-        if (caseData.getRespondent1Copy() != null) {
-            updatedRespondent1 =
-                updatedRespondent1.toBuilder().flags(caseData.getRespondent1Copy().getFlags()).build();
-        }
-
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
             .respondent1(updatedRespondent1)
             .respondent1Copy(null);
@@ -1384,7 +1379,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
             var updatedRespondent2 = caseData.getRespondent2().toBuilder()
                 .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
-                .flags(caseData.getRespondent2Copy().getFlags())
                 .build();
             updatedData.respondent2(updatedRespondent2).respondent2Copy(null);
             updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
@@ -1441,10 +1435,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                         .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress()).build();
                 }
 
-                updatedData
-                    .respondent2(updatedRespondent2.toBuilder()
-                                     .flags(caseData.getRespondent2Copy().getFlags()).build())
-                    .respondent2Copy(null);
+                updatedData.respondent2Copy(null);
                 updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
             }
 
