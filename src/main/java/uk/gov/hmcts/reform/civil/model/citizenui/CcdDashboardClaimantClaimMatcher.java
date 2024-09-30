@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
@@ -390,6 +391,18 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     }
 
     @Override
+    public boolean isHwfFullRemission() {
+        Optional<LocalDateTime> eventTime = getTimeOfMostRecentEventOfType(
+            EnumSet.of(CaseEvent.FULL_REMISSION_HWF));
+        Optional<LocalDateTime> orderTime = getTimeOfLastNonSDOOrder();
+        return (caseData.isHWFTypeHearing()
+            || (caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED && caseData.isHWFTypeClaimIssued()))
+            && caseData.getHwFEvent() == CaseEvent.FULL_REMISSION_HWF
+            && (eventTime).isPresent()
+            && (orderTime.isEmpty() || eventTime.get().isAfter(orderTime.get()));
+    }
+
+    @Override
     public boolean isHwfUpdatedRefNumber() {
         Optional<LocalDateTime> eventTime = getTimeOfMostRecentEventOfType(
             EnumSet.of(CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER));
@@ -420,14 +433,14 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
             .map(p -> p.getStatus() == PaymentStatus.SUCCESS).orElse(
                 Boolean.FALSE)) {
             return ((eventTime = getTimeOfMostRecentEventOfType(
-                EnumSet.of(CaseEvent.CITIZEN_HEARING_FEE_PAYMENT))).isPresent())
+                EnumSet.of(CaseEvent.CITIZEN_HEARING_FEE_PAYMENT, CaseEvent.FEE_PAYMENT_OUTCOME))).isPresent())
                 && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get()
                 .isAfter(orderTime.get()));
         }
         return (caseData.isHWFTypeHearing()
             || (caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED && caseData.isHWFTypeClaimIssued()))
-            && caseData.getHwFEvent() == CaseEvent.FULL_REMISSION_HWF
-            && ((eventTime = getTimeOfMostRecentEventOfType(EnumSet.of(CaseEvent.FULL_REMISSION_HWF))).isPresent())
+            && CaseEvent.FEE_PAYMENT_OUTCOME == caseData.getHwFEvent()
+            && ((eventTime = getTimeOfMostRecentEventOfType(EnumSet.of(CaseEvent.FEE_PAYMENT_OUTCOME))).isPresent())
             && (orderTime.isEmpty() || eventTime.get().isAfter(orderTime.get()));
     }
 
@@ -477,7 +490,8 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         Optional<LocalDateTime> eventTime = getTimeOfMostRecentEventOfType(
             EnumSet.of(CaseEvent.GENERATE_TRIAL_READY_FORM_APPLICANT));
         Optional<LocalDateTime> orderTime = getTimeOfLastNonSDOOrder();
-        return caseData.getTrialReadyApplicant() == YesOrNo.YES
+        return SdoHelper.isFastTrack(caseData)
+            && caseData.getTrialReadyApplicant() != null
             && (eventTime.isPresent())
             && (orderTime.isEmpty() || eventTime.get().isAfter(orderTime.get()));
     }

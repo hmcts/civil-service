@@ -70,6 +70,9 @@ public enum DashboardClaimStatus {
     CLAIMANT_HWF_PARTIAL_REMISSION(
         Claim::isHwfPartialRemission
     ),
+    CLAIMANT_HWF_FULL_REMISSION(
+        Claim::isHwfFullRemission
+    ),
     CLAIMANT_HWF_UPDATED_REF_NUMBER(
         Claim::isHwfUpdatedRefNumber
     ),

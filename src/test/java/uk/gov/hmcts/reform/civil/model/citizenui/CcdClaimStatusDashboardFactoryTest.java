@@ -662,7 +662,7 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void givenClaimStatusInHearingReadinessAndHWFFeePaymentOutcome_WhenGetStatus_thenReturnHearingFeePaidStatus() {
         HelpWithFeesDetails hwfDetails = HelpWithFeesDetails.builder()
-            .hwfCaseEvent(FULL_REMISSION_HWF).build();
+            .hwfCaseEvent(CaseEvent.FEE_PAYMENT_OUTCOME).build();
         CaseData caseData = CaseData.builder()
             .ccdState(CaseState.HEARING_READINESS)
             .hearingHwfDetails(hwfDetails)
@@ -674,7 +674,7 @@ class CcdClaimStatusDashboardFactoryTest {
             caseData, featureToggleService, Collections.singletonList(
             CaseEventDetail.builder()
                 .createdDate(LocalDateTime.now())
-                .id(FULL_REMISSION_HWF.name())
+                .id(CaseEvent.FEE_PAYMENT_OUTCOME.name())
                 .build()
         )));
 

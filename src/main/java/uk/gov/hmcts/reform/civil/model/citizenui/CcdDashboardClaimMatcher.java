@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
@@ -196,5 +197,20 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
         return eventHistory.stream()
             .filter(e -> eventNames.contains(e.getId()))
             .findFirst();
+    }
+
+    public boolean isTrialArrangementStatusActive() {
+        int dayLimit = 6 * 7;
+        Optional<LocalDate> hearingDate = getHearingDate();
+        if (SdoHelper.isFastTrack(caseData)
+            && hearingDate.isPresent()
+            && LocalDate.now().plusDays(dayLimit + 1L).isAfter(hearingDate.get())) {
+            Optional<LocalDateTime> lastOrder = getTimeOfLastNonSDOOrder();
+            return lastOrder.isEmpty()
+                || hearingDate.get().minusDays(dayLimit)
+                .isAfter(lastOrder.get().toLocalDate());
+        } else {
+            return false;
+        }
     }
 }

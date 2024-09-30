@@ -612,4 +612,9 @@ public class CmcClaim implements Claim {
     public Optional<LocalDateTime> getWhenWasHearingScheduled() {
         return Optional.empty();
     }
+
+    @Override
+    public boolean isTrialArrangementStatusActive() {
+        return false;
+    }
 }

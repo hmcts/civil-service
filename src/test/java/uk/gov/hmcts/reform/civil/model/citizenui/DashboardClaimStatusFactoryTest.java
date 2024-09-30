@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
@@ -114,6 +115,62 @@ class DashboardClaimStatusFactoryTest {
         // times passes until there's only 6 weeks to hearing
         caseData = passDays(caseData, eventHistory, 14);
         shouldRequireTrialArrangements(caseData, eventHistory);
+        applyOrderIfPosition(9, orderPosition, orderType,
+                             caseData, eventHistory
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("hearingFeePaidArguments")
+    void shouldReturnCorrectStatus_hearingFeePaidSmallClaim(int orderPosition, OrderType orderType) {
+        List<CaseEventDetail> eventHistory = new ArrayList<>();
+        CaseData caseData = smallClaim(eventHistory);
+        caseData = passDays(caseData, eventHistory, 1);
+        caseData = applyOrderIfPosition(1, orderPosition, orderType,
+                                        caseData, eventHistory
+        );
+
+        caseData = passDays(caseData, eventHistory, 1);
+        caseData = scheduleHearing(caseData, eventHistory);
+        // 56 days to hearing
+        caseData = applyOrderIfPosition(2, orderPosition, orderType,
+                                        caseData, eventHistory
+        );
+        caseData = requestHwF(caseData, eventHistory);
+        caseData = applyOrderIfPosition(3, orderPosition, orderType,
+                                        caseData, eventHistory
+        );
+        caseData = invalidHwFReferenceNumber(caseData, eventHistory);
+        caseData = applyOrderIfPosition(4, orderPosition, orderType,
+                                        caseData, eventHistory
+        );
+        caseData = updatedHwFReferenceNumber(caseData, eventHistory);
+        caseData = applyOrderIfPosition(5, orderPosition, orderType,
+                                        caseData, eventHistory
+        );
+        caseData = moreInformationRequiredHwF(caseData, eventHistory);
+        caseData = applyOrderIfPosition(6, orderPosition, orderType,
+                                        caseData, eventHistory
+        );
+        caseData = hwfRejected(caseData, eventHistory);
+        caseData = applyOrderIfPosition(7, orderPosition, orderType,
+                                        caseData, eventHistory
+        );
+        caseData = payHearingFee(caseData, eventHistory);
+        caseData = applyOrderIfPosition(8, orderPosition, orderType,
+                                        caseData, eventHistory
+        );
+        // times passes until there's only 6 weeks to hearing
+        caseData = passDays(caseData, eventHistory, 14);
+
+        // small claims have no ready trial arrangements
+        DashboardClaimStatus defendantStatus = claimStatusFactory.getDashboardClaimStatus(
+            new CcdDashboardDefendantClaimMatcher(caseData, toggleService, eventHistory)
+        );
+        DashboardClaimStatus claimantStatus = claimStatusFactory.getDashboardClaimStatus(
+            new CcdDashboardClaimantClaimMatcher(caseData, toggleService, eventHistory)
+        );
+        checkStatus(caseData, eventHistory, claimantStatus, defendantStatus);
         applyOrderIfPosition(9, orderPosition, orderType,
                              caseData, eventHistory
         );
@@ -227,6 +284,8 @@ class DashboardClaimStatusFactoryTest {
             .totalClaimAmount(BigDecimal.valueOf(1000))
             .systemGeneratedCaseDocuments(List.of(Element.<CaseDocument>builder()
                                                       .value(sdoDocument).build()))
+            .drawDirectionsOrderRequired(YesOrNo.NO)
+            .claimsTrack(ClaimsTrack.fastTrack)
             .build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.SDO_ORDER_CREATED,
@@ -282,7 +341,8 @@ class DashboardClaimStatusFactoryTest {
         caseDataBuilder.systemGeneratedCaseDocuments(systemGenerated);
         CaseData caseData = caseDataBuilder.build();
         checkStatus(caseData, eventHistory,
-                    DashboardClaimStatus.HEARING_FORM_GENERATED, DashboardClaimStatus.HEARING_FORM_GENERATED);
+                    DashboardClaimStatus.HEARING_FORM_GENERATED, DashboardClaimStatus.HEARING_FORM_GENERATED
+        );
 
         return caseData;
     }
@@ -290,7 +350,8 @@ class DashboardClaimStatusFactoryTest {
     private void shouldRequireTrialArrangements(CaseData caseData, List<CaseEventDetail> eventHistory) {
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.TRIAL_ARRANGEMENTS_REQUIRED,
-                    DashboardClaimStatus.TRIAL_ARRANGEMENTS_REQUIRED);
+                    DashboardClaimStatus.TRIAL_ARRANGEMENTS_REQUIRED
+        );
     }
 
     private CaseData createBundle(CaseData previous, List<CaseEventDetail> eventHistory) {
@@ -307,7 +368,8 @@ class DashboardClaimStatusFactoryTest {
         CaseData caseData = caseDataBuilder.build();
         checkStatus(caseData, eventHistory,
                     expectedStatus,
-                    expectedStatus);
+                    expectedStatus
+        );
 
         return caseData;
     }
@@ -325,7 +387,8 @@ class DashboardClaimStatusFactoryTest {
         );
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.HEARING_SUBMIT_HWF,
-                    defendantStatus);
+                    defendantStatus
+        );
         return caseData;
     }
 
@@ -345,7 +408,8 @@ class DashboardClaimStatusFactoryTest {
             .build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.CLAIMANT_HWF_INVALID_REF_NUMBER,
-                    defendantStatus);
+                    defendantStatus
+        );
         return caseData;
     }
 
@@ -364,7 +428,8 @@ class DashboardClaimStatusFactoryTest {
             .build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.CLAIMANT_HWF_UPDATED_REF_NUMBER,
-                    defendantStatus);
+                    defendantStatus
+        );
         return caseData;
     }
 
@@ -383,7 +448,8 @@ class DashboardClaimStatusFactoryTest {
             .build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.HWF_MORE_INFORMATION_NEEDED,
-                    defendantStatus);
+                    defendantStatus
+        );
         return caseData;
     }
 
@@ -402,7 +468,8 @@ class DashboardClaimStatusFactoryTest {
             .build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.CLAIMANT_HWF_NO_REMISSION,
-                    defendantStatus);
+                    defendantStatus
+        );
         return caseData;
     }
 
@@ -421,7 +488,8 @@ class DashboardClaimStatusFactoryTest {
             .build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.CLAIMANT_HWF_FEE_PAYMENT_OUTCOME,
-                    defendantStatus);
+                    defendantStatus
+        );
         return caseData;
     }
 
@@ -439,7 +507,8 @@ class DashboardClaimStatusFactoryTest {
             .build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED,
-                    DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED);
+                    DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED
+        );
         return caseData;
     }
 
@@ -459,7 +528,8 @@ class DashboardClaimStatusFactoryTest {
             .build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.CLAIMANT_HWF_PARTIAL_REMISSION,
-                    defendantStatus);
+                    defendantStatus
+        );
         return caseData;
     }
 
@@ -469,7 +539,8 @@ class DashboardClaimStatusFactoryTest {
             .build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.HEARING_FEE_UNPAID,
-                    DashboardClaimStatus.HEARING_FEE_UNPAID);
+                    DashboardClaimStatus.HEARING_FEE_UNPAID
+        );
     }
 
     private CaseData hwfFull(CaseData previous, List<CaseEventDetail> eventHistory,
@@ -487,8 +558,9 @@ class DashboardClaimStatusFactoryTest {
                                    .build())
             .build();
         checkStatus(caseData, eventHistory,
-                    DashboardClaimStatus.CLAIMANT_HWF_FEE_PAYMENT_OUTCOME,
-                    defendantStatus);
+                    DashboardClaimStatus.CLAIMANT_HWF_FULL_REMISSION,
+                    defendantStatus
+        );
         return caseData;
     }
 
@@ -511,7 +583,8 @@ class DashboardClaimStatusFactoryTest {
             .build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.TRIAL_ARRANGEMENTS_SUBMITTED,
-                    otherPartyStatus);
+                    otherPartyStatus
+        );
         return caseData;
     }
 
@@ -525,7 +598,7 @@ class DashboardClaimStatusFactoryTest {
                              .id(CaseEvent.GENERATE_TRIAL_READY_FORM_RESPONDENT1.name())
                              .build());
         CaseData caseData = previous.toBuilder()
-            .trialReadyRespondent1(YesOrNo.YES)
+            .trialReadyRespondent1(YesOrNo.NO)
             .build();
         DashboardClaimStatus otherPartyStatus = claimStatusFactory.getDashboardClaimStatus(
             new CcdDashboardClaimantClaimMatcher(
@@ -534,7 +607,8 @@ class DashboardClaimStatusFactoryTest {
             ));
         checkStatus(caseData, eventHistory,
                     otherPartyStatus,
-                    DashboardClaimStatus.TRIAL_ARRANGEMENTS_SUBMITTED);
+                    DashboardClaimStatus.TRIAL_ARRANGEMENTS_SUBMITTED
+        );
         return caseData;
     }
 
@@ -544,7 +618,8 @@ class DashboardClaimStatusFactoryTest {
             .build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.AWAITING_JUDGMENT,
-                    DashboardClaimStatus.AWAITING_JUDGMENT);
+                    DashboardClaimStatus.AWAITING_JUDGMENT
+        );
     }
 
     /**
@@ -577,7 +652,8 @@ class DashboardClaimStatusFactoryTest {
             .build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.ORDER_MADE,
-                    DashboardClaimStatus.ORDER_MADE);
+                    DashboardClaimStatus.ORDER_MADE
+        );
         return caseData;
     }
 
@@ -602,7 +678,8 @@ class DashboardClaimStatusFactoryTest {
             .build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.ORDER_MADE,
-                    DashboardClaimStatus.ORDER_MADE);
+                    DashboardClaimStatus.ORDER_MADE
+        );
         return caseData;
     }
 

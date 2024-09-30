@@ -183,19 +183,7 @@ public interface Claim {
             || lastOrderDate.get().isBefore(bundleDate.get()));
     }
 
-    default boolean isTrialArrangementStatusActive() {
-        int dayLimit = 6 * 7;
-        Optional<LocalDate> hearingDate = getHearingDate();
-        if (hearingDate.isPresent()
-            && LocalDate.now().plusDays(dayLimit + 1L).isAfter(hearingDate.get())) {
-            Optional<LocalDateTime> lastOrder = getTimeOfLastNonSDOOrder();
-            return lastOrder.isEmpty()
-                || hearingDate.get().minusDays(dayLimit)
-                .isAfter(lastOrder.get().toLocalDate());
-        } else {
-            return false;
-        }
-    }
+    boolean isTrialArrangementStatusActive();
 
     default boolean isTrialScheduledStatusActive() {
         Optional<LocalDateTime> hearingScheduledDate = getWhenWasHearingScheduled();
@@ -205,5 +193,9 @@ public interface Claim {
             && (hearingScheduledDate.isPresent())
             && (orderDate.isEmpty()
             || orderDate.get().isBefore(hearingScheduledDate.get()));
+    }
+
+    default boolean isHwfFullRemission() {
+        return false;
     }
 }

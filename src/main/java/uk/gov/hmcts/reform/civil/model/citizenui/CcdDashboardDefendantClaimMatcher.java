@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
@@ -447,7 +448,8 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         Optional<LocalDateTime> eventTime = getTimeOfMostRecentEventOfType(
             EnumSet.of(CaseEvent.GENERATE_TRIAL_READY_FORM_RESPONDENT1));
         Optional<LocalDateTime> orderTime = getTimeOfLastNonSDOOrder();
-        return caseData.getTrialReadyRespondent1() == YesOrNo.YES
+        return SdoHelper.isFastTrack(caseData)
+            && caseData.getTrialReadyRespondent1() != null
             && (eventTime.isPresent())
             && (orderTime.isEmpty() || eventTime.get().isAfter(orderTime.get()));
     }
