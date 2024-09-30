@@ -32,19 +32,25 @@ public class HandleRespondentResponseTypeForSpecTest {
         handleRespondentResponseTypeForSpec = new HandleRespondentResponseTypeForSpec(objectMapper);
     }
 
+    private void assertSpecDefenceFullAdmittedRequired(CaseData caseData, Object expectedValue) {
+        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackResponse response = handleRespondentResponseTypeForSpec.execute(callbackParams);
+
+        Map<String, Object> responseData = ((AboutToStartOrSubmitCallbackResponse) response).getData();
+
+        CaseData updatedCaseData = objectMapper.convertValue(responseData, CaseData.class);
+
+        assertEquals(expectedValue, updatedCaseData.getSpecDefenceFullAdmittedRequired());
+    }
+
     @Test
     void shouldSetSpecDefenceFullAdmittedRequiredToNoWhenNotFullAdmission() {
         CaseData caseData = CaseData.builder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
 
-        CallbackResponse response = handleRespondentResponseTypeForSpec.execute(callbackParams);
-
-        Map<String, Object> responseData = ((AboutToStartOrSubmitCallbackResponse) response).getData();
-        CaseData updatedCaseData = objectMapper.convertValue(responseData, CaseData.class);
-        assertEquals(NO, updatedCaseData.getSpecDefenceFullAdmittedRequired());
+        assertSpecDefenceFullAdmittedRequired(caseData, NO);
     }
 
     @Test
@@ -54,13 +60,8 @@ public class HandleRespondentResponseTypeForSpecTest {
             .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .specDefenceFullAdmittedRequired(YES)
             .build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
 
-        CallbackResponse response = handleRespondentResponseTypeForSpec.execute(callbackParams);
-
-        Map<String, Object> responseData = ((AboutToStartOrSubmitCallbackResponse) response).getData();
-        CaseData updatedCaseData = objectMapper.convertValue(responseData, CaseData.class);
-        assertEquals(YES, updatedCaseData.getSpecDefenceFullAdmittedRequired());
+        assertSpecDefenceFullAdmittedRequired(caseData, YES);
     }
 
     @Test
@@ -69,13 +70,8 @@ public class HandleRespondentResponseTypeForSpecTest {
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .respondent2ClaimResponseTypeForSpec(null)
             .build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
 
-        CallbackResponse response = handleRespondentResponseTypeForSpec.execute(callbackParams);
-
-        Map<String, Object> responseData = ((AboutToStartOrSubmitCallbackResponse) response).getData();
-        CaseData updatedCaseData = objectMapper.convertValue(responseData, CaseData.class);
-        assertEquals(NO, updatedCaseData.getSpecDefenceFullAdmittedRequired());
+        assertSpecDefenceFullAdmittedRequired(caseData, NO);
     }
 
     @Test
@@ -84,12 +80,7 @@ public class HandleRespondentResponseTypeForSpecTest {
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
 
-        CallbackResponse response = handleRespondentResponseTypeForSpec.execute(callbackParams);
-
-        Map<String, Object> responseData = ((AboutToStartOrSubmitCallbackResponse) response).getData();
-        CaseData updatedCaseData = objectMapper.convertValue(responseData, CaseData.class);
-        assertEquals(NO, updatedCaseData.getSpecDefenceFullAdmittedRequired());
+        assertSpecDefenceFullAdmittedRequired(caseData, NO);
     }
 }

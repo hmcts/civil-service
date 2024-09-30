@@ -1,14 +1,17 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
@@ -17,10 +20,16 @@ import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
+@Slf4j
 @ExtendWith(MockitoExtension.class)
 public class ValidateDateOfBirthTest {
 
@@ -164,5 +173,108 @@ public class ValidateDateOfBirthTest {
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateDateOfBirth.execute(callbackParams);
 
         assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void shouldSetSameSolicitorSameResponseToYesWhenBothSolicitorsRepresentOnlyOneRespondent() {
+        caseData = CaseData.builder()
+            .addRespondent2(YES)
+            .build();
+        when(callbackParams.getCaseData()).thenReturn(caseData);
+
+        try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
+            mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(ONE_V_TWO_TWO_LEGAL_REP);
+            when(respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)).thenReturn(true);
+            when(respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)).thenReturn(true);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateDateOfBirth.execute(callbackParams);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    @Test
+    void shouldSetSameSolicitorSameResponseToYesWhenOnlySecondSolicitorRepresentsOneRespondent() {
+        caseData = CaseData.builder()
+            .addRespondent2(YES)
+            .build();
+        when(callbackParams.getCaseData()).thenReturn(caseData);
+
+        try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
+            mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(ONE_V_TWO_TWO_LEGAL_REP);
+            when(respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)).thenReturn(true);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateDateOfBirth.execute(callbackParams);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    @Test
+    void shouldSetSameSolicitorSameResponseToYesWhenNoSolicitorRepresentsOneRespondent() {
+        caseData = CaseData.builder()
+            .addRespondent2(YES)
+            .build();
+        when(callbackParams.getCaseData()).thenReturn(caseData);
+
+        try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
+            mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(ONE_V_TWO_TWO_LEGAL_REP);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateDateOfBirth.execute(callbackParams);
+
+            assertThat(response.getErrors()).isEmpty();
+
+        }
+    }
+
+    @Test
+    void shouldSetSameSolicitorSameResponseToNoWhenOneVTwoOneLegalRepAndRespondentResponseIsNotSame() {
+        caseData = CaseData.builder()
+            .addRespondent2(YES)
+            .respondentResponseIsSame(NO)
+            .build();
+        when(callbackParams.getCaseData()).thenReturn(caseData);
+
+        try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
+            mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(ONE_V_TWO_ONE_LEGAL_REP);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateDateOfBirth.execute(callbackParams);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    @Test
+    void shouldNotSetSameSolicitorSameResponseWhenAddRespondent2IsNoAndRespondentResponseIsNotSame() {
+        caseData = CaseData.builder()
+            .addRespondent2(NO)
+            .respondentResponseIsSame(NO)
+            .build();
+        when(callbackParams.getCaseData()).thenReturn(caseData);
+
+        try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
+            mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(ONE_V_TWO_ONE_LEGAL_REP);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateDateOfBirth.execute(callbackParams);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    @Test
+    void shouldSetSameSolicitorSameResponseToYesWhenOneVTwoOneLegalRepAndRespondentResponseIsSame() {
+        caseData = CaseData.builder()
+            .addRespondent2(YES)
+            .respondentResponseIsSame(YES)
+            .build();
+        when(callbackParams.getCaseData()).thenReturn(caseData);
+
+        try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
+            mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(ONE_V_TWO_ONE_LEGAL_REP);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateDateOfBirth.execute(callbackParams);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
     }
 }

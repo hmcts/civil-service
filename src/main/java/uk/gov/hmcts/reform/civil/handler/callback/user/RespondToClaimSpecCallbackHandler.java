@@ -139,9 +139,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        // resetting statement of truth field, this resets in the page, but the data is still sent to the db.
-        // setting null here does not clear, need to overwrite with value.
-        // must be to do with the way XUI cache data entered through the lifecycle of an event.
         CaseData updatedCaseData = caseData.toBuilder()
             .uiStatementOfTruth(StatementOfTruth.builder().role("").build())
             .build();

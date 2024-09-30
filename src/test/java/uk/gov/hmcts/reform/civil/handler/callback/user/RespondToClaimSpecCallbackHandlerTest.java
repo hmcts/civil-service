@@ -1539,7 +1539,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getData())
             .extracting("respondent1DQFixedRecoverableCostsIntermediate")
             .extracting("frcSupportingDocument")
-            .extracting("categoryID")
+            .extracting("category_id")
             .isEqualTo(DQ_DEF1.getValue());
     }
 

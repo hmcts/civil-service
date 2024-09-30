@@ -40,22 +40,29 @@ public class SetUploadTimelineTypeFlagTest {
         setUploadTimelineTypeFlag = new SetUploadTimelineTypeFlag(objectMapper);
         caseData = CaseData.builder()
             .isRespondent1(YES)
-            .specClaimResponseTimelineList(TimelineUploadTypeSpec.UPLOAD)
-            .showConditionFlags(new HashSet<>(EnumSet.of(TIMELINE_MANUALLY)))
             .build();
 
         when(callbackParams.getCaseData()).thenReturn(caseData);
     }
 
-    @Test
-    void shouldAddTimelineUploadFlagWhenTimelineIsUpload() {
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) setUploadTimelineTypeFlag.execute(callbackParams);
-
-        Set<DefendantResponseShowTag> expectedFlags = new HashSet<>(EnumSet.of(TIMELINE_UPLOAD));
+    private void assertFlags(AboutToStartOrSubmitCallbackResponse response, Set<DefendantResponseShowTag> expectedFlags) {
         Set<DefendantResponseShowTag> actualFlags = objectMapper.convertValue(
-            response.getData().get("showConditionFlags"), objectMapper.getTypeFactory().constructCollectionType(Set.class, DefendantResponseShowTag.class)
+            response.getData().get("showConditionFlags"),
+            objectMapper.getTypeFactory().constructCollectionType(Set.class, DefendantResponseShowTag.class)
         );
         assertThat(actualFlags).isEqualTo(expectedFlags);
+    }
+
+    @Test
+    void shouldAddTimelineUploadFlagWhenTimelineIsUpload() {
+        caseData = caseData.toBuilder()
+            .specClaimResponseTimelineList(TimelineUploadTypeSpec.UPLOAD)
+            .build();
+
+        when(callbackParams.getCaseData()).thenReturn(caseData);
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) setUploadTimelineTypeFlag.execute(callbackParams);
+        assertFlags(response, EnumSet.of(TIMELINE_UPLOAD));
     }
 
     @Test
@@ -67,12 +74,7 @@ public class SetUploadTimelineTypeFlagTest {
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) setUploadTimelineTypeFlag.execute(callbackParams);
-
-        Set<DefendantResponseShowTag> expectedFlags = new HashSet<>(EnumSet.of(TIMELINE_MANUALLY));
-        Set<DefendantResponseShowTag> actualFlags = objectMapper.convertValue(
-            response.getData().get("showConditionFlags"), objectMapper.getTypeFactory().constructCollectionType(Set.class, DefendantResponseShowTag.class)
-        );
-        assertThat(actualFlags).isEqualTo(expectedFlags);
+        assertFlags(response, EnumSet.of(TIMELINE_MANUALLY));
     }
 
     @Test
@@ -85,11 +87,84 @@ public class SetUploadTimelineTypeFlagTest {
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) setUploadTimelineTypeFlag.execute(callbackParams);
+        assertFlags(response, EnumSet.of(TIMELINE_UPLOAD));
+    }
 
-        Set<DefendantResponseShowTag> expectedFlags = new HashSet<>(EnumSet.of(TIMELINE_UPLOAD));
-        Set<DefendantResponseShowTag> actualFlags = objectMapper.convertValue(
-            response.getData().get("showConditionFlags"), objectMapper.getTypeFactory().constructCollectionType(Set.class, DefendantResponseShowTag.class)
-        );
-        assertThat(actualFlags).isEqualTo(expectedFlags);
+    @Test
+    void shouldNotAddTimelineManualFlagWhenTimelineIsNotManual() {
+        caseData = caseData.toBuilder()
+            .specClaimResponseTimelineList(null)
+            .isRespondent1(YES)
+            .build();
+
+        when(callbackParams.getCaseData()).thenReturn(caseData);
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) setUploadTimelineTypeFlag.execute(callbackParams);
+        assertFlags(response, new HashSet<>());
+    }
+
+    @Test
+    void shouldNotAddTimelineUploadFlagWhenRespondent1IsNotYes() {
+        caseData = caseData.toBuilder()
+            .specClaimResponseTimelineList(TimelineUploadTypeSpec.UPLOAD)
+            .isRespondent1(null)
+            .build();
+
+        when(callbackParams.getCaseData()).thenReturn(caseData);
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) setUploadTimelineTypeFlag.execute(callbackParams);
+        assertFlags(response, new HashSet<>());
+    }
+
+    @Test
+    void shouldAddTimelineUploadFlagForRespondent2WhenTimelineIsUpload() {
+        caseData = caseData.toBuilder()
+            .isRespondent2(YES)
+            .specClaimResponseTimelineList2(TimelineUploadTypeSpec.UPLOAD)
+            .build();
+
+        when(callbackParams.getCaseData()).thenReturn(caseData);
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) setUploadTimelineTypeFlag.execute(callbackParams);
+        assertFlags(response, EnumSet.of(TIMELINE_UPLOAD));
+    }
+
+    @Test
+    void shouldAddTimelineManualFlagForRespondent2WhenTimelineIsManual() {
+        caseData = caseData.toBuilder()
+            .isRespondent2(YES)
+            .specClaimResponseTimelineList2(TimelineUploadTypeSpec.MANUAL)
+            .build();
+
+        when(callbackParams.getCaseData()).thenReturn(caseData);
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) setUploadTimelineTypeFlag.execute(callbackParams);
+        assertFlags(response, EnumSet.of(TIMELINE_MANUALLY));
+    }
+
+    @Test
+    void shouldAddTimelineManualFlagWhenRespondent1TimelineIsManual() {
+        caseData = caseData.toBuilder()
+            .isRespondent1(YES)
+            .specClaimResponseTimelineList(TimelineUploadTypeSpec.MANUAL)
+            .build();
+
+        when(callbackParams.getCaseData()).thenReturn(caseData);
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) setUploadTimelineTypeFlag.execute(callbackParams);
+        assertFlags(response, EnumSet.of(TIMELINE_MANUALLY));
+    }
+
+    @Test
+    void shouldNotAddAnyTimelineFlagForRespondent2WhenTimelineIsNull() {
+        caseData = caseData.toBuilder()
+            .isRespondent2(YES)
+            .specClaimResponseTimelineList2(null)
+            .build();
+
+        when(callbackParams.getCaseData()).thenReturn(caseData);
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) setUploadTimelineTypeFlag.execute(callbackParams);
+        assertFlags(response, new HashSet<>());
     }
 }

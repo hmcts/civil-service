@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
@@ -23,7 +24,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
 public class DetermineLoggedInSolicitorTest {
@@ -55,11 +55,9 @@ public class DetermineLoggedInSolicitorTest {
     void shouldSetRespondent1RoleWhenSolicitorHasRespondent1Role() {
         when(coreCaseUserService.userHasCaseRole("1234", "userId", RESPONDENTSOLICITORONE)).thenReturn(true);
 
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) determineLoggedInSolicitor.execute(callbackParams);
+        AboutToStartOrSubmitCallbackResponse response = executeCallback();
 
-        assertThat(response.getData().get("isRespondent1")).isEqualTo("Yes");
-        assertThat(response.getData().get("isRespondent2")).isEqualTo("No");
-        assertThat(response.getData().get("isApplicant1")).isEqualTo("No");
+        assertRoles(response, "Yes", "No", "No");
     }
 
     @Test
@@ -67,11 +65,9 @@ public class DetermineLoggedInSolicitorTest {
         when(coreCaseUserService.userHasCaseRole("1234", "userId", RESPONDENTSOLICITORONE)).thenReturn(false);
         when(coreCaseUserService.userHasCaseRole("1234", "userId", RESPONDENTSOLICITORTWO)).thenReturn(true);
 
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) determineLoggedInSolicitor.execute(callbackParams);
+        AboutToStartOrSubmitCallbackResponse response = executeCallback();
 
-        assertThat(response.getData().get("isRespondent1")).isEqualTo("No");
-        assertThat(response.getData().get("isRespondent2")).isEqualTo("Yes");
-        assertThat(response.getData().get("isApplicant1")).isEqualTo("No");
+        assertRoles(response, "No", "Yes", "No");
     }
 
     @Test
@@ -80,11 +76,9 @@ public class DetermineLoggedInSolicitorTest {
         when(coreCaseUserService.userHasCaseRole("1234", "userId", RESPONDENTSOLICITORTWO)).thenReturn(false);
         when(coreCaseUserService.userHasCaseRole("1234", "userId", APPLICANTSOLICITORONE)).thenReturn(true);
 
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) determineLoggedInSolicitor.execute(callbackParams);
+        AboutToStartOrSubmitCallbackResponse response = executeCallback();
 
-        assertThat(response.getData().get("isRespondent1")).isEqualTo("No");
-        assertThat(response.getData().get("isRespondent2")).isEqualTo("No");
-        assertThat(response.getData().get("isApplicant1")).isEqualTo("Yes");
+        assertRoles(response, "No", "No", "Yes");
     }
 
     @Test
@@ -93,64 +87,66 @@ public class DetermineLoggedInSolicitorTest {
         when(coreCaseUserService.userHasCaseRole("1234", "userId", RESPONDENTSOLICITORTWO)).thenReturn(false);
         when(coreCaseUserService.userHasCaseRole("1234", "userId", APPLICANTSOLICITORONE)).thenReturn(false);
 
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) determineLoggedInSolicitor.execute(callbackParams);
+        AboutToStartOrSubmitCallbackResponse response = executeCallback();
 
-        assertThat(response.getData().get("isRespondent1")).isNull();
-        assertThat(response.getData().get("isRespondent2")).isNull();
-        assertThat(response.getData().get("isApplicant1")).isNull();
+        assertRoles(response, null, null, null);
     }
 
     @Test
     void shouldSetNeitherCompanyNorOrganisationToNoWhenPartyIsCompany() {
-        CaseData caseData = CaseData.builder()
-            .isRespondent2(YES)
-            .respondent2DetailsForClaimDetailsTab(Party.builder().type(Party.Type.COMPANY).build())
-            .ccdCaseReference(1234L)
-            .build();
+        CaseData caseData = buildCaseData(Party.Type.COMPANY);
 
-        callbackParams = CallbackParams.builder()
-            .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "token"))
-            .build();
+        callbackParams = buildCallbackParams(caseData);
 
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) determineLoggedInSolicitor.execute(callbackParams);
+        AboutToStartOrSubmitCallbackResponse response = executeCallback();
 
         assertThat(response.getData().get("neitherCompanyNorOrganisation")).isEqualTo("No");
     }
 
     @Test
     void shouldSetNeitherCompanyNorOrganisationToNoWhenPartyIsOrganisation() {
-        CaseData caseData = CaseData.builder()
-            .isRespondent2(YES)
-            .respondent2DetailsForClaimDetailsTab(Party.builder().type(Party.Type.ORGANISATION).build())
-            .ccdCaseReference(1234L)
-            .build();
+        CaseData caseData = buildCaseData(Party.Type.ORGANISATION);
 
-        callbackParams = CallbackParams.builder()
-            .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "token"))
-            .build();
+        callbackParams = buildCallbackParams(caseData);
 
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) determineLoggedInSolicitor.execute(callbackParams);
+        AboutToStartOrSubmitCallbackResponse response = executeCallback();
 
         assertThat(response.getData().get("neitherCompanyNorOrganisation")).isEqualTo("No");
     }
 
     @Test
     void shouldSetNeitherCompanyNorOrganisationToYesWhenPartyIsNeitherCompanyNorOrganisation() {
-        CaseData caseData = CaseData.builder()
-            .isRespondent2(YES)
-            .respondent2DetailsForClaimDetailsTab(Party.builder().type(Party.Type.INDIVIDUAL).build())
+        CaseData caseData = buildCaseData(Party.Type.INDIVIDUAL);
+
+        callbackParams = buildCallbackParams(caseData);
+
+        AboutToStartOrSubmitCallbackResponse response = executeCallback();
+
+        assertThat(response.getData().get("neitherCompanyNorOrganisation")).isEqualTo("Yes");
+    }
+
+    private AboutToStartOrSubmitCallbackResponse executeCallback() {
+        return (AboutToStartOrSubmitCallbackResponse) determineLoggedInSolicitor.execute(callbackParams);
+    }
+
+    private void assertRoles(AboutToStartOrSubmitCallbackResponse response, String isRespondent1, String isRespondent2, String isApplicant1) {
+        assertThat(response.getData().get("isRespondent1")).isEqualTo(isRespondent1);
+        assertThat(response.getData().get("isRespondent2")).isEqualTo(isRespondent2);
+        assertThat(response.getData().get("isApplicant1")).isEqualTo(isApplicant1);
+    }
+
+    private CaseData buildCaseData(Party.Type partyType) {
+        return CaseData.builder()
+            .isRespondent2(YesOrNo.YES)
+            .respondent2DetailsForClaimDetailsTab(Party.builder().type(partyType).build())
             .ccdCaseReference(1234L)
             .build();
+    }
 
-        callbackParams = CallbackParams.builder()
+    private CallbackParams buildCallbackParams(CaseData caseData) {
+        return CallbackParams.builder()
             .caseData(caseData)
             .params(Map.of(BEARER_TOKEN, "token"))
             .build();
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) determineLoggedInSolicitor.execute(callbackParams);
-
-        assertThat(response.getData().get("neitherCompanyNorOrganisation")).isEqualTo("Yes");
     }
 }

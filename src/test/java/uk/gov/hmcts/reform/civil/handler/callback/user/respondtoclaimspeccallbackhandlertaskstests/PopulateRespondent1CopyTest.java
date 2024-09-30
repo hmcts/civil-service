@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.Party.Type;
@@ -20,9 +21,11 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -182,12 +185,11 @@ public class PopulateRespondent1CopyTest {
     void shouldHandleOneVTwoOneLegalRepScenario() {
         when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
         when(courtLocationUtils.getLocationsFromList(any())).thenReturn(null);
-        when(userService.getUserInfo(any())).thenReturn(userInfo);
-        when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORONE"));
 
         caseData = CaseData.builder()
             .respondent1(Party.builder().type(Type.INDIVIDUAL).build())
             .respondent2(Party.builder().type(Type.INDIVIDUAL).build())
+            .respondent2SameLegalRepresentative(YES)
             .ccdCaseReference(1234L)
             .build();
 
@@ -203,8 +205,42 @@ public class PopulateRespondent1CopyTest {
 
         Map<String, Object> responseData = response.getData();
         CaseData updatedCaseData = objectMapper.convertValue(responseData, CaseData.class);
+
         assertEquals(caseData.getRespondent1(), updatedCaseData.getRespondent1Copy());
         assertEquals(caseData.getRespondent2(), updatedCaseData.getRespondent2Copy());
+
+        assertEquals(YES, updatedCaseData.getShowCarmFields());
+    }
+
+    @Test
+    void shouldAddRespondent1TagWhenSolicitorOneRoleIsPresent() {
+        when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
+        when(courtLocationUtils.getLocationsFromList(any())).thenReturn(null);
+
+        caseData = CaseData.builder()
+            .respondent1(Party.builder().type(Type.INDIVIDUAL).build())
+            .respondent2(null)
+            .ccdCaseReference(1234L)
+            .build();
+
+        Map<CallbackParams.Params, Object> params = new HashMap<>();
+        params.put(BEARER_TOKEN, "testBearerToken");
+
+        CallbackParams callbackParams = CallbackParams.builder()
+            .caseData(caseData)
+            .params(params)
+            .build();
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) populateRespondent1Copy.execute(callbackParams);
+
+        Map<String, Object> responseData = response.getData();
+        CaseData updatedCaseData = objectMapper.convertValue(responseData, CaseData.class);
+
+        Set<DefendantResponseShowTag> showTags = updatedCaseData.getShowConditionFlags();
+        assertTrue(showTags.contains(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1));
+
+        assertEquals(caseData.getRespondent1(), updatedCaseData.getRespondent1Copy());
+        assertNull(updatedCaseData.getRespondent2Copy());
         assertEquals(YES, updatedCaseData.getShowCarmFields());
     }
 }

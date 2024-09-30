@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
@@ -22,7 +23,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
-public class ValidateMediationUnavailableDatesTest {
+class ValidateMediationUnavailableDatesTest {
 
     @InjectMocks
     private ValidateMediationUnavailableDates validateMediationUnavailableDates;
@@ -37,13 +38,7 @@ public class ValidateMediationUnavailableDatesTest {
 
     @Test
     void shouldReturnErrorsWhenResp1MediationAvailabilityExists() {
-        MediationAvailability mediationAvailability = MediationAvailability.builder()
-            .isMediationUnavailablityExists(YES)
-            .unavailableDatesForMediation(wrapElements(UnavailableDate.builder()
-                                                           .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                           .date(LocalDate.now().minusYears(5))
-                                                           .build()))
-            .build();
+        MediationAvailability mediationAvailability = buildMediationAvailability(YES, LocalDate.now().minusYears(5));
         CaseData caseData = CaseData.builder()
             .resp1MediationAvailability(mediationAvailability)
             .build();
@@ -56,13 +51,7 @@ public class ValidateMediationUnavailableDatesTest {
 
     @Test
     void shouldReturnNoErrorsWhenResp1MediationAvailabilityDoesNotExist() {
-        MediationAvailability mediationAvailability = MediationAvailability.builder()
-            .isMediationUnavailablityExists(NO)
-            .unavailableDatesForMediation(wrapElements(UnavailableDate.builder()
-                                                           .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                           .date(LocalDate.now().minusYears(5))
-                                                           .build()))
-            .build();
+        MediationAvailability mediationAvailability = buildMediationAvailability(NO, LocalDate.now().minusYears(5));
         CaseData caseData = CaseData.builder()
             .resp1MediationAvailability(mediationAvailability)
             .build();
@@ -75,13 +64,7 @@ public class ValidateMediationUnavailableDatesTest {
 
     @Test
     void shouldReturnErrorsWhenResp2MediationAvailabilityExists() {
-        MediationAvailability mediationAvailability = MediationAvailability.builder()
-            .isMediationUnavailablityExists(YES)
-            .unavailableDatesForMediation(wrapElements(UnavailableDate.builder()
-                                                           .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                           .date(LocalDate.now().minusYears(5))
-                                                           .build()))
-            .build();
+        MediationAvailability mediationAvailability = buildMediationAvailability(YES, LocalDate.now().minusYears(5));
         CaseData caseData = CaseData.builder()
             .resp2MediationAvailability(mediationAvailability)
             .build();
@@ -94,13 +77,7 @@ public class ValidateMediationUnavailableDatesTest {
 
     @Test
     void shouldReturnNoErrorsWhenResp2MediationAvailabilityDoesNotExist() {
-        MediationAvailability mediationAvailability = MediationAvailability.builder()
-            .isMediationUnavailablityExists(NO)
-            .unavailableDatesForMediation(wrapElements(UnavailableDate.builder()
-                                                           .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                           .date(LocalDate.now().minusYears(5))
-                                                           .build()))
-            .build();
+        MediationAvailability mediationAvailability = buildMediationAvailability(NO, LocalDate.now().minusYears(5));
         CaseData caseData = CaseData.builder()
             .resp2MediationAvailability(mediationAvailability)
             .build();
@@ -119,5 +96,17 @@ public class ValidateMediationUnavailableDatesTest {
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateMediationUnavailableDates.execute(callbackParams);
 
         assertThat(response.getErrors()).isEmpty();
+    }
+
+    private static MediationAvailability buildMediationAvailability(YesOrNo isUnavailable, LocalDate date) {
+        return MediationAvailability.builder()
+            .isMediationUnavailablityExists(isUnavailable)
+            .unavailableDatesForMediation(wrapElements(
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                    .date(date)
+                    .build()
+            ))
+            .build();
     }
 }

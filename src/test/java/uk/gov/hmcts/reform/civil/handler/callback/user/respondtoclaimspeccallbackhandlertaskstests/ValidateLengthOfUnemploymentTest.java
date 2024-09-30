@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class ValidateLengthOfUnemploymentTest {
+class ValidateLengthOfUnemploymentTest {
 
     @InjectMocks
     private ValidateLengthOfUnemployment validateLengthOfUnemployment;
@@ -37,14 +37,10 @@ public class ValidateLengthOfUnemploymentTest {
 
     @Test
     void shouldReturnErrorsWhenLengthOfUnemploymentIsInvalid() {
-        LengthOfUnemploymentComplexTypeLRspec lengthOfUnemployment = LengthOfUnemploymentComplexTypeLRspec.builder()
-            .numberOfYearsInUnemployment("1.5")
-            .numberOfMonthsInUnemployment("2.5")
-            .build();
-        UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec = UnemployedComplexTypeLRspec.builder()
-            .lengthOfUnemployment(lengthOfUnemployment)
-            .build();
-        caseData = caseData.toBuilder().respondToClaimAdmitPartUnemployedLRspec(respondToClaimAdmitPartUnemployedLRspec).build();
+        caseData = caseData.toBuilder()
+            .respondToClaimAdmitPartUnemployedLRspec(
+                buildUnemployedComplexType(buildLengthOfUnemployment("1.5", "2.5"))
+            ).build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateLengthOfUnemployment.execute(callbackParams);
@@ -55,18 +51,66 @@ public class ValidateLengthOfUnemploymentTest {
 
     @Test
     void shouldReturnNoErrorsWhenLengthOfUnemploymentIsValid() {
-        LengthOfUnemploymentComplexTypeLRspec lengthOfUnemployment = LengthOfUnemploymentComplexTypeLRspec.builder()
-            .numberOfYearsInUnemployment("2")
-            .numberOfMonthsInUnemployment("3")
-            .build();
-        UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec = UnemployedComplexTypeLRspec.builder()
-            .lengthOfUnemployment(lengthOfUnemployment)
-            .build();
-        caseData = caseData.toBuilder().respondToClaimAdmitPartUnemployedLRspec(respondToClaimAdmitPartUnemployedLRspec).build();
+        caseData = caseData.toBuilder()
+            .respondToClaimAdmitPartUnemployedLRspec(
+                buildUnemployedComplexType(buildLengthOfUnemployment("2", "3"))
+            ).build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateLengthOfUnemployment.execute(callbackParams);
 
         assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void shouldReturnNoErrorsWhenRespondToClaimAdmitPartUnemployedLRspecIsNull() {
+        caseData = caseData.toBuilder()
+            .respondToClaimAdmitPartUnemployedLRspec(null)
+            .build();
+        when(callbackParams.getCaseData()).thenReturn(caseData);
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateLengthOfUnemployment.execute(callbackParams);
+
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void shouldReturnNoErrorsWhenLengthOfUnemploymentIsNull() {
+        caseData = caseData.toBuilder()
+            .respondToClaimAdmitPartUnemployedLRspec(
+                buildUnemployedComplexType(null)
+            ).build();
+        when(callbackParams.getCaseData()).thenReturn(caseData);
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateLengthOfUnemployment.execute(callbackParams);
+
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void shouldReturnErrorWhenNumberOfMonthsInUnemploymentIsNotWholeNumber() {
+        caseData = caseData.toBuilder()
+            .respondToClaimAdmitPartUnemployedLRspec(
+                buildUnemployedComplexType(buildLengthOfUnemployment("2", "3.5"))
+            ).build();
+        when(callbackParams.getCaseData()).thenReturn(caseData);
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateLengthOfUnemployment.execute(callbackParams);
+
+        List<String> expectedErrors = Collections.singletonList("Length of time unemployed must be a whole number, for example, 10.");
+        assertThat(response.getErrors()).isEqualTo(expectedErrors);
+    }
+
+    private LengthOfUnemploymentComplexTypeLRspec buildLengthOfUnemployment(String years, String months) {
+        return LengthOfUnemploymentComplexTypeLRspec.builder()
+            .numberOfYearsInUnemployment(years)
+            .numberOfMonthsInUnemployment(months)
+            .build();
+    }
+
+    private UnemployedComplexTypeLRspec buildUnemployedComplexType(LengthOfUnemploymentComplexTypeLRspec lengthOfUnemployment) {
+        return UnemployedComplexTypeLRspec.builder()
+            .lengthOfUnemployment(lengthOfUnemployment)
+            .build();
     }
 }

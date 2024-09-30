@@ -45,16 +45,28 @@ public class ValidateUnavailableDatesTest {
         when(callbackParams.getCaseData()).thenReturn(caseData);
     }
 
+    private void setupCaseDataForSmallClaim(SmallClaimHearing smallClaimHearing, boolean isRespondent2) {
+        caseData = CaseData.builder()
+            .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
+            .isRespondent2(isRespondent2 ? YES : NO)
+            .respondent1DQ(Respondent1DQ.builder().respondent1DQHearingSmallClaim(isRespondent2 ? null : smallClaimHearing).build())
+            .respondent2DQ(isRespondent2 ? Respondent2DQ.builder().respondent2DQHearingSmallClaim(smallClaimHearing).build() : null)
+            .build();
+        when(callbackParams.getCaseData()).thenReturn(caseData);
+    }
+
+    private void setupCaseDataForFastClaim(Hearing hearing) {
+        caseData = CaseData.builder()
+            .responseClaimTrack("FAST_CLAIM")
+            .respondent1DQ(Respondent1DQ.builder().respondent1DQHearingFastClaim(hearing).build())
+            .build();
+        when(callbackParams.getCaseData()).thenReturn(caseData);
+    }
+
     @Test
     void shouldReturnErrorsForRespondent2SmallClaimHearing() {
         SmallClaimHearing smallClaimHearing = SmallClaimHearing.builder().build();
-        caseData = CaseData.builder()
-            .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
-            .isRespondent2(YES)
-            .respondent1DQ(Respondent1DQ.builder().build())
-            .respondent2DQ(Respondent2DQ.builder().respondent2DQHearingSmallClaim(smallClaimHearing).build())
-            .build();
-        when(callbackParams.getCaseData()).thenReturn(caseData);
+        setupCaseDataForSmallClaim(smallClaimHearing, true);
         when(unavailableDateValidator.validateSmallClaimsHearing(smallClaimHearing)).thenReturn(List.of("Error"));
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateUnavailableDates.execute(callbackParams);
@@ -65,12 +77,7 @@ public class ValidateUnavailableDatesTest {
     @Test
     void shouldReturnNoErrorsForRespondent1SmallClaimHearing() {
         SmallClaimHearing smallClaimHearing = SmallClaimHearing.builder().build();
-        caseData = CaseData.builder()
-            .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
-            .isRespondent2(NO)
-            .respondent1DQ(Respondent1DQ.builder().respondent1DQHearingSmallClaim(smallClaimHearing).build())
-            .build();
-        when(callbackParams.getCaseData()).thenReturn(caseData);
+        setupCaseDataForSmallClaim(smallClaimHearing, false);
         when(unavailableDateValidator.validateSmallClaimsHearing(smallClaimHearing)).thenReturn(List.of());
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateUnavailableDates.execute(callbackParams);
@@ -81,11 +88,7 @@ public class ValidateUnavailableDatesTest {
     @Test
     void shouldReturnErrorsForFastClaimHearing() {
         Hearing hearing = Hearing.builder().build();
-        caseData = CaseData.builder()
-            .responseClaimTrack("FAST_CLAIM")
-            .respondent1DQ(Respondent1DQ.builder().respondent1DQHearingFastClaim(hearing).build())
-            .build();
-        when(callbackParams.getCaseData()).thenReturn(caseData);
+        setupCaseDataForFastClaim(hearing);
         when(unavailableDateValidator.validateFastClaimHearing(hearing)).thenReturn(List.of("Error"));
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateUnavailableDates.execute(callbackParams);

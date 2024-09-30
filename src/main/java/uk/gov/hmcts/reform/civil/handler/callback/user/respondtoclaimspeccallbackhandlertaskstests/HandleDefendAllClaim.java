@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallba
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -41,6 +42,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.Defendan
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class HandleDefendAllClaim implements CaseTask {
 
     private final ObjectMapper objectMapper;
@@ -52,9 +54,11 @@ public class HandleDefendAllClaim implements CaseTask {
 
     @Override
     public CallbackResponse execute(CallbackParams callbackParams) {
+        log.info("Executing HandleDefendAllClaim with callbackParams: {}", callbackParams);
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = validatePayments(caseData);
         if (!errors.isEmpty()) {
+            log.error("Validation errors found: {}", errors);
             return buildErrorResponse(errors);
         }
 
@@ -62,24 +66,29 @@ public class HandleDefendAllClaim implements CaseTask {
         updatedCase.showConditionFlags(whoDisputesFullDefence(caseData));
 
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
+            log.info("Populating respondent response type spec paid status");
             populateRespondentResponseTypeSpecPaidStatus(caseData, updatedCase);
             updateSpecPaidOrDisputeStatus(caseData, updatedCase);
             updatedCase.responseClaimTrack(getAllocatedTrack(caseData).name());
         }
 
+        log.info("Building callback response");
         return buildCallbackResponse(updatedCase);
     }
 
     private List<String> validatePayments(CaseData caseData) {
+        log.info("Validating payments for caseData: {}", caseData);
         return paymentDateValidator.validate(Optional.ofNullable(caseData.getRespondToClaim())
                                                  .orElseGet(() -> RespondToClaim.builder().build()));
     }
 
     private CallbackResponse buildErrorResponse(List<String> errors) {
+        log.error("Building error response with errors: {}", errors);
         return AboutToStartOrSubmitCallbackResponse.builder().errors(errors).build();
     }
 
     private void updateSpecPaidOrDisputeStatus(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCase) {
+        log.info("Updating spec paid or dispute status for caseData: {}", caseData);
         if (isPaidLessOrDispute(caseData)) {
             updatedCase.specPaidLessAmountOrDisputesOrPartAdmission(YES);
         } else {
@@ -113,7 +122,6 @@ public class HandleDefendAllClaim implements CaseTask {
         return responseType == RespondentResponseTypeSpec.PART_ADMISSION;
     }
 
-
     private boolean isSpecDisputeOrPartAdmission(CaseData caseData) {
         return YES.equals(caseData.getIsRespondent2())
             ? isSpecDisputeOrPartAdmissionForRespondent(caseData.getDefenceRouteRequired2(),
@@ -129,9 +137,8 @@ public class HandleDefendAllClaim implements CaseTask {
             && (DISPUTES_THE_CLAIM.equals(defenceRoute) || responseType == RespondentResponseTypeSpec.PART_ADMISSION);
     }
 
-
-
     private Set<DefendantResponseShowTag> whoDisputesFullDefence(CaseData caseData) {
+        log.info("Determining who disputes full defence for caseData: {}", caseData);
         Set<DefendantResponseShowTag> tags = new HashSet<>(caseData.getShowConditionFlags());
         respondToClaimSpecUtilsDisputeDetails.removeWhoDisputesAndWhoPaidLess(tags);
 
@@ -145,6 +152,7 @@ public class HandleDefendAllClaim implements CaseTask {
 
     private void handleScenario(MultiPartyScenario mpScenario, CaseData caseData,
                                 Set<DefendantResponseShowTag> tags, Set<DefendantResponseShowTag> bcoPartAdmission) {
+        log.info("Handling scenario: {} for caseData: {}", mpScenario, caseData);
         switch (mpScenario) {
             case ONE_V_ONE:
                 handleOneVOneScenario(caseData, bcoPartAdmission);
@@ -159,12 +167,13 @@ public class HandleDefendAllClaim implements CaseTask {
                 handleOneVTwoTwoLegalRepScenario(caseData, tags, bcoPartAdmission);
                 break;
             default:
+                log.error("Unknown multi-party scenario: {}", mpScenario);
                 throw new UnsupportedOperationException(UNKNOWN_MP_SCENARIO);
         }
     }
 
-
     private void handleOneVOneScenario(CaseData caseData, Set<DefendantResponseShowTag> tags) {
+        log.info("Handling ONE_V_ONE scenario for caseData: {}", caseData);
         fullDefenceAndPaidLess(
             caseData.getRespondent1ClaimResponseTypeForSpec(),
             caseData.getDefenceRouteRequired(),
@@ -176,6 +185,7 @@ public class HandleDefendAllClaim implements CaseTask {
     }
 
     private void handleTwoVOneScenario(CaseData caseData, Set<DefendantResponseShowTag> tags) {
+        log.info("Handling TWO_V_ONE scenario for caseData: {}", caseData);
         if (YES.equals(caseData.getDefendantSingleResponseToBothClaimants())) {
             handleOneVOneScenario(caseData, tags);
         } else {
@@ -200,6 +210,7 @@ public class HandleDefendAllClaim implements CaseTask {
     }
 
     private void handleOneVTwoOneLegalRepScenario(CaseData caseData, Set<DefendantResponseShowTag> tags) {
+        log.info("Handling ONE_V_TWO_ONE_LEGAL_REP scenario for caseData: {}", caseData);
         if (YES.equals(caseData.getRespondentResponseIsSame())) {
             fullDefenceAndPaidLess(
                 caseData.getRespondent1ClaimResponseTypeForSpec(),
@@ -220,6 +231,7 @@ public class HandleDefendAllClaim implements CaseTask {
     }
 
     private void handleOneVTwoTwoLegalRepScenario(CaseData caseData, Set<DefendantResponseShowTag> tags, Set<DefendantResponseShowTag> bcoPartAdmission) {
+        log.info("Handling ONE_V_TWO_TWO_LEGAL_REP scenario for caseData: {}", caseData);
         if (tags.contains(CAN_ANSWER_RESPONDENT_1)) {
             fullDefenceAndPaidLess(
                 caseData.getRespondent1ClaimResponseTypeForSpec(),
@@ -242,9 +254,10 @@ public class HandleDefendAllClaim implements CaseTask {
     }
 
     private void addSomeoneDisputesTag(Set<DefendantResponseShowTag> tags) {
-        if (tags.contains(ONLY_RESPONDENT_1_DISPUTES) ||
-            tags.contains(ONLY_RESPONDENT_2_DISPUTES) ||
-            tags.contains(BOTH_RESPONDENTS_DISPUTE)) {
+        log.info("Adding SOMEONE_DISPUTES tag if applicable");
+        if (tags.contains(ONLY_RESPONDENT_1_DISPUTES)
+            || tags.contains(ONLY_RESPONDENT_2_DISPUTES)
+            || tags.contains(BOTH_RESPONDENTS_DISPUTE)) {
             tags.add(SOMEONE_DISPUTES);
         }
     }
@@ -293,8 +306,8 @@ public class HandleDefendAllClaim implements CaseTask {
             .orElse(false);
     }
 
-
     private void populateRespondentResponseTypeSpecPaidStatus(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updated) {
+        log.info("Populating respondent response type spec paid status for caseData: {}", caseData);
         setRespondentPaidStatus(caseData, caseData.getDefenceRouteRequired(), caseData.getRespondToClaim(),
                                 updated::respondent1ClaimResponsePaymentAdmissionForSpec);
 
@@ -321,10 +334,12 @@ public class HandleDefendAllClaim implements CaseTask {
     }
 
     private AllocatedTrack getAllocatedTrack(CaseData caseData) {
+        log.info("Getting allocated track for caseData: {}", caseData);
         return AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null, toggleService, caseData);
     }
 
     private CallbackResponse buildCallbackResponse(CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+        log.info("Building callback response for updated case data");
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();

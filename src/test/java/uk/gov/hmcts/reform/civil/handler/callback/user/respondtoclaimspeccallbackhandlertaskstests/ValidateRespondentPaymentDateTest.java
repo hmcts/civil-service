@@ -30,19 +30,17 @@ public class ValidateRespondentPaymentDateTest {
     @Mock
     private CallbackParams callbackParams;
 
-    private CaseData caseData;
+    private RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
 
     @BeforeEach
     void setUp() {
-        caseData = CaseData.builder().build();
+        respondToClaimAdmitPartLRspec = RespondToClaimAdmitPartLRspec.builder().build();
+        CaseData caseData = CaseData.builder().respondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec).build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
     }
 
     @Test
     void shouldReturnErrorsWhenPaymentDateIsInvalid() {
-        RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = RespondToClaimAdmitPartLRspec.builder().build();
-        caseData = caseData.toBuilder().respondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec).build();
-        when(callbackParams.getCaseData()).thenReturn(caseData);
         List<String> errors = Collections.singletonList("Invalid payment date");
         when(paymentDateValidator.validate(respondToClaimAdmitPartLRspec)).thenReturn(errors);
 
@@ -53,9 +51,6 @@ public class ValidateRespondentPaymentDateTest {
 
     @Test
     void shouldReturnNoErrorsWhenPaymentDateIsValid() {
-        RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = RespondToClaimAdmitPartLRspec.builder().build();
-        caseData = caseData.toBuilder().respondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec).build();
-        when(callbackParams.getCaseData()).thenReturn(caseData);
         when(paymentDateValidator.validate(respondToClaimAdmitPartLRspec)).thenReturn(Collections.emptyList());
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateRespondentPaymentDate.execute(callbackParams);
