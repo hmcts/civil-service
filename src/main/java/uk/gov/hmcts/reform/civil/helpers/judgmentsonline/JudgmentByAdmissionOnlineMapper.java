@@ -158,8 +158,8 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
 
     private PaymentFrequency getClaimantLipSuggestedPaymentFrequency(PaymentFrequencyClaimantResponseLRspec repaymentFrequency) {
         return switch (repaymentFrequency) {
-            case ONCE_ONE_WEEK ->   PaymentFrequency.WEEKLY;
-            case ONCE_TWO_WEEKS ->  PaymentFrequency.EVERY_TWO_WEEKS;
+            case ONCE_ONE_WEEK -> PaymentFrequency.WEEKLY;
+            case ONCE_TWO_WEEKS -> PaymentFrequency.EVERY_TWO_WEEKS;
             default -> PaymentFrequency.MONTHLY;
         };
     }
