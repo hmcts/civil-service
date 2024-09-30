@@ -14,15 +14,13 @@ public class AttendeesRepresentationGroup {
     private ClaimantAttendsOrRepresentedTextBuilder claimantAttendsOrRepresentedTextBuilder;
     private DefendantAttendsOrRepresentedTextBuilder defendantAttendsOrRepresentedTextBuilder;
 
-
-
     public JudgeFinalOrderFormBuilder populateAttendeesDetails(JudgeFinalOrderFormBuilder builder, CaseData caseData) {
         return builder.claimantAttendsOrRepresented(generateClaimantAttendsOrRepresentedText(caseData, false))
-            .claimantTwoAttendsOrRepresented(nonNull(caseData.getApplicant2()) ?
-                                                 generateClaimantAttendsOrRepresentedText(caseData, true) : null)
+            .claimantTwoAttendsOrRepresented(nonNull(caseData.getApplicant2())
+                                                 ? generateClaimantAttendsOrRepresentedText(caseData, true) : null)
             .defendantAttendsOrRepresented(generateDefendantAttendsOrRepresentedText(caseData, false))
-            .defendantTwoAttendsOrRepresented(nonNull(caseData.getRespondent2()) ?
-                                                  generateDefendantAttendsOrRepresentedText(caseData, true) : null)
+            .defendantTwoAttendsOrRepresented(nonNull(caseData.getRespondent2())
+                                                  ? generateDefendantAttendsOrRepresentedText(caseData, true) : null)
             .otherRepresentedText(getOtherRepresentedText(caseData));
     }
 
@@ -34,7 +32,7 @@ public class AttendeesRepresentationGroup {
         return defendantAttendsOrRepresentedTextBuilder.defendantBuilder(caseData, isDefendant2);
     }
 
-    private String getOtherRepresentedText(CaseData caseData) {
+    String getOtherRepresentedText(CaseData caseData) {
         return nonNull(caseData.getFinalOrderRepresentation())
             && nonNull(caseData.getFinalOrderRepresentation().getTypeRepresentationOtherComplex())
             ? caseData.getFinalOrderRepresentation().getTypeRepresentationOtherComplex().getDetailsRepresentationText() : "";

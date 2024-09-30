@@ -16,7 +16,6 @@ public class DefendantAttendsOrRepresentedTextBuilder {
     private static final String NOTICE_NOT_RECEIVED_CANNOT_PROCEED = "The Judge was not satisfied that they had received notice of the hearing "
         + "and it was not reasonable to proceed in their absence.";
 
-
     public String defendantBuilder(CaseData caseData, Boolean isDefendant2) {
         String name = getDefendantName(caseData, isDefendant2);
         FinalOrdersDefendantRepresentationList type = getDefendantRepresentationType(caseData, isDefendant2);
@@ -42,7 +41,7 @@ public class DefendantAttendsOrRepresentedTextBuilder {
             && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex() != null;
     }
 
-    private String buildRespondentRepresentationText(CaseData caseData, String name, FinalOrdersDefendantRepresentationList type, Boolean isDefendant2) {
+    public String buildRespondentRepresentationText(CaseData caseData, String name, FinalOrdersDefendantRepresentationList type, Boolean isDefendant2) {
         return switch (type) {
             case COUNSEL_FOR_DEFENDANT -> format("Counsel for %s, the defendant.", name);
             case SOLICITOR_FOR_DEFENDANT -> format("Solicitor for %s, the defendant.", name);
@@ -73,9 +72,12 @@ public class DefendantAttendsOrRepresentedTextBuilder {
 
     private String getDefendantNotAttendingText(FinalOrdersClaimantDefendantNotAttending notAttendingType, String name) {
         return switch (notAttendingType) {
-            case SATISFIED_REASONABLE_TO_PROCEED -> format("%s, the defendant, did not attend the trial. The Judge was satisfied that they had %s", name, NOTICE_RECEIVED_CAN_PROCEED);
-            case SATISFIED_NOTICE_OF_TRIAL -> format("%s, the defendant, did not attend the trial and, whilst the Judge was satisfied that they had %s", name, NOTICE_RECEIVED_CANNOT_PROCEED);
-            case NOT_SATISFIED_NOTICE_OF_TRIAL -> format("%s, the defendant, did not attend the trial. %s", name, NOTICE_NOT_RECEIVED_CANNOT_PROCEED);
+            case SATISFIED_REASONABLE_TO_PROCEED -> format("%s, the defendant, did not attend the trial. The Judge was satisfied that they had %s",
+                                                           name, NOTICE_RECEIVED_CAN_PROCEED);
+            case SATISFIED_NOTICE_OF_TRIAL -> format("%s, the defendant, did not attend the trial and, whilst the Judge was satisfied that they had %s",
+                                                     name, NOTICE_RECEIVED_CANNOT_PROCEED);
+            case NOT_SATISFIED_NOTICE_OF_TRIAL -> format("%s, the defendant, did not attend the trial. %s",
+                                                         name, NOTICE_NOT_RECEIVED_CANNOT_PROCEED);
         };
     }
 }

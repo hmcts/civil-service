@@ -43,7 +43,7 @@ public class AppealInitiativeGroup {
         return "";
     }
 
-    private String isAppealGranted(CaseData caseData) {
+    public String isAppealGranted(CaseData caseData) {
         return nonNull(caseData.getFinalOrderAppealComplex())
             && caseData.getFinalOrderAppealComplex().getApplicationList().name().equals(ApplicationAppealList.GRANTED.name())
             ? "true" : null;

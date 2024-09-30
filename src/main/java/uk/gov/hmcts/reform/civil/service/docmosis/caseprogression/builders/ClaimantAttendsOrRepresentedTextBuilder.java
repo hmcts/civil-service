@@ -41,7 +41,7 @@ public class ClaimantAttendsOrRepresentedTextBuilder {
             && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex() != null;
     }
 
-    private String buildClaimantRepresentationText(CaseData caseData, String name, FinalOrdersClaimantRepresentationList type, Boolean isClaimant2) {
+    public String buildClaimantRepresentationText(CaseData caseData, String name, FinalOrdersClaimantRepresentationList type, Boolean isClaimant2) {
         return switch (type) {
             case COUNSEL_FOR_CLAIMANT -> format("Counsel for %s, the claimant.", name);
             case SOLICITOR_FOR_CLAIMANT -> format("Solicitor for %s, the claimant.", name);
@@ -52,27 +52,6 @@ public class ClaimantAttendsOrRepresentedTextBuilder {
             case SOLICITORS_AGENT_FOR_THE_CLAIMANT -> format("Solicitor's Agent for %s, the claimant.", name);
             case CLAIMANT_NOT_ATTENDING -> getClaimantNotAttendingText(caseData, isClaimant2, name);
         };
-    }
-
-    public String getClaimantNotAttendingText(CaseData caseData, Boolean isClaimant2, String name) {
-        FinalOrdersClaimantDefendantNotAttending notAttendingType = getNotAttendingType(caseData, isClaimant2);
-
-        return notAttendingType != null ? getClaimantNotAttendingText(name, notAttendingType) : "";
-    }
-
-    private FinalOrdersClaimantDefendantNotAttending getNotAttendingType(CaseData caseData, Boolean isClaimant2) {
-        if (hasRepresentationType(caseData)) {
-
-            if (Boolean.FALSE.equals(isClaimant2) &&
-                caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureClaimantComplex() != null) {
-                return caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureClaimantComplex().getList();
-            }
-
-            if (caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedClaimTwoComplex() != null) {
-                return caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedClaimTwoComplex().getListClaimTwo();
-            }
-        }
-        return null;
     }
 
     private String getClaimantNotAttendingText(String name, FinalOrdersClaimantDefendantNotAttending notAttendingType) {
@@ -90,5 +69,26 @@ public class ClaimantAttendsOrRepresentedTextBuilder {
                 name, NOTICE_NOT_RECEIVED_CANNOT_PROCEED
             );
         };
+    }
+
+    public String getClaimantNotAttendingText(CaseData caseData, Boolean isClaimant2, String name) {
+        FinalOrdersClaimantDefendantNotAttending notAttendingType = getNotAttendingType(caseData, isClaimant2);
+
+        return notAttendingType != null ? getClaimantNotAttendingText(name, notAttendingType) : "";
+    }
+
+    private FinalOrdersClaimantDefendantNotAttending getNotAttendingType(CaseData caseData, Boolean isClaimant2) {
+        if (hasRepresentationType(caseData)) {
+
+            if (Boolean.FALSE.equals(isClaimant2)
+                && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureClaimantComplex() != null) {
+                return caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureClaimantComplex().getList();
+            }
+
+            if (caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedClaimTwoComplex() != null) {
+                return caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedClaimTwoComplex().getListClaimTwo();
+            }
+        }
+        return null;
     }
 }
