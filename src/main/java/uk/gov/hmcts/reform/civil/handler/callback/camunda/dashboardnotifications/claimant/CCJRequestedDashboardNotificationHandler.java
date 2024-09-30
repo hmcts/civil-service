@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
@@ -40,6 +41,11 @@ public class CCJRequestedDashboardNotificationHandler extends DashboardCallbackH
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    @Override
+    public boolean shouldRecordScenario(CaseData caseData) {
+        return YesOrNo.NO.equals(caseData.getApplicant1Represented());
     }
 
     @Override

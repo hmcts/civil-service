@@ -33,6 +33,7 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
         String defendantName = "Mr. Sole Trader";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendantSpec().build()
             .toBuilder().respondent1ResponseDeadline(responseDeadline)
+            .applicant1Represented(YesOrNo.NO)
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .defaultJudgmentDocuments(List.of(
@@ -103,6 +104,7 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendantSpec().build()
             .toBuilder().respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
             .legacyCaseReference("reference")
+            .applicant1Represented(YesOrNo.NO)
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
             .ccdCaseReference(Long.valueOf(caseId))
             .build();
