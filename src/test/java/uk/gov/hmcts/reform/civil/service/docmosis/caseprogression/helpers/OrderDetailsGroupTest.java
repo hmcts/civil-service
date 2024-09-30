@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class OrderDetailsGroupTest {
 
     @InjectMocks
-    private OrderDetailsGroup orderDetailsGroup;
+    private OrderDetailsPopulator orderDetailsPopulator;
 
     @Test
     void shouldPopulateOrderDetails_WhenAllFieldsArePresent() {
@@ -45,7 +45,7 @@ public class OrderDetailsGroupTest {
             .freeFormOrderedText("Ordered Text")
             .freeFormRecordedText("Recorded text");
 
-        builder = orderDetailsGroup.populateOrderDetails(builder, caseData);
+        builder = orderDetailsPopulator.populateOrderDetails(builder, caseData);
 
         String onInitiativeText = "On initiative text";
         LocalDate onInitiativeDate = LocalDate.now();
@@ -64,7 +64,7 @@ public class OrderDetailsGroupTest {
     @ParameterizedTest
     @MethodSource("testData")
     void orderMadeDateBuilder(CaseData caseData, String expectedResponse) {
-        String response = orderDetailsGroup.orderMadeDateBuilder(caseData);
+        String response = orderDetailsPopulator.orderMadeDateBuilder(caseData);
         assertEquals(expectedResponse, response);
     }
 

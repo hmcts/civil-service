@@ -14,11 +14,11 @@ import java.util.Objects;
 import static java.util.Objects.nonNull;
 
 @Component
-public class HearingDetailsGroup {
+public class HearingDetailsPopulator {
 
     private final LocationReferenceDataService locationRefDataService;
 
-    public HearingDetailsGroup(LocationReferenceDataService locationRefDataService) {
+    public HearingDetailsPopulator(LocationReferenceDataService locationRefDataService) {
         this.locationRefDataService = locationRefDataService;
     }
 

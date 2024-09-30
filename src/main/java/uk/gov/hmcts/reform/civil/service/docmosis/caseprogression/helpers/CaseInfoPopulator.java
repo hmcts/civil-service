@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderFo
 import static java.util.Objects.nonNull;
 
 @Component
-public class CaseInfoGroup {
+public class CaseInfoPopulator {
 
     public JudgeFinalOrderForm.JudgeFinalOrderFormBuilder populateCaseInfo(JudgeFinalOrderFormBuilder builder, CaseData caseData) {
         return builder.caseNumber(caseData.getCcdCaseReference().toString())

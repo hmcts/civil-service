@@ -28,7 +28,7 @@ import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.INDEMNITY_BA
 public class CostsDetailsGroupTest {
 
     @InjectMocks
-    private CostsDetailsGroup costsDetailsGroup;
+    private CostDetailsPopulator costsDetailsGroup;
 
     @Test
     void shouldPopulateCostsDetails_WhenAllFieldsArePresent() {

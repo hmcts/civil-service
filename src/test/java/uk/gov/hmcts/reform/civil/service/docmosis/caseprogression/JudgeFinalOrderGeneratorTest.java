@@ -52,13 +52,13 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.builders.ClaimantAttendsOrRepresentedTextBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.builders.DefendantAttendsOrRepresentedTextBuilder;
-import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.AppealInitiativeGroup;
-import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.AttendeesRepresentationGroup;
-import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.CaseInfoGroup;
-import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.CostsDetailsGroup;
-import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.HearingDetailsGroup;
-import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.JudgeCourtDetailsGroup;
-import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.OrderDetailsGroup;
+import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.AppealInitiativePopulator;
+import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.AttendeesRepresentationPopulator;
+import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.CaseInfoPopulator;
+import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.CostDetailsPopulator;
+import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.HearingDetailsPopulator;
+import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.JudgeCourtDetailsPopulator;
+import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.OrderDetailsPopulator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -94,13 +94,13 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FREE_
     JudgeFinalOrderGenerator.class,
     ClaimantAttendsOrRepresentedTextBuilder.class,
     DefendantAttendsOrRepresentedTextBuilder.class,
-    AppealInitiativeGroup.class,
-    AttendeesRepresentationGroup.class,
-    CaseInfoGroup.class,
-    CostsDetailsGroup.class,
-    HearingDetailsGroup.class,
-    JudgeCourtDetailsGroup.class,
-    OrderDetailsGroup.class,
+    AppealInitiativePopulator.class,
+    AttendeesRepresentationPopulator.class,
+    CaseInfoPopulator.class,
+    CostDetailsPopulator.class,
+    HearingDetailsPopulator.class,
+    JudgeCourtDetailsPopulator.class,
+    OrderDetailsPopulator.class,
     JacksonAutoConfiguration.class})
 class JudgeFinalOrderGeneratorTest {
 
@@ -140,19 +140,19 @@ class JudgeFinalOrderGeneratorTest {
     @MockBean
     private ClaimantAttendsOrRepresentedTextBuilder claimantAttendsOrRepresentedTextBuilder;
     @MockBean
-    private AppealInitiativeGroup appealInitiativeGroup;
+    private AppealInitiativePopulator appealInitiativePopulator;
     @MockBean
-    private AttendeesRepresentationGroup attendeesRepresentationGroup;
+    private AttendeesRepresentationPopulator attendeesRepresentationPopulator;
     @MockBean
-    private CaseInfoGroup caseInfoGroup;
+    private CaseInfoPopulator caseInfoPopulator;
     @MockBean
-    private CostsDetailsGroup costsDetailsGroup;
+    private CostDetailsPopulator costsDetailsGroup;
     @MockBean
-    private HearingDetailsGroup hearingDetailsGroup;
+    private HearingDetailsPopulator hearingDetailsPopulator;
     @MockBean
-    private JudgeCourtDetailsGroup judgeCourtDetailsGroup;
+    private JudgeCourtDetailsPopulator judgeCourtDetailsPopulator;
     @MockBean
-    private OrderDetailsGroup orderDetailsGroup;
+    private OrderDetailsPopulator orderDetailsPopulator;
 
     private static LocationRefData locationRefData = LocationRefData.builder().siteName("SiteName")
         .courtAddress("1").postcode("1")
@@ -202,7 +202,7 @@ class JudgeFinalOrderGeneratorTest {
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(FREE_FROM_ORDER);
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
-        when(orderDetailsGroup.populateOrderDetails(any(), any())).thenReturn(JudgeFinalOrderForm.builder().initiativeDate(appealDate));
+        when(orderDetailsPopulator.populateOrderDetails(any(), any())).thenReturn(JudgeFinalOrderForm.builder().initiativeDate(appealDate));
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
@@ -222,7 +222,7 @@ class JudgeFinalOrderGeneratorTest {
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(FREE_FROM_ORDER);
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
-        when(orderDetailsGroup.populateOrderDetails(any(), any())).thenReturn(JudgeFinalOrderForm.builder().initiativeDate(appealDate));
+        when(orderDetailsPopulator.populateOrderDetails(any(), any())).thenReturn(JudgeFinalOrderForm.builder().initiativeDate(appealDate));
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
@@ -242,7 +242,7 @@ class JudgeFinalOrderGeneratorTest {
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(FREE_FROM_ORDER);
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
-        when(orderDetailsGroup.populateOrderDetails(any(), any())).thenReturn(JudgeFinalOrderForm.builder().initiativeDate(appealDate));
+        when(orderDetailsPopulator.populateOrderDetails(any(), any())).thenReturn(JudgeFinalOrderForm.builder().initiativeDate(appealDate));
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .solicitorReferences(null)
@@ -263,7 +263,7 @@ class JudgeFinalOrderGeneratorTest {
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(FREE_FROM_ORDER);
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
-        when(orderDetailsGroup.populateOrderDetails(any(), any())).thenReturn(JudgeFinalOrderForm.builder().initiativeDate(appealDate));
+        when(orderDetailsPopulator.populateOrderDetails(any(), any())).thenReturn(JudgeFinalOrderForm.builder().initiativeDate(appealDate));
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
@@ -285,7 +285,7 @@ class JudgeFinalOrderGeneratorTest {
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(FREE_FROM_ORDER);
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
-        when(orderDetailsGroup.populateOrderDetails(any(), any())).thenReturn(JudgeFinalOrderForm.builder().initiativeDate(appealDate));
+        when(orderDetailsPopulator.populateOrderDetails(any(), any())).thenReturn(JudgeFinalOrderForm.builder().initiativeDate(appealDate));
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
@@ -316,7 +316,7 @@ class JudgeFinalOrderGeneratorTest {
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(FREE_FROM_ORDER);
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
-        when(orderDetailsGroup.populateOrderDetails(any(), any())).thenReturn(JudgeFinalOrderForm.builder().initiativeDate(appealDate));
+        when(orderDetailsPopulator.populateOrderDetails(any(), any())).thenReturn(JudgeFinalOrderForm.builder().initiativeDate(appealDate));
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .caseManagementLocation(caseManagementLocation)
@@ -351,7 +351,7 @@ class JudgeFinalOrderGeneratorTest {
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(assistedForm, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(ASSISTED_FROM_ORDER);
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
-        when(appealInitiativeGroup.populateInitiativeOrWithoutNoticeDetails(any(), any())).thenReturn(
+        when(appealInitiativePopulator.populateInitiativeOrWithoutNoticeDetails(any(), any())).thenReturn(
             JudgeFinalOrderForm.builder().initiativeDate(appealDate));
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -401,7 +401,7 @@ class JudgeFinalOrderGeneratorTest {
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(assistedForm, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(ASSISTED_FROM_ORDER);
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
-        when(appealInitiativeGroup.populateInitiativeOrWithoutNoticeDetails(any(), any())).thenReturn(
+        when(appealInitiativePopulator.populateInitiativeOrWithoutNoticeDetails(any(), any())).thenReturn(
             JudgeFinalOrderForm.builder().initiativeDate(appealDate));
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -451,7 +451,7 @@ class JudgeFinalOrderGeneratorTest {
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(assistedForm, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(ASSISTED_FROM_ORDER);
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
-        when(appealInitiativeGroup.populateInitiativeOrWithoutNoticeDetails(any(), any())).thenReturn(
+        when(appealInitiativePopulator.populateInitiativeOrWithoutNoticeDetails(any(), any())).thenReturn(
             JudgeFinalOrderForm.builder().initiativeDate(appealDate));
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -518,7 +518,7 @@ class JudgeFinalOrderGeneratorTest {
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(assistedForm, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(ASSISTED_FROM_ORDER);
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
-        when(appealInitiativeGroup.populateInitiativeOrWithoutNoticeDetails(any(), any())).thenReturn(
+        when(appealInitiativePopulator.populateInitiativeOrWithoutNoticeDetails(any(), any())).thenReturn(
             JudgeFinalOrderForm.builder().initiativeDate(appealDate));
 
         DynamicListElement dynamicListElement = DynamicListElement.builder().label("test_label").build();

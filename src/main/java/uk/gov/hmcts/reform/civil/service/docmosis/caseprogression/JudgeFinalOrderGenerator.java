@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
@@ -21,13 +20,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.builders.ClaimantAttendsOrRepresentedTextBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.builders.DefendantAttendsOrRepresentedTextBuilder;
-import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.AppealInitiativeGroup;
-import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.AttendeesRepresentationGroup;
-import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.CaseInfoGroup;
-import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.CostsDetailsGroup;
-import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.HearingDetailsGroup;
-import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.JudgeCourtDetailsGroup;
-import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.OrderDetailsGroup;
+import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.JudgeFinalOrderFormPopulator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -48,32 +41,23 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     private final DocumentGeneratorService documentGeneratorService;
     private final UserService userService;
     private final LocationReferenceDataService locationRefDataService;
-    private final FeatureToggleService featureToggleService;
     private final DocumentHearingLocationHelper documentHearingLocationHelper;
-    private LocationRefData caseManagementLocationDetails;
+    private final JudgeFinalOrderFormPopulator judgeFinalOrderFormPopulator;
+
     private final DefendantAttendsOrRepresentedTextBuilder defendantAttendsOrRepresentedTextBuilder;
     private final ClaimantAttendsOrRepresentedTextBuilder claimantAttendsOrRepresentedTextBuilder;
-
-    private final AppealInitiativeGroup appealInitiativeGroup;
-    private final AttendeesRepresentationGroup attendeesRepresentationGroup;
-    private final CaseInfoGroup caseInfoGroup;
-    private final CostsDetailsGroup costsDetailsGroup;
-    private final HearingDetailsGroup hearingDetailsGroup;
-    private final JudgeCourtDetailsGroup judgeCourtDetailsGroup;
-    private final OrderDetailsGroup orderDetailsGroup;
 
     private static final String DATE_FORMAT = "dd/MM/yyyy";
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         JudgeFinalOrderForm templateData = getFinalOrderType(caseData, authorisation);
-        DocmosisTemplates docmosisTemplate = null;
-        if (caseData.getFinalOrderSelection().equals(FREE_FORM_ORDER)) {
-            docmosisTemplate = FREE_FORM_ORDER_PDF;
-        } else {
-            docmosisTemplate = ASSISTED_ORDER_PDF;
-        }
+        DocmosisTemplates docmosisTemplate = caseData.getFinalOrderSelection().equals(FREE_FORM_ORDER)
+            ? FREE_FORM_ORDER_PDF
+            : ASSISTED_ORDER_PDF;
+
         DocmosisDocument docmosisDocument =
             documentGeneratorService.generateDocmosisDocument(templateData, docmosisTemplate);
+
         return documentManagementService.uploadDocument(
             authorisation,
             new PDF(
@@ -88,7 +72,8 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         return format(docmosisTemplate.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
     }
 
-    private JudgeFinalOrderForm getFinalOrderType(CaseData caseData, String authorisation) {
+    private JudgeFinalOrderForm getFinalOrderType(CaseData caseData,
+                                                  String authorisation) {
         return caseData.getFinalOrderSelection().equals(FREE_FORM_ORDER) ? getFreeFormOrder(
             caseData,
             authorisation
@@ -97,37 +82,19 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
 
     private JudgeFinalOrderForm getFreeFormOrder(CaseData caseData, String authorisation) {
         UserDetails userDetails = userService.getUserDetails(authorisation);
-        caseManagementLocationDetails = documentHearingLocationHelper
+        LocationRefData caseManagementLocationDetails = documentHearingLocationHelper
             .getCaseManagementLocationDetailsNro(caseData, locationRefDataService, authorisation);
 
-        var freeFormOrderBuilder = JudgeFinalOrderForm.builder();
-
-        freeFormOrderBuilder = caseInfoGroup.populateCaseInfo(freeFormOrderBuilder, caseData);
-        freeFormOrderBuilder = judgeCourtDetailsGroup.populateJudgeCourtDetails(freeFormOrderBuilder, userDetails,
-                                                         caseManagementLocationDetails, getHearingLocationText(caseData));
-        freeFormOrderBuilder = orderDetailsGroup.populateOrderDetails(freeFormOrderBuilder, caseData);
-
-        return freeFormOrderBuilder.build();
+        return judgeFinalOrderFormPopulator.populateFreeFormOrder(caseData, caseManagementLocationDetails, userDetails);
     }
 
-    private JudgeFinalOrderForm getAssistedOrder(CaseData caseData, String authorisation) {
+    private JudgeFinalOrderForm getAssistedOrder(CaseData caseData,
+                                                 String authorisation) {
         UserDetails userDetails = userService.getUserDetails(authorisation);
-        caseManagementLocationDetails = documentHearingLocationHelper
+        LocationRefData caseManagementLocationDetails = documentHearingLocationHelper
             .getCaseManagementLocationDetailsNro(caseData, locationRefDataService, authorisation);
 
-        var assistedFormOrderBuilder = JudgeFinalOrderForm.builder();
-
-        assistedFormOrderBuilder = caseInfoGroup.populateCaseInfo(assistedFormOrderBuilder, caseData);
-        assistedFormOrderBuilder = judgeCourtDetailsGroup.populateJudgeCourtDetails(assistedFormOrderBuilder, userDetails,
-                                                         caseManagementLocationDetails, getHearingLocationText(caseData));
-        assistedFormOrderBuilder = orderDetailsGroup.populateAssistedOrderDetails(assistedFormOrderBuilder, caseData);
-        assistedFormOrderBuilder = attendeesRepresentationGroup.populateAttendeesDetails(assistedFormOrderBuilder, caseData);
-        assistedFormOrderBuilder = hearingDetailsGroup.populateHearingDetails(assistedFormOrderBuilder, caseData, caseManagementLocationDetails);
-        assistedFormOrderBuilder = costsDetailsGroup.populateCostsDetails(assistedFormOrderBuilder, caseData);
-        assistedFormOrderBuilder = appealInitiativeGroup.populateAppealDetails(assistedFormOrderBuilder, caseData);
-        assistedFormOrderBuilder = appealInitiativeGroup.populateInitiativeOrWithoutNoticeDetails(assistedFormOrderBuilder, caseData);
-
-        return assistedFormOrderBuilder.build();
+        return judgeFinalOrderFormPopulator.populateFinalOrderForm(caseData, caseManagementLocationDetails, userDetails);
     }
 
     public String getInitiativeOrWithoutNotice(CaseData caseData) {
@@ -146,11 +113,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
 
     public String generateDefendantAttendsOrRepresentedText(CaseData caseData, Boolean isDefendant2) {
         return defendantAttendsOrRepresentedTextBuilder.defendantBuilder(caseData, isDefendant2);
-    }
-
-    private String getHearingLocationText(CaseData caseData) {
-        return caseData.getHearingLocationText() != null ? caseData.getHearingLocationText()
-            : LocationRefDataService.getDisplayEntry(caseManagementLocationDetails);
     }
 
 }

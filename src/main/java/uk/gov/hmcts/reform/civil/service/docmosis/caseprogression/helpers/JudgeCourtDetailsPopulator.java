@@ -7,7 +7,7 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 @Component
-public class JudgeCourtDetailsGroup {
+public class JudgeCourtDetailsPopulator {
 
     private LocationRefData caseManagementLocationDetails;
 

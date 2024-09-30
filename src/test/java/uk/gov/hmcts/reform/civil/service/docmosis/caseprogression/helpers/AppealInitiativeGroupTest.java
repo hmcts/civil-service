@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class AppealInitiativeGroupTest {
 
     @InjectMocks
-    private AppealInitiativeGroup appealInitiativeGroup;
+    private AppealInitiativePopulator appealInitiativePopulator;
 
     @Test
     void shouldPopulateAppealDetails_WhenAppealGrantedAndCircuitCourt() {
@@ -39,7 +39,7 @@ public class AppealInitiativeGroupTest {
                                                                                                      .appealGrantedRefusedDate(LocalDate.now().plusDays(5))
                                                                                                      .build()).build()).build()).build();
         JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder();
-        builder = appealInitiativeGroup.populateAppealDetails(builder, caseData);
+        builder = appealInitiativePopulator.populateAppealDetails(builder, caseData);
         LocalDate appealGrantedDate = LocalDate.now().plusDays(5);
 
         JudgeFinalOrderForm form = builder.build();
@@ -60,7 +60,7 @@ public class AppealInitiativeGroupTest {
                                                                                                      .appealGrantedRefusedDate(appealRefusedDate)
                                                                                                      .build()).build()).build()).build();
         JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder();
-        builder = appealInitiativeGroup.populateAppealDetails(builder, caseData);
+        builder = appealInitiativePopulator.populateAppealDetails(builder, caseData);
 
         JudgeFinalOrderForm form = builder.build();
         Assertions.assertNull(form.getAppealGranted());
@@ -80,7 +80,7 @@ public class AppealInitiativeGroupTest {
                                                                                                      .appealGrantedRefusedDate(appealRefusedDate)
                                                                                                      .build()).build()).build()).build();
         JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder();
-        builder = appealInitiativeGroup.populateAppealDetails(builder, caseData);
+        builder = appealInitiativePopulator.populateAppealDetails(builder, caseData);
 
         JudgeFinalOrderForm form = builder.build();
         Assertions.assertNull(form.getAppealGranted());
@@ -92,7 +92,7 @@ public class AppealInitiativeGroupTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .finalOrderRecitals(null)
             .finalOrderAppealComplex(FinalOrderAppeal.builder().list(AppealList.CLAIMANT).build()).build();
-        String response = appealInitiativeGroup.getAppealFor(caseData);
+        String response = appealInitiativePopulator.getAppealFor(caseData);
         assertEquals(AppealList.CLAIMANT.name().toLowerCase() + "'s", response);
     }
 
@@ -101,14 +101,14 @@ public class AppealInitiativeGroupTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .finalOrderRecitals(null)
             .finalOrderAppealComplex(FinalOrderAppeal.builder().otherText("test").list(AppealList.OTHER).build()).build();
-        String response = appealInitiativeGroup.getAppealFor(caseData);
+        String response = appealInitiativePopulator.getAppealFor(caseData);
         assertEquals("test", response);
     }
 
     @ParameterizedTest
     @MethodSource("testCircuitOrHighCourtData")
     void testCircuitOrHighCourt(CaseData caseData, String expectedResponse) {
-        String response = appealInitiativeGroup.circuitOrHighCourt(caseData);
+        String response = appealInitiativePopulator.circuitOrHighCourt(caseData);
         assertEquals(expectedResponse, response);
     }
 
@@ -156,7 +156,7 @@ public class AppealInitiativeGroupTest {
     @ParameterizedTest
     @MethodSource("testGetAppealDateData")
     void testGetAppealDate(CaseData caseData, LocalDate expectedResponse) {
-        LocalDate response = appealInitiativeGroup.getAppealDate(caseData);
+        LocalDate response = appealInitiativePopulator.getAppealDate(caseData);
         assertEquals(expectedResponse, response);
     }
 

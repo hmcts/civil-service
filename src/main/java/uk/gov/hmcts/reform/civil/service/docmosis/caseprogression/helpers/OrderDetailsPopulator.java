@@ -13,7 +13,7 @@ import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 
 @Component
-public class OrderDetailsGroup {
+public class OrderDetailsPopulator {
 
     public JudgeFinalOrderForm.JudgeFinalOrderFormBuilder populateOrderDetails(JudgeFinalOrderFormBuilder builder, CaseData caseData) {
         return builder.freeFormRecordedText(caseData.getFreeFormRecordedTextArea())

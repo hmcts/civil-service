@@ -16,7 +16,7 @@ import static uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList.
 import static uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList.REFUSED;
 
 @Component
-public class AppealInitiativeGroup {
+public class AppealInitiativePopulator {
 
     public JudgeFinalOrderForm.JudgeFinalOrderFormBuilder populateAppealDetails(JudgeFinalOrderFormBuilder builder, CaseData caseData) {
         return builder.claimantOrDefendantAppeal(getAppealFor(caseData))

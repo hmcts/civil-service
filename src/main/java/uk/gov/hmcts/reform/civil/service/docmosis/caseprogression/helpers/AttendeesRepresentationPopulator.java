@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.builders.Defen
 import static java.util.Objects.nonNull;
 
 @Component
-public class AttendeesRepresentationGroup {
+public class AttendeesRepresentationPopulator {
 
     private ClaimantAttendsOrRepresentedTextBuilder claimantAttendsOrRepresentedTextBuilder;
     private DefendantAttendsOrRepresentedTextBuilder defendantAttendsOrRepresentedTextBuilder;

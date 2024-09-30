@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 public class AttendeesRepresentationGroupTest {
 
     @InjectMocks
-    private AttendeesRepresentationGroup attendeesRepresentationGroup;
+    private AttendeesRepresentationPopulator attendeesRepresentationPopulator;
 
     @Mock
     private ClaimantAttendsOrRepresentedTextBuilder claimantAttendsOrRepresentedTextBuilder;
@@ -43,7 +43,7 @@ public class AttendeesRepresentationGroupTest {
         when(defendantAttendsOrRepresentedTextBuilder.defendantBuilder(caseData, true)).thenReturn("Defendant 2 attends");
 
         JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder();
-        builder = attendeesRepresentationGroup.populateAttendeesDetails(builder, caseData);
+        builder = attendeesRepresentationPopulator.populateAttendeesDetails(builder, caseData);
 
         JudgeFinalOrderForm form = builder.build();
         Assertions.assertEquals("Claimant 1 attends", form.getClaimantAttendsOrRepresented());
@@ -59,7 +59,7 @@ public class AttendeesRepresentationGroupTest {
         CaseData caseData = CaseDataBuilder.builder().applicant1(applicant1).build();
 
         JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder();
-        builder = attendeesRepresentationGroup.populateAttendeesDetails(builder, caseData);
+        builder = attendeesRepresentationPopulator.populateAttendeesDetails(builder, caseData);
 
         JudgeFinalOrderForm form = builder.build();
         Assertions.assertNull(form.getClaimantTwoAttendsOrRepresented());
@@ -71,7 +71,7 @@ public class AttendeesRepresentationGroupTest {
 
         when(claimantAttendsOrRepresentedTextBuilder.claimantBuilder(caseData, false)).thenReturn("Claimant 1 attends");
 
-        String result = attendeesRepresentationGroup.generateClaimantAttendsOrRepresentedText(caseData, false);
+        String result = attendeesRepresentationPopulator.generateClaimantAttendsOrRepresentedText(caseData, false);
 
         Assertions.assertEquals("Claimant 1 attends", result);
     }
@@ -86,7 +86,7 @@ public class AttendeesRepresentationGroupTest {
                                                                               .builder().detailsRepresentationText("Test").build()).build())
             .build();
 
-        String result = attendeesRepresentationGroup.getOtherRepresentedText(caseData);
+        String result = attendeesRepresentationPopulator.getOtherRepresentedText(caseData);
 
         Assertions.assertEquals("Test", result);
     }
@@ -97,7 +97,7 @@ public class AttendeesRepresentationGroupTest {
             .atStateNotificationAcknowledged()
             .build();
 
-        String result = attendeesRepresentationGroup.getOtherRepresentedText(caseData);
+        String result = attendeesRepresentationPopulator.getOtherRepresentedText(caseData);
 
         Assertions.assertEquals("", result);
     }

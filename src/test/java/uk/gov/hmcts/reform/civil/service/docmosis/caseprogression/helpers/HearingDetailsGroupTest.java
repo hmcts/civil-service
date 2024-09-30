@@ -31,7 +31,7 @@ import static uk.gov.hmcts.reform.civil.enums.hearing.HearingChannel.IN_PERSON;
 public class HearingDetailsGroupTest {
 
     @InjectMocks
-    private HearingDetailsGroup hearingDetailsGroup;
+    private HearingDetailsPopulator hearingDetailsPopulator;
 
     @Mock
     private LocationReferenceDataService locationRefDataService;
@@ -55,7 +55,7 @@ public class HearingDetailsGroupTest {
 
         JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder();
 
-        builder = hearingDetailsGroup.populateHearingDetails(builder, caseData, caseManagementLocationDetails);
+        builder = hearingDetailsPopulator.populateHearingDetails(builder, caseData, caseManagementLocationDetails);
 
         JudgeFinalOrderForm result = builder.build();
 
@@ -78,7 +78,7 @@ public class HearingDetailsGroupTest {
                                                                           .lengthListOtherHours("1")
                                                                           .lengthListOtherMinutes("30")
                                                                           .build()).build()).build();
-            String response = hearingDetailsGroup.getFurtherHearingLength(caseData);
+            String response = hearingDetailsPopulator.getFurtherHearingLength(caseData);
             switch (hearingLengthFinalOrderList) {
                 case MINUTES_15 -> Assertions.assertEquals("15 minutes", response);
                 case MINUTES_30 -> Assertions.assertEquals("30 minutes", response);
@@ -102,7 +102,7 @@ public class HearingDetailsGroupTest {
                                                                       //.lengthListOtherHours("1")
                                                                       .lengthListOtherMinutes("30")
                                                                       .build()).build()).build();
-        String response = hearingDetailsGroup.getFurtherHearingLength(minCaseData);
+        String response = hearingDetailsPopulator.getFurtherHearingLength(minCaseData);
         Assertions.assertEquals("30 minutes", response);
 
         CaseData hourCaseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -113,7 +113,7 @@ public class HearingDetailsGroupTest {
                                                                       .lengthListOtherHours("1")
                                                                       //.lengthListOtherMinutes("30")
                                                                       .build()).build()).build();
-        response = hearingDetailsGroup.getFurtherHearingLength(hourCaseData);
+        response = hearingDetailsPopulator.getFurtherHearingLength(hourCaseData);
         Assertions.assertEquals("1 hours ", response);
 
         CaseData dayCaseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -124,7 +124,7 @@ public class HearingDetailsGroupTest {
                                                                       //.lengthListOtherHours("1")
                                                                       //.lengthListOtherMinutes("30")
                                                                       .build()).build()).build();
-        response = hearingDetailsGroup.getFurtherHearingLength(dayCaseData);
+        response = hearingDetailsPopulator.getFurtherHearingLength(dayCaseData);
         Assertions.assertEquals("12 days ", response);
     }
 
@@ -134,7 +134,7 @@ public class HearingDetailsGroupTest {
             .finalOrderRecitals(null)
             .finalOrderFurtherHearingComplex(null).build();
 
-        String response = hearingDetailsGroup.getFurtherHearingLength(caseData);
+        String response = hearingDetailsPopulator.getFurtherHearingLength(caseData);
         Assertions.assertEquals("", response);
     }
 
@@ -146,7 +146,7 @@ public class HearingDetailsGroupTest {
             .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder().listFromDate(LocalDate.of(2022, 12,
                                                                                                           12
             )).build()).build();
-        LocalDate response = hearingDetailsGroup.getFurtherHearingDate(caseData, true);
+        LocalDate response = hearingDetailsPopulator.getFurtherHearingDate(caseData, true);
         Assertions.assertEquals(LocalDate.of(2022, 12,
                                              12
         ), response);
@@ -160,7 +160,7 @@ public class HearingDetailsGroupTest {
             .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder().dateToDate(LocalDate.of(2022, 12,
                                                                                                         12
             )).build()).build();
-        LocalDate response = hearingDetailsGroup.getFurtherHearingDate(caseData, false);
+        LocalDate response = hearingDetailsPopulator.getFurtherHearingDate(caseData, false);
         Assertions.assertEquals(LocalDate.of(2022, 12,
                                              12
         ), response);
@@ -188,8 +188,8 @@ public class HearingDetailsGroupTest {
                                                                                                          .build())
                                                                                     .build()).build())
             .build();
-        Boolean response = hearingDetailsGroup.isDefaultCourt(caseData);
-        Boolean responseFalse = hearingDetailsGroup.isDefaultCourt(caseDataWhenFalse);
+        Boolean response = hearingDetailsPopulator.isDefaultCourt(caseData);
+        Boolean responseFalse = hearingDetailsPopulator.isDefaultCourt(caseDataWhenFalse);
         Assertions.assertEquals(true, response);
         Assertions.assertEquals(false, responseFalse);
 

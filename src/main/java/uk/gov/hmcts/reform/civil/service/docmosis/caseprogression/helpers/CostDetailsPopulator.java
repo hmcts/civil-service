@@ -14,7 +14,7 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Component
-public class CostsDetailsGroup {
+public class CostDetailsPopulator {
 
     public JudgeFinalOrderForm.JudgeFinalOrderFormBuilder populateCostsDetails(JudgeFinalOrderFormBuilder builder, CaseData caseData) {
         return builder.costSelection(caseData.getAssistedOrderCostList().name())

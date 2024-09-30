@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 public class JudgeCourtDetailsGroupTest {
 
     @InjectMocks
-    private JudgeCourtDetailsGroup judgeCourtDetailsGroup;
+    private JudgeCourtDetailsPopulator judgeCourtDetailsPopulator;
     @Mock
     private UserDetails userDetails;
 
@@ -34,7 +34,7 @@ public class JudgeCourtDetailsGroupTest {
 
         JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder();
 
-        builder = judgeCourtDetailsGroup.populateJudgeCourtDetails(builder, userDetails, caseManagementLocationDetails, expectedCourtLocation);
+        builder = judgeCourtDetailsPopulator.populateJudgeCourtDetails(builder, userDetails, caseManagementLocationDetails, expectedCourtLocation);
 
         JudgeFinalOrderForm result = builder.build();
         Assertions.assertEquals(expectedJudgeName, result.getJudgeNameTitle());

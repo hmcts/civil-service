@@ -17,7 +17,7 @@ import static org.junit.Assert.assertNull;
 public class CaseInfoGroupTest {
 
     @InjectMocks
-    private CaseInfoGroup caseInfoGroup;
+    private CaseInfoPopulator caseInfoPopulator;
 
     @Test
     void shouldPopulateCaseInfo_WhenAllFieldsPresent() {
@@ -40,7 +40,7 @@ public class CaseInfoGroupTest {
             .build();
 
         JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder();
-        builder = caseInfoGroup.populateCaseInfo(builder, caseData);
+        builder = caseInfoPopulator.populateCaseInfo(builder, caseData);
 
         Assertions.assertEquals("1234567890123456", builder.build().getCaseNumber());
         Assertions.assertEquals("Claimant 1", builder.build().getClaimantNum());
@@ -63,7 +63,7 @@ public class CaseInfoGroupTest {
 
         JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder();
 
-        builder = caseInfoGroup.populateCaseInfo(builder, caseData);
+        builder = caseInfoPopulator.populateCaseInfo(builder, caseData);
 
         Assertions.assertEquals("1234567890123456", builder.build().getCaseNumber());
         Assertions.assertNull(builder.build().getClaimant2Name());
@@ -88,7 +88,7 @@ public class CaseInfoGroupTest {
 
         JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder();
 
-        builder = caseInfoGroup.populateCaseInfo(builder, caseData);
+        builder = caseInfoPopulator.populateCaseInfo(builder, caseData);
 
         assertNull(builder.build().getClaimantReference());
         assertNull(builder.build().getDefendantReference());
