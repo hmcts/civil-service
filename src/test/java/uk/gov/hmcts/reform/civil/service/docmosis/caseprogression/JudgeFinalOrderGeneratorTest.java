@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -128,6 +129,7 @@ class JudgeFinalOrderGeneratorTest {
     private LocationReferenceDataService locationRefDataService;
     @MockBean
     private DocumentHearingLocationHelper locationHelper;
+    @Qualifier("judgeFinalOrderGenerator")
     @Autowired
     private JudgeFinalOrderGenerator generator;
     @MockBean
