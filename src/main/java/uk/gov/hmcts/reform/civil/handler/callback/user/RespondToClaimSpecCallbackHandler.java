@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -53,6 +54,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SP
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RespondToClaimSpecCallbackHandler extends CallbackHandler implements DefendantAddressValidator, WitnessesValidator {
@@ -82,11 +84,13 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
 
     @Override
     public List<CaseEvent> handledEvents() {
+        log.debug("Handling events: {}", EVENTS);
         return EVENTS;
     }
 
     @Override
     protected Map<String, Callback> callbacks() {
+        log.debug("Registering callbacks");
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::populateRespondent1Copy)
             .put(callbackKey(MID, "validate-mediation-unavailable-dates"), this::validateMediationUnavailableDates)
@@ -113,30 +117,37 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     }
 
     private CallbackResponse populateRespondent1Copy(CallbackParams callbackParams) {
+        log.info("Populating respondent 1 copy");
         return populateRespondent1Copy.execute(callbackParams);
     }
 
     private CallbackResponse validateMediationUnavailableDates(CallbackParams callbackParams) {
+        log.info("Validating mediation unavailable dates");
         return validateMediationUnavailableDates.execute(callbackParams);
     }
 
     private CallbackResponse validateDateOfBirth(CallbackParams callbackParams) {
+        log.info("Validating date of birth");
         return validateDateOfBirth.execute(callbackParams);
     }
 
     private CallbackResponse validateUnavailableDates(CallbackParams callbackParams) {
+        log.info("Validating unavailable dates");
         return validateUnavailableDates.execute(callbackParams);
     }
 
     private CallbackResponse validateRespondentExperts(CallbackParams callbackParams) {
+        log.info("Validating respondent experts");
         return validateRespondentExperts.execute(callbackParams);
     }
 
     private CallbackResponse validateRespondentWitnesses(CallbackParams callbackParams) {
+        log.info("Validating respondent witnesses");
         return validateRespondentWitnesses.execute(callbackParams);
     }
 
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
+        log.info("Resetting statement of truth");
         CaseData caseData = callbackParams.getCaseData();
 
         CaseData updatedCaseData = caseData.toBuilder()
@@ -149,10 +160,12 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     }
 
     private CallbackResponse validateRespondentPaymentDate(CallbackParams callbackParams) {
+        log.info("Validating respondent payment date");
         return validateRespondentPaymentDate.execute(callbackParams);
     }
 
     private CallbackResponse validateCorrespondenceApplicantAddress(CallbackParams callbackParams) {
+        log.info("Validating correspondence applicant address");
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
             return validateCorrespondenceApplicantAddress(callbackParams, postcodeValidator);
         }
@@ -161,34 +174,42 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     }
 
     private CallbackResponse determineLoggedInSolicitor(CallbackParams callbackParams) {
+        log.info("Determining logged-in solicitor");
         return determineLoggedInSolicitor.execute(callbackParams);
     }
 
     private CallbackResponse handleDefendAllClaim(CallbackParams callbackParams) {
+        log.info("Handling defend all claim");
         return handleDefendAllClaim.execute(callbackParams);
     }
 
     private CallbackResponse handleRespondentResponseTypeForSpec(CallbackParams callbackParams) {
+        log.info("Handling respondent response type for spec");
         return handleRespondentResponseTypeForSpec.execute(callbackParams);
     }
 
     private CallbackResponse handleAdmitPartOfClaim(CallbackParams callbackParams) {
+        log.info("Handling admit part of claim");
         return handleAdmitPartOfClaim.execute(callbackParams);
     }
 
     private CallbackResponse validateLengthOfUnemployment(CallbackParams callbackParams) {
+        log.info("Validating length of unemployment");
         return validateLengthOfUnemployment.execute(callbackParams);
     }
 
     private CallbackResponse validateDefendant1RepaymentPlan(CallbackParams callbackParams) {
+        log.info("Validating defendant 1 repayment plan");
         return validateRepaymentPlan(callbackParams.getCaseData().getRespondent1RepaymentPlan());
     }
 
     private CallbackResponse validateDefendant2RepaymentPlan(CallbackParams callbackParams) {
+        log.info("Validating defendant 2 repayment plan");
         return validateRepaymentPlan(callbackParams.getCaseData().getRespondent2RepaymentPlan());
     }
 
     private CallbackResponse validateRepaymentPlan(RepaymentPlanLRspec repaymentPlan) {
+        log.info("Validating repayment plan");
         List<String> errors;
 
         if (repaymentPlan != null
@@ -205,18 +226,22 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler implement
     }
 
     private CallbackResponse setGenericResponseTypeFlag(CallbackParams callbackParams) {
+        log.info("Setting generic response type flag");
         return setGenericResponseTypeFlag.execute(callbackParams);
     }
 
     private CallbackResponse setUploadTimelineTypeFlag(CallbackParams callbackParams) {
+        log.info("Setting upload timeline type flag");
         return setUploadTimelineTypeFlag.execute(callbackParams);
     }
 
     private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
+        log.info("Setting applicant response deadline");
         return setApplicantResponseDeadline.execute(callbackParams);
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
+        log.info("Building confirmation response");
         CaseData caseData = callbackParams.getCaseData();
         String claimNumber = caseData.getLegacyCaseReference();
 
