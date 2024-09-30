@@ -47,7 +47,7 @@ allprojects {
 
   checkstyle {
     maxWarnings = 0
-    toolVersion = '10.18.0'
+    toolVersion = '10.18.2'
     getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
   }
 
@@ -292,7 +292,8 @@ sonarqube {
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
     property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/request/servlet/** , **/controllers/**, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**, **/service/PaymentsService.java, **/DashboardWithParamsCallbackHandler.java, **/advice/**"
     property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java, **/*CcdDashboardClaimantClaimMatcher.java, **/*CcdDashboardDefendantClaimMatcher.java"
-    property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**"
+    property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**, **/handler/callback/camunda/dashboardnotifications/claimant/CCJRequestedDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantCCJResponseNotificationHandler.java" +
+      ", **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantResponseNotificationHandler.java,  **/handler/callback/camunda/dashboardnotifications/defendant/MoreTimeRequestedDashboardNotificationDefendantHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantMediationSuccessfulDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimSettledDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/HearingScheduledClaimantNotificationHandler.java"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
     property "sonar.web.javaOpts", "-Xmx2G"
   }
@@ -405,7 +406,7 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.23.1'
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.93'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.23'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.30'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.23'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.1'
 
@@ -426,7 +427,7 @@ dependencies {
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
   implementation group: 'com.azure', name: 'azure-core', version: '1.51.0'
-  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.3'
+  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.4'
   implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
 
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
