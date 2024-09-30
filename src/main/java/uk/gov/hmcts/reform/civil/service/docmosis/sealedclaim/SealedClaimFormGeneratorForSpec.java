@@ -139,6 +139,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
                                   ? caseData.getInterestClaimOptions().equals(SAME_RATE_INTEREST) + "" : null)
             .breakdownInterestRate(caseData.getInterestClaimOptions() != null
                                        ? caseData.getInterestClaimOptions().equals(BREAK_DOWN_INTEREST) + "" : null)
+            .interestPerDayBreakdown(interestCalculator.getInterestPerDayBreakdown(caseData))
             .totalInterestAmount(interest != null ? interest.toString() : null)
             .howTheInterestWasCalculated(caseData.getInterestClaimOptions() != null
                                              ? caseData.getInterestClaimOptions().getDescription() : null)

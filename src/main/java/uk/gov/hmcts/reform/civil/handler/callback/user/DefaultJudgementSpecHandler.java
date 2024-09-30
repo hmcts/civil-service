@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.DefaultJudgmentOnlineMa
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.RegistrationInformation;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -299,7 +300,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         BigDecimal totalInterest = caseData.getTotalInterest() != null ? caseData.getTotalInterest() : BigDecimal.ZERO;
         var claimWithInterest = caseData.getTotalClaimAmount().add(totalInterest);
-        var claimfee = feesService.getFeeDataByTotalClaimAmount(claimWithInterest);
+        Fee claimfee = feesService.getFeeDataByTotalClaimAmount(claimWithInterest);
         BigDecimal claimFeePounds;
         if (caseData.getOutstandingFeeInPounds() != null) {
             claimFeePounds = caseData.getOutstandingFeeInPounds();
@@ -314,6 +315,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             fixedCost,
             callbackParams
         );
+        updateTotalInterestAndClaimFee(caseDataBuilder, interest, claimfee);
 
         caseDataBuilder.repaymentSummaryObject(repaymentBreakdown.toString());
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -453,6 +455,12 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(nextState)
             .build();
+    }
+
+    private void updateTotalInterestAndClaimFee(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, BigDecimal interest,
+                                                Fee claimFeePounds) {
+        caseDataBuilder.claimFee(claimFeePounds)
+            .totalInterest(interest);
     }
 }
 

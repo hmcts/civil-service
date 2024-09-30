@@ -627,12 +627,13 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(100)
                 );
+            Fee fee = Fee.builder()
+                .calculatedAmountInPence(BigDecimal.valueOf(100))
+                .version("1")
+                .code("CODE")
+                .build();
             when(feesService.getFeeDataByTotalClaimAmount(any()))
-                .thenReturn(Fee.builder()
-                                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                                .version("1")
-                                .code("CODE")
-                                .build());
+                .thenReturn(fee);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .partialPayment(YesOrNo.YES)
@@ -669,6 +670,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 + " £1222.00";
 
             assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
+            assertInterestAndClaimFeeArePopulated(response, 100);
         }
 
         @Test
@@ -717,6 +719,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 + " ## Total still owed \n"
                 + " £681.00";
             assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
+            assertInterestAndClaimFeeArePopulated(response, 100);
         }
 
         @Test
@@ -765,6 +768,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 + " £1201.00";
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
+            assertInterestAndClaimFeeArePopulated(response, 100);
         }
 
         @Test
@@ -807,6 +811,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 + " ## Total still owed \n"
                 + " £5001.00";
             assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
+            assertInterestAndClaimFeeArePopulated(response, 0);
         }
 
         @Test
@@ -853,6 +858,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 + " ## Total still owed \n"
                 + " £5001.00";
             assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
+            assertInterestAndClaimFeeArePopulated(response, 0);
         }
 
         @Test
@@ -904,6 +910,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 + " £1222.00";
 
             assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
+            assertInterestAndClaimFeeArePopulated(response, 100);
         }
 
         @Test
@@ -958,7 +965,13 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 + " £1221.00";
 
             assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
+            assertInterestAndClaimFeeArePopulated(response, 100);
         }
+    }
+
+    private static void assertInterestAndClaimFeeArePopulated(AboutToStartOrSubmitCallbackResponse response, int val) {
+        assertThat(response.getData().get("totalInterest")).isEqualTo(BigDecimal.valueOf(val));
+        assertThat(response.getData().get("claimFee")).isNotNull();
     }
 
     @Nested

@@ -87,6 +87,7 @@ public class SealedClaimFormGeneratorForSpecTest {
         when(representativeService.getRespondent2Representative(any())).thenReturn(representative2);
         when(representativeService.getApplicantRepresentative(any())).thenReturn(getRepresentative());
         when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(BigDecimal.ZERO);
+        when(interestCalculator.getInterestPerDayBreakdown(any(CaseData.class))).thenReturn("Interest will accrue at the daily rate of £0.50 up to the date of claim issue");
     }
 
     private Representative getRepresentative() {
