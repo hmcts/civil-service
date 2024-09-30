@@ -106,7 +106,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             data.getCcjPaymentDetails();
 
         if (featureToggleService.isJudgmentOnlineLive()
-            && data.isLRvLipOneVOne()
+            && JudgmentsOnlineHelper.isNonDivergentForDJ(data)
             && data.isPayImmediately()) {
 
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
@@ -115,18 +115,21 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
             businessProcess = BusinessProcess.ready(REQUEST_JUDGEMENT_ADMISSION_SPEC);
         }
-        if (featureToggleService.isJudgmentOnlineLive()) {
-            data.setActiveJudgment(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(data));
-            data.setJoIsLiveJudgmentExists(YesOrNo.YES);
-            data.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(data.getActiveJudgment()));
-        }
 
         CaseData.CaseDataBuilder caseDataBuilder = data.toBuilder()
             .businessProcess(businessProcess)
             .ccjPaymentDetails(ccjPaymentDetails);
 
+        CaseData updatedCaseData = caseDataBuilder.build();
+
+        if (featureToggleService.isJudgmentOnlineLive()) {
+            updatedCaseData.setActiveJudgment(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(updatedCaseData));
+            updatedCaseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
+            updatedCaseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(updatedCaseData.getActiveJudgment()));
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(updatedCaseData.toMap(objectMapper))
             .state(nextState)
             .build();
     }
