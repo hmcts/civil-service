@@ -2,5 +2,22 @@
   "connectionString": "${file:/mnt/secrets/civil/appinsights-connection-string}",
   "role": {
     "name": "HMCTS Civil Service"
+  },
+  "preview": {
+    "sampling" : {
+      "overrides" : [
+        {
+          "telemetryType" : "request",
+          "attributes" : [
+            {
+              "key" : "http.url",
+              "value" : "https?://[^/]+/health.*",
+              "matchType" : "regexp"
+            }
+          ],
+          "percentage" : 1
+        }
+      ]
+    }
   }
 }
