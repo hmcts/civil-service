@@ -18,9 +18,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.civil.CaseDefinitionConstants;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
-import uk.gov.hmcts.reform.civil.model.DefendantLinkStatus;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.PinDto;
 import uk.gov.hmcts.reform.civil.service.AssignCaseService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -79,26 +77,18 @@ public class CaseAssignmentController {
     }
 
     @GetMapping(path = {
-        "/reference/{caseReference}/defendant-link-status"
+        "/reference/{caseReference}/ocmc"
     })
     @Operation(summary = "Check whether a claim is linked to a defendant")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
         @ApiResponse(responseCode = "401", description = "Not Authorized"),
         @ApiResponse(responseCode = "400", description = "Bad Request")})
-    public ResponseEntity<DefendantLinkStatus> isDefendantLinked(
+    public ResponseEntity<Boolean> isOcmcDefendantLinked(
         @PathVariable("caseReference") String caseReference) {
         log.info("Check claim reference {} is linked to defendant", caseReference);
-        CaseDetails caseDetails = caseByLegacyReferenceSearchService.getCaseDataByLegacyReference(caseReference);
-        boolean isOcmcCase = caseDetails.getCaseTypeId().equals(CaseDefinitionConstants.CMC_CASE_TYPE);
-        boolean status;
-        if (isOcmcCase) {
-            status = defendantPinToPostLRspecService.isOcmcDefendantLinked(caseReference);
-        } else {
-            status = defendantPinToPostLRspecService.isDefendantLinked(caseDetails);
-        }
-        DefendantLinkStatus defendantLinkStatus = new DefendantLinkStatus(isOcmcCase, status);
-        return new ResponseEntity<>(defendantLinkStatus, HttpStatus.OK);
+        boolean status = defendantPinToPostLRspecService.isOcmcDefendantLinked(caseReference);
+        return new ResponseEntity<>(status, HttpStatus.OK);
     }
 
     @Deprecated
