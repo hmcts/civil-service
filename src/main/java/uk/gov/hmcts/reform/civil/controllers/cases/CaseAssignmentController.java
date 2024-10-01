@@ -91,22 +91,6 @@ public class CaseAssignmentController {
         return new ResponseEntity<>(status, HttpStatus.OK);
     }
 
-    @Deprecated
-    @GetMapping(path = {
-        "/reference/{caseReference}/ocmc"
-    })
-    @Operation(summary = "Check whether a claim is linked to a defendant")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "OK"),
-        @ApiResponse(responseCode = "401", description = "Not Authorized"),
-        @ApiResponse(responseCode = "400", description = "Bad Request")})
-    public ResponseEntity<Boolean> isOcmcDefendantLinked(
-        @PathVariable("caseReference") String caseReference) {
-        log.info("Check claim reference {} is linked to defendant", caseReference);
-        boolean status = defendantPinToPostLRspecService.isOcmcDefendantLinked(caseReference);
-        return new ResponseEntity<>(status, HttpStatus.OK);
-    }
-
     @PostMapping(path = "/case/{caseId}/{caseRole}")
     @Operation(summary = "Assigns case to defendant")
     public void assignCaseToDefendant(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
