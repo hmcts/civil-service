@@ -43,7 +43,6 @@ public class ManageStayCallbackHandler extends CallbackHandler {
         CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.name(), CaseState.CASE_PROGRESSION
     );
 
-
     private final ObjectMapper mapper;
 
     @Override
