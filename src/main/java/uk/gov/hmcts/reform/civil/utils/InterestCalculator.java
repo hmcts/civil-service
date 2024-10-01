@@ -112,7 +112,7 @@ public class InterestCalculator {
     }
 
     public String getInterestPerDayBreakdown(CaseData caseData) {
-        if (caseData.getInterestClaimOptions().name().equals(BREAK_DOWN_INTEREST)) {
+        if (caseData.getInterestClaimOptions() == null || caseData.getInterestClaimOptions().name().equals(BREAK_DOWN_INTEREST)) {
             return null;
         }
         StringBuilder description = new StringBuilder("Interest will accrue at the daily rate of £");
