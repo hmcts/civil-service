@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.service;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -40,6 +42,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.ADJOURN_HEARING;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.OTHER;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SET_ASIDE_JUDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_ORDER;
 
 @ExtendWith(MockitoExtension.class)
 class GeneralAppFeesServiceTest {
@@ -54,6 +59,7 @@ class GeneralAppFeesServiceTest {
     private static final String AppnToVaryOrSuspend = "AppnToVaryOrSuspend";
     private static final String WithoutNotice = "GeneralAppWithoutNotice";
     private static final String GAOnNotice = "GAOnNotice";
+    private static final String CoS = "CoS";
     private static final FeeLookupResponseDto FEE_POUNDS_108 = FeeLookupResponseDto.builder()
         .feeAmount(TEST_FEE_AMOUNT_POUNDS_108).code("test_fee_code").version(1).build();
     private static final Fee FEE_PENCE_108 = Fee.builder()
@@ -702,6 +708,63 @@ class GeneralAppFeesServiceTest {
             );
             assertThat(feesService.getFeeForGA(caseDataOutside14Days))
                 .isEqualTo(FEE_PENCE_14);
+        }
+
+        @ParameterizedTest
+        @EnumSource(
+            value = GeneralApplicationTypes.class,
+            names = {"VARY_ORDER", "SET_ASIDE_JUDGEMENT", "OTHER"})
+        void shouldReturnFeeDataForJO_whenApplicationTypeIsProvided(GeneralApplicationTypes generalApplicationTypes) {
+            //Given
+            when(feesConfiguration.getChannel()).thenReturn("default");
+            when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
+            when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
+
+            if (Objects.requireNonNull(generalApplicationTypes) == VARY_ORDER) {
+                when(feesConfiguration.getAppnToVaryOrSuspend()).thenReturn("AppnToVaryOrSuspend");
+                when(feesApiClient.lookupFee(
+                        anyString(),
+                        anyString(),
+                        anyString(),
+                        anyString(),
+                        anyString(),
+                        eq(AppnToVaryOrSuspend)
+                )).thenReturn(FEE_POUNDS_14);
+                //When
+                Fee feeForVaryOrder = feesService.getFeeForJOWithApplicationType(VARY_ORDER);
+                //Then
+                assertThat(feeForVaryOrder).isEqualTo(FEE_PENCE_14);
+            } else if (generalApplicationTypes == SET_ASIDE_JUDGEMENT) {
+                when(feesConfiguration.getWithNoticeKeyword()).thenReturn("GAOnNotice");
+
+                when(feesApiClient.lookupFee(
+                        anyString(),
+                        anyString(),
+                        anyString(),
+                        anyString(),
+                        anyString(),
+                        eq(GAOnNotice)
+                )).thenReturn(FEE_POUNDS_14);
+                //When
+                Fee feeForSetAside = feesService.getFeeForJOWithApplicationType(SET_ASIDE_JUDGEMENT);
+                //Then
+                assertThat(feeForSetAside).isEqualTo(FEE_PENCE_14);
+            } else if (generalApplicationTypes == OTHER) {
+                when(feesConfiguration.getCertificateOfSatisfaction()).thenReturn("CoS");
+
+                when(feesApiClient.lookupFee(
+                        anyString(),
+                        anyString(),
+                        anyString(),
+                        anyString(),
+                        anyString(),
+                        eq(CoS)
+                )).thenReturn(FEE_POUNDS_14);
+                //When
+                Fee feeForCertSatisfaction = feesService.getFeeForJOWithApplicationType(OTHER);
+                //Then
+                assertThat(feeForCertSatisfaction).isEqualTo(FEE_PENCE_14);
+            }
         }
 
         private List<GeneralApplicationTypes> getRandomDefaultTypes() {

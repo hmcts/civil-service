@@ -32,4 +32,8 @@ public class DefaultJudgmentNonDivergentSpecLipDefendantLetter implements Mappab
 
     private final String respondToClaimUrl;
     private final String pin;
+    private final String varyJudgmentFee;
+    private final String judgmentSetAsideFee;
+    private final String certifOfSatisfactionFee;
+
 }
