@@ -27,6 +27,8 @@ public class JudgeFinalOrderFormPopulator {
         var finalOrderFormBuilder = JudgeFinalOrderForm.builder();
         String hearingLocationText = getHearingLocationText(caseData, caseManagementLocationDetails);
 
+        judgeCourtDetailsPopulator.populateJudgeCourtDetails(finalOrderFormBuilder, userDetails,
+                                                             caseManagementLocationDetails, hearingLocationText);
         caseInfoPopulator.populateCaseInfo(finalOrderFormBuilder, caseData);
         costDetailsPopulator.populateCostsDetails(finalOrderFormBuilder, caseData);
         appealInitiativePopulator.populateAppealDetails(finalOrderFormBuilder, caseData);
@@ -34,8 +36,6 @@ public class JudgeFinalOrderFormPopulator {
         attendeesRepresentationPopulator.populateAttendeesDetails(finalOrderFormBuilder, caseData);
         orderDetailsPopulator.populateAssistedOrderDetails(finalOrderFormBuilder, caseData);
         hearingDetailsPopulator.populateHearingDetails(finalOrderFormBuilder, caseData, caseManagementLocationDetails);
-        judgeCourtDetailsPopulator.populateJudgeCourtDetails(finalOrderFormBuilder, userDetails,
-                                                             caseManagementLocationDetails, hearingLocationText);
 
         return finalOrderFormBuilder.build();
     }
