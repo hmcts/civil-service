@@ -62,7 +62,6 @@ public class StayCaseCallbackHandler extends CallbackHandler {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(mapper))
-            .state(CASE_STAYED.name())
             .build();
     }
 
