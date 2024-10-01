@@ -10,10 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentUploadException;
-import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
-import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
-import uk.gov.hmcts.reform.civil.exceptions.MissingFieldsUpdatedException;
-import uk.gov.hmcts.reform.civil.exceptions.UserNotFoundOnCaseException;
+import uk.gov.hmcts.reform.civil.exceptions.*;
 import uk.gov.hmcts.reform.civil.request.RequestData;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
 import uk.gov.hmcts.reform.civil.service.search.exceptions.SearchServiceCaseNotFoundException;
@@ -81,5 +78,12 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
         String errorMessage = "User not found error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(userNotFoundOnCaseException.getMessage(), requestData.caseId(), requestData.userId()));
         return new ResponseEntity<>(userNotFoundOnCaseException.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(IncludesLitigantInPersonException.class)
+    public ResponseEntity<Object> userNotFoundOnCaseException(IncludesLitigantInPersonException includesLitigantInPersonException) {
+        String errorMessage = "Action not accepted on case with message: %s for case %s run by user %s";
+        log.error(errorMessage.formatted(includesLitigantInPersonException.getMessage(), requestData.caseId(), requestData.userId()));
+        return new ResponseEntity<>(includesLitigantInPersonException.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 }
