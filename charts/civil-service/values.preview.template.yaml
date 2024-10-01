@@ -272,7 +272,7 @@ aac-manage-case-assignment:
       enabled: false
 
 wiremock:
-  enabled: false
+  enabled: true
   image: "wiremock/wiremock"
   applicationPort: 8080
   imagePullPolicy: Always
@@ -281,7 +281,7 @@ wiremock:
   volumes:
     - name: wiremock-mocks
       configMap:
-        name: chart-wiremock-mocks
+        name: ${SERVICE_NAME}-wiremock-wm
   volumeMounts:
     - name: wiremock-mocks
       mountPath: /home/wiremock/mappings
