@@ -82,7 +82,7 @@ class CvpJoinLinkSchedulerHandlerTest {
         handler.execute(mockTask, externalTaskService);
 
         verify(applicationEventPublisher).publishEvent(new CvpJoinLinkEvent(caseId));
-        verify(externalTaskService).complete(mockTask, null);
+        verify(externalTaskService).complete(mockTask);
     }
 
     @Test
@@ -105,7 +105,7 @@ class CvpJoinLinkSchedulerHandlerTest {
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(externalTaskService, never()).complete(mockTask, null);
+        verify(externalTaskService, never()).complete(mockTask);
         verify(externalTaskService).handleFailure(
             eq(mockTask),
             eq(errorMessage),
@@ -120,7 +120,7 @@ class CvpJoinLinkSchedulerHandlerTest {
         String errorMessage = "there was an error";
 
         doThrow(new NotFoundException(errorMessage, new RestException("", "", 404)))
-            .when(externalTaskService).complete(mockTask, null);
+            .when(externalTaskService).complete(mockTask);
 
         assertThrows(
             CompleteTaskException.class,

@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.event.HearingFeePaidEvent;
 import uk.gov.hmcts.reform.civil.event.NoHearingFeeDueEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -23,7 +24,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class HearingFeeDueHandler implements BaseExternalTaskHandler {
+public class HearingFeeDueHandler extends BaseExternalTaskHandler {
 
     private final HearingFeeDueSearchService caseSearchService;
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -32,7 +33,7 @@ public class HearingFeeDueHandler implements BaseExternalTaskHandler {
     private final FeatureToggleService featureToggleService;
 
     @Override
-    public void handleTask(ExternalTask externalTask) {
+    public ExternalTaskData handleTask(ExternalTask externalTask) {
         List<CaseDetails> cases = caseSearchService.getCases();
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
@@ -80,5 +81,6 @@ public class HearingFeeDueHandler implements BaseExternalTaskHandler {
                 log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
             }
         });
+        return ExternalTaskData.builder().build();
     }
 }

@@ -16,7 +16,7 @@ import static java.util.Optional.ofNullable;
 public abstract class CallbackHandler {
 
     private static final String DEFAULT = "default";
-    private static final Logger LOG = LoggerFactory.getLogger(CallbackHandler.class);
+    protected static final Logger LOG = LoggerFactory.getLogger(CallbackHandler.class);
 
     protected abstract Map<String, Callback> callbacks();
 

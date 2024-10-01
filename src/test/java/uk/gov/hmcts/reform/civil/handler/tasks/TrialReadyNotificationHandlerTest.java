@@ -64,7 +64,7 @@ class TrialReadyNotificationHandlerTest {
         handler.execute(mockTask, externalTaskService);
 
         verify(applicationEventPublisher).publishEvent(new TrialReadyNotificationEvent(caseId));
-        verify(externalTaskService).complete(mockTask, null);
+        verify(externalTaskService).complete(mockTask);
     }
 
     @Test
@@ -87,7 +87,7 @@ class TrialReadyNotificationHandlerTest {
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(externalTaskService, never()).complete(mockTask, null);
+        verify(externalTaskService, never()).complete(mockTask);
         verify(externalTaskService).handleFailure(
             eq(mockTask),
             eq(errorMessage),

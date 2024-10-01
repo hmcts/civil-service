@@ -71,7 +71,7 @@ class EvidenceUploadCheckHandlerTest {
 
         // Then: task should be completed
         verify(applicationEventPublisher).publishEvent(new EvidenceUploadNotificationEvent(caseId));
-        verify(externalTaskService).complete(mockTask, null);
+        verify(externalTaskService).complete(mockTask);
     }
 
     @Test
@@ -116,7 +116,7 @@ class EvidenceUploadCheckHandlerTest {
         String errorMessage = "there was an error";
 
         doThrow(new NotFoundException(errorMessage, new RestException("", "", 404)))
-            .when(externalTaskService).complete(mockTask, null);
+            .when(externalTaskService).complete(mockTask);
 
         // When: handler is called
         assertThrows(

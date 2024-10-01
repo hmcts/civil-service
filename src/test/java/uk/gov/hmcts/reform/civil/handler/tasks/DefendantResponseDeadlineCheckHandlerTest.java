@@ -67,7 +67,7 @@ class DefendantResponseDeadlineCheckHandlerTest {
         handler.execute(mockTask, externalTaskService);
 
         verify(applicationEventPublisher).publishEvent(new DefendantResponseDeadlineCheckEvent(caseId));
-        verify(externalTaskService).complete(mockTask, null);
+        verify(externalTaskService).complete(mockTask);
     }
 
     @Test
@@ -90,7 +90,7 @@ class DefendantResponseDeadlineCheckHandlerTest {
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(externalTaskService, never()).complete(mockTask, null);
+        verify(externalTaskService, never()).complete(mockTask);
         verify(externalTaskService).handleFailure(
             eq(mockTask),
             eq(errorMessage),
@@ -105,7 +105,7 @@ class DefendantResponseDeadlineCheckHandlerTest {
         String errorMessage = "there was an error";
 
         doThrow(new NotFoundException(errorMessage, new RestException("", "", 500)))
-            .when(externalTaskService).complete(mockTask, null);
+            .when(externalTaskService).complete(mockTask);
 
         assertThrows(
             CompleteTaskException.class,

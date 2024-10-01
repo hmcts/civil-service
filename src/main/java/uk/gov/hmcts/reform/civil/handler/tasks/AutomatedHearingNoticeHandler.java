@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.event.HearingNoticeSchedulerTaskEvent;
 import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeSchedulerVars;
+import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
@@ -27,7 +28,7 @@ import static java.util.Optional.ofNullable;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class AutomatedHearingNoticeHandler implements BaseExternalTaskHandler {
+public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
 
     private final UserService userService;
     private final SystemUpdateUserConfiguration userConfig;
@@ -40,7 +41,7 @@ public class AutomatedHearingNoticeHandler implements BaseExternalTaskHandler {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void handleTask(ExternalTask externalTask) {
+    public ExternalTaskData handleTask(ExternalTask externalTask) {
         if (!featureToggleService.isAutomatedHearingNoticeEnabled()) {
             runtimeService.setVariables(
                 externalTask.getProcessInstanceId(),
@@ -48,7 +49,7 @@ public class AutomatedHearingNoticeHandler implements BaseExternalTaskHandler {
                     .totalNumberOfUnnotifiedHearings(0)
                     .build().toMap(mapper)
             );
-            return;
+            return ExternalTaskData.builder().build();
         }
 
         HearingNoticeSchedulerVars schedulerVars = mapper.convertValue(externalTask.getAllVariables(), HearingNoticeSchedulerVars.class);
@@ -72,15 +73,16 @@ public class AutomatedHearingNoticeHandler implements BaseExternalTaskHandler {
                 .totalNumberOfUnnotifiedHearings(unnotifiedHearings.getTotalFound().intValue())
                 .build().toMap(mapper)
         );
+        return ExternalTaskData.builder().build();
     }
 
     @Override
-    public void completeTask(ExternalTask externalTask, ExternalTaskService externalTaskService) {
+    public void completeTask(ExternalTask externalTask, ExternalTaskService externalTaskService, ExternalTaskData data) {
         String topicName = externalTask.getTopicName();
         String processInstanceId = externalTask.getProcessInstanceId();
 
         try {
-            ofNullable(getVariableMap()).ifPresentOrElse(
+            ofNullable(getVariableMap(data)).ifPresentOrElse(
                 variableMap -> externalTaskService.complete(externalTask, variableMap),
                 () -> externalTaskService.complete(externalTask)
             );
