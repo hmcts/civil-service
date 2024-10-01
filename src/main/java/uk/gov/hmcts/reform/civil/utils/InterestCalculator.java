@@ -39,7 +39,7 @@ public class InterestCalculator {
         return this.calculateInterest(caseData, getToDate(caseData));
     }
 
-    public BigDecimal calculateInterest(CaseData caseData, LocalDate interestToDate) {
+    private BigDecimal calculateInterest(CaseData caseData, LocalDate interestToDate) {
         BigDecimal interestAmount = ZERO;
         if (caseData.getClaimInterest() == YesOrNo.YES) {
             if (caseData.getInterestClaimOptions().name().equals(SAME_RATE_INTEREST)) {

@@ -107,7 +107,7 @@ public class JudgmentsOnlineHelper {
     }
 
     public static BigDecimal getDebtAmount(CaseData caseData, InterestCalculator interestCalculator) {
-        BigDecimal interest = interestCalculator.calculateInterest(caseData, LocalDate.now());
+        BigDecimal interest = interestCalculator.calculateInterest(caseData);
         var subTotal = caseData.getTotalClaimAmount()
             .add(interest);
         subTotal = subTotal.subtract(getPartialPayment(caseData));
