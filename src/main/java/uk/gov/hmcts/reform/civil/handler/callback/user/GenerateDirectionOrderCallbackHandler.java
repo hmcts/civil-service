@@ -43,6 +43,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeFinalOrderGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeOrderDownloadGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -141,6 +142,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private final LocationReferenceDataService locationRefDataService;
     private final ObjectMapper objectMapper;
     private final JudgeFinalOrderGenerator judgeFinalOrderGenerator;
+    private final JudgeOrderDownloadGenerator judgeOrderDownloadGenerator;
     private final DocumentHearingLocationHelper locationHelper;
     private String ext = "";
     private final UserService userService;
@@ -210,7 +212,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        // generate and upload document here
+        CaseDocument documentDownload = judgeOrderDownloadGenerator.generate(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
+        caseDataBuilder.finalOrderDownloadTemplateDocument(documentDownload);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -549,6 +552,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         // showing, we remove.
         caseDataBuilder.finalOrderDocument(null);
         caseDataBuilder.uploadOrderDocumentFromTemplate(null);
+        caseDataBuilder.finalOrderDownloadTemplateDocument(null);
 
         if (featureToggleService.isMintiEnabled()) {
             if (YES.equals(caseData.getFinalOrderAllocateToTrack())) {
