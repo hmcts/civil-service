@@ -259,11 +259,11 @@ class InterestCalculatorTest {
             .interestFromSpecificDate(LocalDate.now().minusDays(6))
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .build();
-        LocalDateTime submittedDateTime = LocalDateTime.now().minusDays(20).withHour(13).withMinute(59);
+        LocalDateTime submittedDateTime = LocalDateTime.now().minusDays(20).withHour(18).withMinute(59);
         caseData = caseData.toBuilder().submittedDate(submittedDateTime).build();
 
         BigDecimal actual = interestCalculator.calculateInterest(caseData);
-        assertThat(actual).isEqualTo(BigDecimal.valueOf(27.40).setScale(2, RoundingMode.UNNECESSARY));
+        assertThat(actual).isEqualTo(BigDecimal.valueOf(26.03).setScale(2, RoundingMode.UNNECESSARY));
     }
 
     @Test
