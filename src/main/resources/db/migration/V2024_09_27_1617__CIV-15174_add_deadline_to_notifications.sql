@@ -39,3 +39,6 @@ UPDATE dbs.dashboard_notifications_templates SET deadline_param = 'generalAppNot
 UPDATE dbs.dashboard_notifications_templates SET deadline_param = 'judgeRequestMoreInfoByDate' WHERE template_name = 'Notice.AAA6.GeneralApps.NonUrgentApplicationUncloaked.Respondent';
 UPDATE dbs.dashboard_notifications_templates SET deadline_param = 'writtenRepApplicantDeadline' WHERE template_name = 'Notice.AAA6.GeneralApps.WrittenRepresentationRequired.Applicant';
 UPDATE dbs.dashboard_notifications_templates SET deadline_param = 'writtenRepRespondentDeadline' WHERE template_name = 'Notice.AAA6.GeneralApps.WrittenRepresentationRequired.Respondent';
+UPDATE dbs.dashboard_notifications_templates SET deadline_param = 'priorityNotificationDeadline' WHERE template_name = 'Notice.AAA6.CP.HearingDocuments.Upload.Claimant';
+UPDATE dbs.dashboard_notifications_templates SET deadline_param = 'priorityNotificationDeadline' WHERE template_name = 'Notice.AAA6.CP.HearingDocuments.Upload.Defendant';
+UPDATE dbs.dashboard_notifications_templates SET deadline_param = 'priorityNotificationDeadline' WHERE template_name = 'Notice.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Defendant';

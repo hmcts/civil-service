@@ -265,6 +265,8 @@ public class DashboardNotificationsParamsMapper {
             params.put("applicationFee",
                        "£" + this.removeDoubleZeros(String.valueOf(MonetaryConversions.penniesToPounds(caseData.getGeneralAppPBADetails().getFee().getCalculatedAmountInPence()))));
         }
+        // Ensures that notifications whose template specifies this will be prioritised when sorting
+        params.put("priorityNotificationDeadline", LocalDateTime.now());
 
         return params;
     }
