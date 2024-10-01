@@ -4,14 +4,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.CCJRequestedDashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -29,8 +33,13 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
         String defendantName = "Mr. Sole Trader";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendantSpec().build()
             .toBuilder().respondent1ResponseDeadline(responseDeadline)
+            .applicant1Represented(YesOrNo.NO)
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
+            .defaultJudgmentDocuments(List.of(
+                Element.<CaseDocument>builder()
+                    .value(CaseDocument.builder().documentType(DocumentType.DEFAULT_JUDGMENT)
+                               .createdDatetime(LocalDateTime.now()).build()).build()))
             .build();
 
         handler.handle(callbackParams(caseData));
@@ -49,7 +58,7 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
                         + defendantName
                         + " will no longer be able to respond to your claim online. Any further updates will be by post.</p>"
                         + "<p class=\"govuk-body\">If a postal response is received before the judgment is issued, your request will be rejected.</p>"
-                        + "<p class=\"govuk-body\"><a href=\"{enforceJudgementUrl}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Find out about actions you can take once a CCJ is issued (opens in a new tab)</a>.</p>"),
+                        + "<p class=\"govuk-body\"><a href=\"{enforceJudgementUrl}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">Find out about actions you can take once a CCJ is issued (opens in a new tab)</a>.</p>"),
                 jsonPath("$[0].titleCy").value("Cais am Ddyfarniad Llys Sirol (CCJ) wedi’i wneud"),
                  jsonPath("$[0].descriptionCy").value(
                 "<p class=\"govuk-body\">Byddwn yn prosesu eich cais ac yn anfon copi o’r dyfarniad drwy’r post atoch chi a "
@@ -57,7 +66,7 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
                     + "<p class=\"govuk-body\">Ni fydd eich cyfrif ar-lein yn cael ei ddiweddaru, ac ni fydd "
                     + defendantName + " yn gallu ymateb i’ch hawliad ar-lein mwyach. Byddwch yn cael eich hysbysu drwy’r post am unrhyw ddiweddariadau pellach.</p>"
                     + "<p class=\"govuk-body\">Os derbynnir ymateb drwy’r post cyn cyhoeddi’r dyfarniad, bydd eich cais yn cael ei wrthod.</p>"
-                    + "<p class=\"govuk-body\"><a href=\"{enforceJudgementUrl}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gwybodaeth am y camau y gallwch eu cymryd yn dilyn cyhoeddi CCJ (yn agor mewn tab newydd)</a>.</p>")
+                    + "<p class=\"govuk-body\"><a href=\"{enforceJudgementUrl}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gwybodaeth am y camau y gallwch eu cymryd yn dilyn cyhoeddi CCJ (yn agor mewn tab newydd)</a>.</p>")
             );
 
         //Verify task Item is created
@@ -95,6 +104,7 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendantSpec().build()
             .toBuilder().respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
             .legacyCaseReference("reference")
+            .applicant1Represented(YesOrNo.NO)
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
             .ccdCaseReference(Long.valueOf(caseId))
             .build();

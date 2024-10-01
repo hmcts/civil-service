@@ -11,6 +11,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -19,6 +21,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -28,6 +31,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -89,8 +93,12 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
+            .applicant1Represented(YesOrNo.NO)
             .respondent1ResponseDeadline(dateTime)
-            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
+            .defaultJudgmentDocuments(List.of(
+                Element.<CaseDocument>builder()
+                    .value(CaseDocument.builder().documentType(DocumentType.DEFAULT_JUDGMENT)
+                               .createdDatetime(LocalDateTime.now()).build()).build()))
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -118,6 +126,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
+            .applicant1Represented(YesOrNo.NO)
             .respondent1ResponseDeadline(LocalDateTime.now())
             .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
@@ -168,6 +177,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         CaseData defendantRejectedSSA = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
+            .applicant1Represented(YesOrNo.NO)
             .respondent1ResponseDeadline(LocalDateTime.now())
             .caseDataLiP(CaseDataLiP.builder()
                              .respondentSignSettlementAgreement(YesOrNo.NO)
@@ -177,6 +187,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
 
         CaseData defendantNotRespondedToSSA = CaseData.builder()
             .legacyCaseReference("reference")
+            .applicant1Represented(YesOrNo.NO)
             .ccdCaseReference(1234L)
             .respondent1ResponseDeadline(LocalDateTime.now())
             .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.of(2024, 3, 1, 12, 0, 0))
@@ -186,6 +197,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         CaseData defendantBreakSSA = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
+            .applicant1Represented(YesOrNo.NO)
             .respondent1ResponseDeadline(LocalDateTime.now())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)

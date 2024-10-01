@@ -703,10 +703,29 @@ class CcdClaimStatusDashboardFactoryTest {
         CaseData claim =
             CaseData.builder().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1)).activeJudgment(
                 JudgmentDetails.builder().type(JudgmentType.DEFAULT_JUDGMENT).issueDate(LocalDate.now())
-                    .state(JudgmentState.ISSUED).build()).build();
+                    .state(JudgmentState.ISSUED).build()).defaultJudgmentDocuments(List.of(
+                Element.<CaseDocument>builder()
+                    .value(CaseDocument.builder().documentType(DocumentType.DEFAULT_JUDGMENT)
+                               .createdDatetime(LocalDateTime.now()).build()).build())).build();
         DashboardClaimStatus status =
             ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(claim,
                                                                                                          featureToggleService));
+        assertThat(status).isEqualTo(DashboardClaimStatus.DEFAULT_JUDGEMENT_ISSUED);
+    }
+
+    @Test
+    void given_defaultJudgementStatusIssuedByClaimant_thenReturnDefaultJudgementStatus_WhenJOFlagIsOff() {
+        CaseData claim =
+            CaseData.builder().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
+                .defaultJudgmentDocuments(List.of(
+                    Element.<CaseDocument>builder()
+                        .value(CaseDocument.builder().documentType(DocumentType.DEFAULT_JUDGMENT)
+                                   .createdDatetime(LocalDateTime.now()).build()).build())).build();
+        DashboardClaimStatus status =
+            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+                claim,
+                featureToggleService
+            ));
         assertThat(status).isEqualTo(DashboardClaimStatus.DEFAULT_JUDGEMENT_ISSUED);
     }
 
