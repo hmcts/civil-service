@@ -13,12 +13,15 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.judgmentonline.JudgmentByAdmissionLiPDefendantLetter;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
+import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 
 import java.io.IOException;
 import java.util.List;
 
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.OTHER;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_ORDER;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_ADMISSION_PIN_IN_POST_LIP_DEFENDANT_LETTER;
 
 @Slf4j
@@ -31,13 +34,14 @@ public class JudgmentByAdmissionPiPLetterGenerator {
     private final DocumentDownloadService documentDownloadService;
     private final BulkPrintService bulkPrintService;
     private final PinInPostConfiguration pipInPostConfiguration;
+    private final GeneralAppFeesService generalAppFeesService;
 
     public static final String TASK_ID = "SendJudgmentByAdmissionLiPLetterDef1";
     private static final String JUDGMENT_BY_ADMISSION_LETTER = "judgment-by-admission-letter";
 
     public byte[] generateAndPrintJudgmentByAdmissionLetter(CaseData caseData, String authorisation) {
         DocmosisDocument judgmentByAdmissionLetter = generate(caseData);
-        CaseDocument caseDocument =  documentManagementService.uploadDocument(
+        CaseDocument caseDocument = documentManagementService.uploadDocument(
             authorisation,
             new PDF(
                 JUDGMENT_BY_ADMISSION_PIN_IN_POST_LIP_DEFENDANT_LETTER.getDocumentTitle(),
@@ -81,6 +85,8 @@ public class JudgmentByAdmissionPiPLetterGenerator {
             .defendant(caseData.getRespondent1())
             .pin(caseData.getRespondent1PinToPostLRspec().getAccessCode())
             .respondToClaimUrl(pipInPostConfiguration.getRespondToClaimUrl())
+            .varyJudgmentFee(String.valueOf(generalAppFeesService.getFeeForJOWithApplicationType(VARY_ORDER).formData()))
+            .certifOfSatisfactionFee(String.valueOf(generalAppFeesService.getFeeForJOWithApplicationType(OTHER).formData()))
             .build();
     }
 }
