@@ -27,6 +27,11 @@ public class MoreTimeRequestedDashboardNotificationDefendantHandler extends Dash
     }
 
     @Override
+    public boolean shouldRecordScenario(CaseData caseData) {
+        return caseData.isRespondent1NotRepresented();
+    }
+
+    @Override
     public String camundaActivityId(CallbackParams callbackParams) {
         return TASK_ID;
     }
