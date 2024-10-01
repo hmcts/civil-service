@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure@DTSPO-18983/build-test-skip")
+@Library("Infrastructure")
 import uk.gov.hmcts.contino.AppPipelineConfig
 import uk.gov.hmcts.contino.AppPipelineDsl
 import uk.gov.hmcts.contino.GithubAPI
