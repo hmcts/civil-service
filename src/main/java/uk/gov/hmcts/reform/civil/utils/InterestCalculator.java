@@ -62,7 +62,7 @@ public class InterestCalculator {
     public BigDecimal calculateInterestAmount(CaseData caseData, BigDecimal interestRate, LocalDate interestToDate) {
         if (caseData.getInterestClaimFrom().name().equals(FROM_CLAIM_SUBMIT_DATE)) {
             LocalDate fromDate = LocalDate.now();
-            if(caseData.getSubmittedDate() != null) {
+            if (caseData.getSubmittedDate() != null) {
                 fromDate = isAfterFourPM(caseData.getSubmittedDate()) ? caseData.getSubmittedDate().toLocalDate().plusDays(1) :
                     caseData.getSubmittedDate().toLocalDate();
             }
