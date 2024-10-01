@@ -85,9 +85,9 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(IncludesLitigantInPersonException.class)
-    public ResponseEntity<Object> userNotFoundOnCaseException(IncludesLitigantInPersonException includesLitigantInPersonException) {
+    public ResponseEntity<Object> litigantInPersonException(IncludesLitigantInPersonException includesLitigantInPersonException) {
         String errorMessage = "Action not accepted on case with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(includesLitigantInPersonException.getMessage(), requestData.caseId(), requestData.userId()));
-        return new ResponseEntity<>(includesLitigantInPersonException.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(includesLitigantInPersonException.getMessage(), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
