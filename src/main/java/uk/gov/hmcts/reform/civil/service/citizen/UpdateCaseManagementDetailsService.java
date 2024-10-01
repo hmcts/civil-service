@@ -42,8 +42,8 @@ public class UpdateCaseManagementDetailsService {
         CaseData caseData = callbackParams.getCaseData();
         final List<LocationRefData> availableLocations = fetchLocationData(callbackParams);
 
-        //updateApplicant1RequestedCourtDetails(caseData, builder, availableLocations);
-        //updateRespondent1RequestedCourtDetails(caseData, builder, availableLocations);
+        updateApplicant1RequestedCourtDetails(caseData, builder, availableLocations);
+        updateRespondent1RequestedCourtDetails(caseData, builder, availableLocations);
 
         caseData = builder.build();
         if (caseData.getIsFlightDelayClaim() == YesOrNo.YES && caseData.isSmallClaim()) {
