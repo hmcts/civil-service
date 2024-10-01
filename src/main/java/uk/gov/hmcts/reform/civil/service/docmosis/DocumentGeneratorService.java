@@ -25,17 +25,21 @@ public class DocumentGeneratorService {
     private final ObjectMapper mapper;
 
     public DocmosisDocument generateDocmosisDocument(MappableObject templateData, DocmosisTemplates template) {
-        return generateDocmosisDocument(templateData.toMap(mapper), template);
+        return generateDocmosisDocument(templateData.toMap(mapper), template, "pdf");
     }
 
-    public DocmosisDocument generateDocmosisDocument(Map<String, Object> templateData, DocmosisTemplates template) {
+    public DocmosisDocument generateDocmosisDocument(MappableObject templateData, DocmosisTemplates template, String generateDocx) {
+        return generateDocmosisDocument(templateData.toMap(mapper), template, generateDocx);
+    }
+
+    public DocmosisDocument generateDocmosisDocument(Map<String, Object> templateData, DocmosisTemplates template, String outputFormat) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         DocmosisRequest requestBody = DocmosisRequest.builder()
             .templateName(template.getTemplate())
             .data(templateData)
-            .outputFormat("pdf")
+            .outputFormat(outputFormat)
             .outputName("IGNORED")
             .accessKey(configuration.getAccessKey())
             .build();
