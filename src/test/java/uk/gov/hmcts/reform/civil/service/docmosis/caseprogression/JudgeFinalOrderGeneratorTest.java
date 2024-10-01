@@ -58,6 +58,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.CaseIn
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.CostDetailsPopulator;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.HearingDetailsPopulator;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.JudgeCourtDetailsPopulator;
+import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.JudgeFinalOrderFormPopulator;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.OrderDetailsPopulator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -101,6 +102,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FREE_
     HearingDetailsPopulator.class,
     JudgeCourtDetailsPopulator.class,
     OrderDetailsPopulator.class,
+    JudgeFinalOrderFormPopulator.class,
     JacksonAutoConfiguration.class})
 class JudgeFinalOrderGeneratorTest {
 
