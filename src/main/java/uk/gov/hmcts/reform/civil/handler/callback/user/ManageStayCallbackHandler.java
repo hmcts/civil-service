@@ -35,6 +35,14 @@ public class ManageStayCallbackHandler extends CallbackHandler {
     private static final String BODY_CONFIRMATION = "&nbsp;";
     private static final String LIFT_STAY = "LIFT_STAY";
 
+    private static final Map<String, CaseState> STATE_MAP = Map.of(
+        CaseState.IN_MEDIATION.name(), CaseState.JUDICIAL_REFERRAL,
+        CaseState.JUDICIAL_REFERRAL.name(), CaseState.JUDICIAL_REFERRAL,
+        CaseState.CASE_PROGRESSION.name(), CaseState.CASE_PROGRESSION,
+        CaseState.HEARING_READINESS.name(), CaseState.CASE_PROGRESSION,
+        CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.name(), CaseState.CASE_PROGRESSION
+    );
+
 
     private final ObjectMapper mapper;
 
@@ -56,20 +64,12 @@ public class ManageStayCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse manageStay(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        String preStayState = caseData.getPreStayState();
-        CaseState newState = caseData.getCcdState();
 
-        if (LIFT_STAY.equals(callbackParams.getCaseData().getManageStayOption())) {
-            Map<String, CaseState> stateMap = Map.of(
-                CaseState.IN_MEDIATION.name(), CaseState.JUDICIAL_REFERRAL,
-                CaseState.JUDICIAL_REFERRAL.name(), CaseState.JUDICIAL_REFERRAL,
-                CaseState.CASE_PROGRESSION.name(), CaseState.CASE_PROGRESSION,
-                CaseState.HEARING_READINESS.name(), CaseState.CASE_PROGRESSION,
-                CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.name(), CaseState.CASE_PROGRESSION
-            );
-            newState = stateMap.getOrDefault(preStayState, newState);
-        }
+        CaseData caseData = callbackParams.getCaseData();
+
+        CaseState newState = LIFT_STAY.equals(caseData.getManageStayOption())
+            ? STATE_MAP.getOrDefault(caseData.getPreStayState(), caseData.getCcdState())
+            : caseData.getCcdState();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(mapper))
