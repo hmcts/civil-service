@@ -44,6 +44,8 @@ public class GeneralAppFeesService {
     public static final String FREE_REF = "FREE";
     private static final Fee FREE_FEE = Fee.builder()
         .calculatedAmountInPence(BigDecimal.ZERO).code(FREE_REF).version("1").build();
+    private static final String MISCELLANEOUS = "miscellaneous";
+    private static final String OTHER = "other";
 
     protected static final List<GeneralApplicationTypes> VARY_TYPES
         = Arrays.asList(
@@ -56,6 +58,15 @@ public class GeneralAppFeesService {
         = List.of(GeneralApplicationTypes.ADJOURN_HEARING);
     protected static final List<GeneralApplicationTypes> SD_CONSENT_TYPES
         = List.of(GeneralApplicationTypes.SETTLE_BY_CONSENT);
+
+    public Fee getFeeForJOWithApplicationType(GeneralApplicationTypes applicationType) {
+        return switch (applicationType) {
+            case VARY_ORDER -> getFeeForGA(feesConfiguration.getAppnToVaryOrSuspend(), MISCELLANEOUS, OTHER);
+            case SET_ASIDE_JUDGEMENT -> getFeeForGA(feesConfiguration.getWithNoticeKeyword(), "general application", "general");
+            case OTHER -> getFeeForGA(feesConfiguration.getCertificateOfSatisfaction(), MISCELLANEOUS, OTHER);
+            default -> null;
+        };
+    }
 
     public Fee getFeeForGALiP(List<GeneralApplicationTypes> applicationTypes, Boolean withConsent,
                               Boolean withNotice, LocalDate hearingDate) {
@@ -77,7 +88,7 @@ public class GeneralAppFeesService {
         if (CollectionUtils.containsAny(types, VARY_TYPES)) {
             //only minus 1 as VARY_PAYMENT_TERMS_OF_JUDGMENT can't be multi selected
             typeSize--;
-            result = getFeeForGA(feesConfiguration.getAppnToVaryOrSuspend(), "miscellaneous", "other");
+            result = getFeeForGA(feesConfiguration.getAppnToVaryOrSuspend(), MISCELLANEOUS, OTHER);
         }
         if (typeSize > 0
             && CollectionUtils.containsAny(types, SD_CONSENT_TYPES)) {
