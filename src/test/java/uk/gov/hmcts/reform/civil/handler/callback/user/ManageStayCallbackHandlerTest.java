@@ -181,7 +181,7 @@ public class ManageStayCallbackHandlerTest {
         }
 
         @Test
-        void shouldReturnExpectedSubmittedCallbackResponse_whenInvokedWithOtherOption() {
+        void shouldReturnExpectedSubmittedCallbackResponse_whenInvokedWithRequestUpdate() {
             when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .manageStayOption("REQUEST_UPDATE").build();
