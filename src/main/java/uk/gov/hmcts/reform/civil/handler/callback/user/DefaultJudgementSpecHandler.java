@@ -455,7 +455,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             .state(nextState)
             .build();
     }
-
 }
 
 
