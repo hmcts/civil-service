@@ -33,12 +33,10 @@ import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.ClaimFormService;
 import uk.gov.hmcts.reform.civil.utils.ResourceReader;
-import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.math.BigDecimal;
@@ -79,8 +77,6 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     private AuthTokenGenerator authTokenGenerator;
 
     @MockBean
-    private DocumentUploadClientApi documentUploadClientApi;
-    @MockBean
     private CaseDocumentClientApi caseDocumentClientApi;
 
     @Autowired
@@ -88,9 +84,6 @@ public class DocumentControllerTest extends BaseIntegrationTest {
 
     @Mock
     private DocumentManagementService documentManagementService;
-    @Mock
-    private DocumentGeneratorService documentGeneratorService;
-
     private static final String REFERENCE_NUMBER = "000DC001";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final String FILE_NAME = format(N1.getDocumentTitle(), REFERENCE_NUMBER);
@@ -104,7 +97,6 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     private static final String GENERATE_ANY_DOC_URL = BASE_URL + "/generateAnyDoc";
     private static final LocalDate DATE = LocalDate.of(2023, 5, 1);
     private static final String DOWNLOAD_FILE_URL = BASE_URL + "/downloadDocument/{documentId}";
-    public static final String DOCUMENT_ID = "documentId";
 
     private Document document;
 
@@ -121,7 +113,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     private ResponseEntity<Resource> responseEntity;
 
     private final UserInfo userInfo = UserInfo.builder()
-        .roles(List.of("role"))
+        .roles(List.of("citizen"))
         .uid("id")
         .givenName("userFirstName")
         .familyName("userLastName")
@@ -247,6 +239,30 @@ public class DocumentControllerTest extends BaseIntegrationTest {
         assertEquals("TestFile.png", jsonReturnedCaseDocument.get("documentName"),
                      "Document file names should match"
         );
+    }
+
+    @Test
+    void shouldReturnForbiddenIfUserRoleIsNotCivil() throws Exception {
+
+        //given
+        MockMultipartFile file = new MockMultipartFile(
+            "file",
+            "TestFile.png",
+            "image/png",
+            "This is a dummy file content".getBytes()
+        );
+
+        //when
+        when(userService.getUserInfo(anyString())).thenReturn(userInfo.builder().roles(List.of("role")).build());
+        when(docmosisApiClient.createDocument(any(DocmosisRequest.class)))
+            .thenReturn(bytes);
+        when(caseDocumentClientApi.uploadDocuments(anyString(), anyString(), any()))
+            .thenReturn(new UploadResponse(List.of(document)));
+
+        //then
+        doFilePost(BEARER_TOKEN, file, GENERATE_ANY_DOC_URL)
+            .andExpect(status().isForbidden()).andReturn();
+
     }
 
     @Test
