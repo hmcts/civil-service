@@ -49,7 +49,7 @@ values ('<a href={VIEW_MEDIATION_SETTLEMENT_AGREEMENT} class="govuk-link">View m
 ('<a>View the judgment</a>',
   'Judgment from the court',
   '<a>Gweld y Dyfarniad</a>',
-  'Dyfarniad gan y llys', 'Judgment.View', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 13),
+  'Dyfarniadau gan y llys', 'Judgment.View', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 13),
 
 ('<a>View applications</a>',
   'Applications',

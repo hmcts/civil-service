@@ -2,11 +2,15 @@ package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentAddress;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -105,5 +109,31 @@ public class JudgmentsOnlineHelperTest {
     void testMoneyValue() {
         assertThat(getMoneyValue(null)).isEqualTo(BigDecimal.ZERO);
         assertThat(getMoneyValue("12.36")).isEqualTo("12.36");
+    }
+
+    @Test
+    void testAddress() {
+        JudgmentAddress address = JudgmentsOnlineHelper
+            .getJudgmentAddress(
+                Address.builder()
+                    .addressLine1("sdjhvjdshvsjhdvjhdjkvheddadasdadasdadddadadaddsvjdhkhdskedevdhv")
+                    .addressLine3("sdjhvjdshv sjhdvjhdjkvhdsv jdhkhdskvdhv")
+                    .addressLine2("fdkbmkbklmklf kfmkvbfkvfl fbmkflbmklfmkfvfdkvfv mdvkfldfmfv")
+                    .postCode("fhbfv")
+                    .postTown("dfjbgjkhgjhgkjhdjkbh;hb;kjdkdfkgjdfkgkfgkldjgdf")
+                    .county("fdkgjblkfgjbklgj").country("dfjnbgjkfbjkjkg").build(),
+                new RoboticsAddressMapper(new AddressLinesMapper())
+            );
+        assertThat(address).isNotNull();
+        assertThat(address.getDefendantAddressLine1().length()).isLessThanOrEqualTo(35);
+        assertThat(address.getDefendantAddressLine2().length()).isLessThanOrEqualTo(35);
+        assertThat(address.getDefendantAddressLine3().length()).isLessThanOrEqualTo(35);
+        assertThat(address.getDefendantAddressLine4().length()).isLessThanOrEqualTo(35);
+        assertThat(address.getDefendantAddressLine5().length()).isLessThanOrEqualTo(35);
+    }
+
+    @Test
+    void testWelshChar() {
+        assertThat(JudgmentsOnlineHelper.removeWelshCharacters("TEST Welsh ˆ`´¨")).isEqualTo("TEST Welsh ");
     }
 }

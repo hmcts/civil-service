@@ -29,6 +29,7 @@ public class GoToHearingScenarioTest extends DashboardBaseIntegrationTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
+            .applicant1Represented(YesOrNo.NO)
             .ccdState(CaseState.JUDICIAL_REFERRAL)
             .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
             .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
