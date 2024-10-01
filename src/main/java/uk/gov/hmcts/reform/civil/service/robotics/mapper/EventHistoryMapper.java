@@ -353,6 +353,7 @@ public class EventHistoryMapper {
             paymentInFullDate = null;
         }
 
+        log.info("CLAIM WITH INTEREST {}", amountClaimedWithInterest.setScale(2));
         return Event.builder()
             .eventSequence(prepareEventSequence(builder.build()))
             .eventCode(DEFAULT_JUDGMENT_GRANTED.getCode())

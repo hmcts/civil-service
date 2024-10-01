@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
@@ -51,6 +52,7 @@ import static uk.gov.hmcts.reform.civil.utils.MonetaryConversions.penniesToPound
  * This class is skeleton to be refined after we have final version of RPA Json structure
  * and it's mapping with CaseData.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RoboticsDataMapperForSpec {
@@ -68,7 +70,7 @@ public class RoboticsDataMapperForSpec {
             .solicitors(buildSolicitors(caseData))
             .claimDetails(buildClaimDetails(caseData))
             .events(eventHistoryMapper.buildEvents(caseData, authToken));
-
+        log.info("EVENT HISTORY MAPPER {}", eventHistoryMapper.buildEvents(caseData, authToken));
         if (caseData.getCcdState() == PROCEEDS_IN_HERITAGE_SYSTEM
             || caseData.getCcdState() == CASE_DISMISSED) {
             builder.noticeOfChange(RoboticsDataUtil.buildNoticeOfChange(caseData));
