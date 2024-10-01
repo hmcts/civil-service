@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.DebtPaymentOptions;
 
-import java.time.LocalDate;
-
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
