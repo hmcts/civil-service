@@ -177,6 +177,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT("Scenario.AAA6.DefendantNoticeOfChange.Claimant"),
     SCENARIO_AAA6_DEFENDANT_DECISION_OUTCOME("Scenario.AAA6.Defendant.DecisionOutcome"),
     SCENARIO_AAA6_CLAIMANT_DECISION_OUTCOME("Scenario.AAA6.Claimant.DecisionOutcome"),
+    SCENARIO_AAA6_DEFENDANT_TRIAL_READY_DECISION_OUTCOME("Scenario.AAA6.Defendant.TrialReady.DecisionOutcome"),
+    SCENARIO_AAA6_CLAIMANT_TRIAL_READY_DECISION_OUTCOME("Scenario.AAA6.Claimant.TrialReady.DecisionOutcome"),
     SCENARIO_AAA6_UPDATE_DASHBOARD_DEFENDANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS("Scenario.AAA6.Update.Defendant.TaskList.UploadDocuments.FinalOrders"),
     SCENARIO_AAA6_UPDATE_DASHBOARD_CLAIMANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS("Scenario.AAA6.Update.Claimant.TaskList.UploadDocuments.FinalOrders"),
     SCENARIO_AAA6_DECISION_REQUEST_FOR_RECONSIDERATION_CLAIMANT("Scenario.AAA6.CP.ReconDecisionMade.Claimant"),
@@ -185,7 +187,15 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_CLAIMANT("Scenario.AAA6.ClaimantIntent.ClaimantEndsClaim.Claimant"),
     SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_DEFENDANT("Scenario.AAA6.ClaimantIntent.ClaimantEndsClaim.Defendant"),
     SCENARIO_AAA6_CP_BUNDLE_UPDATED_CLAIMANT("Scenario.AAA6.CP.Bundle.Updated.Claimant"),
-    SCENARIO_AAA6_CP_BUNDLE_UPDATED_DEFENDANT("Scenario.AAA6.CP.Bundle.Updated.Defendant");
+    SCENARIO_AAA6_CP_BUNDLE_UPDATED_DEFENDANT("Scenario.AAA6.CP.Bundle.Updated.Defendant"),
+    SCENARIO_AAA6_CP_BUNDLE_UPDATED_TRIAL_READY_CLAIMANT("Scenario.AAA6.CP.Bundle.Updated.TrialReady.Claimant"),
+    SCENARIO_AAA6_CP_BUNDLE_UPDATED_TRIAL_READY_DEFENDANT("Scenario.AAA6.CP.Bundle.Updated.TrialReady.Defendant"),
+    SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST("Scenario.AAA6.DefendantNoticeOfChange.Claimant.HearingFee.TaskList"),
+    SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_TRIAL_ARRANGEMENTS_TASK_LIST("Scenario.AAA6.DefendantNoticeOfChange.Claimant.Trial.Arrangements.TaskList"),
+    SCENARIO_AAA6_DISMISS_CASE_CLAIMANT("Scenario.AAA6.CP.Case.Dismissed.Claimant"),
+    SCENARIO_AAA6_DISMISS_CASE_DEFENDANT("Scenario.AAA6.CP.Case.Dismissed.Defendant"),
+    SCENARIO_AAA6_CP_CASE_STAYED_CLAIMANT("Scenario.AAA6.CP.Case.Stayed.Claimant"),
+    SCENARIO_AAA6_CP_CASE_STAYED_DEFENDANT("Scenario.AAA6.CP.Case.Stayed.Defendant");
 
     private final String scenario;
 

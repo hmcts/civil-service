@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
+import org.camunda.community.rest.client.model.HistoricProcessInstanceDto;
+import org.camunda.community.rest.client.model.ProcessInstanceWithVariablesDto;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,13 +17,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.civil.controllers.testingsupport.model.TestCamundaProcess;
 import uk.gov.hmcts.reform.civil.event.HearingFeePaidEvent;
 import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
+import uk.gov.hmcts.reform.civil.event.TrialReadyNotificationEvent;
 import uk.gov.hmcts.reform.civil.handler.event.HearingFeePaidEventHandler;
 import uk.gov.hmcts.reform.civil.handler.event.HearingFeeUnpaidEventHandler;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.handler.event.BundleCreationTriggerEventHandler;
+import uk.gov.hmcts.reform.civil.handler.event.TrialReadyNotificationEventHandler;
 import uk.gov.hmcts.reform.civil.handler.tasks.ClaimDismissedHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -30,9 +38,12 @@ import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.judgments.CjesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+
+import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.STARTED;
 
@@ -50,10 +61,12 @@ public class TestingSupportController {
     private final IStateFlowEngine stateFlowEngine;
     private final EventHistoryMapper eventHistoryMapper;
     private final RoboticsDataMapper roboticsDataMapper;
+    private final CjesMapper cjesMapper;
 
     private final ClaimDismissedHandler claimDismissedHandler;
     private final HearingFeePaidEventHandler hearingFeePaidHandler;
     private final HearingFeeUnpaidEventHandler hearingFeeUnpaidHandler;
+    private final TrialReadyNotificationEventHandler trialReadyNotificationHandler;
     private final BundleCreationTriggerEventHandler bundleCreationTriggerEventHandler;
 
     private static final String BEARER_TOKEN = "Bearer Token";
@@ -143,6 +156,14 @@ public class TestingSupportController {
         return roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
     }
 
+    @PostMapping(
+        value = "/testing-support/rtlActiveJudgment",
+        produces = "application/json")
+    public String getRTLJudgment(
+        @RequestBody CaseData caseData) {
+        return cjesMapper.toJudgmentDetailsCJES(caseData, true).toString();
+    }
+
     @GetMapping("/testing-support/trigger-case-dismissal-scheduler")
     public ResponseEntity<String> getCaseDismissalScheduler() {
 
@@ -199,5 +220,42 @@ public class TestingSupportController {
             responseMsg = FAILED;
         }
         return new ResponseEntity<>(responseMsg, HttpStatus.OK);
+    }
+
+    @GetMapping("/testing-support/{caseId}/trigger-trial-arrangements")
+    public ResponseEntity<String> getTrialReadyNotificationsEvent(@PathVariable("caseId") Long caseId) {
+
+        String responseMsg = SUCCESS;
+        var event = new TrialReadyNotificationEvent(caseId);
+        try {
+            trialReadyNotificationHandler.sendTrialReadyNotification(event);
+        } catch (Exception e) {
+            log.error("Error triggering trial arrangement notification for case {}: {}", caseId, e.getMessage(), e);
+            responseMsg = FAILED;
+        }
+        return new ResponseEntity<>(responseMsg, HttpStatus.OK);
+    }
+
+    @PostMapping(
+        value = "/testing-support/trigger-camunda-process",
+        produces = "application/json")
+    public ResponseEntity<ProcessInstanceWithVariablesDto> triggerCamundaProcess(
+        @RequestBody TestCamundaProcess camundaProcess) {
+        var response = camundaRestEngineClient.startProcessByKey(camundaProcess.getName(), camundaProcess.getVariables());
+        return new ResponseEntity<>(response.getBody(), response.getStatusCode());
+    }
+
+    @RequestMapping(
+            method = RequestMethod.GET,
+            value = "/testing-support/camunda-processes",
+            produces = "application/json")
+    public ResponseEntity<List<HistoricProcessInstanceDto>> getCamundaProcesses(
+            @RequestParam(value = "processInstanceId", required = false) String processInstanceId,
+            @RequestParam(value = "definitionKey", required = false) String definitionKey,
+            @RequestParam(value = "variables", required = false) String variables
+    ) {
+        ResponseEntity<List<HistoricProcessInstanceDto>> response =
+                camundaRestEngineClient.getProcessInstances(processInstanceId, definitionKey, variables);
+        return new ResponseEntity<>(response.getBody(), response.getStatusCode());
     }
 }

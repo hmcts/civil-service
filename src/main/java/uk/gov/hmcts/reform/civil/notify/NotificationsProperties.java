@@ -392,6 +392,9 @@ public class NotificationsProperties {
     private String notifyUpdateTemplate;
 
     @NotEmpty
+    private String notifyClaimReconsiderationLRTemplate;
+
+    @NotEmpty
     private String hearingNotificationLipDefendantTemplate;
 
     @NotEmpty
@@ -628,4 +631,9 @@ public class NotificationsProperties {
     @NotEmpty
     private String notifyClaimDiscontinuedLipTemplate;
 
+    @NotEmpty
+    private String notifyLRCaseStayed;
+
+    @NotEmpty
+    private String notifyLRCaseDismissed;
 }

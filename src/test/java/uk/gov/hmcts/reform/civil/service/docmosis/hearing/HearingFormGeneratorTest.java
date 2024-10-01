@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingChannel;
@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -27,7 +28,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -43,14 +43,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFAULT_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_FORM;
+import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_APPLICATION;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_APPLICATION_AHN;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_FAST_TRACK;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_FAST_TRACK_AHN;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_OTHER;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_OTHER_AHN;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_SMALL_CLAIMS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_SMALL_CLAIMS_AHN;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_TRIAL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_TRIAL_AHN;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
@@ -67,7 +68,7 @@ public class HearingFormGeneratorTest {
     private static final String fileName_small_claim = String.format(
         HEARING_SMALL_CLAIMS.getDocumentTitle(), REFERENCE_NUMBER);
     private static final String fileName_fast_track = String.format(
-        HEARING_FAST_TRACK.getDocumentTitle(), REFERENCE_NUMBER);
+        HEARING_TRIAL.getDocumentTitle(), REFERENCE_NUMBER);
     private static final String fileName_other_claim = String.format(
         HEARING_OTHER.getDocumentTitle(), REFERENCE_NUMBER);
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
@@ -85,7 +86,7 @@ public class HearingFormGeneratorTest {
         .epimmsId("000000").build();
 
     @MockBean
-    private UnsecuredDocumentManagementService documentManagementService;
+    private SecuredDocumentManagementService documentManagementService;
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
     @MockBean
@@ -184,8 +185,8 @@ public class HearingFormGeneratorTest {
 
     @Test
     void shouldHearingFormGeneratorOneForm_whenValidDataIsProvided_hearing_fast_track() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_FAST_TRACK)))
-            .thenReturn(new DocmosisDocument(HEARING_FAST_TRACK.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_TRIAL)))
+            .thenReturn(new DocmosisDocument(HEARING_TRIAL.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName_fast_track, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
         when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(false);
@@ -292,8 +293,8 @@ public class HearingFormGeneratorTest {
 
     @Test
     void shouldHearingFormGeneratorOneForm_whenValidDataIsProvided_hearing_fast_track_ahn() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_FAST_TRACK_AHN)))
-            .thenReturn(new DocmosisDocument(HEARING_FAST_TRACK_AHN.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_TRIAL_AHN)))
+            .thenReturn(new DocmosisDocument(HEARING_TRIAL_AHN.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName_fast_track, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
         when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(true);
@@ -342,5 +343,66 @@ public class HearingFormGeneratorTest {
 
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName_other_claim, bytes, HEARING_FORM));
+    }
+
+    @Test
+    void shouldShowListingOrRelistingFeeDue_whenListing() {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .listingOrRelisting(ListingOrRelisting.LISTING)
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
+                                 .build())
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDuration(HearingDuration.DAY_1)
+            .caseManagementLocation(caseManagementLocation)
+            .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION).build();
+
+        assertThat(generator.listingOrRelistingWithFeeDue(caseData)).isEqualTo("SHOW");
+    }
+
+    @Test
+    void shouldShowListingOrRelistingFeeDue_whenRelistingNotPaid() {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .listingOrRelisting(ListingOrRelisting.RELISTING)
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
+                                 .build())
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDuration(HearingDuration.DAY_1)
+            .caseManagementLocation(caseManagementLocation)
+            .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
+            .hearingFeePaymentDetails(null)
+            .build();
+
+        assertThat(generator.listingOrRelistingWithFeeDue(caseData)).isEqualTo("SHOW");
+    }
+
+    @Test
+    void shouldNotShowListingOrRelistingFeeDue_whenRelistingAndPaid() {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .listingOrRelisting(ListingOrRelisting.RELISTING)
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
+                                 .build())
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDuration(HearingDuration.DAY_1)
+            .caseManagementLocation(caseManagementLocation)
+            .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
+            .hearingFeePaymentDetails(PaymentDetails.builder()
+                                          .status(SUCCESS)
+                                          .reference("REFERENCE")
+                                          .build())
+            .build();
+
+        assertThat(generator.listingOrRelistingWithFeeDue(caseData)).isEqualTo("DO_NOT_SHOW");
     }
 }

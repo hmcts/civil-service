@@ -9,10 +9,10 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.SendSDOToLiPDefendantCallbackHandler.TASK_ID_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 
 @Service
@@ -23,7 +23,7 @@ public class SendSDOBulkPrintService {
     private final DocumentDownloadService documentDownloadService;
     private static final String SDO_ORDER_PACK_LETTER_TYPE = "sdo-order-pack";
 
-    public void sendSDOToDefendantLIP(String authorisation, CaseData caseData) {
+    public void sendSDOOrderToLIP(String authorisation, CaseData caseData, String taskId) {
         if (caseData.getSystemGeneratedCaseDocuments() != null && !caseData.getSystemGeneratedCaseDocuments().isEmpty()) {
             Optional<Element<CaseDocument>> caseDocument = caseData.getSDODocument();
 
@@ -37,10 +37,15 @@ public class SendSDOBulkPrintService {
                     log.error("Failed getting letter content for SDO ");
                     throw new DocumentDownloadException(caseDocument.get().getValue().getDocumentName(), e);
                 }
-                List<String> recipients = Arrays.asList(caseData.getRespondent1().getPartyName());
+                List<String> recipients = getRecipientsList(caseData, taskId);
                 bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
                                              caseData.getLegacyCaseReference(), SDO_ORDER_PACK_LETTER_TYPE, recipients);
             }
         }
+    }
+
+    private List<String> getRecipientsList(CaseData caseData, String taskId) {
+        return TASK_ID_DEFENDANT.equals(taskId) ? List.of(caseData.getRespondent1().getPartyName())
+            : List.of(caseData.getApplicant1().getPartyName());
     }
 }

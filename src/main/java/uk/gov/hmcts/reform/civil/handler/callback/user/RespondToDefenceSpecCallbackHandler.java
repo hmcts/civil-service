@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
@@ -28,18 +27,18 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantRespon
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnlineMapper;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.model.UnavailableDate;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
@@ -49,8 +48,10 @@ import uk.gov.hmcts.reform.civil.service.citizenui.RespondentMediationService;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.DQResponseDocumentUtils;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -68,12 +69,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.math.BigDecimal.ZERO;
-import static org.springframework.util.CollectionUtils.isEmpty;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -98,6 +98,7 @@ import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDeta
 import static uk.gov.hmcts.reform.civil.utils.CaseStateUtils.shouldMoveToInMediationState;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
+import static uk.gov.hmcts.reform.civil.utils.MediationUnavailableDatesUtils.checkUnavailable;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
 import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
 import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistPartyAddress;
@@ -122,6 +123,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final JudgementService judgementService;
     private final LocationHelper locationHelper;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
+    private final AssignCategoryId assignCategoryId;
     private static final String DATE_PATTERN = "dd MMMM yyyy";
     private final RespondentMediationService respondentMediationService;
     private final PaymentDateService paymentDateService;
@@ -130,13 +132,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final CaseDetailsConverter caseDetailsConverter;
     private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
     private final FrcDocumentsUtils frcDocumentsUtils;
+    private final DQResponseDocumentUtils dqResponseDocumentUtils;
 
-    public static final String UNAVAILABLE_DATE_RANGE_MISSING = "Please provide at least one valid Date from if you cannot attend hearing within next 3 months.";
-    public static final String INVALID_UNAVAILABILITY_RANGE = "Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.";
-    public static final String INVALID_UNAVAILABLE_DATE_BEFORE_TODAY = "Unavailability Date must not be before today.";
-    public static final String INVALID_UNAVAILABLE_DATE_FROM_BEFORE_TODAY = "Unavailability Date From must not be before today.";
-    public static final String INVALID_UNAVAILABLE_DATE_TO_WHEN_MORE_THAN_YEAR = "Unavailability Date To must not be more than one year in the future.";
-    public static final String INVALID_UNAVAILABLE_DATE_WHEN_MORE_THAN_YEAR = "Unavailability Date must not be more than one year in the future.";
     @Value("${court-location.specified-claim.epimms-id}") String cnbcEpimsId;
 
     @Override
@@ -224,34 +221,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
-    }
-
-    private void checkUnavailable(List<String> errors,
-                                  List<Element<UnavailableDate>> datesUnavailableList) {
-        if (isEmpty(datesUnavailableList)) {
-            errors.add(UNAVAILABLE_DATE_RANGE_MISSING);
-        } else {
-            for (Element<UnavailableDate> dateRange : datesUnavailableList) {
-                var unavailableDateType = dateRange.getValue().getUnavailableDateType();
-                LocalDate dateFrom = dateRange.getValue().getFromDate();
-                LocalDate dateTo = dateRange.getValue().getToDate();
-                if (unavailableDateType.equals(UnavailableDateType.SINGLE_DATE)) {
-                    if (dateRange.getValue().getDate().isBefore(LocalDate.now())) {
-                        errors.add(INVALID_UNAVAILABLE_DATE_BEFORE_TODAY);
-                    } else if (dateRange.getValue().getDate().isAfter(LocalDate.now().plusYears(1))) {
-                        errors.add(INVALID_UNAVAILABLE_DATE_WHEN_MORE_THAN_YEAR);
-                    }
-                } else if (unavailableDateType.equals(UnavailableDateType.DATE_RANGE)) {
-                    if (dateTo != null && dateTo.isBefore(dateFrom)) {
-                        errors.add(INVALID_UNAVAILABILITY_RANGE);
-                    } else if (dateFrom != null && dateFrom.isBefore(LocalDate.now())) {
-                        errors.add(INVALID_UNAVAILABLE_DATE_FROM_BEFORE_TODAY);
-                    } else if (dateTo != null && dateTo.isAfter(LocalDate.now().plusYears(1))) {
-                        errors.add(INVALID_UNAVAILABLE_DATE_TO_WHEN_MORE_THAN_YEAR);
-                    }
-                }
-            }
-        }
     }
 
     private void setApplicantDefenceResponseDocFlag(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
@@ -461,8 +430,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                     nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
                 }
                 if (featureToggleService.isJudgmentOnlineLive()) {
-                    builder.activeJudgment(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData));
+                    JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
+                    builder.activeJudgment(activeJudgment);
                     builder.joIsLiveJudgmentExists(YesOrNo.YES);
+                    builder.joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment));
                 }
             } else if (caseData.hasApplicantRejectedRepaymentPlan()) {
                 nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
@@ -491,6 +462,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         builder.businessProcess(businessProcess);
 
         frcDocumentsUtils.assembleClaimantsFRCDocuments(caseData);
+
+        builder.claimantResponseDocuments(
+            dqResponseDocumentUtils.buildClaimantResponseDocuments(builder.build()));
+
+        clearTempDocuments(builder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
@@ -537,7 +513,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (requestedCourt != null) {
             LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
                 fetchLocationData(callbackParams), requestedCourt.getResponseCourtLocations());
-            if (Objects.nonNull(courtLocation)) {
+            if (nonNull(courtLocation)) {
                 dataBuilder
                     .applicant1DQ(dq.applicant1DQRequestedCourt(
                         caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().toBuilder()
@@ -857,5 +833,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     public boolean notTransferredOnline(CaseData caseData) {
         return caseData.getCaseManagementLocation().getBaseLocation().equals(cnbcEpimsId);
+    }
+
+    private void clearTempDocuments(CaseData.CaseDataBuilder<?, ?> builder) {
+        Applicant1DQ applicant1DQ = builder.build().getApplicant1DQ();
+        if (nonNull(applicant1DQ)) {
+            builder.applicant1DQ(builder.build().getApplicant1DQ().toBuilder().applicant1DQDraftDirections(null).build());
+        }
     }
 }

@@ -51,6 +51,7 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
                                           .repaymentFrequency(frequency)
                                           .build())
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+            .claimInterest(YesOrNo.NO)
             .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(1000))
             .build();
 
@@ -124,7 +125,7 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You have offered to pay Claimant John £1000 in instalments of £10 " +
+                    "<p class=\"govuk-body\">You have offered to pay Claimant John £1001 in instalments of £10 " +
                         frequency.getDashboardLabel() + "." +
                         " You have offered to do this starting from " + DateUtils.formatDate(firstRepaymentDate) + "." +
                         " You need to send the claimant your financial details. The court will contact you when they respond.</p>" +
@@ -132,7 +133,7 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
                 ),
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Rydych wedi cynnig talu £1000 mewn rhandaliadau o £10 i Claimant John " +
+                    "<p class=\"govuk-body\">Rydych wedi cynnig talu £1001 mewn rhandaliadau o £10 i Claimant John " +
                         frequency.getDashboardLabelWelsh() + "." +
                         " Rydych wedi cynnig gwneud hyn o " + DateUtils.formatDateInWelsh(firstRepaymentDate) + " ymlaen." +
                         " Mae angen i chi anfon eich manylion ariannol at yr hawlydd. Bydd y llys yn cysylltu â chi pan fyddant yn ymateb.</p>" +

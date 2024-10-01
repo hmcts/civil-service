@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -17,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateAndApplyFee;
@@ -61,6 +63,7 @@ class HearingFeeUtilsTest {
         "SMALL_CLAIM,34600",
         "FAST_CLAIM,54500",
         "MULTI_CLAIM,117500",
+        "INTERMEDIATE_CLAIM,117500",
     })
     void shouldCalculateAndApplyFee_whenClaimTrackIsSet(String track, String expectedFee) {
         AllocatedTrack allocatedTrack = getAllocatedTrack(track);
@@ -83,11 +86,21 @@ class HearingFeeUtilsTest {
             .isEqualTo(expected);
     }
 
+    @Test
+    void shouldThrowException_whenInvalidClaimTrack() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+            .build().toBuilder()
+            .build();
+
+        assertThrows(IllegalArgumentException.class, () -> calculateAndApplyFee(hearingFeesService, caseData, "bananas"));
+    }
+
     private AllocatedTrack getAllocatedTrack(String allocatedTrack) {
         return switch (allocatedTrack) {
             case "SMALL_CLAIM" -> AllocatedTrack.SMALL_CLAIM;
             case "FAST_CLAIM" -> AllocatedTrack.FAST_CLAIM;
             case "MULTI_CLAIM" -> AllocatedTrack.MULTI_CLAIM;
+            case "INTERMEDIATE_CLAIM" -> AllocatedTrack.INTERMEDIATE_CLAIM;
             default -> null;
         };
     }

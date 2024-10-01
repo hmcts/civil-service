@@ -3,7 +3,9 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.CP.HearingDocuments.Upload.Claimant',
-        '{"Notice.AAA6.ClaimantIntent.GoToHearing.Claimant", "Notice.AAA6.ClaimIssue.Response.Await"}',
+        '{"Notice.AAA6.ClaimantIntent.GoToHearing.Claimant",
+          "Notice.AAA6.ClaimantIntent.MediationUnsuccessful.Claimant",
+          "Notice.AAA6.ClaimIssue.Response.Await"}',
         '{"Notice.AAA6.CP.HearingDocuments.Upload.Claimant" : ["sdoDocumentUploadRequestedDateEn", "sdoDocumentUploadRequestedDateCy"]}');
 
 /**
@@ -13,7 +15,7 @@ INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, titl
                                                   ,notification_role)
 VALUES ('Notice.AAA6.CP.HearingDocuments.Upload.Claimant', 'Upload documents', 'Llwytho dogfennau',
         '<p class="govuk-body">You can <a href="{UPLOAD_HEARING_DOCUMENTS}" class="govuk-link">upload and submit documents</a> to support your claim. Follow the instructions set out in the <a href="{VIEW_ORDERS_AND_NOTICES}" class="govuk-link">directions order</a>. Any documents submitted after the deadlines in the directions order may not be considered by the judge.</p>',
-        '<p class="govuk-body">Gallwch <a href="{UPLOAD_HEARING_DOCUMENTS}" class="govuk-link">lanlwytho a chyflwyno dogfennau</a> i gefnogi eich cais. Dilynwch y cyfarwyddiadau a nodir yn y <a href="{VIEW_ORDERS_AND_NOTICES}" class="govuk-link">gorchymyn cyfarwyddiadau</a>. Ni chaiff y barnwr ystyried unrhyw ddogfennau a gyflwynir ar ôl y dyddiadau cau yn y gorchymyn cyfarwyddiadau.</p>',
+        '<p class="govuk-body">Gallwch <a href="{UPLOAD_HEARING_DOCUMENTS}" class="govuk-link">lwytho a chyflwyno dogfennau</a> i gefnogi eich hawliad. Dilynwch y cyfarwyddiadau a nodir yn y <a href="{VIEW_ORDERS_AND_NOTICES}" class="govuk-link">gorchymyn cyfarwyddiadau</a>. Ni chaiff y barnwr ystyried unrhyw ddogfennau a gyflwynir ar ôl y dyddiadau cau yn y gorchymyn cyfarwyddiadau.</p>',
         'CLAIMANT');
 
 /**

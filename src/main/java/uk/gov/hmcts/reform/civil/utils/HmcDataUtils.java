@@ -1,10 +1,13 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import org.jetbrains.annotations.Nullable;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.hmc.model.hearing.Attendees;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
+import uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel;
 import uk.gov.hmcts.reform.hmc.model.hearings.CaseHearing;
 import uk.gov.hmcts.reform.hmc.model.hearings.HearingsResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.HearingDay;
@@ -19,9 +22,16 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.getContentText;
+import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.getTitleText;
+import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.getType;
 import static uk.gov.hmcts.reform.civil.utils.DateUtils.convertFromUTC;
 import static uk.gov.hmcts.reform.civil.utils.StringUtils.textToPlural;
+import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.INTER;
+import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.TELCVP;
 import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.VIDCVP;
 
 public class HmcDataUtils {
@@ -30,6 +40,7 @@ public class HmcDataUtils {
         // NO OP
     }
 
+    private static final String HEARING = "hearing";
     private static final int HOURS_PER_DAY = 6;
     private static final int MINUTES_PER_HOUR = 60;
 
@@ -247,20 +258,64 @@ public class HmcDataUtils {
         return hearings.getCaseHearings() != null && !hearings.getCaseHearings().isEmpty();
     }
 
+    public static boolean includesVideoHearing(HearingsResponse hearings) {
+        return hasHearings(hearings)
+                && hearings.getCaseHearings().stream()
+                .filter(HmcDataUtils::includesVideoHearing).count() > 0;
+    }
+
     private static boolean includesVideoHearing(HearingDaySchedule hearingDay) {
         return hearingDay.getAttendees().stream().filter(
             attendee -> attendee.getHearingSubChannel() != null
                 && attendee.getHearingSubChannel().equals(VIDCVP)).count() > 0;
     }
 
-    private static boolean includesVideoHearing(CaseHearing caseHearing) {
-        return caseHearing.getHearingDaySchedule().stream().filter(day -> includesVideoHearing(day)).count() > 0;
+    private static boolean includesVideoHearing(List<HearingDaySchedule> schedule) {
+        return schedule.stream().filter(HmcDataUtils::includesVideoHearing).count() > 0;
     }
 
-    public static boolean includesVideoHearing(HearingsResponse hearings) {
-        return hasHearings(hearings)
-            && hearings.getCaseHearings().stream()
-            .filter(HmcDataUtils::includesVideoHearing).count() > 0;
+    private static boolean includesVideoHearing(CaseHearing caseHearing) {
+        return includesVideoHearing(caseHearing.getHearingDaySchedule());
+    }
+
+    private static List<Attendees> getAttendeesBySubChannel(HearingGetResponse hearing, HearingSubChannel subChannel) {
+        HearingDaySchedule firstHearingDay = getHearingStartDay(hearing);
+        return nonNull(firstHearingDay) && nonNull(firstHearingDay.getAttendees()) ? firstHearingDay.getAttendees().stream()
+                .filter(attendee -> nonNull(attendee.getHearingSubChannel()) && attendee.getHearingSubChannel().equals(subChannel)).toList()
+                : new ArrayList<>();
+    }
+
+    public static List<String> getHearingAttendeeNames(HearingGetResponse hearing, HearingSubChannel subChannel) {
+        return getAttendeesBySubChannel(hearing, subChannel).stream()
+                .flatMap(attendee -> hearing.getPartyDetails().stream()
+                        .filter(party -> party.getPartyID().equals(attendee.getPartyID()))
+                        .map(party -> StringUtils.joinNonNull(" ", party.getIndividualDetails().getFirstName(),
+                                party.getIndividualDetails().getLastName()))
+                ).collect(Collectors.toList());
+    }
+
+    private static String concatenateNames(List<String> names) {
+        return nonNull(names) && names.size() > 0 ? org.apache.commons.lang.StringUtils.join(names, "\n") : null;
+    }
+
+    public static String getInPersonAttendeeNames(HearingGetResponse hearing) {
+        return concatenateNames(getHearingAttendeeNames(hearing, INTER));
+    }
+
+    public static String getPhoneAttendeeNames(HearingGetResponse hearing) {
+        return concatenateNames(getHearingAttendeeNames(hearing, TELCVP));
+    }
+
+    public static String getVideoAttendeesNames(HearingGetResponse hearing) {
+        return concatenateNames(getHearingAttendeeNames(hearing, VIDCVP));
+    }
+
+    public static String getHearingTypeTitleText(CaseData caseData, HearingGetResponse hearing) {
+        return getTitleText(getType(hearing.getHearingDetails().getHearingType()), caseData.getAssignedTrackType());
+    }
+
+    public static String getHearingTypeContentText(CaseData caseData, HearingGetResponse hearing) {
+        return getContentText(getType(hearing.getHearingDetails().getHearingType()), caseData.getAssignedTrackType());
     }
 
     @Nullable

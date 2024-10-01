@@ -16,14 +16,17 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_SDO_ORDER_TO_LIP_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_SDO_ORDER_TO_LIP_DEFENDANT;
 
 @Service
 @RequiredArgsConstructor
 public class SendSDOToLiPDefendantCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(SEND_SDO_ORDER_TO_LIP_DEFENDANT);
-    public static final String TASK_ID = "SendSDOToDefendantLIP";
+    private static final List<CaseEvent> EVENTS = List.of(SEND_SDO_ORDER_TO_LIP_DEFENDANT,
+                                                          SEND_SDO_ORDER_TO_LIP_CLAIMANT);
+    public static final String TASK_ID_DEFENDANT = "SendSDOToDefendantLIP";
+    public static final String TASK_ID_CLAIMANT = "SendSDOToClaimantLIP";
     private final SendSDOBulkPrintService sendSDOBulkPrintService;
 
     @Override
@@ -35,7 +38,11 @@ public class SendSDOToLiPDefendantCallbackHandler extends CallbackHandler {
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+        if (caseEvent == SEND_SDO_ORDER_TO_LIP_DEFENDANT) {
+            return TASK_ID_DEFENDANT;
+        }
+        return TASK_ID_CLAIMANT;
     }
 
     @Override
@@ -45,7 +52,7 @@ public class SendSDOToLiPDefendantCallbackHandler extends CallbackHandler {
 
     private CallbackResponse sendSDOLetter(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        sendSDOBulkPrintService.sendSDOToDefendantLIP(callbackParams.getParams().get(BEARER_TOKEN).toString(), caseData);
+        sendSDOBulkPrintService.sendSDOOrderToLIP(callbackParams.getParams().get(BEARER_TOKEN).toString(), caseData, camundaActivityId(callbackParams));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();

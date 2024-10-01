@@ -136,6 +136,30 @@ class DashboardControllerTest {
     }
 
     @Test
+    void shouldReturnNotificationsForListOfCaseReferenceAndRole() {
+
+        Map<String, List<Notification>> notificationslist = new HashMap<>();
+        notificationslist.put("123", getNotificationList());
+        notificationslist.put("1234", getNotificationList());
+
+        String[] gaCaseIds = new String[]{"123", "1234"};
+
+        //given
+        when(dashboardNotificationService.getAllCasesNotifications(any(), any()))
+            .thenReturn(notificationslist);
+
+        //when
+        ResponseEntity<Map<String, List<Notification>>> output = dashboardController.getNotificationsByIdentifiersAndRole(
+            gaCaseIds,
+            "Claimant",
+            AUTHORISATION
+        );
+
+        //then
+        assertThat(output.getBody()).isEqualTo(notificationslist);
+    }
+
+    @Test
     void should_create_scenario() {
         doNothing().when(dashboardScenariosService)
             .recordScenarios(AUTHORISATION, NOTIFICATION_DRAFT_CLAIM_START, CASE_ID, SCENARIO_REQUEST_PARAMS);
@@ -168,5 +192,29 @@ class DashboardControllerTest {
 
         //then
         assertThrows(RuntimeException.class, () -> dashboardController.deleteNotification(ID, AUTHORISATION));
+    }
+
+    @Test
+    void shouldReturnOkWhenMakeProgressAbleTasksInactiveForCaseIdentifierAndRoleInvoked() {
+
+        //when
+        final ResponseEntity responseEntity = dashboardController
+            .makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant", AUTHORISATION);
+
+        //then
+        assertEquals(OK, responseEntity.getStatusCode());
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant");
+    }
+
+    @Test
+    void shouldReturn401WhenMakeProgressAbleTasksInactiveForCaseIdentifierAndRoleUnauthorised() {
+
+        //given
+        doThrow(new RuntimeException()).when(taskListService)
+            .makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant");
+
+        //then
+        assertThrows(RuntimeException.class, () -> dashboardController
+            .makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant", AUTHORISATION));
     }
 }

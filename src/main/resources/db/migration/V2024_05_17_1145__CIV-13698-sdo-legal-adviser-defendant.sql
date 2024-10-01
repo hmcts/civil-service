@@ -2,7 +2,14 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA6.CP.SDOMadebyLA.Defendant', '{}', '{"Notice.AAA6.CP.SDOMadebyLA.Defendant" : ["requestForReconsiderationDeadlineEn", "requestForReconsiderationDeadlineCy"]}');
+VALUES ('Scenario.AAA6.CP.SDOMadebyLA.Defendant',
+        '{"Notice.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.Defendant",
+          "Notice.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.ClaimantConfirms.Defendant",
+          "Notice.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.PartOrFull.ClaimantDisputes.Defendant",
+          "Notice.AAA6.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.Defendant",
+          "Notice.AAA6.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.NoMediation.Defendant",
+          "Notice.AAA6.ClaimantIntent.MediationUnsuccessful.Defendant"}',
+        '{"Notice.AAA6.CP.SDOMadebyLA.Defendant" : ["requestForReconsiderationDeadlineEn", "requestForReconsiderationDeadlineCy"]}');
 
 /**
  * Add notification template

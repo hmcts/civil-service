@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,7 +15,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import org.junit.jupiter.api.BeforeEach;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -22,8 +23,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentFormGenerator;
-import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -39,8 +38,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_DJ_FORM_NON_DIVERGENT_SPEC_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFAULT_JUDGMENT_CLAIMANT1;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFAULT_JUDGMENT_DEFENDANT1;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFAULT_JUDGMENT_CLAIMANT2;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFAULT_JUDGMENT_DEFENDANT1;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFAULT_JUDGMENT_DEFENDANT2;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -51,8 +50,6 @@ class GenerateDJFormHandlerSpecNonDivergentTest extends BaseCallbackHandlerTest 
     private ObjectMapper mapper;
     @InjectMocks
     private GenerateDJFormHandlerSpecNonDivergent handler;
-    @InjectMocks
-    private AssignCategoryId assignCategoryId;
     @Mock
     private DefaultJudgmentFormGenerator defaultJudgmentFormGenerator;
     @Mock
@@ -61,7 +58,7 @@ class GenerateDJFormHandlerSpecNonDivergentTest extends BaseCallbackHandlerTest 
     @BeforeEach
     void setUp() {
         mapper = new ObjectMapper();
-        handler = new GenerateDJFormHandlerSpecNonDivergent(assignCategoryId, defaultJudgmentFormGenerator, mapper);
+        handler = new GenerateDJFormHandlerSpecNonDivergent(defaultJudgmentFormGenerator, mapper);
         mapper.registerModule(new JavaTimeModule());
     }
 

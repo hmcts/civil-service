@@ -43,17 +43,31 @@ class SendSDOBulkPrintServiceTest {
     private static final Document DOCUMENT_LINK = new Document("document/url", TEST, TEST, TEST, TEST, UPLOAD_TIMESTAMP);
     private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
+    public static final String TASK_ID_DEFENDANT = "SendSDOToDefendantLIP";
+    public static final String TASK_ID_CLAIMANT = "SendSDOToClaimantLIP";
 
     @Test
-    void shouldDownloadDocumentAndPrintLetterSuccessfully() {
+    void shouldDownloadDocumentAndPrintLetterSuccessfullyForDefendantLIP() {
         Party respondent1 = createSoleTraderParty();
         CaseData caseData = createCaseDataWithSDOOrder(respondent1);
 
         givenDocumentDownloadWillReturn();
 
-        sendSDOBulkPrintService.sendSDOToDefendantLIP(BEARER_TOKEN, caseData);
+        sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
         verifyPrintLetter(caseData, respondent1);
+    }
+
+    @Test
+    void shouldDownloadDocumentAndPrintLetterSuccessfullyForClaimantLIP() {
+        Party applicant1 = createSoleTraderParty();
+        CaseData caseData = createCaseDataWithSDOOrder(applicant1);
+
+        givenDocumentDownloadWillReturn();
+
+        sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
+
+        verifyPrintLetter(caseData, applicant1);
     }
 
     @Test
@@ -61,7 +75,7 @@ class SendSDOBulkPrintServiceTest {
         CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(null).build();
 
-        sendSDOBulkPrintService.sendSDOToDefendantLIP(BEARER_TOKEN, caseData);
+        sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
         verifyNoInteractions(bulkPrintService);
     }
@@ -70,7 +84,7 @@ class SendSDOBulkPrintServiceTest {
     void shouldNotDownloadDocument_whenSDOOrderAbsent() {
         CaseData caseData = createCaseDataWithSealedClaim();
 
-        sendSDOBulkPrintService.sendSDOToDefendantLIP(BEARER_TOKEN, caseData);
+        sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
         verifyNoInteractions(bulkPrintService);
     }
@@ -80,13 +94,13 @@ class SendSDOBulkPrintServiceTest {
             .willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), TEST, TEST));
     }
 
-    private void verifyPrintLetter(CaseData caseData, Party respondent1) {
+    private void verifyPrintLetter(CaseData caseData, Party party) {
         verify(bulkPrintService).printLetter(
             LETTER_CONTENT,
             caseData.getLegacyCaseReference(),
             caseData.getLegacyCaseReference(),
             SDO_ORDER_PACK_LETTER_TYPE,
-            Collections.singletonList(respondent1.getPartyName())
+            Collections.singletonList(party.getPartyName())
         );
     }
 
@@ -94,13 +108,14 @@ class SendSDOBulkPrintServiceTest {
         return PartyBuilder.builder().soleTrader().build();
     }
 
-    private CaseData createCaseDataWithSDOOrder(Party respondent1) {
+    private CaseData createCaseDataWithSDOOrder(Party party) {
         return CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder()
                                                            .documentType(SDO_ORDER)
                                                            .documentLink(DOCUMENT_LINK)
                                                            .build()))
-            .respondent1(respondent1)
+            .respondent1(party)
+            .applicant1(party)
             .build();
     }
 

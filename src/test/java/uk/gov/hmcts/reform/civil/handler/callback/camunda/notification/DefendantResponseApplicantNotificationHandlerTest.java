@@ -1,15 +1,15 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -20,14 +20,26 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.fulldefence.FullDefenceApplicantSolicitorOneCCSpecNotifier;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.fulldefence.FullDefenceApplicantSolicitorOneCCUnspecNotifier;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.fulldefence.FullDefenceApplicantSolicitorOneSpecNotifier;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.fulldefence.FullDefenceApplicantSolicitorOneUnspecNotifier;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.fulldefence.FullDefenceRespondentSolicitorOneCCSpecNotifier;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.fulldefence.FullDefenceRespondentSolicitorOneCCUnspecNotifier;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.fulldefence.FullDefenceRespondentSolicitorTwoCCSpecNotifier;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.fulldefence.FullDefenceRespondentSolicitorTwoCCUnspecNotifier;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.fulldefence.FullDefenceSolicitorNotifierFactory;
 
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -46,26 +58,49 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest(classes = {
+    DefendantResponseApplicantNotificationHandler.class,
+    FullDefenceSolicitorNotifierFactory.class,
+    FullDefenceApplicantSolicitorOneSpecNotifier.class,
+    FullDefenceApplicantSolicitorOneUnspecNotifier.class,
+    FullDefenceApplicantSolicitorOneCCSpecNotifier.class,
+    FullDefenceApplicantSolicitorOneCCUnspecNotifier.class,
+    FullDefenceRespondentSolicitorOneCCSpecNotifier.class,
+    FullDefenceRespondentSolicitorOneCCUnspecNotifier.class,
+    FullDefenceRespondentSolicitorTwoCCSpecNotifier.class,
+    FullDefenceRespondentSolicitorTwoCCUnspecNotifier.class,
+    JacksonAutoConfiguration.class
+
+})
 class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @Mock
+    @MockBean
     private NotificationService notificationService;
-
-    @Mock
+    @MockBean
     private NotificationsProperties notificationsProperties;
-
-    @InjectMocks
+    @Autowired
     private DefendantResponseApplicantNotificationHandler handler;
-
-    @Mock
+    @MockBean
     private OrganisationService organisationService;
+
+    @BeforeEach
+    void setup() {
+        when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn("template-id");
+        when(notificationsProperties.getClaimantSolicitorDefendantResponse1v2DSForSpec())
+            .thenReturn("spec-claimant-1v2DS-template-id");
+        when(notificationsProperties.getClaimantSolicitorDefendantResponseForSpec())
+            .thenReturn("spec-claimant-template-id");
+        when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec())
+            .thenReturn("spec-respondent-template-id");
+        when(organisationService.findOrganisationById(anyString()))
+            .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+        when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec()).thenReturn("templateImm-id");
+        when(notificationsProperties.getRespondentSolicitorDefResponseSpecWithClaimantAction()).thenReturn("spec-respondent-template-id-action");
+    }
 
     @Nested
     class AboutToSubmitCallback {
@@ -75,8 +110,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyApplicantSolicitorIn1v1Scenario_whenV1CallbackInvoked() {
-                when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn("template-id");
-
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence()
                     .build();
@@ -84,8 +117,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
-                                 .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE")
-                                 .build())
+                        .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE")
+                        .build())
                     .build();
 
                 handler.handle(params);
@@ -100,8 +133,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyRespondentSolicitor1In1v1Scenario_whenV1CallbackInvoked() {
-                when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn("template-id");
-
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence()
                     .build();
@@ -109,8 +140,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
-                                 .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC")
-                                 .build())
+                        .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC")
+                        .build())
                     .build();
 
                 handler.handle(params);
@@ -125,8 +156,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyRespondentSolicitor1In1v1ScenarioSecondSol_whenV1CallbackInvoked() {
-                when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn("template-id");
-
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence()
                     .build();
@@ -134,8 +163,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
-                                 .eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC")
-                                 .build())
+                        .eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC")
+                        .build())
                     .build();
 
                 handler.handle(params);
@@ -150,8 +179,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyApplicantSolicitorSpec_whenInvoked() {
-                when(notificationsProperties.getClaimantSolicitorDefendantResponseForSpec())
-                    .thenReturn("spec-claimant-template-id");
 
                 LocalDate whenWillPay = LocalDate.now().plusMonths(1);
                 CaseData caseData = CaseDataBuilder.builder()
@@ -186,8 +213,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyCitizenApplicantSpec_whenInvoked() {
-                when(notificationsProperties.getClaimantSolicitorDefendantResponseForSpec())
-                    .thenReturn("spec-claimant-template-id");
 
                 LocalDate whenWillPay = LocalDate.now().plusMonths(1);
                 CaseData caseData = CaseDataBuilder.builder()
@@ -222,7 +247,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyApplicantSolicitorSpecImmediately_whenInvoked() {
-                when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec()).thenReturn("templateImm-id");
 
                 LocalDate whenWillPay = LocalDate.now().plusMonths(1);
                 CaseData caseData = CaseDataBuilder.builder()
@@ -257,7 +281,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyApplicantSolicitorSpecImmediatelyScenerio2_whenInvoked() {
-                when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec()).thenReturn("templateImm-id");
 
                 LocalDate whenWillPay = LocalDate.now().plusDays(5);
                 CaseData caseData = CaseDataBuilder.builder()
@@ -292,7 +315,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyApplicantSolicitorSpecImmediatelyScenerio3_whenInvoked() {
-                when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec()).thenReturn("templateImm-id");
 
                 LocalDate whenWillPay = LocalDate.now().plusDays(5);
                 CaseData caseData = CaseDataBuilder.builder()
@@ -327,9 +349,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyRespondentSolicitorSpec_whenInvokedWithCcEvent() {
-                when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec())
-                    .thenReturn("spec-respondent-template-id");
-
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged().build();
                 caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
@@ -353,8 +372,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyRespondentSolicitorSpecDef1_whenInvokedWithCcEvent() {
-                when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec())
-                    .thenReturn("spec-respondent-template-id");
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged().build();
                 caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
@@ -378,9 +395,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void sendNotificationToSolicitorSpec_shouldNotifyRespondentSolicitorSpecDef1v1() {
-                when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec())
-                    .thenReturn("spec-respondent-template-id");
-
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged().build();
                 caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
@@ -404,8 +418,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void sendNotificationToSolicitorSpecPart_shouldNotifyRespondentSolicitorSpecDef1v1() {
-                when(notificationsProperties.getRespondentSolicitorDefResponseSpecWithClaimantAction()).thenReturn("spec-respondent-template-id-action");
-
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged().build();
                 caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
@@ -430,9 +442,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyRespondentSolicitorSpecDef1SecondScenerio_whenInvokedWithCcEvent() {
-                when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec())
-                    .thenReturn("spec-respondent-template-id");
-
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged().build();
                 caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
@@ -465,8 +474,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyApplicantSolicitorIn1v2Scenario_whenV1CallbackInvoked() {
-                when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn("template-id");
-
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimTwoDefendantSolicitors()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
@@ -475,8 +482,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
-                                 .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE")
-                                 .build())
+                        .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE")
+                        .build())
                     .build();
 
                 handler.handle(params);
@@ -491,8 +498,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyRespondentSolicitor1In1v2Scenario_whenV1CallbackInvoked() {
-                when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn("template-id");
-
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimTwoDefendantSolicitors()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
@@ -501,8 +506,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
-                                 .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC")
-                                 .build())
+                        .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC")
+                        .build())
                     .build();
 
                 handler.handle(params);
@@ -517,8 +522,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyRespondentSolicitor2In1v2Scenario_whenV1CallbackInvoked() {
-                when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn("template-id");
-
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimTwoDefendantSolicitors()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
@@ -527,8 +530,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
-                                 .eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC")
-                                 .build())
+                        .eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC")
+                        .build())
                     .build();
 
                 handler.handle(params);
@@ -546,8 +549,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
         class TwoVsOneScenario {
             @Test
             void shouldNotifyApplicantSolicitorIn2v1Scenario_whenV1CallbackInvoked() {
-                when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn("template-id");
-
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimTwoApplicants()
                     .atStateRespondentFullDefence()
@@ -556,8 +557,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
-                                 .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE")
-                                 .build())
+                        .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE")
+                        .build())
                     .build();
 
                 handler.handle(params);
@@ -572,8 +573,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyRespondentSolicitor1In2v1Scenario_whenV1CallbackInvoked() {
-                when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn("template-id");
-
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimTwoApplicants()
                     .atStateRespondentFullDefence()
@@ -582,8 +581,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
-                                 .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC")
-                                 .build())
+                        .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC")
+                        .build())
                     .build();
 
                 handler.handle(params);
@@ -659,230 +658,5 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
             "NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC").build()).build())).isEqualTo(TASK_ID_CC_RESP1);
-    }
-
-    @Test
-    void shoulldReturnPartyInformation_whenCaseEventIsInvoked() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
-            .respondent2DQ(Respondent2DQ.builder().build())
-            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
-            .build();
-
-        assertThat(handler.addPropertiesSpec(caseData,
-                                             CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC))
-            .containsEntry("legalOrgName", "Signer Name")
-            .containsEntry("claimReferenceNumber",  "000DC001")
-            .containsEntry("defendantName", "my company");
-    }
-
-    @Test
-    void shoulldReturnPartyInformationSecondScenerio_whenCaseEventIsInvoked() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
-            .respondent2DQ(Respondent2DQ.builder().build())
-            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
-            .build();
-
-        assertThat(handler.addPropertiesSpec(caseData,
-                                             CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC))
-            .containsEntry("legalOrgName", "Signer Name")
-            .containsEntry("claimReferenceNumber",  "000DC001")
-            .containsEntry("defendantName", "my company");
-    }
-
-    @Test
-    void shoulldReturnPartyInformationThirdScenerio_whenCaseEventIsInvoked() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
-            .respondent1DQ(Respondent1DQ.builder().build())
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
-            .build();
-
-        assertThat(handler.addPropertiesSpec(caseData,
-                                             CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC))
-            .containsEntry("legalOrgName", "Signer Name")
-            .containsEntry("claimReferenceNumber",  "000DC001")
-            .containsEntry("defendantName", "my company");
-    }
-
-    @Test
-    void shoulldReturnPartyInformationScenerio1_whenCaseEventIsInvoked() {
-        LocalDate whenWillPay = LocalDate.now().plusDays(5);
-        String formattedDate = formatLocalDate(whenWillPay, DATE);
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
-            .respondent1DQ(Respondent1DQ.builder().build())
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .respondToClaimAdmitPartLRspec(
-                RespondToClaimAdmitPartLRspec.builder()
-                    .whenWillThisAmountBePaid(whenWillPay)
-                    .build()
-            )
-            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Mr. John Rambo").build())
-            .build();
-
-        assertThat(handler.addPropertiesSpec(caseData,
-                                             CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE))
-            .containsEntry("legalOrgName", "Signer Name")
-            .containsEntry("claimReferenceNumber",  "000DC001")
-            .containsEntry("defendantName", "Mr. John Rambo")
-            .containsEntry("payImmediately", formattedDate.toUpperCase());
-
-    }
-
-    @Test
-    void shoulldReturnPartyInformationScenerioOne_whenCaseEventIsInvoked() {
-        LocalDate whenWillPay = LocalDate.now().plusDays(5);
-        String formattedDate = formatLocalDate(whenWillPay, DATE);
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
-            .respondent1DQ(Respondent1DQ.builder().build())
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .respondToClaimAdmitPartLRspec(
-                RespondToClaimAdmitPartLRspec.builder()
-                    .whenWillThisAmountBePaid(whenWillPay)
-                    .build()
-            )
-            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Mr. John Rambo").build())
-            .build();
-
-        assertThat(handler.addPropertiesSpec(caseData,
-                                             CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE))
-            .containsEntry("legalOrgName", "Signer Name")
-            .containsEntry("claimReferenceNumber",  "000DC001")
-            .containsEntry("defendantName", "Mr. John Rambo")
-            .containsEntry("payImmediately", formattedDate.toUpperCase());
-
-    }
-
-    @Test
-    void shoulldReturnPartyInformationScenerioTwo_whenCaseEventIsInvoked() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
-            .respondent1DQ(Respondent1DQ.builder().build())
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
-            .respondToClaimAdmitPartLRspec(
-                RespondToClaimAdmitPartLRspec.builder().build()
-            )
-            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Mr. John Rambo").build())
-            .build();
-
-        assertThat(handler.addPropertiesSpec(caseData,
-                                             CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE))
-            .containsEntry("legalOrgName", "Signer Name")
-            .containsEntry("claimReferenceNumber",  "000DC001")
-            .containsEntry("defendantName", "Mr. John Rambo");
-    }
-
-    @Test
-    void shoulldReturnPartyInformationScenerioThird_whenCaseEventIsInvoked() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
-            .respondent2DQ(Respondent2DQ.builder().build())
-            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
-            .build();
-
-        assertThat(handler.addPropertiesSpec(caseData,
-                                             CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC))
-            .containsEntry("legalOrgName", "Signer Name")
-            .containsEntry("claimReferenceNumber",  "000DC001")
-            .containsEntry("defendantName", "my company");
-    }
-
-    @Test
-    void shoulldReturnPartyInformationScenerioFourth_whenCaseEventIsInvoked() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
-            .respondent2DQ(Respondent2DQ.builder().build())
-            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
-            .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
-            .build();
-
-        assertThat(handler.addPropertiesSpec(caseData,
-                                             CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC))
-            .containsEntry("legalOrgName", "Signer Name")
-            .containsEntry("claimReferenceNumber",  "000DC001")
-            .containsEntry("defendantName", "my company");
-    }
-
-    @Test
-    void shoulldReturnPartyInformationScenerioFifth_whenCaseEventIsInvoked() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
-            .respondent1DQ(Respondent1DQ.builder().build())
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
-            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
-            .build();
-
-        assertThat(handler.addPropertiesSpec(caseData,
-                                             CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC))
-            .containsEntry("legalOrgName", "Signer Name")
-            .containsEntry("claimReferenceNumber",  "000DC001")
-            .containsEntry("defendantName", "my company");
-    }
-
-    @Test
-    void shoulldReturnPartyInformationScenerioSix_whenCaseEventIsInvoked() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
-            .respondent2DQ(Respondent2DQ.builder().build())
-            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
-            .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
-            .build();
-
-        assertThat(handler.addPropertiesSpec(caseData,
-                                             CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC))
-            .containsEntry("legalOrgName", "Signer Name")
-            .containsEntry("claimReferenceNumber",  "000DC001")
-            .containsEntry("defendantName", "my company");
-    }
-
-    @Test
-    void shoulldReturnPartyInformationScenerio2_whenCaseEventIsInvoked() {
-        LocalDate whenWillPay = LocalDate.now().plusDays(5);
-        String formattedDate = formatLocalDate(whenWillPay, DATE);
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
-            .respondent1DQ(Respondent1DQ.builder().build())
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .respondToClaimAdmitPartLRspec(
-                RespondToClaimAdmitPartLRspec.builder()
-                    .whenWillThisAmountBePaid(whenWillPay)
-                    .build()
-            )
-            .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Mr. John Rambo").build())
-            .build();
-
-        assertThat(handler.addPropertiesSpec(caseData,
-                                             CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE))
-            .containsEntry("legalOrgName", "Signer Name")
-            .containsEntry("claimReferenceNumber",  "000DC001")
-            .containsEntry("defendantName", "Mr. John Rambo")
-            .containsEntry("payImmediately", formattedDate.toUpperCase());
-
     }
 }

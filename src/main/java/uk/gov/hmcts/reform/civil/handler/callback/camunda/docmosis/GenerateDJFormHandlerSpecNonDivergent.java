@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentFormGenerator;
-import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +35,6 @@ public class GenerateDJFormHandlerSpecNonDivergent extends CallbackHandler {
     );
     private static final String TASK_ID_CLAIMANT = "GenerateDJFormNondivergentSpecClaimant";
     private static final String TASK_ID_DEFENDANT = "GenerateDJFormNondivergentSpecDefendant";
-    private final AssignCategoryId assignCategoryId;
 
     private final DefaultJudgmentFormGenerator defaultJudgmentFormGenerator;
     private final ObjectMapper objectMapper;

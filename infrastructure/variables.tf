@@ -33,5 +33,5 @@ variable "send_grid_subscription" {
 }
 
 variable "custom_alerts_enabled" {
-  default     = 0
+  default = 0
 }

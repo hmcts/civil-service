@@ -21,6 +21,8 @@ import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnlineMapper;
+import uk.gov.hmcts.reform.civil.utils.JudgmentAdmissionUtils;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -59,6 +61,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private final UpdateCaseManagementDetailsService updateCaseManagementLocationDetailsService;
     private final DeadlinesCalculator deadlinesCalculator;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
+    private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -125,6 +128,12 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(
             builder, featureToggleService.isUpdateContactDetailsEnabled());
+
+        if (featureToggleService.isJudgmentOnlineLive() && JudgmentAdmissionUtils.getLIPJudgmentAdmission(caseData)) {
+            CaseData updatedCaseData = builder.build();
+            builder.activeJudgment(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(updatedCaseData));
+            builder.joIsLiveJudgmentExists(YES);
+        }
 
         CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =

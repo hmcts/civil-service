@@ -28,12 +28,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.getType;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_NOTICE_HMC;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.hearingFeeRequired;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getHearingDaysText;
+import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getHearingTypeContentText;
+import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getHearingTypeTitleText;
+import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getInPersonAttendeeNames;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getLocationRefData;
+import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getPhoneAttendeeNames;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getTotalHearingDurationText;
+import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getVideoAttendeesNames;
 
 @Service
 @RequiredArgsConstructor
@@ -78,11 +82,12 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
             getLocationRefData(hearingId, caseData.getCaseManagementLocation().getBaseLocation(), bearerToken, locationRefDataService);
 
         return HearingNoticeHmc.builder()
+            .title(getHearingTypeTitleText(caseData, hearing))
             .hearingSiteName(nonNull(caseManagementLocation) ? caseManagementLocation.getExternalShortName() : null)
             .hearingLocation(hearingLocation)
             .caseNumber(caseData.getCcdCaseReference())
             .creationDate(LocalDate.now())
-            .hearingType(getType(hearing.getHearingDetails().getHearingType()).getLabel())
+            .hearingType(getHearingTypeContentText(caseData, hearing))
             .claimant(caseData.getApplicant1().getPartyName())
             .claimantReference(nonNull(caseData.getSolicitorReferences())
                                    ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
@@ -99,6 +104,9 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
             .feeAmount(feeAmount)
             .hearingDueDate(hearingDueDate)
             .hearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
+            .partiesAttendingInPerson(getInPersonAttendeeNames(hearing))
+            .partiesAttendingByTelephone(getPhoneAttendeeNames(hearing))
+            .partiesAttendingByVideo(getVideoAttendeesNames(hearing))
             .build();
     }
 

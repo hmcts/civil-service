@@ -837,6 +837,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         @Test
         void should_Non_Urgency_Lip_Vs_Lip_At_25th() {
+            LocalDate hearingDate = LocalDate.now().plusDays(25);
             CaseData.CaseDataBuilder caseDataBuilder =
                 getTestCaseData(CaseData.builder().build(), false, 25).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
@@ -857,7 +858,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .claimantUserDetails(IdamUserDetails.builder().id(CL_LIP_USER_ID).email("partyemail@gmail.com").build())
                 .defendantUserDetails(IdamUserDetails.builder().id(DEF_LIP_USER_ID).email("partyemail@gmail.com")
                                           .build())
-                .applicant1Represented(NO);
+                .applicant1Represented(NO)
+                .hearingDate(hearingDate);
             when(caseAssignmentApi.getUserRoles(any(), any(), eq(List.of("12"))))
                 .thenReturn(CaseAssignmentUserRolesResource.builder()
                                 .caseAssignmentUserRoles(getCaseUsersForLipVLip()).build());
@@ -874,6 +876,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
             assertThat(result.getGeneralAppUrgencyRequirement()).isNotNull();
             assertThat(result.getGeneralAppUrgencyRequirement().getGeneralAppUrgency())
                 .isEqualTo(NO);
+            assertThat(result.getGeneralAppUrgencyRequirement().getUrgentAppConsiderationDate()).isEqualTo(hearingDate);
         }
 
         @Test

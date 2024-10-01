@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.model.Address;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -19,8 +18,8 @@ public class JudgmentDetails {
     private Integer judgmentId;
     private String defendant1Name;
     private String defendant2Name;
-    private Address defendant1Address;
-    private Address defendant2Address;
+    private JudgmentAddress defendant1Address;
+    private JudgmentAddress defendant2Address;
     private LocalDate defendant1Dob;
     private LocalDate defendant2Dob;
     private LocalDateTime lastUpdateTimeStamp;
@@ -37,6 +36,8 @@ public class JudgmentDetails {
     private YesOrNo isJointJudgment;
     private String orderedAmount;
     private String costs;
+    private String claimFeeAmount;
+    private String amountAlreadyPaid;
     private String totalAmount;
     private String courtLocation;
     private JudgmentInstalmentDetails instalmentDetails;

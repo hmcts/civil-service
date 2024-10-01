@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -35,7 +36,6 @@ import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState.ISSUE
 import static uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection.PAY_IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection.PAY_IN_INSTALMENTS;
 import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
-import static uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils.getDefendantAdmittedAmount;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +49,7 @@ public class DashboardNotificationsParamsMapper {
     public static final String CLAIMANT1_REJECTED_REPAYMENT_PLAN_WELSH = "gwrthod";
     public static final String ORDER_DOCUMENT = "orderDocument";
     private final FeatureToggleService featureToggleService;
+    private final ClaimantResponseUtils claimantResponseUtils;
 
     public HashMap<String, Object> mapCaseDataToParams(CaseData caseData) {
 
@@ -90,10 +91,10 @@ public class DashboardNotificationsParamsMapper {
             updateCCJParams(caseData, params);
         }
 
-        if (nonNull(getDefendantAdmittedAmount(caseData))) {
+        if (nonNull(claimantResponseUtils.getDefendantAdmittedAmount(caseData))) {
             params.put(
                 "defendantAdmittedAmount",
-                "£" + this.removeDoubleZeros(formatAmount(getDefendantAdmittedAmount(caseData)))
+                "£" + this.removeDoubleZeros(formatAmount(claimantResponseUtils.getDefendantAdmittedAmount(caseData)))
             );
         }
         if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
@@ -247,6 +248,11 @@ public class DashboardNotificationsParamsMapper {
             params.put("bundleRestitchedDateCy", DateUtils.formatDateInWelsh(date.toLocalDate()));
         });
 
+        if (caseData.getGeneralAppPBADetails() != null) {
+            params.put("applicationFee",
+                       "£" + this.removeDoubleZeros(String.valueOf(MonetaryConversions.penniesToPounds(caseData.getGeneralAppPBADetails().getFee().getCalculatedAmountInPence()))));
+        }
+
         return params;
     }
 
@@ -262,10 +268,10 @@ public class DashboardNotificationsParamsMapper {
 
     private static void updateCCJParams(CaseData caseData, HashMap<String, Object> params) {
         JudgmentDetails judgmentDetails = caseData.getActiveJudgment();
-        String orderedAmount = judgmentDetails.getOrderedAmount();
+        String totalAmount = judgmentDetails.getTotalAmount();
         params.put(
             "ccjDefendantAdmittedAmount",
-            MonetaryConversions.penniesToPounds(new BigDecimal(orderedAmount))
+            MonetaryConversions.penniesToPounds(new BigDecimal(totalAmount))
         );
 
         if (caseData.getActiveJudgment().getPaymentPlan().getType().equals(PAY_IN_INSTALMENTS)) {

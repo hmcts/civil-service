@@ -1991,8 +1991,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "will not be permitted except with permission from the Court.");
 
             assertThat(response.getData()).extracting("fastTrackSchedulesOfLoss").extracting("input1")
-                .isEqualTo("The claimant must upload to the Digital Portal an up-to-date schedule of loss to the "
-                               + "defendant by 4pm on");
+                .isEqualTo("The claimant must upload to the Digital Portal an up-to-date schedule of loss by 4pm on");
             assertThat(response.getData()).extracting("fastTrackSchedulesOfLoss").extracting("date1")
                 .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("fastTrackSchedulesOfLoss").extracting("input2")
@@ -2195,7 +2194,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(nextWorkingDayDate.toString());
 
             assertThat(response.getData()).extracting("fastTrackRoadTrafficAccident").extracting("input")
-                .isEqualTo("Photographs and/or a place of the accident location shall be prepared and agreed by the "
+                .isEqualTo("Photographs and/or a plan of the accident location shall be prepared and agreed by the "
                                + "parties and uploaded to the Digital Portal by 4pm on");
 
             assertThat(response.getData()).extracting("smallClaimsJudgesRecital").extracting("input")
@@ -2313,7 +2312,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("This witness statement is limited to 10 pages per party, including any appendices.");
 
             assertThat(response.getData()).extracting("smallClaimsRoadTrafficAccident").extracting("input")
-                .isEqualTo("Photographs and/or a place of the accident location shall be prepared and agreed by the "
+                .isEqualTo("Photographs and/or a plan of the accident location shall be prepared and agreed by the "
                                + "parties and uploaded to the Digital Portal no later than 21 days before the "
                                + "hearing.");
             assertThat(response.getData()).extracting("disposalHearingHearingTime").extracting("input")

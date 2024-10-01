@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -28,6 +29,7 @@ public class MoreTimeRequestedScenarioTest extends DashboardBaseIntegrationTest 
             .respondent1ResponseDeadline(LocalDateTime.of(2024, 4, 1, 12, 0))
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
+            .totalClaimAmount(new BigDecimal(5000))
             .build();
 
         handler.handle(callbackParams(caseData));

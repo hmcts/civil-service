@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.claimantresponse.JudgmentByAdmis
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,7 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator imple
     private final JudgmentByAdmissionOrDeterminationMapper judgmentByAdmissionOrDeterminationMapper;
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
+    private final AssignCategoryId assignCategoryId;
 
     public CaseDocument generate(CaseEvent caseEvent, CaseData caseData, String authorisation) {
 
@@ -88,14 +90,17 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator imple
             getTemplateDataForNonDivergentDocs(caseData),
             getTemplateName(caseEvent)
         );
-        list.add(documentManagementService.uploadDocument(
+        CaseDocument uploadedDocument = documentManagementService.uploadDocument(
             authorisation,
-            new PDF(getTemplateName(caseEvent).getDocumentTitle(),
-                    docmosisDocument.getBytes(),
-                    getDocumentType(caseEvent)
+            new PDF(
+                getTemplateName(caseEvent).getDocumentTitle(),
+                docmosisDocument.getBytes(),
+                getDocumentType(caseEvent)
             )
-        )
         );
+        assignCategoryId.assignCategoryIdToCaseDocument(uploadedDocument, "judgments");
+        list.add(uploadedDocument);
+
         return list;
     }
 

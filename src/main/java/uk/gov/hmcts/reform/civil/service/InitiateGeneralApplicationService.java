@@ -77,6 +77,7 @@ public class InitiateGeneralApplicationService {
     private final FeatureToggleService featureToggleService;
     private final CrossAccessUserConfiguration crossAccessUserConfiguration;
     private final CoreCaseEventDataService coreCaseEventDataService;
+    private final Time time;
 
     private static final int NUMBER_OF_DEADLINE_DAYS = 5;
     public static final String GA_DOC_CATEGORY_ID = "applications";
@@ -96,6 +97,7 @@ public class InitiateGeneralApplicationService {
     public static final String INVALID_SETTLE_BY_CONSENT = "Settle by consent " +
             "must have been agreed with the respondent " +
             "before raising the application";
+    public static final List<String> lipCaseRole = Arrays.asList("[DEFENDANT]", "[CLAIMANT]");
 
     private static final List<CaseState> statesBeforeSDO = Arrays.asList(PENDING_CASE_ISSUED, CASE_ISSUED,
             AWAITING_CASE_DETAILS_NOTIFICATION, AWAITING_RESPONDENT_ACKNOWLEDGEMENT, IN_MEDIATION,
@@ -248,8 +250,11 @@ public class InitiateGeneralApplicationService {
             applicationBuilder.isGaApplicantLip(NO)
                 .isGaRespondentOneLip(NO)
                 .isGaRespondentTwoLip(NO);
+            if (caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented()) {
+                applicationBuilder.generalAppSubmittedDateGAspec(time.now());
+            }
         }
-
+        applicationBuilder.caseNameGaInternal(caseData.getCaseNameHmctsInternal());
         return helper.setRespondentDetailsIfPresent(applicationBuilder.build(), caseData, userDetails);
     }
 
@@ -331,6 +336,20 @@ public class InitiateGeneralApplicationService {
         String caseId = caseData.getCcdCaseReference().toString();
         CaseAssignmentUserRolesResource userRoles = getUserRolesOnCase(caseId);
         List<String> respondentCaseRoles = getRespondentCaseRoles(caseData);
+
+        if (featureToggleService.isGaForLipsEnabled() && (caseData.isRespondent1LiP() || caseData.isRespondent2LiP()
+            || caseData.isApplicantNotRepresented())) {
+
+            for (String lipRole : lipCaseRole) {
+                if (userRoles.getCaseAssignmentUserRoles() != null && userRoles.getCaseAssignmentUserRoles().size() > 1
+                    || userRoles.getCaseAssignmentUserRoles().stream()
+                    .anyMatch(role -> role.getCaseRole().equals(lipRole))) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         for (String respondentCaseRole : respondentCaseRoles) {
             if (userRoles.getCaseAssignmentUserRoles() == null
                 || userRoles.getCaseAssignmentUserRoles().stream()

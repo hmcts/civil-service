@@ -20,10 +20,16 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.managecontactinformation.PrepareEventTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.managecontactinformation.ShowWarningTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.managecontactinformation.SubmitChangesTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.managecontactinformation.ValidateExpertsTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.managecontactinformation.ValidateWitnessesTask;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -45,10 +51,14 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.PartyDetailsChangedUtil;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
+import uk.gov.hmcts.reform.civil.validation.PartyValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -59,9 +69,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -101,7 +115,13 @@ import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFE
     ManageContactInformationCallbackHandler.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
-    PostcodeValidator.class
+    PostcodeValidator.class,
+    PartyValidator.class,
+    PrepareEventTask.class,
+    ShowWarningTask.class,
+    SubmitChangesTask.class,
+    ValidateExpertsTask.class,
+    ValidateWitnessesTask.class
 })
 @SuppressWarnings("unchecked")
 class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -111,6 +131,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
     @Autowired
     private ObjectMapper mapper;
+
+    @Autowired
+    private PartyValidator partyValidator;
 
     @MockBean
     private PartyDetailsChangedUtil partyDetailsChangedUtil;
@@ -126,6 +149,12 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
     @MockBean
     private PostcodeValidator postcodeValidator;
+
+    @MockBean
+    private FeatureToggleService featureToggleService;
+
+    @MockBean
+    private CoreCaseDataService coreCaseDataService;
 
     private static final UserInfo ADMIN_USER = UserInfo.builder()
         .roles(List.of("caseworker-civil-admin"))
@@ -888,6 +917,11 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         }
 
         @Test
+        void handleEventsReturnsTheExpectedCallbackEvent() {
+            assertThat(handler.handledEvents()).contains(MANAGE_CONTACT_INFORMATION);
+        }
+
+        @Test
         void shouldReturnExpectedResponseCaseData_whenTriggeredByAdmin_withPartyChanges() {
             Flags respondent1Flags = Flags.builder().partyName("respondent1name").roleOnCase("respondent1").build();
             CaseData caseDataBefore = CaseDataBuilder.builder()
@@ -927,6 +961,55 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             assertEquals(READY, responseData.getBusinessProcess().getStatus());
             assertEquals(
                 EVENT.toBuilder().submittedByCaseworker(YES).build(), responseData.getContactDetailsUpdatedEvent());
+        }
+
+        @Test
+        void shouldReturnExpectedResponseCaseData_whenTriggeredByAdmin_withPartyChangesWithGaData() {
+            Flags respondent1Flags = Flags.builder().partyName("respondent1name").roleOnCase("respondent1").build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1(Party.builder()
+                                 .individualFirstName("Dis")
+                                 .individualLastName("Guy")
+                                 .type(INDIVIDUAL).flags(respondent1Flags).build())
+                .buildClaimIssuedPaymentCaseData();
+
+            CaseData caseDataBefore = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseData(caseData);
+
+            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+
+            CaseData updated = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .updateDetailsForm(UpdateDetailsForm.builder()
+                                       .partyChosen(DynamicList.builder()
+                                                        .value(DynamicListElement.builder()
+                                                                   .code(DEFENDANT_ONE_ID)
+                                                                   .build())
+                                                        .build())
+                                       .partyChosenId(DEFENDANT_ONE_ID)
+                                       .build())
+                .build();
+
+            CaseData updatedCaseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseData(updated);
+
+            when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
+            when(partyDetailsChangedUtil.buildChangesEvent(any(CaseData.class), any(CaseData.class))).thenReturn(
+                EVENT);
+            when(coreCaseDataService.triggerGeneralApplicationEvent(anyLong(), any(CaseEvent.class), anyMap())).thenReturn(updatedCaseData);
+            CallbackParams params = callbackParamsOf(updatedCaseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData responseData = mapper.convertValue(response.getData(), CaseData.class);
+
+            assertEquals(updated.getApplicant1(), responseData.getApplicant1());
+            assertEquals(MANAGE_CONTACT_INFORMATION.name(), responseData.getBusinessProcess().getCamundaEvent());
+            assertEquals(READY, responseData.getBusinessProcess().getStatus());
+            assertEquals(EVENT.toBuilder().submittedByCaseworker(YES).build(), responseData.getContactDetailsUpdatedEvent());
+            verify(coreCaseDataService).triggerGeneralApplicationEvent(eq(1234L), eq(CaseEvent.UPDATE_GA_CASE_DATA), anyMap());
         }
 
         @Test
@@ -2312,6 +2395,203 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                 assertThat(response.getWarnings()).isEmpty();
             }
+        }
+
+        @Nested
+        class MidShowWarningJudgmentOnline {
+            private static final String PAGE_ID = "show-warning";
+
+            @BeforeEach
+            void setup() {
+                when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+            }
+
+            @ParameterizedTest
+            @ValueSource(strings = {CLAIMANT_ONE_ID, CLAIMANT_TWO_ID})
+            void shouldReturnErrorForClaimantManageInformation(String partyChosenId) {
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                    .updateDetailsForm(UpdateDetailsForm.builder()
+                                           .partyChosen(DynamicList.builder()
+                                                            .value(DynamicListElement.builder()
+                                                                       .code(partyChosenId)
+                                                                       .build())
+                                                            .build())
+                                           .build())
+                    .applicant1(Party.builder().type(Party.Type.INDIVIDUAL)
+                                    .primaryAddress(Address.builder()
+                                                        .addressLine1("Line 1 test again for more than 35 characters")
+                                                        .addressLine2("Line 1 test again for more than 35 characters")
+                                                        .addressLine3("Line 1 test again for more than 35 characters")
+                                                        .county("Line 1 test again for more than 35 characters")
+                                                        .postCode("PostCode more than 8 characters")
+                                                        .postTown("Line 1 test again for more than 35 characters").build())
+                                    .build())
+                    .applicant2(Party.builder().type(Party.Type.INDIVIDUAL)
+                                    .primaryAddress(Address.builder()
+                                                        .addressLine1("Line 1 test again for more than 35 characters")
+                                                        .addressLine2("Line 1 test again for more than 35 characters")
+                                                        .addressLine3("Line 1 test again for more than 35 characters")
+                                                        .county("Line 1 test again for more than 35 characters")
+                                                        .postCode("PostCode more than 8 characters")
+                                                        .postTown("Line 1 test again for more than 35 characters").build())
+                                    .build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                assertThat(response.getErrors()).isNotEmpty();
+                assertThat(response.getErrors()).hasSize(6);
+            }
+
+            @ParameterizedTest
+            @ValueSource(strings = {CLAIMANT_ONE_ID, CLAIMANT_TWO_ID})
+            void shouldNotErrorForClaimantManageInformation(String partyChosenId) {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .updateDetailsForm(UpdateDetailsForm.builder()
+                                           .partyChosen(DynamicList.builder()
+                                                            .value(DynamicListElement.builder()
+                                                                       .code(partyChosenId)
+                                                                       .build())
+                                                            .build())
+                                           .build())
+                    .build();
+
+                CaseData caseDataBefore = CaseDataBuilder.builder()
+                    .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                    .applicant1(Party.builder().type(INDIVIDUAL).build())
+                    .applicant2(Party.builder().type(INDIVIDUAL).build())
+                    .respondent1(Party.builder().type(INDIVIDUAL).build())
+                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .buildClaimIssuedPaymentCaseData();
+                given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                assertThat(response.getErrors()).isEmpty();
+            }
+
+            @Test
+            void shouldNotErrorForNoPartyChosenSelectedManageInformation() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .updateDetailsForm(UpdateDetailsForm.builder()
+                                           .partyChosen(DynamicList.builder()
+                                                            .value(DynamicListElement.builder()
+                                                                       .code("partyChosenId")
+                                                                       .build())
+                                                            .build())
+                                           .build())
+                    .build();
+
+                CaseData caseDataBefore = CaseDataBuilder.builder()
+                    .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                    .applicant1(Party.builder().type(INDIVIDUAL).build())
+                    .applicant2(Party.builder().type(INDIVIDUAL).build())
+                    .respondent1(Party.builder().type(INDIVIDUAL).build())
+                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .buildClaimIssuedPaymentCaseData();
+                given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                assertThat(response.getErrors()).isEmpty();
+            }
+
+            @Test
+            void shouldNotErrorForDefaultPartyChosenSelectedManageInformation() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                    .updateDetailsForm(UpdateDetailsForm.builder()
+                                           .partyChosen(DynamicList.builder()
+                                                            .value(DynamicListElement.builder()
+                                                                       .code("default")
+                                                                       .build())
+                                                            .build())
+                                           .build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                assertThat(response.getErrors()).isEmpty();
+            }
+
+            @ParameterizedTest
+            @ValueSource(strings = {DEFENDANT_ONE_ID, DEFENDANT_TWO_ID})
+            void shouldReturnErrorForDefendantManageInformation(String partyChosenId) {
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                    .updateDetailsForm(UpdateDetailsForm.builder()
+                                           .partyChosen(DynamicList.builder()
+                                                            .value(DynamicListElement.builder()
+                                                                       .code(partyChosenId)
+                                                                       .build())
+                                                            .build())
+                                           .build())
+                    .respondent1(Party.builder().type(Party.Type.INDIVIDUAL)
+                                    .primaryAddress(Address.builder()
+                                                        .addressLine1("Line 1 test again for more than 35 characters")
+                                                        .addressLine2("Line 1 test again for more than 35 characters")
+                                                        .addressLine3("Line 1 test again for more than 35 characters")
+                                                        .county("Line 1 test again for more than 35 characters")
+                                                        .postCode("PostCode more than 8 characters")
+                                                        .postTown("Line 1 test again for more than 35 characters").build())
+                                    .build())
+                    .respondent2(Party.builder().type(Party.Type.INDIVIDUAL)
+                                    .primaryAddress(Address.builder()
+                                                        .addressLine1("Line 1 test again for more than 35 characters")
+                                                        .addressLine2("Line 1 test again for more than 35 characters")
+                                                        .addressLine3("Line 1 test again for more than 35 characters")
+                                                        .county("Line 1 test again for more than 35 characters")
+                                                        .postCode("PostCode more than 8 characters")
+                                                        .postTown("Line 1 test again for more than 35 characters").build())
+                                    .build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                assertThat(response.getErrors()).isNotEmpty();
+                assertThat(response.getErrors()).hasSize(6);
+            }
+
+            @ParameterizedTest
+            @ValueSource(strings = {DEFENDANT_ONE_ID, DEFENDANT_TWO_ID})
+            void shouldNotErrorForDefendantManageInformation(String partyChosenId) {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .updateDetailsForm(UpdateDetailsForm.builder()
+                                           .partyChosen(DynamicList.builder()
+                                                            .value(DynamicListElement.builder()
+                                                                       .code(partyChosenId)
+                                                                       .build())
+                                                            .build())
+                                           .build())
+                    .build();
+
+                CaseData caseDataBefore = CaseDataBuilder.builder()
+                    .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                    .applicant1(Party.builder().type(INDIVIDUAL).build())
+                    .applicant2(Party.builder().type(INDIVIDUAL).build())
+                    .respondent1(Party.builder().type(INDIVIDUAL).build())
+                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .buildClaimIssuedPaymentCaseData();
+                given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                assertThat(response.getErrors()).isEmpty();
+            }
+
         }
 
         @Nested

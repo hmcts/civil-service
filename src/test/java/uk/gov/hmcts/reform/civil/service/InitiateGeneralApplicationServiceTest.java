@@ -115,6 +115,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                                                                                   .baseLocation("22222")
                                                                                   .build())
                                                                 .build()).build();
+    private static final LocalDateTime SUBMITTED_DATE = LocalDateTime.of(2023, 6, 1, 0, 0, 0);
     @Autowired
     private InitiateGeneralApplicationService service;
 
@@ -151,6 +152,9 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     @MockBean
     private CoreCaseEventDataService coreCaseEventDataService;
 
+    @MockBean
+    private Time time;
+
     @BeforeEach
     public void setUp() throws IOException {
         when(calc.calculateApplicantResponseDeadline(
@@ -175,6 +179,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         when(authTokenGenerator.generate()).thenReturn(STRING_CONSTANT);
 
         when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
+
+        when(time.now()).thenReturn(SUBMITTED_DATE);
     }
 
     @Nested
@@ -923,7 +929,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         assertThat(result.getGeneralApplications().get(0).getValue().getClaimant2PartyName()).isEqualTo("Applicant2");
         assertThat(result.getGeneralApplications().get(0).getValue().getDefendant1PartyName()).isEqualTo("Respondent1");
         assertThat(result.getGeneralApplications().get(0).getValue().getDefendant2PartyName()).isEqualTo("Respondent2");
-
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseNameGaInternal()).isEqualTo("Internal caseName");
     }
 
     @Test
@@ -1229,6 +1235,60 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         assertThat(result.getGeneralApplications().get(0)
                        .getValue().getGeneralAppEvidenceDocument().get(1).getValue().getCategoryID())
             .isEqualTo(GA_DOC_CATEGORY_ID);
+    }
+
+    @Test
+    void shouldPopulateGeneralAppSubmittedDateForLipDefendant() {
+        when(locationRefDataService.getCnbcLocation(any())).thenReturn(getSampleCourLocationsRefObjectPreSdoCNBC());
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataForConsentUnconsentCheck(null)
+            .toBuilder()
+            .applicant1Represented(YES).respondent1Represented(NO).build();
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+
+        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
+            .isNotNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
+            .isEqualTo(SUBMITTED_DATE);
+    }
+
+    @Test
+    void shouldPopulateGeneralAppSubmittedDateForLipDefendant2() {
+        when(locationRefDataService.getCnbcLocation(any())).thenReturn(getSampleCourLocationsRefObjectPreSdoCNBC());
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataForConsentUnconsentCheck(null)
+            .toBuilder()
+            .applicant1Represented(YES).respondent1Represented(YES).respondent2Represented(NO).build();
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+
+        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
+            .isNotNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
+            .isEqualTo(SUBMITTED_DATE);
+    }
+
+    @Test
+    void shouldPopulateGeneralAppSubmittedDateForLipClaimant() {
+        when(locationRefDataService.getCnbcLocation(any())).thenReturn(getSampleCourLocationsRefObjectPreSdoCNBC());
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataForConsentUnconsentCheck(null)
+            .toBuilder()
+            .applicant1Represented(NO).respondent1Represented(YES).build();
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+
+        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
+            .isNotNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
+            .isEqualTo(SUBMITTED_DATE);
     }
 
     private void assertCaseDateEntries(CaseData caseData) {

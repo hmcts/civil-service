@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.hearing.HearingNoticeHmc;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.HearingIndividual;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -78,7 +79,7 @@ class HearingNoticeHmcGeneratorTest {
         .build();
 
     @MockBean
-    private UnsecuredDocumentManagementService documentManagementService;
+    private SecuredDocumentManagementService documentManagementService;
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
     @Autowired
@@ -108,25 +109,34 @@ class HearingNoticeHmcGeneratorTest {
                                                                                              .postcode("Postcode")
                                                                                              .build()));
 
+        List<HearingIndividual> hearingIndividuals = List.of(
+                HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
+                HearingIndividual.attendingHearingByVideo("Michael", "Carver"),
+                HearingIndividual.attendingHearingByPhone("Jenny", "Harper"),
+                HearingIndividual.nonAttending("James", "Allen")
+        );
+
         HearingDay hearingDay = HearingDay.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 01, 01, 0, 0, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 01, 01, 12, 0, 0))
             .build();
         LocalDateTime hearingResponseDate = LocalDateTime.of(2023, 02, 02, 0, 0, 0);
         baseHearing = HearingGetResponse.builder()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                    List.of(
-                        HearingDaySchedule.builder()
-                            .hearingVenueId(EPIMS)
-                            .hearingStartDateTime(hearingDay.getHearingStartDateTime())
-                            .hearingEndDateTime(hearingDay.getHearingEndDateTime())
-                            .build()))
-                                 .receivedDateTime(hearingResponseDate)
-                                 .build())
-            .requestDetails(HearingRequestDetails.builder()
-                                .versionNumber(VERSION_NUMBER)
-                                .build())
-            .build();
+                .partyDetails(hearingIndividuals.stream().map(HearingIndividual::buildPartyDetails).toList())
+                .hearingResponse(HearingResponse.builder().hearingDaySchedule(
+                                List.of(
+                                        HearingDaySchedule.builder()
+                                                .attendees(hearingIndividuals.stream().map(HearingIndividual::buildAttendee).toList())
+                                                .hearingVenueId(EPIMS)
+                                                .hearingStartDateTime(hearingDay.getHearingStartDateTime())
+                                                .hearingEndDateTime(hearingDay.getHearingEndDateTime())
+                                                .build()))
+                        .receivedDateTime(hearingResponseDate)
+                        .build())
+                .requestDetails(HearingRequestDetails.builder()
+                        .versionNumber(VERSION_NUMBER)
+                        .build())
+                .build();
     }
 
     @Test
@@ -135,7 +145,8 @@ class HearingNoticeHmcGeneratorTest {
         var hearing = baseHearing.toBuilder()
                     .hearingDetails(HearingDetails.builder()
                                         .hearingType("AAA7-TRI")
-                                        .build())
+                                        .build()
+                    )
             .build();
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
@@ -164,6 +175,7 @@ class HearingNoticeHmcGeneratorTest {
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
                                                             "SiteName - CourtAddress - Postcode", "hearingId");
         var expected = HearingNoticeHmc.builder()
+            .title("trial")
             .caseNumber(caseData.getCcdCaseReference())
             .creationDate(LocalDate.now())
             .claimant(caseData.getApplicant1().getPartyName())
@@ -178,6 +190,9 @@ class HearingNoticeHmcGeneratorTest {
             .hearingType("trial")
             .hearingDueDate(null)
             .hearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
+            .partiesAttendingInPerson("Chloe Landale")
+            .partiesAttendingByVideo("Michael Carver")
+            .partiesAttendingByTelephone("Jenny Harper")
             .build();
 
         assertEquals(expected, actual);
@@ -218,6 +233,7 @@ class HearingNoticeHmcGeneratorTest {
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
                                                             "SiteName - CourtAddress - Postcode", "hearingId");
         var expected = HearingNoticeHmc.builder()
+            .title("trial")
             .caseNumber(caseData.getCcdCaseReference())
             .creationDate(LocalDate.now())
             .claimant(caseData.getApplicant1().getPartyName())
@@ -232,6 +248,9 @@ class HearingNoticeHmcGeneratorTest {
             .hearingType("trial")
             .hearingDueDate(LocalDate.of(2023, 1, 1))
             .hearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
+            .partiesAttendingInPerson("Chloe Landale")
+            .partiesAttendingByVideo("Michael Carver")
+            .partiesAttendingByTelephone("Jenny Harper")
             .build();
 
         assertEquals(expected, actual);
@@ -272,6 +291,7 @@ class HearingNoticeHmcGeneratorTest {
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
                                                             "SiteName - CourtAddress - Postcode", "hearingId");
         var expected = HearingNoticeHmc.builder()
+            .title("disposal hearing")
             .caseNumber(caseData.getCcdCaseReference())
             .creationDate(LocalDate.now())
             .claimant(caseData.getApplicant1().getPartyName())
@@ -288,17 +308,20 @@ class HearingNoticeHmcGeneratorTest {
             .hearingType("hearing")
             .hearingDueDate(null)
             .hearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
-            .build();
+                .partiesAttendingInPerson("Chloe Landale")
+                .partiesAttendingByVideo("Michael Carver")
+                .partiesAttendingByTelephone("Jenny Harper")
+                .build();
 
         assertEquals(expected, actual);
     }
 
     @ParameterizedTest
     @CsvSource({
-        "AAA7-DIS",
-        "AAA7-DRH"
+        "AAA7-DIS, disposal hearing",
+        "AAA7-DRH, dispute resolution hearing"
     })
-    void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid_whenHearingType(String hearingType) {
+    void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid_whenHearingType(String hearingType, String expectedTitle) {
 
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
@@ -334,6 +357,7 @@ class HearingNoticeHmcGeneratorTest {
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
                                                             "SiteName - CourtAddress - Postcode", "hearingId");
         var expected = HearingNoticeHmc.builder()
+            .title(expectedTitle)
             .caseNumber(caseData.getCcdCaseReference())
             .creationDate(LocalDate.now())
             .claimant(caseData.getApplicant1().getPartyName())
@@ -350,6 +374,9 @@ class HearingNoticeHmcGeneratorTest {
             .hearingType("hearing")
             .hearingDueDate(null)
             .hearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
+            .partiesAttendingInPerson("Chloe Landale")
+            .partiesAttendingByVideo("Michael Carver")
+            .partiesAttendingByTelephone("Jenny Harper")
             .build();
 
         assertEquals(expected, actual);
@@ -393,6 +420,7 @@ class HearingNoticeHmcGeneratorTest {
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
                                                             "SiteName - CourtAddress - Postcode", "hearingId");
         var expected = HearingNoticeHmc.builder()
+                .title("dispute resolution hearing")
             .caseNumber(caseData.getCcdCaseReference())
             .creationDate(LocalDate.now())
             .claimant(caseData.getApplicant1().getPartyName())
@@ -406,6 +434,9 @@ class HearingNoticeHmcGeneratorTest {
             .hearingType("hearing")
             .hearingDueDate(null)
             .hearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
+            .partiesAttendingInPerson("Chloe Landale")
+            .partiesAttendingByVideo("Michael Carver")
+            .partiesAttendingByTelephone("Jenny Harper")
             .build();
 
         assertEquals(expected, actual);
@@ -495,6 +526,7 @@ class HearingNoticeHmcGeneratorTest {
 
         assertEquals(expected, actual);
     }
+
 }
 
 

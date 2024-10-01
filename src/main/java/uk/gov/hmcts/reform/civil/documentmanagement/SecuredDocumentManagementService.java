@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.documentmanagement;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -25,22 +24,25 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
 import uk.gov.hmcts.reform.document.utils.InMemoryMultipartFile;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+
 import java.net.URI;
 import java.time.ZoneId;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
+
 import static org.springframework.http.MediaType.ALL_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
+import static uk.gov.hmcts.reform.civil.constants.DocumentManagementConstants.CASE_TYPE_ID;
+import static uk.gov.hmcts.reform.civil.constants.DocumentManagementConstants.CREATED_BY;
+import static uk.gov.hmcts.reform.civil.constants.DocumentManagementConstants.JURISDICTION_ID;
 
 @Slf4j
 @Service("documentManagementService")
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "document_management", name = "secured", havingValue = "true")
 public class SecuredDocumentManagementService implements DocumentManagementService {
 
     protected static final int DOC_UUID_LENGTH = 36;
-    public static final String CREATED_BY = "Civil";
     protected static final String FILES_NAME = "files";
 
     private final DocumentDownloadClientApi documentDownloadClientApi;
@@ -61,8 +63,8 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
 
             DocumentUploadRequest documentUploadRequest = new DocumentUploadRequest(
                 Classification.RESTRICTED.toString(),
-                "CIVIL",
-                "CIVIL",
+                CASE_TYPE_ID,
+                JURISDICTION_ID,
                 Collections.singletonList(file)
             );
 

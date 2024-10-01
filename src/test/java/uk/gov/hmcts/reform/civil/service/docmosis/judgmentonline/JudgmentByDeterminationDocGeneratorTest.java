@@ -8,7 +8,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
-import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -65,7 +66,7 @@ class JudgmentByDeterminationDocGeneratorTest {
         .documentType(DocumentType.JUDGMENT_BY_DETERMINATION_DEFENDANT)
         .build();
     @MockBean
-    private UnsecuredDocumentManagementService documentManagementService;
+    private SecuredDocumentManagementService documentManagementService;
 
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
@@ -75,6 +76,9 @@ class JudgmentByDeterminationDocGeneratorTest {
 
     @MockBean
     private OrganisationService organisationService;
+
+    @MockBean
+    private AssignCategoryId assignCategoryId;
 
     @Test
     void shouldDefaultJudgmentFormGeneratorOneFormClaimant() {
@@ -107,7 +111,8 @@ class JudgmentByDeterminationDocGeneratorTest {
 
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF("Judgment_by_determination_claimant.pdf", bytes, JUDGMENT_BY_DETERMINATION_CLAIMANT));
-
+        verify(assignCategoryId)
+            .assignCategoryIdToCaseDocument(CASE_DOCUMENT_CLAIMANT, "judgments");
     }
 
     @Test
@@ -141,7 +146,8 @@ class JudgmentByDeterminationDocGeneratorTest {
 
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF("Judgment_by_determination_claimant.pdf", bytes, JUDGMENT_BY_DETERMINATION_CLAIMANT));
-
+        verify(assignCategoryId)
+            .assignCategoryIdToCaseDocument(CASE_DOCUMENT_CLAIMANT, "judgments");
     }
 
     @Test
@@ -170,6 +176,8 @@ class JudgmentByDeterminationDocGeneratorTest {
 
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF("Judgment_by_determination_claimant.pdf", bytes, JUDGMENT_BY_DETERMINATION_CLAIMANT));
+        verify(assignCategoryId)
+            .assignCategoryIdToCaseDocument(CASE_DOCUMENT_CLAIMANT, "judgments");
 
     }
 
@@ -196,6 +204,8 @@ class JudgmentByDeterminationDocGeneratorTest {
 
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF("Judgment_by_determination_claimant.pdf", bytes, JUDGMENT_BY_DETERMINATION_CLAIMANT));
+        verify(assignCategoryId)
+            .assignCategoryIdToCaseDocument(CASE_DOCUMENT_CLAIMANT, "judgments");
 
     }
 
@@ -224,6 +234,8 @@ class JudgmentByDeterminationDocGeneratorTest {
         verify(documentManagementService, times(2))
             .uploadDocument(BEARER_TOKEN, new PDF("Judgment_by_determination_defendant.pdf", bytes,
                                                   DocumentType.JUDGMENT_BY_DETERMINATION_DEFENDANT));
+        verify(assignCategoryId, times(2))
+            .assignCategoryIdToCaseDocument(CASE_DOCUMENT_DEFENDANT, "judgments");
 
     }
 
@@ -261,6 +273,8 @@ class JudgmentByDeterminationDocGeneratorTest {
         verify(documentManagementService, times(2))
             .uploadDocument(BEARER_TOKEN, new PDF("Judgment_by_determination_defendant.pdf", bytes,
                                                   DocumentType.JUDGMENT_BY_DETERMINATION_DEFENDANT));
+        verify(assignCategoryId, times(2))
+            .assignCategoryIdToCaseDocument(CASE_DOCUMENT_DEFENDANT, "judgments");
 
     }
 }

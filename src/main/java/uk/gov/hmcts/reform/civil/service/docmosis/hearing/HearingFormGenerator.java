@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
+import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
+import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -29,8 +31,8 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_APPLICATION;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_APPLICATION_AHN;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_FAST_TRACK;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_FAST_TRACK_AHN;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_TRIAL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_TRIAL_AHN;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_OTHER;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_OTHER_AHN;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_SMALL_CLAIMS;
@@ -78,7 +80,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
 
         return HearingForm.builder()
             .courtName(caseManagementLocationDetails.getExternalShortName())
-            .listingOrRelisting(caseData.getListingOrRelisting().toString())
+            .listingOrRelistingWithFeeDue(listingOrRelistingWithFeeDue(caseData))
             .court(caseData.getHearingLocation().getValue().getLabel())
             .caseNumber(caseData.getCcdCaseReference().toString())
             .creationDate(getDateFormatted(LocalDate.now()))
@@ -108,6 +110,21 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
             .build();
     }
 
+    public String listingOrRelistingWithFeeDue(CaseData caseData) {
+        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+            if (caseData.getListingOrRelisting().equals(ListingOrRelisting.RELISTING)
+                && caseData.getHearingFeePaymentDetails() != null
+                && caseData.getHearingFeePaymentDetails().getStatus().equals(PaymentStatus.SUCCESS)) {
+                return "DO_NOT_SHOW";
+            }
+        } else  {
+            if (caseData.getListingOrRelisting().equals(ListingOrRelisting.RELISTING)) {
+                return "DO_NOT_SHOW";
+            }
+        }
+        return "SHOW";
+    }
+
     private String getFileName(CaseData caseData, DocmosisTemplates template) {
         return String.format(template.getDocumentTitle(), caseData.getLegacyCaseReference());
     }
@@ -134,7 +151,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
                 case SMALL_CLAIMS:
                     return HEARING_SMALL_CLAIMS;
                 case FAST_TRACK_TRIAL:
-                    return HEARING_FAST_TRACK;
+                    return HEARING_TRIAL;
                 case HEARING_OF_APPLICATION:
                     return HEARING_APPLICATION;
                 default:
@@ -145,7 +162,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
                 case SMALL_CLAIMS:
                     return HEARING_SMALL_CLAIMS_AHN;
                 case FAST_TRACK_TRIAL:
-                    return HEARING_FAST_TRACK_AHN;
+                    return HEARING_TRIAL_AHN;
                 case HEARING_OF_APPLICATION:
                     return HEARING_APPLICATION_AHN;
                 default:

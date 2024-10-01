@@ -40,7 +40,7 @@ public enum DocmosisTemplates {
     SDO_FAST_FAST_TRACK_INT_R2("CV-UNS-STD-ENG-01378_13066.docx", "fast_track_sdo_%s.pdf"),
     DEFENDANT_RESPONSE_LIP_SPEC("CV-SPC-CLM-ENG-01065-LIP.docx", "response_sealed_form_%s.pdf"),
     HEARING_SMALL_CLAIMS("CV-UNS-HNO-ENG-01197.docx", "hearing_small_claim_%s.pdf"),
-    HEARING_FAST_TRACK("CV-UNS-HNO-ENG-01198.docx", "hearing_fast_track_%s.pdf"),
+    HEARING_TRIAL("CV-UNS-HNO-ENG-01198.docx", "trial_%s.pdf"),
     HEARING_APPLICATION("CV-UNS-HNO-ENG-01199.docx", "hearing_application_%s.pdf"),
     HEARING_OTHER("CV-UNS-HNO-ENG-01196.docx", "hearing_other_claim_%s.pdf"),
     PIN_IN_THE_POST_LETTER("CV-CMC-LET-ENG-PIP0001.docx", "PIP_letter.pdf"),
@@ -70,7 +70,7 @@ public enum DocmosisTemplates {
 
     DRAFT_CLAIM_FORM("CV-SPC-CLM-ENG-00001-DRAFT.docx", "draft_claim_form_%s.pdf"),
     HEARING_SMALL_CLAIMS_AHN("CV-UNS-HNO-ENG-01202.docx", "hearing_small_claim_%s.pdf"),
-    HEARING_FAST_TRACK_AHN("CV-UNS-HNO-ENG-01203.docx", "hearing_fast_track_%s.pdf"),
+    HEARING_TRIAL_AHN("CV-UNS-HNO-ENG-01203.docx", "trial_%s.pdf"),
     HEARING_APPLICATION_AHN("CV-UNS-HNO-ENG-01204.docx", "hearing_application_%s.pdf"),
     HEARING_OTHER_AHN("CV-UNS-HNO-ENG-01201.docx", "hearing_other_claim_%s.pdf"),
     REQUEST_FOR_RECONSIDERATION("CV-SPC-CLM-ENG-REQUEST-RECONSIDERATION.docx", "%s_request_for_reconsideration.pdf"),
@@ -78,6 +78,12 @@ public enum DocmosisTemplates {
     // judge final Order
     FREE_FORM_ORDER_PDF("CV-UNS-DEC-ENG-01099.docx", "Order_%s.pdf"),
     ASSISTED_ORDER_PDF("CV-UNS-DEC-ENG-01283.docx", "Order_%s.pdf"),
+
+    // Judge order download order
+    BLANK_TEMPLATE_AFTER_HEARING_DOCX("CV-UNS-DEC-ENG-01286.docx", "%s_order.docx"),
+    BLANK_TEMPLATE_BEFORE_HEARING_DOCX("CV-UNS-DEC-ENG-01301.docx", "%s_Directions order.docx"),
+    FIX_DATE_CCMC_DOCX("CV-UNS-DEC-ENG-01287.docx", "%s_Directions order.docx"),
+    FIX_DATE_CMC_DOCX("CV-UNS-DEC-ENG-01302.docx", "%s_Directions order.docx"),
 
     //Court officer order
     COURT_OFFICER_ORDER_PDF("CV-UNS-DEC-ENG-01299.docx", "Order_%s.pdf"),

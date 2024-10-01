@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnlineMapper;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -105,7 +106,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             data.getCcjPaymentDetails();
 
         if (featureToggleService.isJudgmentOnlineLive()
-            && data.isLRvLipOneVOne()
+            && JudgmentsOnlineHelper.isNonDivergentForDJ(data)
             && data.isPayImmediately()) {
 
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
@@ -114,17 +115,21 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
             businessProcess = BusinessProcess.ready(REQUEST_JUDGEMENT_ADMISSION_SPEC);
         }
-        if (featureToggleService.isJudgmentOnlineLive()) {
-            data.setActiveJudgment(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(data));
-            data.setJoIsLiveJudgmentExists(YesOrNo.YES);
-        }
 
         CaseData.CaseDataBuilder caseDataBuilder = data.toBuilder()
             .businessProcess(businessProcess)
             .ccjPaymentDetails(ccjPaymentDetails);
 
+        CaseData updatedCaseData = caseDataBuilder.build();
+
+        if (featureToggleService.isJudgmentOnlineLive()) {
+            updatedCaseData.setActiveJudgment(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(updatedCaseData));
+            updatedCaseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
+            updatedCaseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(updatedCaseData.getActiveJudgment()));
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(updatedCaseData.toMap(objectMapper))
             .state(nextState)
             .build();
     }

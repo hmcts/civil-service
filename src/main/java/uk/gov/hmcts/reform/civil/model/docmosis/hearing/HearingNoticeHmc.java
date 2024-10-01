@@ -17,6 +17,7 @@ import java.time.LocalDate;
 @Data
 public class HearingNoticeHmc implements MappableObject {
 
+    private final String title;
     private final Long caseNumber;
     private final LocalDate creationDate;
     private final String claimant;
@@ -35,5 +36,8 @@ public class HearingNoticeHmc implements MappableObject {
     private final String hearingType;
     private final LocalDate hearingDueDate;
     private final PaymentDetails hearingFeePaymentDetails;
+    private final String partiesAttendingInPerson;
+    private final String partiesAttendingByTelephone;
+    private final String partiesAttendingByVideo;
 
 }

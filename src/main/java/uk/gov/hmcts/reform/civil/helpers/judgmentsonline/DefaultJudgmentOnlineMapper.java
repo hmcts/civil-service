@@ -10,10 +10,12 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -28,6 +30,7 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
 
     boolean isNonDivergent =  false;
     private final InterestCalculator interestCalculator;
+    private final RoboticsAddressMapper addressMapper;
 
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
@@ -36,8 +39,8 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
         BigInteger costs = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getCostOfJudgmentForDJ(caseData));
         isNonDivergent =  JudgmentsOnlineHelper.isNonDivergentForDJ(caseData);
         JudgmentDetails activeJudgment = super.addUpdateActiveJudgment(caseData);
-        activeJudgment = super.updateDefendantDetails(activeJudgment, caseData);
-        return activeJudgment.toBuilder()
+        activeJudgment = super.updateDefendantDetails(activeJudgment, caseData, addressMapper);
+        JudgmentDetails judgmentDetails = activeJudgment.toBuilder()
             .createdTimestamp(LocalDateTime.now())
             .state(getJudgmentState(caseData))
             .type(JudgmentType.DEFAULT_JUDGMENT)
@@ -45,11 +48,15 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
                                    ? getInstalmentDetails(caseData) : null)
             .paymentPlan(getPaymentPlan(caseData))
             .isRegisterWithRTL(isNonDivergent ? YesOrNo.YES : YesOrNo.NO)
+            .rtlState(isNonDivergent ? JudgmentRTLStatus.ISSUED.getRtlState() : null)
             .issueDate(LocalDate.now())
             .orderedAmount(orderAmount.toString())
             .costs(costs.toString())
             .totalAmount(orderAmount.add(costs).toString())
             .build();
+        super.updateJudgmentTabDataWithActiveJudgment(judgmentDetails, caseData);
+
+        return judgmentDetails;
     }
 
     @Override
