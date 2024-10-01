@@ -81,6 +81,6 @@ public class DashboardNotificationsEntity implements Serializable {
     @Schema(name = "updated_on")
     private OffsetDateTime updatedOn;
 
-    @Schema(name="deadline")
+    @Schema(name = "deadline")
     private LocalDateTime deadline;
 }
