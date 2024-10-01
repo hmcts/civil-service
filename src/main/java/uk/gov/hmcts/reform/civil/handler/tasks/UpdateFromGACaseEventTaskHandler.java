@@ -260,23 +260,26 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
     }
 
     private List<Element<?>> checkDraftDocumentsInMainCase(List<Element<?>> civilDocs, List<Element<?>> gaDocs) {
-
         List<UUID> ids = gaDocs.stream().map(Element::getId).toList();
         List<Element<?>> civilDocsCopy = newArrayList();
+        
         for (Element<?> civilDoc : civilDocs) {
             if (!ids.contains(civilDoc.getId())) {
                 civilDocsCopy.add(civilDoc);
             }
         }
+        
         List<UUID> civilIds = civilDocs.stream().map(Element::getId).toList();
         for (Element<?> gaDoc : gaDocs) {
             if (!civilIds.contains(gaDoc.getId())) {
                 civilDocsCopy.add(gaDoc);
             }
         }
+        
         civilDocs.clear();
         civilDocs.addAll(civilDocsCopy);
         civilDocsCopy.clear();
+        
         return civilDocs;
     }
 
@@ -285,6 +288,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
         if (isNull(gaAppDetails)) {
             return false;
         }
+        
         return gaAppDetails.stream()
             .anyMatch(civilGaData -> generalAppCaseData.getCcdCaseReference()
                 .equals(parseLong(civilGaData.getValue().getCaseLink().getCaseReference())));
@@ -300,6 +304,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
         if (isNull(gaAppDetails)) {
             return false;
         }
+        
         return gaAppDetails.stream()
             .anyMatch(civilGaData -> generalAppCaseData.getCcdCaseReference()
                 .equals(parseLong(civilGaData.getValue().getCaseLink().getCaseReference())));
