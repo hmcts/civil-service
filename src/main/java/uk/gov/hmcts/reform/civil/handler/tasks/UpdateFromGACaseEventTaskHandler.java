@@ -126,14 +126,6 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             newGaAddlDoc.addAll(generalAppCaseData.getGaAddlDocBundle());
             return generalAppCaseData.toBuilder().gaAddlDoc(newGaAddlDoc).build();
         }
-        if (featureToggleService.isGaForLipsEnabled() && (civilCaseData.isRespondent1LiP() || civilCaseData.isRespondent2LiP()
-            || civilCaseData.isApplicantNotRepresented()) && (Objects.nonNull(generalAppCaseData.getGaDraftDocument()) && generalAppCaseData.getGaDraftDocument().size() > 1)) {
-            generalAppCaseData.getGaDraftDocument().sort(Comparator.comparing(gaDocElement -> gaDocElement.getValue().getCreatedDatetime(), Comparator.reverseOrder()));
-            generalAppCaseData.getGaDraftDocument().remove(1);
-            List<Element<CaseDocument>> draftApplicationList = newArrayList();
-            draftApplicationList.addAll(generalAppCaseData.getGaDraftDocument());
-            generalAppCaseData.toBuilder().gaDraftDocument(draftApplicationList).build();
-        }
         return generalAppCaseData;
     }
 
