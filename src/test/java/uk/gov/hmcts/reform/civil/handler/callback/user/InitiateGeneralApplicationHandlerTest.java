@@ -14,12 +14,14 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
+import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypesLR;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationTypeLR;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
@@ -423,13 +425,14 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotCauseAnyErrors_whenGaTypeIsNotSettleOrDiscontinueConsent() {
 
-            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT);
+            List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.STRIKE_OUT, GeneralApplicationTypesLR.SUMMARY_JUDGEMENT);
             CaseData caseData = CaseDataBuilder
-                    .builder().generalAppType(GAApplicationType.builder().types(types).build())
-                    .build().toBuilder()
-                    .generalAppRespondentAgreement(GARespondentOrderAgreement
-                            .builder().hasAgreed(NO).build())
-                    .build();
+                .builder()
+                .generalAppTypeLR(GAApplicationTypeLR.builder().types(typesLR).build())
+                .build().toBuilder()
+                .generalAppRespondentAgreement(GARespondentOrderAgreement
+                                                   .builder().hasAgreed(NO).build())
+                .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_CONSENT);
 
@@ -441,13 +444,14 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotCauseAnyErrors_whenGaTypeIsNotSettleOrDiscontinueConsentYes() {
 
-            List<GeneralApplicationTypes> types = List.of(SETTLE_BY_CONSENT);
+            List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.SETTLE_BY_CONSENT);
             CaseData caseData = CaseDataBuilder
-                    .builder().generalAppType(GAApplicationType.builder().types(types).build())
-                    .build().toBuilder()
-                    .generalAppRespondentAgreement(GARespondentOrderAgreement
-                            .builder().hasAgreed(YES).build())
-                    .build();
+                .builder()
+                .generalAppTypeLR(GAApplicationTypeLR.builder().types(typesLR).build())
+                .build().toBuilder()
+                .generalAppRespondentAgreement(GARespondentOrderAgreement
+                                                   .builder().hasAgreed(YES).build())
+                .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_CONSENT);
 
@@ -459,13 +463,14 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldCauseError_whenGaTypeIsNotSettleOrDiscontinueConsentNo() {
 
-            List<GeneralApplicationTypes> types = List.of(SETTLE_BY_CONSENT);
+            List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.SETTLE_BY_CONSENT);
             CaseData caseData = CaseDataBuilder
-                    .builder().generalAppType(GAApplicationType.builder().types(types).build())
-                    .build().toBuilder()
-                    .generalAppRespondentAgreement(GARespondentOrderAgreement
-                            .builder().hasAgreed(NO).build())
-                    .build();
+                .builder()
+                .generalAppTypeLR(GAApplicationTypeLR.builder().types(typesLR).build())
+                .build().toBuilder()
+                .generalAppRespondentAgreement(GARespondentOrderAgreement
+                                                   .builder().hasAgreed(NO).build())
+                .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_CONSENT);
 
