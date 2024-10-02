@@ -56,7 +56,7 @@ public class StayCaseCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        caseDataBuilder.businessProcess(BusinessProcess.ready(STAY_CASE));
+        caseDataBuilder.businessProcess(BusinessProcess.ready(STAY_CASE)).hearingFee(null).hearingDate(null).hearingDueDate(null).build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(mapper))
