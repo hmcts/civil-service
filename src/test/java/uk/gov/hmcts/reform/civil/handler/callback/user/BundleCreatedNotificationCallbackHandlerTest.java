@@ -63,7 +63,7 @@ class BundleCreatedNotificationCallbackHandlerTest extends BaseCallbackHandlerTe
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: Handler is called
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(false);
+            when(featureToggleService.isAmendBundleEnabled()).thenReturn(false);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             //Then: It should start BUNDLE_CREATION_NOTIFICATION camunda business process
@@ -96,7 +96,7 @@ class BundleCreatedNotificationCallbackHandlerTest extends BaseCallbackHandlerTe
             CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+            when(featureToggleService.isAmendBundleEnabled()).thenReturn(true);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -110,7 +110,7 @@ class BundleCreatedNotificationCallbackHandlerTest extends BaseCallbackHandlerTe
             CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(false);
+            when(featureToggleService.isAmendBundleEnabled()).thenReturn(false);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
