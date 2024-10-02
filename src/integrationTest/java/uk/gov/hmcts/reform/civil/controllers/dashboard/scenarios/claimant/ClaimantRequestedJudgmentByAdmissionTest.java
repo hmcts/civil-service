@@ -24,6 +24,7 @@ public class ClaimantRequestedJudgmentByAdmissionTest extends DashboardBaseInteg
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
+            .applicant1Represented(YesOrNo.NO)
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
             .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).individualTitle("Mr").individualFirstName("Claimant").build())
             .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).individualTitle("Mr").individualFirstName(
