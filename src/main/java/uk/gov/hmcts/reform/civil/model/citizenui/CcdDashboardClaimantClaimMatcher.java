@@ -497,6 +497,23 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     }
 
     @Override
+    public boolean isTrialArrangementStatusActive() {
+        int dayLimit = 6 * 7;
+        Optional<LocalDate> hearingDate = getHearingDate();
+        if (SdoHelper.isFastTrack(caseData)
+            && !trialArrangementsSubmitted()
+            && hearingDate.isPresent()
+            && LocalDate.now().plusDays(dayLimit + 1L).isAfter(hearingDate.get())) {
+            Optional<LocalDateTime> lastOrder = getTimeOfLastNonSDOOrder();
+            return lastOrder.isEmpty()
+                || hearingDate.get().minusDays(dayLimit)
+                .isAfter(lastOrder.get().toLocalDate());
+        } else {
+            return false;
+        }
+    }
+
+    @Override
     public boolean isHwFHearingSubmit() {
         Optional<LocalDateTime> eventTime = getTimeOfMostRecentEventOfType(
             EnumSet.of(CaseEvent.APPLY_HELP_WITH_HEARING_FEE));
