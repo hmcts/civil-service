@@ -21,7 +21,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STAY_CASE;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
 
 @Service
 @RequiredArgsConstructor
@@ -58,11 +57,10 @@ public class StayCaseCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         caseDataBuilder.businessProcess(BusinessProcess.ready(STAY_CASE));
-        caseDataBuilder.preStayState(callbackParams.getRequest().getCaseDetails().getState());
+        caseDataBuilder.preStayState(callbackParams.getRequest().getCaseDetailsBefore().getState());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(mapper))
-            .state(CASE_STAYED.name())
             .build();
     }
 
