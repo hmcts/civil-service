@@ -85,7 +85,9 @@ public class DashboardScenariosService {
                 StringSubstitutor stringSubstitutor = new StringSubstitutor(templateParams);
 
                 String notificationDeadlineValue = template.getDeadlineParam() != null
-                    ? scenarioRequestParams.getParams().get(template.getDeadlineParam()).toString()
+                    ? Optional.ofNullable(
+                        scenarioRequestParams.getParams().get(template.getDeadlineParam())
+                    ).map(Object::toString).orElse(null)
                     : null;
                 LocalDateTime notificationDeadline = Optional.ofNullable(notificationDeadlineValue)
                     .map(value -> {
