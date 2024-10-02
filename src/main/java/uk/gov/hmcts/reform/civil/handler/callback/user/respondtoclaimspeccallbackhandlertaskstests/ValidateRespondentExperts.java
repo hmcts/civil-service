@@ -22,7 +22,6 @@ public class ValidateRespondentExperts implements CaseTask, ExpertsValidator {
 
     private final RespondToClaimSpecUtils respondToClaimSpecUtils;
 
-    @Override
     public CallbackResponse execute(CallbackParams callbackParams) {
         log.info("Executing ValidateRespondentExperts task");
         CaseData caseData = callbackParams.getCaseData();

@@ -31,7 +31,6 @@ public class DetermineLoggedInSolicitor implements CaseTask {
     private final CoreCaseUserService coreCaseUserService;
     private final ObjectMapper objectMapper;
 
-    @Override
     public CallbackResponse execute(CallbackParams callbackParams) {
         log.info("Executing DetermineLoggedInSolicitor task for case ID: {}", callbackParams.getCaseData().getCcdCaseReference());
 

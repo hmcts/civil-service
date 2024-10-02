@@ -52,7 +52,6 @@ public class HandleDefendAllClaim implements CaseTask {
 
     static final String UNKNOWN_MP_SCENARIO = "Unknown mp scenario";
 
-    @Override
     public CallbackResponse execute(CallbackParams callbackParams) {
         log.info("Executing HandleDefendAllClaim with callbackParams: {}", callbackParams);
         CaseData caseData = callbackParams.getCaseData();

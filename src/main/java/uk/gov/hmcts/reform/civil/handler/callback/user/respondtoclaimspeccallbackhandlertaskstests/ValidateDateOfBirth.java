@@ -37,7 +37,6 @@ public class ValidateDateOfBirth implements CaseTask {
     private final ObjectMapper objectMapper;
     private final RespondToClaimSpecUtils respondToClaimSpecUtils;
 
-    @Override
     public CallbackResponse execute(CallbackParams callbackParams) {
         log.info("Executing ValidateDateOfBirth task");
         CaseData caseData = callbackParams.getCaseData();

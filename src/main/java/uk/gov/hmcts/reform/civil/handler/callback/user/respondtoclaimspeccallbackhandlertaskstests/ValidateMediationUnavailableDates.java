@@ -20,7 +20,6 @@ import static uk.gov.hmcts.reform.civil.utils.MediationUnavailableDatesUtils.che
 @Slf4j
 public class ValidateMediationUnavailableDates implements CaseTask {
 
-    @Override
     public CallbackResponse execute(CallbackParams callbackParams) {
         log.info("Executing ValidateMediationUnavailableDates task");
         CaseData caseData = callbackParams.getCaseData();

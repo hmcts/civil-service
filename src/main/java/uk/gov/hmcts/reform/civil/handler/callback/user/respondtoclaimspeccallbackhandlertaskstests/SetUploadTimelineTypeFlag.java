@@ -27,7 +27,6 @@ public class SetUploadTimelineTypeFlag implements CaseTask {
 
     private final ObjectMapper objectMapper;
 
-    @Override
     public CallbackResponse execute(CallbackParams callbackParams) {
         log.info("Executing SetUploadTimelineTypeFlag task");
         CaseData caseData = callbackParams.getCaseData();

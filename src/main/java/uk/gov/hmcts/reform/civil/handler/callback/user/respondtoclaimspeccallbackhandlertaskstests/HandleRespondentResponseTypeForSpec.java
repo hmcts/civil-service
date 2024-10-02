@@ -20,7 +20,6 @@ public class HandleRespondentResponseTypeForSpec implements CaseTask {
 
     private final ObjectMapper objectMapper;
 
-    @Override
     public CallbackResponse execute(CallbackParams callbackParams) {
         log.info("Executing HandleRespondentResponseTypeForSpec with callbackParams: {}", callbackParams);
 

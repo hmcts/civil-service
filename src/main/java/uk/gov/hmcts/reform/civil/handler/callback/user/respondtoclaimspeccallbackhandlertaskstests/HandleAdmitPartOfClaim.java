@@ -57,7 +57,6 @@ public class HandleAdmitPartOfClaim implements CaseTask {
     private final PaymentDateValidator paymentDateValidator;
     private final RespondToClaimSpecUtils respondToClaimSpecUtils;
 
-    @Override
     public CallbackResponse execute(CallbackParams callbackParams) {
         log.info("Executing HandleAdmitPartOfClaim task for case ID: {}", callbackParams.getCaseData().getCcdCaseReference());
 

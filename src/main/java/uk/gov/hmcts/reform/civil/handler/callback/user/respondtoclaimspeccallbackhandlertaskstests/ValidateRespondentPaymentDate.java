@@ -21,7 +21,6 @@ public class ValidateRespondentPaymentDate implements CaseTask {
 
     private final PaymentDateValidator paymentDateValidator;
 
-    @Override
     public CallbackResponse execute(CallbackParams callbackParams) {
         log.info("Executing ValidateRespondentPaymentDate task with callbackParams: {}", callbackParams);
 

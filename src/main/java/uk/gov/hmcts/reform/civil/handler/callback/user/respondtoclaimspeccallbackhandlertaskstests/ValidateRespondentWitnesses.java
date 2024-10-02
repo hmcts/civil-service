@@ -28,7 +28,6 @@ public class ValidateRespondentWitnesses implements CaseTask, WitnessesValidator
 
     private final RespondToClaimSpecUtils respondToClaimSpecUtils;
 
-    @Override
     public CallbackResponse execute(CallbackParams callbackParams) {
         log.info("Executing ValidateRespondentWitnesses task with callbackParams: {}", callbackParams);
         CaseData caseData = callbackParams.getCaseData();

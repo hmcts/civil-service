@@ -52,7 +52,6 @@ public class SetGenericResponseTypeFlag implements CaseTask {
     private final CoreCaseUserService coreCaseUserService;
     private final RespondToClaimSpecUtils respondToClaimSpecUtilsDisputeDetails;
 
-    @Override
     public CallbackResponse execute(CallbackParams callbackParams) {
         log.info("Executing SetGenericResponseTypeFlag task");
         log.debug("Received CallbackParams: {}", callbackParams);
