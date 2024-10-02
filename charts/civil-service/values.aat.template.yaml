@@ -237,3 +237,6 @@ aac-manage-case-assignment:
             alias: IDAM_NOC_APPROVER_PASSWORD
           - name: notify-mca-api-key-secret
             alias: NOTIFY_MCA_API_KEY
+
+wiremock:
+  enabled: false
