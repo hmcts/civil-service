@@ -26,4 +26,7 @@ public class RecordJudgmentDeterminationOfMeansLiPDefendantLetter implements Map
     private final LocalDate letterIssueDate;
     private final String respondToClaimUrl;
     private final String pin;
+    private final String varyJudgmentFee;
+    private final String certifOfSatisfactionFee;
+
 }
