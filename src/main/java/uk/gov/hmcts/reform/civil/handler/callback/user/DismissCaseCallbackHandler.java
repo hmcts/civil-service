@@ -54,7 +54,9 @@ public class DismissCaseCallbackHandler extends CallbackHandler {
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataUpdated = caseData.toBuilder()
-            .businessProcess(BusinessProcess.ready(DISMISS_CASE));
+            .businessProcess(BusinessProcess.ready(DISMISS_CASE))
+            .hearingFee(null).hearingDate(null).hearingDueDate(null);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.build().toMap(objectMapper))
             .build();
