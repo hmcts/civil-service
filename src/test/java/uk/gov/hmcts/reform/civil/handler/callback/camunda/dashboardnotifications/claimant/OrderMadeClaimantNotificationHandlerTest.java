@@ -446,7 +446,7 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
 
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA6.Update.Claimant.TaskList.TrialReady.FinalOrders",
+                "Scenario.AAA6.Update.TaskList.TrialReady.FinalOrders.Claimant",
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );

@@ -509,7 +509,7 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
             HashMap<String, Object> scenarioParams = new HashMap<>();
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA6.Update.Defendant.TaskList.TrialReady.FinalOrders",
+                "Scenario.AAA6.Update.TaskList.TrialReady.FinalOrders.Defendant",
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
