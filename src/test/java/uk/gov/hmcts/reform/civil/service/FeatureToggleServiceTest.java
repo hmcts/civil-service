@@ -287,4 +287,13 @@ class FeatureToggleServiceTest {
 
         assertThat(featureToggleService.isDashboardEnabledForCase(caseData)).isEqualTo(toggleStat);
     }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsCoSCEnabled(Boolean toggleStat) {
+        var isCoSCEnabledKey = "isCoSCEnabled";
+        givenToggle(isCoSCEnabledKey, toggleStat);
+
+        assertThat(featureToggleService.isCoSCEnabled()).isEqualTo(toggleStat);
+    }
 }
