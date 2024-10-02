@@ -12,14 +12,14 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_STAY_CASE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_STAY_LIFTED;
 
 @Service
 public class NotifyClaimantStayLiftedHandler extends AbstractNotifyStayLiftedHandler {
 
     private static final String TASK_ID = "NotifyClaimantStayLifted";
     private static final String REFERENCE_TEMPLATE = "stay-lifted-claimant-notification-%s";
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIMANT_STAY_CASE);
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIMANT_STAY_LIFTED);
 
     public NotifyClaimantStayLiftedHandler(NotificationService notificationService, NotificationsProperties notificationsProperties) {
         super(notificationService, notificationsProperties);

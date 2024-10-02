@@ -26,6 +26,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_STAY;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STAY_LIFTED;
+import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 
 @ExtendWith(MockitoExtension.class)
 public class ManageStayCallbackHandlerTest {
@@ -79,13 +81,16 @@ public class ManageStayCallbackHandlerTest {
         @Test
         void shouldReturnNoError_WhenAboutToSubmitIsInvokedToggleTrue() {
             when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build()
+                .toBuilder().manageStayOption("LIFT_STAY").build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).extracting("businessProcess")
+                .extracting("status", "camundaEvent")
+                .containsExactly(READY.name(), STAY_LIFTED.name());
         }
 
         @Test
