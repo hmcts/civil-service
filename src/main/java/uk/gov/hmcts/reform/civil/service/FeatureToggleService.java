@@ -152,4 +152,7 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("ga-allowed-pre-sdo");
     }
 
+    public boolean isCoSCEnabled() {
+        return featureToggleApi.isFeatureEnabled("isCoSCEnabled");
+    }
 }
