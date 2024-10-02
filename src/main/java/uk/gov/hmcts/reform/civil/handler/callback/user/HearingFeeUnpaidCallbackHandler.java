@@ -50,6 +50,7 @@ public class HearingFeeUnpaidCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData().toBuilder()
             .businessProcess(BusinessProcess.ready(HEARING_FEE_UNPAID))
             .caseDismissedHearingFeeDueDate(time.now())
+            .hearingFee(null).hearingDate(null).hearingDueDate(null)
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
