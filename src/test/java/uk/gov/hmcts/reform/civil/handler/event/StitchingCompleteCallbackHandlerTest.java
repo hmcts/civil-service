@@ -91,7 +91,7 @@ public class StitchingCompleteCallbackHandlerTest extends BaseCallbackHandlerTes
         CaseData caseData = CaseData.builder().caseBundles(caseBundles)
             .bundleEvent("BUNDLE_CREATED_NOTIFICATION").build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+        when(featureToggleService.isAmendBundleEnabled()).thenReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isNull();
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -127,7 +127,7 @@ public class StitchingCompleteCallbackHandlerTest extends BaseCallbackHandlerTes
     @MethodSource("provideCaseDataForTriggerUpdateBundleCategoryIdTest")
     void shouldUpdateBundleCategoryId(CaseData caseData, YesOrNo expectedBundleError, String expectedBusinessProcessEvent) {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+        when(featureToggleService.isAmendBundleEnabled()).thenReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isNull();
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
