@@ -425,6 +425,59 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotCauseAnyErrors_whenGaTypeIsNotSettleOrDiscontinueConsent() {
 
+            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT);
+            CaseData caseData = CaseDataBuilder
+                .builder().generalAppType(GAApplicationType.builder().types(types).build())
+                .build().toBuilder()
+                .generalAppRespondentAgreement(GARespondentOrderAgreement
+                                                   .builder().hasAgreed(NO).build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_CONSENT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldNotCauseAnyErrors_whenGaTypeIsNotSettleOrDiscontinueConsentYes() {
+
+            List<GeneralApplicationTypes> types = List.of(SETTLE_BY_CONSENT);
+            CaseData caseData = CaseDataBuilder
+                .builder().generalAppType(GAApplicationType.builder().types(types).build())
+                .build().toBuilder()
+                .generalAppRespondentAgreement(GARespondentOrderAgreement
+                                                   .builder().hasAgreed(YES).build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_CONSENT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldCauseError_whenGaTypeIsNotSettleOrDiscontinueConsentNo() {
+
+            List<GeneralApplicationTypes> types = List.of(SETTLE_BY_CONSENT);
+            CaseData caseData = CaseDataBuilder
+                .builder().generalAppType(GAApplicationType.builder().types(types).build())
+                .build().toBuilder()
+                .generalAppRespondentAgreement(GARespondentOrderAgreement
+                                                   .builder().hasAgreed(NO).build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_CONSENT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNotEmpty();
+            assertThat(response.getErrors()).contains(INVALID_SETTLE_BY_CONSENT);
+        }
+
+        @Test
+        void shouldNotCauseAnyErrors_whenGaTypeIsNotSettleOrDiscontinueConsentCoscEnabled() {
+
+            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
             List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.STRIKE_OUT, GeneralApplicationTypesLR.SUMMARY_JUDGEMENT);
             CaseData caseData = CaseDataBuilder
                 .builder()
@@ -442,9 +495,10 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotCauseAnyErrors_whenGaTypeIsNotSettleOrDiscontinueConsentYes() {
+        void shouldNotCauseAnyErrors_whenGaTypeIsNotSettleOrDiscontinueConsentYesCoscEnabled() {
 
             List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.SETTLE_BY_CONSENT);
+            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder
                 .builder()
                 .generalAppTypeLR(GAApplicationTypeLR.builder().types(typesLR).build())
@@ -461,8 +515,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldCauseError_whenGaTypeIsNotSettleOrDiscontinueConsentNo() {
+        void shouldCauseError_whenGaTypeIsNotSettleOrDiscontinueConsentNoCoscEnabled() {
 
+            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
             List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.SETTLE_BY_CONSENT);
             CaseData caseData = CaseDataBuilder
                 .builder()
@@ -812,6 +867,31 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldSet275Fees_whenVaryApplicationIsUnConsentedCoscEnabled() {
+            given(feesService.getFeeForGA(any()))
+                .willReturn(Fee.builder()
+                                .code(FEE_CODE)
+                                .calculatedAmountInPence(fee275)
+                                .version(FEE_VERSION).build());
+            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
+            List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.VARY_PAYMENT_TERMS_OF_JUDGMENT);
+            CaseData caseData = CaseDataBuilder
+                .builder()
+                .generalAppTypeLR(GAApplicationTypeLR.builder().types(typesLR).build())
+                .build()
+                .toBuilder()
+                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_AND_PBA);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(getPBADetails(response).getFee()).isNotNull();
+            assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("27500");
+        }
+
+        @Test
         void shouldSet14Fees_whenApplicationIsVaryOrder() {
             given(feesService.getFeeForGA(any()))
                 .willReturn(Fee.builder()
@@ -834,6 +914,28 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldSet14Fees_whenApplicationIsVaryOrderCoscEnabled() {
+            given(feesService.getFeeForGA(any()))
+                .willReturn(Fee.builder()
+                                .code(FEE_CODE)
+                                .calculatedAmountInPence(fee14)
+                                .build());
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
+                CaseDataBuilder.builder().build(), false, false);
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
+            List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.VARY_ORDER);
+            caseDataBuilder.generalAppTypeLR(GAApplicationTypeLR.builder().types(typesLR).build());
+            CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, SET_FEES_AND_PBA);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(getPBADetails(response).getFee()).isNotNull();
+            assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("1400");
+        }
+
+        @Test
         void shouldSet14Fees_whenApplicationIsVaryOrderWithMultipleTypes() {
             given(feesService.getFeeForGA(any()))
                 .willReturn(Fee.builder()
@@ -846,6 +948,27 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             caseDataBuilder.generalAppType(GAApplicationType.builder()
                                                .types(types)
                                                .build());
+            CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, SET_FEES_AND_PBA);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(getPBADetails(response).getFee()).isNotNull();
+            assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("1400");
+        }
+
+        @Test
+        void shouldSet14Fees_whenApplicationIsVaryOrderWithMultipleTypesCoscEnabled() {
+            given(feesService.getFeeForGA(any()))
+                .willReturn(Fee.builder()
+                                .code(FEE_CODE)
+                                .calculatedAmountInPence(fee14).build());
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
+                CaseDataBuilder.builder().build(), false, false);
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
+            List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.VARY_ORDER, GeneralApplicationTypesLR.STAY_THE_CLAIM);
+            caseDataBuilder.generalAppTypeLR(GAApplicationTypeLR.builder().types(typesLR).build());
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, SET_FEES_AND_PBA);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
@@ -163,7 +164,14 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CallbackResponse gaValidateConsent(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        var generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
+
+        List<GeneralApplicationTypes> generalAppTypes;
+        if (featureToggleService.isCoSCEnabled()) {
+            generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
+        } else {
+            generalAppTypes = caseData.getGeneralAppType().getTypes();
+        }
+
         var consent = Objects.nonNull(caseData.getGeneralAppRespondentAgreement())
                                 && YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed());
         List<String> errors = new ArrayList<>();
@@ -181,10 +189,15 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CallbackResponse gaValidateType(CallbackParams callbackParams) {
 
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-
         List<String> errors = new ArrayList<>();
-        var generalAppTypes = caseData.getGeneralAppType().getTypes();
+
+        List<GeneralApplicationTypes> generalAppTypes;
+        if (featureToggleService.isCoSCEnabled()) {
+            generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
+        } else {
+            generalAppTypes = caseData.getGeneralAppType().getTypes();
+        }
+
         if (generalAppTypes.size() > 1
             && generalAppTypes.contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {
             errors.add("It is not possible to select an additional application type when applying to vary payment terms of judgment");
@@ -194,7 +207,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             errors.add("It is not possible to select an additional application type " +
                     "when applying to Settle by consent");
         }
-
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (generalAppTypes.size() == 1
             && generalAppTypes.contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {
             caseDataBuilder.generalAppVaryJudgementType(YesOrNo.YES)
@@ -256,6 +269,11 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
     private CallbackResponse setFeesAndPBA(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+
+        if (featureToggleService.isCoSCEnabled()) {
+            caseData = caseData.toBuilder().generalAppType(GAApplicationType.builder().types(GATypeHelper.getGATypes(
+                caseData.getGeneralAppTypeLR().getTypes())).build()).build();
+        }
         caseData = setWithNoticeByType(caseData);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         Fee feeForGA = feesService.getFeeForGA(caseData);
@@ -316,6 +334,13 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             CaseData updatedCaseData = caseData.toBuilder()
                 .generalAppHearingDetails(generalAppHearingDetails)
                 .generalAppParentClaimantIsApplicant(null)
+                .build();
+            caseData = updatedCaseData;
+        }
+        if (featureToggleService.isCoSCEnabled()) {
+            var generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
+            CaseData updatedCaseData = caseData.toBuilder()
+                .generalAppType(GAApplicationType.builder().types(generalAppTypes).build())
                 .build();
             caseData = updatedCaseData;
         }
