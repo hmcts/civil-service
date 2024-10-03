@@ -15,11 +15,14 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
+import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_STAY_LIFTED;
 
 @ExtendWith(MockitoExtension.class)
 class NotifyClaimantStayLiftedHandlerTest {
@@ -42,6 +45,20 @@ class NotifyClaimantStayLiftedHandlerTest {
             .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe").type(Party.Type.INDIVIDUAL).build())
             .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson").type(Party.Type.INDIVIDUAL).build())
             .build();
+    }
+
+    @Test
+    void checkCamundaActivityTest() {
+        caseData = caseData.toBuilder().build();
+        CallbackParams params = CallbackParams.builder().caseData(caseData).build();
+        var response = handler.camundaActivityId(params);
+        assertEquals("NotifyClaimantStayLifted", response);
+    }
+
+    @Test
+    void checkHandleEventTest() {
+        var response = handler.handledEvents();
+        assertEquals(List.of(NOTIFY_CLAIMANT_STAY_LIFTED), response);
     }
 
     @Test
