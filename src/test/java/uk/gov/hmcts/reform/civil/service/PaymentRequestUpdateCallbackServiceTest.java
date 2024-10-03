@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.Map;
 
 import static org.mockito.Mockito.any;
@@ -82,6 +83,7 @@ class PaymentRequestUpdateCallbackServiceTest {
             .payment(PaymentDto.builder()
                          .amount(new BigDecimal(167))
                          .paymentReference(REFERENCE)
+                         .dateUpdated(OffsetDateTime.now())
                          .caseReference(REFERENCE)
                          .accountNumber(ACCOUNT_NUMBER)
                          .build())
