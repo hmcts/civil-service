@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
+import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
@@ -111,18 +113,36 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
     }
 
     private JudgmentInstalmentDetails getInstalmentDetails(CaseData caseData) {
+        if (caseData.hasApplicant1CourtDecisionInFavourOfClaimant()) {
+            BigInteger instalmentsAmount =
+                MonetaryConversions.poundsToPennies(caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec());
+            return buildJudgmentInstalmentDetails(
+                String.valueOf(instalmentsAmount),
+                getClaimantLipSuggestedPaymentFrequency(
+                    caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec()),
+                caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec()
+            );
+        }
 
         RepaymentPlanLRspec repaymentPlan = caseData.getRespondent1RepaymentPlan() != null
             ? caseData.getRespondent1RepaymentPlan() : caseData.getRespondent2RepaymentPlan();
         if (repaymentPlan != null) {
-            return JudgmentInstalmentDetails.builder()
-                .amount(String.valueOf(getValue(repaymentPlan.getPaymentAmount())))
-                .paymentFrequency(getPaymentFrequency(repaymentPlan.getRepaymentFrequency()))
-                .startDate(repaymentPlan.getFirstRepaymentDate())
-                .build();
+            return buildJudgmentInstalmentDetails(
+                String.valueOf(getValue(repaymentPlan.getPaymentAmount())),
+                getPaymentFrequency(repaymentPlan.getRepaymentFrequency()),
+                repaymentPlan.getFirstRepaymentDate()
+            );
         }
         return null;
+    }
 
+    private JudgmentInstalmentDetails buildJudgmentInstalmentDetails(
+        String paymentAmount, PaymentFrequency paymentFrequency, LocalDate firstRepaymentDate) {
+        return JudgmentInstalmentDetails.builder()
+            .amount(paymentAmount)
+            .paymentFrequency(paymentFrequency)
+            .startDate(firstRepaymentDate)
+            .build();
     }
 
     private PaymentFrequency getPaymentFrequency(PaymentFrequencyLRspec frequencyLRspec) {
@@ -136,12 +156,35 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
         }
     }
 
+    private PaymentFrequency getClaimantLipSuggestedPaymentFrequency(PaymentFrequencyClaimantResponseLRspec repaymentFrequency) {
+        return switch (repaymentFrequency) {
+            case ONCE_ONE_WEEK -> PaymentFrequency.WEEKLY;
+            case ONCE_TWO_WEEKS -> PaymentFrequency.EVERY_TWO_WEEKS;
+            default -> PaymentFrequency.MONTHLY;
+        };
+    }
+
     private LocalDate getPaymentDeadLineDate(CaseData caseData, PaymentPlanSelection paymentPlan) {
-        return PaymentPlanSelection.PAY_BY_DATE.equals(paymentPlan) && caseData.getRespondToClaimAdmitPartLRspec() != null
-            ? caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() : null;
+        if (PaymentPlanSelection.PAY_BY_DATE.equals(paymentPlan)) {
+            if (caseData.hasApplicant1CourtDecisionInFavourOfClaimant()) {
+                return (caseData.getApplicant1RequestedPaymentDateForDefendantSpec()) != null
+                    ? caseData.getApplicant1RequestedPaymentDateForDefendantSpec().getPaymentSetDate() : null;
+            }
+            return caseData.getRespondToClaimAdmitPartLRspec() != null
+                ? caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() : null;
+        }
+        return null;
     }
 
     private PaymentPlanSelection getPaymentPlan(CaseData caseData) {
+        if (caseData.hasApplicant1CourtDecisionInFavourOfClaimant()) {
+            if (PaymentType.REPAYMENT_PLAN.equals(caseData.getApplicant1RepaymentOptionForDefendantSpec())) {
+                return PaymentPlanSelection.PAY_IN_INSTALMENTS;
+            } else if (PaymentType.SET_DATE.equals(caseData.getApplicant1RepaymentOptionForDefendantSpec())) {
+                return PaymentPlanSelection.PAY_BY_DATE;
+            }
+            return PaymentPlanSelection.PAY_IMMEDIATELY;
+        }
 
         if (caseData.isPayByInstallment()) {
             return PaymentPlanSelection.PAY_IN_INSTALMENTS;
