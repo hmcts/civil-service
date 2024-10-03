@@ -83,6 +83,7 @@ public class SetGenericResponseTypeFlag implements CaseTask {
         handleRespondentResponses(caseData, updatedData);
         log.debug("Handled respondent responses");
 
+        ///test
         if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
             || caseData.getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE) {
             updatedData.specFullDefenceOrPartAdmission1V1(YES);
