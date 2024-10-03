@@ -56,6 +56,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_SETTLE_BY_CONSENT;
@@ -166,7 +167,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         List<GeneralApplicationTypes> generalAppTypes;
-        if (featureToggleService.isCoSCEnabled()) {
+        if (featureToggleService.isCoSCEnabled() && isUserLR(caseData)) {
             generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
         } else {
             generalAppTypes = caseData.getGeneralAppType().getTypes();
@@ -192,7 +193,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
 
         List<GeneralApplicationTypes> generalAppTypes;
-        if (featureToggleService.isCoSCEnabled()) {
+        if (featureToggleService.isCoSCEnabled() && isUserLR(caseData)) {
             generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
         } else {
             generalAppTypes = caseData.getGeneralAppType().getTypes();
@@ -270,7 +271,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CallbackResponse setFeesAndPBA(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (featureToggleService.isCoSCEnabled()) {
+        if (featureToggleService.isCoSCEnabled() && isUserLR(caseData)) {
             caseData = caseData.toBuilder().generalAppType(GAApplicationType.builder().types(GATypeHelper.getGATypes(
                 caseData.getGeneralAppTypeLR().getTypes())).build()).build();
         }
@@ -337,7 +338,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 .build();
             caseData = updatedCaseData;
         }
-        if (featureToggleService.isCoSCEnabled()) {
+        if (featureToggleService.isCoSCEnabled() && isUserLR(caseData)) {
             var generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
             CaseData updatedCaseData = caseData.toBuilder()
                 .generalAppType(GAApplicationType.builder().types(generalAppTypes).build())
@@ -378,5 +379,12 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private boolean inStateAfterJudicialReferral(CaseState state) {
         return !stateAfterJudicialReferral.contains(state);
     }
+
+    private boolean isUserLR(CaseData caseData) {
+        return caseData.isApplicantRepresented()
+            || caseData.getRespondent1Represented() == YES
+            || caseData.getRespondent2Represented() == YES;
+    }
+
 
 }
