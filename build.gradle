@@ -19,8 +19,8 @@ group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
 
 def versions = [
-  junit             : '5.11.0',
-  junitPlatform     : '1.11.0',
+  junit             : '5.11.1',
+  junitPlatform     : '1.11.1',
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.0',
   lombok            : '1.18.34',
@@ -90,7 +90,7 @@ allprojects {
   dependencyManagement {
     dependencies {
       //CVE-2018-10237 - Unbounded memory allocation
-      dependencySet(group: 'com.google.guava', version: '33.3.0-jre') {
+      dependencySet(group: 'com.google.guava', version: '33.3.1-jre') {
         entry 'guava'
       }
 
@@ -117,15 +117,6 @@ allprojects {
         version: '2.2'
       ) {
         entry 'snakeyaml'
-      }
-      // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
-      dependencySet(
-        group: 'com.amazonaws',
-        version: '1.12.770'
-      ) {
-        entry 'aws-java-sdk-core'
-        entry 'aws-java-sdk-kms'
-        entry 'aws-java-sdk-s3'
       }
 
       dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.28') {
@@ -373,7 +364,7 @@ dependencies {
 
   implementation group: 'com.github.hmcts', name: 'ccd-client', version: '4.9.5-SPRING2'
   implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
-  implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '3.0.4'
+  implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '3.0.23'
   implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version:'7.4'
   implementation('com.github.hmcts:fees-java-client:0.0.6') {
     exclude group: 'uk.gov.hmcts.reform', module: 'java-logging'
@@ -384,7 +375,7 @@ dependencies {
   }
   implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.2.0-RELEASE'
   implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.1'
-  implementation group: 'com.sendgrid', name: 'sendgrid-java', version: '4.10.2'
+  implementation group: 'com.sendgrid', name: 'sendgrid-java', version: '4.10.3'
 
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -405,10 +396,10 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.23.1'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.23.1'
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.93'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.95'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.30'
-  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.23'
-  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.1'
+  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.24'
+  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.2'
 
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: versions.jackson
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
@@ -433,7 +424,7 @@ dependencies {
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.15.0'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.15.3'
   testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.14.19'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -450,13 +441,13 @@ dependencies {
   //pact contract testing
   contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.5'
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.11.0')
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.11.0')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.11.1')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.11.1')
   contractTestImplementation sourceSets.main.runtimeClasspath
   contractTestImplementation sourceSets.test.runtimeClasspath
 
-  integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.11.0')
-  integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.11.0')
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.11.1')
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.11.1')
 
   // dashboard specific changes
 
