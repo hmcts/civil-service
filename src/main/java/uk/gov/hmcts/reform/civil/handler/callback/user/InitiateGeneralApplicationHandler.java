@@ -14,11 +14,13 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
+import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypesLR;
 import uk.gov.hmcts.reform.civil.helpers.GATypeHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
@@ -163,7 +165,12 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CallbackResponse gaValidateConsent(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        var generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
+
+        var generalAppTypes = caseData.getGeneralAppType().getTypes();
+        if (featureToggleService.isCoSCEnabled()) {
+            generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
+        }
+
         var consent = Objects.nonNull(caseData.getGeneralAppRespondentAgreement())
                                 && YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed());
         List<String> errors = new ArrayList<>();
@@ -185,18 +192,23 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
         List<String> errors = new ArrayList<>();
         var generalAppTypes = caseData.getGeneralAppType().getTypes();
+
+        if (featureToggleService.isCoSCEnabled()) {
+            generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
+        }
+
         if (generalAppTypes.size() > 1
-            && generalAppTypes.contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {
+            && generalAppTypes.contains(GeneralApplicationTypesLR.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {
             errors.add("It is not possible to select an additional application type when applying to vary payment terms of judgment");
         }
         if (generalAppTypes.size() > 1
-                && generalAppTypes.contains(GeneralApplicationTypes.SETTLE_BY_CONSENT)) {
+                && generalAppTypes.contains(GeneralApplicationTypesLR.SETTLE_BY_CONSENT)) {
             errors.add("It is not possible to select an additional application type " +
                     "when applying to Settle by consent");
         }
 
         if (generalAppTypes.size() == 1
-            && generalAppTypes.contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {
+            && generalAppTypes.contains(GeneralApplicationTypesLR.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {
             caseDataBuilder.generalAppVaryJudgementType(YesOrNo.YES)
                     .generalAppInformOtherParty(
                             GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build());
@@ -256,6 +268,10 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
     private CallbackResponse setFeesAndPBA(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        if (featureToggleService.isCoSCEnabled()) {
+            caseData = caseData.toBuilder().generalAppType(GAApplicationType.builder().types(GATypeHelper.getGATypes(
+                caseData.getGeneralAppTypeLR().getTypes())).build()).build();
+        }
         caseData = setWithNoticeByType(caseData);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         Fee feeForGA = feesService.getFeeForGA(caseData);
@@ -319,6 +335,14 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 .build();
             caseData = updatedCaseData;
         }
+        if (featureToggleService.isCoSCEnabled()) {
+            var generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
+            CaseData updatedCaseData = caseData.toBuilder()
+                .generalAppType(GAApplicationType.builder().types(generalAppTypes).build())
+                .build();
+            caseData = updatedCaseData;
+        }
+
 
         Map<String, Object> data = initiateGeneralApplicationService
                 .buildCaseData(dataBuilder, caseData, userDetails, callbackParams.getParams().get(BEARER_TOKEN)
