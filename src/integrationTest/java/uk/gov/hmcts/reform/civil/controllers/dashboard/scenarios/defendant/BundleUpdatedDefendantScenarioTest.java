@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.civil.controllers.CaseEventsDashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.controllers.CaseProgressionDashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
@@ -22,7 +22,7 @@ import java.util.Optional;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class BundleUpdatedDefendantScenarioTest extends CaseEventsDashboardBaseIntegrationTest {
+public class BundleUpdatedDefendantScenarioTest extends CaseProgressionDashboardBaseIntegrationTest {
 
     @Autowired
     private BundleUpdatedDefendantNotificationHandler handler;
