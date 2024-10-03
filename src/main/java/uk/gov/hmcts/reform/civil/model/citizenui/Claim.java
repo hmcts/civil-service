@@ -66,8 +66,6 @@ public interface Claim {
 
     boolean hasSdoBeenDrawn();
 
-    boolean isBeforeHearing();
-
     boolean isMoreDetailsRequired();
 
     boolean isMediationSuccessful();

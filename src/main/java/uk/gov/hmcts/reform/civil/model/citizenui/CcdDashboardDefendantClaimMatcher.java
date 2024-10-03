@@ -209,29 +209,6 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     }
 
     @Override
-    public boolean isBeforeHearing() {
-        return isBeforeSmallClaimHearing() || (isBeforeFastTrackHearing() || noHearingScheduled());
-    }
-
-    private boolean noHearingScheduled() {
-        return caseData.getSmallClaimsHearing() == null && caseData.getFastTrackHearingTime() == null;
-    }
-
-    private boolean isBeforeSmallClaimHearing() {
-        return Optional.ofNullable(caseData.getSmallClaimsHearing())
-            .map(SmallClaimsHearing::getDateFrom)
-            .map(hearingFromDate -> hearingFromDate.isAfter(LocalDate.now()))
-            .orElse(false);
-    }
-
-    private boolean isBeforeFastTrackHearing() {
-        return Optional.ofNullable(caseData.getFastTrackHearingTime())
-            .map(FastTrackHearingTime::getDateFrom)
-            .map(hearingFromDate -> hearingFromDate.isAfter(LocalDate.now()))
-            .orElse(false);
-    }
-
-    @Override
     public boolean isMediationSuccessful() {
         return !hasSdoBeenDrawn()
             && nonNull(caseData.getMediation())

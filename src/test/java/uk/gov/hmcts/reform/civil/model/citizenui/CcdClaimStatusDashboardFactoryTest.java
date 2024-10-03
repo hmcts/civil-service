@@ -282,7 +282,7 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @Test
-    void given_hearingDateForSmallClaimIsAfterToday_and_SDOBeenDrawn_whenGetStatus_moreDetailsRequired() {
+    void given_noHearingDateFromHearingScheduled_and_SDOBeenDrawn_whenGetStatus_moreDetailsRequired() {
         Element<CaseDocument> document = new Element<>(
             UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
             CaseDocument.builder()
@@ -291,31 +291,6 @@ class CcdClaimStatusDashboardFactoryTest {
                 .build()
         );
         CaseData claim = CaseData.builder()
-            .smallClaimsHearing(SmallClaimsHearing.builder()
-                                    .dateFrom(LocalDate.now().plusDays(10))
-                                    .build())
-            .respondent1ResponseDate(LocalDateTime.now())
-            .systemGeneratedCaseDocuments(List.of(document))
-            .build();
-        given(featureToggleService.isCaseProgressionEnabled()).willReturn(true);
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-            claim, featureToggleService, Collections.emptyList()));
-        assertThat(status).isEqualTo(DashboardClaimStatus.MORE_DETAILS_REQUIRED);
-    }
-
-    @Test
-    void given_hearingDateForFastTrackClaimIsAfterToday_and_SDOBeenDrawn_whenGetStatus_moreDetailsRequired() {
-        Element<CaseDocument> document = new Element<>(
-            UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
-            CaseDocument.builder()
-                .createdDatetime(LocalDateTime.now())
-                .documentType(DocumentType.SDO_ORDER)
-                .build()
-        );
-        CaseData claim = CaseData.builder()
-            .fastTrackHearingTime(FastTrackHearingTime.builder()
-                                      .dateFrom(LocalDate.now().plusDays(10))
-                                      .build())
             .respondent1ResponseDate(LocalDateTime.now())
             .systemGeneratedCaseDocuments(List.of(document))
             .build();

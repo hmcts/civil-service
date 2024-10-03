@@ -353,11 +353,6 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public boolean isBeforeHearing() {
-        return false;
-    }
-
-    @Override
     public boolean isMoreDetailsRequired() {
         return false;
     }

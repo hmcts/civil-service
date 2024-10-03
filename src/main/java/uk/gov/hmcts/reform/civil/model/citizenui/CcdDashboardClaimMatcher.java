@@ -150,7 +150,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
         Optional<LocalDateTime> lastOrder = getTimeOfLastNonSDOOrder();
         Optional<LocalDateTime> sdoTime = getSDOTime();
         return sdoTime.isPresent()
-            && isBeforeHearing()
+            && caseData.getHearingDate() == null
             && featureToggleService.isCaseProgressionEnabled()
             && (lastOrder.isEmpty()
             || lastOrder.get().isBefore(sdoTime.get()));
