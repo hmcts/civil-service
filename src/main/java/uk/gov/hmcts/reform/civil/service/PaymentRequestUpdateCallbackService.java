@@ -111,7 +111,7 @@ public class PaymentRequestUpdateCallbackService {
             .map(PaymentDetails::toBuilder)
             .orElse(PaymentDetails.builder())
             .status(SUCCESS)
-            .customerReference(customerReference)
+            .customerReference(serviceRequestUpdateDto.getPayment().getDateUpdated().toLocalDateTime().toString())
             .reference(serviceRequestUpdateDto.getPayment().getPaymentReference())
             .errorCode(null)
             .errorMessage(null)
