@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -14,14 +15,17 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -55,6 +59,35 @@ class NotifyDefendantStayLiftedHandlerTest {
             Arguments.of(false, NOTIFY_DEFENDANT_STAY_LIFTED),
             Arguments.of(true, NOTIFY_DEFENDANT2_STAY_LIFTED)
         );
+    }
+
+    @Test
+    void checkCamundaActivityDefendantTest() {
+        caseData = caseData.toBuilder()
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("respondentSolicitor@hmcts.net").build())
+            .build();
+        CallbackParams params = CallbackParams.builder().caseData(caseData)
+            .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT_STAY_LIFTED.toString()).build()).build();
+        var response = handler.camundaActivityId(params);
+        assertEquals("NotifyDefendantStayLifted", response);
+    }
+
+    @Test
+    void checkCamundaActivityDefendant2Test() {
+        caseData = caseData.toBuilder()
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("respondentSolicitor@hmcts.net").build())
+            .build();
+        CallbackParams params = CallbackParams.builder().caseData(caseData)
+            .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT2_STAY_LIFTED.toString()).build()).build();
+        var response = handler.camundaActivityId(params);
+        assertEquals("NotifyDefendant2StayLifted", response);
+    }
+
+    @Test
+    void checkHandleEventTest() {
+        var response = handler.handledEvents();
+        assertEquals(List.of(NOTIFY_DEFENDANT_STAY_LIFTED,
+                             NOTIFY_DEFENDANT2_STAY_LIFTED), response);
     }
 
     @ParameterizedTest

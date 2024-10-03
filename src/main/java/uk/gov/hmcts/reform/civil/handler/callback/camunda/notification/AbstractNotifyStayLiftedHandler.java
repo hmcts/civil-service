@@ -19,7 +19,9 @@ public abstract class AbstractNotifyStayLiftedHandler extends CallbackHandler im
 
     public CallbackResponse sendNotification(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
+        if (isLiP(caseData)) { // TODO: remove when lip notification is developed
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
         notificationService.sendMail(
             getRecipient(callbackParams),
             getNotificationTemplate(caseData),
