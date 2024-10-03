@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -11,7 +10,6 @@ import java.time.ZoneId;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FeatureToggleService {
@@ -128,8 +126,14 @@ public class FeatureToggleService {
     }
 
     public boolean isDashboardEnabledForCase(CaseData caseData) {
-        log.info("CaseData", caseData);
-        return true;
+        ZoneId zoneId = ZoneId.systemDefault();
+        long epoch;
+        if (caseData.getSubmittedDate() == null) {
+            epoch = LocalDateTime.now().atZone(zoneId).toEpochSecond();
+        } else {
+            epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
+        }
+        return epoch > 1721302996;
     }
 
     public boolean isPartOfNationalRollout(String locationEpimms) {
