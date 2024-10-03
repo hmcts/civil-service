@@ -32,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_STAY;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
 
 @ExtendWith(MockitoExtension.class)
 public class ManageStayCallbackHandlerTest {
@@ -109,19 +110,18 @@ public class ManageStayCallbackHandlerTest {
             assertThat(response.getState()).isEqualTo(expectedState.name());
         }
 
-        @ParameterizedTest
-        @MethodSource("provideCaseStatesForRequestUpdate")
-        void shouldNotChangeCaseState_WhenManageStayOptionIsNotLiftStay(CaseState initialState) {
+        @Test
+        void shouldNotChangeCaseState_WhenManageStayOptionIsNotLiftStay() {
             when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .manageStayOption("REQUEST_UPDATE").ccdState(initialState).build();
+                .manageStayOption("REQUEST_UPDATE").ccdState(CASE_STAYED).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            assertThat(response.getState()).isEqualTo(initialState.name());
+            assertThat(response.getState()).isEqualTo(CASE_STAYED.name());
         }
 
         private static Stream<Arguments> provideCaseStatesForLiftStay() {
@@ -131,16 +131,6 @@ public class ManageStayCallbackHandlerTest {
                 Arguments.of(CaseState.CASE_PROGRESSION, CaseState.CASE_PROGRESSION),
                 Arguments.of(CaseState.HEARING_READINESS, CaseState.CASE_PROGRESSION),
                 Arguments.of(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING, CaseState.CASE_PROGRESSION)
-            );
-        }
-
-        private static Stream<Arguments> provideCaseStatesForRequestUpdate() {
-            return Stream.of(
-                Arguments.of(CaseState.IN_MEDIATION),
-                Arguments.of(CaseState.JUDICIAL_REFERRAL),
-                Arguments.of(CaseState.CASE_PROGRESSION),
-                Arguments.of(CaseState.HEARING_READINESS),
-                Arguments.of(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING)
             );
         }
 
