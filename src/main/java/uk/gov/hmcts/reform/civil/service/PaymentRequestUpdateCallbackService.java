@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
-import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
 import java.util.Map;
 
@@ -103,9 +102,6 @@ public class PaymentRequestUpdateCallbackService {
                                                               CaseData caseData, String feeType) {
 
         PaymentDetails pbaDetails = getPBADetailsFromFeeType(feeType, caseData);
-        String customerReference = ofNullable(serviceRequestUpdateDto.getPayment())
-            .map(PaymentDto::getCustomerReference)
-            .orElse(ofNullable(pbaDetails).map(PaymentDetails::getCustomerReference).orElse(null));
 
         PaymentDetails paymentDetails = ofNullable(pbaDetails)
             .map(PaymentDetails::toBuilder)
