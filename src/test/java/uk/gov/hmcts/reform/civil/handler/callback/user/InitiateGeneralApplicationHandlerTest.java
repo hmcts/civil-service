@@ -485,6 +485,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                 .build().toBuilder()
                 .generalAppRespondentAgreement(GARespondentOrderAgreement
                                                    .builder().hasAgreed(NO).build())
+                .applicant1Represented(YES)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_CONSENT);
@@ -505,6 +506,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                 .build().toBuilder()
                 .generalAppRespondentAgreement(GARespondentOrderAgreement
                                                    .builder().hasAgreed(YES).build())
+                .applicant1Represented(YES)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_CONSENT);
@@ -525,6 +527,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                 .build().toBuilder()
                 .generalAppRespondentAgreement(GARespondentOrderAgreement
                                                    .builder().hasAgreed(NO).build())
+                .applicant1Represented(YES)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_CONSENT);
@@ -881,6 +884,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                 .build()
                 .toBuilder()
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
+                .applicant1Represented(YES)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_AND_PBA);
 
@@ -926,6 +930,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isCoSCEnabled()).thenReturn(true);
             List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.VARY_ORDER);
             caseDataBuilder.generalAppTypeLR(GAApplicationTypeLR.builder().types(typesLR).build());
+            caseDataBuilder.applicant1Represented(YES);
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, SET_FEES_AND_PBA);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -969,6 +974,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isCoSCEnabled()).thenReturn(true);
             List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.VARY_ORDER, GeneralApplicationTypesLR.STAY_THE_CLAIM);
             caseDataBuilder.generalAppTypeLR(GAApplicationTypeLR.builder().types(typesLR).build());
+            caseDataBuilder.applicant1Represented(YES);
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, SET_FEES_AND_PBA);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
