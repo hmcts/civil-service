@@ -225,26 +225,59 @@ update body with case id and payment reference no
 below the required services for Civil are created in Preview under the developer's name, so these will be exclusively
 for the named developer use.
 
-While connected to the VPN simply run:
+While connected to the VPN simply run one of the below commands from your project's (civil-service) folder:
 Note: be sure to have Docker running
 ```shell
-npx @hmcts/dev-env && ./bin/setup-devuser-preview-env.sh
+npx @hmcts/dev-env@latest && ./bin/setup-devuser-preview-env.sh
 ```
 You can optionally specify a branch for CCD definitions and Camunda definitions like below or leave it blank to use master.
 
 ```shell
-npx @hmcts/dev-env && ./bin/setup-devuser-preview-env.sh ccdBranchName camundaBranchName
+npx @hmcts/dev-env@latest && ./bin/setup-devuser-preview-env.sh ccdBranchName camundaBranchName
+```
+If you want to clean up the environment just run:
+
+```shell
+npx @hmcts/dev-env@latest --delete
 ```
 
 Once the pods are up and running you can connect to them using a plugin called Mirrord on Intellij.
 https://mirrord.dev
 
-If you want to clean up the environment just run:
+Most times, by just enabling the Mirrord plugin and running the application in debug mode a popup will come for you to select the target pod running civil-service.
+In some setups you will need a mirrord config file specifying the pod as below.
 
-```shell
-npx @hmcts/dev-env --delete
+The script should create a /.mirrord/.mirrord.json config file under the project's root directory.
+
+Specifically for civil-service you might need to exclude a flyway environment variable to allow the startup process to run without errors.
+For that you should have such file as this:
+
+```json
+{
+  "feature": {
+    "network": {
+      "incoming": "steal",
+      "outgoing": true
+    },
+    "fs": "read",
+    "env": {
+      "override": {
+        "REFERENCE_DATABASE_MIGRATION": "false"
+      }
+    }
+  },
+  "target": {
+    "path": {
+      "pod": "Your civil-service pod ID"
+    },
+    "namespace": "civil"
+  },
+  "operator": false,
+  "agent": {
+    "flush_connections": false
+  }
+}
 ```
-
 
 ## License
 

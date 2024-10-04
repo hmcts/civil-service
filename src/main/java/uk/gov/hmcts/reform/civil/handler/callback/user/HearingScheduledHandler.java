@@ -231,8 +231,12 @@ public class HearingScheduledHandler extends CallbackHandler {
     }
 
     private void calculateHearingFeeAndDueDate(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseData caseData, String claimTrack) {
-        if (caseData.getHearingNoticeList().equals(HearingNoticeList.OTHER)
-            || ListingOrRelisting.RELISTING.equals(caseData.getListingOrRelisting())) {
+        if (caseData.getHearingNoticeList().equals(HearingNoticeList.OTHER)) {
+            return;
+        }
+        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
+            && ListingOrRelisting.RELISTING.equals(caseData.getListingOrRelisting())) {
+            caseDataBuilder.hearingDueDate(calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate()));
             return;
         }
         caseDataBuilder.hearingDueDate(calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate()));
