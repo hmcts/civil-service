@@ -12,9 +12,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 
 import static java.math.BigDecimal.ZERO;
 import static java.math.BigDecimal.valueOf;
+import static uk.gov.hmcts.reform.civil.utils.DateUtils.isAfterFourPM;
 import static  uk.gov.hmcts.reform.civil.utils.MonetaryConversions.HUNDRED;
 
 @Component
@@ -51,26 +53,34 @@ public class InterestCalculator {
     }
 
     public BigDecimal calculateInterestAmount(CaseData caseData, BigDecimal interestRate) {
+        LocalDate interestEndDate =  time.now().toLocalDate();
+
         if (caseData.getInterestClaimFrom().name().equals(FROM_CLAIM_SUBMIT_DATE)) {
-            LocalDate claimIssueDate = isAfterFourPM() ? time.now().toLocalDate().plusDays(1) :
-                time.now().toLocalDate();
-            return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate, claimIssueDate);
-        } else if (caseData.getInterestClaimFrom().name().equals(FROM_SPECIFIC_DATE)
-            && caseData.getInterestClaimUntil().name().equals(UNTIL_CLAIM_SUBMIT_DATE)
-            || caseData.getInterestClaimUntil().name().equals(UNTIL_SETTLED_OR_JUDGEMENT_MADE)) {
-            LocalDate claimIssueDate = isAfterFourPM()
-                ? caseData.getInterestFromSpecificDate().minusDays(1) :
-                caseData.getInterestFromSpecificDate();
+            LocalDateTime claimSubmitDate = Objects.nonNull(caseData.getSubmittedDate()) ? caseData.getSubmittedDate() : time.now();
+            LocalDate interestStartDate = isAfterFourPM(claimSubmitDate) ? claimSubmitDate.toLocalDate().plusDays(1) :
+                claimSubmitDate.toLocalDate();
+            interestEndDate = isAfter4PM() ? interestEndDate.plusDays(1) : interestEndDate;
+            return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate, interestStartDate, interestEndDate);
+        } else if (caseData.getInterestClaimFrom().name().equals(FROM_SPECIFIC_DATE)) {
+            LocalDate interestStartDate = caseData.getInterestFromSpecificDate();
+
+            if (caseData.getInterestClaimUntil().name().equals(UNTIL_CLAIM_SUBMIT_DATE)) {
+                LocalDateTime endDate = Objects.nonNull(caseData.getSubmittedDate()) ? caseData.getSubmittedDate() : time.now();
+                interestEndDate = isAfterFourPM(endDate) ? endDate.toLocalDate().plusDays(2) : endDate.toLocalDate().plusDays(1);
+            } else {
+                interestEndDate = isAfterFourPM(time.now()) ? time.now().toLocalDate().plusDays(2) : time.now().toLocalDate().plusDays(
+                    1);
+            }
             return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate,
-                                     claimIssueDate);
+                                           interestStartDate, interestEndDate);
         }
         return ZERO;
     }
 
     public BigDecimal calculateInterestByDate(BigDecimal claimAmount, BigDecimal interestRate, LocalDate
-        interestFromSpecificDate) {
+        interestStartDate, LocalDate interestEndDate) {
         long numberOfDays
-            = Math.abs(ChronoUnit.DAYS.between(time.now().toLocalDate(), interestFromSpecificDate));
+            = Math.abs(ChronoUnit.DAYS.between(interestStartDate, interestEndDate));
         BigDecimal interestForAYear
             = claimAmount.multiply(interestRate.divide(HUNDRED));
         BigDecimal  interestPerDay = interestForAYear.divide(NUMBER_OF_DAYS_IN_YEAR, TO_FULL_PENNIES,
@@ -81,7 +91,7 @@ public class InterestCalculator {
     public BigDecimal calculateBulkInterest(CaseData caseData) {
         if (caseData.getClaimInterest() == YesOrNo.YES) {
             long numberOfDays = Math.abs(ChronoUnit.DAYS.between(time.now().toLocalDate(), caseData.getInterestFromSpecificDate()));
-            if (isAfterFourPM()) {
+            if (isAfterFourPM(time.now())) {
                 numberOfDays = Math.abs(ChronoUnit.DAYS.between(time.now().toLocalDate(), caseData.getInterestFromSpecificDate().plusDays(1)));
             }
             BigDecimal interestDailyAmount = caseData.getSameRateInterestSelection().getDifferentRate();
@@ -91,7 +101,7 @@ public class InterestCalculator {
         }
     }
 
-    private boolean isAfterFourPM() {
+    private boolean isAfter4PM() {
         LocalTime localTime = time.now().toLocalTime();
         return localTime.getHour() > 15;
     }
