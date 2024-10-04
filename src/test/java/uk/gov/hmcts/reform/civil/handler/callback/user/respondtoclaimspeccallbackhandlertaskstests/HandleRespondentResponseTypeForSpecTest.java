@@ -19,7 +19,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
-public class HandleRespondentResponseTypeForSpecTest {
+class HandleRespondentResponseTypeForSpecTest {
 
     @InjectMocks
     private HandleRespondentResponseTypeForSpec handleRespondentResponseTypeForSpec;

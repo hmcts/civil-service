@@ -35,7 +35,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC;
 
 @ExtendWith(MockitoExtension.class)
-public class HandleDefendAllClaimTest {
+class HandleDefendAllClaimTest {
 
     @Mock
     private FeatureToggleService toggleService;

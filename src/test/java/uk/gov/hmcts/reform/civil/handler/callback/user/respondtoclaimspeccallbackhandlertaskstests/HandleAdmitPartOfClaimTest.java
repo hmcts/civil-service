@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -51,7 +50,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.Defendan
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2;
 
 @ExtendWith(MockitoExtension.class)
-public class HandleAdmitPartOfClaimTest {
+class HandleAdmitPartOfClaimTest {
 
     @Mock
     private FeatureToggleService toggleService;
@@ -184,7 +183,7 @@ public class HandleAdmitPartOfClaimTest {
             "respondToClaimAdmitPartEmploymentTypeLRspecGeneric");
         List<EmploymentTypeCheckboxFixedListLRspec> employmentTypeList = actualList.stream()
             .map(item -> EmploymentTypeCheckboxFixedListLRspec.valueOf((String) item))
-            .collect(Collectors.toList());
+            .toList();
         assertEquals(Collections.singletonList(EmploymentTypeCheckboxFixedListLRspec.EMPLOYED), employmentTypeList);
     }
 
@@ -402,7 +401,7 @@ public class HandleAdmitPartOfClaimTest {
             "respondToClaimAdmitPartEmploymentTypeLRspecGeneric");
         List<EmploymentTypeCheckboxFixedListLRspec> employmentTypeList = actualList.stream()
             .map(item -> EmploymentTypeCheckboxFixedListLRspec.valueOf((String) item))
-            .collect(Collectors.toList());
+            .toList();
         assertEquals(Collections.singletonList(EmploymentTypeCheckboxFixedListLRspec.EMPLOYED), employmentTypeList);
     }
 

@@ -26,7 +26,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 
 @ExtendWith(MockitoExtension.class)
-public class DetermineLoggedInSolicitorTest {
+class DetermineLoggedInSolicitorTest {
 
     @Mock
     private UserService userService;
@@ -100,7 +100,7 @@ public class DetermineLoggedInSolicitorTest {
 
         AboutToStartOrSubmitCallbackResponse response = executeCallback();
 
-        assertThat(response.getData().get("neitherCompanyNorOrganisation")).isEqualTo("No");
+        assertThat(response.getData()).containsEntry("neitherCompanyNorOrganisation", "No");
     }
 
     @Test
@@ -111,7 +111,7 @@ public class DetermineLoggedInSolicitorTest {
 
         AboutToStartOrSubmitCallbackResponse response = executeCallback();
 
-        assertThat(response.getData().get("neitherCompanyNorOrganisation")).isEqualTo("No");
+        assertThat(response.getData()).containsEntry("neitherCompanyNorOrganisation", "No");
     }
 
     @Test
@@ -122,7 +122,7 @@ public class DetermineLoggedInSolicitorTest {
 
         AboutToStartOrSubmitCallbackResponse response = executeCallback();
 
-        assertThat(response.getData().get("neitherCompanyNorOrganisation")).isEqualTo("Yes");
+        assertThat(response.getData()).containsEntry("neitherCompanyNorOrganisation", "Yes");
     }
 
     private AboutToStartOrSubmitCallbackResponse executeCallback() {
@@ -130,9 +130,9 @@ public class DetermineLoggedInSolicitorTest {
     }
 
     private void assertRoles(AboutToStartOrSubmitCallbackResponse response, String isRespondent1, String isRespondent2, String isApplicant1) {
-        assertThat(response.getData().get("isRespondent1")).isEqualTo(isRespondent1);
-        assertThat(response.getData().get("isRespondent2")).isEqualTo(isRespondent2);
-        assertThat(response.getData().get("isApplicant1")).isEqualTo(isApplicant1);
+        assertThat(response.getData()).containsEntry("isRespondent1", isRespondent1);
+        assertThat(response.getData()).containsEntry("isRespondent2", isRespondent2);
+        assertThat(response.getData()).containsEntry("isApplicant1", isApplicant1);
     }
 
     private CaseData buildCaseData(Party.Type partyType) {

@@ -71,7 +71,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
-public class SetApplicantResponseDeadlineTest {
+class SetApplicantResponseDeadlineTest {
 
     private SetApplicantResponseDeadline setApplicantResponseDeadline;
 
@@ -169,7 +169,7 @@ public class SetApplicantResponseDeadlineTest {
 
     @Test
     void shouldSetApplicantResponseDeadlineWhenSolicitorRepresentsOnlyRespondentOne() {
-        when(coreCaseUserService.userHasCaseRole(eq("1594901956117591"), eq("uid"), eq(RESPONDENTSOLICITORTWO)))
+        when(coreCaseUserService.userHasCaseRole("1594901956117591", "uid", RESPONDENTSOLICITORTWO))
             .thenReturn(true);
         when(time.now()).thenReturn(LocalDateTime.now());
 

@@ -31,7 +31,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
-public class ValidateDateOfBirthTest {
+class ValidateDateOfBirthTest {
 
     @InjectMocks
     private ValidateDateOfBirth validateDateOfBirth;

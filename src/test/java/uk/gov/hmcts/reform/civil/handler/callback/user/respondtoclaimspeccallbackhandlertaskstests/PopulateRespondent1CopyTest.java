@@ -33,7 +33,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
-public class PopulateRespondent1CopyTest {
+class PopulateRespondent1CopyTest {
 
     private PopulateRespondent1Copy populateRespondent1Copy;
 

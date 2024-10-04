@@ -32,7 +32,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(MockitoExtension.class)
-public class ValidateRespondentWitnessesTest {
+class ValidateRespondentWitnessesTest {
 
     @InjectMocks
     private ValidateRespondentWitnesses validateRespondentWitnesses;

@@ -23,7 +23,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.Defendan
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.TIMELINE_UPLOAD;
 
 @ExtendWith(MockitoExtension.class)
-public class SetUploadTimelineTypeFlagTest {
+class SetUploadTimelineTypeFlagTest {
 
     private ObjectMapper objectMapper;
 

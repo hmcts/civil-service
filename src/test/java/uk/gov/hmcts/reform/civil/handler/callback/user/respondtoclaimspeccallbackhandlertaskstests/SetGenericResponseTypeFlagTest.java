@@ -40,7 +40,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
-public class SetGenericResponseTypeFlagTest {
+class SetGenericResponseTypeFlagTest {
 
     private static final String BEARER_TOKEN_VALUE = "Bearer token";
     private static final String MULTI_PARTY_RESPONSE_TYPE_FLAGS = "multiPartyResponseTypeFlags";
