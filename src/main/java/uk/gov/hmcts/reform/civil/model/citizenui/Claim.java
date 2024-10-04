@@ -183,15 +183,9 @@ public interface Claim {
 
     boolean isTrialArrangementStatusActive();
 
-    default boolean isTrialScheduledStatusActive() {
-        Optional<LocalDateTime> hearingScheduledDate = getWhenWasHearingScheduled();
-        Optional<LocalDateTime> orderDate = getTimeOfLastNonSDOOrder();
-        return isHearingScheduled()
-            && !isHearingLessThanDaysAway(6 * 7)
-            && (hearingScheduledDate.isPresent())
-            && (orderDate.isEmpty()
-            || orderDate.get().isBefore(hearingScheduledDate.get()));
-    }
+    boolean isTrialScheduledNoPaymentStatusActive();
+
+    boolean isTrialScheduledPaymentPaidStatusActive();
 
     default boolean isHwfFullRemission() {
         return false;

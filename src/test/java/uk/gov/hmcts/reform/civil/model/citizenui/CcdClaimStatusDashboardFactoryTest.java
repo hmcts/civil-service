@@ -267,6 +267,7 @@ class CcdClaimStatusDashboardFactoryTest {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())
             .hearingDate(LocalDate.now().plusDays(6 * 7 + 1))
+            .ccdState(CaseState.HEARING_READINESS)
             .hearingDocuments(List.of(Element.<CaseDocument>builder().value(CaseDocument.builder()
                                                                                 .documentName("testDoc")
                                                                                 .build()).build()))
@@ -277,6 +278,24 @@ class CcdClaimStatusDashboardFactoryTest {
                                                                        .createdDate(LocalDateTime.now())
                                                                        .build())));
         assertThat(status).isEqualTo(DashboardClaimStatus.HEARING_FORM_GENERATED);
+    }
+
+    @Test
+    void given_hearingNoticeDocumentIssuedAndRelisted_whenGetStatus_thenReturnHearingFormGeneratedRelisting() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .hearingDate(LocalDate.now().plusDays(6 * 7 + 1))
+            .ccdState(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING)
+            .hearingDocuments(List.of(Element.<CaseDocument>builder().value(CaseDocument.builder()
+                                                                                .documentName("testDoc")
+                                                                                .build()).build()))
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+            claim, featureToggleService, Collections.singletonList(CaseEventDetail.builder()
+                                                                       .id(CaseEvent.HEARING_SCHEDULED.name())
+                                                                       .createdDate(LocalDateTime.now())
+                                                                       .build())));
+        assertThat(status).isEqualTo(DashboardClaimStatus.HEARING_FORM_GENERATED_RELISTING);
     }
 
     @Test

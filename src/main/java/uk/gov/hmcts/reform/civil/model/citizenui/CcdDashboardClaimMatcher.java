@@ -197,4 +197,41 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
             .filter(e -> eventNames.contains(e.getId()))
             .findFirst();
     }
+
+    @Override
+    public boolean isTrialArrangementStatusActive() {
+        int dayLimit = 6 * 7;
+        Optional<LocalDate> hearingDate = getHearingDate();
+        if (caseData.isFastTrackClaim()
+            && isHearingLessThanDaysAway(6 * 7)) {
+            Optional<LocalDateTime> lastOrder = getTimeOfLastNonSDOOrder();
+            return lastOrder.isEmpty()
+                || hearingDate.get().minusDays(dayLimit)
+                .isAfter(lastOrder.get().toLocalDate());
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isTrialScheduledNoPaymentStatusActive() {
+        Optional<LocalDateTime> hearingScheduledDate = getWhenWasHearingScheduled();
+        Optional<LocalDateTime> orderDate = getTimeOfLastNonSDOOrder();
+        return !isHearingLessThanDaysAway(6 * 7)
+            && CaseState.HEARING_READINESS.equals(caseData.getCcdState())
+            && (hearingScheduledDate.isPresent())
+            && (orderDate.isEmpty()
+            || orderDate.get().isBefore(hearingScheduledDate.get()));
+    }
+
+    @Override
+    public boolean isTrialScheduledPaymentPaidStatusActive() {
+        Optional<LocalDateTime> hearingScheduledDate = getWhenWasHearingScheduled();
+        Optional<LocalDateTime> orderDate = getTimeOfLastNonSDOOrder();
+        return !isHearingLessThanDaysAway(6 * 7)
+            && CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.equals(caseData.getCcdState())
+            && (hearingScheduledDate.isPresent())
+            && (orderDate.isEmpty()
+            || orderDate.get().isBefore(hearingScheduledDate.get()));
+    }
 }

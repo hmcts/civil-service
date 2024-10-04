@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -423,26 +422,9 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         Optional<LocalDateTime> eventTime = getTimeOfMostRecentEventOfType(
             EnumSet.of(CaseEvent.GENERATE_TRIAL_READY_FORM_RESPONDENT1));
         Optional<LocalDateTime> orderTime = getTimeOfLastNonSDOOrder();
-        return SdoHelper.isFastTrack(caseData)
+        return caseData.isFastTrackClaim()
             && caseData.getTrialReadyRespondent1() != null
             && (eventTime.isPresent())
             && (orderTime.isEmpty() || eventTime.get().isAfter(orderTime.get()));
-    }
-
-    @Override
-    public boolean isTrialArrangementStatusActive() {
-        int dayLimit = 6 * 7;
-        Optional<LocalDate> hearingDate = getHearingDate();
-        if (SdoHelper.isFastTrack(caseData)
-            && !trialArrangementsSubmitted()
-            && hearingDate.isPresent()
-            && LocalDate.now().plusDays(dayLimit + 1L).isAfter(hearingDate.get())) {
-            Optional<LocalDateTime> lastOrder = getTimeOfLastNonSDOOrder();
-            return lastOrder.isEmpty()
-                || hearingDate.get().minusDays(dayLimit)
-                .isAfter(lastOrder.get().toLocalDate());
-        } else {
-            return false;
-        }
     }
 }

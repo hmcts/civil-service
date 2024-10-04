@@ -89,7 +89,10 @@ public enum DashboardClaimStatus {
         Claim::isHwFHearingSubmit
     ),
     HEARING_FORM_GENERATED(
-        Claim::isTrialScheduledStatusActive
+        Claim::isTrialScheduledNoPaymentStatusActive
+    ),
+    HEARING_FORM_GENERATED_RELISTING(
+        Claim::isTrialScheduledPaymentPaidStatusActive
     ),
     MORE_DETAILS_REQUIRED(
         Claim::isMoreDetailsRequired
