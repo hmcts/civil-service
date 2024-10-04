@@ -994,6 +994,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
             && isOneVOne(this);
     }
 
+
     @JsonIgnore
     public boolean isLipvLipOneVOne() {
         return isRespondent1LiP()
@@ -1572,5 +1573,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isClaimantDontWantToProceedWithFulLDefenceFD() {
         return this.isClaimBeingDisputed()
             && this.hasApplicantNotProceededWithClaim();
+    }
+
+    @JsonIgnore
+    public boolean isLipCase(){
+        return this.isApplicant1NotRepresented() || this.isRespondent1LiP();
     }
 }
