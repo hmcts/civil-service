@@ -48,6 +48,16 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOp
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.CreateSDOCallbackHandlerUtils;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.DisposalHearingPopulator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.FastTrackPopulator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.GenerateSdoOrder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.PrePopulateOrderDetailsPages;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.PrePopulateSdoR2AndNihlFields;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.SetOrderDetailsFlags;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.SmallClaimsPopulator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.SubmitSDO;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.ValidateFieldsNihl;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
@@ -193,7 +203,17 @@ import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.FEEDBACK_LINK;
     DeadlinesCalculator.class,
     ValidationAutoConfiguration.class,
     LocationHelper.class,
-    AssignCategoryId.class},
+    AssignCategoryId.class,
+    SubmitSDO.class,
+    GenerateSdoOrder.class,
+    PrePopulateOrderDetailsPages.class,
+    SetOrderDetailsFlags.class,
+    CreateSDOCallbackHandlerUtils.class,
+    SmallClaimsPopulator.class,
+    FastTrackPopulator.class,
+    DisposalHearingPopulator.class,
+    ValidateFieldsNihl.class,
+    PrePopulateSdoR2AndNihlFields.class},
     properties = {"reference.database.enabled=false"})
 public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
