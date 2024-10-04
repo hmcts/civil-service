@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -37,6 +38,14 @@ public class ManageStayCallbackHandler extends CallbackHandler {
     private static final String BODY_CONFIRMATION = "&nbsp;";
     private static final String LIFT_STAY = "LIFT_STAY";
 
+    private static final Map<String, CaseState> STATE_MAP = Map.of(
+        CaseState.IN_MEDIATION.name(), CaseState.JUDICIAL_REFERRAL,
+        CaseState.JUDICIAL_REFERRAL.name(), CaseState.JUDICIAL_REFERRAL,
+        CaseState.CASE_PROGRESSION.name(), CaseState.CASE_PROGRESSION,
+        CaseState.HEARING_READINESS.name(), CaseState.CASE_PROGRESSION,
+        CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.name(), CaseState.CASE_PROGRESSION
+    );
+
     private final ObjectMapper mapper;
 
     @Override
@@ -59,13 +68,17 @@ public class ManageStayCallbackHandler extends CallbackHandler {
     private CallbackResponse manageStay(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-
+        CaseState newState;
         if (nonNull(caseData.getManageStayOption()) && caseData.getManageStayOption().equals(LIFT_STAY)) {
             caseDataBuilder.businessProcess(BusinessProcess.ready(STAY_LIFTED));
+            newState = STATE_MAP.getOrDefault(caseData.getPreStayState(), caseData.getCcdState());
+        } else {
+            newState = caseData.getCcdState();
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(mapper))
+            .state(newState.name())
             .build();
     }
 
@@ -76,8 +89,13 @@ public class ManageStayCallbackHandler extends CallbackHandler {
 
     private SubmittedCallbackResponse addConfirmationScreen(CallbackParams callbackParams) {
 
+        CaseData caseData = callbackParams.getCaseData();
+        String confirmationHeader = LIFT_STAY.equals(caseData.getManageStayOption())
+            ? HEADER_CONFIRMATION_LIFT_STAY
+            : HEADER_CONFIRMATION_REQUEST_UPDATE;
+
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(HEADER_CONFIRMATION_LIFT_STAY)
+            .confirmationHeader(confirmationHeader)
             .confirmationBody(BODY_CONFIRMATION)
             .build();
 
