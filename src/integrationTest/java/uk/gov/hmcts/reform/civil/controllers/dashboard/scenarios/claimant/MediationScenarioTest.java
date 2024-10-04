@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.ClaimantResponseNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -22,7 +23,7 @@ public class MediationScenarioTest extends DashboardBaseIntegrationTest {
 
         String caseId = "4123456789";
         CaseData caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
-        caseData = caseData.toBuilder().ccdState(CaseState.IN_MEDIATION).ccdCaseReference(Long.valueOf(caseId)).build();
+        caseData = caseData.toBuilder().ccdState(CaseState.IN_MEDIATION).ccdCaseReference(Long.valueOf(caseId)).applicant1Represented(YesOrNo.NO).build();
 
         // When
         handler.handle(callbackParams(caseData));

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -14,8 +15,10 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddress;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
@@ -40,6 +43,13 @@ class SetAsideJudgmentsOnlineMapperTest {
     private InterestCalculator interestCalculator;
     @InjectMocks
     private DefaultJudgmentOnlineMapper defaultJudgmentOnlineMapper;
+    @Mock
+    private RoboticsAddressMapper addressMapper;
+
+    @BeforeEach
+    void setUp() {
+        when(addressMapper.toRoboticsAddress(any())).thenReturn(RoboticsAddress.builder().build());
+    }
 
     @Test
     void testIfActiveJudgmentIsHistoricSetAsideApplication() {
