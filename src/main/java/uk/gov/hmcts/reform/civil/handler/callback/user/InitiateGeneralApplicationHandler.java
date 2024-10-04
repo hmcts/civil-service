@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
@@ -33,6 +34,7 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataServ
 import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 import uk.gov.hmcts.reform.civil.utils.UserRoleUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -88,6 +90,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private final GeneralAppFeesService feesService;
     private final LocationReferenceDataService locationRefDataService;
     private final FeatureToggleService featureToggleService;
+    private final CoreCaseUserService coreCaseUserService;
     private static final List<CaseState> stateAfterJudicialReferral = Arrays.asList(PENDING_CASE_ISSUED, CASE_ISSUED,
                                                                          AWAITING_CASE_DETAILS_NOTIFICATION, AWAITING_RESPONDENT_ACKNOWLEDGEMENT, CASE_DISMISSED,
                                                                          AWAITING_APPLICANT_INTENTION, PROCEEDS_IN_HERITAGE_SYSTEM, IN_MEDIATION);
@@ -188,8 +191,12 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     }
 
     private boolean isCoscEnabledAndUserNotLip(CallbackParams callbackParams) {
-        UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        return featureToggleService.isCoSCEnabled() && !UserRoleUtils.isLIPDefendant(userDetails.getRoles());
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        List<String> roles = coreCaseUserService.getUserCaseRoles(
+            callbackParams.getCaseData().getCcdCaseReference().toString(),
+            userInfo.getUid()
+        );
+        return featureToggleService.isCoSCEnabled() && !UserRoleUtils.isLIPDefendant(roles);
     }
 
     private CallbackResponse gaValidateType(CallbackParams callbackParams) {
