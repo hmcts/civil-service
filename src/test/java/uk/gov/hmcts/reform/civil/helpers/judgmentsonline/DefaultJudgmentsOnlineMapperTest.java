@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseEventDataService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
@@ -29,16 +31,26 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DefaultJudgmentsOnlineMapperTest {
 
-    @MockBean
     private Time time;
-    private InterestCalculator interestCalculator = new InterestCalculator(time);
+    private CoreCaseEventDataService coreCaseEventDataService;
+    private InterestCalculator interestCalculator;
     private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
 
-    private DefaultJudgmentOnlineMapper defaultJudgmentOnlineMapper  = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
+    private DefaultJudgmentOnlineMapper defaultJudgmentOnlineMapper;
+
+    @BeforeEach
+    public void setUp() {
+        time = Mockito.mock(Time.class);
+        coreCaseEventDataService = Mockito.mock(CoreCaseEventDataService.class);
+        when(time.now()).thenReturn(LocalDateTime.now());
+        interestCalculator = new InterestCalculator(time, coreCaseEventDataService);
+        defaultJudgmentOnlineMapper = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
+    }
 
     @Test
     void testIfDefaultJudgmentIsMarkedActive_1v1() {
@@ -101,10 +113,10 @@ class DefaultJudgmentsOnlineMapperTest {
             .partialPayment(YesOrNo.YES)
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
             .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("Test User")
-                                                 .build())
-                                      .build())
+                .value(DynamicListElement.builder()
+                    .label("Test User")
+                    .build())
+                .build())
             .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
             .repaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_WEEK)
             .repaymentSuggestion("100")
@@ -144,10 +156,10 @@ class DefaultJudgmentsOnlineMapperTest {
             .partialPayment(YesOrNo.YES)
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
             .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("Test User")
-                                                 .build())
-                                      .build())
+                .value(DynamicListElement.builder()
+                    .label("Test User")
+                    .build())
+                .build())
             .paymentTypeSelection(DJPaymentTypeSelection.SET_DATE)
             .paymentSetDate(LocalDate.now().plusDays(10))
             .build();

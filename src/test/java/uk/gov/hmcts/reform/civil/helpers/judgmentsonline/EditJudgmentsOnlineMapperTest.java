@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
@@ -19,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseEventDataService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
@@ -26,22 +29,37 @@ import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
-@ExtendWith(SpringExtension.class)
+@RunWith(MockitoJUnitRunner.class)
 public class EditJudgmentsOnlineMapperTest {
 
+    private InterestCalculator interestCalculator;
     private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
     private EditJudgmentOnlineMapper editJudgmentOnlineMapper = new EditJudgmentOnlineMapper();
     private RecordJudgmentOnlineMapper recordJudgmentMapper = new RecordJudgmentOnlineMapper(addressMapper);
     private JudgmentByAdmissionOnlineMapper judgmentByAdmissionMapper = new JudgmentByAdmissionOnlineMapper(addressMapper);
-    private Time time;
-    private InterestCalculator interestCalculator = new InterestCalculator(time);
     private DefaultJudgmentOnlineMapper defaultJudgmentMapper = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
+
+    private Time time;
+    private CoreCaseEventDataService coreCaseEventDataService;
+
+    @BeforeEach
+    public void setUpTest() {
+        time = Mockito.mock(Time.class);
+        coreCaseEventDataService = Mockito.mock(CoreCaseEventDataService.class);
+        when(time.now()).thenReturn(LocalDateTime.now());
+
+        interestCalculator = new InterestCalculator(time, coreCaseEventDataService);
+        defaultJudgmentMapper = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
+
+    }
 
     @Test
     void testIfActiveJudgmentIsnullIfnotSet() {
@@ -218,13 +236,13 @@ public class EditJudgmentsOnlineMapperTest {
             .specRespondent1Represented(YES)
             .applicant1Represented(YES)
             .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("John Doe")
-                                                 .build())
-                                      .build())
+                .value(DynamicListElement.builder()
+                    .label("John Doe")
+                    .build())
+                .build())
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                               .whenWillThisAmountBePaid(LocalDate.now().plusDays(5)).build())
+                .whenWillThisAmountBePaid(LocalDate.now().plusDays(5)).build())
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
             .ccjPaymentDetails(ccjPaymentDetails)
             .respondent1(PartyBuilder.builder().organisation().build())
