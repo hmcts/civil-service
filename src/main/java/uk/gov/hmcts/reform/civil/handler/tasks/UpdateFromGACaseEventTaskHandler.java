@@ -219,7 +219,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
      *                           add 'get' to the name then call getter to access related Civil document field.
      *                           when update output, use name as key to hold to-be-update collection
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "java:S3776"})
     protected void updateDocCollection(Map<String, Object> output, CaseData generalAppCaseData, String fromGaList,
                                        CaseData civilCaseData, String toCivilList) throws Exception {
         Method gaGetter = ReflectionUtils.findMethod(CaseData.class,
@@ -238,11 +238,11 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
                     civilDocs.add(gaDoc);
                 }
             }
-        } else  if (featureToggleService.isGaForLipsEnabled() && (civilCaseData.isRespondent1LiP() || civilCaseData.isRespondent2LiP()
+        } else if (featureToggleService.isGaForLipsEnabled() && (civilCaseData.isRespondent1LiP() || civilCaseData.isRespondent2LiP()
             || civilCaseData.isApplicantNotRepresented()) && (gaDocs != null && (fromGaList.equals("gaDraftDocument")))) {
 
             checkDraftDocumentsInMainCase(civilDocs, gaDocs);
-        } else  {
+        } else {
             if (gaDocs != null && gaDocs.size() == 1 && checkIfDocumentExists(civilDocs, gaDocs) < 1) {
                 civilDocs.addAll(gaDocs);
             }
@@ -253,24 +253,24 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
     private List<Element<?>> checkDraftDocumentsInMainCase(List<Element<?>> civilDocs, List<Element<?>> gaDocs) {
         List<UUID> ids = gaDocs.stream().map(Element::getId).toList();
         List<Element<?>> civilDocsCopy = newArrayList();
-        
+
         for (Element<?> civilDoc : civilDocs) {
             if (!ids.contains(civilDoc.getId())) {
                 civilDocsCopy.add(civilDoc);
             }
         }
-        
+
         List<UUID> civilIds = civilDocs.stream().map(Element::getId).toList();
         for (Element<?> gaDoc : gaDocs) {
             if (!civilIds.contains(gaDoc.getId())) {
                 civilDocsCopy.add(gaDoc);
             }
         }
-        
+
         civilDocs.clear();
         civilDocs.addAll(civilDocsCopy);
         civilDocsCopy.clear();
-        
+
         return civilDocs;
     }
 
@@ -279,7 +279,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
         if (isNull(gaAppDetails)) {
             return false;
         }
-        
+
         return gaAppDetails.stream()
             .anyMatch(civilGaData -> generalAppCaseData.getCcdCaseReference()
                 .equals(parseLong(civilGaData.getValue().getCaseLink().getCaseReference())));
@@ -295,7 +295,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
         if (isNull(gaAppDetails)) {
             return false;
         }
-        
+
         return gaAppDetails.stream()
             .anyMatch(civilGaData -> generalAppCaseData.getCcdCaseReference()
                 .equals(parseLong(civilGaData.getValue().getCaseLink().getCaseReference())));

@@ -16,15 +16,17 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.ArrayList;
@@ -37,6 +39,7 @@ import static java.lang.Long.parseLong;
 import static java.time.LocalDateTime.now;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -1024,6 +1027,26 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                 .gaAddlDocBundle(addlDocBundle).build();
         gaCaseData = handler.mergeBundle(gaCaseData);
         assertThat(gaCaseData.getGaAddlDoc().size()).isEqualTo(2);
+    }
+
+    @Test
+    void expectExceptionOnGetUpdatedCaseData() {
+        when(mockExternalTask.getAllVariables())
+            .thenReturn(Map.of(
+                "caseId", GENERAL_APP_CASE_ID,
+                "caseEvent", ADD_PDF_TO_MAIN_CASE,
+                "generalAppParentCaseLink", CIVIL_CASE_ID
+            ));
+
+        when(caseDetailsConverter.toGACaseData(any())).thenThrow(NumberFormatException.class);
+
+        InvalidCaseDataException exceptionThrown = assertThrows(InvalidCaseDataException.class, () -> {
+            handler.handleTask(mockExternalTask);
+        });
+
+        String messageFromException = exceptionThrown.getMessage();
+        System.out.println(messageFromException);
+        assertTrue(messageFromException.contains("Conversion to long datatype failed for general application for a case "));
     }
 
     public final CaseDocument pdfDocument = CaseDocument.builder()
