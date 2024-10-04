@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
