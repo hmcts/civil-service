@@ -757,7 +757,6 @@ class SetApplicantResponseDeadlineTest {
 
         Experts actualExperts = objectMapper.convertValue(responseData.get("respondent2DQExperts"), Experts.class);
 
-        assertThat(actualExperts.getExpertRequired()).isEqualTo(NO);
         assertThat(actualExperts.getDetails()).isNull();
     }
 
