@@ -53,6 +53,18 @@ class InterestCalculatorTest {
     }
 
     @Test
+    void shouldReturnBreakDownInterest() {
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+            .claimInterest(YesOrNo.YES)
+            .interestClaimOptions(InterestClaimOptions.BREAK_DOWN_INTEREST)
+            .breakDownInterestTotal(BigDecimal.valueOf(100))
+            .build();
+
+        BigDecimal actual = interestCalculator.calculateInterest(caseData);
+        assertThat(actual).isEqualTo(BigDecimal.valueOf(100));
+    }
+
+    @Test
     void shouldReturnZeroInterestRateWhenSameRateInterestAndSubmitDateIsChoosen() {
         LocalDateTime dateTime = LocalDateTime.of(2022, 11, 15, 13, 0);
         when(time.now()).thenReturn(dateTime);
@@ -89,7 +101,7 @@ class InterestCalculatorTest {
     }
 
     @Test
-    void shouldReturnZeroInterestRateWhenSameRateInterestDifferentRateAndSpecificDateIsChoosen() {
+    void shouldReturnInterestRateWhenSameRateInterestDifferentRateAndSpecificDateIsChoosen() {
         LocalDateTime dateTime = LocalDateTime.now();
         when(time.now()).thenReturn(dateTime);
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
@@ -126,6 +138,44 @@ class InterestCalculatorTest {
 
         BigDecimal actual = interestCalculator.calculateInterest(caseData);
         assertThat(actual).isEqualTo(BigDecimal.valueOf(7.70).setScale(2, RoundingMode.UNNECESSARY));
+    }
+
+    @Test
+    void shouldReturnValidInterestRateWhenSameRateInterestAndSpecificDateIsChoosenUnitlJudgmentDay() {
+        LocalDateTime dateTime = LocalDateTime.now().withHour(13).withMinute(59);
+        when(time.now()).thenReturn(dateTime);
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+            .claimInterest(YesOrNo.YES)
+            .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
+            .sameRateInterestSelection(SameRateInterestSelection.builder()
+                                           .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
+            .interestClaimFrom(InterestClaimFromType.FROM_A_SPECIFIC_DATE)
+            .interestClaimUntil(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE)
+            .interestFromSpecificDate(LocalDate.now().minusDays(6))
+            .totalClaimAmount(BigDecimal.valueOf(5000))
+            .build();
+
+        BigDecimal actual = interestCalculator.calculateInterest(caseData);
+        assertThat(actual).isEqualTo(BigDecimal.valueOf(7.70).setScale(2, RoundingMode.UNNECESSARY));
+    }
+
+    @Test
+    void shouldReturnValidInterestRateWhenSameRateInterestAndSpecificDateIsChoosenUnitlJudgmentDayPost4pm() {
+        LocalDateTime dateTime = LocalDateTime.now().withHour(17).withMinute(59);
+        when(time.now()).thenReturn(dateTime);
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+            .claimInterest(YesOrNo.YES)
+            .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
+            .sameRateInterestSelection(SameRateInterestSelection.builder()
+                                           .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
+            .interestClaimFrom(InterestClaimFromType.FROM_A_SPECIFIC_DATE)
+            .interestClaimUntil(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE)
+            .interestFromSpecificDate(LocalDate.now().minusDays(6))
+            .totalClaimAmount(BigDecimal.valueOf(5000))
+            .build();
+
+        BigDecimal actual = interestCalculator.calculateInterest(caseData);
+        assertThat(actual).isEqualTo(BigDecimal.valueOf(8.80).setScale(2, RoundingMode.UNNECESSARY));
     }
 
     @Test
