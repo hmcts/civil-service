@@ -41,6 +41,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
@@ -478,6 +479,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotCauseAnyErrors_whenGaTypeIsNotSettleOrDiscontinueConsentCoscEnabled() {
 
             when(featureToggleService.isCoSCEnabled()).thenReturn(true);
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+                                                                            .email(APPLICANT_EMAIL_ID_CONSTANT)
+                                                                            .roles(Arrays.asList("[APPLICANTSOLICITORONE]")).build());
             List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.STRIKE_OUT, GeneralApplicationTypesLR.SUMMARY_JUDGEMENT);
             CaseData caseData = CaseDataBuilder
                 .builder()
@@ -499,6 +503,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotCauseAnyErrors_whenGaTypeIsNotSettleOrDiscontinueConsentYesCoscEnabled() {
 
             List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.SETTLE_BY_CONSENT);
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+                                                                            .email(APPLICANT_EMAIL_ID_CONSTANT)
+                                                                            .roles(Arrays.asList("[APPLICANTSOLICITORONE]")).build());
             when(featureToggleService.isCoSCEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder
                 .builder()
@@ -520,6 +527,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         void shouldCauseError_whenGaTypeIsNotSettleOrDiscontinueConsentNoCoscEnabled() {
 
             when(featureToggleService.isCoSCEnabled()).thenReturn(true);
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+                                                                            .email(APPLICANT_EMAIL_ID_CONSTANT)
+                                                                            .roles(Arrays.asList("[APPLICANTSOLICITORONE]")).build());
             List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.SETTLE_BY_CONSENT);
             CaseData caseData = CaseDataBuilder
                 .builder()
@@ -877,6 +887,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                 .calculatedAmountInPence(fee275)
                                 .version(FEE_VERSION).build());
             when(featureToggleService.isCoSCEnabled()).thenReturn(true);
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+                                                                            .email(APPLICANT_EMAIL_ID_CONSTANT)
+                                                                            .roles(Arrays.asList("[APPLICANTSOLICITORONE]")).build());
             List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.VARY_PAYMENT_TERMS_OF_JUDGMENT);
             CaseData caseData = CaseDataBuilder
                 .builder()
@@ -926,9 +939,15 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                 .build());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
                 CaseDataBuilder.builder().build(), false, false);
-            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
             when(featureToggleService.isCoSCEnabled()).thenReturn(true);
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+                                                                            .email(APPLICANT_EMAIL_ID_CONSTANT)
+                                                                            .roles(Arrays.asList("[APPLICANTSOLICITORONE]")).build());
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+                                                                            .email(APPLICANT_EMAIL_ID_CONSTANT)
+                                                                            .roles(Arrays.asList("[APPLICANTSOLICITORONE]")).build());
             List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.VARY_ORDER);
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
             caseDataBuilder.generalAppTypeLR(GAApplicationTypeLR.builder().types(typesLR).build());
             caseDataBuilder.applicant1Represented(YES);
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, SET_FEES_AND_PBA);
@@ -972,6 +991,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                 CaseDataBuilder.builder().build(), false, false);
             CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
             when(featureToggleService.isCoSCEnabled()).thenReturn(true);
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+                                                                            .email(APPLICANT_EMAIL_ID_CONSTANT)
+                                                                            .roles(Arrays.asList("[APPLICANTSOLICITORONE]")).build());
             List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.VARY_ORDER, GeneralApplicationTypesLR.STAY_THE_CLAIM);
             caseDataBuilder.generalAppTypeLR(GAApplicationTypeLR.builder().types(typesLR).build());
             caseDataBuilder.applicant1Represented(YES);
