@@ -24,7 +24,6 @@ import java.util.Optional;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2;
 
 @Service
 @RequiredArgsConstructor
@@ -37,10 +36,7 @@ public class StandardDirectionOrderDJDefendantNotificationHandler extends Callba
     private static final String BOTH_DEFENDANTS = "Both Defendants";
     private static final String CLAIM_NUMBER = "claimReferenceNumber";
     private static final String LEGAL_ORG_NAME = "legalOrgName";
-    private static final List<CaseEvent> EVENTS = List.of(
-        NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT,
-        NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2
-    );
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT);
     private static final String REFERENCE_TEMPLATE_SDO_DJ = "sdo-dj-order-notification-defendant-%s";
     private static final String TASK_ID_DEFENDANT = "StandardDirectionOrderDj";
 
@@ -59,42 +55,28 @@ public class StandardDirectionOrderDJDefendantNotificationHandler extends Callba
     private CallbackResponse notifyDefendantSDOrderDj(CallbackParams callbackParams) {
 
         CaseData caseData = callbackParams.getCaseData();
-        String eventId = callbackParams.getRequest().getEventId();
-
-        if (eventId.equals(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT.name())) {
-            if (checkDefendantRequested(caseData, caseData.getRespondent1().getPartyName())
+        if (checkDefendantRequested(caseData, caseData.getRespondent1().getPartyName())
+            || checkIfBothDefendants(caseData)) {
+            notificationService.sendMail(caseData.isRespondent1NotRepresented()
+                                             ? caseData.getDefendantUserDetails().getEmail()
+                                             : caseData.getRespondentSolicitor1EmailAddress(),
+                                         notificationsProperties.getStandardDirectionOrderDJTemplate(),
+                                         addProperties(caseData),
+                                         String.format(REFERENCE_TEMPLATE_SDO_DJ,
+                                                       caseData.getLegacyCaseReference()));
+        }
+        if (caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(YesOrNo.YES)) {
+            if (checkDefendantRequested(caseData, caseData.getRespondent2().getPartyName())
                 || checkIfBothDefendants(caseData)) {
-                notificationService.sendMail(
-                    caseData.isRespondent1NotRepresented()
-                        ? caseData.getDefendantUserDetails().getEmail()
-                        : caseData.getRespondentSolicitor1EmailAddress(),
-                    notificationsProperties.getStandardDirectionOrderDJTemplate(),
-                    addProperties(caseData),
-                    String.format(
-                        REFERENCE_TEMPLATE_SDO_DJ,
-                        caseData.getLegacyCaseReference()
-                    )
-                );
-            }
-        } else if (eventId.equals(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2.name())) {
-            if (caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(YesOrNo.YES)) {
-                if (checkDefendantRequested(caseData, caseData.getRespondent2().getPartyName())
-                    || checkIfBothDefendants(caseData)) {
-                    notificationService.sendMail(
-                        caseData.getRespondentSolicitor2EmailAddress() != null
-                            ? caseData.getRespondentSolicitor2EmailAddress() :
-                            caseData.getRespondentSolicitor1EmailAddress(),
-                        notificationsProperties.getStandardDirectionOrderDJTemplate(),
-                        addPropertiesDef2(caseData),
-                        String.format(
-                            REFERENCE_TEMPLATE_SDO_DJ,
-                            caseData.getLegacyCaseReference()
-                        )
-                    );
-                }
+                notificationService.sendMail(caseData.getRespondentSolicitor2EmailAddress() != null
+                                                 ? caseData.getRespondentSolicitor2EmailAddress() :
+                                                 caseData.getRespondentSolicitor1EmailAddress(),
+                                             notificationsProperties.getStandardDirectionOrderDJTemplate(),
+                                             addPropertiesDef2(caseData),
+                                             String.format(REFERENCE_TEMPLATE_SDO_DJ,
+                                                           caseData.getLegacyCaseReference()));
             }
         }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
@@ -121,27 +103,27 @@ public class StandardDirectionOrderDJDefendantNotificationHandler extends Callba
     }
 
     private String getLegalOrganizationName(final CaseData caseData) {
-        if (nonNull(caseData.getRespondent1OrganisationPolicy().getOrganisation())) {
+        if (nonNull(caseData.getApplicant1OrganisationPolicy().getOrganisation())) {
             Optional<Organisation> organisation = organisationService
-                .findOrganisationById(caseData.getRespondent1OrganisationPolicy()
+                .findOrganisationById(caseData.getApplicant1OrganisationPolicy()
                                           .getOrganisation().getOrganisationID());
             if (organisation.isPresent()) {
                 return organisation.get().getName();
             }
         }
-        return caseData.getRespondent1().getPartyName();
+        return caseData.getApplicant1().getPartyName();
     }
 
     private String getLegalOrganizationDef2Name(final CaseData caseData) {
         Optional<Organisation> organisation = organisationService
-            .findOrganisationById(caseData.getRespondent2OrganisationPolicy() != null
-                                      ? caseData.getRespondent2OrganisationPolicy()
-                .getOrganisation().getOrganisationID() : caseData.getRespondent1OrganisationPolicy()
+            .findOrganisationById(caseData.getApplicant2OrganisationPolicy() != null
+                                      ? caseData.getApplicant2OrganisationPolicy()
+                .getOrganisation().getOrganisationID() : caseData.getApplicant1OrganisationPolicy()
                 .getOrganisation().getOrganisationID());
         if (organisation.isPresent()) {
             return organisation.get().getName();
         }
-        return caseData.getRespondent2().getPartyName();
+        return caseData.getApplicant2().getPartyName();
     }
 
     private Boolean checkIfBothDefendants(CaseData caseData) {
