@@ -66,6 +66,7 @@ public class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackH
         @Test
         void shouldRecordScenario_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
+                .applicant1Represented(YesOrNo.NO)
                 .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
                                  .applicant1ClaimSettledDate(
                                      LocalDate.now()).build()).build();

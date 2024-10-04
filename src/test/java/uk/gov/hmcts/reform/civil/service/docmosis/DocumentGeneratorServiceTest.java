@@ -58,6 +58,20 @@ class DocumentGeneratorServiceTest {
     }
 
     @Test
+    void shouldInvokeTornado_whenDocx() {
+        SealedClaimForm sealedClaimForm = SealedClaimForm.builder().issueDate(LocalDate.now()).build();
+
+        byte[] expectedResponse = {1, 2, 3};
+        when(docmosisApiClient.createDocument(argumentCaptor.capture())).thenReturn(expectedResponse);
+
+        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(sealedClaimForm, N1, "docx");
+        assertThat(docmosisDocument.getBytes()).isEqualTo(expectedResponse);
+
+        assertThat(argumentCaptor.getValue().getTemplateName()).isEqualTo(N1.getTemplate());
+        assertThat(argumentCaptor.getValue().getOutputFormat()).isEqualTo("docx");
+    }
+
+    @Test
     void shouldThrowWhenTornadoFails() {
         when(docmosisApiClient.createDocument(argumentCaptor.capture())).thenThrow(new HttpClientErrorException(
             HttpStatus.NOT_FOUND,
@@ -71,7 +85,8 @@ class DocumentGeneratorServiceTest {
                 HttpClientErrorException.class,
                 () -> documentGeneratorService.generateDocmosisDocument(
                     placeholders,
-                    N1
+                    N1,
+                    "pdf"
                 )
             );
 
