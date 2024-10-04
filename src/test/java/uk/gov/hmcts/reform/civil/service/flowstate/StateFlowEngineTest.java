@@ -5531,6 +5531,52 @@ class StateFlowEngineTest {
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), true)
             );
         }
+
+        @Test
+        void shouldReturnIsLipForGALipFlagWhenLipVsLR2() {
+            // Given
+            CaseData caseData = CaseData.builder()
+                // spec claim
+                .caseAccessCategory(SPEC_CLAIM)
+                // claim submitted
+                .submittedDate(LocalDateTime.now())
+                .respondent1Represented(YES)
+                .applicant1Represented(YES)
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(NO)
+                .respondent2Represented(YES)
+                .respondent2OrgRegistered(YES)
+                // payment successful
+                .paymentSuccessfulDate(LocalDateTime.now())
+                // pending claim issued
+                .issueDate(LocalDate.now())
+                .respondent1OrgRegistered(YES)
+                // claim issued
+                .claimNotificationDeadline(LocalDateTime.now())
+                // part admit
+                .respondent1ResponseDate(LocalDateTime.now())
+                .caseDataLiP(CaseDataLiP.builder().respondentSignSettlementAgreement(YES)
+                                 .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
+                                                                              .hasAgreedFreeMediation(MediationDecision.No)
+                                                                              .build())
+                                 .build())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .claimNotificationDate(LocalDateTime.now())
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .applicant1PartAdmitConfirmAmountPaidSpec(YES)
+                .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+                .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
+                .build();
+
+            // When
+            when(featureToggleService.isGeneralApplicationsEnabled()).thenReturn(true);
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertThat(stateFlow.getFlags()).contains(
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), true)
+            );
+        }
     }
 
     @Nested
