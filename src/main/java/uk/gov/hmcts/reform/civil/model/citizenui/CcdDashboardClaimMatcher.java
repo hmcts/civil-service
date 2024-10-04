@@ -203,6 +203,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
         int dayLimit = 6 * 7;
         Optional<LocalDate> hearingDate = getHearingDate();
         if (caseData.isFastTrackClaim()
+            && hearingDate.isPresent()
             && isHearingLessThanDaysAway(6 * 7)) {
             Optional<LocalDateTime> lastOrder = getTimeOfLastNonSDOOrder();
             return lastOrder.isEmpty()
