@@ -55,11 +55,9 @@ public class InterestCalculator {
     public LocalDateTime getInterestEndDate(CaseData caseData) {
         LocalDateTime interestEndDate =  time.now();
         if (caseData.getInterestClaimFrom().name().equals(FROM_SPECIFIC_DATE)
-            && (caseData.getInterestClaimUntil().name().equals(UNTIL_CLAIM_SUBMIT_DATE)))
-        {
+            && (caseData.getInterestClaimUntil().name().equals(UNTIL_CLAIM_SUBMIT_DATE))) {
             return Objects.nonNull(caseData.getSubmittedDate()) ? caseData.getSubmittedDate() : interestEndDate;
         }
-
         return interestEndDate;
     }
 
@@ -76,7 +74,7 @@ public class InterestCalculator {
         } else if (caseData.getInterestClaimFrom().name().equals(FROM_SPECIFIC_DATE)) {
             interestStartDate = caseData.getInterestFromSpecificDate();
         }
-        interestEndDate = isAfterFourPM(interestEndDate) ? interestEndDate.plusDays(2): interestEndDate.plusDays(1);
+        interestEndDate = isAfterFourPM(interestEndDate) ? interestEndDate.plusDays(2) : interestEndDate.plusDays(1);
 
         return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate,
                                            interestStartDate, interestEndDate.toLocalDate());
