@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -92,55 +94,19 @@ class CreateSDOCallbackHandlerUtilsTest {
         assertNotNull(result);
     }
 
-    @Test
-    void shouldSetCheckListWhenSdoR2AndCarmEnabled() {
+    @ParameterizedTest
+    @CsvSource({
+        "true, true",
+        "true, false",
+        "false, true",
+        "false, false"
+    })
+    void shouldSetCheckList(boolean isSdoR2Enabled, boolean isCarmEnabledForCase) {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder();
         List<OrderDetailsPagesSectionsToggle> checkList = List.of(OrderDetailsPagesSectionsToggle.SHOW);
 
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-        lenient().when(featureToggleService.isCarmEnabledForCase(caseDataBuilder.build())).thenReturn(true);
-
-        createSDOCallbackHandlerUtils.setCheckList(caseDataBuilder, checkList);
-
-        verify(featureToggleService).isSdoR2Enabled();
-        verify(featureToggleService).isCarmEnabledForCase(caseDataBuilder.build());
-    }
-
-    @Test
-    void shouldSetCheckListWhenSdoR2Enabled() {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder();
-        List<OrderDetailsPagesSectionsToggle> checkList = List.of(OrderDetailsPagesSectionsToggle.SHOW);
-
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-        lenient().when(featureToggleService.isCarmEnabledForCase(caseDataBuilder.build())).thenReturn(false);
-
-        createSDOCallbackHandlerUtils.setCheckList(caseDataBuilder, checkList);
-
-        verify(featureToggleService).isSdoR2Enabled();
-        verify(featureToggleService).isCarmEnabledForCase(caseDataBuilder.build());
-    }
-
-    @Test
-    void shouldSetCheckListWhenCarmEnabled() {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder();
-        List<OrderDetailsPagesSectionsToggle> checkList = List.of(OrderDetailsPagesSectionsToggle.SHOW);
-
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(false);
-        lenient().when(featureToggleService.isCarmEnabledForCase(caseDataBuilder.build())).thenReturn(true);
-
-        createSDOCallbackHandlerUtils.setCheckList(caseDataBuilder, checkList);
-
-        verify(featureToggleService).isSdoR2Enabled();
-        verify(featureToggleService).isCarmEnabledForCase(caseDataBuilder.build());
-    }
-
-    @Test
-    void shouldSetCheckListWhenNeitherSdoR2NorCarmEnabled() {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder();
-        List<OrderDetailsPagesSectionsToggle> checkList = List.of(OrderDetailsPagesSectionsToggle.SHOW);
-
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(false);
-        lenient().when(featureToggleService.isCarmEnabledForCase(caseDataBuilder.build())).thenReturn(false);
+        when(featureToggleService.isSdoR2Enabled()).thenReturn(isSdoR2Enabled);
+        lenient().when(featureToggleService.isCarmEnabledForCase(caseDataBuilder.build())).thenReturn(isCarmEnabledForCase);
 
         createSDOCallbackHandlerUtils.setCheckList(caseDataBuilder, checkList);
 

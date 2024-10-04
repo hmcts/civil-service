@@ -58,7 +58,7 @@ public class GenerateSdoOrder implements CaseTask {
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
         if (errors.isEmpty()) {
             log.info("No errors found, proceeding to document generation");
-            handleDocumentGeneration(caseData, callbackParams, updatedData, errors);
+            handleDocumentGeneration(caseData, callbackParams, updatedData);
         } else {
             log.warn("Errors found: {}", errors);
         }
@@ -123,7 +123,7 @@ public class GenerateSdoOrder implements CaseTask {
     }
 
     private void handleDocumentGeneration(CaseData caseData, CallbackParams callbackParams,
-                                          CaseData.CaseDataBuilder<?, ?> updatedData, List<String> errors) {
+                                          CaseData.CaseDataBuilder<?, ?> updatedData) {
         log.info("Generating SDO document");
         CaseDocument document = sdoGeneratorService.generate(
             caseData,

@@ -20,7 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class FastTrackPopulatorTest {
+class FastTrackPopulatorTest {
 
     @Mock
     private WorkingDayIndicator workingDayIndicator;
@@ -42,8 +42,7 @@ public class FastTrackPopulatorTest {
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder();
-        CaseData caseData = CaseData.builder().build();
-        fastTrackPopulator.setFastTrackFields(caseDataBuilder, caseData);
+        fastTrackPopulator.setFastTrackFields(caseDataBuilder);
 
         verify(workingDayIndicator, atLeastOnce()).getNextWorkingDay(any(LocalDate.class));
         verify(deadlinesCalculator, atLeastOnce()).getOrderSetAsideOrVariedApplicationDeadline(any(LocalDateTime.class));
@@ -58,8 +57,7 @@ public class FastTrackPopulatorTest {
         when(featureToggleService.isSdoR2Enabled()).thenReturn(false);
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder();
-        CaseData caseData = CaseData.builder().build();
-        fastTrackPopulator.setFastTrackFields(caseDataBuilder, caseData);
+        fastTrackPopulator.setFastTrackFields(caseDataBuilder);
 
         verify(workingDayIndicator, atLeastOnce()).getNextWorkingDay(any(LocalDate.class));
         verify(deadlinesCalculator, atLeastOnce()).getOrderSetAsideOrVariedApplicationDeadline(any(LocalDateTime.class));

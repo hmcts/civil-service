@@ -30,9 +30,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_HEADER_SDO;
-import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_1v1;
-import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_1v2;
-import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_2v1;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_1_V_1;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_1_V_2;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_2_V_1;
 import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.FEEDBACK_LINK;
 
 @Slf4j
@@ -106,21 +106,21 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         Party respondent2 = caseData.getRespondent2();
 
         String initialBody = format(
-            CONFIRMATION_SUMMARY_1v1,
+            CONFIRMATION_SUMMARY_1_V_1,
             applicant1Name,
             respondent1Name
         );
 
         if (applicant2 != null) {
             initialBody = format(
-                CONFIRMATION_SUMMARY_2v1,
+                CONFIRMATION_SUMMARY_2_V_1,
                 applicant1Name,
                 applicant2.getPartyName(),
                 respondent1Name
             );
         } else if (respondent2 != null) {
             initialBody = format(
-                CONFIRMATION_SUMMARY_1v2,
+                CONFIRMATION_SUMMARY_1_V_2,
                 applicant1Name,
                 respondent1Name,
                 respondent2.getPartyName()

@@ -19,7 +19,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class DisposalHearingPopulatorTest {
+class DisposalHearingPopulatorTest {
 
     @Mock
     private WorkingDayIndicator workingDayIndicator;

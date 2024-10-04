@@ -40,7 +40,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 
 @ExtendWith(MockitoExtension.class)
-public class PrePopulateOrderDetailsPagesTest {
+class PrePopulateOrderDetailsPagesTest {
 
     @Mock
     private LocationReferenceDataService locationRefDataService;
@@ -135,8 +135,8 @@ public class PrePopulateOrderDetailsPagesTest {
 
         assertThat(response).isNotNull();
         assertThat(response.getData()).isNotEmpty();
-        assertThat(response.getData().get("smallClaimsMethod")).isEqualTo("smallClaimsMethodInPerson");
-        assertThat(response.getData().get("fastTrackMethod")).isEqualTo("fastTrackMethodInPerson");
+        assertThat(response.getData()).containsEntry("smallClaimsMethod", "smallClaimsMethodInPerson");
+        assertThat(response.getData()).containsEntry("fastTrackMethod", "fastTrackMethodInPerson");
     }
 
     @Test
@@ -160,8 +160,8 @@ public class PrePopulateOrderDetailsPagesTest {
 
         assertThat(response).isNotNull();
         assertThat(response.getData()).isNotEmpty();
-        assertThat(response.getData().get("smallClaimsMethod")).isEqualTo("smallClaimsMethodInPerson");
-        assertThat(response.getData().get("fastTrackMethod")).isEqualTo("fastTrackMethodInPerson");
+        assertThat(response.getData()).containsEntry("smallClaimsMethod", "smallClaimsMethodInPerson");
+        assertThat(response.getData()).containsEntry("fastTrackMethod", "fastTrackMethodInPerson");
     }
 
     @Test
@@ -232,7 +232,7 @@ public class PrePopulateOrderDetailsPagesTest {
 
         assertThat(response).isNotNull();
         assertThat(response.getData()).isNotEmpty();
-        assertThat(response.getData().get("smallClaimsMethod")).isEqualTo("smallClaimsMethodInPerson");
-        assertThat(response.getData().get("fastTrackMethod")).isEqualTo("fastTrackMethodInPerson");
+        assertThat(response.getData()).containsEntry("smallClaimsMethod", "smallClaimsMethodInPerson");
+        assertThat(response.getData()).containsEntry("fastTrackMethod", "fastTrackMethodInPerson");
     }
 }

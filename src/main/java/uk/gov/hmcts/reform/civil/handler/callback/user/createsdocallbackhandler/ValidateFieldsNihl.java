@@ -20,7 +20,7 @@ public class ValidateFieldsNihl {
 
     private static final Logger logger = LoggerFactory.getLogger(ValidateFieldsNihl.class);
 
-    public ArrayList<String> validateFieldsNihl(CaseData caseData) {
+    public List<String> validateFieldsNihl(CaseData caseData) {
         logger.info("Validating NIHL fields");
         ArrayList<String> errors = new ArrayList<>();
         validateStandardDisclosureDate(caseData, errors);

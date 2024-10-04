@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 @ExtendWith(MockitoExtension.class)
-public class SetOrderDetailsFlagsTest {
+class SetOrderDetailsFlagsTest {
 
     @Mock
     private FeatureToggleService featureToggleService;

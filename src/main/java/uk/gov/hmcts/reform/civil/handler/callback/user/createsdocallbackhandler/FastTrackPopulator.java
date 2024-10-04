@@ -51,168 +51,179 @@ public class FastTrackPopulator {
     private final DeadlinesCalculator deadlinesCalculator;
     private final FeatureToggleService featureToggleService;
     private final List<DateToShowToggle> dateToShowTrue = List.of(DateToShowToggle.SHOW);
-    static final String witnessStatementString = "This witness statement is limited to 10 pages per party, including any appendices.";
-    static final String laterThanFourPmString = "later than 4pm on";
-    static final String claimantEvidenceString = "and the claimant's evidence in reply if so advised to be uploaded by 4pm on";
+    static final String WITNESS_STATEMENT_STRING = "This witness statement is limited to 10 pages per party, including any appendices.";
+    static final String LATER_THAN_FOUR_PM_STRING = "later than 4pm on";
+    static final String CLAIMANT_EVIDENCE_STRING = "and the claimant's evidence in reply if so advised to be uploaded by 4pm on";
 
-    public void setFastTrackFields(CaseData.CaseDataBuilder<?, ?> updatedData, CaseData caseData) {
-        log.info("Setting FastTrackJudgesRecital");
+    public void setFastTrackFields(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        setFastTrackJudgesRecital(updatedData);
+        setFastTrackDisclosureOfDocuments(updatedData);
+        setFastTrackWitnessOfFact(updatedData);
+        setFastTrackSchedulesOfLoss(updatedData);
+        setFastTrackTrial(updatedData);
+        setFastTrackHearingTime(updatedData);
+        setFastTrackNotes(updatedData);
+        setFastTrackOrderWithoutJudgement(updatedData);
+        setFastTrackBuildingDispute(updatedData);
+        setFastTrackClinicalNegligence(updatedData);
+        setFastTrackCreditHire(updatedData);
+        setFastTrackHousingDisrepair(updatedData);
+        setFastTrackPersonalInjury(updatedData);
+        setFastTrackRoadTrafficAccident(updatedData);
+    }
+
+    private void setFastTrackJudgesRecital(CaseData.CaseDataBuilder<?, ?> updatedData) {
         updatedData.fastTrackJudgesRecital(FastTrackJudgesRecital.builder()
-                                               .input("Upon considering the statements of case and the information provided by the parties,")
-                                               .build());
+                .input("Upon considering the statements of case and the information provided by the parties,")
+                .build());
+    }
 
-        log.info("Setting FastTrackDisclosureOfDocuments");
+    private void setFastTrackDisclosureOfDocuments(CaseData.CaseDataBuilder<?, ?> updatedData) {
         updatedData.fastTrackDisclosureOfDocuments(FastTrackDisclosureOfDocuments.builder()
-                                                       .input1("Standard disclosure shall be provided by the parties by" +
-                                                                   " uploading to the Digital Portal their list of documents by 4pm on")
-                                                       .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
-                                                       .input2("Any request to inspect a document," +
-                                                                   " or for a copy of a document, shall be made directly to the other party by 4pm on")
-                                                       .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
-                                                       .input3("Requests will be complied with within 7 days of the receipt of the request.")
-                                                       .input4("Each party must upload to the Digital Portal copies of those documents " +
-                                                                   "on which they wish to rely at trial by 4pm on")
-                                                       .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-                                                       .build());
+                .input1("Standard disclosure shall be provided by the parties by uploading to the Digital Portal their list of documents by 4pm on")
+                .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
+                .input2("Any request to inspect a document, or for a copy of a document, shall be made directly to the other party by 4pm on")
+                .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
+                .input3("Requests will be complied with within 7 days of the receipt of the request.")
+                .input4("Each party must upload to the Digital Portal copies of those documents on which they wish to rely at trial by 4pm on")
+                .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
+                .build());
+    }
 
+    private void setFastTrackWitnessOfFact(CaseData.CaseDataBuilder<?, ?> updatedData) {
         if (featureToggleService.isSdoR2Enabled()) {
-            log.info("Feature toggle SdoR2 is enabled. Setting SdoR2FastTrackWitnessOfFact");
             updatedData.sdoR2FastTrackWitnessOfFact(getSdoR2WitnessOfFact());
         } else {
-            log.info("Feature toggle SdoR2 is disabled. Setting FastTrackWitnessOfFact");
             updatedData.fastTrackWitnessOfFact(getFastTrackWitnessOfFact());
         }
+    }
 
-        log.info("Setting FastTrackSchedulesOfLoss");
+    private void setFastTrackSchedulesOfLoss(CaseData.CaseDataBuilder<?, ?> updatedData) {
         updatedData.fastTrackSchedulesOfLoss(FastTrackSchedulesOfLoss.builder()
-                                                 .input1("The claimant must upload to the Digital Portal an up-to-date schedule of loss by 4pm on")
-                                                 .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
-                                                 .input2("If the defendant wants to challenge this claim, upload to the Digital Portal counter-schedule of loss by 4pm on")
-                                                 .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(12)))
-                                                 .input3("If there is a claim for future pecuniary loss and the parties have" +
-                                                             " not already set out their case on periodical payments," +
-                                                             " they must do so in the respective schedule and counter-schedule.")
-                                                 .build());
+                .input1("The claimant must upload to the Digital Portal an up-to-date schedule of loss by 4pm on")
+                .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
+                .input2("If the defendant wants to challenge this claim, upload to the Digital Portal counter-schedule of loss by 4pm on")
+                .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(12)))
+                .input3("If there is a claim for future pecuniary loss and the parties have not already set out their case on periodical payments," +
+                        " they must do so in the respective schedule and counter-schedule.")
+                .build());
+    }
 
-        log.info("Setting FastTrackTrial");
+    private void setFastTrackTrial(CaseData.CaseDataBuilder<?, ?> updatedData) {
         updatedData.fastTrackTrial(FastTrackTrial.builder()
-                                       .input1("The time provisionally allowed for this trial is")
-                                       .date1(LocalDate.now().plusWeeks(22))
-                                       .date2(LocalDate.now().plusWeeks(30))
-                                       .input2("If either party considers that the time estimate is insufficient," +
-                                                   " they must inform the court within 7 days of the date stated on this order.")
-                                       .input3("At least 7 days before the trial, the claimant must upload to the Digital Portal")
-                                       .type(Collections.singletonList(FastTrackTrialBundleType.DOCUMENTS))
-                                       .build());
+                .input1("The time provisionally allowed for this trial is")
+                .date1(LocalDate.now().plusWeeks(22))
+                .date2(LocalDate.now().plusWeeks(30))
+                .input2("If either party considers that the time estimate is insufficient, they must inform the court within 7 days of the date stated on this order.")
+                .input3("At least 7 days before the trial, the claimant must upload to the Digital Portal")
+                .type(Collections.singletonList(FastTrackTrialBundleType.DOCUMENTS))
+                .build());
+    }
 
-        log.info("Setting FastTrackHearingTime");
+    private void setFastTrackHearingTime(CaseData.CaseDataBuilder<?, ?> updatedData) {
         updatedData.fastTrackHearingTime(FastTrackHearingTime.builder()
-                                             .dateFrom(LocalDate.now().plusWeeks(22))
-                                             .dateTo(LocalDate.now().plusWeeks(30))
-                                             .dateToToggle(dateToShowTrue)
-                                             .helpText1("If either party considers that the time estimate is insufficient," +
-                                                            " they must inform the court within 7 days of the date of this order.")
-                                             .helpText2("Not more than seven nor less than three clear days before the trial," +
-                                                            " the claimant must file at court and serve an indexed and paginated bundle of" +
-                                                            " documents which complies with the requirements of" +
-                                                            " Rule 39.5 Civil Procedure Rules and which complies with requirements of PD32." +
-                                                            " The parties must endeavour to agree the contents of the bundle before it is filed." +
-                                                            " The bundle will include a case summary and a chronology.")
-                                             .build());
+                .dateFrom(LocalDate.now().plusWeeks(22))
+                .dateTo(LocalDate.now().plusWeeks(30))
+                .dateToToggle(dateToShowTrue)
+                .helpText1("If either party considers that the time estimate is insufficient, they must inform the court within 7 days of the date of this order.")
+                .helpText2("Not more than seven nor less than three clear days before the trial, the claimant must file at court and serve an indexed and" +
+                        " paginated bundle of documents which complies with the requirements of Rule 39.5 Civil Procedure Rules and which complies with requirements of PD32." +
+                        " The parties must endeavour to agree the contents of the bundle before it is filed. The bundle will include a case summary and a chronology.")
+                .build());
+    }
 
-        log.info("Setting FastTrackNotes");
+    private void setFastTrackNotes(CaseData.CaseDataBuilder<?, ?> updatedData) {
         updatedData.fastTrackNotes(FastTrackNotes.builder()
-                                       .input("This Order has been made without a hearing." +
-                                                  " Each party has the right to apply to have this Order set aside or varied." +
-                                                  " Any application must be received by the Court, together with the appropriate fee by 4pm on")
-                                       .date(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(1)))
-                                       .build());
+                .input("This Order has been made without a hearing. Each party has the right to apply to have this Order set aside or varied." +
+                        " Any application must be received by the Court, together with the appropriate fee by 4pm on")
+                .date(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(1)))
+                .build());
+    }
 
-        log.info("Setting FastTrackOrderWithoutJudgement");
+    private void setFastTrackOrderWithoutJudgement(CaseData.CaseDataBuilder<?, ?> updatedData) {
         updatedData.fastTrackOrderWithoutJudgement(FastTrackOrderWithoutJudgement.builder()
-                                                       .input(String.format(
-                                                           "This order has been made without hearing." +
-                                                               " Each party has the right to apply to have this Order set aside or varied." +
-                                                               " Any such application must be received by the Court (together with the appropriate fee) by 4pm on %s.",
-                                                           deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(LocalDateTime.now())
-                                                               .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))
-                                                       ))
-                                                       .build());
+                .input(String.format(
+                        "This order has been made without hearing. Each party has the right to apply to have this Order set aside or varied." +
+                                " Any such application must be received by the Court (together with the appropriate fee) by 4pm on %s.",
+                        deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(LocalDateTime.now())
+                                .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))
+                ))
+                .build());
+    }
 
-        log.info("Setting FastTrackBuildingDispute");
+    private void setFastTrackBuildingDispute(CaseData.CaseDataBuilder<?, ?> updatedData) {
         updatedData.fastTrackBuildingDispute(FastTrackBuildingDispute.builder()
-                                                 .input1("The claimant must prepare a Scott Schedule of the defects, items of damage, or any other relevant matters")
-                                                 .input2("""
-                The columns should be headed:
-                  •  Item
-                  •  Alleged defect
-                  •  Claimant’s costing
-                  •  Defendant’s response
-                  •  Defendant’s costing
-                  •  Reserved for Judge’s use""")
-                                                 .input3("The claimant must upload to the Digital Portal the Scott Schedule with the relevant columns completed by 4pm on")
-                                                 .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
-                                                 .input4("The defendant must upload to the Digital Portal an amended version of" +
-                                                             " the Scott Schedule with the relevant columns in response completed by 4pm on")
-                                                 .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(12)))
-                                                 .build());
+                .input1("The claimant must prepare a Scott Schedule of the defects, items of damage, or any other relevant matters")
+                .input2("""
+            The columns should be headed:
+              •  Item
+              •  Alleged defect
+              •  Claimant’s costing
+              •  Defendant’s response
+              •  Defendant’s costing
+              •  Reserved for Judge’s use""")
+                .input3("The claimant must upload to the Digital Portal the Scott Schedule with the relevant columns completed by 4pm on")
+                .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
+                .input4("The defendant must upload to the Digital Portal an amended version of the Scott Schedule with the relevant columns in response completed by 4pm on")
+                .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(12)))
+                .build());
+    }
 
-        log.info("Setting FastTrackClinicalNegligence");
+    private void setFastTrackClinicalNegligence(CaseData.CaseDataBuilder<?, ?> updatedData) {
         updatedData.fastTrackClinicalNegligence(FastTrackClinicalNegligence.builder()
-                                                    .input1("Documents should be retained as follows:")
-                                                    .input2("a) The parties must retain all electronically stored documents relating to the issues in this claim.")
-                                                    .input3("b) the defendant must retain the original clinical notes relating to the issues in this claim." +
-                                                                " The defendant must give facilities for inspection by the claimant," +
-                                                                " the claimant's legal advisers and experts of these original notes on 7 days written notice.")
-                                                    .input4("c) Legible copies of the medical and educational records of the claimant are" +
-                                                                " to be placed in a separate paginated bundle by the claimant's solicitors and kept up to date." +
-                                                                " All references to medical notes are to be made by reference to the pages in that bundle.")
-                                                    .build());
+                .input1("Documents should be retained as follows:")
+                .input2("a) The parties must retain all electronically stored documents relating to the issues in this claim.")
+                .input3("b) the defendant must retain the original clinical notes relating to the issues in this claim." +
+                        " The defendant must give facilities for inspection by the claimant," +
+                        " the claimant's legal advisers and experts of these original notes on 7 days written notice.")
+                .input4("c) Legible copies of the medical and educational records of the claimant are to be placed in a" +
+                        " separate paginated bundle by the claimant's solicitors and kept up to date." +
+                        " All references to medical notes are to be made by reference to the pages in that bundle.")
+                .build());
+    }
 
+    private void setFastTrackCreditHire(CaseData.CaseDataBuilder<?, ?> updatedData) {
         if (featureToggleService.isSdoR2Enabled()) {
-            log.info("Feature toggle SdoR2 is enabled. Setting SdoR2FastTrackCreditHire");
             updatedData.sdoR2FastTrackCreditHire(getSdoR2FastTrackCreditHire());
         }
-        log.info("Setting FastTrackCreditHire");
         updatedData.fastTrackCreditHire(getFastTrackCreditHire());
+    }
 
-        log.info("Setting FastTrackHousingDisrepair");
+    private void setFastTrackHousingDisrepair(CaseData.CaseDataBuilder<?, ?> updatedData) {
         updatedData.fastTrackHousingDisrepair(FastTrackHousingDisrepair.builder()
-                                                  .input1("The claimant must prepare a Scott Schedule of the items in disrepair.")
-                                                  .input2("""
-                The columns should be headed:
-                  •  Item
-                  •  Alleged disrepair
-                  •  Defendant’s response
-                  •  Reserved for Judge’s use""")
-                                                  .input3("The claimant must upload to the Digital Portal the Scott Schedule with the relevant columns completed by 4pm on")
-                                                  .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
-                                                  .input4("The defendant must upload to the" +
-                                                              " Digital Portal the amended Scott Schedule with the relevant columns in response completed by 4pm on")
-                                                  .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(12)))
-                                                  .build());
+                .input1("The claimant must prepare a Scott Schedule of the items in disrepair.")
+                .input2("""
+            The columns should be headed:
+              •  Item
+              •  Alleged disrepair
+              •  Defendant’s response
+              •  Reserved for Judge’s use""")
+                .input3("The claimant must upload to the Digital Portal the Scott Schedule with the relevant columns completed by 4pm on")
+                .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
+                .input4("The defendant must upload to the Digital Portal the amended Scott Schedule with the relevant columns in response completed by 4pm on")
+                .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(12)))
+                .build());
+    }
 
-        log.info("Setting FastTrackPersonalInjury");
+    private void setFastTrackPersonalInjury(CaseData.CaseDataBuilder<?, ?> updatedData) {
         updatedData.fastTrackPersonalInjury(FastTrackPersonalInjury.builder()
-                                                .input1("The claimant has permission to rely upon the written expert evidence already uploaded to the Digital Portal with the" +
-                                                            " particulars of claim and in addition has permission to rely upon any associated correspondence or" +
-                                                            " updating report which is uploaded to the Digital Portal by 4pm on")
-                                                .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
-                                                .input2("Any questions which are to be addressed to an expert must be sent to the expert directly" +
-                                                            " and uploaded to the Digital Portal by 4pm on")
-                                                .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
-                                                .input3("The answers to the questions shall be answered by the Expert by")
-                                                .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-                                                .input4("and uploaded to the Digital Portal by")
-                                                .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-                                                .build());
+                .input1("The claimant has permission to rely upon the written expert evidence already uploaded to the Digital Portal with the particulars of claim and in" +
+                        " addition has permission to rely upon any associated correspondence or updating report which is uploaded to the Digital Portal by 4pm on")
+                .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
+                .input2("Any questions which are to be addressed to an expert must be sent to the expert directly and uploaded to the Digital Portal by 4pm on")
+                .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
+                .input3("The answers to the questions shall be answered by the Expert by")
+                .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
+                .input4("and uploaded to the Digital Portal by")
+                .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
+                .build());
+    }
 
-        log.info("Setting FastTrackRoadTrafficAccident");
+    private void setFastTrackRoadTrafficAccident(CaseData.CaseDataBuilder<?, ?> updatedData) {
         updatedData.fastTrackRoadTrafficAccident(FastTrackRoadTrafficAccident.builder()
-                                                     .input("Photographs and/or a plan of the accident location shall be prepared and" +
-                                                                " agreed by the parties and uploaded to the Digital Portal by 4pm on")
-                                                     .date(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-                                                     .build());
+                .input("Photographs and/or a plan of the accident location shall be prepared and agreed by the parties and uploaded to the Digital Portal by 4pm on")
+                .date(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
+                .build());
     }
 
     private FastTrackWitnessOfFact getFastTrackWitnessOfFact() {
@@ -254,7 +265,7 @@ public class FastTrackPopulator {
             .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
             .input3("A failure to comply with the paragraph above will result in the claimant being debarred from asserting need or relying on impecuniosity" +
                         " as the case may be at the final hearing, save with permission of the Trial Judge.")
-            .input4(partiesLiaseString + laterThanFourPmString)
+            .input4(partiesLiaseString + LATER_THAN_FOUR_PM_STRING)
             .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
             .input5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the paragraph above," +
                         " each party may rely upon written evidence by way of witness statement of one witness to provide evidence of" +
@@ -262,9 +273,9 @@ public class FastTrackPopulator {
                         " from a mainstream supplier, or a local reputable supplier if none is available.")
             .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
             .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-            .input7("and the claimant's evidence in reply if so advised to be uploaded by 4pm on")
+            .input7(CLAIMANT_EVIDENCE_STRING)
             .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
-            .input8("This witness statement is limited to 10 pages per party, including any appendices.")
+            .input8(WITNESS_STATEMENT_STRING)
             .build();
     }
 
@@ -291,9 +302,9 @@ public class FastTrackPopulator {
                         " from a mainstream supplier, or a local reputable supplier if none is available.")
             .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
             .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-            .input7(claimantEvidenceString)
+            .input7(CLAIMANT_EVIDENCE_STRING)
             .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
-            .input8(witnessStatementString)
+            .input8(WITNESS_STATEMENT_STRING)
             .detailsShowToggle(addOrRemoveToggleList)
             .sdoR2FastTrackCreditHireDetails(SdoR2FastTrackCreditHireDetails.builder()
                                                  .input2("""

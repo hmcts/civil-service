@@ -41,9 +41,9 @@ public class SmallClaimsPopulator {
     private final WorkingDayIndicator workingDayIndicator;
     private final DeadlinesCalculator deadlinesCalculator;
     private final FeatureToggleService featureToggleService;
-    static final String witnessStatementString = "This witness statement is limited to 10 pages per party, including any appendices.";
-    static final String laterThanFourPmString = "later than 4pm on";
-    static final String claimantEvidenceString = "and the claimant's evidence in reply if so advised to be uploaded by 4pm on";
+    static final String WITNESS_STATEMENT_STRING = "This witness statement is limited to 10 pages per party, including any appendices.";
+    static final String LATER_THAN_FOUR_PM_STRING = "later than 4pm on";
+    static final String CLAIMANT_EVIDENCE_STRING = "and the claimant's evidence in reply if so advised to be uploaded by 4pm on";
 
     public void setSmallClaimsFields(CaseData.CaseDataBuilder<?, ?> updatedData, CaseData caseData) {
         log.info("Setting small claims fields for case {}", caseData.getCcdCaseReference());
@@ -182,7 +182,7 @@ public class SmallClaimsPopulator {
             .input3(
                 "A failure to comply with the paragraph above will result in the claimant being debarred from asserting need or relying on impecuniosity" +
                     " as the case may be at the final hearing, save with permission of the Trial Judge.")
-            .input4(partiesLiaseString + laterThanFourPmString)
+            .input4(partiesLiaseString + LATER_THAN_FOUR_PM_STRING)
             .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
             .input5(
                 "If the parties fail to agree rates subject to liability and/or other issues pursuant to the paragraph above," +
@@ -191,9 +191,9 @@ public class SmallClaimsPopulator {
                     " from a mainstream supplier, or a local reputable supplier if none is available.")
             .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
             .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-            .input7(claimantEvidenceString)
+            .input7(CLAIMANT_EVIDENCE_STRING)
             .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
-            .input11(witnessStatementString)
+            .input11(WITNESS_STATEMENT_STRING)
             .build();
     }
 

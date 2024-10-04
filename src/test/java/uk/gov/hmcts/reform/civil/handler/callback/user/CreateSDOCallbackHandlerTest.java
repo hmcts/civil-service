@@ -186,9 +186,9 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate.FIVE_HOURS;
 import static uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions.OPEN_DATE;
-import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_1v1;
-import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_1v2;
-import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_2v1;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_1_V_1;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_1_V_2;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_2_V_1;
 import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE;
 import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO;
 import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.FEEDBACK_LINK;
@@ -3336,7 +3336,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             );
 
             String body = format(
-                CONFIRMATION_SUMMARY_1v1,
+                CONFIRMATION_SUMMARY_1_V_1,
                 "Mr. John Rambo",
                 "Mr. Sole Trader"
             ) + format(FEEDBACK_LINK, "Feedback: Please provide judicial feedback");
@@ -3363,7 +3363,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             );
 
             String body = format(
-                CONFIRMATION_SUMMARY_1v2,
+                CONFIRMATION_SUMMARY_1_V_2,
                 "Mr. John Rambo",
                 "Mr. Sole Trader",
                 "Mr. John Rambo"
@@ -3391,7 +3391,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             );
 
             String body = format(
-                CONFIRMATION_SUMMARY_2v1,
+                CONFIRMATION_SUMMARY_2_V_1,
                 "Mr. John Rambo",
                 "Mr. Jason Rambo",
                 "Mr. Sole Trader"

@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialWindow;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -40,7 +40,7 @@ class ValidateFieldsNihlTest {
                                             .build())
             .build();
 
-        ArrayList<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
+        List<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
 
         assertEquals(1, errors.size());
         assertEquals("Date must be in the future", errors.get(0));
@@ -54,7 +54,7 @@ class ValidateFieldsNihlTest {
                                      .build())
             .build();
 
-        ArrayList<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
+        List<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
 
         assertEquals(1, errors.size());
         assertEquals("Date must be in the future", errors.get(0));
@@ -74,7 +74,7 @@ class ValidateFieldsNihlTest {
                                       .build())
             .build();
 
-        ArrayList<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
+        List<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
 
         assertEquals(1, errors.size());
         assertEquals("The number entered cannot be less than zero", errors.get(0));
@@ -88,7 +88,7 @@ class ValidateFieldsNihlTest {
                                        .build())
             .build();
 
-        ArrayList<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
+        List<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
 
         assertEquals(1, errors.size());
         assertEquals("Date must be in the future", errors.get(0));
@@ -114,7 +114,7 @@ class ValidateFieldsNihlTest {
                                       .build())
             .build();
 
-        ArrayList<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
+        List<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
 
         assertEquals(0, errors.size());
     }
@@ -127,7 +127,7 @@ class ValidateFieldsNihlTest {
                                             .build())
             .build();
 
-        ArrayList<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
+        List<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
 
         assertEquals(1, errors.size());
         assertEquals("Date must be in the future", errors.get(0));
@@ -141,7 +141,7 @@ class ValidateFieldsNihlTest {
                                        .build())
             .build();
 
-        ArrayList<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
+        List<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
 
         assertEquals(1, errors.size());
         assertEquals("Date must be in the future", errors.get(0));
@@ -155,7 +155,7 @@ class ValidateFieldsNihlTest {
                                               .build())
             .build();
 
-        ArrayList<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
+        List<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
 
         assertEquals(1, errors.size());
         assertEquals("Date must be in the future", errors.get(0));
@@ -169,7 +169,7 @@ class ValidateFieldsNihlTest {
                                               .build())
             .build();
 
-        ArrayList<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
+        List<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
 
         assertEquals(1, errors.size());
         assertEquals("Date must be in the future", errors.get(0));
@@ -183,7 +183,7 @@ class ValidateFieldsNihlTest {
                                                .build())
             .build();
 
-        ArrayList<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
+        List<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
 
         assertEquals(1, errors.size());
         assertEquals("Date must be in the future", errors.get(0));
@@ -197,7 +197,7 @@ class ValidateFieldsNihlTest {
                                                .build())
             .build();
 
-        ArrayList<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
+        List<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
 
         assertEquals(1, errors.size());
         assertEquals("Date must be in the future", errors.get(0));
@@ -211,7 +211,7 @@ class ValidateFieldsNihlTest {
                                                .build())
             .build();
 
-        ArrayList<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
+        List<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
 
         assertEquals(1, errors.size());
         assertEquals("Date must be in the future", errors.get(0));
@@ -225,7 +225,7 @@ class ValidateFieldsNihlTest {
                                                .build())
             .build();
 
-        ArrayList<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
+        List<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
 
         assertEquals(1, errors.size());
         assertEquals("Date must be in the future", errors.get(0));
@@ -239,7 +239,7 @@ class ValidateFieldsNihlTest {
                                                .build())
             .build();
 
-        ArrayList<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
+        List<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
 
         assertEquals(1, errors.size());
         assertEquals("Date must be in the future", errors.get(0));
@@ -253,7 +253,7 @@ class ValidateFieldsNihlTest {
                                            .build())
             .build();
 
-        ArrayList<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
+        List<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
 
         assertEquals(1, errors.size());
         assertEquals("Date must be in the future", errors.get(0));
@@ -267,7 +267,7 @@ class ValidateFieldsNihlTest {
                                            .build())
             .build();
 
-        ArrayList<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
+        List<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
 
         assertEquals(1, errors.size());
         assertEquals("Date must be in the future", errors.get(0));
@@ -281,7 +281,7 @@ class ValidateFieldsNihlTest {
                                      .build())
             .build();
 
-        ArrayList<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
+        List<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
 
         assertEquals(1, errors.size());
         assertEquals("Date must be in the future", errors.get(0));
@@ -295,7 +295,7 @@ class ValidateFieldsNihlTest {
                                      .build())
             .build();
 
-        ArrayList<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
+        List<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
 
         assertEquals(1, errors.size());
         assertEquals("Date must be in the future", errors.get(0));
@@ -312,7 +312,7 @@ class ValidateFieldsNihlTest {
                             .build())
             .build();
 
-        ArrayList<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
+        List<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
 
         // Assert
         assertEquals(1, errors.size());
@@ -329,7 +329,7 @@ class ValidateFieldsNihlTest {
                             .build())
             .build();
 
-        ArrayList<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
+        List<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
 
         assertEquals(1, errors.size());
         assertEquals("Date must be in the future", errors.get(0));
@@ -345,7 +345,7 @@ class ValidateFieldsNihlTest {
                             .build())
             .build();
 
-        ArrayList<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
+        List<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
 
         assertEquals(1, errors.size());
         assertEquals("Date must be in the future", errors.get(0));
@@ -357,7 +357,7 @@ class ValidateFieldsNihlTest {
             .sdoR2ImportantNotesDate(LocalDate.now().minusDays(1))
             .build();
 
-        ArrayList<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
+        List<String> errors = validateFieldsNihl.validateFieldsNihl(caseData);
 
         assertEquals(1, errors.size());
         assertEquals("Date must be in the future", errors.get(0));

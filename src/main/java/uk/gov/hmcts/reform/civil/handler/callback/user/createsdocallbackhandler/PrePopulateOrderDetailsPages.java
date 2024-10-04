@@ -122,7 +122,7 @@ public class PrePopulateOrderDetailsPages implements CaseTask {
             disposalHearingPopulator.setDisposalHearingFields(updatedData, caseData);
 
             logger.debug("Populating fast track fields");
-            fastTrackPopulator.setFastTrackFields(updatedData, caseData);
+            fastTrackPopulator.setFastTrackFields(updatedData);
 
             logger.debug("Populating small claims fields");
             smallClaimsPopulator.setSmallClaimsFields(updatedData, caseData);
