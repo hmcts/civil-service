@@ -384,6 +384,35 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
     @Test
     @SuppressWarnings("unchecked")
+    void shouldAddToCivilDocsCopyIfGADocsNotInCivilDocs() {
+        CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithDraftApplicationPDFDocumentLip(CaseData.builder().build());
+
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
+        caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataWithDirectionOrderStaffPDFDocument(caseData);
+        caseData = caseData.toBuilder().respondent1Represented(YesOrNo.NO).build();
+
+        Method gaGetter = ReflectionUtils.findMethod(CaseData.class,
+                                                     "get" + StringUtils.capitalize("gaDraftDocument"));
+        Method civilGetter = ReflectionUtils.findMethod(CaseData.class,
+                                                        "get" + StringUtils.capitalize("directionOrderDocStaff"));
+
+        try {
+            List<Element<?>> gaDocs =
+                (List<Element<?>>) (gaGetter != null ? gaGetter.invoke(generalCaseData) : null);
+            List<Element<?>> civilDocs =
+                (List<Element<?>>) ofNullable(civilGetter != null ? civilGetter.invoke(caseData) : null)
+                    .orElse(new ArrayList<>());
+            List<Element<?>> civilDocsPre = List.copyOf(civilDocs);
+            civilDocs = handler.checkDraftDocumentsInMainCase(civilDocs, gaDocs);
+            assertTrue(civilDocs.get(0).getId() != civilDocsPre.get(0).getId());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
     void shouldNotUpdateNoExistFieldDocCollection() {
         CaseData gaCaseData = new CaseDataBuilder().atStateClaimDraft()
                 .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())

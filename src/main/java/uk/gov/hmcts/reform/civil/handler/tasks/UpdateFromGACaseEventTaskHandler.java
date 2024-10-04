@@ -254,7 +254,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
         output.put(toCivilList, civilDocs.isEmpty() ? null : civilDocs);
     }
 
-    List<Element<?>> checkDraftDocumentsInMainCase(List<Element<?>> civilDocs, List<Element<?>> gaDocs) {
+    protected List<Element<?>> checkDraftDocumentsInMainCase(List<Element<?>> civilDocs, List<Element<?>> gaDocs) {
         List<UUID> ids = gaDocs.stream().map(Element::getId).toList();
         List<Element<?>> civilDocsCopy = newArrayList();
 

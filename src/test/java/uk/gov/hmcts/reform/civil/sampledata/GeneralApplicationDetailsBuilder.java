@@ -1632,6 +1632,9 @@ public class GeneralApplicationDetailsBuilder {
     public CaseData getTestCaseDataWithDirectionOrderStaffPDFDocument(CaseData caseData) {
         String uid = "f000aa01-0451-4000-b000-000000000111";
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
+        List<Element<CaseDocument>> directionOrderDocStaff = new ArrayList<>();
+        directionOrderDocStaff.add(Element.<CaseDocument>builder().id(UUID.fromString(uid1)).value(pdfDocument).build());
+
         return caseData.toBuilder()
                 .ccdCaseReference(1234L)
                 .generalAppType(GAApplicationType.builder()
@@ -1640,8 +1643,7 @@ public class GeneralApplicationDetailsBuilder {
                 .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
                 .generalOrderDocStaff(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid))
                         .value(pdfDocument).build()))
-                .directionOrderDocStaff(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
-                        .value(pdfDocument).build()))
+                .directionOrderDocStaff(directionOrderDocStaff)
                 .build();
     }
 
