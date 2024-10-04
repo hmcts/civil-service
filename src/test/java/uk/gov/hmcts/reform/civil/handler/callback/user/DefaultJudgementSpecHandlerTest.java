@@ -75,7 +75,6 @@ import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
     JacksonAutoConfiguration.class,
     ValidationAutoConfiguration.class,
     CaseDetailsConverter.class,
-    InterestCalculator.class,
     FeesService.class,
     DefaultJudgmentOnlineMapper.class,
     RoboticsAddressMapper.class,

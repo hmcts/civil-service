@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseEventDataService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -82,6 +83,10 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private HelpWithFeesForTabService hwfForTabService;
+
+    @MockBean
+    CoreCaseEventDataService coreCaseEventDataService;
+
 
     @Autowired
     private CreateClaimLipCallBackHandler handler;
