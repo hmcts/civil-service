@@ -4,9 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.cjes.JudgementAddress;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentAddress;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.cjes.JudgmentDefendantDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.cjes.JudgmentDetailsCJES;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
@@ -76,7 +75,7 @@ public class CjesMapperTest {
         assertEquals("Defendant 1", defendant1.getDefendantName());
         assertEquals(LocalDate.of(1980, 1, 1), defendant1.getDefendantDateOfBirth());
 
-        JudgementAddress defendant1Address = defendant1.getDefendantAddress();
+        JudgmentAddress defendant1Address = defendant1.getDefendantAddress();
         assertNotNull(defendant1Address);
         assertEquals("Line 1", defendant1Address.getDefendantAddressLine1());
         assertEquals("Line 2", defendant1Address.getDefendantAddressLine2());
@@ -146,7 +145,7 @@ public class CjesMapperTest {
         assertEquals("Defendant 2", defendant2.getDefendantName());
         assertEquals(LocalDate.of(1990, 2, 2), defendant2.getDefendantDateOfBirth());
 
-        JudgementAddress defendant2Address = defendant2.getDefendantAddress();
+        JudgmentAddress defendant2Address = defendant2.getDefendantAddress();
         assertNotNull(defendant2Address);
         assertEquals("Line 1", defendant2Address.getDefendantAddressLine1());
         assertEquals("Line 2", defendant2Address.getDefendantAddressLine2());
@@ -195,7 +194,7 @@ public class CjesMapperTest {
         assertEquals("Defendant 2", defendant2.getDefendantName());
         assertEquals(LocalDate.of(1990, 2, 2), defendant2.getDefendantDateOfBirth());
 
-        JudgementAddress defendant2Address = defendant2.getDefendantAddress();
+        JudgmentAddress defendant2Address = defendant2.getDefendantAddress();
         assertNotNull(defendant2Address);
         assertEquals("Line 1", defendant2Address.getDefendantAddressLine1());
         assertEquals("Line 2", defendant2Address.getDefendantAddressLine2());
@@ -205,14 +204,14 @@ public class CjesMapperTest {
         assertEquals("PostCode", defendant2Address.getDefendantPostCode());
     }
 
-    private Address createMockAddress() {
-        return Address.builder()
-            .addressLine1("Line 1")
-            .addressLine2("Line 2")
-            .addressLine3("Line 3")
-            .postTown("Town")
-            .country("Country")
-            .postCode("PostCode")
+    private JudgmentAddress createMockAddress() {
+        return JudgmentAddress.builder()
+            .defendantAddressLine1("Line 1")
+            .defendantAddressLine2("Line 2")
+            .defendantAddressLine3("Line 3")
+            .defendantAddressLine4("Town")
+            .defendantAddressLine5("Country")
+            .defendantPostCode("PostCode")
             .build();
     }
 }

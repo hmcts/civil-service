@@ -50,6 +50,8 @@ spring:
   flyway:
     enabled: ${REFERENCE_DATABASE_MIGRATION:true}
     placeholder-replacement: false
+    table: schema_version
+    baseline-on-migrate: true
 
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
@@ -117,6 +119,7 @@ genApp:
       withNotice: GAOnNotice
       consentedOrWithoutNotice: GeneralAppWithoutNotice
       appnToVaryOrSuspend: AppnToVaryOrSuspend
+      certificateOfSatisfaction: CoS
   lrd:
     endpoint: /refdata/location/court-venues
     ccmcc:
@@ -159,7 +162,6 @@ idam:
 
 document_management:
   userRoles: "caseworker-civil,caseworker-civil-solicitor"
-  secured: ${DOCUMENT_MANAGEMENT_SECURED:true}
 
 bankHolidays:
   api:
@@ -527,6 +529,8 @@ feign:
   client:
     config:
       processInstance:
+        url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
+      historicProcessInstance:
         url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
       processDefinition:
         url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
