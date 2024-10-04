@@ -1312,7 +1312,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData result = service.buildCaseData(data.toBuilder(), data, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
-        assertThat(unwrapElements(data.getGeneralApplications()).size()).isEqualTo(1);
+        assertThat(result.getGeneralApplications()).hasSize(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
             .isNotNull();
         assertThat(result.getGeneralApplications().get(0).getValue().getCertOfSC()).isNotNull();
