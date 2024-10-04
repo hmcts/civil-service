@@ -7837,4 +7837,9 @@ public class CaseDataBuilder {
         this.judgmentPaidInFull = judgmentPaidInFull;
         return this;
     }
+
+    public CaseDataBuilder ccdCaseReference(long ref) {
+        this.ccdCaseReference = ref;
+        return this;
+    }
 }

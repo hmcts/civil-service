@@ -25,13 +25,16 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
+import uk.gov.hmcts.reform.civil.utils.UserRoleUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -87,6 +90,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private final GeneralAppFeesService feesService;
     private final LocationReferenceDataService locationRefDataService;
     private final FeatureToggleService featureToggleService;
+    private final CoreCaseUserService coreCaseUserService;
     private static final List<CaseState> stateAfterJudicialReferral = Arrays.asList(PENDING_CASE_ISSUED, CASE_ISSUED,
                                                                          AWAITING_CASE_DETAILS_NOTIFICATION, AWAITING_RESPONDENT_ACKNOWLEDGEMENT, CASE_DISMISSED,
                                                                          AWAITING_APPLICANT_INTENTION, PROCEEDS_IN_HERITAGE_SYSTEM, IN_MEDIATION);
@@ -166,7 +170,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         List<GeneralApplicationTypes> generalAppTypes;
-        if (featureToggleService.isCoSCEnabled()) {
+        if (isCoscEnabledAndUserNotLip(callbackParams)) {
             generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
         } else {
             generalAppTypes = caseData.getGeneralAppType().getTypes();
@@ -186,13 +190,22 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 .build();
     }
 
+    private boolean isCoscEnabledAndUserNotLip(CallbackParams callbackParams) {
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        List<String> roles = coreCaseUserService.getUserCaseRoles(
+            callbackParams.getCaseData().getCcdCaseReference().toString(),
+            userInfo.getUid()
+        );
+        return featureToggleService.isCoSCEnabled() && !UserRoleUtils.isLIPDefendant(roles);
+    }
+
     private CallbackResponse gaValidateType(CallbackParams callbackParams) {
 
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 
         List<GeneralApplicationTypes> generalAppTypes;
-        if (featureToggleService.isCoSCEnabled()) {
+        if (isCoscEnabledAndUserNotLip(callbackParams)) {
             generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
         } else {
             generalAppTypes = caseData.getGeneralAppType().getTypes();
@@ -270,7 +283,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CallbackResponse setFeesAndPBA(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (featureToggleService.isCoSCEnabled()) {
+        if (isCoscEnabledAndUserNotLip(callbackParams)) {
             caseData = caseData.toBuilder().generalAppType(GAApplicationType.builder().types(GATypeHelper.getGATypes(
                 caseData.getGeneralAppTypeLR().getTypes())).build()).build();
         }
@@ -337,7 +350,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 .build();
             caseData = updatedCaseData;
         }
-        if (featureToggleService.isCoSCEnabled()) {
+        if (isCoscEnabledAndUserNotLip(callbackParams)) {
             var generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
             CaseData updatedCaseData = caseData.toBuilder()
                 .generalAppType(GAApplicationType.builder().types(generalAppTypes).build())
