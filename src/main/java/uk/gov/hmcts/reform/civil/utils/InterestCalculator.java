@@ -52,29 +52,35 @@ public class InterestCalculator {
         return interestAmount;
     }
 
+    public LocalDateTime getInterestEndDate(CaseData caseData) {
+        LocalDateTime interestEndDate =  time.now();
+        if (caseData.getInterestClaimFrom().name().equals(FROM_SPECIFIC_DATE)
+            && (caseData.getInterestClaimUntil().name().equals(UNTIL_CLAIM_SUBMIT_DATE)))
+        {
+            return Objects.nonNull(caseData.getSubmittedDate()) ? caseData.getSubmittedDate() : interestEndDate;
+        }
+
+        return interestEndDate;
+    }
+
     public BigDecimal calculateInterestAmount(CaseData caseData, BigDecimal interestRate) {
-        LocalDate interestEndDate =  time.now().toLocalDate();
+        LocalDateTime interestEndDate =  getInterestEndDate(caseData);
+        LocalDateTime claimSubmitDate = Objects.nonNull(caseData.getSubmittedDate())
+            ? caseData.getSubmittedDate() : time.now();
+        LocalDate interestStartDate = null;
 
         if (caseData.getInterestClaimFrom().name().equals(FROM_CLAIM_SUBMIT_DATE)) {
-            LocalDateTime claimSubmitDate = Objects.nonNull(caseData.getSubmittedDate()) ? caseData.getSubmittedDate() : time.now();
-            LocalDate interestStartDate = isAfterFourPM(claimSubmitDate) ? claimSubmitDate.toLocalDate().plusDays(1) :
-                claimSubmitDate.toLocalDate();
-            interestEndDate = isAfter4PM() ? interestEndDate.plusDays(1) : interestEndDate;
-            return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate, interestStartDate, interestEndDate);
+            interestStartDate = isAfterFourPM(claimSubmitDate)
+                ? claimSubmitDate.toLocalDate().plusDays(1)
+                : claimSubmitDate.toLocalDate();
         } else if (caseData.getInterestClaimFrom().name().equals(FROM_SPECIFIC_DATE)) {
-            LocalDate interestStartDate = caseData.getInterestFromSpecificDate();
-
-            if (caseData.getInterestClaimUntil().name().equals(UNTIL_CLAIM_SUBMIT_DATE)) {
-                LocalDateTime endDate = Objects.nonNull(caseData.getSubmittedDate()) ? caseData.getSubmittedDate() : time.now();
-                interestEndDate = isAfterFourPM(endDate) ? endDate.toLocalDate().plusDays(2) : endDate.toLocalDate().plusDays(1);
-            } else {
-                interestEndDate = isAfterFourPM(time.now()) ? time.now().toLocalDate().plusDays(2) : time.now().toLocalDate().plusDays(
-                    1);
-            }
-            return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate,
-                                           interestStartDate, interestEndDate);
+            interestStartDate = caseData.getInterestFromSpecificDate();
         }
-        return ZERO;
+        interestEndDate = isAfterFourPM(interestEndDate) ? interestEndDate.plusDays(2): interestEndDate.plusDays(1);
+
+        return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate,
+                                           interestStartDate, interestEndDate.toLocalDate());
+
     }
 
     public BigDecimal calculateInterestByDate(BigDecimal claimAmount, BigDecimal interestRate, LocalDate
@@ -85,7 +91,7 @@ public class InterestCalculator {
             = claimAmount.multiply(interestRate.divide(HUNDRED));
         BigDecimal  interestPerDay = interestForAYear.divide(NUMBER_OF_DAYS_IN_YEAR, TO_FULL_PENNIES,
                                                              RoundingMode.HALF_UP);
-        return interestPerDay.multiply(BigDecimal.valueOf(numberOfDays));
+        return interestPerDay.multiply(valueOf(numberOfDays));
     }
 
     public BigDecimal calculateBulkInterest(CaseData caseData) {
@@ -95,7 +101,7 @@ public class InterestCalculator {
                 numberOfDays = Math.abs(ChronoUnit.DAYS.between(time.now().toLocalDate(), caseData.getInterestFromSpecificDate().plusDays(1)));
             }
             BigDecimal interestDailyAmount = caseData.getSameRateInterestSelection().getDifferentRate();
-            return interestDailyAmount.multiply(BigDecimal.valueOf(numberOfDays));
+            return interestDailyAmount.multiply(valueOf(numberOfDays));
         } else {
             return ZERO;
         }

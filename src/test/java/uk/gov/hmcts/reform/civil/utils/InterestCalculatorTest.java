@@ -65,7 +65,7 @@ class InterestCalculatorTest {
     }
 
     @Test
-    void shouldReturnZeroInterestRateWhenSameRateInterestAndSubmitDateIsChoosen() {
+    void shouldReturnInterestRateWhenSameRateInterestAndSubmitDateIsChoosen() {
         LocalDateTime dateTime = LocalDateTime.of(2022, 11, 15, 13, 0);
         when(time.now()).thenReturn(dateTime);
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
@@ -78,11 +78,29 @@ class InterestCalculatorTest {
             .build();
 
         BigDecimal actual = interestCalculator.calculateInterest(caseData);
-        assertThat(actual).isZero();
+        assertThat(actual).isEqualTo(BigDecimal.valueOf(1.10).setScale(2, RoundingMode.UNNECESSARY));
     }
 
     @Test
-    void shouldReturnZeroInterestRateWhenSameRateInterestDifferentRateAndSubmitDateIsChoosen() {
+    void shouldReturnInterestRateWhenSameRateInterestAndSubmitDateIsChoosenAfter4PM() {
+        LocalDateTime dateTime = LocalDateTime.of(2024, 10, 03, 17, 0);
+        when(time.now()).thenReturn(dateTime);
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+            .claimInterest(YesOrNo.YES)
+            .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
+            .sameRateInterestSelection(SameRateInterestSelection.builder()
+                                           .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
+            .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
+            .totalClaimAmount(BigDecimal.valueOf(1000))
+            .build();
+
+        caseData = caseData.toBuilder().submittedDate(dateTime).build();
+        BigDecimal actual = interestCalculator.calculateInterest(caseData);
+        assertThat(actual).isEqualTo(BigDecimal.valueOf(0.22).setScale(2, RoundingMode.UNNECESSARY));
+    }
+
+    @Test
+    void shouldReturnInterestRateWhenSameRateInterestDifferentRateAndSubmitDateIsChoosen() {
         LocalDateTime dateTime = LocalDateTime.of(2022, 11, 15, 16, 0);
         when(time.now()).thenReturn(dateTime);
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
@@ -97,7 +115,7 @@ class InterestCalculatorTest {
             .build();
 
         BigDecimal actual = interestCalculator.calculateInterest(caseData);
-        assertThat(actual).isZero();
+        assertThat(actual).isEqualTo(BigDecimal.valueOf(1.37).setScale(2, RoundingMode.UNNECESSARY));
     }
 
     @Test
