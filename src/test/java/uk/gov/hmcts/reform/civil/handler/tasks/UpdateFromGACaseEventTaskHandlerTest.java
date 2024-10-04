@@ -28,6 +28,9 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Optional.ofNullable;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
@@ -346,6 +349,34 @@ public class UpdateFromGACaseEventTaskHandlerTest {
             List<Element<CaseDocument>> toUpdatedDocs =
                     (List<Element<CaseDocument>>)output.get("directionOrderDocStaff");
             assertThat(toUpdatedDocs).isNull();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void shouldAddToCivilDocsCopy() {
+        CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithDraftApplicationPDFDocumentLip(CaseData.builder().build());
+
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
+        caseData = caseData.toBuilder().respondent1Represented(YesOrNo.NO).build();
+
+        Method gaGetter = ReflectionUtils.findMethod(CaseData.class,
+                                                     "get" + StringUtils.capitalize("gaDraftDocument"));
+        Method civilGetter = ReflectionUtils.findMethod(CaseData.class,
+                                                        "get" + StringUtils.capitalize("directionOrderDocStaff"));
+
+        try {
+            List<Element<?>> gaDocs =
+                (List<Element<?>>) (gaGetter != null ? gaGetter.invoke(generalCaseData) : null);
+            List<Element<?>> civilDocs =
+                (List<Element<?>>) ofNullable(civilGetter != null ? civilGetter.invoke(caseData) : null)
+                    .orElse(newArrayList());
+            List<Element<?>> civilDocsPre = List.copyOf(civilDocs);
+            civilDocs = handler.checkDraftDocumentsInMainCase(civilDocs, gaDocs);
+            assertTrue(civilDocs.size() > civilDocsPre.size());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

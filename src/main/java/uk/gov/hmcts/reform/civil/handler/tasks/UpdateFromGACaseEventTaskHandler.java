@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
@@ -52,6 +54,8 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
     private CaseData generalAppCaseData;
     private CaseData civilCaseData;
     private CaseData data;
+
+    private final Logger log = LoggerFactory.getLogger(UpdateFromGACaseEventTaskHandler.class);
 
     @Override
     public void handleTask(ExternalTask externalTask) {
@@ -250,7 +254,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
         output.put(toCivilList, civilDocs.isEmpty() ? null : civilDocs);
     }
 
-    private List<Element<?>> checkDraftDocumentsInMainCase(List<Element<?>> civilDocs, List<Element<?>> gaDocs) {
+    List<Element<?>> checkDraftDocumentsInMainCase(List<Element<?>> civilDocs, List<Element<?>> gaDocs) {
         List<UUID> ids = gaDocs.stream().map(Element::getId).toList();
         List<Element<?>> civilDocsCopy = newArrayList();
 
