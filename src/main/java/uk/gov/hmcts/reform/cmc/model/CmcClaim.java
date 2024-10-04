@@ -616,10 +616,10 @@ public class CmcClaim implements Claim {
     @Override
     public boolean isTrialScheduledNoPaymentStatusActive() {
         return false;
-    };
+    }
 
     @Override
     public boolean isTrialScheduledPaymentPaidStatusActive() {
         return false;
-    };
+    }
 }
