@@ -1069,11 +1069,10 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                                                          "get" + StringUtils.capitalize("gaRespondDoc"));
             gaGetter.setAccessible(false);
             CaseData finalGaCaseData = gaCaseData;
+            CaseData.class.getDeclaredField("gaRespondDoc").setAccessible(false);
+            finalGaCaseData.getClass().getDeclaredField("gaRespondDoc").setAccessible(false);
+            finalGaCaseData.getClass().getMethod("getGaRespondDoc").setAccessible(false);
             assertThrows(Exception.class, () -> {
-                CaseData.class.getDeclaredField("gaRespondDoc").setAccessible(false);
-                finalGaCaseData.getClass().getDeclaredField("gaRespondDoc").setAccessible(false);
-                finalGaCaseData.getClass().getMethod("getGaRespondDoc").setAccessible(false);
-
                 when(ReflectionUtils.findMethod(CaseData.class,
                                                 "get" + StringUtils.capitalize("GaRespondDoc"))).thenReturn(gaGetter);
 
