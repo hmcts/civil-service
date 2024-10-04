@@ -646,6 +646,27 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
+    void shouldNotGetHearingFee_shouldRecalculateHearingDueDate_whenAboutToSubmitRelisting() {
+        given(time.now()).willReturn(LocalDateTime.now());
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .hearingNoticeList(HearingNoticeList.SMALL_CLAIMS)
+            .listingOrRelisting(ListingOrRelisting.RELISTING)
+            .hearingDate(time.now().toLocalDate().plusWeeks(5))
+            .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+            .totalClaimAmount(new BigDecimal(12300))
+            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        // Then
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        assertThat(updatedData.getHearingDueDate()).isNotNull();
+    }
+
+    @Test
     void shouldTriggerBusinessProcessHearingScheduledOtherAndRelisting_whenAboutToSubmit() {
         given(time.now()).willReturn(LocalDateTime.now());
 
