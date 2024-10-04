@@ -15,8 +15,10 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.hearing.HearingNoticeHmcGenerator;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
+import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.HearingFeeUtils;
 import uk.gov.hmcts.reform.civil.utils.HmcDataUtils;
@@ -31,8 +33,11 @@ import java.util.Map;
 import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.utils.DateUtils.convertFromUTC;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateAndApplyFee;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getHearingDays;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getLocationRefData;
 
@@ -51,6 +56,8 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
     private final HearingNoticeHmcGenerator hearingNoticeHmcGenerator;
     private final ObjectMapper objectMapper;
     private final LocationReferenceDataService locationRefDataService;
+    private final HearingFeesService hearingFeesService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -99,6 +106,8 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
                 .build()
         );
 
+        String claimTrack = determineClaimTrack(caseData);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder
                       .hearingDate(hearingStartDate.toLocalDate())
@@ -106,6 +115,9 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
                       .hearingLocation(DynamicList.builder().value(DynamicListElement.builder()
                                                                        .label(hearingLocation)
                                                                        .build()).build())
+                      .hearingFee(featureToggleService.isCaseProgressionEnabled()
+                                      ? calculateAndApplyFee(hearingFeesService, caseData, claimTrack)
+                                      : null)
                       .build().toMap(objectMapper))
             .build();
     }
@@ -137,6 +149,15 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
             locationRefDataService);
         if (hearingLocation != null) {
             return LocationReferenceDataService.getDisplayEntry(hearingLocation);
+        }
+        return null;
+    }
+
+    private String determineClaimTrack(CaseData caseData) {
+        if (caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
+            return caseData.getAllocatedTrack().name();
+        } else if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
+            return caseData.getResponseClaimTrack();
         }
         return null;
     }
