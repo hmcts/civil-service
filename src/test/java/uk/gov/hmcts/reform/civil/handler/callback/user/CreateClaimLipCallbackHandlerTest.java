@@ -87,7 +87,6 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     CoreCaseEventDataService coreCaseEventDataService;
 
-
     @Autowired
     private CreateClaimLipCallBackHandler handler;
 
