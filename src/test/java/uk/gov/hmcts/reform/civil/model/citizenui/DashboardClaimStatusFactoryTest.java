@@ -339,7 +339,7 @@ class DashboardClaimStatusFactoryTest {
                                                                           .getSystemGeneratedCaseDocuments());
         systemGenerated.add(Element.<CaseDocument>builder().value(hearingForm).build());
         caseDataBuilder.systemGeneratedCaseDocuments(systemGenerated);
-        CaseData caseData = caseDataBuilder.build();
+        CaseData caseData = caseDataBuilder.ccdState(CaseState.HEARING_READINESS).build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.HEARING_FORM_GENERATED, DashboardClaimStatus.HEARING_FORM_GENERATED
         );
