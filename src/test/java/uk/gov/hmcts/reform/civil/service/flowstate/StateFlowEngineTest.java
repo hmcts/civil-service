@@ -5487,7 +5487,7 @@ class StateFlowEngineTest {
         }
 
         @Test
-        void shouldReturnIsLipForGALipFlagWhenLipVsLR2() {
+        void shouldReturnIsLipForGALipFlagWhenLRVsLR2() {
             // Given
             CaseData caseData = CaseData.builder()
                 // spec claim
