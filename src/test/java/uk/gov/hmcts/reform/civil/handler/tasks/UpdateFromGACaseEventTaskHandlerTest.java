@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
@@ -29,6 +31,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,8 +48,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_PDF_TO_MAIN_CASE;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.GENERAL_ORDER;
 
@@ -1030,7 +1032,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
     }
 
     @Test
-    void expectExceptionOnGetUpdatedCaseData() {
+    void expectInvalidCaseDataExceptionOnToGaCaseData() {
         when(mockExternalTask.getAllVariables())
             .thenReturn(Map.of(
                 "caseId", GENERAL_APP_CASE_ID,
@@ -1047,6 +1049,39 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         String messageFromException = exceptionThrown.getMessage();
         System.out.println(messageFromException);
         assertTrue(messageFromException.contains("Conversion to long datatype failed for general application for a case "));
+    }
+
+    @Test
+    void expectExceptionOnGaGetter() {
+        CaseData gaCaseData = new CaseDataBuilder().atStateClaimDraft()
+            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .build();
+        String uid = "f000aa01-0451-4000-b000-000000000000";
+        gaCaseData = gaCaseData.toBuilder()
+            .directionOrderDocument(singletonList(Element.<CaseDocument>builder()
+                                                      .id(UUID.fromString(uid))
+                                                      .value(pdfDocument).build())).build();
+        Map<String, Object> output = new HashMap<>();
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
+        try {
+            Method gaGetter = ReflectionUtils.findMethod(CaseData.class,
+                                                         "get" + StringUtils.capitalize("gaRespondDoc"));
+            gaGetter.setAccessible(false);
+            CaseData finalGaCaseData = gaCaseData;
+            assertThrows(Exception.class, () -> {
+                CaseData.class.getDeclaredField("gaRespondDoc").setAccessible(false);
+                finalGaCaseData.getClass().getDeclaredField("gaRespondDoc").setAccessible(false);
+                finalGaCaseData.getClass().getMethod("getGaRespondDoc").setAccessible(false);
+
+                when(ReflectionUtils.findMethod(CaseData.class,
+                                                "get" + StringUtils.capitalize("GaRespondDoc"))).thenReturn(gaGetter);
+
+                handler.updateDocCollection(output, finalGaCaseData, "get" + StringUtils.capitalize("gaRespondDoc"),
+                                        caseData, "directionOrderDocStaff");
+            });
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public final CaseDocument pdfDocument = CaseDocument.builder()
