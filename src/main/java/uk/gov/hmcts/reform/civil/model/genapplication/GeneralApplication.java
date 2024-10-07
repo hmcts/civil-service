@@ -25,6 +25,7 @@ public class GeneralApplication implements MappableObject {
 
     private final String generalApplicationState;
     private final GAApplicationType generalAppType;
+    private final GAApplicationTypeLR generalAppTypeLR;
     private final GARespondentOrderAgreement generalAppRespondentAgreement;
     private final BusinessProcess businessProcess;
     private final GAPbaDetails generalAppPBADetails;
@@ -75,6 +76,7 @@ public class GeneralApplication implements MappableObject {
     @JsonCreator
     GeneralApplication(@JsonProperty("generalApplicationState") String generalApplicationState,
                        @JsonProperty("generalAppType") GAApplicationType generalAppType,
+                       @JsonProperty("generalAppTypeLR") GAApplicationTypeLR generalAppTypeLR,
                        @JsonProperty("generalAppRespondentAgreement")
                            GARespondentOrderAgreement generalAppRespondentAgreement,
                        @JsonProperty("businessProcess") BusinessProcess businessProcess,
@@ -167,6 +169,7 @@ public class GeneralApplication implements MappableObject {
         this.isGaRespondentTwoLip = isGaRespondentTwoLip;
         this.generalAppHelpWithFees = generalAppHelpWithFees;
         this.certOfSC = certOfSC;
+        this.generalAppTypeLR = generalAppTypeLR;
         this.caseNameGaInternal = caseNameGaInternal;
     }
 }
