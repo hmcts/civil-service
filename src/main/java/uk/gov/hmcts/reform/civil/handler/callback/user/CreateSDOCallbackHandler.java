@@ -1591,10 +1591,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
             dataBuilder.eaCourtLocation(YES);
 
-            if (featureToggleService.isHmcEnabled()
-                && !caseData.isApplicantLiP()
-                && !caseData.isRespondent1LiP()
-                && !caseData.isRespondent2LiP()) {
+            if (featureToggleService.isHmcEnabled()) {
                 dataBuilder.hmcEaCourtLocation(featureToggleService.isLocationWhiteListedForCaseProgression(
                     caseData.getCaseManagementLocation().getBaseLocation()) ? YES : NO);
             }
