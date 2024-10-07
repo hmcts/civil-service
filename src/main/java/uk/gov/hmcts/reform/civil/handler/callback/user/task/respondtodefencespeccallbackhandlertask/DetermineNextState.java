@@ -47,7 +47,7 @@ public class DetermineNextState  {
                 Pair<String, BusinessProcess> result = handleAcceptedRepaymentPlan(caseData, builder, businessProcess);
                 nextState = result.getLeft();
                 businessProcess = result.getRight();
-            } else if (IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())) {
+            } else if (isDefenceAdmitPayImmediately(caseData)) {
                 nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             } else if (caseData.hasApplicantRejectedRepaymentPlan()) {
                 nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
@@ -68,6 +68,11 @@ public class DetermineNextState  {
 
         builder.businessProcess(businessProcess);
         return nextState;
+    }
+
+    private boolean isDefenceAdmitPayImmediately(CaseData caseData) {
+        return featureToggleService.isJudgmentOnlineLive()
+            && IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
     }
 
     private static boolean isClaimNotSettled(CaseData caseData) {
