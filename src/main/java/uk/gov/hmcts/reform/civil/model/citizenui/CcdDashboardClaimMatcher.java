@@ -25,7 +25,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
      * sorted in descending order by creation date.
      */
     protected List<CaseEventDetail> eventHistory;
-    protected final int dayLimit = 42;
+    protected static final int DAY_LIMIT = 42;
 
     protected CcdDashboardClaimMatcher(CaseData caseData,
                                        FeatureToggleService featureToggleService,
@@ -209,10 +209,10 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
         Optional<LocalDate> hearingDate = getHearingDate();
         if (caseData.isFastTrackClaim()
             && hearingDate.isPresent()
-            && isHearingLessThanDaysAway(dayLimit)) {
+            && isHearingLessThanDaysAway(DAY_LIMIT)) {
             Optional<LocalDateTime> lastOrder = getTimeOfLastNonSDOOrder();
             return lastOrder.isEmpty()
-                || hearingDate.get().minusDays(dayLimit)
+                || hearingDate.get().minusDays(DAY_LIMIT)
                 .isAfter(lastOrder.get().toLocalDate());
         } else {
             return false;
@@ -223,7 +223,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     public boolean isTrialScheduledNoPaymentStatusActive() {
         Optional<LocalDateTime> hearingScheduledDate = getWhenWasHearingScheduled();
         Optional<LocalDateTime> orderDate = getTimeOfLastNonSDOOrder();
-        return !isHearingLessThanDaysAway(dayLimit)
+        return !isHearingLessThanDaysAway(DAY_LIMIT)
             && CaseState.HEARING_READINESS.equals(caseData.getCcdState())
             && (hearingScheduledDate.isPresent())
             && (orderDate.isEmpty()
@@ -234,7 +234,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     public boolean isTrialScheduledPaymentPaidStatusActive() {
         Optional<LocalDateTime> hearingScheduledDate = getWhenWasHearingScheduled();
         Optional<LocalDateTime> orderDate = getTimeOfLastNonSDOOrder();
-        return !isHearingLessThanDaysAway(dayLimit)
+        return !isHearingLessThanDaysAway(DAY_LIMIT)
             && CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.equals(caseData.getCcdState())
             && (hearingScheduledDate.isPresent())
             && (orderDate.isEmpty()
