@@ -1351,7 +1351,6 @@ public class FlowStateAllowedEventService {
                 DISMISS_CASE
             )
         ),
-
         entry(
             PART_ADMISSION.fullName(),
             List.of(
@@ -1382,7 +1381,14 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MORE_INFORMATION_HWF,
+                FEE_PAYMENT_OUTCOME,
+                NO_REMISSION_HWF,
+                PARTIAL_REMISSION_HWF_GRANTED,
+                FULL_REMISSION_HWF,
+                UPDATE_HELP_WITH_FEE_NUMBER,
+                INVALID_HWF_REFERENCE
             )
         ),
 
@@ -1520,7 +1526,14 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MORE_INFORMATION_HWF,
+                FEE_PAYMENT_OUTCOME,
+                NO_REMISSION_HWF,
+                PARTIAL_REMISSION_HWF_GRANTED,
+                FULL_REMISSION_HWF,
+                UPDATE_HELP_WITH_FEE_NUMBER,
+                INVALID_HWF_REFERENCE
             )
         ),
 
@@ -1774,7 +1787,15 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MORE_INFORMATION_HWF,
+                FEE_PAYMENT_OUTCOME,
+                NO_REMISSION_HWF,
+                PARTIAL_REMISSION_HWF_GRANTED,
+                FULL_REMISSION_HWF,
+                UPDATE_HELP_WITH_FEE_NUMBER,
+                INVALID_HWF_REFERENCE,
+                AMEND_RESTITCH_BUNDLE
             )
         ),
         entry(
