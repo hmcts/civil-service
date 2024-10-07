@@ -48,7 +48,7 @@ public class SettlementNoResponseFromDefendantHandlerTest {
 
         // Then: task should be completed
         verify(applicationEventPublisher).publishEvent(new SettlementNoResponseFromDefendantEvent(caseId));
-        verify(externalTaskService).complete(mockTask);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @Test

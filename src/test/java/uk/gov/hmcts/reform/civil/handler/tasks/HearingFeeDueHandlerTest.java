@@ -87,7 +87,7 @@ class HearingFeeDueHandlerTest {
         handler.execute(mockTask, externalTaskService);
 
         verify(applicationEventPublisher).publishEvent(new NoHearingFeeDueEvent(caseId));
-        verify(externalTaskService).complete(mockTask);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @ParameterizedTest
@@ -107,7 +107,7 @@ class HearingFeeDueHandlerTest {
         handler.execute(mockTask, externalTaskService);
 
         verify(applicationEventPublisher).publishEvent(new HearingFeePaidEvent(caseId));
-        verify(externalTaskService).complete(mockTask);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @ParameterizedTest
@@ -134,7 +134,7 @@ class HearingFeeDueHandlerTest {
         handler.execute(mockTask, externalTaskService);
 
         verify(applicationEventPublisher).publishEvent(new HearingFeePaidEvent(caseId));
-        verify(externalTaskService).complete(mockTask);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @ParameterizedTest
@@ -154,7 +154,7 @@ class HearingFeeDueHandlerTest {
         handler.execute(mockTask, externalTaskService);
 
         verify(applicationEventPublisher).publishEvent(new HearingFeeUnpaidEvent(caseId));
-        verify(externalTaskService).complete(mockTask);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @Test

@@ -68,6 +68,6 @@ class RequestForReconsiderationNotificationDeadlineHandlerTest {
         handler.execute(mockTask, externalTaskService);
 
         verify(applicationEventPublisher).publishEvent(new RequestForReconsiderationNotificationDeadlineEvent(caseId));
-        verify(externalTaskService).complete(mockTask);
+        verify(externalTaskService).complete(mockTask, null);
     }
 }

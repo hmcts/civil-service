@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 
 import java.util.Arrays;
 
-import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.helpers.ExponentialRetryTimeoutHelper.calculateExponentialRetryTimeout;
 
 /**
@@ -78,10 +77,7 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
         String processInstanceId = externalTask.getProcessInstanceId();
 
         try {
-            ofNullable(getVariableMap(data)).ifPresentOrElse(
-                variableMap -> externalTaskService.complete(externalTask, variableMap),
-                () -> externalTaskService.complete(externalTask)
-            );
+            externalTaskService.complete(externalTask, getVariableMap(data));
             log.info("External task '{}' finished with processInstanceId '{}'",
                      topicName, processInstanceId
             );

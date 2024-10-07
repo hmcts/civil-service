@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -92,6 +93,7 @@ import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedT
 @Service
 @RequiredArgsConstructor
 @SuppressWarnings("unchecked")
+@Slf4j
 public class RespondToClaimCallbackHandler extends CallbackHandler implements ExpertsValidator, WitnessesValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE);
@@ -555,7 +557,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
         // these documents are added to defendantUploads, if we do not remove/null the original,
         // case file view will show duplicate documents
-        LOG.info("Null placeholder documents");
+        log.info("Null placeholder documents");
         updatedCaseDataBuilder.respondent1ClaimResponseDocument(null);
         updatedCaseDataBuilder.respondent2ClaimResponseDocument(null);
         if (caseData.getRespondent1() != null

@@ -73,7 +73,7 @@ class PollingEventEmitterHandlerTest {
 
         verify(searchService).getCases();
         verifyNoInteractions(eventEmitterService);
-        verify(externalTaskService).complete(externalTask);
+        verify(externalTaskService).complete(externalTask, null);
     }
 
     @Test
@@ -93,7 +93,7 @@ class PollingEventEmitterHandlerTest {
             caseDetailsConverter.toCaseData(caseDetails3),
             true
         );
-        verify(externalTaskService).complete(externalTask);
+        verify(externalTaskService).complete(externalTask, null);
 
         verifyNoMoreInteractions(eventEmitterService);
     }

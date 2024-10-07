@@ -23,8 +23,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.Optional.ofNullable;
-
 @Slf4j
 @RequiredArgsConstructor
 @Component
@@ -82,10 +80,8 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
         String processInstanceId = externalTask.getProcessInstanceId();
 
         try {
-            ofNullable(getVariableMap(data)).ifPresentOrElse(
-                variableMap -> externalTaskService.complete(externalTask, variableMap),
-                () -> externalTaskService.complete(externalTask)
-            );
+            externalTaskService.complete(externalTask, getVariableMap(data));
+
             log.info("External task '{}' finished with processInstanceId '{}'",
                      topicName, processInstanceId
             );

@@ -67,7 +67,7 @@ class TakeCaseOfflineHandlerTest {
         handler.execute(mockTask, externalTaskService);
 
         verify(applicationEventPublisher).publishEvent(new TakeCaseOfflineEvent(caseId));
-        verify(externalTaskService).complete(mockTask);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @Test
@@ -105,7 +105,7 @@ class TakeCaseOfflineHandlerTest {
         String errorMessage = "there was an error";
 
         doThrow(new NotFoundException(errorMessage, new RestException("", "", 404)))
-            .when(externalTaskService).complete(mockTask);
+            .when(externalTaskService).complete(mockTask, null);
 
         assertThrows(
             CompleteTaskException.class,
