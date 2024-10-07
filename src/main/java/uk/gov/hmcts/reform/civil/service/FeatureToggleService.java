@@ -129,7 +129,14 @@ public class FeatureToggleService {
 
     public boolean isDashboardEnabledForCase(CaseData caseData) {
         log.info("caseadata", caseData);
-        return true;
+        ZoneId zoneId = ZoneId.systemDefault();
+        long epoch;
+        if (caseData.getSubmittedDate() == null) {
+            epoch = LocalDateTime.now().atZone(zoneId).toEpochSecond();
+        } else {
+            epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
+        }
+        return epoch >= LocalDateTime.now().atZone(zoneId).toEpochSecond();
     }
 
     public boolean isPartOfNationalRollout(String locationEpimms) {
