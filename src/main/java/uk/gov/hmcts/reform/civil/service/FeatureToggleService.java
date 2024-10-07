@@ -23,7 +23,7 @@ public class FeatureToggleService {
     }
 
     public boolean isGeneralApplicationsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("general_applications_enabled");
+        return true;
     }
 
     public boolean isBulkClaimEnabled() {
@@ -112,7 +112,7 @@ public class FeatureToggleService {
     }
 
     public boolean isGaForLipsEnabled() {
-        return featureToggleApi.isFeatureEnabled("GaForLips");
+        return false;
     }
 
     public boolean isMultiOrIntermediateTrackEnabled(CaseData caseData) {
