@@ -27,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_FAILED_PAYMENT_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 @ExtendWith(MockitoExtension.class)
@@ -70,7 +71,8 @@ public class FailedPaymentApplicantForSpecNotificationHandlerTest extends BaseCa
         private Map<String, String> getNotificationDataMap() {
             return Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE
+                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
             );
         }
 

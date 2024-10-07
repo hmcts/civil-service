@@ -40,6 +40,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseCaseHandedOfflineRespondentNotificationHandler.TASK_ID_RESPONDENT1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseCaseHandedOfflineRespondentNotificationHandler.TASK_ID_RESPONDENT2;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASON;
@@ -47,7 +48,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_ONE_RESPONSE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_TWO_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_TWO_RESPONSE;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
@@ -92,6 +93,9 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                         .build())
                     .build();
 
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+
                 handler.handle(params);
 
                 verify(notificationService).sendMail(
@@ -122,6 +126,8 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     .build();
                 when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec())
                     .thenReturn("template-id-multiparty");
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
 
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
@@ -158,6 +164,9 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                         .build())
                     .build();
 
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+
                 handler.handle(params);
 
                 verify(notificationService).sendMail(
@@ -176,6 +185,9 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
                     .multiPartyClaimTwoDefendantSolicitors()
                     .build();
+
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
 
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
@@ -216,6 +228,9 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                 when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty())
                     .thenReturn("template-id-multiparty");
 
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+
                 handler.handle(params);
 
                 verify(notificationService).sendMail(
@@ -239,6 +254,9 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                         .eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE")
                         .build())
                     .build();
+
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
 
                 handler.handle(params);
 
@@ -265,6 +283,9 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                         .eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_HANDED_OFFLINE")
                         .build())
                     .build();
+
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
 
                 handler.handle(params);
 
@@ -294,6 +315,9 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                         .build())
                     .build();
 
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+
                 handler.handle(params);
 
                 verify(notificationService).sendMail(
@@ -321,6 +345,9 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                         .build())
                     .build();
 
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+
                 handler.handle(params);
 
                 verify(notificationService).sendMail(
@@ -346,6 +373,9 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                         .eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE")
                         .build())
                     .build();
+
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
 
                 handler.handle(params);
 
@@ -373,6 +403,9 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                         .build())
                     .build();
 
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+
                 handler.handle(params);
 
                 verify(notificationService).sendMail(
@@ -391,6 +424,9 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     .multiPartyClaimOneDefendantSolicitor()
                     .respondent2SameLegalRepresentative(YesOrNo.NO)
                     .build();
+
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
 
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
@@ -439,6 +475,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     "respondentsolicitor2@example.com",
                     "template-id-multiparty",
                     Map.of("legalOrgName", r2Org.getName(),
+                           "partyReferences", "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided",
                         "claimReferenceNumber", caseData.getLegacyCaseReference()),
                     "defendant-response-case-handed-offline-respondent-notification-000DC001"
                 );
@@ -460,6 +497,9 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                         .build())
                     .build();
 
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+
                 handler.handle(params);
 
                 verify(notificationService).sendMail(
@@ -479,6 +519,8 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
             void shouldNotifyDefendantSolicitor1_when2v1Case() {
                 when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline())
                     .thenReturn("template-id");
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimTwoApplicants()
@@ -573,7 +615,8 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
-                PARTY_REFERENCES, buildPartiesReferences(caseData)
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
             );
         } else if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
             return Map.of(
@@ -582,17 +625,19 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     .concat(" against " + caseData.getApplicant1().getPartyName())
                     .concat(" and " + caseData.getRespondent1ClaimResponseTypeToApplicant2())
                     .concat(" against " + caseData.getApplicant2().getPartyName()),
-                PARTY_REFERENCES, buildPartiesReferences(caseData)
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
             );
         } else {
             //1v2 template is used and expects different data
             return Map.of(
-                PARTY_REFERENCES, buildPartiesReferences(caseData),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
                 RESPONDENT_ONE_RESPONSE, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
-                RESPONDENT_TWO_RESPONSE, caseData.getRespondent2ClaimResponseType().getDisplayedValue()
+                RESPONDENT_TWO_RESPONSE, caseData.getRespondent2ClaimResponseType().getDisplayedValue(),
+                CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
             );
         }
     }
@@ -600,7 +645,8 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
     private Map<String, String> getNotificationDataMapSpec(CaseData caseData) {
         return Map.of(
             "defendantLR", "Signer Name",
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
         );
     }
 

@@ -36,6 +36,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
@@ -224,7 +225,8 @@ class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHandlerTes
         private Map<String, String> getNotificationDataMap() {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                CLAIM_LEGAL_ORG_NAME_SPEC, ORG_NAME
+                CLAIM_LEGAL_ORG_NAME_SPEC, ORG_NAME,
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
             );
         }
 
@@ -240,7 +242,8 @@ class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHandlerTes
         private Map<String, String> getNotificationDataLipMap1(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                CLAIM_LEGAL_ORG_NAME_SPEC, caseData.getRespondent1().getPartyName()
+                CLAIM_LEGAL_ORG_NAME_SPEC, caseData.getRespondent1().getPartyName(),
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
             );
         }
     }

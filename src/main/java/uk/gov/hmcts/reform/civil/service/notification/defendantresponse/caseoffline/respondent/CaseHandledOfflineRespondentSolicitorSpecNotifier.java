@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Component
 @AllArgsConstructor
@@ -69,7 +70,8 @@ public class CaseHandledOfflineRespondentSolicitorSpecNotifier extends CaseHandl
                                                  CaseHandledOfflineRecipient recipientType) {
         return Map.of(
             DEFENDANT_NAME_SPEC, getLegalOrganisationName(caseData, recipientType),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 
@@ -77,7 +79,8 @@ public class CaseHandledOfflineRespondentSolicitorSpecNotifier extends CaseHandl
                                                            CaseHandledOfflineRecipient recipientType) {
         return Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, recipientType),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 

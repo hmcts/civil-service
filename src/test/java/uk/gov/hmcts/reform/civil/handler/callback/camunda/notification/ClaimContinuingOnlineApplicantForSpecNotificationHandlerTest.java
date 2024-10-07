@@ -35,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.ISSUED_ON;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_ONE_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_TWO_NAME;
@@ -87,7 +88,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
             handler.handle(params);
 
-            Map<String, String> expectedProperties = getNotificationDataMap(caseData);
+            Map<String, String> expectedProperties = getNotificationDataMap(caseData, false);
             expectedProperties.put(RESPONSE_DEADLINE, formatLocalDateTime(
                 caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT));
 
@@ -122,7 +123,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
             verify(notificationService).sendMail(
                 APPLICANT_SOLICITOR_EMAIL,
                 TEMPLATE_1v2,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(caseData, false),
                 REFERENCE
             );
         }
@@ -150,7 +151,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
             verify(notificationService).sendMail(
                 APPLICANT_SOLICITOR_EMAIL,
                 TEMPLATE_1v2,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(caseData, true),
                 REFERENCE
             );
         }
@@ -174,7 +175,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
             handler.handle(params);
 
-            Map<String, String> expectedProperties = getNotificationDataMap(caseData);
+            Map<String, String> expectedProperties = getNotificationDataMap(caseData, false);
             expectedProperties.put(RESPONSE_DEADLINE, formatLocalDateTime(
                 caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT));
 
@@ -186,14 +187,16 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
             );
         }
 
-        private Map<String, String> getNotificationDataMap(CaseData caseData) {
+        private Map<String, String> getNotificationDataMap(CaseData caseData, boolean is1v2DS) {
 
             Map<String, String> properties = new HashMap<>(Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, ORG_NAME,
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
                 CLAIM_DETAILS_NOTIFICATION_DEADLINE,
-                formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE)
+                formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE),
+                PARTY_REFERENCES, is1v2DS ? "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: 01234" :
+                "Claimant reference: 12345 - Defendant reference: 6789"
             ));
 
             if (caseData.getRespondent2() != null) {
@@ -223,7 +226,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
             handler.handle(params);
 
-            Map<String, String> expectedProperties = getNotificationDataMap(caseData);
+            Map<String, String> expectedProperties = getNotificationDataMap(caseData, false);
             expectedProperties.put(RESPONSE_DEADLINE, formatLocalDateTime(
                 caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT));
 
@@ -254,7 +257,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
             handler.handle(params);
 
-            Map<String, String> expectedProperties = getNotificationDataMap(caseData);
+            Map<String, String> expectedProperties = getNotificationDataMap(caseData, false);
 
             verify(notificationService).sendMail(
                 APPLICANT_SOLICITOR_EMAIL,
@@ -283,7 +286,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
             handler.handle(params);
 
-            Map<String, String> expectedProperties = getNotificationDataMap(caseData);
+            Map<String, String> expectedProperties = getNotificationDataMap(caseData, false);
 
             verify(notificationService).sendMail(
                 APPLICANT_SOLICITOR_EMAIL,

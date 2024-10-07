@@ -11,8 +11,10 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,7 +23,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_PROCEEDS_IN_CASEMAN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_PROCEEDS_IN_CASEMAN;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_NOTIFIED;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +42,7 @@ public class CaseProceedsInCasemanRespondentNotificationHandler extends Callback
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final IStateFlowEngine stateFlowEngine;
+    private final OrganisationService organisationService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -74,11 +78,14 @@ public class CaseProceedsInCasemanRespondentNotificationHandler extends Callback
             } else {
                 emailAddress = caseData.getRespondentSolicitor2EmailAddress();
             }
+
+            Map<String, String> notificationProperties = addProperties(caseData);
+            notificationProperties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentOrgName(callbackParams.getRequest().getEventId(), caseData));
             Optional.ofNullable(emailAddress).ifPresent(
                 email -> notificationService.sendMail(
                     email,
                     notificationsProperties.getSolicitorCaseTakenOffline(),
-                    addProperties(caseData),
+                    notificationProperties,
                     String.format(
                         REFERENCE_TEMPLATE,
                         caseData.getLegacyCaseReference()
@@ -89,11 +96,17 @@ public class CaseProceedsInCasemanRespondentNotificationHandler extends Callback
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
+    private String getRespondentOrgName(String caseEvent, CaseData caseData) {
+        return NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_PROCEEDS_IN_CASEMAN.name()
+            .equals(caseEvent) ? getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService)
+            : getRespondentLegalOrganizationName(caseData.getRespondent2OrganisationPolicy(), organisationService);
+    }
+
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
+        return new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            PARTY_REFERENCES, buildPartiesReferences(caseData)
-        );
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+        ));
     }
 }

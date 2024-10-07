@@ -16,16 +16,20 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -37,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.AcknowledgeClaimApplicantNotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.AcknowledgeClaimApplicantNotificationHandler.TASK_ID_CC;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
@@ -45,7 +50,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseIntentionForEmail;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,6 +60,8 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
     private NotificationService notificationService;
     @Mock
     private NotificationsProperties notificationsProperties;
+    @Mock
+    private OrganisationService organisationService;
     @InjectMocks
     private AcknowledgeClaimApplicantNotificationHandler handler;
 
@@ -68,7 +75,8 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT").build())
                 .build();
-
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
             handler.handle(params);
 
             verify(notificationService).sendMail(
@@ -88,7 +96,8 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT").build())
                 .build();
-
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
             handler.handle(params);
 
             assertThatNoException();
@@ -103,7 +112,8 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT").build())
                 .build();
-
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
             handler.handle(params);
 
             assertThatNoException();
@@ -118,7 +128,8 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT").build())
                 .build();
-
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
             handler.handle(params);
 
             assertThatNoException();
@@ -131,7 +142,8 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT_CC").build())
                 .build();
-
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
             handler.handle(params);
 
             verify(notificationService).sendMail(
@@ -159,7 +171,8 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT_CC").build())
                 .build();
-
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
             handler.handle(params);
 
             verify(notificationService).sendMail(
@@ -187,7 +200,8 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT_CC").build())
                 .build();
-
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
             handler.handle(params);
 
             verify(notificationService).sendMail(
@@ -214,7 +228,8 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT_CC").build())
                 .build();
-
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
             handler.handle(params);
 
             verify(notificationService).sendMail(
@@ -243,7 +258,8 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
                     CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT_CC")
                         .build())
                 .build();
-
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
             handler.handle(params);
 
             verify(notificationService).sendMail(
@@ -269,7 +285,8 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
                     CallbackRequest.builder()
                         .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT_CC").build())
                 .build();
-
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
             handler.handle(params);
 
             verify(notificationService).sendMail(
@@ -296,7 +313,8 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT_CC").build())
                 .build();
-
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
             handler.handle(params);
 
             verify(notificationService).sendMail(
@@ -338,9 +356,10 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 RESPONDENT_NAME, respondent.getPartyName(),
-                PARTY_REFERENCES, buildPartiesReferences(caseData),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                 RESPONSE_DEADLINE, formatLocalDate(responseDeadline.toLocalDate(), DATE),
-                RESPONSE_INTENTION, getResponseIntentionForEmail(caseData)
+                RESPONSE_INTENTION, getResponseIntentionForEmail(caseData),
+                CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
             );
         }
     }
