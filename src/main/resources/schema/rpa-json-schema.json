@@ -352,7 +352,9 @@
         "defaultJudgment",
         "judgmentByAdmission",
         "generalFormOfApplication",
-        "defenceStruckOut"
+        "defenceStruckOut",
+        "judgmentByDetermination",
+        "judgmentAfterHearing"
       ],
       "properties": {
         "miscellaneous": {
@@ -575,6 +577,30 @@
           "anyOf": [
             {
               "$ref": "#/definitions/defenceStruckOutEventType"
+            },
+            {
+              "$ref": "#/definitions/nullEventType"
+            }
+          ],
+          "description": ""
+        },
+        "judgmentByDetermination": {
+          "$id": "#/properties/events/properties/judgmentByDetermination",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/judgmentByDeterminationEventType"
+            },
+            {
+              "$ref": "#/definitions/nullEventType"
+            }
+          ],
+          "description": ""
+        },
+        "judgmentAfterHearing": {
+          "$id": "#/properties/events/properties/judgmentAfterHearing",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/judgmentAfterHearingEventType"
             },
             {
               "$ref": "#/definitions/nullEventType"
@@ -2291,6 +2317,295 @@
           }
         },
         "additionalProperties": false
+      },
+      "judgmentByDeterminationEventType": {
+        "$id": "#/definitions/judgmentByDeterminationEventType",
+        "type": "array",
+        "additionalItems": false,
+        "items": {
+          "$id": "#/definitions/judgmentByDeterminationEventType/items",
+          "type": "object",
+          "required": [
+            "eventSequence",
+            "eventCode",
+            "dateReceived",
+            "litigiousPartyID",
+            "eventDetails",
+            "eventDetailsText"
+          ],
+          "properties": {
+            "eventSequence": {
+              "$id": "#/definitions/judgmentByDeterminationEventType/items/properties/eventSequence",
+              "$ref": "#/definitions/eventSequenceType"
+            },
+            "eventCode": {
+              "$id": "#/definitions/judgmentByDeterminationEventType/items/properties/eventCode",
+              "type": "string",
+              "const": "250",
+              "description": "The CASEMAN code for the judgmentByDeterminationEventType event."
+            },
+            "dateReceived": {
+              "$id": "#/definitions/judgmentByDeterminationEventType/items/properties/dateReceived",
+              "$ref": "#/definitions/formatDate",
+              "description": ""
+            },
+            "litigiousPartyID": {
+              "$id": "#/definitions/judgmentByDeterminationEventType/items/properties/litigiousPartyID",
+              "$ref": "#/definitions/litigiousPartyIDType",
+              "description": ""
+            },
+            "eventDetails": {
+              "$id": "#/definitions/judgmentByDeterminationEventType/items/properties/eventDetails",
+              "type": [
+                "object",
+                "null"
+              ],
+              "required": [
+                "amountOfJudgment",
+                "isJudgmentForthwith",
+                "amountOfCosts"
+              ],
+              "properties": {
+                "amountOfJudgment": {
+                  "$id": "#/definitions/judgmentByDeterminationEventType/items/properties/eventDetails/properties/amountOfJudgment",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 999999999999,
+                  "description": ""
+                },
+                "amountOfCosts": {
+                  "$id": "#/definitions/judgmentByDeterminationEventType/items/properties/eventDetails/properties/amountOfCosts",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 99999999,
+                  "description": ""
+                },
+                "amountPaidBeforeJudgment": {
+                  "$id": "#/definitions/judgmentByDeterminationEventType/items/properties/eventDetails/properties/amountPaidBeforeJudgment",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 999999999999,
+                  "description": ""
+                },
+                "isJudgmentForthwith": {
+                  "$id": "#/definitions/judgmentByDeterminationEventType/items/properties/eventDetails/properties/isJudgmentForthwith",
+                  "type": "boolean",
+                  "default": "true"
+                },
+                "paymentInFullDate": {
+                  "$id": "#/definitions/judgmentByDeterminationEventType/items/properties/eventDetails/properties/paymentInFullDate",
+                  "$ref": "#/definitions/formatDateOrNull",
+                  "description": ""
+                },
+                "installmentAmount": {
+                  "$id": "#/definitions/judgmentByDeterminationEventType/items/properties/eventDetails/properties/installmentAmount",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 99999999999,
+                  "description": ""
+                },
+                "installmentPeriod": {
+                  "$id": "#/definitions/judgmentByDeterminationEventType/items/properties/eventDetails/properties/installmentPeriod",
+                  "type": "string",
+                  "enum": [
+                    "FOR",
+                    "FUL",
+                    "FW",
+                    "MTH",
+                    "WK",
+                    null
+                  ],
+                  "default": null,
+                  "description": ""
+                },
+                "firstInstallmentDate": {
+                  "$id": "#/definitions/judgmentByDeterminationEventType/items/properties/eventDetails/properties/firstInstallmentDate",
+                  "$ref": "#/definitions/formatDateOrNull",
+                  "description": ""
+                },
+                "dateOfJudgment": {
+                  "$id": "#/definitions/judgmentByDeterminationEventType/items/properties/eventDetails/properties/dateOfJudgment",
+                  "$ref": "#/definitions/formatDateOrNull",
+                  "description": ""
+                },
+                "jointJudgment": {
+                  "$id": "#/definitions/judgmentByDeterminationEventType/items/properties/eventDetails/properties/jointJudgment",
+                  "type": "boolean",
+                  "default": "false",
+                  "description": ""
+                },
+                "judgmentToBeRegistered": {
+                  "$id": "#/definitions/judgmentByDeterminationEventType/items/properties/eventDetails/properties/judgmentToBeRegistered",
+                  "type": "boolean",
+                  "default": "true",
+                  "description": ""
+                },
+                "miscText": {
+                  "$id": "#/definitions/judgmentByDeterminationEventType/items/properties/eventDetails/properties/miscText",
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 250,
+                  "description": ""
+                }
+              },
+              "additionalProperties": false
+            },
+            "eventDetailsText": {
+              "$id": "#/definitions/judgmentByDeterminationEventType/items/properties/eventDetailsText",
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 250,
+              "description": ""
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "judgmentAfterHearingEventType": {
+        "$id": "#/definitions/judgmentAfterHearingEventType",
+        "type": "array",
+        "additionalItems": false,
+        "items": {
+          "$id": "#/definitions/judgmentAfterHearingEventType/items",
+          "type": "object",
+          "required": [
+            "eventSequence",
+            "eventCode",
+            "dateReceived",
+            "litigiousPartyID",
+            "eventDetails",
+            "eventDetailsText"
+          ],
+          "properties": {
+            "eventSequence": {
+              "$id": "#/definitions/judgmentAfterHearingEventType/items/properties/eventSequence",
+              "$ref": "#/definitions/eventSequenceType"
+            },
+            "eventCode": {
+              "$id": "#/definitions/judgmentAfterHearingEventType/items/properties/eventCode",
+              "type": "string",
+              "const": "251",
+              "description": "The CASEMAN code for the judgmentAfterHearingEventType event."
+            },
+            "dateReceived": {
+              "$id": "#/definitions/judgmentAfterHearingEventType/items/properties/dateReceived",
+              "$ref": "#/definitions/formatDate",
+              "description": ""
+            },
+            "litigiousPartyID": {
+              "$id": "#/definitions/judgmentAfterHearingEventType/items/properties/litigiousPartyID",
+              "$ref": "#/definitions/litigiousPartyIDType",
+              "description": ""
+            },
+            "eventDetails": {
+              "$id": "#/definitions/judgmentAfterHearingEventType/items/properties/eventDetails",
+              "type": [
+                "object",
+                "null"
+              ],
+              "properties": {
+                "amountOfJudgment": {
+                  "$id": "#/definitions/judgmentAfterHearingEventType/items/properties/eventDetails/properties/amountOfJudgment",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 999999999999,
+                  "description": ""
+                },
+                "amountOfCosts": {
+                  "$id": "#/definitions/judgmentAfterHearingEventType/items/properties/eventDetails/properties/amountOfCosts",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 99999999,
+                  "description": ""
+                },
+                "amountPaidBeforeJudgment": {
+                  "$id": "#/definitions/judgmentAfterHearingEventType/items/properties/eventDetails/properties/amountPaidBeforeJudgment",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 999999999999,
+                  "description": ""
+                },
+                "isJudgmentForthwith": {
+                  "$id": "#/definitions/judgmentAfterHearingEventType/items/properties/eventDetails/properties/isJudgmentForthwith",
+                  "type": "boolean",
+                  "default": "true"
+                },
+                "paymentInFullDate": {
+                  "$id": "#/definitions/judgmentAfterHearingEventType/items/properties/eventDetails/properties/paymentInFullDate",
+                  "$ref": "#/definitions/formatDateOrNull",
+                  "description": ""
+                },
+                "installmentAmount": {
+                  "$id": "#/definitions/judgmentAfterHearingEventType/items/properties/eventDetails/properties/installmentAmount",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 99999999999,
+                  "description": ""
+                },
+                "installmentPeriod": {
+                  "$id": "#/definitions/judgmentAfterHearingEventType/items/properties/eventDetails/properties/installmentPeriod",
+                  "type": "string",
+                  "enum": [
+                    "FOR",
+                    "FUL",
+                    "FW",
+                    "MTH",
+                    "WK",
+                    null
+                  ],
+                  "default": null,
+                  "description": ""
+                },
+                "firstInstallmentDate": {
+                  "$id": "#/definitions/judgmentAfterHearingEventType/items/properties/eventDetails/properties/firstInstallmentDate",
+                  "$ref": "#/definitions/formatDateOrNull",
+                  "description": ""
+                },
+                "dateOfJudgment": {
+                  "$id": "#/definitions/judgmentAfterHearingEventType/items/properties/eventDetails/properties/dateOfJudgment",
+                  "$ref": "#/definitions/formatDateOrNull",
+                  "description": ""
+                },
+                "jointJudgment": {
+                  "$id": "#/definitions/judgmentAfterHearingEventType/items/properties/eventDetails/properties/jointJudgment",
+                  "type": "boolean",
+                  "default": "false",
+                  "description": ""
+                },
+                "judgmentToBeRegistered": {
+                  "$id": "#/definitions/judgmentAfterHearingEventType/items/properties/eventDetails/properties/judgmentToBeRegistered",
+                  "type": "boolean",
+                  "default": "true",
+                  "description": ""
+                },
+                "miscText": {
+                  "$id": "#/definitions/judgmentAfterHearingEventType/items/properties/eventDetails/properties/miscText",
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 250,
+                  "description": ""
+                }
+              },
+              "additionalProperties": false
+            },
+            "eventDetailsText": {
+              "$id": "#/definitions/judgmentAfterHearingEventType/items/properties/eventDetailsText",
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 250,
+              "description": ""
+            }
+          },
+          "additionalProperties": false
+        }
       }
     }
   }
