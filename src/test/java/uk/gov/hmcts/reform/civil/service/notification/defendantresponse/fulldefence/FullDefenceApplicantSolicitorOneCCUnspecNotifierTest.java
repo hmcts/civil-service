@@ -22,7 +22,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 class FullDefenceApplicantSolicitorOneCCUnspecNotifierTest {
@@ -81,7 +81,7 @@ class FullDefenceApplicantSolicitorOneCCUnspecNotifierTest {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                PARTY_REFERENCES, buildPartiesReferences(caseData),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                 ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack())
             );
         } else {
@@ -92,7 +92,7 @@ class FullDefenceApplicantSolicitorOneCCUnspecNotifierTest {
                 getPartyNameBasedOnType(caseData.getRespondent1())
                     .concat(" and ")
                     .concat(getPartyNameBasedOnType(caseData.getRespondent2())),
-                PARTY_REFERENCES, buildPartiesReferences(caseData),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                 ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack())
             );
         }
