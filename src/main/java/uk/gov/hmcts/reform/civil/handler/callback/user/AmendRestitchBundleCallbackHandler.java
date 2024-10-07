@@ -41,7 +41,7 @@ public class AmendRestitchBundleCallbackHandler extends CallbackHandler {
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return featureToggleService.isCaseEventsEnabled()
+        return featureToggleService.isAmendBundleEnabled()
             ? Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(ABOUT_TO_SUBMIT), this::amendRestitchBundle,
