@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
@@ -136,7 +137,7 @@ public class FeatureToggleService {
         } else {
             epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         }
-        return epoch >= LocalDateTime.now().atZone(zoneId).toEpochSecond();
+        return epoch >= LocalDate.now().atStartOfDay(zoneId).toEpochSecond();
     }
 
     public boolean isPartOfNationalRollout(String locationEpimms) {
