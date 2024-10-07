@@ -202,7 +202,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty(value = "stateflow.engine.simplification.enabled", havingValue = "false", matchIfMissing = false)
+@ConditionalOnProperty(value = "stateflow.engine.simplification.enabled", havingValue = "false", matchIfMissing = true)
 public class StateFlowEngine implements IStateFlowEngine {
 
     private final CaseDetailsConverter caseDetailsConverter;
@@ -703,8 +703,7 @@ public class StateFlowEngine implements IStateFlowEngine {
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             return build(SPEC_DRAFT).evaluate(caseData);
         }
-        StateFlow flow = build(DRAFT);
-        return flow.evaluate(caseData);
+        return build(DRAFT).evaluate(caseData);
     }
 
     @Override
