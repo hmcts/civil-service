@@ -408,11 +408,6 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     }
 
     @Override
-    public boolean isHearingScheduled() {
-        return caseData.getHearingDate() != null;
-    }
-
-    @Override
     public boolean isAwaitingJudgment() {
         return caseData.getCcdState() == CaseState.DECISION_OUTCOME;
     }

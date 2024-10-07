@@ -25,6 +25,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
      * sorted in descending order by creation date.
      */
     protected List<CaseEventDetail> eventHistory;
+    protected final int dayLimit = 42;
 
     protected CcdDashboardClaimMatcher(CaseData caseData,
                                        FeatureToggleService featureToggleService,
@@ -116,6 +117,11 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     }
 
     @Override
+    public boolean isHearingScheduled() {
+        return caseData.getHearingDate() != null;
+    }
+
+    @Override
     public boolean isSDOOrderCreated() {
         Optional<LocalDateTime> lastNonSdoOrderTime = getTimeOfLastNonSDOOrder();
         Optional<LocalDateTime> sdoTime = getSDOTime();
@@ -157,9 +163,9 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     }
 
     @Override
-    public boolean isHearingLessThanDaysAway(int i) {
+    public boolean isHearingLessThanDaysAway(int days) {
         return caseData.getHearingDate() != null
-            && LocalDate.now().plusDays(i + 1L).isAfter(caseData.getHearingDate());
+            && LocalDate.now().plusDays(days + 1L).isAfter(caseData.getHearingDate());
     }
 
     @Override
@@ -200,11 +206,10 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isTrialArrangementStatusActive() {
-        int dayLimit = 6 * 7;
         Optional<LocalDate> hearingDate = getHearingDate();
         if (caseData.isFastTrackClaim()
             && hearingDate.isPresent()
-            && isHearingLessThanDaysAway(6 * 7)) {
+            && isHearingLessThanDaysAway(dayLimit)) {
             Optional<LocalDateTime> lastOrder = getTimeOfLastNonSDOOrder();
             return lastOrder.isEmpty()
                 || hearingDate.get().minusDays(dayLimit)
@@ -218,7 +223,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     public boolean isTrialScheduledNoPaymentStatusActive() {
         Optional<LocalDateTime> hearingScheduledDate = getWhenWasHearingScheduled();
         Optional<LocalDateTime> orderDate = getTimeOfLastNonSDOOrder();
-        return !isHearingLessThanDaysAway(6 * 7)
+        return !isHearingLessThanDaysAway(dayLimit)
             && CaseState.HEARING_READINESS.equals(caseData.getCcdState())
             && (hearingScheduledDate.isPresent())
             && (orderDate.isEmpty()
@@ -229,7 +234,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     public boolean isTrialScheduledPaymentPaidStatusActive() {
         Optional<LocalDateTime> hearingScheduledDate = getWhenWasHearingScheduled();
         Optional<LocalDateTime> orderDate = getTimeOfLastNonSDOOrder();
-        return !isHearingLessThanDaysAway(6 * 7)
+        return !isHearingLessThanDaysAway(dayLimit)
             && CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.equals(caseData.getCcdState())
             && (hearingScheduledDate.isPresent())
             && (orderDate.isEmpty()

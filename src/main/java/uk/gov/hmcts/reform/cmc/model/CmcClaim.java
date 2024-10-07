@@ -569,7 +569,7 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public boolean isHearingLessThanDaysAway(int i) {
+    public boolean isHearingLessThanDaysAway(int days) {
         return false;
     }
 
