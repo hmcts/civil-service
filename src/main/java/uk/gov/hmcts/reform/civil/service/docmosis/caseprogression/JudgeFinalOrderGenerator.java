@@ -41,6 +41,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     private final UserService userService;
     private final LocationReferenceDataService locationRefDataService;
     private final DocumentHearingLocationHelper documentHearingLocationHelper;
+    private LocationRefData caseManagementLocationDetails;
     private final JudgeFinalOrderFormPopulator judgeFinalOrderFormPopulator;
 
     private final DefendantAttendsOrRepresentedTextBuilder defendantAttendsOrRepresentedTextBuilder;
@@ -81,7 +82,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
 
     private JudgeFinalOrderForm getFreeFormOrder(CaseData caseData, String authorisation) {
         UserDetails userDetails = userService.getUserDetails(authorisation);
-        LocationRefData caseManagementLocationDetails = documentHearingLocationHelper
+        caseManagementLocationDetails = documentHearingLocationHelper
             .getCaseManagementLocationDetailsNro(caseData, locationRefDataService, authorisation);
 
         return judgeFinalOrderFormPopulator.populateFreeFormOrder(caseData, caseManagementLocationDetails, userDetails);
@@ -90,7 +91,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     private JudgeFinalOrderForm getAssistedOrder(CaseData caseData,
                                                  String authorisation) {
         UserDetails userDetails = userService.getUserDetails(authorisation);
-        LocationRefData caseManagementLocationDetails = documentHearingLocationHelper
+        caseManagementLocationDetails = documentHearingLocationHelper
             .getCaseManagementLocationDetailsNro(caseData, locationRefDataService, authorisation);
 
         return judgeFinalOrderFormPopulator.populateFinalOrderForm(caseData, caseManagementLocationDetails, userDetails);
