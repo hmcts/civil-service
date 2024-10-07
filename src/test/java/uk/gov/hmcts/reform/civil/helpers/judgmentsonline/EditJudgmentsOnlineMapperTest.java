@@ -28,12 +28,10 @@ import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -51,8 +49,7 @@ public class EditJudgmentsOnlineMapperTest {
     @BeforeEach
     public void setUpTest() {
         time = Mockito.mock(Time.class);
-        when(time.now()).thenReturn(LocalDateTime.now());
-        interestCalculator = new InterestCalculator(time);
+        interestCalculator = new InterestCalculator();
         defaultJudgmentMapper = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
     }
 

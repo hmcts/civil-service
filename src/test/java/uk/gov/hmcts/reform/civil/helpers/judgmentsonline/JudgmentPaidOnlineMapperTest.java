@@ -27,9 +27,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class JudgmentPaidOnlineMapperTest {
-
-    private Time time;
-    private InterestCalculator interestCalculator = new InterestCalculator(time);
+    private InterestCalculator interestCalculator = new InterestCalculator();
     private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
     private JudgmentPaidInFullOnlineMapper judgmentPaidInFullOnlineMapper = new JudgmentPaidInFullOnlineMapper();
     private RecordJudgmentOnlineMapper recordJudgmentMapper = new RecordJudgmentOnlineMapper(addressMapper);
@@ -37,8 +35,7 @@ public class JudgmentPaidOnlineMapperTest {
 
     @BeforeEach
     public void setUp() {
-        time = Mockito.mock(Time.class);
-        interestCalculator = new InterestCalculator(time);
+        interestCalculator = new InterestCalculator();
         defaultJudgmentOnlineMapper = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
     }
 
@@ -87,7 +84,6 @@ public class JudgmentPaidOnlineMapperTest {
     @Test
     void testIfDefaultActiveJudgmentIsHistoricAfterCancelled() {
 
-        when(time.now()).thenReturn(LocalDateTime.now());
         CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case();
         caseData.setActiveJudgment(defaultJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
 

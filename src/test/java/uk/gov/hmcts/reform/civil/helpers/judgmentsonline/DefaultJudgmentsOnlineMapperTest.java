@@ -38,14 +38,11 @@ class DefaultJudgmentsOnlineMapperTest {
     private Time time;
     private InterestCalculator interestCalculator;
     private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
-
     private DefaultJudgmentOnlineMapper defaultJudgmentOnlineMapper;
 
     @BeforeEach
     public void setUp() {
-        time = Mockito.mock(Time.class);
-        when(time.now()).thenReturn(LocalDateTime.now());
-        interestCalculator = new InterestCalculator(time);
+        interestCalculator = new InterestCalculator();
         defaultJudgmentOnlineMapper = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
     }
 

@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.utils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -13,7 +12,6 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -21,13 +19,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class InterestCalculatorTest {
 
-    @Mock
-    private Time time;
     @InjectMocks
     private InterestCalculator interestCalculator;
 
@@ -47,7 +42,6 @@ class InterestCalculatorTest {
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .caseReference(123456789L)
             .build();
-        when(time.now()).thenReturn(LocalDateTime.now());
 
         BigDecimal actual = interestCalculator.calculateInterest(caseData);
         assertThat(actual).isZero();
@@ -67,7 +61,6 @@ class InterestCalculatorTest {
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .build();
         caseData = caseData.toBuilder().submittedDate(dateTime).build();
-        when(time.now()).thenReturn(LocalDateTime.now());
         BigDecimal actual = interestCalculator.calculateInterest(caseData);
         assertThat(actual).isZero();
     }
@@ -87,7 +80,7 @@ class InterestCalculatorTest {
             .interestClaimUntil(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE)
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .build();
-        when(time.now()).thenReturn(LocalDateTime.now());
+
         caseData = caseData.toBuilder().submittedDate(dateTime).build();
         BigDecimal actual = interestCalculator.calculateInterest(caseData);
         assertThat(actual).isZero();
@@ -109,7 +102,7 @@ class InterestCalculatorTest {
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .build();
         caseData = caseData.toBuilder().submittedDate(LocalDateTime.now()).build();
-        when(time.now()).thenReturn(LocalDateTime.now().withHour(13).withMinute(59));
+
         BigDecimal actual = interestCalculator.calculateInterest(caseData);
         assertThat(actual).isZero();
     }
@@ -128,7 +121,6 @@ class InterestCalculatorTest {
             .interestFromSpecificDate(LocalDate.now().minusDays(6))
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .build();
-        when(time.now()).thenReturn(LocalDateTime.now().withHour(13).withMinute(59));
 
         caseData = caseData.toBuilder().submittedDate(LocalDateTime.now()).build();
         BigDecimal actual = interestCalculator.calculateInterest(caseData);
@@ -144,7 +136,6 @@ class InterestCalculatorTest {
             .interestClaimOptions(InterestClaimOptions.BREAK_DOWN_INTEREST)
             .breakDownInterestTotal(BigDecimal.valueOf(500))
             .build();
-        when(time.now()).thenReturn(LocalDateTime.now());
         caseData = caseData.toBuilder().submittedDate(LocalDateTime.now()).build();
 
         BigDecimal actual = interestCalculator.calculateInterest(caseData);
@@ -153,12 +144,11 @@ class InterestCalculatorTest {
 
     @Test
     void shouldReturnInterestRateBulkClaim() {
-        LocalDateTime dateTime = LocalDateTime.of(2023, 11, 15, 15, 0);
-        when(time.now()).thenReturn(dateTime);
+
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .claimInterest(YesOrNo.YES)
             .caseReference(123456789L)
-            .interestFromSpecificDate(LocalDate.of(2023, 11, 20))
+            .interestFromSpecificDate(LocalDate.now().minusDays(5))
             .sameRateInterestSelection(SameRateInterestSelection.builder()
                 .differentRate(BigDecimal.valueOf(6L))
                 .build())
@@ -196,7 +186,7 @@ class InterestCalculatorTest {
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .build();
         caseData = caseData.toBuilder().submittedDate(LocalDateTime.now()).build();
-        when(time.now()).thenReturn(LocalDateTime.now());
+
         BigDecimal actual = interestCalculator.calculateInterest(caseData);
         assertThat(actual).isEqualTo(BigDecimal.valueOf(11.00).setScale(2, RoundingMode.UNNECESSARY));
     }
@@ -215,7 +205,7 @@ class InterestCalculatorTest {
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .build();
         caseData = caseData.toBuilder().issueDate(LocalDate.now()).build();
-        when(time.now()).thenReturn(LocalDateTime.now());
+
         BigDecimal actual = interestCalculator.calculateInterest(caseData);
         assertThat(actual).isEqualTo(BigDecimal.valueOf(6.60).setScale(2, RoundingMode.UNNECESSARY));
     }
@@ -237,7 +227,7 @@ class InterestCalculatorTest {
             .build();
         LocalDate issueDate = LocalDate.now().minusDays(20);
         caseData = caseData.toBuilder().issueDate(issueDate).build();
-        when(time.now()).thenReturn(LocalDateTime.now());
+        ;
 
         BigDecimal actual = interestCalculator.calculateInterest(caseData);
         assertThat(actual).isEqualTo(BigDecimal.valueOf(27.40).setScale(2, RoundingMode.UNNECESSARY));
