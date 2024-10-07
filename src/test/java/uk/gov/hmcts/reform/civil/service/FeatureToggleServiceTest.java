@@ -74,6 +74,15 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsAmendBundleEnabledInvoked(Boolean toggleStat) {
+        var caseFlagsKey = "amend-bundle-enabled";
+        givenToggle(caseFlagsKey, toggleStat);
+
+        assertThat(featureToggleService.isAmendBundleEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsBulkClaimInvoked(Boolean toggleStat) {
         var bulkClaimKey = "bulk_claim_enabled";
         givenToggle(bulkClaimKey, toggleStat);
@@ -286,5 +295,14 @@ class FeatureToggleServiceTest {
         }
 
         assertThat(featureToggleService.isDashboardEnabledForCase(caseData)).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsCoSCEnabled(Boolean toggleStat) {
+        var isCoSCEnabledKey = "isCoSCEnabled";
+        givenToggle(isCoSCEnabledKey, toggleStat);
+
+        assertThat(featureToggleService.isCoSCEnabled()).isEqualTo(toggleStat);
     }
 }
