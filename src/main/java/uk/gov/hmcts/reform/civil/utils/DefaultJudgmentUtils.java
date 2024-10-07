@@ -20,8 +20,7 @@ public class DefaultJudgmentUtils {
     public static BigDecimal calculateFixedCosts(CaseData caseData) {
 
         int fixedCost = 0;
-        boolean isBetween25And26 = isBetween25And26Pounds(caseData.getTotalClaimAmount());
-        int totalClaimAmount = caseData.getTotalClaimAmount().intValue() + (isBetween25And26 ? 1 : 0);
+        double totalClaimAmount = caseData.getTotalClaimAmount().doubleValue();
 
         if (totalClaimAmount > 25 && totalClaimAmount <= 5000) {
             if (totalClaimAmount <= 500) {
@@ -36,9 +35,5 @@ public class DefaultJudgmentUtils {
             fixedCost = COMMENCEMENT_FIXED_COST_100 + ENTRY_FIXED_COST_30;
         }
         return new BigDecimal(fixedCost);
-    }
-
-    private static boolean isBetween25And26Pounds(BigDecimal amount) {
-        return amount.doubleValue() >= 25.01 && amount.doubleValue() <= 25.99;
     }
 }

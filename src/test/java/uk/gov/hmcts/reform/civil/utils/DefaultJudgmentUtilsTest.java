@@ -65,4 +65,13 @@ public class DefaultJudgmentUtilsTest {
         BigDecimal result = calculateFixedCosts(caseData);
         assertThat(result).isEqualTo(new BigDecimal(72));
     }
+
+    @Test
+    void shouldReturnFixedCost_whenClaimAmountIsBetween5kAnd5001() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .addRespondent2(YesOrNo.NO)
+            .totalClaimAmount(new BigDecimal("5000.50")).build();
+        BigDecimal result = calculateFixedCosts(caseData);
+        assertThat(result).isEqualTo(new BigDecimal(130));
+    }
 }
