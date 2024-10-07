@@ -111,7 +111,7 @@ class AmendRestitchBundleCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_WhenMidIsInvoked() {
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(false);
+            when(featureToggleService.isAmendBundleEnabled()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -123,7 +123,7 @@ class AmendRestitchBundleCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnBundle_AndOverwriteExistingBundleForHearingDate() {
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+            when(featureToggleService.isAmendBundleEnabled()).thenReturn(true);
             Bundle bundle = Bundle.builder().value(BundleDetails.builder().title("Trial Bundle - New").id("2")
                                                        .stitchStatus("new")
                                                        .fileName("Trial Bundle.pdf")
@@ -162,7 +162,7 @@ class AmendRestitchBundleCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_WhenSubmittedIsInvoked() {
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(false);
+            when(featureToggleService.isAmendBundleEnabled()).thenReturn(false);
             CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateDecisionOutcome().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseDetails).build();
 
@@ -174,7 +174,7 @@ class AmendRestitchBundleCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked() {
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+            when(featureToggleService.isAmendBundleEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);

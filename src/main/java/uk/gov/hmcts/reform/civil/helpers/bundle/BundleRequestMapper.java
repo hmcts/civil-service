@@ -441,7 +441,7 @@ public class BundleRequestMapper {
                 witnessStatmentsMap.remove(party.getIndividualFirstName().trim().toLowerCase());
             }
         }
-        if (featureToggleService.isCaseEventsEnabled()) {
+        if (featureToggleService.isAmendBundleEnabled()) {
             witnessStatmentsMap.forEach((witnessName, witnessEvidence) ->
                                             witnessEvidence.stream().filter(caseDocumentElement -> caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID() != null
                                                 && !caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID().equals(
@@ -756,7 +756,7 @@ public class BundleRequestMapper {
                                                                                    boolean isWitnessSelf) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         if (witnessEvidence != null) {
-            if (featureToggleService.isCaseEventsEnabled()) {
+            if (featureToggleService.isAmendBundleEnabled()) {
                 witnessEvidence = new ArrayList<>(witnessEvidence.stream()
                                                       .filter(caseDocumentElement -> caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID() != null
                     && !caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID().equals(
@@ -793,7 +793,7 @@ public class BundleRequestMapper {
                                                                                       PartyType party) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         if (evidenceUploadDocList != null) {
-            if (featureToggleService.isCaseEventsEnabled()) {
+            if (featureToggleService.isAmendBundleEnabled()) {
                 evidenceUploadDocList = new ArrayList<>(evidenceUploadDocList.stream()
                     .filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentUpload().getCategoryID() != null
                         && !caseDocumentElement.getValue().getDocumentUpload().getCategoryID().equals(UNBUNDLED_FOLDER)).toList());
@@ -857,7 +857,7 @@ public class BundleRequestMapper {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
 
         if (evidenceUploadExpert != null) {
-            if (featureToggleService.isCaseEventsEnabled()) {
+            if (featureToggleService.isAmendBundleEnabled()) {
                 evidenceUploadExpert = new ArrayList<>(evidenceUploadExpert.stream()
                                                            .filter(caseDocumentElement -> caseDocumentElement.getValue().getExpertDocument().getCategoryID() != null
                     && !caseDocumentElement.getValue().getExpertDocument().getCategoryID().equals(UNBUNDLED_FOLDER)).toList());
