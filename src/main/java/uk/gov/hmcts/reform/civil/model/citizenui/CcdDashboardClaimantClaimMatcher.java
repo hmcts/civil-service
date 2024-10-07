@@ -335,7 +335,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
             && caseData.getHwFEvent() == hwfEvent
             && (eventTime.isPresent())
             && (orderTime.isEmpty() || eventTime.get().isAfter(orderTime.get()));
-    };
+    }
 
     @Override
     public boolean isHwFClaimSubmit() {
