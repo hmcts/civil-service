@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -38,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -84,6 +87,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private final CaseDetailsConverter caseDetailsConverter;
     private final Time time;
     private final FeatureToggleService featureToggleService;
+    private final Cache<Long, BigDecimal> cache = Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build();
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -307,6 +311,10 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         }
         BigDecimal fixedCost = calculateFixedCosts(caseData);
         BigDecimal theOverallTotal = calculateOverallTotal(caseData, interest, claimFeePounds, fixedCost);
+
+        long caseId = callbackParams.getRequest().getCaseDetails().getId();
+        cache.put(caseId, theOverallTotal);
+
         StringBuilder repaymentBreakdown = buildRepaymentBreakdown(
             caseData,
             interest,
@@ -317,7 +325,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         );
 
         caseDataBuilder.repaymentSummaryObject(repaymentBreakdown.toString());
-        caseDataBuilder.defaultJudgementOverallTotal(theOverallTotal);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
@@ -409,13 +416,20 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     private CallbackResponse overallTotalAndDate(CallbackParams callbackParams) {
 
+        long caseId = callbackParams.getRequest().getCaseDetails().getId();
+        BigDecimal theOverallTotal = cache.getIfPresent(caseId);
+
+        if (theOverallTotal == null) {
+            throw new IllegalStateException(String.format("overall total was not found in cache for case %s", caseId));
+        }
+
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         //Set the hint date for repayment to be 30 days in the future
         String formattedDeadline = formatLocalDateTime(LocalDateTime.now().plusDays(30), DATE);
         caseDataBuilder.currentDatebox(formattedDeadline);
         //set the calculated repayment owed
-        var theOverallTotal = caseData.getDefaultJudgementOverallTotal();
+
         caseDataBuilder.repaymentDue(theOverallTotal.toString());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -458,8 +472,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         String nextState;
 
-        caseDataBuilder.defaultJudgementOverallTotal(null);
-
         if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC));
@@ -472,6 +484,9 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
         // persist party flags (ccd issue)
         persistFlagsForParties(oldCaseData, caseData, caseDataBuilder);
+
+        long caseId = callbackParams.getRequest().getCaseDetails().getId();
+        cache.invalidate(caseId);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
