@@ -15,8 +15,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
-import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.builders.ClaimantAttendsOrRepresentedTextBuilder;
-import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.builders.DefendantAttendsOrRepresentedTextBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.JudgeFinalOrderFormPopulator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -59,17 +57,9 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
 
     public JudgeOrderDownloadGenerator(DocumentManagementService documentManagementService, DocumentGeneratorService documentGeneratorService,
                                        UserService userService, LocationReferenceDataService locationRefDataService,
-                                       DocumentHearingLocationHelper documentHearingLocationHelper, JudgeFinalOrderFormPopulator judgeFinalOrderFormPopulator,
-                                       DefendantAttendsOrRepresentedTextBuilder defendantAttendsOrRepresentedTextBuilder,
-                                       ClaimantAttendsOrRepresentedTextBuilder claimantAttendsOrRepresentedTextBuilder) {
-        super(documentManagementService,
-              documentGeneratorService,
-              userService,
-              locationRefDataService,
-              documentHearingLocationHelper,
-              judgeFinalOrderFormPopulator,
-              defendantAttendsOrRepresentedTextBuilder,
-              claimantAttendsOrRepresentedTextBuilder);
+                                       DocumentHearingLocationHelper documentHearingLocationHelper, JudgeFinalOrderFormPopulator judgeFinalOrderFormPopulator) {
+        super(documentManagementService, documentGeneratorService, userService,
+              locationRefDataService, documentHearingLocationHelper, judgeFinalOrderFormPopulator);
         this.documentManagementService = documentManagementService;
         this.documentGeneratorService = documentGeneratorService;
         this.userService = userService;

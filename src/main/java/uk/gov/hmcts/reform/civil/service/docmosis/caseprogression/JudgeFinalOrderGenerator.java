@@ -44,9 +44,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     private LocationRefData caseManagementLocationDetails;
     private final JudgeFinalOrderFormPopulator judgeFinalOrderFormPopulator;
 
-    private final DefendantAttendsOrRepresentedTextBuilder defendantAttendsOrRepresentedTextBuilder;
-    private final ClaimantAttendsOrRepresentedTextBuilder claimantAttendsOrRepresentedTextBuilder;
-
     private static final String DATE_FORMAT = "dd/MM/yyyy";
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
@@ -69,11 +66,10 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     }
 
     private String getFileName(DocmosisTemplates docmosisTemplate) {
-        return format(docmosisTemplate.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
+        return format(docmosisTemplate.getDocumentTitle(), formatLocalDate(LocalDate.now(), DATE_FORMAT));
     }
 
-    private JudgeFinalOrderForm getFinalOrderType(CaseData caseData,
-                                                  String authorisation) {
+    private JudgeFinalOrderForm getFinalOrderType(CaseData caseData, String authorisation) {
         return caseData.getFinalOrderSelection().equals(FREE_FORM_ORDER) ? getFreeFormOrder(
             caseData,
             authorisation
@@ -88,8 +84,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         return judgeFinalOrderFormPopulator.populateFreeFormOrder(caseData, caseManagementLocationDetails, userDetails);
     }
 
-    private JudgeFinalOrderForm getAssistedOrder(CaseData caseData,
-                                                 String authorisation) {
+    private JudgeFinalOrderForm getAssistedOrder(CaseData caseData, String authorisation) {
         UserDetails userDetails = userService.getUserDetails(authorisation);
         caseManagementLocationDetails = documentHearingLocationHelper
             .getCaseManagementLocationDetailsNro(caseData, locationRefDataService, authorisation);
@@ -105,14 +100,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             return caseData.getOrderMadeOnDetailsOrderWithoutNotice().getWithOutNoticeText();
         }
         return null;
-    }
-
-    public String generateClaimantAttendsOrRepresentedText(CaseData caseData, Boolean isClaimant2) {
-        return claimantAttendsOrRepresentedTextBuilder.claimantBuilder(caseData, isClaimant2);
-    }
-
-    public String generateDefendantAttendsOrRepresentedText(CaseData caseData, Boolean isDefendant2) {
-        return defendantAttendsOrRepresentedTextBuilder.defendantBuilder(caseData, isDefendant2);
     }
 
 }
