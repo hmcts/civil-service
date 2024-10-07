@@ -3,20 +3,15 @@ package uk.gov.hmcts.reform.civil.utils;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
-import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.CoreCaseEventDataService;
 import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 import static java.math.BigDecimal.ZERO;
 import static java.math.BigDecimal.valueOf;
@@ -38,8 +33,6 @@ public class InterestCalculator {
     protected static final String BREAK_DOWN_INTEREST = "BREAK_DOWN_INTEREST";
 
     private final Time time;
-
-    private final CoreCaseEventDataService coreCaseEventDataService;
 
     public BigDecimal calculateInterest(CaseData caseData) {
         return this.calculateInterest(caseData, getToDate(caseData));
@@ -67,7 +60,7 @@ public class InterestCalculator {
 
     private BigDecimal calculateInterestAmount(CaseData caseData, BigDecimal interestRate, LocalDate interestToDate) {
         if (caseData.getInterestClaimFrom().name().equals(FROM_CLAIM_SUBMIT_DATE)) {
-            LocalDate interestFromDate = getCurrentDateWithTimeCheck();
+            LocalDate interestFromDate = getCurrentDate();
             if (caseData.getIssueDate() != null) {
                 interestFromDate = getIssuedDate(caseData);
             }
@@ -79,16 +72,15 @@ public class InterestCalculator {
         return ZERO;
     }
 
-    private LocalDate getCurrentDateWithTimeCheck() {
-        return isAfterFourPM() ? time.now().toLocalDate().plusDays(1) :
-            time.now().toLocalDate();
+    private LocalDate getCurrentDate() {
+        return time.now().toLocalDate();
     }
 
     private LocalDate getToDate(CaseData caseData) {
         if (caseData.getInterestClaimUntil() != null && caseData.getInterestClaimUntil().name().equals(UNTIL_CLAIM_SUBMIT_DATE)) {
             return getIssuedDate(caseData);
         }
-        return getCurrentDateWithTimeCheck();
+        return getCurrentDate();
     }
 
     protected BigDecimal calculateInterestByDate(BigDecimal claimAmount, BigDecimal interestRate, LocalDate
@@ -111,9 +103,6 @@ public class InterestCalculator {
     public BigDecimal calculateBulkInterest(CaseData caseData) {
         if (caseData.getClaimInterest() == YesOrNo.YES) {
             long numberOfDays = Math.abs(ChronoUnit.DAYS.between(time.now().toLocalDate(), caseData.getInterestFromSpecificDate()));
-            if (isAfterFourPM()) {
-                numberOfDays = Math.abs(ChronoUnit.DAYS.between(time.now().toLocalDate(), caseData.getInterestFromSpecificDate().plusDays(1)));
-            }
             BigDecimal interestDailyAmount = caseData.getSameRateInterestSelection().getDifferentRate();
             return interestDailyAmount.multiply(BigDecimal.valueOf(numberOfDays));
         } else {
@@ -148,19 +137,8 @@ public class InterestCalculator {
         return localTime.getHour() > 15;
     }
 
-    private boolean isAfterFourPM(LocalDateTime localDateTime) {
-        return localDateTime.getHour() > 15;
-    }
-
     private LocalDate getIssuedDate(CaseData caseData) {
-        List<CaseEventDetail> eventsForCase = coreCaseEventDataService.getEventsForCase(caseData.getCcdCaseReference().toString());
-        for (CaseEventDetail event : eventsForCase) {
-            if (event.getId().equals(CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT.name())) {
-                return isAfterFourPM(event.getCreatedDate()) ? event.getCreatedDate().toLocalDate().plusDays(1) :
-                    event.getCreatedDate().toLocalDate();
-            }
-        }
-        return getCurrentDateWithTimeCheck();
+        return caseData.getIssueDate() != null ? caseData.getIssueDate() : getCurrentDate();
     }
 
 }

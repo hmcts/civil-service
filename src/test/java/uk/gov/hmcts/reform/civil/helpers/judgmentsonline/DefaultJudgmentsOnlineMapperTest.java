@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.CoreCaseEventDataService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
@@ -37,7 +36,6 @@ import static org.mockito.Mockito.when;
 class DefaultJudgmentsOnlineMapperTest {
 
     private Time time;
-    private CoreCaseEventDataService coreCaseEventDataService;
     private InterestCalculator interestCalculator;
     private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
 
@@ -46,9 +44,8 @@ class DefaultJudgmentsOnlineMapperTest {
     @BeforeEach
     public void setUp() {
         time = Mockito.mock(Time.class);
-        coreCaseEventDataService = Mockito.mock(CoreCaseEventDataService.class);
         when(time.now()).thenReturn(LocalDateTime.now());
-        interestCalculator = new InterestCalculator(time, coreCaseEventDataService);
+        interestCalculator = new InterestCalculator(time);
         defaultJudgmentOnlineMapper = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
     }
 

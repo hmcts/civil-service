@@ -299,7 +299,7 @@ class ClaimFormMapperTest {
     void shouldReturnInterestFromClaimIssueDate_whenInterestFromSpecificDateIsNull() {
         //Given
         CaseData caseData = getCaseData().toBuilder()
-            .submittedDate(SUBMITTED_DATE)
+            .issueDate(SUBMITTED_DATE.toLocalDate())
             .build();
         when(interestCalculator.calculateInterest(any())).thenReturn(INTEREST);
         //When

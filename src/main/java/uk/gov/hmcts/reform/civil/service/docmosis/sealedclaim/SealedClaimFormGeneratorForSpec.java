@@ -154,14 +154,13 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
                 + "Section 69 of the County Courts Act 1984" : null)
             .interestFromDate(caseData.getInterestFromSpecificDate() != null
                                   ? caseData.getInterestFromSpecificDate() :
-                                  (isAfterFourPM(localDateTime)
-                                      ? localDateTime.toLocalDate().plusDays(1) : localDateTime.toLocalDate()))
+                                 localDateTime.toLocalDate())
             .whenAreYouClaimingInterestFrom(caseData.getInterestClaimFrom() != null
                                                 ? caseData.getInterestClaimFrom().name()
                 .equals("FROM_CLAIM_SUBMIT_DATE")
                 ? "From the date the claim was issued"
                 : caseData.getInterestFromSpecificDateDescription() : null)
-            .interestEndDate(isAfterFourPM(localDateTime) ? localDateTime.toLocalDate().plusDays(1) : localDateTime.toLocalDate())
+            .interestEndDate(localDateTime.toLocalDate())
             .interestEndDateDescription(caseData.getBreakDownInterestDescription() != null
                                             ? caseData.getBreakDownInterestDescription() + "" : null)
             .totalClaimAmount(caseData.getTotalClaimAmount() + "")
