@@ -133,7 +133,7 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
         LocationRefData caseManagementLocationDetails = documentHearingLocationHelper
             .getCaseManagementLocationDetailsNro(caseData, locationRefDataService, authorisation);
 
-        log.info("CCD ref is {}", caseData.getCcdCaseReference().toString());
+        log.info("CCD ref is {}", caseData.getCcdCaseReference());
         return JudgeFinalOrderForm.builder()
             .judgeNameTitle(userDetails.getFullName())
             .courtName(caseManagementLocationDetails.getExternalShortName())
