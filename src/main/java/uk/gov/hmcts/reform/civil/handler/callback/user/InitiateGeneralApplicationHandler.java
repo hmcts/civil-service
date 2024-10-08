@@ -196,7 +196,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             callbackParams.getCaseData().getCcdCaseReference().toString(),
             userInfo.getUid()
         );
-        return featureToggleService.isCoSCEnabled() && !UserRoleUtils.isLIPDefendant(roles);
+        return featureToggleService.isCoSCEnabled() && !(UserRoleUtils.isLIPDefendant(roles) || UserRoleUtils.isLIPClaimant(roles));
     }
 
     private CallbackResponse gaValidateType(CallbackParams callbackParams) {
