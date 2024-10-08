@@ -31,7 +31,6 @@ public class InterestCalculator {
     protected static final String SAME_RATE_INTEREST_DIFFERENT_RATE = "SAME_RATE_INTEREST_DIFFERENT_RATE";
     protected static final String BREAK_DOWN_INTEREST = "BREAK_DOWN_INTEREST";
 
-
     public BigDecimal calculateInterest(CaseData caseData) {
         return this.calculateInterest(caseData, getToDate(caseData));
     }
