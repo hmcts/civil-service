@@ -417,7 +417,7 @@ dependencies {
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
-  implementation group: 'com.azure', name: 'azure-core', version: '1.51.0'
+  implementation group: 'com.azure', name: 'azure-core', version: '1.53.0'
   implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.4'
   implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
 
