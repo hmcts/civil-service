@@ -265,6 +265,6 @@ class InterestCalculatorTest {
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .build();
         assertThat(interestCalculator.getInterestPerDayBreakdown(caseData))
-            .isEqualTo("Interest will accrue at the daily rate of £1.10 up to the date of claim submission");
+            .isEqualTo("Interest will accrue at the daily rate of £1.10 up to the date of claim issue");
     }
 }

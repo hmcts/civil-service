@@ -118,7 +118,7 @@ public class InterestCalculator {
         }
         description.append(interestPerDay.setScale(2, RoundingMode.HALF_UP));
         description.append(" up to the date of ");
-        description.append(caseData.getInterestClaimUntil().name().equals(UNTIL_CLAIM_SUBMIT_DATE) ? "claim submission" : "judgment");
+        description.append(caseData.getInterestClaimUntil().name().equals(UNTIL_CLAIM_SUBMIT_DATE) ? "claim issue" : "judgment");
         return description.toString();
     }
 
