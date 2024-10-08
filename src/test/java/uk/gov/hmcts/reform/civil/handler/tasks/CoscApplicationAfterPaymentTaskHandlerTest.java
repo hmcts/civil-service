@@ -52,7 +52,7 @@ public class CoscApplicationAfterPaymentTaskHandlerTest {
     @BeforeEach
     void setUp() {
         ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
-        handler = new CoscApplicationAfterPaymentTaskHandler(coreCaseDataService, caseDetailsConverter, objectMapper);
+        handler = new CoscApplicationAfterPaymentTaskHandler(coreCaseDataService, objectMapper);
     }
 
     @Test

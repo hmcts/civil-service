@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 
@@ -22,9 +21,7 @@ import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataC
 public class CoscApplicationAfterPaymentTaskHandler implements BaseExternalTaskHandler {
 
     private final CoreCaseDataService coreCaseDataService;
-    private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
-
 
     @Override
     public void handleTask(ExternalTask externalTask) {
