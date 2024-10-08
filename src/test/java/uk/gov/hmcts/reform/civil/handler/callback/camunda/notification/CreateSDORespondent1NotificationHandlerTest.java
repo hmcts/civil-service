@@ -107,7 +107,7 @@ class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldNotifyRespondentSolicitor_whenInvokedEA() {
             when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-            when(notificationsProperties.getSdoOrderedEA()).thenReturn(TEMPLATE_ID_EA);
+            when(notificationsProperties.getSdoOrdered()).thenReturn(TEMPLATE_ID_EA);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
 
@@ -160,7 +160,7 @@ class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldNotifyRespondentLiP_whenInvokedEA() {
             when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-            when(notificationsProperties.getSdoOrderedSpecEA()).thenReturn(TEMPLATE_ID_EA);
+            when(notificationsProperties.getSdoOrderedSpec()).thenReturn(TEMPLATE_ID_EA);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()

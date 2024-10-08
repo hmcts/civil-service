@@ -129,12 +129,6 @@ public class NotificationsProperties {
     private String sdoOrderedSpec;
 
     @NotEmpty
-    private String sdoOrderedEA;
-
-    @NotEmpty
-    private String sdoOrderedSpecEA;
-
-    @NotEmpty
     private String sdoOrderedSpecBilingual;
 
     @NotEmpty

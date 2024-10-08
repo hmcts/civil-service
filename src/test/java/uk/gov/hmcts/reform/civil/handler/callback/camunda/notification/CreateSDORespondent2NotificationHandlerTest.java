@@ -103,7 +103,7 @@ class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldNotifyRespondentSolicitor_whenInvokedEA() {
             when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-            when(notificationsProperties.getSdoOrderedEA()).thenReturn("template-id-ea");
+            when(notificationsProperties.getSdoOrdered()).thenReturn("template-id-ea");
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
 

@@ -177,7 +177,7 @@ class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHandlerTest
 
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked() {
-            when(notificationsProperties.getSdoOrderedEA()).thenReturn("template-id-EA");
+            when(notificationsProperties.getSdoOrdered()).thenReturn("template-id-EA");
             when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
@@ -197,7 +197,7 @@ class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHandlerTest
 
         @Test
         void shouldNotifyApplicantSolicitorSpec_whenInvoked() {
-            when(notificationsProperties.getSdoOrderedSpecEA()).thenReturn("template-id-spec-EA");
+            when(notificationsProperties.getSdoOrderedSpec()).thenReturn("template-id-spec-EA");
             when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));

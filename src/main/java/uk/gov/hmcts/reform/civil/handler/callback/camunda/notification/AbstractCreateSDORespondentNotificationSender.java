@@ -48,11 +48,9 @@ public abstract class AbstractCreateSDORespondentNotificationSender implements N
             if (caseData.isRespondentResponseBilingual()) {
                 return notificationsProperties.getSdoOrderedSpecBilingual();
             }
-            return featureToggleService.isEarlyAdoptersEnabled()
-                ? notificationsProperties.getSdoOrderedSpecEA() : notificationsProperties.getSdoOrderedSpec();
+            return notificationsProperties.getSdoOrderedSpec();
         }
-        return featureToggleService.isEarlyAdoptersEnabled()
-            ? notificationsProperties.getSdoOrderedEA() : notificationsProperties.getSdoOrdered();
+        return notificationsProperties.getSdoOrdered();
     }
 
     /**
