@@ -13,16 +13,16 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
 
 @Component
-public class ReferenceNumberPopulator {
+public class ReferenceNumberAndCourtDetailsPopulator {
 
     private final LocationReferenceDataService locationRefDataService;
 
-    public ReferenceNumberPopulator(LocationReferenceDataService locationRefDataService) {
+    public ReferenceNumberAndCourtDetailsPopulator(LocationReferenceDataService locationRefDataService) {
         this.locationRefDataService = locationRefDataService;
     }
 
-    public void populateDetails(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData,
-                                String authorisation) {
+    public void populateReferenceNumberDetails(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData,
+                                               String authorisation) {
 
         String requestedCourt = null;
 

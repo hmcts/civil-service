@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentMethod;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
-import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
@@ -25,16 +24,13 @@ import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.ResponseRepaymentDetailsForm;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimResponseFormForSpec;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.TimelineEventDetailsDocmosis;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGeneratorWithAuth;
-import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.helpers.ReferenceNumberPopulator;
-import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.helpers.SealedClaimResponseFormForSpecPopulator;
+import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.helpers.ReferenceNumberAndCourtDetailsPopulator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.helpers.StatementOfTruthPopulator;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.util.ArrayList;
@@ -48,7 +44,6 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V2;
-import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
 
 @Service
 @RequiredArgsConstructor
@@ -58,14 +53,17 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     private final DocumentGeneratorService documentGeneratorService;
     private final DocumentManagementService documentManagementService;
     private final FeatureToggleService featureToggleService;
-    private final SealedClaimResponseFormForSpecPopulator sealedClaimResponseFormForSpecPopulator;
+    private final ReferenceNumberAndCourtDetailsPopulator referenceNumberPopulator;
+    private final StatementOfTruthPopulator statementOfTruthPopulator;
 
     @Override
     public SealedClaimResponseFormForSpec getTemplateData(CaseData caseData, String authorisation) {
 
         SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder = SealedClaimResponseFormForSpec.builder();
 
-        sealedClaimResponseFormForSpecPopulator.populateForm(caseData, authorisation);
+        referenceNumberPopulator.populateReferenceNumberDetails(builder, caseData, authorisation);
+        statementOfTruthPopulator.populateStatementOfTruthDetails(builder, caseData);
+
         addCarmMediationDetails(builder, caseData);
         addRepaymentPlanDetails(builder, caseData);
         handleRespondents(builder, caseData);

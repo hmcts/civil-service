@@ -15,7 +15,7 @@ public class StatementOfTruthPopulator {
         this.featureToggleService = featureToggleService;
     }
 
-    public void populateDetails(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
+    public void populateStatementOfTruthDetails(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
 
         StatementOfTruth statementOfTruth = null;
 
