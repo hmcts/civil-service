@@ -168,6 +168,4 @@ public class StatementOfTruthPopulatorTest {
                                 form.getMediation());
         verify(featureToggleService).isCarmEnabledForCase(caseData);
     }
-
-
 }

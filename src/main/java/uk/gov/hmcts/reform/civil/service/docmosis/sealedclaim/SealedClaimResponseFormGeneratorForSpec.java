@@ -87,8 +87,8 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
             builder.respondent1(getDefendant1v2ds(caseData));
         } else {
             builder.respondent1(getSpecifiedParty(caseData.getRespondent1(), representativeService.getRespondent1Representative(caseData)));
-            Optional.ofNullable(caseData.getRespondent2()).ifPresent(respondent2 ->
-                                                                         builder.respondent2(getSpecifiedParty(respondent2, representativeService.getRespondent2Representative(caseData)))
+            Optional.ofNullable(caseData.getRespondent2()).ifPresent(respondent2 -> builder
+                .respondent2(getSpecifiedParty(respondent2, representativeService.getRespondent2Representative(caseData)))
             );
         }
     }
@@ -181,9 +181,9 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     }
 
     private boolean shouldUseRespondent2MediationDetails(CaseData caseData) {
-        return caseData.getRespondent1ResponseDate() == null ||
-            (caseData.getRespondent2ResponseDate() != null &&
-                caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate()));
+        return caseData.getRespondent1ResponseDate() == null
+            || (caseData.getRespondent2ResponseDate() != null
+            && caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate()));
     }
 
     private void getCarmMediationFields(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder,
@@ -267,7 +267,6 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         }
         return timelineOfEventDetails;
     }
-
 
     private String getRespondent1MediationFirstName(CaseData caseData) {
 

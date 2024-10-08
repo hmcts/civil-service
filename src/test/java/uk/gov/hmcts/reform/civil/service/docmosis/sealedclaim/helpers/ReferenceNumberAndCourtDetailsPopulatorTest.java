@@ -39,7 +39,7 @@ public class ReferenceNumberAndCourtDetailsPopulatorTest {
 
     @Test
     void testPopulateDetails_Respondent1() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder() .respondent1DQRequestedCourt(
+        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQRequestedCourt(
                 RequestedCourt.builder()
                     .responseCourtCode("121")
                     .reasonForHearingAtSpecificCourt("test")
@@ -77,7 +77,7 @@ public class ReferenceNumberAndCourtDetailsPopulatorTest {
 
     @Test
     void testPopulateDetails_Respondent2() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder() .respondent1DQRequestedCourt(
+        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQRequestedCourt(
                 RequestedCourt.builder()
                     .responseCourtCode("121")
                     .reasonForHearingAtSpecificCourt("test")
@@ -87,7 +87,7 @@ public class ReferenceNumberAndCourtDetailsPopulatorTest {
                                       .build())
                     .build())
             .build();
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder() .respondent2DQRequestedCourt(
+        Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQRequestedCourt(
                 RequestedCourt.builder()
                     .responseCourtCode("121")
                     .reasonForHearingAtSpecificCourt("test")
@@ -131,7 +131,7 @@ public class ReferenceNumberAndCourtDetailsPopulatorTest {
     @Test
     void testPopulateDetails_NoCourtLocation() {
         // Given
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder() .respondent1DQRequestedCourt(
+        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQRequestedCourt(
                 RequestedCourt.builder()
                     .responseCourtCode("121")
                     .reasonForHearingAtSpecificCourt("test")
@@ -168,7 +168,7 @@ public class ReferenceNumberAndCourtDetailsPopulatorTest {
 
     @Test
     void testPopulateDetails_NeitherRespondentCourt() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder() .respondent1DQRequestedCourt(
+        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQRequestedCourt(
                 RequestedCourt.builder()
                     .responseCourtCode("121")
                     .reasonForHearingAtSpecificCourt("test")
@@ -191,7 +191,6 @@ public class ReferenceNumberAndCourtDetailsPopulatorTest {
             .legacyCaseReference("12345")
             .detailsOfWhyDoesYouDisputeTheClaim("Dispute details")
             .build();
-
 
         SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder = SealedClaimResponseFormForSpec.builder();
         referenceNumberPopulator.populateReferenceNumberDetails(builder, caseData, "authorisation");
