@@ -11,12 +11,13 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.Time;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 import static java.util.Collections.singletonList;
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHECK_PAID_IN_FULL_SCHED_DEADLINE;
@@ -24,10 +25,11 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHECK_PAID_IN_FULL_SC
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CheckCoscMarkpaidCallbackHandler extends CallbackHandler {
+public class CheckCoscMarkPaidCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = singletonList(CHECK_PAID_IN_FULL_SCHED_DEADLINE);
     private final ObjectMapper objectMapper;
+    private final Time time;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -46,9 +48,8 @@ public class CheckCoscMarkpaidCallbackHandler extends CallbackHandler {
 
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
-
-        if (caseData.getActiveJudgment() == null || caseData.getActiveJudgment().getFullyPaymentMadeDate() == null) {
-            caseData.setCoscSchedulerDeadline(LocalDateTime.now().plusDays(30));
+        if (caseData.getActiveJudgment() == null || ofNullable(caseData.getActiveJudgment().getFullyPaymentMadeDate()).isEmpty()) {
+            caseData.setCoscSchedulerDeadline(time.now().plusDays(30));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
