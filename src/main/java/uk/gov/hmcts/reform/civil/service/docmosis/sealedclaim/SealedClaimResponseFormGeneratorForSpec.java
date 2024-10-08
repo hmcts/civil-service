@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
@@ -45,6 +46,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFEN
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V2;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGeneratorWithAuth<SealedClaimResponseFormForSpec> {
@@ -58,7 +60,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
 
     @Override
     public SealedClaimResponseFormForSpec getTemplateData(CaseData caseData, String authorisation) {
-
+        log.info("GetTemplateData for case ID {}", caseData.getCcdCaseReference());
         SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder = SealedClaimResponseFormForSpec.builder();
 
         referenceNumberPopulator.populateReferenceNumberDetails(builder, caseData, authorisation);
@@ -86,10 +88,17 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         if (MultiPartyScenario.getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
             builder.respondent1(getDefendant1v2ds(caseData));
         } else {
-            builder.respondent1(getSpecifiedParty(caseData.getRespondent1(), representativeService.getRespondent1Representative(caseData)));
-            Optional.ofNullable(caseData.getRespondent2()).ifPresent(respondent2 -> builder
-                .respondent2(getSpecifiedParty(respondent2, representativeService.getRespondent2Representative(caseData)))
-            );
+            builder.respondent1(getSpecifiedParty(
+                caseData.getRespondent1(),
+                representativeService.getRespondent1Representative(caseData)
+            ));
+            Optional.ofNullable(caseData.getRespondent2()).ifPresent(
+                respondent2 ->
+                    builder.respondent2(getSpecifiedParty(
+                        respondent2,
+                        representativeService.getRespondent2Representative(
+                            caseData)
+                    )));
         }
     }
 
@@ -115,7 +124,8 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     private void handleTimeline(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
         if (caseData.getSpecResponseTimelineDocumentFiles() != null) {
             builder.timelineUploaded(true)
-                .specResponseTimelineDocumentFiles(caseData.getSpecResponseTimelineDocumentFiles().getFile().getDocumentFileName());
+                .specResponseTimelineDocumentFiles(caseData.getSpecResponseTimelineDocumentFiles()
+                                                       .getFile().getDocumentFileName());
         } else {
             builder.timelineUploaded(false)
                 .timeline(getTimeLine(caseData));
@@ -124,9 +134,11 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
 
     private void handleDefenceResponseDocument(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
         if (caseData.getRespondent1SpecDefenceResponseDocument() != null && !isRespondent2(caseData)) {
-            builder.respondent1SpecDefenceResponseDocument(caseData.getRespondent1SpecDefenceResponseDocument().getFile().getDocumentFileName());
+            builder.respondent1SpecDefenceResponseDocument(
+                caseData.getRespondent1SpecDefenceResponseDocument().getFile().getDocumentFileName());
         } else if (caseData.getRespondent2SpecDefenceResponseDocument() != null && isRespondent2(caseData)) {
-            builder.respondent1SpecDefenceResponseDocument(caseData.getRespondent2SpecDefenceResponseDocument().getFile().getDocumentFileName());
+            builder.respondent1SpecDefenceResponseDocument(
+                caseData.getRespondent2SpecDefenceResponseDocument().getFile().getDocumentFileName());
         }
     }
 
@@ -134,7 +146,8 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         Stream.of(caseData.getRespondToClaim(), caseData.getRespondToAdmittedClaim())
             .filter(Objects::nonNull)
             .findFirst()
-            .ifPresent(response -> builder.poundsPaid(MonetaryConversions.penniesToPounds(response.getHowMuchWasPaid()).toString())
+            .ifPresent(response -> builder.poundsPaid(MonetaryConversions
+                                                          .penniesToPounds(response.getHowMuchWasPaid()).toString())
                 .paymentDate(response.getWhenWasThisAmountPaid())
                 .paymentMethod(getPaymentMethod(response)));
     }

@@ -35,7 +35,6 @@ public class StatementOfTruthPopulatorTest {
 
     @Test
     void shouldPopulateDetailsForRespondent1() {
-        // Given
         StatementOfTruth respondent1StatementOfTruth = StatementOfTruth.builder().name("Respondent 1").build();
         Respondent1DQ respondent1DQ = Respondent1DQ.builder()
             .respondent1DQRequestedCourt(RequestedCourt.builder().build())
@@ -51,10 +50,8 @@ public class StatementOfTruthPopulatorTest {
 
         given(featureToggleService.isCarmEnabledForCase(caseData)).willReturn(false);
 
-        // When
         statementOfTruthPopulator.populateStatementOfTruthDetails(builder, caseData);
 
-        // Then
         SealedClaimResponseFormForSpec form = builder.build();
         assertEquals(respondent1StatementOfTruth, form.getStatementOfTruth());
         assertFalse(form.isCheckCarmToggle());
@@ -63,7 +60,6 @@ public class StatementOfTruthPopulatorTest {
 
     @Test
     void shouldPopulateDetailsForRespondent2() {
-        // Given
         StatementOfTruth respondent2StatementOfTruth = StatementOfTruth.builder().name("Respondent 2").build();
         Respondent1DQ respondent1DQ = Respondent1DQ.builder()
             .respondent1DQRequestedCourt(RequestedCourt.builder().build())
@@ -84,10 +80,8 @@ public class StatementOfTruthPopulatorTest {
 
         given(featureToggleService.isCarmEnabledForCase(caseData)).willReturn(true);
 
-        // When
         statementOfTruthPopulator.populateStatementOfTruthDetails(builder, caseData);
 
-        // Then
         SealedClaimResponseFormForSpec form = builder.build();
         assertEquals(respondent2StatementOfTruth, form.getStatementOfTruth());
         assertTrue(form.isCheckCarmToggle());
@@ -96,7 +90,6 @@ public class StatementOfTruthPopulatorTest {
 
     @Test
     void shouldHandleNoStatementOfTruthForRespondent1AndRespondent2() {
-        // Given
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder().build()).build();
         Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQRequestedCourt(RequestedCourt.builder().build()).build();
 
@@ -111,10 +104,8 @@ public class StatementOfTruthPopulatorTest {
 
         given(featureToggleService.isCarmEnabledForCase(caseData)).willReturn(false);
 
-        // When
         statementOfTruthPopulator.populateStatementOfTruthDetails(builder, caseData);
 
-        // Then
         SealedClaimResponseFormForSpec form = builder.build();
         assertNull(form.getStatementOfTruth());
         assertFalse(form.isCheckCarmToggle());
@@ -123,7 +114,6 @@ public class StatementOfTruthPopulatorTest {
 
     @Test
     void shouldHandleCarmFeatureToggleEnabled() {
-        // Given
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder().build()).build();
         CaseData caseData = CaseData.builder()
             .respondent1DQ(respondent1DQ)
@@ -131,13 +121,10 @@ public class StatementOfTruthPopulatorTest {
 
         SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder = SealedClaimResponseFormForSpec.builder();
 
-        // Toggle enabled
         given(featureToggleService.isCarmEnabledForCase(caseData)).willReturn(true);
 
-        // When
         statementOfTruthPopulator.populateStatementOfTruthDetails(builder, caseData);
 
-        // Then
         SealedClaimResponseFormForSpec form = builder.build();
         Assertions.assertTrue(form.isCheckCarmToggle());
         verify(featureToggleService).isCarmEnabledForCase(caseData);
@@ -145,7 +132,6 @@ public class StatementOfTruthPopulatorTest {
 
     @Test
     void shouldHandleCarmFeatureToggleDisabled() {
-        // Given
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder().build()).build();
         CaseData caseData = CaseData.builder()
             .respondent1DQ(respondent1DQ)
@@ -154,14 +140,11 @@ public class StatementOfTruthPopulatorTest {
 
         SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder = SealedClaimResponseFormForSpec.builder();
 
-        // Toggle disabled
         given(featureToggleService.isCarmEnabledForCase(caseData)).willReturn(false);
         given(featureToggleService.isPinInPostEnabled()).willReturn(false);
 
-        // When
         statementOfTruthPopulator.populateStatementOfTruthDetails(builder, caseData);
 
-        // Then
         SealedClaimResponseFormForSpec form = builder.build();
         Assertions.assertFalse(form.isCheckCarmToggle());
         Assertions.assertEquals(YesOrNo.YES,

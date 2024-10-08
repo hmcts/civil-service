@@ -476,4 +476,22 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
         Assertions.assertEquals(LocalDate.now(),
                                 templateData.getMediationUnavailableDatesList().get(0).getValue().getDate());
     }
+
+    @Test
+    void shouldGenerateDocumentSuccessfully_AfterCarmDisabled() {
+        //Given
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+        given(featureToggleService.isPinInPostEnabled()).willReturn(false);
+
+        //When
+        CaseData caseData = CASE_DATA_WITH_RESPONDENT1.toBuilder()
+            .responseClaimMediationSpecRequired(YesOrNo.YES)
+            .build();
+        //Then
+        SealedClaimResponseFormForSpec templateData = generator.getTemplateData(
+            caseData, BEARER_TOKEN);
+        Assertions.assertEquals(YesOrNo.YES,
+                                templateData.getMediation()
+        );
+    }
 }

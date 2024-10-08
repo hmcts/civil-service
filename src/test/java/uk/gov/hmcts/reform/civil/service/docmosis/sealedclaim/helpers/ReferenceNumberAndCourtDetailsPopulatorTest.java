@@ -70,7 +70,6 @@ public class ReferenceNumberAndCourtDetailsPopulatorTest {
 
         SealedClaimResponseFormForSpec form = builder.build();
         assertEquals("12345", form.getReferenceNumber());
-        //assertEquals("Applicant Name vs Respondent Name", form.getCaseName());
         assertEquals("Dispute details", form.getWhyDisputeTheClaim());
         assertEquals("Court Name", form.getHearingCourtLocation());
     }
@@ -123,14 +122,12 @@ public class ReferenceNumberAndCourtDetailsPopulatorTest {
 
         SealedClaimResponseFormForSpec form = builder.build();
         assertEquals("12345", form.getReferenceNumber());
-        //assertEquals("Applicant Name vs Respondent Name", form.getCaseName());
         assertEquals("Dispute details", form.getWhyDisputeTheClaim());
         assertEquals("Court Name", form.getHearingCourtLocation());
     }
 
     @Test
     void testPopulateDetails_NoCourtLocation() {
-        // Given
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQRequestedCourt(
                 RequestedCourt.builder()
                     .responseCourtCode("121")
@@ -155,13 +152,11 @@ public class ReferenceNumberAndCourtDetailsPopulatorTest {
             .detailsOfWhyDoesYouDisputeTheClaim("Dispute details")
             .build();
 
-        // Mock the location reference data service to return an empty list
         given(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).willReturn(Collections.emptyList());
 
         SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder = SealedClaimResponseFormForSpec.builder();
         referenceNumberPopulator.populateReferenceNumberDetails(builder, caseData, "authorisation");
 
-        // Then
         SealedClaimResponseFormForSpec form = builder.build();
         assertNull(form.getHearingCourtLocation());
     }
