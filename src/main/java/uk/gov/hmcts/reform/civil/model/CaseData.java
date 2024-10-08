@@ -713,6 +713,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private CaseDocument noticeOfDiscontinueAllParitiesDoc;
     @JsonUnwrapped
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
+    private LocalDateTime coscSchedulerDeadline;
+
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
