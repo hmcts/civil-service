@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
@@ -49,6 +50,7 @@ import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent1
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent2SolicitorRef;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<DefaultJudgmentForm> {
 
@@ -69,6 +71,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
         DocmosisDocument docmosisDocument2;
         List<DefaultJudgmentForm> templateData = getDefaultJudgmentForms(caseData, event);
         DocmosisTemplates docmosisTemplate = getDocmosisTemplate(event);
+        log.info("templateData {} for case {} and template {}",templateData, caseData.getCcdCaseReference(), docmosisTemplate.getTemplate());
         DocmosisDocument docmosisDocument1 =
             documentGeneratorService.generateDocmosisDocument(templateData.get(0), docmosisTemplate);
         caseDocuments.add(documentManagementService.uploadDocument(
@@ -305,6 +308,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
                 defaultJudgmentForms.add(getDefaultJudgmentFormNonDivergent(caseData, RESPONDENT_2));
             }
         }
+        log.info("defaultJudgmentForms {}", defaultJudgmentForms);
         return generateDocmosisDocsForNonDivergent(defaultJudgmentForms, authorisation, caseData, event);
     }
 
