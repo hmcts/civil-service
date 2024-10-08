@@ -31,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
 class DefaultJudgmentsOnlineMapperTest {
+
     private InterestCalculator interestCalculator;
     private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
     private DefaultJudgmentOnlineMapper defaultJudgmentOnlineMapper;
