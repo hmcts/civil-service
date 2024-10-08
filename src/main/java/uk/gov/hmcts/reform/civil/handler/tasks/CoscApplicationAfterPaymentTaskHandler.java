@@ -71,24 +71,4 @@ public class CoscApplicationAfterPaymentTaskHandler implements BaseExternalTaskH
             throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
         }
     }
-
-    private CaseDataContent caseDataContent(StartEventResponse startEventResponse, ExternalTask externalTask) {
-        CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
-        BusinessProcess businessProcess = updateProcessInstanceId(caseData.getBusinessProcess(), externalTask);
-
-
-        return CaseDataContent.builder()
-            .eventToken(startEventResponse.getToken())
-            .event(Event.builder()
-                       .id(startEventResponse.getEventId())
-                       .build())
-            .data(caseData.toBuilder()
-                      .businessProcess(businessProcess)
-                      .build().toMap(mapper))
-            .build();
-    }
-
-    private BusinessProcess updateProcessInstanceId(BusinessProcess businessProcess, ExternalTask externalTask) {
-        return businessProcess.updateProcessInstanceId(externalTask.getProcessInstanceId());
-    }
 }
