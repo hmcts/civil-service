@@ -39,13 +39,13 @@ class CheckCoscMarkPaidCallbackHandlerTest extends BaseCallbackHandlerTest {
     private Time time;
 
     private final LocalDateTime nowMock = LocalDateTime.of(2024, 10, 8, 0, 0, 0);
-
     private final LocalDateTime expectedlocalDateTime = LocalDateTime.of(2024, 10, 8, 0, 0, 0).plusDays(30);
 
     @Test
-    void checkIsMarkedPaidWithoutActiveJudgment() {
+    void setCoscSchedulerDeadline_whenActiveJudgmentIsNull() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
         when(time.now()).thenReturn(nowMock);
+        caseData.setActiveJudgment(null);
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -56,15 +56,11 @@ class CheckCoscMarkPaidCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void checkIsMarkedPaidWithActiveJudgment() {
+    void setCoscSchedulerDeadline_whenFullPaymentMadeDateIsEmpty() {
         when(time.now()).thenReturn(nowMock);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-        caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now())
-                                       .paymentPlan(JudgmentPaymentPlan.builder()
-                                                        .type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
-                                       .orderedAmount("100")
-                                       .costs("50")
-                                       .totalAmount("150")
+        caseData.setActiveJudgment(JudgmentDetails.builder()
+                                       .fullyPaymentMadeDate(null)
                                        .build());
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -84,8 +80,7 @@ class CheckCoscMarkPaidCallbackHandlerTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         assertThat(response.getErrors()).isNull();
-        assertNull(caseData.getActiveJudgment().getFullyPaymentMadeDate());
-
+        assertNull(caseData.getCoscSchedulerDeadline());
     }
 
     @Test
