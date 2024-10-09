@@ -714,7 +714,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private CaseDocument noticeOfDiscontinueAllParitiesDoc;
     @JsonUnwrapped
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
-    private LocalDateTime coscSchedulerDeadline;
+    private LocalDate coscSchedulerDeadline;
     private CoscApplicationStatus coSCApplicationStatus;
 
 

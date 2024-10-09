@@ -43,7 +43,7 @@ class CheckCoscMarkPaidCallbackHandlerTest extends BaseCallbackHandlerTest {
     private ObjectMapper objectMapper;
 
     private final LocalDateTime nowMock = LocalDateTime.of(2024, 10, 8, 0, 0, 0);
-    private final LocalDateTime expectedlocalDateTime = LocalDateTime.of(2024, 10, 8, 0, 0, 0).plusDays(30);
+    private final LocalDate expectedlocalDate = LocalDate.of(2024, 10, 8).plusDays(30);
 
     @Test
     void setCoscSchedulerDeadline_whenActiveJudgmentGetFullyPaymentDateIsNull() {
@@ -59,7 +59,7 @@ class CheckCoscMarkPaidCallbackHandlerTest extends BaseCallbackHandlerTest {
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
         assertThat(response.getErrors()).isNull();
-        assertEquals(expectedlocalDateTime, responseCaseData.getCoscSchedulerDeadline());
+        assertEquals(expectedlocalDate, responseCaseData.getCoscSchedulerDeadline());
         assertEquals(ACTIVE, responseCaseData.getCoSCApplicationStatus());
     }
 

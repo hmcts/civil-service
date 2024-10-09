@@ -51,7 +51,7 @@ public class CheckCoscMarkPaidCallbackHandler extends CallbackHandler {
 
         if (Objects.nonNull(caseData.getActiveJudgment()) && (caseData.getActiveJudgment().getFullyPaymentMadeDate() == null)) {
             dataBuilder
-                .coscSchedulerDeadline(time.now().plusDays(30))
+                .coscSchedulerDeadline(time.now().plusDays(30).toLocalDate())
                 .coSCApplicationStatus(ACTIVE);
         }
 
