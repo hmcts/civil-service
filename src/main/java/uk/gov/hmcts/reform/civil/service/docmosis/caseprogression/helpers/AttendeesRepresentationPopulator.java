@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm.JudgeFinalOrderFormBuilder;
@@ -8,17 +9,12 @@ import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.builders.Defen
 
 import static java.util.Objects.nonNull;
 
+@RequiredArgsConstructor
 @Component
 public class AttendeesRepresentationPopulator {
 
     private final ClaimantAttendsOrRepresentedTextBuilder claimantAttendsOrRepresentedTextBuilder;
     private final DefendantAttendsOrRepresentedTextBuilder defendantAttendsOrRepresentedTextBuilder;
-
-    public AttendeesRepresentationPopulator(ClaimantAttendsOrRepresentedTextBuilder claimantAttendsOrRepresentedTextBuilder,
-                                            DefendantAttendsOrRepresentedTextBuilder defendantAttendsOrRepresentedTextBuilder) {
-        this.claimantAttendsOrRepresentedTextBuilder = claimantAttendsOrRepresentedTextBuilder;
-        this.defendantAttendsOrRepresentedTextBuilder = defendantAttendsOrRepresentedTextBuilder;
-    }
 
     public JudgeFinalOrderFormBuilder populateAttendeesDetails(JudgeFinalOrderFormBuilder builder, CaseData caseData) {
         return builder.claimantAttendsOrRepresented(generateClaimantAttendsOrRepresentedText(caseData, false))
