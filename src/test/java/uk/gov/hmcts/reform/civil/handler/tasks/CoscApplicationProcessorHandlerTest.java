@@ -14,6 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.CoscApplicationProcessorEvent;
 import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.CoscApplicationSearchService;
 
 import java.util.List;
@@ -46,6 +47,9 @@ class CoscApplicationProcessorHandlerTest {
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     @InjectMocks
     private CoscApplicationProcessorHandler handler;
 
@@ -53,6 +57,17 @@ class CoscApplicationProcessorHandlerTest {
     void init() {
         when(mockTask.getTopicName()).thenReturn("test");
         when(mockTask.getWorkerId()).thenReturn("worker");
+        when(featureToggleService.isCoSCEnabled()).thenReturn(true);
+    }
+
+    @Test
+    void shouldNotInteractWithSearchService_whenCoscToggleIsOff() {
+        when(featureToggleService.isCoSCEnabled()).thenReturn(false);
+
+        handler.execute(mockTask, externalTaskService);
+
+        verify(externalTaskService).complete(mockTask, null);
+        verifyNoInteractions(searchService);
     }
 
     @Test
