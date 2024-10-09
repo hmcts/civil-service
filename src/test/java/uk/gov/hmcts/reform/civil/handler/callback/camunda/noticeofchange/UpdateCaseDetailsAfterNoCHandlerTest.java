@@ -215,7 +215,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getDefendant1LIPAtClaimIssued()).isEqualTo(NO);
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNull();
-            if(caseEventsEnabled) {
+            if (caseEventsEnabled) {
                 assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(YES);
             } else {
                 assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(NO);
@@ -491,7 +491,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent2LRIndividuals()).isNull();
-            if(caseEventsEnabled) {
+            if (caseEventsEnabled) {
                 assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(YES);
             } else {
                 assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(NO);
@@ -536,7 +536,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNull();
             assertThat(updatedCaseData.getRespondent2LRIndividuals()).isNull();
-            if(caseEventsEnabled) {
+            if (caseEventsEnabled) {
                 assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(YES);
             } else {
                 assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(NO);
@@ -644,7 +644,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .isEqualTo("requester@example.com");
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNull();
-            if(caseEventsEnabled) {
+            if (caseEventsEnabled) {
                 assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(YES);
             } else {
                 assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(NO);
@@ -794,7 +794,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent2LRIndividuals()).isNull();
-            if(caseEventsEnabled) {
+            if (caseEventsEnabled) {
                 assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(YES);
             } else {
                 assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(NO);
@@ -836,7 +836,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNull();
             assertThat(updatedCaseData.getRespondent2LRIndividuals()).isNull();
-            if(caseEventsEnabled) {
+            if (caseEventsEnabled) {
                 assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(YES);
             } else {
                 assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(NO);

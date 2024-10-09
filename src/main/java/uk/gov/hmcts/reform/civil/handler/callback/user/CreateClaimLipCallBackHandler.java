@@ -109,7 +109,7 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
         if (featureToggleService.isHmcEnabled()) {
             populateWithPartyIds(caseDataBuilder);
         }
-        if(featureToggleService.isCaseEventsEnabled()) {
+        if (featureToggleService.isCaseEventsEnabled()) {
             caseDataBuilder.anyRepresented(NO);
         }
         if (caseData.getIsFlightDelayClaim() == YesOrNo.YES) {

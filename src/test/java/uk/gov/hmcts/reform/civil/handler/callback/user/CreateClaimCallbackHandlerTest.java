@@ -1531,7 +1531,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @ParameterizedTest
         @ValueSource(booleans = {true, false})
-        void shouldAddAnyRepresentedAsYes_whenCaseEventsEnabledOnly(boolean caseEventsEnabled){
+        void shouldAddAnyRepresentedAsYes_whenCaseEventsEnabledOnly(boolean caseEventsEnabled) {
             when(featureToggleService.isCaseEventsEnabled()).thenReturn(caseEventsEnabled);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

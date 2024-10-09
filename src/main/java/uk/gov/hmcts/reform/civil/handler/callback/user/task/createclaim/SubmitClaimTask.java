@@ -185,7 +185,7 @@ public class SubmitClaimTask {
             populateWithPartyIds(dataBuilder);
         }
 
-        if(featureToggleService.isCaseEventsEnabled()) {
+        if (featureToggleService.isCaseEventsEnabled()) {
             dataBuilder.anyRepresented(YES);
         }
 
