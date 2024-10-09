@@ -2,7 +2,7 @@ apiVersion: v2
 description: A Helm chart for civil-service App
 name: civil-service
 home: https://github.com/hmcts/civil-service
-version: 0.0.71
+version: 0.0.72
 maintainers:
   - name: HMCTS Civil team
 
@@ -31,6 +31,6 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: aac-manage-case-assignment.enabled
   - name: wiremock
-    version: 0.0.4
+    version: 0.0.5
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: wiremock.enabled
