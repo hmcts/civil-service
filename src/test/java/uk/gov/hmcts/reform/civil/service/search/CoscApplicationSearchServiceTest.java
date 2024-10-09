@@ -9,7 +9,7 @@ import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
+import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
 class CoscApplicationSearchServiceTest extends ElasticSearchServiceTest {
 
@@ -22,8 +22,7 @@ class CoscApplicationSearchServiceTest extends ElasticSearchServiceTest {
     protected Query buildQuery(int fromValue) {
         BoolQueryBuilder query = boolQuery()
             .must(matchQuery("data.coSCApplicationStatus", "Active"))
-            .must(matchQuery("state", All_FINAL_ORDERS_ISSUED.toString()))
-            .mustNot(matchQuery("data.coSCApplicationPaidInFull", "Yes"));
+            .must(rangeQuery("data.coscSchedulerDeadline").lt("now"));
         return new Query(query, List.of("reference"), fromValue);
     }
 
