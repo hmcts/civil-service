@@ -26,7 +26,7 @@ def versions = [
   lombok            : '1.18.34',
   springSecurity    : '5.8.14',
   camunda           : '7.20.0',
-  jackson           : '2.17.2',
+  jackson           : '2.18.0',
   testcontainers    : '1.20.2'
 ]
 
@@ -134,7 +134,7 @@ allprojects {
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.9'
-      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.15.0"
+      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.16.0"
     }
   }
 
@@ -396,7 +396,7 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.23.1'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.23.1'
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.95'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.96'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.30'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.24'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.2'
@@ -417,7 +417,7 @@ dependencies {
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
-  implementation group: 'com.azure', name: 'azure-core', version: '1.51.0'
+  implementation group: 'com.azure', name: 'azure-core', version: '1.53.0'
   implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.4'
   implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
 
