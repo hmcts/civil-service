@@ -45,6 +45,7 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.DQResponseDocumentUtils;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -53,6 +54,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static java.util.Objects.nonNull;
@@ -389,11 +391,69 @@ public class SetApplicantResponseDeadline implements CaseTask {
     }
 
     private void assembleResponseDocumentsSpec(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
-        log.debug("Assembling response documents for spec");
-        List<Element<CaseDocument>> defendantUploads = getDefendantUploads(caseData);
-        addRespondent1SpecDefenceResponseDocument(caseData, updatedCaseData, defendantUploads);
-        addRespondent2SpecDefenceResponseDocument(caseData, updatedCaseData, defendantUploads);
-        addAdditionalDocuments(updatedCaseData, defendantUploads);
+        List<Element<CaseDocument>> defendantUploads = nonNull(caseData.getDefendantResponseDocuments())
+            ? caseData.getDefendantResponseDocuments() : new ArrayList<>();
+
+        ResponseDocument respondent1SpecDefenceResponseDocument = caseData.getRespondent1SpecDefenceResponseDocument();
+        if (respondent1SpecDefenceResponseDocument != null) {
+            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1ClaimDocument = respondent1SpecDefenceResponseDocument.getFile();
+            if (respondent1ClaimDocument != null) {
+                Element<CaseDocument> documentElement = buildElemCaseDocument(
+                    respondent1ClaimDocument, "Defendant",
+                    updatedCaseData.build().getRespondent1ResponseDate(),
+                    DocumentType.DEFENDANT_DEFENCE
+                );
+                assignCategoryId.assignCategoryIdToDocument(
+                    respondent1ClaimDocument,
+                    DocCategory.DEF1_DEFENSE_DQ.getValue()
+                );
+                defendantUploads.add(documentElement);
+            }
+        }
+        Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
+        if (respondent1DQ != null) {
+            ResponseDocument respondent2SpecDefenceResponseDocument = caseData.getRespondent2SpecDefenceResponseDocument();
+            if (respondent2SpecDefenceResponseDocument != null) {
+                uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2ClaimDocument = respondent2SpecDefenceResponseDocument.getFile();
+                if (respondent2ClaimDocument != null) {
+                    Element<CaseDocument> documentElement = buildElemCaseDocument(
+                        respondent2ClaimDocument, DEF2,
+                        updatedCaseData.build().getRespondent2ResponseDate(),
+                        DocumentType.DEFENDANT_DEFENCE
+                    );
+                    assignCategoryId.assignCategoryIdToDocument(
+                        respondent2ClaimDocument,
+                        DocCategory.DEF2_DEFENSE_DQ.getValue()
+                    );
+                    defendantUploads.add(documentElement);
+                }
+            }
+        } else {
+            ResponseDocument respondent2SpecDefenceResponseDocument = caseData.getRespondent2SpecDefenceResponseDocument();
+            if (respondent2SpecDefenceResponseDocument != null) {
+                uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2ClaimDocument = respondent2SpecDefenceResponseDocument.getFile();
+                if (respondent2ClaimDocument != null) {
+                    Element<CaseDocument> documentElement = buildElemCaseDocument(
+                        respondent2ClaimDocument, DEF2,
+                        updatedCaseData.build().getRespondent2ResponseDate(),
+                        DocumentType.DEFENDANT_DEFENCE
+                    );
+                    assignCategoryId.assignCategoryIdToDocument(
+                        respondent2ClaimDocument,
+                        DocCategory.DEF2_DEFENSE_DQ.getValue()
+                    );
+                    CaseDocument copy = assignCategoryId
+                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF2.getValue());
+                    defendantUploads.add(documentElement);
+                    if (Objects.nonNull(copy)) {
+                        defendantUploads.add(ElementUtils.element(copy));
+                    }
+                }
+            }
+        }
+
+        List<Element<CaseDocument>> additionalDocuments = dqResponseDocumentUtils.buildDefendantResponseDocuments(updatedCaseData.build());
+        defendantUploads.addAll(additionalDocuments);
 
         if (!defendantUploads.isEmpty()) {
             updatedCaseData.defendantResponseDocuments(defendantUploads);
@@ -401,64 +461,6 @@ public class SetApplicantResponseDeadline implements CaseTask {
 
         frcDocumentsUtils.assembleDefendantsFRCDocuments(caseData);
         clearTempDocuments(updatedCaseData);
-    }
-
-    private List<Element<CaseDocument>> getDefendantUploads(CaseData caseData) {
-        log.debug("Getting defendant uploads");
-        return nonNull(caseData.getDefendantResponseDocuments()) ? caseData.getDefendantResponseDocuments() : new ArrayList<>();
-    }
-
-    private void addRespondent1SpecDefenceResponseDocument(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData, List<Element<CaseDocument>> defendantUploads) {
-        ResponseDocument respondent1SpecDefenceResponseDocument = caseData.getRespondent1SpecDefenceResponseDocument();
-        if (respondent1SpecDefenceResponseDocument != null) {
-            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1ClaimDocument = respondent1SpecDefenceResponseDocument.getFile();
-            if (respondent1ClaimDocument != null) {
-                Element<CaseDocument> documentElement = buildCaseDocumentElement(
-                    respondent1ClaimDocument,
-                    updatedCaseData.build().getRespondent1ResponseDate(),
-                    DocCategory.DEF1_DEFENSE_DQ.getValue()
-                );
-                defendantUploads.add(documentElement);
-            }
-        }
-    }
-
-    private Element<CaseDocument> buildCaseDocumentElement(
-        Document document,
-        LocalDateTime responseDate,
-        String categoryId
-    ) {
-        Element<CaseDocument> documentElement = buildElemCaseDocument(
-            document, "Defendant", responseDate, DocumentType.DEFENDANT_DEFENCE
-        );
-        assignCategoryId.assignCategoryIdToDocument(document, categoryId);
-        return documentElement;
-    }
-
-    private void addRespondent2SpecDefenceResponseDocument(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData, List<Element<CaseDocument>> defendantUploads) {
-        log.debug("Adding respondent 2 spec defence response document");
-        ResponseDocument respondent2SpecDefenceResponseDocument = caseData.getRespondent2SpecDefenceResponseDocument();
-        if (respondent2SpecDefenceResponseDocument != null) {
-            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2ClaimDocument = respondent2SpecDefenceResponseDocument.getFile();
-            if (respondent2ClaimDocument != null) {
-                Element<CaseDocument> documentElement = buildElemCaseDocument(
-                    respondent2ClaimDocument, DEF2,
-                    updatedCaseData.build().getRespondent2ResponseDate(),
-                    DocumentType.DEFENDANT_DEFENCE
-                );
-                assignCategoryId.assignCategoryIdToDocument(
-                    respondent2ClaimDocument,
-                    DocCategory.DEF2_DEFENSE_DQ.getValue()
-                );
-                defendantUploads.add(documentElement);
-            }
-        }
-    }
-
-    private void addAdditionalDocuments(CaseData.CaseDataBuilder<?, ?> updatedCaseData, List<Element<CaseDocument>> defendantUploads) {
-        log.debug("Adding additional documents");
-        List<Element<CaseDocument>> additionalDocuments = dqResponseDocumentUtils.buildDefendantResponseDocuments(updatedCaseData.build());
-        defendantUploads.addAll(additionalDocuments);
     }
 
     private void handleCourtLocationForRespondent1DQ(CaseData caseData,
