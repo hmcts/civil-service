@@ -14,7 +14,8 @@ public class AttendeesRepresentationPopulator {
     private final ClaimantAttendsOrRepresentedTextBuilder claimantAttendsOrRepresentedTextBuilder;
     private final DefendantAttendsOrRepresentedTextBuilder defendantAttendsOrRepresentedTextBuilder;
 
-    public AttendeesRepresentationPopulator(ClaimantAttendsOrRepresentedTextBuilder claimantAttendsOrRepresentedTextBuilder, DefendantAttendsOrRepresentedTextBuilder defendantAttendsOrRepresentedTextBuilder) {
+    public AttendeesRepresentationPopulator(ClaimantAttendsOrRepresentedTextBuilder claimantAttendsOrRepresentedTextBuilder,
+                                            DefendantAttendsOrRepresentedTextBuilder defendantAttendsOrRepresentedTextBuilder) {
         this.claimantAttendsOrRepresentedTextBuilder = claimantAttendsOrRepresentedTextBuilder;
         this.defendantAttendsOrRepresentedTextBuilder = defendantAttendsOrRepresentedTextBuilder;
     }
