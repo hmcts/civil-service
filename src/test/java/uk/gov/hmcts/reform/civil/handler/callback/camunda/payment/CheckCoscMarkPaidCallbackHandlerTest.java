@@ -46,10 +46,12 @@ class CheckCoscMarkPaidCallbackHandlerTest extends BaseCallbackHandlerTest {
     private final LocalDateTime expectedlocalDateTime = LocalDateTime.of(2024, 10, 8, 0, 0, 0).plusDays(30);
 
     @Test
-    void setCoscSchedulerDeadline_whenActiveJudgmentIsNull() {
+    void setCoscSchedulerDeadline_whenActiveJudgmentGetFullyPaymentDateIsNull() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
         when(time.now()).thenReturn(nowMock);
-        caseData.setActiveJudgment(null);
+        caseData.setActiveJudgment(JudgmentDetails.builder()
+                                       .totalAmount("123")
+                                             .build());
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -62,24 +64,22 @@ class CheckCoscMarkPaidCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void setCoscSchedulerDeadline_whenFullPaymentMadeDateIsEmpty() {
+    void doNotSetCoscSchedulerDeadline_whenNoActiveJudgment() {
         when(time.now()).thenReturn(nowMock);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-        caseData.setActiveJudgment(JudgmentDetails.builder()
-                                       .fullyPaymentMadeDate(null)
-                                       .build());
+        caseData.setActiveJudgment(null);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         var response = (AboutToStartOrSubmitCallbackResponse) checkCoscMarkPaidCallbackHandler.handle(params);
         CaseData data = getCaseData(response);
 
         assertThat(response.getErrors()).isNull();
-        assertEquals(expectedlocalDateTime, data.getCoscSchedulerDeadline());
-        assertEquals(ACTIVE, data.getCoSCApplicationStatus());
+        assertNull(data.getCoscSchedulerDeadline());
+        assertNull(data.getCoSCApplicationStatus());
     }
 
     @Test
-    void checkIsMarkedPaidWithFullyPaymentMadeDate() {
+    void doNotSetCoscSchedulerDeadline_whenActiveJudgementwithDate() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
         caseData.setActiveJudgment(JudgmentDetails.builder()
                                        .fullyPaymentMadeDate(LocalDate.of(2023, 1, 15))
