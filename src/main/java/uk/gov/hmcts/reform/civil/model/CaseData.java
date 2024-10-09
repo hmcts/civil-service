@@ -693,10 +693,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private LocalDateTime requestForReconsiderationDeadline;
     private YesOrNo requestForReconsiderationDeadlineChecked;
 
-    //caseworker events
-    private String manageStayOption;
-    private final String preStayState;
-
     //Settle And Discontinue
     private YesOrNo markPaidForAllClaimants;
     private DynamicList claimantWhoIsSettling;
