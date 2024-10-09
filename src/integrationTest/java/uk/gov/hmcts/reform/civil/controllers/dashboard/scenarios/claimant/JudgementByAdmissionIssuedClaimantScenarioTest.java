@@ -77,6 +77,6 @@ public class JudgementByAdmissionIssuedClaimantScenarioTest extends  DashboardBa
                             "swm llawn sy’n ddyledus i chi</a>.<br>Os na fyddant yn eich talu erbyn y dyddiad ar y dyfarniad, gallwch " +
                             "<u>ofyn am gymryd camau  gorfodi yn eu herbyn</u>.<br>Os oes arnoch angen newid y telerau talu o fewn y dyfarniad, " +
                             "fel y rhandaliadau roeddech wedi cytuno arnynt ynflaenorol, gallwch <a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" " +
-                            "class=\"govuk-link\">wneud cais i amrywio’r dyfarniad</a>.</p>") );
+                            "class=\"govuk-link\">wneud cais i amrywio’r dyfarniad</a>.</p>"));
     }
 }
