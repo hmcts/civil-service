@@ -52,7 +52,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
 
         DocmosisDocument docmosisDocument =
             documentGeneratorService.generateDocmosisDocument(templateData, docmosisTemplate);
-
         return documentManagementService.uploadDocument(
             authorisation,
             new PDF(
@@ -64,7 +63,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     }
 
     private String getFileName(DocmosisTemplates docmosisTemplate) {
-        return format(docmosisTemplate.getDocumentTitle(), formatLocalDate(LocalDate.now(), DATE_FORMAT));
+        return format(docmosisTemplate.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
     }
 
     private JudgeFinalOrderForm getFinalOrderType(CaseData caseData, String authorisation) {
