@@ -1,8 +1,5 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard;
 
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -42,7 +39,6 @@ public class GetNotificationControllerTest extends BaseIntegrationTest {
                                  .titleCy("title_cy")
                                  .descriptionEn("description_en")
                                  .descriptionCy("description_cy")
-                                 .createdAt(OffsetDateTime.of(LocalDateTime.parse("2024-02-10T10:00:00"), ZoneOffset.UTC))
                                  .timeToLive("Click").build());
 
         return notificationList;
