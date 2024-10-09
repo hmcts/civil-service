@@ -21,6 +21,7 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHECK_PAID_IN_FULL_SCHED_DEADLINE;
+import static uk.gov.hmcts.reform.civil.enums.CoscApplicationStatus.ACTIVE;
 
 @Slf4j
 @Service
@@ -49,7 +50,9 @@ public class CheckCoscMarkPaidCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
         if (caseData.getActiveJudgment() == null || ofNullable(caseData.getActiveJudgment().getFullyPaymentMadeDate()).isEmpty()) {
-            caseData.setCoscSchedulerDeadline(time.now().plusDays(30));
+            dataBuilder
+                .coscSchedulerDeadline(time.now().plusDays(30))
+                .coSCApplicationStatus(ACTIVE);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
