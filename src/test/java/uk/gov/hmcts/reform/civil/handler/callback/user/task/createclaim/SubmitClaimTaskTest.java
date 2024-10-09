@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -82,8 +84,11 @@ class SubmitClaimTaskTest {
                                               organisationService, airlineEpimsService, locationRefDataService);
     }
 
-    @Test
-    void shouldSubmitClaimSuccessfully() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldSubmitClaimSuccessfully(boolean caseEventsEnabled) {
+        when(featureToggleService.isCaseEventsEnabled()).thenReturn(caseEventsEnabled);
+
         CaseData caseData = CaseData.builder()
             .totalClaimAmount(new BigDecimal("1000"))
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("test@gmail.com").build())
@@ -105,6 +110,11 @@ class SubmitClaimTaskTest {
 
         assertThat(response.getData()).isNotNull();
         assertThat(response.getErrors()).isEmpty();
+        if(caseEventsEnabled) {
+            assertThat(response.getData().get("anyRepresented")).isEqualTo("Yes");
+        } else {
+            assertThat(response.getData().get("anyRepresented")).isNull();
+        }
     }
 }
 

@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.Collections;
@@ -45,6 +46,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
 
     private final ObjectMapper objectMapper;
     private final CoreCaseUserService coreCaseUserService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -207,6 +209,10 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             .respondent2Represented(YES)
             .defendant2LIPAtClaimIssued(NO);
 
+        if(featureToggleService.isCaseEventsEnabled()) {
+            caseDataBuilder.anyRepresented(YES);
+        }
+
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             caseDataBuilder.respondentSolicitor2ServiceAddress(null)
                 .respondentSolicitor2ServiceAddressRequired(NO)
@@ -235,6 +241,10 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             .respondent1Represented(YES)
             .defendant1LIPAtClaimIssued(NO);
 
+        if(featureToggleService.isCaseEventsEnabled()) {
+            caseDataBuilder.anyRepresented(YES);
+        }
+
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             caseDataBuilder.respondentSolicitor1ServiceAddress(null)
                 .respondentSolicitor1ServiceAddressRequired(NO)
@@ -259,6 +269,10 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
 
         caseDataBuilder.applicantSolicitor1PbaAccounts(null)
             .applicantSolicitor1PbaAccountsIsEmpty(YES);
+
+        if(featureToggleService.isCaseEventsEnabled()) {
+            caseDataBuilder.anyRepresented(YES);
+        }
 
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             caseDataBuilder
