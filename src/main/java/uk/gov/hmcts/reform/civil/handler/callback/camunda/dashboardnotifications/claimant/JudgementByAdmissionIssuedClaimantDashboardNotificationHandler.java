@@ -63,8 +63,7 @@ public class JudgementByAdmissionIssuedClaimantDashboardNotificationHandler exte
     }
 
     private boolean isIndividualOrSoleTraderWithJoIssued(CaseData caseData) {
-        return caseData.isRespondent1LiP()
-            && caseData.getRespondent1().isIndividualORSoleTrader();
+        return caseData.getRespondent1().isIndividualORSoleTrader();
     }
 
     private boolean isCompanyOrOrganisationWithRepaymentPlanAccepted(CaseData caseData) {

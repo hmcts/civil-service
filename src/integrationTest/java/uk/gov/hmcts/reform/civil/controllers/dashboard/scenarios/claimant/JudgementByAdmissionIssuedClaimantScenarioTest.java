@@ -7,10 +7,14 @@ import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.JudgementByAdmissionIssuedClaimantDashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+
 import java.time.LocalDate;
 
 import static org.mockito.Mockito.when;
@@ -25,14 +29,22 @@ public class JudgementByAdmissionIssuedClaimantScenarioTest extends  DashboardBa
     private JudgementByAdmissionIssuedClaimantDashboardNotificationHandler handler;
 
     @Test
-    void should_create_scenario_for_default_judgement() throws Exception {
+    void should_create_scenario_jo_notification_for_claimant() throws Exception {
 
         String caseId = "6532987";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
+            .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
+            .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.YES)
+            .defendantDetailsSpec(DynamicList.builder()
+                                      .value(DynamicListElement.builder()
+                                                 .label("John Doe")
+                                                 .build())
+                                      .build())
+            .respondent1(PartyBuilder.builder().organisation().build())
             .activeJudgment(JudgmentDetails.builder().issueDate(LocalDate.now())
                                 .state(JudgmentState.ISSUED)
                                 .type(JudgmentType.JUDGMENT_BY_ADMISSION)
