@@ -50,4 +50,6 @@ public class FlowLipPredicate {
 
     public static final Predicate<CaseData> nocSubmittedForLiPDefendant = CaseData::nocApplyForLiPDefendant;
 
+    public  static final Predicate<CaseData> isContainsLip = CaseData::isLipCase;
+
 }

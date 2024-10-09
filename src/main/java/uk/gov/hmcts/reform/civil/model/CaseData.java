@@ -141,6 +141,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private final CaseState ccdState;
     private final CaseState previousCCDState;
+    private final String preStayState;
     private final GAApplicationType generalAppType;
     private final GARespondentOrderAgreement generalAppRespondentAgreement;
     private final GAPbaDetails generalAppPBADetails;
@@ -1572,5 +1573,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isClaimantDontWantToProceedWithFulLDefenceFD() {
         return this.isClaimBeingDisputed()
             && this.hasApplicantNotProceededWithClaim();
+    }
+
+    @JsonIgnore
+    public boolean isLipCase() {
+        return this.isApplicant1NotRepresented() || this.isRespondent1LiP();
     }
 }
