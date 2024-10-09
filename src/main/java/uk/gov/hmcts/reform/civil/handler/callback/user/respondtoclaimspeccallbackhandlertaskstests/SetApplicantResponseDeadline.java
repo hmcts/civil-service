@@ -346,17 +346,17 @@ public class SetApplicantResponseDeadline implements CaseTask {
     private boolean isDefending(CaseData caseData) {
         log.debug("Checking if the case is defending");
         return FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+            || (caseData.getRespondent2ClaimResponseTypeForSpec() != null && FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))
             || PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec());
+            || (caseData.getRespondent2ClaimResponseTypeForSpec() != null && PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()));
     }
 
     private boolean ifResponseTypeIsPartOrFullAdmission(CaseData caseData) {
-        log.debug("Checking if the response type is part or full admission");
         return (RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))
-            || (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()));
+            || (caseData.getRespondent2ClaimResponseTypeForSpec() != null && RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))
+            ) || (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || (caseData.getRespondent2ClaimResponseTypeForSpec() != null && RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))
+            );
     }
 
     private void updateCorrespondenceAddress(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> updatedCaseData, CaseData caseData) {
@@ -551,10 +551,8 @@ public class SetApplicantResponseDeadline implements CaseTask {
     }
 
     private boolean isAwaitingAnotherDefendantResponse(CaseData caseData) {
-        boolean condition = caseData.getRespondent1ClaimResponseTypeForSpec() == null
+        return caseData.getRespondent1ClaimResponseTypeForSpec() == null
             || caseData.getRespondent2ClaimResponseTypeForSpec() == null;
-        log.debug("Checking if awaiting another defendant response: {}", condition);
-        return condition;
     }
 
     private LocalDateTime getApplicant1ResponseDeadline(LocalDateTime responseDate) {
