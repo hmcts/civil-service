@@ -871,7 +871,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getApplicantSolicitor1UserDetails().getEmail())
                 .isEqualTo("requester@example.com");
             assertThat(updatedCaseData.getApplicant1Represented()).isEqualTo(YES);
-            if(caseEventsEnabled) {
+            if (caseEventsEnabled) {
                 assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(YES);
             } else {
                 assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(NO);
