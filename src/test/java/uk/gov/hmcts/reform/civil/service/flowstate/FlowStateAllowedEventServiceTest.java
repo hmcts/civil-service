@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.of;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_STAY;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARK_PAID_FULL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM_CLAIMANT;
@@ -397,7 +398,8 @@ class FlowStateAllowedEventServiceTest {
                         asyncStitchingComplete,
                         COURT_OFFICER_ORDER,
                         STAY_CASE,
-                        DISMISS_CASE
+                        DISMISS_CASE,
+                        MANAGE_STAY
                     }
                 ),
                 of(
@@ -434,7 +436,8 @@ class FlowStateAllowedEventServiceTest {
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         COURT_OFFICER_ORDER,
                         STAY_CASE,
-                        DISMISS_CASE
+                        DISMISS_CASE,
+                        MANAGE_STAY
                     }
                 ),
                 of(
@@ -471,7 +474,8 @@ class FlowStateAllowedEventServiceTest {
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         COURT_OFFICER_ORDER,
                         STAY_CASE,
-                        DISMISS_CASE
+                        DISMISS_CASE,
+                        MANAGE_STAY
 
                     }
                 ),
@@ -518,7 +522,8 @@ class FlowStateAllowedEventServiceTest {
                         BUNDLE_CREATION_NOTIFICATION,
                         COURT_OFFICER_ORDER,
                         STAY_CASE,
-                        DISMISS_CASE
+                        DISMISS_CASE,
+                        MANAGE_STAY
                     }
                 ),
                 of(
@@ -548,7 +553,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         STAY_CASE,
-                        DISMISS_CASE
+                        DISMISS_CASE,
+                        MANAGE_STAY
                     }
                 ),
                 of(
@@ -578,7 +584,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         STAY_CASE,
-                        DISMISS_CASE
+                        DISMISS_CASE,
+                        MANAGE_STAY
                     }
                 ),
                 of(
@@ -608,7 +615,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         STAY_CASE,
-                        DISMISS_CASE
+                        DISMISS_CASE,
+                        MANAGE_STAY
                     }
                 ),
                 of(
@@ -635,7 +643,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         STAY_CASE,
-                        DISMISS_CASE
+                        DISMISS_CASE,
+                        MANAGE_STAY
                     }
                 ),
                 of(
@@ -662,7 +671,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         STAY_CASE,
-                        DISMISS_CASE
+                        DISMISS_CASE,
+                        MANAGE_STAY
                     }
                 ),
                 of(
@@ -744,7 +754,8 @@ class FlowStateAllowedEventServiceTest {
                         REFER_JUDGE_DEFENCE_RECEIVED,
                         COURT_OFFICER_ORDER,
                         STAY_CASE,
-                        DISMISS_CASE
+                        DISMISS_CASE,
+                        MANAGE_STAY
                     }
                 ),
                 of(
@@ -769,7 +780,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         STAY_CASE,
-                        DISMISS_CASE
+                        DISMISS_CASE,
+                        MANAGE_STAY
                     }
                 ),
                 of(
@@ -953,7 +965,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         STAY_CASE,
-                        DISMISS_CASE
+                        DISMISS_CASE,
+                        MANAGE_STAY
                     }
                 ),
                 of(
@@ -1006,7 +1019,8 @@ class FlowStateAllowedEventServiceTest {
                         COURT_OFFICER_ORDER,
                         AMEND_RESTITCH_BUNDLE,
                         STAY_CASE,
-                        DISMISS_CASE
+                        DISMISS_CASE,
+                        MANAGE_STAY
                     }
                 )
             );
@@ -1190,6 +1204,24 @@ class FlowStateAllowedEventServiceTest {
                 ),
                 of(
                     DISMISS_CASE,
+                    new String[] {
+                        NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
+                        FULL_ADMISSION.fullName(),
+                        CLAIM_DETAILS_NOTIFIED.fullName(),
+                        CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
+                        IN_MEDIATION.fullName(),
+                        NOTIFICATION_ACKNOWLEDGED.fullName(),
+                        AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
+                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
+                        PART_ADMISSION.fullName(),
+                        FULL_DEFENCE_NOT_PROCEED.fullName(),
+                        FULL_DEFENCE.fullName(),
+                        FULL_DEFENCE_PROCEED.fullName(),
+                        IN_HEARING_READINESS.fullName()
+                    }
+                ),
+                of(
+                    MANAGE_STAY,
                     new String[] {
                         NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
                         FULL_ADMISSION.fullName(),
