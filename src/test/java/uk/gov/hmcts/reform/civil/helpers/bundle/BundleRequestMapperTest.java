@@ -50,7 +50,7 @@ class BundleRequestMapperTest {
         // Given
         //Add all type of documents and other request details in case data
         CaseData caseData = getCaseData();
-        given(featureToggleService.isCaseEventsEnabled()).willReturn(false);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
 
         // When
         BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +
@@ -177,7 +177,7 @@ class BundleRequestMapperTest {
         // Given
         //Add all type of documents and other request details in case data
         CaseData caseData = getCaseDataNoCategoryId();
-        given(featureToggleService.isCaseEventsEnabled()).willReturn(true);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(true);
 
         // When
         BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +
@@ -294,7 +294,7 @@ class BundleRequestMapperTest {
         // Case file view was add on 16th nov 2023, cases before that will not have categoryId, and cannot be sorted into bundles using CL1, DF1, DF2 prefix
         // Given
         CaseData caseData = getCaseDataWithNoId();
-        given(featureToggleService.isCaseEventsEnabled()).willReturn(false);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
         // When
         BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +
             ".yaml", "test", "test"
@@ -318,7 +318,7 @@ class BundleRequestMapperTest {
         // Case file view was add on 16th nov 2023, cases before that will not have categoryId, and cannot be sorted into bundles using CL1, DF1, DF2 prefix
         // Given
         CaseData caseData = getCaseDataWithNoId();
-        given(featureToggleService.isCaseEventsEnabled()).willReturn(true);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(true);
         // When
         BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +
             ".yaml", "test", "test"
@@ -841,7 +841,7 @@ class BundleRequestMapperTest {
     @Test
     void testBundleCreateRequestMapperForEmptyDetailsAndCaseEventEnable() {
         // Given
-        given(featureToggleService.isCaseEventsEnabled()).willReturn(true);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(true);
         CaseData caseData = CaseData.builder().ccdCaseReference(1L)
             .applicant1(Party.builder().individualLastName("lastname").partyName("applicant1").type(Party.Type.INDIVIDUAL).build())
             .respondent1(Party.builder().individualLastName("lastname").partyName("respondent1").type(Party.Type.INDIVIDUAL).build())
@@ -861,7 +861,7 @@ class BundleRequestMapperTest {
     @Test
     void testBundleCreateRequestMapperForEmptyDetails() {
         // Given
-        given(featureToggleService.isCaseEventsEnabled()).willReturn(false);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
         CaseData caseData = CaseData.builder().ccdCaseReference(1L)
             .applicant1(Party.builder().individualLastName("lastname").partyName("applicant1").type(Party.Type.INDIVIDUAL).build())
             .respondent1(Party.builder().individualLastName("lastname").partyName("respondent1").type(Party.Type.INDIVIDUAL).build())
@@ -881,7 +881,7 @@ class BundleRequestMapperTest {
     @Test
     void testBundleCreateRequestMapperForOneRespondentAndOneApplicant() {
         // Given: Casedata with Applicant2 and Respondent2 as NO
-        given(featureToggleService.isCaseEventsEnabled()).willReturn(false);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
         CaseData caseData = CaseData.builder().ccdCaseReference(1L)
             .hearingDate(LocalDate.now())
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
@@ -904,7 +904,7 @@ class BundleRequestMapperTest {
     @Test
     void testBundleCreateRequestMapperForOneRespondentAndOneApplicantAndCaseEventEnable() {
         // Given: Casedata with Applicant2 and Respondent2 as NO
-        given(featureToggleService.isCaseEventsEnabled()).willReturn(true);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(true);
         CaseData caseData = CaseData.builder().ccdCaseReference(1L)
             .hearingDate(LocalDate.now())
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
@@ -926,7 +926,7 @@ class BundleRequestMapperTest {
 
     @Test
     void shouldFilterEvidenceForTrial() {
-        given(featureToggleService.isCaseEventsEnabled()).willReturn(false);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
         List<Element<UploadEvidenceDocumentType>> list =
             bundleRequestMapper.filterDocumentaryEvidenceForTrialDocs(getDocumentEvidenceForTrial(),
                                                                       TypeOfDocDocumentaryEvidenceOfTrial.getAllDocsDisplayNames(), true);
@@ -935,7 +935,7 @@ class BundleRequestMapperTest {
 
     @Test
     void shouldFilterEvidenceForTrialAndCaseEventEnable() {
-        given(featureToggleService.isCaseEventsEnabled()).willReturn(true);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(true);
         List<Element<UploadEvidenceDocumentType>> list =
             bundleRequestMapper.filterDocumentaryEvidenceForTrialDocs(getDocumentEvidenceForTrial(),
                                                                       TypeOfDocDocumentaryEvidenceOfTrial.getAllDocsDisplayNames(), true);
