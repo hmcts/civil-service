@@ -18,6 +18,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.utils.CaseStateUtils.shouldMoveToInMediationState;
 
 @Component
@@ -46,6 +47,8 @@ public class DetermineNextState  {
                 Pair<String, BusinessProcess> result = handleAcceptedRepaymentPlan(caseData, builder, businessProcess);
                 nextState = result.getLeft();
                 businessProcess = result.getRight();
+            } else if (isDefenceAdmitPayImmediately(caseData)) {
+                nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             } else if (caseData.hasApplicantRejectedRepaymentPlan()) {
                 nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
             } else if (isClaimNotSettled(caseData)) {
@@ -67,6 +70,11 @@ public class DetermineNextState  {
         return nextState;
     }
 
+    private boolean isDefenceAdmitPayImmediately(CaseData caseData) {
+        return featureToggleService.isJudgmentOnlineLive()
+            && IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
+    }
+
     private static boolean isClaimNotSettled(CaseData caseData) {
         return caseData.isClaimantNotSettlePartAdmitClaim()
             && ((caseData.hasClaimantNotAgreedToFreeMediation()
@@ -85,11 +93,9 @@ public class DetermineNextState  {
                                                BusinessProcess businessProcess) {
         String nextState;
         if (featureToggleService.isJudgmentOnlineLive()
-            && (caseData.isPayByInstallment() || caseData.isPayBySetDate())
-            && caseData.isLRvLipOneVOne()) {
+            && (caseData.isPayByInstallment() || caseData.isPayBySetDate())) {
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             businessProcess = BusinessProcess.ready(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC);
-
         } else {
             nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
         }

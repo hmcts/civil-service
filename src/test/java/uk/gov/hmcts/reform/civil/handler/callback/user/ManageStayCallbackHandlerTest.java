@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -26,13 +25,13 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STAY_CASE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_STAY;
 
 @ExtendWith(MockitoExtension.class)
-public class StayCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
+public class ManageStayCallbackHandlerTest {
 
     @InjectMocks
-    private StayCaseCallbackHandler handler;
+    private ManageStayCallbackHandler handler;
     @Mock
     private FeatureToggleService featureToggleService;
 
@@ -41,7 +40,7 @@ public class StayCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
     @BeforeEach
     public void setup() {
         mapper.registerModules(new JavaTimeModule(), new Jdk8Module());
-        handler = new StayCaseCallbackHandler(
+        handler = new ManageStayCallbackHandler(
             featureToggleService,
             mapper
         );
@@ -69,8 +68,7 @@ public class StayCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnNoError_WhenAboutToSubmitIsInvokedToggleFalse() {
             when(featureToggleService.isCaseEventsEnabled()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            params.getRequest().getCaseDetailsBefore().setState("CASE_PROGRESSION");
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -82,8 +80,7 @@ public class StayCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnNoError_WhenAboutToSubmitIsInvokedToggleTrue() {
             when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            params.getRequest().getCaseDetailsBefore().setState("CASE_PROGRESSION");
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -93,7 +90,7 @@ public class StayCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void handleEventsReturnsTheExpectedCallbackEvent() {
-            assertThat(handler.handledEvents()).contains(STAY_CASE);
+            assertThat(handler.handledEvents()).contains(MANAGE_STAY);
         }
     }
 
@@ -121,7 +118,7 @@ public class StayCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader("# Stay added to the case \n\n ## All parties have been notified and any upcoming hearings must be cancelled")
+                    .confirmationHeader("# You have lifted the stay from this \n\n # case \n\n ## All parties have been notified")
                     .confirmationBody("&nbsp;")
                     .build());
         }
