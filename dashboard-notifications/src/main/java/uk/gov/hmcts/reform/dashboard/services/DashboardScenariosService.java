@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.dashboard.services;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringSubstitutor;
 import org.springframework.stereotype.Service;
@@ -84,22 +82,6 @@ public class DashboardScenariosService {
 
                 StringSubstitutor stringSubstitutor = new StringSubstitutor(templateParams);
 
-                String notificationDeadlineValue = template.getDeadlineParam() != null
-                    ? Optional.ofNullable(
-                        scenarioRequestParams.getParams().get(template.getDeadlineParam())
-                    ).map(Object::toString).orElse(null)
-                    : null;
-                LocalDateTime notificationDeadline = Optional.ofNullable(notificationDeadlineValue)
-                    .map(value -> {
-                        try {
-                            return LocalDateTime.parse(notificationDeadlineValue);
-                        } catch (DateTimeParseException ex) {
-                            log.error("Unable to parse deadline for notification {}", notificationDeadlineValue);
-                            return null;
-                        }
-                    })
-                    .orElse(null);
-
                 DashboardNotificationsEntity notification = DashboardNotificationsEntity.builder()
                     .id(UUID.randomUUID())
                     .reference(uniqueCaseIdentifier)
@@ -113,7 +95,6 @@ public class DashboardScenariosService {
                     .createdAt(OffsetDateTime.now())
                     .updatedOn(OffsetDateTime.now())
                     .params(scenarioRequestParams.getParams())
-                    .deadline(notificationDeadline)
                     .build();
 
                 log.info(
