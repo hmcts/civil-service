@@ -11,8 +11,13 @@ import static java.util.Objects.nonNull;
 @Component
 public class AttendeesRepresentationPopulator {
 
-    private ClaimantAttendsOrRepresentedTextBuilder claimantAttendsOrRepresentedTextBuilder;
-    private DefendantAttendsOrRepresentedTextBuilder defendantAttendsOrRepresentedTextBuilder;
+    private final ClaimantAttendsOrRepresentedTextBuilder claimantAttendsOrRepresentedTextBuilder;
+    private final DefendantAttendsOrRepresentedTextBuilder defendantAttendsOrRepresentedTextBuilder;
+
+    public AttendeesRepresentationPopulator(ClaimantAttendsOrRepresentedTextBuilder claimantAttendsOrRepresentedTextBuilder, DefendantAttendsOrRepresentedTextBuilder defendantAttendsOrRepresentedTextBuilder) {
+        this.claimantAttendsOrRepresentedTextBuilder = claimantAttendsOrRepresentedTextBuilder;
+        this.defendantAttendsOrRepresentedTextBuilder = defendantAttendsOrRepresentedTextBuilder;
+    }
 
     public JudgeFinalOrderFormBuilder populateAttendeesDetails(JudgeFinalOrderFormBuilder builder, CaseData caseData) {
         return builder.claimantAttendsOrRepresented(generateClaimantAttendsOrRepresentedText(caseData, false))
