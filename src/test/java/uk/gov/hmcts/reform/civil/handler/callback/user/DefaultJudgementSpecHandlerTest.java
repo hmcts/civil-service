@@ -670,7 +670,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 + " £1222.00";
 
             assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
-            assertInterestIsPopulated(response, 100);
+
         }
 
         @Test
@@ -719,7 +719,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 + " ## Total still owed \n"
                 + " £681.00";
             assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
-            assertInterestIsPopulated(response, 100);
         }
 
         @Test
@@ -768,7 +767,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 + " £1201.00";
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
-            assertInterestIsPopulated(response, 100);
         }
 
         @Test
@@ -811,7 +809,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 + " ## Total still owed \n"
                 + " £5001.00";
             assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
-            assertInterestIsPopulated(response, 0);
         }
 
         @Test
@@ -858,7 +855,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 + " ## Total still owed \n"
                 + " £5001.00";
             assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
-            assertInterestIsPopulated(response, 0);
         }
 
         @Test
@@ -911,7 +907,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                     + " £1222.00";
 
             assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
-            assertInterestIsPopulated(response, 100);
+
         }
 
         @Test
@@ -967,7 +963,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                     + " £1221.00";
 
             assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
-            assertInterestIsPopulated(response, 100);
         }
     }
 
@@ -1032,6 +1027,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("businessProcess").isNotNull();
             assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_SPEC.name());
             assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+            assertInterestIsPopulated(response, 0);
         }
 
         @Test
@@ -1084,6 +1080,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("activeJudgment")).extracting("isRegisterWithRTL").isEqualTo("Yes");
             assertThat(response.getData().get("activeJudgment")).extracting("defendant1Name").isEqualTo("Mr. Sole Trader");
             assertThat(response.getData().get("activeJudgment")).extracting("defendant1Address").isNotNull();
+            assertInterestIsPopulated(response, 0);
 
         }
 
@@ -1145,6 +1142,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("activeJudgment")).extracting("defendant2Name").isEqualTo("Mr. John Rambo");
             assertThat(response.getData().get("activeJudgment")).extracting("defendant2Address").isNotNull();
             assertThat(response.getData().get("activeJudgment")).extracting("defendant2Dob").isNotNull();
+            assertInterestIsPopulated(response, 0);
 
         }
 
@@ -1206,6 +1204,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("activeJudgment")).extracting("defendant2Name").isEqualTo("Mr. John Rambo");
             assertThat(response.getData().get("activeJudgment")).extracting("defendant2Address").isNotNull();
             assertThat(response.getData().get("activeJudgment")).extracting("defendant2Dob").isNotNull();
+            assertInterestIsPopulated(response, 0);
 
         }
 
@@ -1246,6 +1245,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("businessProcess").isNotNull();
             assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_SPEC.name());
             assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+
         }
 
         @Test
@@ -1294,6 +1294,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("businessProcess").isNotNull();
             assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
             assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+            assertInterestIsPopulated(response, 0);
         }
     }
 

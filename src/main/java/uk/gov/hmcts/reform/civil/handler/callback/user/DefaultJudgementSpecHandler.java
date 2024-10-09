@@ -315,7 +315,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             fixedCost,
             callbackParams
         );
-        caseDataBuilder.totalInterest(interest);
         caseDataBuilder.repaymentSummaryObject(repaymentBreakdown.toString());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -436,6 +435,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         }
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.totalInterest(interestCalculator.calculateInterest(caseData));
         String nextState;
 
         if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
