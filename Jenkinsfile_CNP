@@ -160,5 +160,6 @@ withPipeline(type, product, component) {
 
   afterAlways('functionalTest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
+
   }
 }
