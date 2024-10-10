@@ -21,11 +21,13 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.BULK_CLAIM_EN
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.CASE_PROGRESSION_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.DASHBOARD_SERVICE_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.GENERAL_APPLICATION_ENABLED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.JO_ONLINE_LIVE_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.agreedToMediation;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.ccjRequestJudgmentByAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.declinedMediation;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isClaimantNotSettleFullDefenceClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isClaimantSettleTheClaim;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isContainsLip;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isDefendantNotPaidFullDefenceClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLiPvLRCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLipCase;
@@ -214,10 +216,15 @@ public class StateFlowEngine implements IStateFlowEngine {
                 .onlyIf(claimSubmittedOneRespondentRepresentative.or(claimSubmitted1v1RespondentOneUnregistered))
                 .set((c, flags) -> {
                     flags.put(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true);
-                    flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    if (isContainsLip.test(c)) {
+                        flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGaForLipsEnabled());
+                    } else {
+                        flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    }
                     flags.put(DASHBOARD_SERVICE_ENABLED.name(), (featureToggleService.isDashboardEnabledForCase(c) && caseContainsLiP.test(c)));
                     flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
                     flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
+                    flags.put(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive());
                 })
             .transitionTo(CLAIM_SUBMITTED)
                 .onlyIf(claimSubmittedTwoRegisteredRespondentRepresentatives
@@ -228,20 +235,30 @@ public class StateFlowEngine implements IStateFlowEngine {
                     // camunda diagram for TAKE_CASE_OFFLINE is changed
                     flags.put(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false);
                     flags.put(FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true);
-                    flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    if (isContainsLip.test(c)) {
+                        flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGaForLipsEnabled());
+                    } else {
+                        flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    }
                     flags.put(DASHBOARD_SERVICE_ENABLED.name(), (featureToggleService.isDashboardEnabledForCase(c) && caseContainsLiP.test(c)));
                     flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
                     flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
+                    flags.put(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive());
                 })
             // Only one unrepresented defendant
             .transitionTo(CLAIM_SUBMITTED)
                 .onlyIf(claimSubmittedOneUnrepresentedDefendantOnly)
                 .set((c, flags) -> {
                     flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
-                    flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    if (isContainsLip.test(c)) {
+                        flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGaForLipsEnabled());
+                    } else {
+                        flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    }
                     flags.put(DASHBOARD_SERVICE_ENABLED.name(), (featureToggleService.isDashboardEnabledForCase(c) && caseContainsLiP.test(c)));
                     flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
                     flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
+                    flags.put(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive());
                 })
             // Unrepresented defendant 1
             .transitionTo(CLAIM_SUBMITTED)
@@ -251,10 +268,15 @@ public class StateFlowEngine implements IStateFlowEngine {
                 .set((c, flags) -> {
                     flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
                     flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false);
-                    flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    if (isContainsLip.test(c)) {
+                        flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGaForLipsEnabled());
+                    } else {
+                        flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    }
                     flags.put(DASHBOARD_SERVICE_ENABLED.name(), (featureToggleService.isDashboardEnabledForCase(c) && caseContainsLiP.test(c)));
                     flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
                     flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
+                    flags.put(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive());
                 })
             // Unrepresented defendant 2
             .transitionTo(CLAIM_SUBMITTED)
@@ -263,10 +285,15 @@ public class StateFlowEngine implements IStateFlowEngine {
                 .set((c, flags) -> {
                     flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false);
                     flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true);
-                    flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    if (isContainsLip.test(c)) {
+                        flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGaForLipsEnabled());
+                    } else {
+                        flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    }
                     flags.put(DASHBOARD_SERVICE_ENABLED.name(), (featureToggleService.isDashboardEnabledForCase(c) && caseContainsLiP.test(c)));
                     flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
                     flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
+                    flags.put(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive());
                 })
             // Unrepresented defendants
             .transitionTo(CLAIM_SUBMITTED)
@@ -275,10 +302,15 @@ public class StateFlowEngine implements IStateFlowEngine {
                 .set((c, flags) -> {
                     flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
                     flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true);
-                    flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    if (isContainsLip.test(c)) {
+                        flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGaForLipsEnabled());
+                    } else {
+                        flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    }
                     flags.put(DASHBOARD_SERVICE_ENABLED.name(), (featureToggleService.isDashboardEnabledForCase(c) && caseContainsLiP.test(c)));
                     flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
                     flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
+                    flags.put(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive());
                 })
             .state(CLAIM_SUBMITTED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)

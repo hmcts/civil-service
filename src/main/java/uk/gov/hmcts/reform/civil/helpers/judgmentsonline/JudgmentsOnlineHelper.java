@@ -1,8 +1,14 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
+import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentAddress;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
+import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddress;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -20,6 +26,8 @@ public class JudgmentsOnlineHelper {
     private static final String ERROR_MESSAGE_DATE_PAID_BY_MUST_BE_IN_FUTURE = "Date the judgment will be paid by must be in the future";
     private static final String ERROR_MESSAGE_DATE_FIRST_INSTALMENT_MUST_BE_IN_FUTURE = "Date of first instalment must be in the future";
     private static final String ERROR_MESSAGE_DATE_ORDER_MUST_BE_IN_PAST = "Date judge made the order must be in the past";
+
+    private static final String regex = "[ˆ`´¨]";
 
     private JudgmentsOnlineHelper() {
     }
@@ -122,4 +130,81 @@ public class JudgmentsOnlineHelper {
         return val != null ? new BigDecimal(val) : ZERO;
     }
 
+    @NotNull
+    public static String calculateRepaymentBreakdownSummary(JudgmentDetails activeJudgment) {
+
+        BigDecimal totalAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getTotalAmount()));
+
+        //creates  the text on the page, based on calculated values
+        StringBuilder repaymentBreakdown = new StringBuilder();
+        repaymentBreakdown.append("The judgment will order the defendants to pay £").append(totalAmount);
+        repaymentBreakdown.append(", including the claim fee and interest, if applicable, as shown:");
+
+        BigDecimal orderedAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getOrderedAmount()));
+        if (null != orderedAmount) {
+            repaymentBreakdown.append("\n").append("### Claim amount \n £").append(orderedAmount.setScale(2));
+        }
+
+        if (null != activeJudgment.getCosts()) {
+            BigDecimal costs = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getCosts()));
+            if (costs.compareTo(BigDecimal.ZERO) != 0) {
+                repaymentBreakdown.append("\n ### Fixed cost amount \n").append("£").append(costs.setScale(2));
+            }
+        }
+
+        if (null != activeJudgment.getClaimFeeAmount()) {
+            BigDecimal claimFeeAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getClaimFeeAmount()));
+            if (claimFeeAmount.compareTo(BigDecimal.ZERO) != 0) {
+                repaymentBreakdown.append("\n ### Claim fee amount \n").append("£").append(claimFeeAmount.setScale(2));
+            }
+        }
+
+        repaymentBreakdown.append("\n ## Subtotal \n £").append(totalAmount.setScale(2))
+            .append("\n");
+
+        BigDecimal amountAlreadyPaid = ZERO;
+        if (null != activeJudgment.getAmountAlreadyPaid()) {
+            amountAlreadyPaid = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getAmountAlreadyPaid()));
+            if (amountAlreadyPaid.compareTo(BigDecimal.ZERO) != 0) {
+                repaymentBreakdown.append("\n ### Amount already paid \n").append("£").append(amountAlreadyPaid.setScale(
+                    2));
+            }
+        }
+
+        BigDecimal totalStillOwed = (null != activeJudgment.getAmountAlreadyPaid())
+            ? totalAmount.subtract(amountAlreadyPaid)
+            : totalAmount;
+        repaymentBreakdown.append("\n ## Total still owed \n £").append(totalStillOwed.setScale(2));
+
+        return repaymentBreakdown.toString();
+    }
+
+    public static JudgmentAddress getJudgmentAddress(Address address, RoboticsAddressMapper addressMapper) {
+
+        Address newAddress = Address.builder()
+            .addressLine1(removeWelshCharacters(address.getAddressLine1()))
+            .addressLine2(removeWelshCharacters(address.getAddressLine2()))
+            .addressLine3(removeWelshCharacters(address.getAddressLine3()))
+            .postCode(removeWelshCharacters(address.getPostCode()))
+            .postTown(removeWelshCharacters(address.getPostTown()))
+            .county(removeWelshCharacters(address.getCounty()))
+            .country(removeWelshCharacters(address.getCountry())).build();
+
+        RoboticsAddress roboticsAddress = addressMapper.toRoboticsAddress(newAddress);
+        return JudgmentAddress.builder()
+            .defendantAddressLine1(trimDownTo35(roboticsAddress.getAddressLine1()))
+            .defendantAddressLine2(trimDownTo35(roboticsAddress.getAddressLine2()))
+            .defendantAddressLine3(trimDownTo35(roboticsAddress.getAddressLine3()))
+            .defendantAddressLine4(trimDownTo35(roboticsAddress.getAddressLine4()))
+            .defendantAddressLine5(trimDownTo35(roboticsAddress.getAddressLine5()))
+            .defendantPostCode(roboticsAddress.getPostCode()).build();
+    }
+
+    public static String removeWelshCharacters(String input) {
+        return input != null ? input.replaceAll(regex, "") : input;
+    }
+
+    private static String trimDownTo35(String input) {
+        return input != null && input.length() > 35 ? input.substring(0, 35) : input;
+    }
 }

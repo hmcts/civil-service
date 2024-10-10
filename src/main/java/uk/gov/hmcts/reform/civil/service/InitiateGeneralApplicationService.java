@@ -77,6 +77,7 @@ public class InitiateGeneralApplicationService {
     private final FeatureToggleService featureToggleService;
     private final CrossAccessUserConfiguration crossAccessUserConfiguration;
     private final CoreCaseEventDataService coreCaseEventDataService;
+    private final Time time;
 
     private static final int NUMBER_OF_DEADLINE_DAYS = 5;
     public static final String GA_DOC_CATEGORY_ID = "applications";
@@ -249,8 +250,11 @@ public class InitiateGeneralApplicationService {
             applicationBuilder.isGaApplicantLip(NO)
                 .isGaRespondentOneLip(NO)
                 .isGaRespondentTwoLip(NO);
+            if (caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented()) {
+                applicationBuilder.generalAppSubmittedDateGAspec(time.now());
+            }
         }
-
+        applicationBuilder.caseNameGaInternal(caseData.getCaseNameHmctsInternal());
         return helper.setRespondentDetailsIfPresent(applicationBuilder.build(), caseData, userDetails);
     }
 

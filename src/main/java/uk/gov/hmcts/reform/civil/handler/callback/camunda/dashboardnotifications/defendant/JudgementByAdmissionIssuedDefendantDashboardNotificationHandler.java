@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.DashboardJudgementOnlineCallbackHandler;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
@@ -41,7 +42,7 @@ public class JudgementByAdmissionIssuedDefendantDashboardNotificationHandler ext
     @Override
     public String getScenario(CaseData caseData) {
         if (caseData.isRespondent1LiP()) {
-            if (caseData.isLRvLipOneVOne() && null != caseData.getDefenceAdmitPartPaymentTimeRouteRequired()) {
+            if (isJudgmentOrderIssued(caseData)) {
                 return
                     SCENARIO_AAA6_JUDGEMENTS_ONLINE_ISSUED_CCJ_DEFENDANT.getScenario();
             } else if (
@@ -51,5 +52,25 @@ public class JudgementByAdmissionIssuedDefendantDashboardNotificationHandler ext
             }
         }
         return null;
+    }
+
+    private boolean isJudgmentOrderIssued(CaseData caseData) {
+        if (caseData.isLRvLipOneVOne() && null != caseData.getDefenceAdmitPartPaymentTimeRouteRequired()) {
+            return true;
+        }
+        return caseData.isLipvLipOneVOne()
+            && (isIndividualOrSoleTraderWithJoIssued(caseData)
+            || isCompanyOrOrganisationWithRepaymentPlanAccepted(caseData));
+    }
+
+    private boolean isIndividualOrSoleTraderWithJoIssued(CaseData caseData) {
+        return caseData.getRespondent1().isIndividualORSoleTrader()
+            && (caseData.getActiveJudgment() != null
+            && JudgmentState.ISSUED.equals(caseData.getActiveJudgment().getState()));
+    }
+
+    private boolean isCompanyOrOrganisationWithRepaymentPlanAccepted(CaseData caseData) {
+        return caseData.getRespondent1().isCompanyOROrganisation()
+            && caseData.hasApplicantAcceptedRepaymentPlan();
     }
 }

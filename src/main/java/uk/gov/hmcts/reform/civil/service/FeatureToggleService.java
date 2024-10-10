@@ -38,10 +38,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("pin-in-post");
     }
 
-    public boolean isPbaV3Enabled() {
-        return this.featureToggleApi.isFeatureEnabled("pba-version-3-ways-to-pay");
-    }
-
     public boolean isRPAEmailEnabled() {
         return this.featureToggleApi.isFeatureEnabled("enable-rpa-emails");
     }
@@ -152,8 +148,15 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("cui-case-events-enabled");
     }
 
+    public boolean isAmendBundleEnabled() {
+        return featureToggleApi.isFeatureEnabled("amend-bundle-enabled");
+    }
+
     public boolean isGenAppsAllowedPreSdo() {
         return featureToggleApi.isFeatureEnabled("ga-allowed-pre-sdo");
     }
 
+    public boolean isCoSCEnabled() {
+        return featureToggleApi.isFeatureEnabled("isCoSCEnabled");
+    }
 }

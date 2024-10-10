@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.SetAsideJudgmentOnlineM
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 
 import java.util.ArrayList;
@@ -32,13 +31,13 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SET_ASIDE_JUDGMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_SET_ASIDE_JUDGMENT;
 
 @Service
 @RequiredArgsConstructor
 public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(SET_ASIDE_JUDGMENT);
+
     protected final ObjectMapper objectMapper;
     private final SetAsideJudgmentOnlineMapper setAsideJudgmentOnlineMapper;
     private static final String ERROR_MESSAGE_DATE_ORDER_MUST_BE_IN_PAST = "Date must be in the past";
@@ -52,6 +51,11 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
             .put(callbackKey(ABOUT_TO_SUBMIT), this::saveJudgmentDetails)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
+    }
+
+    @Override
+    public List<CaseEvent> handledEvents() {
+        return EVENTS;
     }
 
     private CallbackResponse validateDates(CallbackParams callbackParams) {
@@ -77,17 +81,13 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse saveJudgmentDetails(CallbackParams callbackParams) {
-
         CaseData caseData = callbackParams.getCaseData();
         caseData.setJoIsLiveJudgmentExists(YesOrNo.NO);
+        caseData.setJoIsDisplayInJudgmentTab(YesOrNo.NO);
         setAsideJudgmentOnlineMapper.moveToHistoricJudgment(caseData);
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-
-        if (caseData.getJoSetAsideReason() == JudgmentSetAsideReason.JUDGMENT_ERROR) {
-            caseDataBuilder.businessProcess(BusinessProcess.ready(NOTIFY_SET_ASIDE_JUDGMENT));
-        }
-
+        caseDataBuilder.businessProcess(BusinessProcess.ready(SET_ASIDE_JUDGMENT));
         String nextState;
         if (Objects.nonNull(caseData.getJoSetAsideOrderType()) && caseData.getJoSetAsideOrderType().equals(
             JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION)) {
@@ -102,10 +102,5 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(nextState)
             .build();
-    }
-
-    @Override
-    public List<CaseEvent> handledEvents() {
-        return EVENTS;
     }
 }

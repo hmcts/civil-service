@@ -248,6 +248,11 @@ public class DashboardNotificationsParamsMapper {
             params.put("bundleRestitchedDateCy", DateUtils.formatDateInWelsh(date.toLocalDate()));
         });
 
+        if (caseData.getGeneralAppPBADetails() != null) {
+            params.put("applicationFee",
+                       "£" + this.removeDoubleZeros(String.valueOf(MonetaryConversions.penniesToPounds(caseData.getGeneralAppPBADetails().getFee().getCalculatedAmountInPence()))));
+        }
+
         return params;
     }
 
@@ -263,10 +268,10 @@ public class DashboardNotificationsParamsMapper {
 
     private static void updateCCJParams(CaseData caseData, HashMap<String, Object> params) {
         JudgmentDetails judgmentDetails = caseData.getActiveJudgment();
-        String orderedAmount = judgmentDetails.getOrderedAmount();
+        String totalAmount = judgmentDetails.getTotalAmount();
         params.put(
             "ccjDefendantAdmittedAmount",
-            MonetaryConversions.penniesToPounds(new BigDecimal(orderedAmount))
+            MonetaryConversions.penniesToPounds(new BigDecimal(totalAmount))
         );
 
         if (caseData.getActiveJudgment().getPaymentPlan().getType().equals(PAY_IN_INSTALMENTS)) {

@@ -87,6 +87,9 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
@@ -138,6 +141,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private final CaseState ccdState;
     private final CaseState previousCCDState;
+    private final String preStayState;
+    private final String manageStayOption;
     private final GAApplicationType generalAppType;
     private final GARespondentOrderAgreement generalAppRespondentAgreement;
     private final GAPbaDetails generalAppPBADetails;
@@ -319,6 +324,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final ResponseDocument respondent1SpecDefenceResponseDocument;
     private final ResponseDocument respondent2SpecDefenceResponseDocument;
+
+    private final YesOrNo bundleError;
+    private final String bundleEvent;
 
     public RespondentResponseTypeSpec getRespondent1ClaimResponseTypeForSpec() {
 
@@ -651,6 +659,21 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo joShowRegisteredWithRTLOption;
     private JudgmentDetails activeJudgment;
     private List<Element<JudgmentDetails>> historicJudgment;
+
+    private String joDefendantName1;
+    private String joDefendantName2;
+    private PaymentPlanSelection joPaymentPlanSelected;
+    private String joRepaymentAmount;
+    private LocalDate joRepaymentStartDate;
+    private PaymentFrequency joRepaymentFrequency;
+    private LocalDate joIssueDate;
+    private JudgmentState joState;
+    private LocalDate joFullyPaymentMadeDate;
+    private String joOrderedAmount;
+    private String joCosts;
+    private String joTotalAmount;
+    private YesOrNo joIsDisplayInJudgmentTab;
+    private String joRepaymentSummaryObject;
 
     private final TransferCaseDetails transferCaseDetails;
 
@@ -1551,5 +1574,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isClaimantDontWantToProceedWithFulLDefenceFD() {
         return this.isClaimBeingDisputed()
             && this.hasApplicantNotProceededWithClaim();
+    }
+
+    @JsonIgnore
+    public boolean isLipCase() {
+        return this.isApplicant1NotRepresented() || this.isRespondent1LiP();
     }
 }

@@ -53,11 +53,11 @@ public class HearingUtils {
     public static String getHearingType(CaseData caseData) {
         switch (caseData.getChannel()) {
             case IN_PERSON:
-                return caseData.getHearingLocation().getValue().getLabel();
+                return "in person";
             case VIDEO:
-                return "video conference";
+                return "by video conference";
             case TELEPHONE:
-                return "telephone";
+                return "by telephone";
             default:
                 return "not defined";
         }

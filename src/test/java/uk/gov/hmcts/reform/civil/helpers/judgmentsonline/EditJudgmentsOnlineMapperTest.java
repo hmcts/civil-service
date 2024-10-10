@@ -2,10 +2,7 @@ package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
@@ -18,9 +15,13 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
@@ -29,25 +30,18 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
 public class EditJudgmentsOnlineMapperTest {
 
-    @InjectMocks
-    private EditJudgmentOnlineMapper editJudgmentOnlineMapper;
-    @InjectMocks
-    private RecordJudgmentOnlineMapper recordJudgmentMapper;
-    @InjectMocks
-    private JudgmentByAdmissionOnlineMapper judgmentByAdmissionMapper;
-    @MockBean
+    private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
+    private EditJudgmentOnlineMapper editJudgmentOnlineMapper = new EditJudgmentOnlineMapper();
+    private RecordJudgmentOnlineMapper recordJudgmentMapper = new RecordJudgmentOnlineMapper(addressMapper);
+    private JudgmentByAdmissionOnlineMapper judgmentByAdmissionMapper = new JudgmentByAdmissionOnlineMapper(addressMapper);
     private Time time;
-    @Mock
-    private InterestCalculator interestCalculator;
-    @InjectMocks
-    private DefaultJudgmentOnlineMapper defaultJudgmentMapper;
+    private InterestCalculator interestCalculator = new InterestCalculator(time);
+    private DefaultJudgmentOnlineMapper defaultJudgmentMapper = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
 
     @Test
     void testIfActiveJudgmentIsnullIfnotSet() {
@@ -82,6 +76,9 @@ public class EditJudgmentsOnlineMapperTest {
         assertEquals("Mr. Sole Trader", activeJudgment.getDefendant1Name());
         assertNotNull(activeJudgment.getDefendant1Dob());
         assertNotNull(activeJudgment.getDefendant1Address());
+
+        assertEquals("Mr. Sole Trader", caseData.getJoDefendantName1());
+        assertEquals(PaymentPlanSelection.PAY_IMMEDIATELY, caseData.getJoPaymentPlanSelected());
     }
 
     @Test
@@ -112,9 +109,68 @@ public class EditJudgmentsOnlineMapperTest {
     }
 
     @Test
+    void testIfActiveJudgmentIsUpdated_PayInstallments() {
+
+        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+        caseData.setJoAmountCostOrdered(null);
+        caseData.setActiveJudgment(recordJudgmentMapper.addUpdateActiveJudgment(caseData));
+
+        JudgmentDetails activeJudgment = editJudgmentOnlineMapper.addUpdateActiveJudgment(caseData);
+
+        assertNotNull(activeJudgment);
+        assertEquals(JudgmentState.MODIFIED, activeJudgment.getState());
+        assertEquals("1200", activeJudgment.getOrderedAmount());
+        assertEquals("0", activeJudgment.getCosts());
+        assertEquals("1200", activeJudgment.getTotalAmount());
+        assertEquals(YesOrNo.YES, activeJudgment.getIsRegisterWithRTL());
+        assertEquals(LocalDate.of(2022, 12, 12), activeJudgment.getIssueDate());
+        assertEquals("0123", activeJudgment.getCourtLocation());
+        assertEquals(JudgmentType.JUDGMENT_FOLLOWING_HEARING, activeJudgment.getType());
+        assertEquals(YesOrNo.YES, activeJudgment.getIsJointJudgment());
+        assertEquals(1, activeJudgment.getJudgmentId());
+        assertEquals(caseData.getJoPaymentPlan(), activeJudgment.getPaymentPlan());
+        assertEquals("Mr. John Rambo", activeJudgment.getDefendant1Name());
+        assertNotNull(activeJudgment.getDefendant1Dob());
+        assertNotNull(activeJudgment.getDefendant1Address());
+
+        assertEquals("Mr. John Rambo", caseData.getJoDefendantName1());
+        assertEquals(PaymentPlanSelection.PAY_IN_INSTALMENTS, caseData.getJoPaymentPlanSelected());
+        assertEquals("120", caseData.getJoRepaymentAmount());
+        assertNotNull(caseData.getJoRepaymentStartDate());
+        assertEquals(PaymentFrequency.MONTHLY, caseData.getJoRepaymentFrequency());
+    }
+
+    @Test
+    void testIfActiveJudgmentIsUpdated_PayByDate() {
+
+        CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
+        caseData.setJoAmountCostOrdered(null);
+        caseData.setActiveJudgment(recordJudgmentMapper.addUpdateActiveJudgment(caseData));
+
+        JudgmentDetails activeJudgment = editJudgmentOnlineMapper.addUpdateActiveJudgment(caseData);
+
+        assertNotNull(activeJudgment);
+        assertEquals(JudgmentState.MODIFIED, activeJudgment.getState());
+        assertEquals("1200", activeJudgment.getOrderedAmount());
+        assertEquals("0", activeJudgment.getCosts());
+        assertEquals("1200", activeJudgment.getTotalAmount());
+        assertEquals(YesOrNo.YES, activeJudgment.getIsRegisterWithRTL());
+        assertEquals(LocalDate.of(2022, 12, 12), activeJudgment.getIssueDate());
+        assertEquals("0123", activeJudgment.getCourtLocation());
+        assertEquals(JudgmentType.JUDGMENT_FOLLOWING_HEARING, activeJudgment.getType());
+        assertEquals(YesOrNo.YES, activeJudgment.getIsJointJudgment());
+        assertEquals(1, activeJudgment.getJudgmentId());
+        assertEquals(caseData.getJoPaymentPlan(), activeJudgment.getPaymentPlan());
+        assertEquals("The Organisation", activeJudgment.getDefendant1Name());
+        assertNotNull(activeJudgment.getDefendant1Address());
+
+        assertEquals("The Organisation", caseData.getJoDefendantName1());
+        assertEquals(PaymentPlanSelection.PAY_BY_DATE, caseData.getJoPaymentPlanSelected());
+    }
+
+    @Test
     void testIfDefaultActiveJudgmentIsUpdated_scenario2() {
 
-        when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(BigDecimal.ZERO);
         CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case();
         caseData.setJoAmountCostOrdered(null);
         caseData.setActiveJudgment(defaultJudgmentMapper.addUpdateActiveJudgment(caseData));
@@ -151,6 +207,7 @@ public class EditJudgmentsOnlineMapperTest {
     void testIfJudgmentByAdmission_scenario3() {
 
         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+            .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(140))
             .ccjPaymentPaidSomeOption(YesOrNo.YES)
             .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(10))
             .ccjJudgmentTotalStillOwed(BigDecimal.valueOf(150))
