@@ -198,7 +198,7 @@ class PaymentRequestUpdateCallbackServiceTest {
     @Test
     void shouldNotCallUpdatePaymentServiceWhenLipVLipAndHearingFeeDetailsAreNotNull() {
         CaseData caseData = buildCaseData(CaseState.CASE_PROGRESSION, BusinessProcessStatus.READY,
-                                          BUSINESS_PROCESS, new PaymentDetails()).toBuilder().applicant1Represented(YesOrNo.NO).respondent1Represented(YesOrNo.NO).build();
+                                          BUSINESS_PROCESS, PaymentDetails.builder().status(PaymentStatus.SUCCESS).build()).toBuilder().applicant1Represented(YesOrNo.NO).respondent1Represented(YesOrNo.NO).build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
