@@ -202,7 +202,8 @@ class PaymentRequestUpdateCallbackServiceTest {
 
     @Test
     void shouldProceed_WhenClaimIssue_PaymentNull() {
-        CaseData caseData = buildCaseData(CaseState.CASE_PROGRESSION, BusinessProcessStatus.READY, BUSINESS_PROCESS, null);
+        CaseData caseData = buildCaseData(CaseState.CASE_PROGRESSION, BusinessProcessStatus.READY, BUSINESS_PROCESS, null)
+            .toBuilder().claimIssuedPaymentDetails(null).build();
         caseData = caseData.toBuilder().applicant1Represented(YesOrNo.NO).respondent1Represented(YesOrNo.NO).build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
