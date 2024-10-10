@@ -1306,7 +1306,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .generalAppType(GAApplicationType.builder()
             .types(singletonList(CONFIRM_CCJ_DEBT_PAID))
             .build()).build();
-
+        data.getGeneralAppHearingDetails().getHearingPreferredLocation().setValue(null);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(getSampleCourLocationsRefObjectPostSdo());
         when(featureToggleService.isCoSCEnabled()).thenReturn(true);
         CaseData result = service.buildCaseData(data.toBuilder(), data, UserDetails.builder()

@@ -326,7 +326,8 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             caseData = newCaseData;
         }
 
-        if (caseData.getGeneralAppHearingDetails().getHearingPreferredLocation() != null && !isCoScApplicationType(caseData)) {
+        if (caseData.getGeneralAppHearingDetails().getHearingPreferredLocation() != null
+             && Objects.nonNull(caseData.getGeneralAppHearingDetails().getHearingPreferredLocation().getValue())) {
             List<String> applicationLocationList = List.of(caseData.getGeneralAppHearingDetails()
                                                                .getHearingPreferredLocation()
                                                                .getValue().getLabel());
@@ -392,8 +393,4 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         return !stateAfterJudicialReferral.contains(state);
     }
 
-    private boolean isCoScApplicationType(CaseData caseData) {
-        var generalAppTypes = caseData.getGeneralAppType().getTypes();
-        return featureToggleService.isCoSCEnabled() && generalAppTypes.contains(GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID);
-    }
 }
