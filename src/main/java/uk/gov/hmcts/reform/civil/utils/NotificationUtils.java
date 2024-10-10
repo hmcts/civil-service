@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.civil.utils;
 
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
@@ -56,7 +56,8 @@ public class NotificationUtils {
             || getMultiPartyScenario(caseData).equals(TWO_V_ONE);
     }
 
-    public static Map<String, String> caseOfflineNotificationAddProperties(CaseData caseData) {
+    public static Map<String, String> caseOfflineNotificationAddProperties(
+        CaseData caseData) {
         if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
@@ -87,12 +88,8 @@ public class NotificationUtils {
                     ? caseData.getRespondent1ClaimResponseTypeForSpec().getDisplayedValue()
                     : caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
                 RESPONDENT_TWO_RESPONSE, SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-                    ? (caseData.getRespondent2ClaimResponseTypeForSpec() != null
                     ? caseData.getRespondent2ClaimResponseTypeForSpec().getDisplayedValue()
-                    : "N/A")
-                    : (caseData.getRespondent2ClaimResponseType() != null
-                    ? caseData.getRespondent2ClaimResponseType().getDisplayedValue()
-                    : "N/A"),
+                    : caseData.getRespondent2ClaimResponseType().getDisplayedValue(),
                 PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
         }
