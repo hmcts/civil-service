@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PA
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 
 @Slf4j
@@ -36,8 +37,6 @@ public class PaymentRequestUpdateCallbackService {
     private final CoreCaseDataService coreCaseDataService;
     private final ObjectMapper objectMapper;
     private final UpdatePaymentStatusService updatePaymentStatusService;
-
-    private CaseData data;
 
     public void processCallback(ServiceRequestUpdateDto serviceRequestUpdateDto, String feeType) {
         log.info("Processing the callback for the caseId {} with status {}", serviceRequestUpdateDto.getCcdCaseNumber(),
@@ -53,18 +52,28 @@ public class PaymentRequestUpdateCallbackService {
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
             if (feeType.equals(FeeType.HEARING.name()) || feeType.equals(FeeType.CLAIMISSUED.name())) {
                 if (caseData.isLipvLipOneVOne()) {
-                    if ((feeType.equals(FeeType.HEARING.name()) && caseData.getHearingFeePaymentDetails() == null)
-                        || (feeType.equals(FeeType.CLAIMISSUED.name()) && caseData.getClaimIssuedPaymentDetails() == null)) {
+                    if (isValidUpdateHearing(feeType, caseData) || isValidUpdateClaimIssue(feeType, caseData)) {
                         updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
                         CardPaymentStatusResponse cardPaymentStatusResponse = getCardPaymentStatusResponse(serviceRequestUpdateDto);
                         updatePaymentStatusService.updatePaymentStatus(FeeType.valueOf(feeType), serviceRequestUpdateDto.getCcdCaseNumber(), cardPaymentStatusResponse);
                     }
                 } else {
+                    log.info("Not lip 1v1 for case {}", serviceRequestUpdateDto.getCcdCaseNumber());
                     caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
                     createEvent(caseData, serviceRequestUpdateDto.getCcdCaseNumber(), feeType);
                 }
             }
         }
+    }
+
+    private static boolean isValidUpdateHearing(String feeType, CaseData caseData) {
+        return feeType.equals(FeeType.HEARING.name()) && (caseData.getHearingFeePaymentDetails() == null || caseData.getHearingFeePaymentDetails().getStatus().equals(
+            FAILED));
+    }
+
+    private static boolean isValidUpdateClaimIssue(String feeType, CaseData caseData) {
+        return feeType.equals(FeeType.CLAIMISSUED.name()) && (caseData.getClaimIssuedPaymentDetails() == null || caseData.getClaimIssuedPaymentDetails().getStatus().equals(
+            FAILED));
     }
 
     private CardPaymentStatusResponse getCardPaymentStatusResponse(ServiceRequestUpdateDto serviceRequestUpdateDto) {

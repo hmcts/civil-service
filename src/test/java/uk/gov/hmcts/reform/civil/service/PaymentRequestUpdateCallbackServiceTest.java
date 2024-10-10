@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -118,6 +119,21 @@ class PaymentRequestUpdateCallbackServiceTest {
     }
 
     @Test
+    void shouldStartAndSubmitEventWithCaseDetailsForClaimIssuedAndPreviousFail() {
+        CaseData caseData = buildCaseData(CaseState.PENDING_CASE_ISSUED, null, null, null).toBuilder()
+            .claimIssuedPaymentDetails(PaymentDetails.builder().status(PaymentStatus.FAILED).build()).caseAccessCategory(SPEC_CLAIM).build();
+        CaseDetails caseDetails = buildCaseDetails(caseData);
+
+        setupMocks(caseDetails, caseData, CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT);
+
+        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), FeeType.CLAIMISSUED.name());
+
+        verify(coreCaseDataService).getCase(CASE_ID);
+        verify(coreCaseDataService).startUpdate(any(), any());
+        verify(coreCaseDataService).submitUpdate(any(), any());
+    }
+
+    @Test
     void shouldStartAndSubmitEventWithCaseDetailsForClaimIssued() {
         CaseData caseData = buildCaseData(CaseState.PENDING_CASE_ISSUED, null, null, null).toBuilder().caseAccessCategory(SPEC_CLAIM).build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
@@ -144,6 +160,7 @@ class PaymentRequestUpdateCallbackServiceTest {
         verify(coreCaseDataService).getCase(CASE_ID);
         verify(coreCaseDataService).startUpdate(any(), any());
         verify(coreCaseDataService).submitUpdate(any(), any());
+        verify(updatePaymentStatusService).updatePaymentStatus(any(), any(), any());
     }
 
     @Test
