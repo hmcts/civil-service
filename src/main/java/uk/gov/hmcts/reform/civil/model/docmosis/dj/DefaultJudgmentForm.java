@@ -36,4 +36,31 @@ public class DefaultJudgmentForm implements MappableObject {
     private final String repaymentDate;
     private final String paymentStr;
     private final String installmentAmount;
+
+    @Override
+    public String toString() {
+        return "DefaultJudgmentForm{" +
+            "caseNumber='" + caseNumber + '\'' +
+            ", applicant=" + applicant +
+            ", applicantReference='" + applicantReference + '\'' +
+            ", respondentReference='" + respondentReference + '\'' +
+            ", respondent=" + respondent +
+            ", formText='" + formText + '\'' +
+            ", claimantLR=" + claimantLR +
+            ", debt='" + debt + '\'' +
+            ", costs='" + costs + '\'' +
+            ", totalCost='" + totalCost + '\'' +
+            ", respondent1Name='" + respondent1Name + '\'' +
+            ", respondent2Name='" + respondent2Name + '\'' +
+            ", respondent1Ref='" + respondent1Ref + '\'' +
+            ", respondent2Ref='" + respondent2Ref + '\'' +
+            ", applicantDetails=" + applicantDetails +
+            ", paymentPlan='" + paymentPlan + '\'' +
+            ", payByDate='" + payByDate + '\'' +
+            ", repaymentFrequency='" + repaymentFrequency + '\'' +
+            ", repaymentDate='" + repaymentDate + '\'' +
+            ", paymentStr='" + paymentStr + '\'' +
+            ", installmentAmount='" + installmentAmount + '\'' +
+            '}';
+    }
 }

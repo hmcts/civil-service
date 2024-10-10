@@ -314,7 +314,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
 
     private List<CaseDocument> generateDocmosisDocsForNonDivergent(List<DefaultJudgmentForm> defaultJudgmentForms,
                                                    String authorisation, CaseData caseData, String event) {
-        log.info("defaultJudgmentForms generateDocmosisDocsForNonDivergent {}", defaultJudgmentForms);
+        log.info("defaultJudgmentForms generateDocmosisDocsForNonDivergent {}", defaultJudgmentForms.toString());
         List<CaseDocument> caseDocuments = new ArrayList<>();
         for (int i = 0; i < defaultJudgmentForms.size(); i++) {
             DefaultJudgmentForm defaultJudgmentForm = defaultJudgmentForms.get(i);
