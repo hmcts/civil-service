@@ -278,6 +278,43 @@ public class NotificationDefendantOfHearingHandlerTest {
         }
 
         @Test
+        void shouldNotifyRespondentLip_whenInvokedAnd1v1HMC() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .hearingDate(LocalDate.of(2023, 05, 17))
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
+                .addApplicant2(YesOrNo.NO)
+                .addRespondent2(YesOrNo.NO)
+                .applicant1(Party.builder().partyName("John").partyEmail("applicant1@example.com").type(Party.Type.INDIVIDUAL).build())
+                .respondent1(Party.builder().partyName("Mark").partyEmail("respondent1@example.com").type(Party.Type.INDIVIDUAL).build())
+                .hearingReferenceNumber("000HN001")
+                .businessProcess(BusinessProcess.builder().processInstanceId("").build())
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT1_HEARING_HMC").build()).build();
+            // When
+            when(hearingNoticeCamundaService.getProcessVariables(any()))
+                .thenReturn(uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables.builder()
+                                .hearingStartDateTime(java.time.LocalDateTime.of(
+                                    LocalDate.of(2022, 10, 7),
+                                    java.time.LocalTime.of(13, 0)
+                                ))
+                                .hearingId("123456")
+                                .build());
+            when(notificationsProperties.getHearingNotificationLipDefendantTemplate())
+                .thenReturn("test-template-defendant-lip-id");
+            handler.handle(params);
+            // Then
+            verify(notificationService).sendMail(
+                "respondent1@example.com",
+                "test-template-defendant-lip-id",
+                getNotificationLipHmcDataMap(caseData),
+                "notification-of-hearing-lip-123456"
+            );
+        }
+
+        @Test
         void shouldNotifyRespondentSolicitorLipInWelsh_whenInvokedAnd1v1() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
@@ -529,6 +566,14 @@ public class NotificationDefendantOfHearingHandlerTest {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 "hearingDate", "17-05-2023", "hearingTime", "11:00am"
+            );
+        }
+
+        @NotNull
+        private Map<String, String> getNotificationLipHmcDataMap(CaseData caseData) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                "hearingDate", "17-05-2023", "hearingTime", "01:00pm"
             );
         }
 
