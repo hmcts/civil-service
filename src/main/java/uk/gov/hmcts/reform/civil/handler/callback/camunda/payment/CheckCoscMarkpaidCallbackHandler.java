@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.payment;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -10,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.ConfirmOrderGivesPermission;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.time.LocalDateTime;
@@ -28,6 +30,7 @@ public class CheckCoscMarkpaidCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = singletonList(CHECK_PAID_IN_FULL_SCHED_DEADLINE);
     private final ObjectMapper objectMapper;
+    private final RuntimeService runTimeService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -46,10 +49,16 @@ public class CheckCoscMarkpaidCallbackHandler extends CallbackHandler {
 
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
-
+        boolean isJudgmentMarkedPaidInFull = true;
         if (caseData.getActiveJudgment() == null || caseData.getActiveJudgment().getFullyPaymentMadeDate() == null) {
             caseData.setCoscSchedulerDeadline(LocalDateTime.now().plusDays(30));
+            isJudgmentMarkedPaidInFull = false;
         }
+
+        runTimeService.setVariable(
+            caseData.getBusinessProcess().getProcessInstanceId(),
+            "isJudgmentMarkedPaidInFull",
+            isJudgmentMarkedPaidInFull);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
