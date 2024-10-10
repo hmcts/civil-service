@@ -10,8 +10,11 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAParties;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
@@ -51,7 +54,8 @@ public class InitiateGeneralApplicationServiceHelper {
     private static final String LIP_URGENT_REASON = "There is a hearing on the main case within 10 days";
 
     public GeneralApplication setRespondentDetailsIfPresent(GeneralApplication generalApplication,
-                                                            CaseData caseData, UserDetails userDetails) {
+                                                            CaseData caseData, UserDetails userDetails,
+                                                            GeneralAppFeesService feesService) {
         if (caseData.getApplicant1OrganisationPolicy() == null
             || caseData.getRespondent1OrganisationPolicy() == null
             || (YES.equals(caseData.getAddRespondent2()) && caseData.getRespondent2OrganisationPolicy() == null)) {
@@ -123,13 +127,16 @@ public class InitiateGeneralApplicationServiceHelper {
             .parentClaimantIsApplicant(isGAApplicantSameAsParentCaseClaimant
                                            ? YES
                                            : NO).build();
-        checkLipUrgency(isGaAppSameAsParentCaseClLip, applicationBuilder, caseData);
+        checkLipUrgency(isGaAppSameAsParentCaseClLip, applicationBuilder,
+                        generalApplication, caseData, feesService);
         return applicationBuilder.build();
     }
 
     private void checkLipUrgency(Boolean isGaAppSameAsParentCaseClLip,
                                  GeneralApplication.GeneralApplicationBuilder applicationBuilder,
-                                 CaseData caseData) {
+                                 GeneralApplication generalApplication,
+                                 CaseData caseData,
+                                 GeneralAppFeesService feesService) {
         if (Objects.nonNull(isGaAppSameAsParentCaseClLip)
                 && Objects.nonNull(caseData.getHearingDate())
                 && LocalDate.now().plusDays(LIP_URGENT_DAYS).isAfter(caseData.getHearingDate())) {
@@ -146,6 +153,14 @@ public class InitiateGeneralApplicationServiceHelper {
                     .generalAppUrgency(NO)
                     .urgentAppConsiderationDate(caseData.getHearingDate())
                     .build());
+        }
+        //set main case hearing date as ga hearing date
+        if (Objects.nonNull(isGaAppSameAsParentCaseClLip) && Objects.nonNull(caseData.getHearingDate())) {
+            applicationBuilder
+                .generalAppHearingDate(GAHearingDateGAspec.builder().hearingScheduledDate(caseData.getHearingDate()).build());
+            Fee feeForGA = feesService.getFeeForGA(generalApplication, caseData.getHearingDate());
+            GAPbaDetails generalAppPBADetails = GAPbaDetails.builder().fee(feeForGA).build();
+            applicationBuilder.generalAppPBADetails(generalAppPBADetails);
         }
     }
 

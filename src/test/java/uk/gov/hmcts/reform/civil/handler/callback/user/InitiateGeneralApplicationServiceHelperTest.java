@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,12 +17,14 @@ import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceHelper;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
@@ -42,6 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.CLAIMANT;
@@ -78,6 +82,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
     @Mock
     protected IdamClient idamClient;
+    @Mock
+    private GeneralAppFeesService feesService;
 
     private static final String TEST_USER_EMAILID = "test@gmail.com";
     public static final String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
@@ -189,6 +195,11 @@ public class InitiateGeneralApplicationServiceHelperTest {
         );
     }
 
+    @BeforeEach
+    public void setUp() {
+        lenient().when(feesService.getFeeForGA(any(GeneralApplication.class), any())).thenReturn(Fee.builder().build());
+    }
+
     @Test
     void shouldReturnsFourRespondents() {
         when(caseAssignmentApi.getUserRoles(any(), any(), any()))
@@ -199,7 +210,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .setRespondentDetailsIfPresent(
                         GeneralApplication.builder().build(),
                         getTestCaseData(CaseData.builder().build(), true, null),
-                        getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT)
+                        getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
+                        feesService
                 );
 
         assertThat(result).isNotNull();
@@ -229,7 +241,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .setRespondentDetailsIfPresent(
                         GeneralApplication.builder().build(),
                         getTestCaseData(CaseData.builder().build(), true, null),
-                        getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT)
+                        getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
+                        feesService
                 ));
 
     }
@@ -243,7 +256,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                         .setRespondentDetailsIfPresent(
                                 GeneralApplication.builder().build(),
                                 CaseData.builder().ccdCaseReference(1234L).build(),
-                                getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT)
+                                getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
+                                feesService
                         )
         );
 
@@ -261,7 +275,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                         .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
                                         .respondent2(Party.builder().type(COMPANY).companyName("Respondent1").build())
                                         .applicant1OrganisationPolicy(OrganisationPolicy.builder().build()).build(),
-                                getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT)
+                                getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
+                                feesService
                         )
         );
 
@@ -281,7 +296,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                         .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
                                         .respondent2(Party.builder().type(COMPANY).companyName("Respondent1").build())
                                         .applicant1OrganisationPolicy(OrganisationPolicy.builder().build()).build(),
-                                getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT)
+                                getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
+                                feesService
                         )
         );
     }
@@ -317,7 +333,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                 .organisation(Organisation.builder().organisationID("201").build())
                                 .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
                                 .build()).build(),
-                getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT)
+                getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
+                feesService
         );
 
         assertDoesNotThrow(() -> helper);
@@ -358,7 +375,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                 .organisation(Organisation.builder().organisationID("201").build())
                                 .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
                                 .build()).build(),
-                getUserDetails("2", APPLICANT_EMAIL_ID_CONSTANT)
+                getUserDetails("2", APPLICANT_EMAIL_ID_CONSTANT),
+                feesService
         );
 
         assertDoesNotThrow(() -> helper);
@@ -399,7 +417,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                 .organisation(Organisation.builder().organisationID("201").build())
                                 .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
                                 .build()).build(),
-                getUserDetails("3", APPLICANT_EMAIL_ID_CONSTANT)
+                getUserDetails("3", APPLICANT_EMAIL_ID_CONSTANT),
+                feesService
         );
 
         assertDoesNotThrow(() -> helper);
@@ -441,7 +460,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                 .build())
                         .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
                         .build(),
-                getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT)
+                getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
+                feesService
         );
 
         assertDoesNotThrow(() -> helper);
@@ -491,7 +511,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                         .respondent1(Party.builder().type(COMPANY).companyName("Respondent1").build())
                         .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
                         .build(),
-                getUserDetails("1", RESPONDENT_EMAIL_ID_CONSTANT)
+                getUserDetails("1", RESPONDENT_EMAIL_ID_CONSTANT),
+                feesService
         );
 
         assertDoesNotThrow(() -> helper);
@@ -552,7 +573,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                 .build())
                         .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
                         .build(),
-                getUserDetails("2", TEST_USER_EMAILID)
+                getUserDetails("2", TEST_USER_EMAILID),
+                feesService
         );
 
         assertDoesNotThrow(() -> helper);
@@ -612,7 +634,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                     .setRespondentDetailsIfPresent(
                             GeneralApplication.builder().build(),
                             caseDataBuilder.build(),
-                            getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT)
+                            getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
+                            feesService
                     );
 
             assertThat(result).isNotNull();
@@ -662,7 +685,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                     .setRespondentDetailsIfPresent(
                             GeneralApplication.builder().build(),
                             caseDataBuilder.build(),
-                            getUserDetails(STRING_NUM_CONSTANT, RESPONDENT_EMAIL_ID_CONSTANT)
+                            getUserDetails(STRING_NUM_CONSTANT, RESPONDENT_EMAIL_ID_CONSTANT),
+                            feesService
                     );
 
             assertThat(result).isNotNull();
@@ -701,7 +725,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                     .setRespondentDetailsIfPresent(
                             GeneralApplication.builder().build(),
                             caseDataBuilder.build(),
-                            getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT)
+                            getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
+                            feesService
                     );
 
             assertThat(result).isNotNull();
@@ -741,7 +766,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                     .setRespondentDetailsIfPresent(
                             GeneralApplication.builder().build(),
                             caseDataBuilder.build(),
-                            getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT)
+                            getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
+                            feesService
                     );
 
             assertThat(result).isNotNull();
@@ -781,7 +807,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                     .setRespondentDetailsIfPresent(
                             GeneralApplication.builder().build(),
                             caseDataBuilder.build(),
-                            getUserDetails(CL_LIP_USER_ID, APPLICANT_EMAIL_ID_CONSTANT)
+                            getUserDetails(CL_LIP_USER_ID, APPLICANT_EMAIL_ID_CONSTANT),
+                            feesService
                     );
 
             assertThat(result).isNotNull();
@@ -822,7 +849,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                     .setRespondentDetailsIfPresent(
                             GeneralApplication.builder().build(),
                             caseData,
-                            getUserDetails(CL_LIP_USER_ID, APPLICANT_EMAIL_ID_CONSTANT)
+                            getUserDetails(CL_LIP_USER_ID, APPLICANT_EMAIL_ID_CONSTANT),
+                            feesService
                     );
 
             assertThat(result).isNotNull();
@@ -869,7 +897,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .setRespondentDetailsIfPresent(
                     GeneralApplication.builder().build(),
                     caseData,
-                    getUserDetails(CL_LIP_USER_ID, APPLICANT_EMAIL_ID_CONSTANT)
+                    getUserDetails(CL_LIP_USER_ID, APPLICANT_EMAIL_ID_CONSTANT),
+                    feesService
                 );
 
             assertThat(result).isNotNull();
@@ -907,7 +936,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                     .setRespondentDetailsIfPresent(
                             GeneralApplication.builder().build(),
                             caseDataBuilder.build(),
-                            getUserDetails(CL_LIP_USER_ID, APPLICANT_EMAIL_ID_CONSTANT)
+                            getUserDetails(CL_LIP_USER_ID, APPLICANT_EMAIL_ID_CONSTANT),
+                            feesService
                     );
 
             assertThat(result).isNotNull();
