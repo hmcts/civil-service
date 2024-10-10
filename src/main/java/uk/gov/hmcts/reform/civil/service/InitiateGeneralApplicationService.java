@@ -254,7 +254,7 @@ public class InitiateGeneralApplicationService {
                 applicationBuilder.generalAppSubmittedDateGAspec(time.now());
             }
         }
-
+        applicationBuilder.caseNameGaInternal(caseData.getCaseNameHmctsInternal());
         return helper.setRespondentDetailsIfPresent(applicationBuilder.build(), caseData, userDetails, feesService);
     }
 

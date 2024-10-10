@@ -6131,6 +6131,36 @@ public class CaseDataBuilder {
             .joIsRegisteredWithRTL(YES).build();
     }
 
+    public CaseData buildJudmentOnlineCaseDataWithPaymentImmediatelyWithOldAddress() {
+        return build().toBuilder()
+            .ccdState(All_FINAL_ORDERS_ISSUED)
+            .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
+            .joAmountOrdered("1200")
+            .joAmountCostOrdered("1100")
+            .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
+            .joOrderMadeDate(LocalDate.of(2022, 12, 12))
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .individualTitle("Mr.")
+                             .individualFirstName("Alex")
+                             .individualLastName(
+                                 "Richards Extra long name which exceeds 70 characters need to be trimmed down")
+                             .partyName(
+                                 "Mr. Alex Richards Extra long name which exceeds 70 characters need to be trimmed down")
+                             .partyEmail("respondent1@gmail.com")
+                             .primaryAddress(Address.builder()
+                                                 .addressLine1("Line 1 test again for more than 35 characters")
+                                                 .addressLine2("Line 1 test again for more than 35 characters")
+                                                 .addressLine3("Line 1 test again for more than 35 characters")
+                                                 .county("Line 1 test again for more than 35 characters")
+                                                 .postCode("Line 1 test again for more than 35 characters")
+                                                 .postTown("Line 1 test again for more than 35 characters")
+                                                 .build())
+                             .build())
+            .joIsRegisteredWithRTL(YES).build();
+    }
+
     public CaseData buildJudgmentOnlineCaseDataWithPaymentByDate() {
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
