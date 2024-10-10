@@ -3,21 +3,13 @@ package uk.gov.hmcts.reform.civil.utils;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
-import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
-import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
-import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
-import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestType;
-import uk.gov.hmcts.reform.civil.service.CoreCaseEventDataService;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.Objects;
 
 import static java.math.BigDecimal.ZERO;
@@ -30,9 +22,14 @@ public class InterestCalculator {
 
     public static final int TO_FULL_PENNIES = 2;
     protected static final BigDecimal EIGHT_PERCENT_INTEREST_RATE = valueOf(8);
+    private static final String FROM_CLAIM_SUBMIT_DATE = "FROM_CLAIM_SUBMIT_DATE";
+    private static final String FROM_SPECIFIC_DATE = "FROM_A_SPECIFIC_DATE";
+    private static final String UNTIL_CLAIM_SUBMIT_DATE = "UNTIL_CLAIM_SUBMIT_DATE";
     public static final BigDecimal NUMBER_OF_DAYS_IN_YEAR = new BigDecimal(365L);
-
-    private final CoreCaseEventDataService coreCaseEventDataService;
+    protected static final String SAME_RATE_INTEREST = "SAME_RATE_INTEREST";
+    protected static final String SAME_RATE_INTEREST_8_PC = "SAME_RATE_INTEREST_8_PC";
+    protected static final String SAME_RATE_INTEREST_DIFFERENT_RATE = "SAME_RATE_INTEREST_DIFFERENT_RATE";
+    protected static final String BREAK_DOWN_INTEREST = "BREAK_DOWN_INTEREST";
 
     public BigDecimal calculateInterest(CaseData caseData) {
         return this.calculateInterest(caseData, getToDate(caseData));
@@ -41,17 +38,17 @@ public class InterestCalculator {
     private BigDecimal calculateInterest(CaseData caseData, LocalDate interestToDate) {
         BigDecimal interestAmount = ZERO;
         if (caseData.getClaimInterest() == YesOrNo.YES) {
-            if (caseData.getInterestClaimOptions().equals(InterestClaimOptions.SAME_RATE_INTEREST)) {
-                if (caseData.getSameRateInterestSelection().getSameRateInterestType()
-                    .equals(SameRateInterestType.SAME_RATE_INTEREST_8_PC)) {
+            if (caseData.getInterestClaimOptions().name().equals(SAME_RATE_INTEREST)) {
+                if (caseData.getSameRateInterestSelection().getSameRateInterestType().name()
+                    .equals(SAME_RATE_INTEREST_8_PC)) {
                     interestAmount = calculateInterestAmount(caseData, EIGHT_PERCENT_INTEREST_RATE, interestToDate);
                 }
-                if (caseData.getSameRateInterestSelection().getSameRateInterestType()
-                    .equals(SameRateInterestType.SAME_RATE_INTEREST_DIFFERENT_RATE)) {
+                if (caseData.getSameRateInterestSelection().getSameRateInterestType().name()
+                    .equals(SAME_RATE_INTEREST_DIFFERENT_RATE)) {
                     interestAmount = calculateInterestAmount(caseData,
                         caseData.getSameRateInterestSelection().getDifferentRate(), interestToDate);
                 }
-            } else if (caseData.getInterestClaimOptions().equals(InterestClaimOptions.BREAK_DOWN_INTEREST)) {
+            } else if (caseData.getInterestClaimOptions().name().equals(BREAK_DOWN_INTEREST)) {
                 interestAmount = caseData.getBreakDownInterestTotal();
             }
         }
@@ -59,10 +56,10 @@ public class InterestCalculator {
     }
 
     private BigDecimal calculateInterestAmount(CaseData caseData, BigDecimal interestRate, LocalDate interestToDate) {
-        if (caseData.getInterestClaimFrom().equals(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)) {
+        if (caseData.getInterestClaimFrom().name().equals(FROM_CLAIM_SUBMIT_DATE)) {
             LocalDate interestFromDate = getIssuedDate(caseData);
             return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate, interestFromDate, interestToDate);
-        } else if (caseData.getInterestClaimFrom().equals(InterestClaimFromType.FROM_A_SPECIFIC_DATE)) {
+        } else if (caseData.getInterestClaimFrom().name().equals(FROM_SPECIFIC_DATE)) {
             return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate,
                 caseData.getInterestFromSpecificDate(), interestToDate);
         }
@@ -70,10 +67,8 @@ public class InterestCalculator {
     }
 
     private LocalDate getToDate(CaseData caseData) {
-        if (Objects.nonNull(caseData.getInterestClaimUntil()) && caseData.getInterestClaimUntil().equals(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE)) {
+        if (Objects.nonNull(caseData.getInterestClaimUntil()) && caseData.getInterestClaimUntil().name().equals(UNTIL_CLAIM_SUBMIT_DATE)) {
             return getIssuedDate(caseData);
-        } else if (Objects.nonNull(caseData.getInterestClaimUntil()) && caseData.getInterestClaimUntil().equals(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE)) {
-            return getDefaultJudgmentDate(caseData);
         }
         return LocalDate.now();
     }
@@ -106,39 +101,29 @@ public class InterestCalculator {
     }
 
     public String getInterestPerDayBreakdown(CaseData caseData) {
-        if (caseData.getInterestClaimOptions() == null || caseData.getInterestClaimOptions().equals(InterestClaimOptions.BREAK_DOWN_INTEREST)) {
+        if (caseData.getInterestClaimOptions() == null || caseData.getInterestClaimOptions().name().equals(BREAK_DOWN_INTEREST)) {
             return null;
         }
         StringBuilder description = new StringBuilder("Interest will accrue at the daily rate of £");
         BigDecimal interestPerDay = ZERO;
-        if (caseData.getInterestClaimOptions().equals(InterestClaimOptions.SAME_RATE_INTEREST)) {
-            if (caseData.getSameRateInterestSelection().getSameRateInterestType()
-                .equals(SameRateInterestType.SAME_RATE_INTEREST_8_PC)) {
+        if (caseData.getInterestClaimOptions().name().equals(SAME_RATE_INTEREST)) {
+            if (caseData.getSameRateInterestSelection().getSameRateInterestType().name()
+                .equals(SAME_RATE_INTEREST_8_PC)) {
                 interestPerDay = getInterestPerDay(caseData.getTotalClaimAmount(), EIGHT_PERCENT_INTEREST_RATE);
             }
-            if (caseData.getSameRateInterestSelection().getSameRateInterestType()
-                .equals(SameRateInterestType.SAME_RATE_INTEREST_DIFFERENT_RATE)) {
+            if (caseData.getSameRateInterestSelection().getSameRateInterestType().name()
+                .equals(SAME_RATE_INTEREST_DIFFERENT_RATE)) {
                 interestPerDay = getInterestPerDay(caseData.getTotalClaimAmount(), caseData.getSameRateInterestSelection().getDifferentRate());
             }
         }
         description.append(interestPerDay.setScale(2, RoundingMode.HALF_UP));
         description.append(" up to the date of ");
-        description.append(caseData.getInterestClaimUntil().equals(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE) ? "claim issue" : "judgment");
+        description.append(caseData.getInterestClaimUntil().name().equals(UNTIL_CLAIM_SUBMIT_DATE) ? "claim issue" : "judgment");
         return description.toString();
     }
 
     private LocalDate getIssuedDate(CaseData caseData) {
         return Objects.nonNull(caseData.getIssueDate()) ? caseData.getIssueDate() : LocalDate.now();
-    }
-
-    private LocalDate getDefaultJudgmentDate(CaseData caseData) {
-        List<CaseEventDetail> eventsForCase = coreCaseEventDataService.getEventsForCase(caseData.getCcdCaseReference().toString());
-        for (CaseEventDetail event : eventsForCase) {
-            if (event.getId().equals(CaseEvent.DEFAULT_JUDGEMENT_SPEC.name())) {
-                return event.getCreatedDate().toLocalDate();
-            }
-        }
-        return LocalDate.now();
     }
 
 }
