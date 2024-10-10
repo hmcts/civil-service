@@ -14,6 +14,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.BULK_CLAIM_EN
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.CASE_PROGRESSION_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.DASHBOARD_SERVICE_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.GENERAL_APPLICATION_ENABLED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.JO_ONLINE_LIVE_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseContainsLiP;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_SUBMITTED;
 
@@ -32,10 +33,11 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                 // camunda diagram for TAKE_CASE_OFFLINE is changed
                 Map.of(
                     FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true,
-                    GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
+                    GENERAL_APPLICATION_ENABLED.name(), switchTheGAFlagIfLipExists(c),
                     DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c),
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
-                    BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
+                    BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
+                    JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()
                 )))
             .moveTo(CLAIM_SUBMITTED)
             .onlyWhen(claimSubmittedTwoRegisteredRespondentRepresentatives
@@ -47,10 +49,11 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                 Map.of(
                     FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false,
                     FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true,
-                    GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
+                    GENERAL_APPLICATION_ENABLED.name(), switchTheGAFlagIfLipExists(c),
                     DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c),
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
-                    BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
+                    BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
+                    JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()
                 )))
             // Only one unrepresented defendant
             .moveTo(CLAIM_SUBMITTED)
@@ -58,10 +61,11 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
             .set((c, flags) -> flags.putAll(
                 Map.of(
                     FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
-                    GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
+                    GENERAL_APPLICATION_ENABLED.name(), switchTheGAFlagIfLipExists(c),
                     DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c),
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
-                    BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
+                    BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
+                    JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()
                 )))
             // Unrepresented defendant 1
             .moveTo(CLAIM_SUBMITTED)
@@ -72,10 +76,11 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                 Map.of(
                     FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
                     FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false,
-                    GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
+                    GENERAL_APPLICATION_ENABLED.name(), switchTheGAFlagIfLipExists(c),
                     DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c),
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
-                    BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
+                    BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
+                    JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()
                 )))
             // Unrepresented defendant 2
             .moveTo(CLAIM_SUBMITTED)
@@ -85,10 +90,11 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                 Map.of(
                     FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false,
                     FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
-                    GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
+                    GENERAL_APPLICATION_ENABLED.name(), switchTheGAFlagIfLipExists(c),
                     DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c),
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
-                    BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
+                    BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
+                    JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()
                 )))
             // Unrepresented defendants
             .moveTo(CLAIM_SUBMITTED)
@@ -98,10 +104,11 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                 Map.of(
                     FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
                     FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
-                    GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
+                    GENERAL_APPLICATION_ENABLED.name(), switchTheGAFlagIfLipExists(c),
                     DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c),
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
-                    BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
+                    BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
+                    JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()
                 )));
     }
 
@@ -160,5 +167,12 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
 
     public boolean isDashBoardEnabledForCase(CaseData caseData) {
         return featureToggleService.isDashboardEnabledForCase(caseData) && caseContainsLiP.test(caseData);
+    }
+
+    public boolean switchTheGAFlagIfLipExists(CaseData caseData) {
+        if (caseData.isLipCase()) {
+            return featureToggleService.isGaForLipsEnabled();
+        }
+        return featureToggleService.isGeneralApplicationsEnabled();
     }
 }

@@ -286,6 +286,7 @@ public class DashboardNotificationsParamsMapperTest {
                                 .state(ISSUED)
                                 .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_IN_INSTALMENTS).build())
                                 .orderedAmount("150001")
+                                .totalAmount("150001")
                                 .instalmentDetails(JudgmentInstalmentDetails.builder()
                                        .amount("20001")
                                        .paymentFrequency(paymentFrequency)
@@ -324,6 +325,7 @@ public class DashboardNotificationsParamsMapperTest {
                                 .state(ISSUED)
                                 .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_IMMEDIATELY).build())
                                 .orderedAmount("150001")
+                                .totalAmount("150001")
                                 .build())
             .build();;
 
@@ -351,6 +353,7 @@ public class DashboardNotificationsParamsMapperTest {
                                                  .paymentDeadlineDate(LocalDate.of(2050, Month.AUGUST, 19))
                                                  .build())
                                 .orderedAmount("150001")
+                                .totalAmount("150001")
                                 .build())
             .build();;
 

@@ -68,7 +68,7 @@ public class StitchingCompleteCallbackHandler extends CallbackHandler {
             }
         ));
 
-        if (featureToggleService.isCaseEventsEnabled()) {
+        if (featureToggleService.isAmendBundleEnabled()) {
             YesOrNo hasBundleErrors = getLatestBundle(caseData)
                 .map(bundle -> "FAILED".equalsIgnoreCase(bundle.getStitchStatus().orElse(null)) ? YesOrNo.YES : null)
                 .orElse(null);
