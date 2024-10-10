@@ -27,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.ccjRe
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.declinedMediation;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isClaimantNotSettleFullDefenceClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isClaimantSettleTheClaim;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isContainsLip;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isDefendantNotPaidFullDefenceClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLiPvLRCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLipCase;
@@ -215,7 +216,11 @@ public class StateFlowEngine implements IStateFlowEngine {
                 .onlyIf(claimSubmittedOneRespondentRepresentative.or(claimSubmitted1v1RespondentOneUnregistered))
                 .set((c, flags) -> {
                     flags.put(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true);
-                    flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    if (isContainsLip.test(c)) {
+                        flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGaForLipsEnabled());
+                    } else {
+                        flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    }
                     flags.put(DASHBOARD_SERVICE_ENABLED.name(), (featureToggleService.isDashboardEnabledForCase(c) && caseContainsLiP.test(c)));
                     flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
                     flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
@@ -230,7 +235,11 @@ public class StateFlowEngine implements IStateFlowEngine {
                     // camunda diagram for TAKE_CASE_OFFLINE is changed
                     flags.put(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false);
                     flags.put(FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true);
-                    flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    if (isContainsLip.test(c)) {
+                        flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGaForLipsEnabled());
+                    } else {
+                        flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    }
                     flags.put(DASHBOARD_SERVICE_ENABLED.name(), (featureToggleService.isDashboardEnabledForCase(c) && caseContainsLiP.test(c)));
                     flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
                     flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
@@ -241,7 +250,11 @@ public class StateFlowEngine implements IStateFlowEngine {
                 .onlyIf(claimSubmittedOneUnrepresentedDefendantOnly)
                 .set((c, flags) -> {
                     flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
-                    flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    if (isContainsLip.test(c)) {
+                        flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGaForLipsEnabled());
+                    } else {
+                        flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    }
                     flags.put(DASHBOARD_SERVICE_ENABLED.name(), (featureToggleService.isDashboardEnabledForCase(c) && caseContainsLiP.test(c)));
                     flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
                     flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
@@ -255,7 +268,11 @@ public class StateFlowEngine implements IStateFlowEngine {
                 .set((c, flags) -> {
                     flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
                     flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false);
-                    flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    if (isContainsLip.test(c)) {
+                        flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGaForLipsEnabled());
+                    } else {
+                        flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    }
                     flags.put(DASHBOARD_SERVICE_ENABLED.name(), (featureToggleService.isDashboardEnabledForCase(c) && caseContainsLiP.test(c)));
                     flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
                     flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
@@ -268,7 +285,11 @@ public class StateFlowEngine implements IStateFlowEngine {
                 .set((c, flags) -> {
                     flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false);
                     flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true);
-                    flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    if (isContainsLip.test(c)) {
+                        flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGaForLipsEnabled());
+                    } else {
+                        flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    }
                     flags.put(DASHBOARD_SERVICE_ENABLED.name(), (featureToggleService.isDashboardEnabledForCase(c) && caseContainsLiP.test(c)));
                     flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
                     flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
@@ -281,7 +302,11 @@ public class StateFlowEngine implements IStateFlowEngine {
                 .set((c, flags) -> {
                     flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
                     flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true);
-                    flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    if (isContainsLip.test(c)) {
+                        flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGaForLipsEnabled());
+                    } else {
+                        flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    }
                     flags.put(DASHBOARD_SERVICE_ENABLED.name(), (featureToggleService.isDashboardEnabledForCase(c) && caseContainsLiP.test(c)));
                     flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
                     flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
