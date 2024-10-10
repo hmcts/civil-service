@@ -52,7 +52,7 @@ public class PaymentRequestUpdateCallbackService {
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
             if (feeType.equals(FeeType.HEARING.name()) || feeType.equals(FeeType.CLAIMISSUED.name())) {
                 if (caseData.isLipvLipOneVOne()) {
-                    if (isValidUpdateHearing(feeType, caseData) || isValidUpdateClaimIssue(feeType, caseData)) {
+                    if (isValidPaymentUpdateHearing(feeType, caseData) || isValidUpdatePaymentClaimIssue(feeType, caseData)) {
                         updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
                         CardPaymentStatusResponse cardPaymentStatusResponse = getCardPaymentStatusResponse(serviceRequestUpdateDto);
                         updatePaymentStatusService.updatePaymentStatus(FeeType.valueOf(feeType), serviceRequestUpdateDto.getCcdCaseNumber(), cardPaymentStatusResponse);
@@ -66,12 +66,12 @@ public class PaymentRequestUpdateCallbackService {
         }
     }
 
-    private static boolean isValidUpdateHearing(String feeType, CaseData caseData) {
+    private static boolean isValidPaymentUpdateHearing(String feeType, CaseData caseData) {
         return feeType.equals(FeeType.HEARING.name()) && (caseData.getHearingFeePaymentDetails() == null || caseData.getHearingFeePaymentDetails().getStatus().equals(
             FAILED));
     }
 
-    private static boolean isValidUpdateClaimIssue(String feeType, CaseData caseData) {
+    private static boolean isValidUpdatePaymentClaimIssue(String feeType, CaseData caseData) {
         return feeType.equals(FeeType.CLAIMISSUED.name()) && (caseData.getClaimIssuedPaymentDetails() == null || caseData.getClaimIssuedPaymentDetails().getStatus().equals(
             FAILED));
     }
