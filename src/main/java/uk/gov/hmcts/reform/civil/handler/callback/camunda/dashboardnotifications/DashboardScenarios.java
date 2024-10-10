@@ -195,7 +195,9 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_DISMISS_CASE_CLAIMANT("Scenario.AAA6.CP.Case.Dismissed.Claimant"),
     SCENARIO_AAA6_DISMISS_CASE_DEFENDANT("Scenario.AAA6.CP.Case.Dismissed.Defendant"),
     SCENARIO_AAA6_CP_CASE_STAYED_CLAIMANT("Scenario.AAA6.CP.Case.Stayed.Claimant"),
-    SCENARIO_AAA6_CP_CASE_STAYED_DEFENDANT("Scenario.AAA6.CP.Case.Stayed.Defendant");
+    SCENARIO_AAA6_CP_CASE_STAYED_DEFENDANT("Scenario.AAA6.CP.Case.Stayed.Defendant"),
+    SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_APPLICANT("Scenario.AAA6.GeneralApps.ApplicationProceedsOffline.Applicant"),
+    SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_RESPONDENT("Scenario.AAA6.GeneralApps.ApplicationProceedsOffline.Respondent");
 
     private final String scenario;
 
