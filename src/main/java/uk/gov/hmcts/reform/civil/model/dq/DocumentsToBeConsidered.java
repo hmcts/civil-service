@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.civil.model.dq;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 @Data
-@SuperBuilder(toBuilder = true)
+@Builder(toBuilder = true)
 @AllArgsConstructor
 public class DocumentsToBeConsidered {
 
