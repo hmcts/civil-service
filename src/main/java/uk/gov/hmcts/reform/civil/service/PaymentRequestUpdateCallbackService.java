@@ -58,7 +58,6 @@ public class PaymentRequestUpdateCallbackService {
                         updatePaymentStatusService.updatePaymentStatus(FeeType.valueOf(feeType), serviceRequestUpdateDto.getCcdCaseNumber(), cardPaymentStatusResponse);
                     }
                 } else {
-                    log.info("Not lip 1v1 for case {}", serviceRequestUpdateDto.getCcdCaseNumber());
                     caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
                     createEvent(caseData, serviceRequestUpdateDto.getCcdCaseNumber(), feeType);
                 }
