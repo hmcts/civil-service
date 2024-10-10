@@ -362,6 +362,7 @@ public class CaseDataBuilder {
     protected String responseClaimTrack;
     protected CaseState ccdState;
     protected List<Element<CaseDocument>> systemGeneratedCaseDocuments;
+    protected List<Element<CaseDocument>> gaDraftDocument;
     protected PaymentDetails claimIssuedPaymentDetails;
     protected PaymentDetails paymentDetails;
     protected PaymentDetails hearingFeePaymentDetails;
@@ -2518,6 +2519,59 @@ public class CaseDataBuilder {
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID("QWERTY R").build())
             .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
+            .build();
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .organisation(Organisation.builder().organisationID("QWERTY R2").build())
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
+            .build();
+        respondentSolicitor1EmailAddress = "respondentsolicitor@example.com";
+        respondentSolicitor2EmailAddress = "respondentsolicitor2@example.com";
+        applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
+        applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.defaults().build();
+        applicantSolicitor1CheckEmail = CorrectEmail.builder().email("hmcts.civil@gmail.com").correct(YES).build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDraftLip() {
+        solicitorReferences = SolicitorReferences.builder()
+            .applicantSolicitor1Reference("12345")
+            .respondentSolicitor1Reference("6789")
+            .build();
+        courtLocation = CourtLocation.builder()
+            .applicantPreferredCourt("214320")
+            .applicantPreferredCourtLocationList(
+                DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
+            .caseLocation(CaseLocationCivil.builder()
+                              .region("10")
+                              .baseLocation("214320")
+                              .build())
+            .build();
+        uploadParticularsOfClaim = NO;
+        claimValue = ClaimValue.builder()
+            .statementOfValueInPennies(BigDecimal.valueOf(10000000))
+            .build();
+        claimType = ClaimType.PERSONAL_INJURY;
+        claimTypeUnSpec = ClaimTypeUnspec.CLINICAL_NEGLIGENCE;
+        personalInjuryType = ROAD_ACCIDENT;
+        applicantSolicitor1PbaAccounts = DynamicList.builder()
+            .value(DynamicListElement.builder().label("PBA0077597").build())
+            .build();
+        claimFee = Fee.builder()
+            .version("1")
+            .code("CODE")
+            .calculatedAmountInPence(BigDecimal.valueOf(100))
+            .build();
+        applicant1 = PartyBuilder.builder().individual().build().toBuilder().partyID("app-1-party-id").build();
+        respondent1 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-1-party-id").build();
+        respondent1Represented = YES;
+        respondent1OrgRegistered = YES;
+        respondent2OrgRegistered = YES;
+        applicant1OrganisationPolicy = OrganisationPolicy.builder()
+            .organisation(Organisation.builder().organisationID("QWERTY A").build())
+            .build();
+        respondent1OrganisationPolicy = OrganisationPolicy.builder()
+            .organisation(Organisation.builder().organisationID("QWERTY R").build())
+            .orgPolicyCaseAssignedRole("[DEFENDANT]")
             .build();
         respondent2OrganisationPolicy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID("QWERTY R2").build())
@@ -7827,6 +7881,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder judgmentPaidInFull(JudgmentPaidInFull judgmentPaidInFull) {
         this.judgmentPaidInFull = judgmentPaidInFull;
+        return this;
+    }
+
+    public CaseDataBuilder gaDraftDocument(List<Element<CaseDocument>> singletonList) {
+        this.gaDraftDocument = singletonList;
         return this;
     }
 }
