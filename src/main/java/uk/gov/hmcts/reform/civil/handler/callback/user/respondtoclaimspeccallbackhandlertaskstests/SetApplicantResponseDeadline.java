@@ -343,52 +343,6 @@ public class SetApplicantResponseDeadline implements CaseTask {
                 .build();
     }
 
-    private boolean isDefending(CaseData caseData) {
-        log.debug("Checking if the case is defending");
-        return FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || (caseData.getRespondent2ClaimResponseTypeForSpec() != null && FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))
-            || PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || (caseData.getRespondent2ClaimResponseTypeForSpec() != null && PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()));
-    }
-
-    private boolean ifResponseTypeIsPartOrFullAdmission(CaseData caseData) {
-        return (RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || (caseData.getRespondent2ClaimResponseTypeForSpec() != null && RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))
-            ) || (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || (caseData.getRespondent2ClaimResponseTypeForSpec() != null && RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))
-            );
-    }
-
-    private void updateCorrespondenceAddress(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> updatedCaseData, CaseData caseData) {
-        log.debug("Updating correspondence address");
-        if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORONE)) {
-            handleRespondent1CorrespondenceAddress(caseData, updatedCaseData);
-        } else if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORTWO)) {
-            handleRespondent2CorrespondenceAddress(caseData, updatedCaseData);
-        }
-    }
-
-    private void handleRespondent1CorrespondenceAddress(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
-        log.debug("Handling respondent 1 correspondence address");
-        if (caseData.getSpecAoSRespondentCorrespondenceAddressRequired() == YesOrNo.NO) {
-            Address newAddress = caseData.getSpecAoSRespondentCorrespondenceAddressdetails();
-            updatedCaseData.specRespondentCorrespondenceAddressdetails(newAddress)
-                .specAoSRespondentCorrespondenceAddressdetails(Address.builder().build());
-            if (getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP) {
-                updatedCaseData.specRespondent2CorrespondenceAddressdetails(newAddress);
-            }
-        }
-    }
-
-    private void handleRespondent2CorrespondenceAddress(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
-        log.debug("Handling respondent 2 correspondence address");
-        if (caseData.getSpecAoSRespondent2CorrespondenceAddressRequired() == YesOrNo.NO) {
-            updatedCaseData.specRespondent2CorrespondenceAddressdetails(
-                    caseData.getSpecAoSRespondent2CorrespondenceAddressdetails())
-                .specAoSRespondent2CorrespondenceAddressdetails(Address.builder().build());
-        }
-    }
-
     private void assembleResponseDocumentsSpec(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
         List<Element<CaseDocument>> defendantUploads = nonNull(caseData.getDefendantResponseDocuments())
             ? caseData.getDefendantResponseDocuments() : new ArrayList<>();
@@ -462,60 +416,43 @@ public class SetApplicantResponseDeadline implements CaseTask {
         clearTempDocuments(updatedCaseData);
     }
 
-    private void handleCourtLocationForRespondent1DQ(CaseData caseData,
-                                                     Respondent1DQ.Respondent1DQBuilder dq,
-                                                     CallbackParams callbackParams) {
-        log.debug("Handling court location for Respondent 1 DQ");
-        Optional<LocationRefData> optCourtLocation = getCourtLocationDefendant1(caseData, callbackParams);
-
-        if (optCourtLocation.isPresent()) {
-            LocationRefData courtLocation = optCourtLocation.get();
-            log.info("Found preferred court location for Respondent 1: {}", courtLocation.getCourtLocationCode());
-
-            dq.respondent1DQRequestedCourt(caseData.getRespondent1DQ()
-                                               .getRespondToCourtLocation().toBuilder()
-                                               .reasonForHearingAtSpecificCourt(
-                                                   caseData.getRespondent1DQ()
-                                                       .getRespondToCourtLocation()
-                                                       .getReasonForHearingAtSpecificCourt())
-                                               .responseCourtLocations(null)
-                                               .caseLocation(LocationHelper.buildCaseLocation(courtLocation))
-                                               .responseCourtCode(courtLocation.getCourtLocationCode()).build());
-            dq.respondToCourtLocation(RequestedCourt.builder()
-                                          .responseCourtLocations(null)
-                                          .responseCourtCode(courtLocation.getCourtLocationCode())
-                                          .build())
-                .responseClaimCourtLocationRequired(YES);
-        } else {
-            log.info("No preferred court location found for Respondent 1");
-            dq.responseClaimCourtLocationRequired(NO);
-        }
+    private boolean respondent2HasSameLegalRep(CaseData caseData) {
+        return caseData.getRespondent2SameLegalRepresentative() != null
+            && caseData.getRespondent2SameLegalRepresentative() == YES;
     }
 
-    private Optional<LocationRefData> getCourtLocationDefendant1(CaseData caseData, CallbackParams callbackParams) {
-        if (caseData.getRespondent1DQ() != null
-            && caseData.getRespondent1DQ().getRespondToCourtLocation() != null) {
-            DynamicList courtLocations = caseData
-                .getRespondent1DQ().getRespondToCourtLocation().getResponseCourtLocations();
-            LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
-                respondToClaimSpecUtils.getLocationData(callbackParams), courtLocations);
-            log.debug("Retrieved court location data for Respondent 1: {}", courtLocation);
-            return Optional.ofNullable(courtLocation);
-        } else {
-            log.debug("Respondent 1 DQ or RespondToCourtLocation is null");
-            return Optional.empty();
-        }
+    private boolean ifResponseTypeIsPartOrFullAdmission(CaseData caseData) {
+        return (RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.PART_ADMISSION.equals(
+            caseData.getRespondent2ClaimResponseTypeForSpec())
+        ) || (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.FULL_ADMISSION.equals(
+            caseData.getRespondent2ClaimResponseTypeForSpec())
+        );
     }
 
-    private void handleCourtLocationForRespondent2DQ(CaseData caseData,  CaseData.CaseDataBuilder<?, ?> updatedCase,
+    private boolean solicitorRepresentsOnlyOneOfRespondents(CallbackParams callbackParams, CaseRole caseRole) {
+        CaseData caseData = callbackParams.getCaseData();
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+
+        return stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)
+            && coreCaseUserService.userHasCaseRole(
+            caseData.getCcdCaseReference().toString(),
+            userInfo.getUid(),
+            caseRole
+        );
+    }
+
+    private LocalDateTime getApplicant1ResponseDeadline(LocalDateTime responseDate) {
+        return deadlinesCalculator.calculateApplicantResponseDeadlineSpec(responseDate);
+    }
+
+    private void handleCourtLocationForRespondent2DQ(CaseData caseData, CaseData.CaseDataBuilder updatedCase,
                                                      Respondent2DQ.Respondent2DQBuilder dq,
                                                      CallbackParams callbackParams) {
-        log.debug("Handling court location for Respondent 2 DQ");
         Optional<LocationRefData> optCourtLocation = getCourtLocationDefendant2(caseData, callbackParams);
         if (optCourtLocation.isPresent()) {
             LocationRefData courtLocation = optCourtLocation.get();
-            log.info("Found preferred court location for Respondent 2: {}", courtLocation.getCourtLocationCode());
-
             dq.respondent2DQRequestedCourt(caseData.getRespondent2DQ().getRespondToCourtLocation2().toBuilder()
                                                .responseCourtLocations(null)
                                                .caseLocation(LocationHelper.buildCaseLocation(courtLocation))
@@ -530,66 +467,39 @@ public class SetApplicantResponseDeadline implements CaseTask {
                                              .build());
             updatedCase.responseClaimCourtLocation2Required(YES);
         } else {
-            log.info("No preferred court location found for Respondent 2");
             updatedCase.responseClaimCourtLocation2Required(NO);
         }
     }
 
-    public Optional<LocationRefData> getCourtLocationDefendant2(CaseData caseData, CallbackParams callbackParams) {
-        if (caseData.getRespondent2DQ() != null
-            && caseData.getRespondent2DQ().getRespondToCourtLocation2() != null) {
-            DynamicList courtLocations = caseData
-                .getRespondent2DQ().getRespondToCourtLocation2().getResponseCourtLocations();
-            LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
-                respondToClaimSpecUtils.getLocationData(callbackParams), courtLocations);
-            log.debug("Retrieved court location data for Respondent 2: {}", courtLocation);
-            return Optional.ofNullable(courtLocation);
+    private void handleCourtLocationForRespondent1DQ(CaseData caseData,
+                                                     Respondent1DQ.Respondent1DQBuilder dq,
+                                                     CallbackParams callbackParams) {
+        Optional<LocationRefData> optCourtLocation = getCourtLocationDefendant1(caseData, callbackParams);
+        // data for court location
+        if (optCourtLocation.isPresent()) {
+            LocationRefData courtLocation = optCourtLocation.get();
+
+            dq.respondent1DQRequestedCourt(caseData.getRespondent1DQ()
+                                               .getRespondToCourtLocation().toBuilder()
+                                               .reasonForHearingAtSpecificCourt(
+                                                   caseData.getRespondent1DQ()
+                                                       .getRespondToCourtLocation()
+                                                       .getReasonForHearingAtSpecificCourt())
+                                               .responseCourtLocations(null)
+                                               .caseLocation(LocationHelper.buildCaseLocation(courtLocation))
+                                               .responseCourtCode(courtLocation.getCourtLocationCode()).build());
+            dq.respondToCourtLocation(RequestedCourt.builder()
+                                          .responseCourtLocations(null)
+                                          .responseCourtCode(courtLocation.getCourtLocationCode())
+
+                                          .build())
+                .responseClaimCourtLocationRequired(YES);
         } else {
-            log.debug("Respondent 2 DQ or RespondToCourtLocation2 is null");
-            return Optional.empty();
+            dq.responseClaimCourtLocationRequired(NO);
         }
     }
 
-    private boolean isAwaitingAnotherDefendantResponse(CaseData caseData) {
-        return caseData.getRespondent1ClaimResponseTypeForSpec() == null
-            || caseData.getRespondent2ClaimResponseTypeForSpec() == null;
-    }
-
-    private LocalDateTime getApplicant1ResponseDeadline(LocalDateTime responseDate) {
-        LocalDateTime deadline = deadlinesCalculator.calculateApplicantResponseDeadlineSpec(responseDate);
-        log.debug("Calculated applicant 1 response deadline: {}", deadline);
-        return deadline;
-    }
-
-    private boolean respondent2HasSameLegalRep(CaseData caseData) {
-        log.debug("Checking if respondent 2 has the same legal representative");
-        return caseData.getRespondent2SameLegalRepresentative() != null
-            && caseData.getRespondent2SameLegalRepresentative() == YES;
-    }
-
-    private boolean twoVsOneDivergent(CaseData caseData) {
-        log.debug("Checking if the scenario is two vs one divergent");
-        return (!FULL_DEFENCE.equals(caseData.getClaimant1ClaimResponseTypeForSpec())
-            && FULL_DEFENCE.equals(caseData.getClaimant2ClaimResponseTypeForSpec()))
-            || (!FULL_DEFENCE.equals(caseData.getClaimant2ClaimResponseTypeForSpec())
-            && FULL_DEFENCE.equals(caseData.getClaimant1ClaimResponseTypeForSpec()));
-    }
-
-    private boolean solicitorRepresentsOnlyOneOfRespondents(CallbackParams callbackParams, CaseRole caseRole) {
-        log.debug("Checking if the solicitor represents only one of the respondents");
-        CaseData caseData = callbackParams.getCaseData();
-        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-
-        return stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)
-                && coreCaseUserService.userHasCaseRole(
-                caseData.getCcdCaseReference().toString(),
-                userInfo.getUid(),
-                caseRole
-        );
-    }
-
     private boolean solicitorHasCaseRole(CallbackParams callbackParams, CaseRole caseRole) {
-        log.debug("Checking if the solicitor has the case role: {}", caseRole);
         CaseData caseData = callbackParams.getCaseData();
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
@@ -600,10 +510,50 @@ public class SetApplicantResponseDeadline implements CaseTask {
         );
     }
 
-    private void clearTempDocuments(CaseData.CaseDataBuilder<?, ?> builder) {
-        log.debug("Clearing temporary documents");
-        CaseData caseData = builder.build();
+    private void updateCorrespondenceAddress(CallbackParams callbackParams,
+                                             CaseData.CaseDataBuilder<?, ?> updatedCaseData,
+                                             CaseData caseData) {
+        if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORONE)
+            && caseData.getSpecAoSRespondentCorrespondenceAddressRequired() == YesOrNo.NO) {
+            Address newAddress = caseData.getSpecAoSRespondentCorrespondenceAddressdetails();
+            updatedCaseData.specRespondentCorrespondenceAddressdetails(newAddress)
+                .specAoSRespondentCorrespondenceAddressdetails(Address.builder().build());
+            if (getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP) {
+                // to keep with heading tab
+                updatedCaseData.specRespondent2CorrespondenceAddressdetails(newAddress);
+            }
+        } else if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORTWO)
+            && caseData.getSpecAoSRespondent2CorrespondenceAddressRequired() == YesOrNo.NO) {
+            updatedCaseData.specRespondent2CorrespondenceAddressdetails(
+                    caseData.getSpecAoSRespondent2CorrespondenceAddressdetails())
+                .specAoSRespondent2CorrespondenceAddressdetails(Address.builder().build());
+        }
+    }
 
+    private boolean isAwaitingAnotherDefendantResponse(CaseData caseData) {
+        return caseData.getRespondent1ClaimResponseTypeForSpec() == null
+            || caseData.getRespondent2ClaimResponseTypeForSpec() == null;
+    }
+
+    private boolean isDefending(CaseData caseData) {
+        return FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+            || PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()
+        );
+    }
+
+    private boolean twoVsOneDivergent(CaseData caseData) {
+        return (!FULL_DEFENCE.equals(caseData.getClaimant1ClaimResponseTypeForSpec())
+            && FULL_DEFENCE.equals(caseData.getClaimant2ClaimResponseTypeForSpec()))
+            || (!FULL_DEFENCE.equals(caseData.getClaimant2ClaimResponseTypeForSpec())
+            && FULL_DEFENCE.equals(caseData.getClaimant1ClaimResponseTypeForSpec()));
+    }
+
+    private void clearTempDocuments(CaseData.CaseDataBuilder<?, ?> builder) {
+        CaseData caseData = builder.build();
+        // these documents are added to defendantUploads, if we do not remove/null the original,
+        // case file view will show duplicate documents
         builder.respondent1SpecDefenceResponseDocument(null);
         builder.respondent2SpecDefenceResponseDocument(null);
 
@@ -612,6 +562,32 @@ public class SetApplicantResponseDeadline implements CaseTask {
         }
         if (nonNull(caseData.getRespondent2DQ())) {
             builder.respondent2DQ(builder.build().getRespondent2DQ().toBuilder().respondent2DQDraftDirections(null).build());
+        }
+    }
+
+    private Optional<LocationRefData> getCourtLocationDefendant2(CaseData caseData, CallbackParams callbackParams) {
+        if (caseData.getRespondent2DQ() != null
+            && caseData.getRespondent2DQ().getRespondToCourtLocation2() != null) {
+            DynamicList courtLocations = caseData
+                .getRespondent2DQ().getRespondToCourtLocation2().getResponseCourtLocations();
+            LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
+                respondToClaimSpecUtils.getLocationData(callbackParams), courtLocations);
+            return Optional.ofNullable(courtLocation);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private Optional<LocationRefData> getCourtLocationDefendant1(CaseData caseData, CallbackParams callbackParams) {
+        if (caseData.getRespondent1DQ() != null
+            && caseData.getRespondent1DQ().getRespondToCourtLocation() != null) {
+            DynamicList courtLocations = caseData
+                .getRespondent1DQ().getRespondToCourtLocation().getResponseCourtLocations();
+            LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
+                respondToClaimSpecUtils.getLocationData(callbackParams), courtLocations);
+            return Optional.ofNullable(courtLocation);
+        } else {
+            return Optional.empty();
         }
     }
 }
