@@ -425,10 +425,10 @@ public class SetApplicantResponseDeadline implements CaseTask {
         return (RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
             || RespondentResponseTypeSpec.PART_ADMISSION.equals(
             caseData.getRespondent2ClaimResponseTypeForSpec())
-        ) || (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            ) || (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
             || RespondentResponseTypeSpec.FULL_ADMISSION.equals(
             caseData.getRespondent2ClaimResponseTypeForSpec())
-        );
+            );
     }
 
     private boolean solicitorRepresentsOnlyOneOfRespondents(CallbackParams callbackParams, CaseRole caseRole) {
