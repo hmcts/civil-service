@@ -3,7 +3,10 @@ package uk.gov.hmcts.reform.civil.utils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
@@ -12,16 +15,22 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseEventDataService;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class InterestCalculatorTest {
+
+    @Mock
+    private CoreCaseEventDataService coreCaseEventDataService;
 
     @InjectMocks
     private InterestCalculator interestCalculator;
@@ -201,13 +210,15 @@ class InterestCalculatorTest {
                 .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
             .interestClaimFrom(InterestClaimFromType.FROM_A_SPECIFIC_DATE)
             .interestClaimUntil(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE)
-            .interestFromSpecificDate(LocalDate.now().minusDays(6))
+            .interestFromSpecificDate(LocalDate.now().minusDays(60))
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .build();
-        caseData = caseData.toBuilder().issueDate(LocalDate.now()).build();
+        caseData = caseData.toBuilder().issueDate(LocalDate.now().minusDays(10)).build();
 
+        when(coreCaseEventDataService.getEventsForCase(caseData.getCcdCaseReference().toString()))
+            .thenReturn(buildCaseEventDetails(LocalDateTime.now().minusDays(10)));
         BigDecimal actual = interestCalculator.calculateInterest(caseData);
-        assertThat(actual).isEqualTo(BigDecimal.valueOf(6.60).setScale(2, RoundingMode.UNNECESSARY));
+        assertThat(actual).isEqualTo(BigDecimal.valueOf(55.00).setScale(2, RoundingMode.UNNECESSARY));
     }
 
     @Test
@@ -266,5 +277,75 @@ class InterestCalculatorTest {
             .build();
         assertThat(interestCalculator.getInterestPerDayBreakdown(caseData))
             .isEqualTo("Interest will accrue at the daily rate of £1.10 up to the date of claim issue");
+    }
+
+    private List<CaseEventDetail> buildCaseEventDetails(LocalDateTime defaultJudgmentDate) {
+        return List.of(
+            CaseEventDetail.builder()
+                .userId("claimant user id")
+                .userLastName("Claimant-solicitor")
+                .userFirstName("claimant email")
+                .createdDate(LocalDateTime.now().minusDays(14))
+                .caseTypeId("CIVIL")
+                .caseTypeVersion(1)
+                .description("")
+                .eventName("Create claim - Specified")
+                .id(CaseEvent.CREATE_CLAIM_SPEC.name())
+                .stateId("PENDING_CASE_ISSUED")
+                .stateName("Claim Issue Pending")
+                .build(),
+            CaseEventDetail.builder()
+                .userId("claimant user id")
+                .userLastName("Claimant-solicitor")
+                .userFirstName("claimant email")
+                .createdDate(LocalDateTime.now().minusDays(13))
+                .caseTypeId("CIVIL")
+                .caseTypeVersion(1)
+                .description("")
+                .eventName("Case issued after payment")
+                .id(CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT.name())
+                .stateId("PENDING_CASE_ISSUED")
+                .stateName("Claim Issue Pending")
+                .build(),
+            CaseEventDetail.builder()
+                .userId("claimant user id")
+                .userLastName("Claimant-solicitor")
+                .userFirstName("claimant email")
+                .createdDate(LocalDateTime.now().minusDays(12))
+                .caseTypeId("CIVIL")
+                .caseTypeVersion(1)
+                .description("")
+                .eventName("Generate claim form")
+                .id(CaseEvent.GENERATE_CLAIM_FORM.name())
+                .stateId("PENDING_CASE_ISSUED")
+                .stateName("Claim Issue Pending")
+                .build(),
+            CaseEventDetail.builder()
+                .userId("claimant user id")
+                .userLastName("Claimant-solicitor")
+                .userFirstName("claimant email")
+                .createdDate(LocalDateTime.now().minusDays(11))
+                .caseTypeId("CIVIL")
+                .caseTypeVersion(1)
+                .description("")
+                .eventName("Issue claim")
+                .id(CaseEvent.PROCESS_CLAIM_ISSUE.name())
+                .stateId("Awaiting Claim Notification")
+                .stateName("CASE_ISSUED")
+                .build(),
+            CaseEventDetail.builder()
+                .userId("claimant user id")
+                .userLastName("Claimant-solicitor")
+                .userFirstName("claimant email")
+                .createdDate(defaultJudgmentDate)
+                .caseTypeId("CIVIL")
+                .caseTypeVersion(1)
+                .description("")
+                .eventName("Issue claim")
+                .id(CaseEvent.DEFAULT_JUDGEMENT_SPEC.name())
+                .stateId("Awaiting Claim Notification")
+                .stateName("CASE_ISSUED")
+                .build()
+        );
     }
 }
