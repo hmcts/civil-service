@@ -134,7 +134,7 @@ allprojects {
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.9'
-      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.17.0"
+      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.17.1"
     }
   }
 
@@ -281,7 +281,7 @@ sonarqube {
     property "sonar.projectName", "CIVIL :: service"
     property "sonar.projectKey", "civil-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/request/servlet/** , **/controllers/**, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**, **/service/PaymentsService.java, **/DashboardWithParamsCallbackHandler.java, **/advice/**"
+    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/request/servlet/** , **/controllers/**, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**, **/service/PaymentsService.java, **/DashboardWithParamsCallbackHandler.java, **/PaymentRequestUpdateCallbackService.java, **/advice/**"
     property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java, **/*CcdDashboardClaimantClaimMatcher.java, **/*CcdDashboardDefendantClaimMatcher.java"
     property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**, **/handler/callback/camunda/dashboardnotifications/claimant/CCJRequestedDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantCCJResponseNotificationHandler.java" +
       ", **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantResponseNotificationHandler.java,  **/handler/callback/camunda/dashboardnotifications/defendant/MoreTimeRequestedDashboardNotificationDefendantHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantMediationSuccessfulDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimSettledDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/HearingScheduledClaimantNotificationHandler.java"
@@ -424,7 +424,7 @@ dependencies {
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.15.3'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.15.4'
   testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.14.19'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
