@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.controllers.CaseProgressionDashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.HearingScheduledDefendantNotificationHandler;
@@ -46,8 +48,13 @@ public class HearingScheduledDefendantScenarioTest extends CaseProgressionDashbo
             .respondent1Represented(YesOrNo.NO)
             .hearingLocation(list).build();
 
+        CallbackParams callbackParams = callbackParams(caseData);
+        callbackParams = callbackParams.toBuilder().request(CallbackRequest.builder()
+                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_DEFENDANT")
+                                                                .build()).build();
+
         // When
-        handler.handle(callbackParams(caseData));
+        handler.handle(callbackParams);
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
