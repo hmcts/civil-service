@@ -269,8 +269,8 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
 
     private Address getAddress(ContactInformation address) {
         return Address.builder().addressLine1(address.getAddressLine1())
-            .addressLine2(address.getAddressLine1())
-            .addressLine3(address.getAddressLine1())
+            .addressLine2(Objects.toString(address.getAddressLine2(), ""))
+            .addressLine3(Objects.toString(address.getAddressLine3(), ""))
             .country(address.getCountry())
             .county(address.getCounty())
             .postCode(address.getPostCode())
