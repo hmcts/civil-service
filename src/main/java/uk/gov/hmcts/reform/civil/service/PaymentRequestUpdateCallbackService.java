@@ -52,7 +52,9 @@ public class PaymentRequestUpdateCallbackService {
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
             if (feeType.equals(FeeType.HEARING.name()) || feeType.equals(FeeType.CLAIMISSUED.name())) {
                 if (caseData.isLipvLipOneVOne()) {
+                    log.info("caseIssuePaymentDetails = {} for case {}", caseData.getClaimIssuedPaymentDetails(), serviceRequestUpdateDto.getCcdCaseNumber());
                     if (isValidPaymentUpdateHearing(feeType, caseData) || isValidUpdatePaymentClaimIssue(feeType, caseData)) {
+                        log.info("inside payment validation for case {}", serviceRequestUpdateDto.getCcdCaseNumber());
                         updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
                         CardPaymentStatusResponse cardPaymentStatusResponse = getCardPaymentStatusResponse(serviceRequestUpdateDto);
                         updatePaymentStatusService.updatePaymentStatus(FeeType.valueOf(feeType), serviceRequestUpdateDto.getCcdCaseNumber(), cardPaymentStatusResponse);
@@ -66,13 +68,13 @@ public class PaymentRequestUpdateCallbackService {
     }
 
     private static boolean isValidPaymentUpdateHearing(String feeType, CaseData caseData) {
-        return feeType.equals(FeeType.HEARING.name()) && (caseData.getHearingFeePaymentDetails() == null || caseData.getHearingFeePaymentDetails().getStatus().equals(
-            FAILED));
+        return feeType.equals(FeeType.HEARING.name())
+            && (caseData.getHearingFeePaymentDetails() == null || caseData.getHearingFeePaymentDetails().getStatus() == FAILED);
     }
 
     private static boolean isValidUpdatePaymentClaimIssue(String feeType, CaseData caseData) {
-        return feeType.equals(FeeType.CLAIMISSUED.name()) && (caseData.getClaimIssuedPaymentDetails() == null || caseData.getClaimIssuedPaymentDetails().getStatus().equals(
-            FAILED));
+        return feeType.equals(FeeType.CLAIMISSUED.name())
+            && (caseData.getClaimIssuedPaymentDetails() == null || caseData.getClaimIssuedPaymentDetails().getStatus() == FAILED);
     }
 
     private CardPaymentStatusResponse getCardPaymentStatusResponse(ServiceRequestUpdateDto serviceRequestUpdateDto) {
