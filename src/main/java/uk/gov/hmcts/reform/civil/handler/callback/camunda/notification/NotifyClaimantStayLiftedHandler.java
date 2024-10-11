@@ -31,6 +31,11 @@ public class NotifyClaimantStayLiftedHandler extends AbstractNotifyStayLiftedHan
     }
 
     @Override
+    public String camundaActivityId(CallbackParams callbackParams) {
+        return TASK_ID;
+    }
+
+    @Override
     protected String getRecipient(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         return caseData.isApplicantLiP()
@@ -44,6 +49,11 @@ public class NotifyClaimantStayLiftedHandler extends AbstractNotifyStayLiftedHan
     }
 
     @Override
+    public List<CaseEvent> handledEvents() {
+        return EVENTS;
+    }
+
+    @Override
     protected String getPartyName(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         return caseData.getApplicant1().getPartyName();
@@ -52,15 +62,5 @@ public class NotifyClaimantStayLiftedHandler extends AbstractNotifyStayLiftedHan
     @Override
     public Map<String, Callback> callbacks() {
         return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::sendNotification);
-    }
-
-    @Override
-    public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
-    }
-
-    @Override
-    public List<CaseEvent> handledEvents() {
-        return EVENTS;
     }
 }
