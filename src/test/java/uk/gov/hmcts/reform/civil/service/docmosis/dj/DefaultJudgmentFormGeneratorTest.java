@@ -112,7 +112,7 @@ class DefaultJudgmentFormGeneratorTest {
         List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN, GENERATE_DJ_FORM_SPEC.name());
 
         assertThat(caseDocuments).hasSize(1);
-
+        verify(organisationService).findOrganisationById(any());
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT));
 
@@ -143,7 +143,7 @@ class DefaultJudgmentFormGeneratorTest {
         List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN, GENERATE_DJ_FORM_SPEC.name());
 
         assertThat(caseDocuments).hasSize(1);
-
+        verify(organisationService).findOrganisationById(any());
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT));
 
@@ -174,7 +174,7 @@ class DefaultJudgmentFormGeneratorTest {
         List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN, GENERATE_DJ_FORM_SPEC.name());
 
         assertThat(caseDocuments).hasSize(1);
-
+        verify(organisationService).findOrganisationById(any());
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT));
 
@@ -203,7 +203,7 @@ class DefaultJudgmentFormGeneratorTest {
         List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN, GENERATE_DJ_FORM_SPEC.name());
 
         assertThat(caseDocuments).hasSize(1);
-
+        verify(organisationService).findOrganisationById(any());
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT));
 
@@ -230,6 +230,7 @@ class DefaultJudgmentFormGeneratorTest {
         List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN, GENERATE_DJ_FORM_SPEC.name());
 
         assertThat(caseDocuments).hasSize(2);
+        verify(organisationService, times(2)).findOrganisationById(any());
     }
 
     @Test
@@ -262,7 +263,7 @@ class DefaultJudgmentFormGeneratorTest {
             .build();
         List<CaseDocument> caseDocuments = generator.generateNonDivergentDocs(caseData, BEARER_TOKEN,
                                                                               GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT.name());
-
+        verify(organisationService, times(6)).findOrganisationById(any());
         verify(assignCategoryId, times(2))
             .assignCategoryIdToCaseDocument(CASE_DOCUMENT, "judgments");
         assertThat(caseDocuments).hasSize(2);
@@ -293,7 +294,7 @@ class DefaultJudgmentFormGeneratorTest {
             .build();
         List<CaseDocument> caseDocuments = generator.generateNonDivergentDocs(caseData, BEARER_TOKEN,
                                                                               GEN_DJ_FORM_NON_DIVERGENT_SPEC_DEFENDANT.name());
-
+        verify(organisationService, times(6)).findOrganisationById(any());
         verify(assignCategoryId, times(2))
             .assignCategoryIdToCaseDocument(CASE_DOCUMENT, "judgments");
         assertThat(caseDocuments).hasSize(2);
@@ -322,7 +323,7 @@ class DefaultJudgmentFormGeneratorTest {
             .build();
         List<CaseDocument> caseDocuments = generator.generateNonDivergentDocs(caseData, BEARER_TOKEN,
                                                                               GEN_DJ_FORM_NON_DIVERGENT_SPEC_DEFENDANT.name());
-
+        verify(organisationService, times(2)).findOrganisationById(any());
         verify(assignCategoryId)
             .assignCategoryIdToCaseDocument(CASE_DOCUMENT, "judgments");
         assertThat(caseDocuments).hasSize(1);
@@ -358,6 +359,7 @@ class DefaultJudgmentFormGeneratorTest {
                                                                               GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT.name());
         verify(assignCategoryId)
             .assignCategoryIdToCaseDocument(CASE_DOCUMENT, "judgments");
+        verify(organisationService, times(3)).findOrganisationById(any());
         assertThat(caseDocuments).hasSize(1);
     }
 
@@ -393,6 +395,7 @@ class DefaultJudgmentFormGeneratorTest {
 
         verify(assignCategoryId, times(2))
             .assignCategoryIdToCaseDocument(CASE_DOCUMENT, "judgments");
+        verify(organisationService, times(5)).findOrganisationById(any());
         assertThat(caseDocuments).hasSize(2);
     }
 }
