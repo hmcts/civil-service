@@ -70,7 +70,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
         DocmosisDocument docmosisDocument2;
         List<DefaultJudgmentForm> templateData = getDefaultJudgmentForms(caseData, event);
         DocmosisTemplates docmosisTemplate = getDocmosisTemplate(event);
-        log.info("templateData {} for case {} and template {}", templateData, caseData.getCcdCaseReference(), docmosisTemplate.getTemplate());
+        log.info("Template for case {} for caseId {}", docmosisTemplate.getTemplate(), caseData.getCcdCaseReference());
         DocmosisDocument docmosisDocument1 =
             documentGeneratorService.generateDocmosisDocument(templateData.get(0), docmosisTemplate);
         caseDocuments.add(documentManagementService.uploadDocument(
@@ -296,13 +296,11 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
                 defaultJudgmentForms.add(getDefaultJudgmentFormNonDivergent(caseData, RESPONDENT_2));
             }
         }
-        log.info("defaultJudgmentForms {}", defaultJudgmentForms);
         return generateDocmosisDocsForNonDivergent(defaultJudgmentForms, authorisation, caseData, event);
     }
 
     private List<CaseDocument> generateDocmosisDocsForNonDivergent(List<DefaultJudgmentForm> defaultJudgmentForms,
                                                    String authorisation, CaseData caseData, String event) {
-        log.info("defaultJudgmentForms generateDocmosisDocsForNonDivergent {}", defaultJudgmentForms.toString());
         List<CaseDocument> caseDocuments = new ArrayList<>();
         for (int i = 0; i < defaultJudgmentForms.size(); i++) {
             DefaultJudgmentForm defaultJudgmentForm = defaultJudgmentForms.get(i);
