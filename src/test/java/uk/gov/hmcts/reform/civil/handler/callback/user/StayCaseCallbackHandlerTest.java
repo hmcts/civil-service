@@ -21,6 +21,8 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.time.LocalDate;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -80,13 +82,17 @@ public class StayCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoError_WhenAboutToSubmitIsInvokedToggleTrue() {
             when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build().toBuilder()
+                .hearingDate(LocalDate.now())
+                .hearingDueDate(LocalDate.now()).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().getCaseDetailsBefore().setState("CASE_PROGRESSION");
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).extracting("hearingDate").isNull();
+            assertThat(response.getData()).extracting("hearingDueDate").isNull();
         }
 
         @Test
