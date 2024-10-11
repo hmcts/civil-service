@@ -456,6 +456,7 @@ notifications:
   notifyLRBundleRestitched: "f42c83ed-03ce-4b1c-95b7-958045293793"
   notifyLRCaseStayed: "c5e40526-e3f6-4d98-8881-b00c9bc4f200"
   notifyLRCaseDismissed: "4fa16416-650a-4af3-8305-e21fd63a8754"
+  notifyLRStayLifted: "a9cdde1e-6e11-44b2-bf8e-83e1f64a5735"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}

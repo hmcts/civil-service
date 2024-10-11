@@ -233,12 +233,13 @@ public class DraftTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendant()
             .defendant1LIPAtClaimIssued(YES).build();
         when(mockFeatureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
+        when(mockFeatureToggleService.isGaForLipsEnabled()).thenReturn(true);
 
         assertTrue(claimSubmittedOneUnrepresentedDefendantOnly.test(caseData));
         assertTrue(claimSubmittedRespondent1Unrepresented.test(caseData));
         assertThat(getCaseFlags(result.get(2), caseData)).hasSize(6).contains(
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-            entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+            entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), true),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
             entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
             entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
