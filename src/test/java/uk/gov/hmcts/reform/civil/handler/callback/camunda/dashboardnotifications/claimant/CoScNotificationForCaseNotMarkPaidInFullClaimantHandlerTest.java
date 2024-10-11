@@ -28,14 +28,14 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DB_NOTIFY_COSC_PAID_FULL_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_COSC_NOT_PAID_FULL_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
-public class CoScNotificationForCasePaidInFullClaimantHandlerTest extends BaseCallbackHandlerTest {
+public class CoScNotificationForCaseNotMarkPaidInFullClaimantHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
-    private CoScNotificationForCasePaidInFullClaimantHandler handler;
+    private CoScNotificationForCaseNotMarkPaidInFullClaimantHandler handler;
     @Mock
     private DashboardApiClient dashboardApiClient;
     @Mock
@@ -53,19 +53,19 @@ public class CoScNotificationForCasePaidInFullClaimantHandlerTest extends BaseCa
             assertThat(handler.camundaActivityId(
                 CallbackParamsBuilder.builder()
                     .request(CallbackRequest.builder()
-                                 .eventId(DB_NOTIFY_COSC_PAID_FULL_CLAIMANT.name())
+                                 .eventId(CREATE_DASHBOARD_NOTIFICATION_COSC_NOT_PAID_FULL_CLAIMANT.name())
                                  .build())
                     .build()))
                 .isEqualTo(TASK_ID);
         }
 
         @Test
-        void shouldRecordScenario_whenInvokedWhenCaseProgressionSmallClaims() {
+        void shouldRecordScenario_whenInvokedCoScCaseNotMarkedPaidInFull() {
             CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build().toBuilder()
                 .applicant1Represented(YesOrNo.NO)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(DB_NOTIFY_COSC_PAID_FULL_CLAIMANT.name()).build()
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COSC_NOT_PAID_FULL_CLAIMANT.name()).build()
             ).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();

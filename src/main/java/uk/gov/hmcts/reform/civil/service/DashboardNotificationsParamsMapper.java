@@ -253,11 +253,11 @@ public class DashboardNotificationsParamsMapper {
                        "£" + this.removeDoubleZeros(String.valueOf(MonetaryConversions.penniesToPounds(caseData.getGeneralAppPBADetails().getFee().getCalculatedAmountInPence()))));
         }
 
-        if(nonNull(caseData.getCertOfSC())) {
-           params.put("coscFullPaymentDateEn", DateUtils.formatDate(caseData.getCertOfSC().getDefendantFinalPaymentDate()));
-           params.put("coscFullPaymentDateCy", DateUtils.formatDateInWelsh(caseData.getCertOfSC().getDefendantFinalPaymentDate()));
-           params.put("coscNotificationDateEn", DateUtils.formatDate(LocalDate.now()));
-           params.put("coscNotificationDateCy", DateUtils.formatDateInWelsh(LocalDate.now()));
+        if (nonNull(caseData.getCertOfSC())) {
+            params.put("coscFullPaymentDateEn", DateUtils.formatDate(caseData.getCertOfSC().getDefendantFinalPaymentDate()));
+            params.put("coscFullPaymentDateCy", DateUtils.formatDateInWelsh(caseData.getCertOfSC().getDefendantFinalPaymentDate()));
+            params.put("coscNotificationDateEn", DateUtils.formatDate(LocalDate.now()));
+            params.put("coscNotificationDateCy", DateUtils.formatDateInWelsh(LocalDate.now()));
         }
 
         return params;

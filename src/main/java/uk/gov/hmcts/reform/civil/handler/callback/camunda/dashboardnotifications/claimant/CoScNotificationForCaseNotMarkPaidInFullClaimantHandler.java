@@ -12,19 +12,19 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DB_NOTIFY_COSC_PAID_FULL_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_COSC_NOT_PAID_FULL_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_CLAIMANT;
 
 @Service
-public class CoScNotificationForCasePaidInFullClaimantHandler extends DashboardCallbackHandler {
+public class CoScNotificationForCaseNotMarkPaidInFullClaimantHandler extends DashboardCallbackHandler {
 
     private static final List<CaseEvent> EVENTS =
-        List.of(DB_NOTIFY_COSC_PAID_FULL_CLAIMANT);
+        List.of(CREATE_DASHBOARD_NOTIFICATION_COSC_NOT_PAID_FULL_CLAIMANT);
     public static final String TASK_ID = "ClaimantDashboardNotificationMarkNotPaidInFull";
 
-    public CoScNotificationForCasePaidInFullClaimantHandler(DashboardApiClient dashboardApiClient,
-                                                        DashboardNotificationsParamsMapper mapper,
-                                                        FeatureToggleService featureToggleService) {
+    public CoScNotificationForCaseNotMarkPaidInFullClaimantHandler(DashboardApiClient dashboardApiClient,
+                                                                   DashboardNotificationsParamsMapper mapper,
+                                                                   FeatureToggleService featureToggleService) {
         super(dashboardApiClient, mapper, featureToggleService);
     }
 
