@@ -225,8 +225,8 @@ class InterestCalculatorTest {
             .issueDate(LocalDate.now().minusDays(20))
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .build();
-        LocalDate issueDate = LocalDate.now().minusDays(20);
-        caseData = caseData.toBuilder().issueDate(issueDate).build();
+        LocalDateTime submittedDate = LocalDateTime.now().minusDays(20);
+        caseData = caseData.toBuilder().submittedDate(submittedDate).build();
         ;
 
         BigDecimal actual = interestCalculator.calculateInterest(caseData);
@@ -265,6 +265,6 @@ class InterestCalculatorTest {
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .build();
         assertThat(interestCalculator.getInterestPerDayBreakdown(caseData))
-            .isEqualTo("Interest will accrue at the daily rate of £1.10 up to the date of claim issue");
+            .isEqualTo("Interest will accrue at the daily rate of £1.10 up to the date of claim submitted");
     }
 }

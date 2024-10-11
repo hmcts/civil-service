@@ -57,7 +57,7 @@ public class InterestCalculator {
 
     private BigDecimal calculateInterestAmount(CaseData caseData, BigDecimal interestRate, LocalDate interestToDate) {
         if (caseData.getInterestClaimFrom().name().equals(FROM_CLAIM_SUBMIT_DATE)) {
-            LocalDate interestFromDate = getIssuedDate(caseData);
+            LocalDate interestFromDate = getSubmittedDate(caseData);
             return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate, interestFromDate, interestToDate);
         } else if (caseData.getInterestClaimFrom().name().equals(FROM_SPECIFIC_DATE)) {
             return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate,
@@ -68,7 +68,7 @@ public class InterestCalculator {
 
     private LocalDate getToDate(CaseData caseData) {
         if (Objects.nonNull(caseData.getInterestClaimUntil()) && caseData.getInterestClaimUntil().name().equals(UNTIL_CLAIM_SUBMIT_DATE)) {
-            return getIssuedDate(caseData);
+            return getSubmittedDate(caseData);
         }
         return LocalDate.now();
     }
@@ -118,12 +118,12 @@ public class InterestCalculator {
         }
         description.append(interestPerDay.setScale(2, RoundingMode.HALF_UP));
         description.append(" up to the date of ");
-        description.append(caseData.getInterestClaimUntil().name().equals(UNTIL_CLAIM_SUBMIT_DATE) ? "claim issue" : "judgment");
+        description.append(caseData.getInterestClaimUntil().name().equals(UNTIL_CLAIM_SUBMIT_DATE) ? "claim submitted" : "judgment");
         return description.toString();
     }
 
-    private LocalDate getIssuedDate(CaseData caseData) {
-        return Objects.nonNull(caseData.getIssueDate()) ? caseData.getIssueDate() : LocalDate.now();
+    private LocalDate getSubmittedDate(CaseData caseData) {
+        return Objects.nonNull(caseData.getSubmittedDate()) ? caseData.getSubmittedDate().toLocalDate() : LocalDate.now();
     }
 
 }
