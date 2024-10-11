@@ -25,7 +25,9 @@ import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.LitigantInPersonFo
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -78,11 +80,14 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private FeatureToggleService toggleService;
 
+    @Mock
+    private InterestCalculator interestCalculator;
+
     @BeforeEach
     void setUp() {
         mapper = new ObjectMapper();
         handler = new GenerateClaimFormForSpecCallbackHandler(sealedClaimFormGeneratorForSpec, mapper, time, deadlinesCalculator,
-                                                              civilDocumentStitchingService, toggleService, assignCategoryId, toggleService);
+            civilDocumentStitchingService, assignCategoryId, toggleService, interestCalculator);
         mapper.registerModule(new JavaTimeModule());
     }
 
@@ -123,9 +128,12 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGenerateClaimForm_whenOneVsOne_andDefendantRepresentedSpecClaim() {
+
             // Given
             when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
             when(time.now()).thenReturn(issueDate.atStartOfDay());
+            when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(BigDecimal.TEN);
+
             documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
                                                "Sealed Claim form",
                                                LocalDate.now().toString()));
@@ -151,6 +159,7 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
             // Then
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(CLAIM_FORM);
             assertThat(updatedData.getIssueDate()).isEqualTo(issueDate);
+            assertThat(updatedData.getTotalInterest()).isEqualTo(BigDecimal.TEN);
 
             verify(sealedClaimFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
             verifyNoInteractions(litigantInPersonFormGenerator);

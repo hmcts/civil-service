@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimform.ClaimFormGenerator;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,7 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final ClaimFormGenerator claimFormGenerator;
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
+    private final InterestCalculator interestCalculator;
     private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::generateClaimForm);
 
     @Override
@@ -59,6 +61,7 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
         );
 
         CaseData updatedCaseData = updateCaseData(caseData, caseDocument, caseEvent);
+        caseData.toBuilder().totalInterest(interestCalculator.calculateInterest(updatedCaseData));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
             .build();
