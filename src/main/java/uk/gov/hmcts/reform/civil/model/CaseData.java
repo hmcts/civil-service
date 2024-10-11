@@ -52,6 +52,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -160,6 +161,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final SRPbaDetails hearingFeePBADetails;
     private final SRPbaDetails claimIssuedPBADetails;
     private final String applicantPartyName;
+    private final CertOfSC certOfSC;
 
     private final YesOrNo generalAppVaryJudgementType;
     private final YesOrNo generalAppParentClaimantIsApplicant;
