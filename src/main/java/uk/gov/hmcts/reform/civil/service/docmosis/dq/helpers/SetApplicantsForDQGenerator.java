@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionsQuestionnaireGeneratorTasks;
+package uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -16,7 +16,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Component
 @RequiredArgsConstructor
-public class SetApplicantsForDQGeneratorTask {
+public class SetApplicantsForDQGenerator {
 
     private final RepresentativeService representativeService;
     static final String organisationName = "Organisation name";
@@ -109,5 +109,4 @@ public class SetApplicantsForDQGeneratorTask {
         return !YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
             && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
     }
-
 }

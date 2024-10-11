@@ -1,11 +1,10 @@
-package uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionsQuestionnaireGeneratorTasks;
+package uk.gov.hmcts.reform.civil.service.docmosis.dq.builders;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
-import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
@@ -32,8 +31,9 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers.GetRespondentsForDQGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers.SetApplicantsForDQGenerator;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
@@ -71,18 +71,17 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 @Component
 @RequiredArgsConstructor
-public class DQGeneratorFormBuilderTask {
+public class DQGeneratorFormBuilder {
 
     private final IStateFlowEngine stateFlowEngine;
     private final RepresentativeService representativeService;
     private final FeatureToggleService featureToggleService;
     private final LocationReferenceDataService locationRefDataService;
-    private final GetRespondentsForDQGeneratorTask respondentsForDQGeneratorTask;
-    private final SetApplicantsForDQGeneratorTask setApplicantsForDQGeneratorTask;
+    private final GetRespondentsForDQGenerator respondentsForDQGeneratorTask;
+    private final SetApplicantsForDQGenerator setApplicantsForDQGenerator;
     static final String DEFENDANT = "defendant";
     static final String SMALL_CLAIM = "SMALL_CLAIM";
     static final String organisationName = "Organisation name";
-
 
     @NotNull
     public DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder getDirectionsQuestionnaireFormBuilder(CaseData caseData, String authorisation) {
@@ -104,7 +103,7 @@ public class DQGeneratorFormBuilderTask {
         DQ dq = getDQAndSetSubmittedOn(builder, caseData);
 
         if (!claimantResponseLRspec) {
-            setApplicantsForDQGeneratorTask.setApplicants(builder, caseData);
+            setApplicantsForDQGenerator.setApplicants(builder, caseData);
         }
 
         Witnesses witnesses = getWitnesses(dq);
@@ -394,6 +393,7 @@ public class DQGeneratorFormBuilderTask {
             .details(caseData.isRespondent1NotRepresented() && dq.getExperts() != null ? getExpertsDetails(dq) : List.of(expertDetails))
             .build();
     }
+
     private List<Expert> getExpertsDetails(DQ dq) {
         if (dq.getExperts().getDetails() == null) {
             return Collections.emptyList();
