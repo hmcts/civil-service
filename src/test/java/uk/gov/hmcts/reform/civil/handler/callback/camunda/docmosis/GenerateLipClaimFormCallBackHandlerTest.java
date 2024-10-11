@@ -16,9 +16,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimform.ClaimFormGenerator;
-import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -41,8 +39,6 @@ class GenerateLipClaimFormCallBackHandlerTest extends BaseCallbackHandlerTest {
     private SystemGeneratedDocumentService systemGeneratedDocumentService;
     @Mock
     private ObjectMapper mapper;
-    @Mock
-    private InterestCalculator interestCalculator;
     @InjectMocks
     private GenerateLipClaimFormCallBackHandler handler;
 
@@ -56,7 +52,6 @@ class GenerateLipClaimFormCallBackHandlerTest extends BaseCallbackHandlerTest {
             anyString(),
             eq(CaseEvent.GENERATE_DRAFT_FORM)
         )).willReturn(generateForm(DRAFT_CLAIM_FORM));
-        given(interestCalculator.calculateInterest(any(CaseData.class))).willReturn(BigDecimal.TEN);
         CaseData caseData = CaseData.builder().build();
         CallbackParams callbackParams = buildCallbackParams(caseData, "GENERATE_DRAFT_FORM");
 
@@ -115,10 +110,10 @@ class GenerateLipClaimFormCallBackHandlerTest extends BaseCallbackHandlerTest {
             .documentType(documentType)
             .createdDatetime(LocalDateTime.now())
             .documentLink(Document.builder()
-                .documentUrl("fake-url")
-                .documentFileName("file-name")
-                .documentBinaryUrl("binary-url")
-                .build())
+                              .documentUrl("fake-url")
+                              .documentFileName("file-name")
+                              .documentBinaryUrl("binary-url")
+                              .build())
             .build();
     }
 
@@ -127,8 +122,8 @@ class GenerateLipClaimFormCallBackHandlerTest extends BaseCallbackHandlerTest {
         return CallbackParams.builder()
             .caseData(caseData)
             .request(CallbackRequest.builder()
-                .eventId(eventId)
-                .build())
+                         .eventId(eventId)
+                         .build())
             .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"))
             .type(ABOUT_TO_SUBMIT)
             .build();

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -9,17 +10,16 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
-import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -41,14 +41,18 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_CLAIM_FORM_SPEC);
     private static final String TASK_ID = "GenerateClaimFormForSpec";
 
+    private static final String BUNDLE_NAME = "Sealed Claim Form with LiP Claim Form";
     private final SealedClaimFormGeneratorForSpec sealedClaimFormGeneratorForSpec;
     private final ObjectMapper objectMapper;
     private final Time time;
     private final DeadlinesCalculator deadlinesCalculator;
     private final CivilDocumentStitchingService civilDocumentStitchingService;
+    private final FeatureToggleService toggleService;
     private final AssignCategoryId assignCategoryId;
     private final FeatureToggleService featureToggleService;
-    private final InterestCalculator interestCalculator;
+
+    @Value("${stitching.enabled}")
+    private boolean stitchEnabled;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -78,7 +82,6 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
                 deadlinesCalculator.plus28DaysAt4pmDeadline(LocalDateTime.now()))
             // .respondent1Represented(YES)
             .claimDismissedDate(null);
-        caseDataBuilder.totalInterest(interestCalculator.calculateInterest(caseDataBuilder.build()));
         CaseDocument sealedClaim = sealedClaimFormGeneratorForSpec.generate(
             caseDataBuilder.build(),
             callbackParams.getParams().get(BEARER_TOKEN).toString()
@@ -96,8 +99,8 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
                 .build();
             caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder().particularsOfClaimDocument(
                     wrapElements(caseData.getSpecClaimDetailsDocumentFiles()))
-                .timelineEventUpload(wrapElements(caseData.getSpecClaimTemplateDocumentFiles()))
-                .build());
+                               .timelineEventUpload(wrapElements(caseData.getSpecClaimTemplateDocumentFiles()))
+                               .build());
         } else if (caseData.getSpecClaimTemplateDocumentFiles() != null) {
             assignCategoryId.assignCategoryIdToDocument(caseData.getSpecClaimTemplateDocumentFiles(), categoryId);
             ServedDocumentFiles.builder().timelineEventUpload(wrapElements(
@@ -141,8 +144,8 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
         List<DocumentMetaData> documentMetaDataList = new ArrayList<>();
 
         documentMetaDataList.add(new DocumentMetaData(caseDocument.getDocumentLink(),
-            "Sealed Claim form",
-            LocalDate.now().toString()));
+                                                      "Sealed Claim form",
+                                                      LocalDate.now().toString()));
 
         if (caseData.getSpecClaimTemplateDocumentFiles() != null) {
             documentMetaDataList.add(new DocumentMetaData(
