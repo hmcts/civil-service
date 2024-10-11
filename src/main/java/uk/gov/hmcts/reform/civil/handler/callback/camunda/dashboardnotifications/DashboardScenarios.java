@@ -197,7 +197,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CP_CASE_STAYED_CLAIMANT("Scenario.AAA6.CP.Case.Stayed.Claimant"),
     SCENARIO_AAA6_CP_CASE_STAYED_DEFENDANT("Scenario.AAA6.CP.Case.Stayed.Defendant"),
     SCENARIO_AAA6_UPDATE_TASK_LIST_TRIAL_READY_FINALS_ORDERS_DEFENDANT("Scenario.AAA6.Update.TaskList.TrialReady.FinalOrders.Defendant"),
-    SCENARIO_AAA6_UPDATE_TASK_LIST_TRIAL_READY_FINALS_ORDERS_CLAIMANT("Scenario.AAA6.Update.TaskList.TrialReady.FinalOrders.Claimant");
+    SCENARIO_AAA6_UPDATE_TASK_LIST_TRIAL_READY_FINALS_ORDERS_CLAIMANT("Scenario.AAA6.Update.TaskList.TrialReady.FinalOrders.Claimant"),
+    SCENARIO_AAA6_JUDGEMENTS_ONLINE_ISSUED_CCJ_CLAIMANT("Scenario.AAA6.JudgmentsOnline.IssuedCCJ.Claimant");
 
     private final String scenario;
 
