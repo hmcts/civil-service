@@ -1,0 +1,64 @@
+name: Validate Database Migration Timestamps
+
+on:
+  pull_request:
+    branches:
+      - '**'  # This triggers on PRs to any branch
+
+jobs:
+  validate-migrations:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current branch
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch all branches to get the base branch
+
+      - name: Set up environment
+        run: |
+          # Create a directory for the migration files
+          mkdir -p current_migrations
+          mkdir -p base_migrations
+
+      - name: Fetch base branch
+        run: |
+          # Use the base branch name from the pr in github
+          BASE_BRANCH=${{ github.event.pull_request.base.ref }}
+          echo "Base branch is: $BASE_BRANCH"
+
+          # Fetch the base branch
+          git fetch origin $BASE_BRANCH:refs/remotes/origin/$BASE_BRANCH
+          git checkout $BASE_BRANCH
+          cp -R src/main/resources/db/migration/* base_migrations/
+
+      - name: Check current migration timestamps
+        run: |
+          # Switch back to the current branch
+          git checkout ${{ github.head_ref }}
+          cp -R src/main/resources/db/migration/* current_migrations/
+
+          # Validate timestamps
+          echo "Validating migration timestamps..."
+
+          # Extract and sort timestamps
+          current_timestamps=$(ls current_migrations | sed 's/^\([0-9]*\).*/\1/' | sort -n)
+          base_timestamps=$(ls base_migrations | sed 's/^\([0-9]*\).*/\1/' | sort -n)
+
+          # Check for duplicate timestamps
+          if echo "$current_timestamps" | uniq -d | grep -q .; then
+            echo "Error: Duplicate timestamps found in the current branch migration files!"
+            exit 1
+          fi
+
+          # Check for timestamps in the current branch that are before the latest base branch timestamp
+          latest_base_timestamp=$(echo "$base_timestamps" | tail -n 1)
+          echo "Latest timestamp in base branch: $latest_base_timestamp"
+
+          for timestamp in $current_timestamps; do
+            if [ "$timestamp" -lt "$latest_base_timestamp" ]; then
+              echo "Error: Migration timestamp $timestamp is earlier than the latest base timestamp $latest_base_timestamp!"
+              exit 1
+            fi
+          done
+
+          echo "All migration timestamps are valid."
