@@ -8,7 +8,6 @@ import lombok.Data;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypesLR;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
@@ -26,7 +25,7 @@ public class GeneralApplication implements MappableObject {
 
     private final String generalApplicationState;
     private final GAApplicationType generalAppType;
-    private final GeneralApplicationTypesLR generalAppTypeLR;
+    private final GAApplicationTypeLR generalAppTypeLR;
     private final GARespondentOrderAgreement generalAppRespondentAgreement;
     private final BusinessProcess businessProcess;
     private final GAPbaDetails generalAppPBADetails;
@@ -77,7 +76,7 @@ public class GeneralApplication implements MappableObject {
     @JsonCreator
     GeneralApplication(@JsonProperty("generalApplicationState") String generalApplicationState,
                        @JsonProperty("generalAppType") GAApplicationType generalAppType,
-                       @JsonProperty("generalAppTypeLR") GeneralApplicationTypesLR generalAppTypeLR,
+                       @JsonProperty("generalAppTypeLR") GAApplicationTypeLR generalAppTypeLR,
                        @JsonProperty("generalAppRespondentAgreement")
                            GARespondentOrderAgreement generalAppRespondentAgreement,
                        @JsonProperty("businessProcess") BusinessProcess businessProcess,
