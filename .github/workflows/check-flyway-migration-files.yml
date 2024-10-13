@@ -6,7 +6,7 @@ on:
       - '**'
 
 jobs:
-  validate:
+  validate-timestamps:
     runs-on: ubuntu-latest
 
     steps:
