@@ -295,7 +295,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotCauseAnyErrors_whenGaTypeIsNotVaryJudgement() {
 
             List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT);
-            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             CaseData caseData = CaseDataBuilder
                 .builder().ccdCaseReference(1234L).generalAppType(GAApplicationType.builder().types(types).build()).build();
 
@@ -312,7 +311,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotCauseAnyErrorsWhenGaTypeIsVaryJudgement() {
             List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
-            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             CaseData caseData = CaseDataBuilder
                 .builder().ccdCaseReference(1234L).generalAppType(GAApplicationType.builder().types(types).build()).build();
 
@@ -328,7 +326,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotCauseAnyErrorsWhenGaTypeIsMultipleTypeWithVaryJudgement() {
-            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_PAYMENT_TERMS_OF_JUDGMENT);
             CaseData caseData = CaseDataBuilder
                 .builder().ccdCaseReference(1234L).generalAppType(GAApplicationType.builder().types(types).build()).build();
@@ -348,7 +345,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotCauseAnyErrorsWhenGaTypeIsMultipleTypeWithSettleOrDiscontinueConsent() {
             List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT,
                     SETTLE_BY_CONSENT);
-            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             CaseData caseData = CaseDataBuilder
                     .builder().ccdCaseReference(1234L).generalAppType(GAApplicationType.builder().types(types).build()).build();
 
@@ -440,7 +436,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotCauseAnyErrors_whenGaTypeIsNotSettleOrDiscontinueConsent() {
 
             List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT);
-            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             CaseData caseData = CaseDataBuilder
                 .builder().generalAppType(GAApplicationType.builder().types(types).build())
                 .build().toBuilder()
@@ -459,7 +454,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotCauseAnyErrors_whenGaTypeIsNotSettleOrDiscontinueConsentYes() {
 
             List<GeneralApplicationTypes> types = List.of(SETTLE_BY_CONSENT);
-            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             CaseData caseData = CaseDataBuilder
                 .builder().generalAppType(GAApplicationType.builder().types(types).build())
                 .build().toBuilder()
@@ -478,7 +472,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         void shouldCauseError_whenGaTypeIsNotSettleOrDiscontinueConsentNo() {
 
             List<GeneralApplicationTypes> types = List.of(SETTLE_BY_CONSENT);
-            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             CaseData caseData = CaseDataBuilder
                 .builder().generalAppType(GAApplicationType.builder().types(types).build())
                 .build().toBuilder()
@@ -786,7 +779,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             given(feesService.getFeeForGA(any()))
                     .willReturn(Fee.builder().code(FEE_CODE).calculatedAmountInPence(fee108)
                             .version(FEE_VERSION).build());
-            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(1234L).atStateClaimDraft().build();
             CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_AND_PBA);
 
@@ -807,7 +799,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                 .ccdCaseReference(1234L)
                 .atStateClaimDraft()
                 .build();
-            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_AND_PBA);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -822,7 +813,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                             .code(FEE_CODE)
                             .calculatedAmountInPence(fee108)
                             .version(FEE_VERSION).build());
-            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(1234L).atStateClaimIssued().build();
             CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_AND_PBA);
 
@@ -839,7 +829,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                             .code(FEE_CODE)
                             .calculatedAmountInPence(fee108)
                             .version(FEE_VERSION).build());
-            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
                     CaseDataBuilder.builder().build(), true, false);
             CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_AND_PBA);
@@ -858,7 +847,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                             .code(FEE_CODE)
                             .calculatedAmountInPence(fee108)
                             .version(FEE_VERSION).build());
-            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
                     CaseDataBuilder.builder().build(), false, false);
             CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_AND_PBA);
@@ -877,7 +865,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                             .code(FEE_CODE)
                             .calculatedAmountInPence(fee275)
                             .version(FEE_VERSION).build());
-            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
                     CaseDataBuilder.builder().build(), false, true);
             CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_AND_PBA);
@@ -896,7 +883,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                             .code(FEE_CODE)
                             .calculatedAmountInPence(fee275)
                             .version(FEE_VERSION).build());
-            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
             CaseData caseData = CaseDataBuilder
                 .builder().generalAppType(GAApplicationType.builder().types(types).build())
@@ -952,7 +938,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                 .code(FEE_CODE)
                                 .calculatedAmountInPence(fee14)
                                 .build());
-            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
                 CaseDataBuilder.builder().build(), false, false);
             CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
@@ -1002,7 +987,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(Fee.builder()
                                 .code(FEE_CODE)
                                 .calculatedAmountInPence(fee14).build());
-            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
                 CaseDataBuilder.builder().build(), false, false);
             CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
@@ -1068,11 +1052,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
                                                          any(CaseData.class), any(UserDetails.class), anyString()))
                 .thenReturn(caseData);
-            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-
-            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
-                .thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.getFormattedName()));
-
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1089,10 +1068,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                     .email(APPLICANT_EMAIL_ID_CONSTANT)
                     .build());
-            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
 
-            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
-                .thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.getFormattedName()));
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
                     any(CaseData.class), any(UserDetails.class), anyString()))
                     .thenReturn(getMockServiceData(caseData));
@@ -1156,7 +1132,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                                                                         .email(APPLICANT_EMAIL_ID_CONSTANT)
                                                                         .build());
-            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
                                                          any(CaseData.class), any(UserDetails.class), anyString()))
                 .thenReturn(getMockServiceData(caseData));
@@ -1186,10 +1161,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                     .email(APPLICANT_EMAIL_ID_CONSTANT)
                     .build());
-            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
 
-            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
-                .thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.getFormattedName()));
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
                     any(CaseData.class), any(UserDetails.class), anyString())).thenAnswer((Answer) invocation -> invocation.getArguments()[1]
             );
