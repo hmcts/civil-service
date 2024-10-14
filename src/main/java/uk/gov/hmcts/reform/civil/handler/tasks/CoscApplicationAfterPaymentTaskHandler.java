@@ -29,6 +29,7 @@ public class CoscApplicationAfterPaymentTaskHandler implements BaseExternalTaskH
     private final ObjectMapper mapper;
     private final IStateFlowEngine stateFlowEngine;
     private CaseData data;
+
     @Override
     public void handleTask(ExternalTask externalTask) {
         try {
@@ -64,7 +65,7 @@ public class CoscApplicationAfterPaymentTaskHandler implements BaseExternalTaskH
         return variables;
     }
 
-    private boolean checkMarkPaidInFull(CaseData data) {
-       return (Objects.nonNull(data.getActiveJudgment()) && (data.getActiveJudgment().getFullyPaymentMadeDate() != null));
-    }
+   private boolean checkMarkPaidInFull(CaseData data) {
+        return (Objects.nonNull(data.getActiveJudgment()) && (data.getActiveJudgment().getFullyPaymentMadeDate() != null));
+   }
 }
