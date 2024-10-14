@@ -50,7 +50,6 @@ import java.time.LocalDateTime;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -82,6 +81,8 @@ import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
     AddressLinesMapper.class
 })
 public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
+
+    private static final String OVERALL_TOTAL_KEY = "defaultJudgementOverallTotal";
 
     @Autowired
     private DefaultJudgementSpecHandler handler;
@@ -968,11 +969,16 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGetException_whenIsCalledAndTheOverallIsNull() {
+            BigDecimal overallTotal = BigDecimal.valueOf(500);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .defaultJudgementOverallTotal(overallTotal)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            assertThrows(IllegalStateException.class, () -> handler.handle(params));
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            var actualRepaymentAmount = response.getData().get(OVERALL_TOTAL_KEY);
+            assertThat(actualRepaymentAmount.toString()).isEqualTo(overallTotal.toString());
         }
     }
 
