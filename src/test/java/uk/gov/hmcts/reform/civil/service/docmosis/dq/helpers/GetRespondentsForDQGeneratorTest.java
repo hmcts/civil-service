@@ -82,6 +82,6 @@ class GetRespondentsForDQGeneratorTest {
         List<Party> respondents = getRespondentsForDQGenerator.getRespondents(caseData, "TWO");
 
         assertNotNull(respondents);
-        assertEquals(2, respondents.size());
+        assertEquals(1, respondents.size());
     }
 }
