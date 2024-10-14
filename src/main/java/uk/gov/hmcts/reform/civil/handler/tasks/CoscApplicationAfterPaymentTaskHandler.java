@@ -65,7 +65,7 @@ public class CoscApplicationAfterPaymentTaskHandler implements BaseExternalTaskH
         return variables;
     }
 
-   private boolean checkMarkPaidInFull(CaseData data) {
+    private boolean checkMarkPaidInFull(CaseData data) {
         return (Objects.nonNull(data.getActiveJudgment()) && (data.getActiveJudgment().getFullyPaymentMadeDate() != null));
-   }
+    }
 }
