@@ -52,7 +52,7 @@ public class GATypeHelper {
             case OTHER:
                 return GeneralApplicationTypes.OTHER;
             default:
-                throw new IllegalArgumentException("Invalid Claim Type");
+                throw new IllegalArgumentException("Invalid General Application Type");
         }
 
     }

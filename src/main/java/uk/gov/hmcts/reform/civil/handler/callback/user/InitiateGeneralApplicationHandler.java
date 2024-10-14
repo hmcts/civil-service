@@ -169,12 +169,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        List<GeneralApplicationTypes> generalAppTypes;
-        if (isCoscEnabledAndUserNotLip(callbackParams)) {
-            generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
-        } else {
-            generalAppTypes = caseData.getGeneralAppType().getTypes();
-        }
+        List<GeneralApplicationTypes> generalAppTypes = getGeneralApplicationTypes(callbackParams, caseData);
 
         var consent = Objects.nonNull(caseData.getGeneralAppRespondentAgreement())
                                 && YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed());
@@ -190,13 +185,27 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 .build();
     }
 
+    private List<GeneralApplicationTypes> getGeneralApplicationTypes(CallbackParams callbackParams, CaseData caseData) {
+        List<GeneralApplicationTypes> generalAppTypes;
+        if (caseData.getGeneralAppTypeLR() != null && isCoscEnabledAndUserNotLip(callbackParams)) {
+            generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
+        } else {
+            generalAppTypes = caseData.getGeneralAppType().getTypes();
+        }
+        return generalAppTypes;
+    }
+
     private boolean isCoscEnabledAndUserNotLip(CallbackParams callbackParams) {
-        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        List<String> roles = coreCaseUserService.getUserCaseRoles(
-            callbackParams.getCaseData().getCcdCaseReference().toString(),
-            userInfo.getUid()
-        );
-        return featureToggleService.isCoSCEnabled() && !(UserRoleUtils.isLIPDefendant(roles) || UserRoleUtils.isLIPClaimant(roles));
+        if (featureToggleService.isCoSCEnabled()) {
+            UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+            List<String> roles = coreCaseUserService.getUserCaseRoles(
+                callbackParams.getCaseData().getCcdCaseReference().toString(),
+                userInfo.getUid()
+            );
+            return !(UserRoleUtils.isLIPDefendant(roles) || UserRoleUtils.isLIPClaimant(roles));
+        } else {
+            return false;
+        }
     }
 
     private CallbackResponse gaValidateType(CallbackParams callbackParams) {
@@ -204,12 +213,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 
-        List<GeneralApplicationTypes> generalAppTypes;
-        if (isCoscEnabledAndUserNotLip(callbackParams)) {
-            generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
-        } else {
-            generalAppTypes = caseData.getGeneralAppType().getTypes();
-        }
+        List<GeneralApplicationTypes> generalAppTypes = getGeneralApplicationTypes(callbackParams, caseData);
 
         if (generalAppTypes.size() > 1
             && generalAppTypes.contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {
@@ -283,7 +287,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CallbackResponse setFeesAndPBA(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (isCoscEnabledAndUserNotLip(callbackParams)) {
+        if (caseData.getGeneralAppTypeLR() != null && isCoscEnabledAndUserNotLip(callbackParams)) {
             caseData = caseData.toBuilder().generalAppType(GAApplicationType.builder().types(GATypeHelper.getGATypes(
                 caseData.getGeneralAppTypeLR().getTypes())).build()).build();
         }
@@ -351,7 +355,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 .build();
             caseData = updatedCaseData;
         }
-        if (isCoscEnabledAndUserNotLip(callbackParams)) {
+        if (caseData.getGeneralAppTypeLR() != null && isCoscEnabledAndUserNotLip(callbackParams)) {
             var generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
             CaseData updatedCaseData = caseData.toBuilder()
                 .generalAppType(GAApplicationType.builder().types(generalAppTypes).build())
