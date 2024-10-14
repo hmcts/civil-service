@@ -13,19 +13,19 @@ import java.util.Map;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT2_STAY_LIFTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_STAY_LIFTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT2_STAY_UPDATE_REQUESTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_STAY_UPDATE_REQUESTED;
 
 @Service
-public class NotifyDefendantStayLiftedHandler extends AbstractNotifyManageStayHandler {
+public class NotifyDefendantStayUpdateRequestedHandler extends AbstractNotifyManageStayHandler {
 
-    private static final String TASK_ID = "NotifyDefendantStayLifted";
-    private static final String TASK_ID_DEFENDANT_2 = "NotifyDefendant2StayLifted";
-    private static final String REFERENCE_TEMPLATE = "stay-lifted-defendant-notification-%s";
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_DEFENDANT_STAY_LIFTED,
-                                                          NOTIFY_DEFENDANT2_STAY_LIFTED);
+    private static final String TASK_ID = "NotifyDefendantStayUpdateRequested";
+    private static final String TASK_ID_DEFENDANT_2 = "NotifyDefendant2StayUpdateRequested";
+    private static final String REFERENCE_TEMPLATE = "stay-update-requested-defendant-notification-%s";
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_DEFENDANT_STAY_UPDATE_REQUESTED,
+                                                          NOTIFY_DEFENDANT2_STAY_UPDATE_REQUESTED);
 
-    public NotifyDefendantStayLiftedHandler(NotificationService notificationService, NotificationsProperties notificationsProperties) {
+    public NotifyDefendantStayUpdateRequestedHandler(NotificationService notificationService, NotificationsProperties notificationsProperties) {
         super(notificationService, notificationsProperties);
     }
 
@@ -50,6 +50,16 @@ public class NotifyDefendantStayLiftedHandler extends AbstractNotifyManageStayHa
     @Override
     protected boolean isLiP(CaseData caseData) {
         return caseData.isRespondent1LiP();
+    }
+
+    @Override
+    protected String getNotificationTemplate(CaseData caseData) {
+        if (isLiP(caseData)) {
+            // TODO: add lip template
+            return null;
+        } else {
+            return notificationsProperties.getNotifyLRStayUpdateRequested();
+        }
     }
 
     @Override
@@ -81,6 +91,6 @@ public class NotifyDefendantStayLiftedHandler extends AbstractNotifyManageStayHa
 
     private boolean isRespondentSolicitor2(CallbackParams callbackParams) {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-        return NOTIFY_DEFENDANT2_STAY_LIFTED.equals(caseEvent);
+        return NOTIFY_DEFENDANT2_STAY_UPDATE_REQUESTED.equals(caseEvent);
     }
 }

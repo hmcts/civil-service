@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public abstract class AbstractNotifyStayLiftedHandler extends CallbackHandler implements NotificationData {
+public abstract class AbstractNotifyManageStayHandler extends CallbackHandler implements NotificationData {
 
     protected final NotificationService notificationService;
     protected final NotificationsProperties notificationsProperties;
