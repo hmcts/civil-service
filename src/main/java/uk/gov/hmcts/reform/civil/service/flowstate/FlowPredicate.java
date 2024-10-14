@@ -727,10 +727,11 @@ public class FlowPredicate {
             && caseData.getTakenOfflineByStaffDate() == null;
     };
 
-    public static final Predicate<CaseData> applicantOutOfTime = caseData ->
+    public static final Predicate<CaseData> applicantOutOfTimeAndNotBeingTakenOffline = caseData ->
         caseData.getApplicant1ResponseDeadline() != null
             && caseData.getApplicant1ResponseDeadline().isBefore(LocalDateTime.now())
-            && caseData.getApplicant1ResponseDate() == null;
+            && caseData.getApplicant1ResponseDate() == null
+            && caseData.getTakenOfflineByStaffDate() == null;
 
     //TODO Remove after DTSCCI-244
     public static final Predicate<CaseData> claimDismissalOutOfTime = caseData ->

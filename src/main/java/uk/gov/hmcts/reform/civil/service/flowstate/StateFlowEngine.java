@@ -41,7 +41,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.acceptRe
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.agreePartAdmitSettle;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allAgreedToLrMediationSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allResponsesReceived;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTime;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeAndNotBeingTakenOffline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeProcessedByCamunda;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesFullDefenceReceived;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesFullDefenceReceivedSpec;
@@ -568,7 +568,7 @@ public class StateFlowEngine implements IStateFlowEngine {
                 })
                     .transitionTo(FULL_DEFENCE_PROCEED)
                 .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
-                            .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim))
+                            .or(declinedMediation).and(applicantOutOfTimeAndNotBeingTakenOffline.negate()).and(demageMultiClaim))
                 .set((c, flags) -> {
                     flags.put(FlowFlag.IS_MULTI_TRACK.name(), true);
                     flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
@@ -576,7 +576,7 @@ public class StateFlowEngine implements IStateFlowEngine {
                 })
                 .transitionTo(FULL_DEFENCE_PROCEED)
                 .onlyIf(fullDefenceProceed.and(isCarmApplicableLipCase.negate()).and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
-                             .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate()))
+                             .or(declinedMediation).and(applicantOutOfTimeAndNotBeingTakenOffline.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate()))
                 .set((c, flags) -> {
                     flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
                     flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
@@ -597,7 +597,7 @@ public class StateFlowEngine implements IStateFlowEngine {
                 .transitionTo(FULL_DEFENCE_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterDefendantResponse)
                 .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
-                        .onlyIf(applicantOutOfTime)
+                        .onlyIf(applicantOutOfTimeAndNotBeingTakenOffline)
             .state(PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA)
                 .transitionTo(CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE).onlyIf(claimDismissedByCamunda)
             .state(CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE)
@@ -627,7 +627,7 @@ public class StateFlowEngine implements IStateFlowEngine {
                 .transitionTo(FULL_ADMIT_JUDGMENT_ADMISSION).onlyIf(ccjRequestJudgmentByAdmission.and(isPayImmediately))
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
                 .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
-                .onlyIf(applicantOutOfTime)
+                .onlyIf(applicantOutOfTimeAndNotBeingTakenOffline)
             .state(PART_ADMISSION)
                 .transitionTo(IN_MEDIATION).onlyIf(agreedToMediation.and(not(takenOfflineByStaff)))
                 .transitionTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION)
@@ -649,7 +649,7 @@ public class StateFlowEngine implements IStateFlowEngine {
                 )
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
                 .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
-                .onlyIf(applicantOutOfTime)
+                .onlyIf(applicantOutOfTimeAndNotBeingTakenOffline)
             .state(DIVERGENT_RESPOND_GO_OFFLINE)
             .state(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE)
             .state(ALL_RESPONSES_RECEIVED)
