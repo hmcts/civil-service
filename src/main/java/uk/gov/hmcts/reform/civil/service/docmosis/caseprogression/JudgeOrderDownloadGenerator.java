@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -31,7 +30,6 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.BLANK
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FIX_DATE_CCMC_DOCX;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FIX_DATE_CMC_DOCX;
 
-@Slf4j
 @Service
 public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFinalOrderForm> {
 
@@ -137,7 +135,7 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
         return JudgeFinalOrderForm.builder()
             .judgeNameTitle(userDetails.getFullName())
             .courtName(caseManagementLocationDetails.getExternalShortName())
-            .caseNumber(caseData.getCcdCaseReference().toString())
+            .caseNumber(nonNull(caseData.getCcdCaseReference()) ? caseData.getCcdCaseReference().toString() : null)
             .claimant1Name(caseData.getApplicant1().getPartyName())
             .claimant2Name(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
             .defendant1Name(caseData.getRespondent1().getPartyName())
