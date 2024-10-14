@@ -75,10 +75,15 @@ public class InterestCalculator {
 
     protected BigDecimal calculateInterestByDate(BigDecimal claimAmount, BigDecimal interestRate, LocalDate
         interestFromSpecificDate, LocalDate interestToSpecificDate) {
-        long numberOfDays
-            = Math.abs(ChronoUnit.DAYS.between(interestToSpecificDate, interestFromSpecificDate));
+        long numberOfDays = getNumberOfDays(interestFromSpecificDate, interestToSpecificDate);
         BigDecimal interestPerDay = getInterestPerDay(claimAmount, interestRate);
         return interestPerDay.multiply(BigDecimal.valueOf(numberOfDays));
+    }
+
+    private static long getNumberOfDays(LocalDate interestFromSpecificDate, LocalDate interestToSpecificDate) {
+        long numberOfDays
+            = Math.abs(ChronoUnit.DAYS.between(interestToSpecificDate, interestFromSpecificDate)) + 1;
+        return numberOfDays;
     }
 
     @NotNull
@@ -92,7 +97,7 @@ public class InterestCalculator {
 
     public BigDecimal calculateBulkInterest(CaseData caseData) {
         if (caseData.getClaimInterest() == YesOrNo.YES) {
-            long numberOfDays = Math.abs(ChronoUnit.DAYS.between(LocalDate.now(), caseData.getInterestFromSpecificDate()));
+            long numberOfDays = getNumberOfDays(caseData.getInterestFromSpecificDate(), LocalDate.now());
             BigDecimal interestDailyAmount = caseData.getSameRateInterestSelection().getDifferentRate();
             return interestDailyAmount.multiply(BigDecimal.valueOf(numberOfDays));
         } else {
