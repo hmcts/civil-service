@@ -17,7 +17,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 @Service
 public class CoscFeePaidCaseNotMarkedFullPaidDefendantNotificationHandler extends DashboardCallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(CaseEvent.CREATE_DASHBOARD_NOTIFICATION_COSC_PROCESSED_DEFENDANT);
+    private static final List<CaseEvent> EVENTS = Collections.singletonList(CaseEvent.CREATE_DASHBOARD_NOTIFICATION_COSC_NOT_PAID_FULL_DEFENDANT);
     private static final String TASK_ID = "GenerateDashboardNotificationCoSCProcessedDefendant";
 
     public CoscFeePaidCaseNotMarkedFullPaidDefendantNotificationHandler(DashboardApiClient dashboardApiClient,

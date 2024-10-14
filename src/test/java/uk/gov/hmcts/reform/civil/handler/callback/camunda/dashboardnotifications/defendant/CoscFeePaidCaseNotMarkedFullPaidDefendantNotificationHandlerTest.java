@@ -29,7 +29,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_COSC_PROCESSED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_COSC_NOT_PAID_FULL_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_DEFENDANT;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,7 +48,7 @@ public class CoscFeePaidCaseNotMarkedFullPaidDefendantNotificationHandlerTest ex
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
-        assertThat(handler.handledEvents()).contains(CREATE_DASHBOARD_NOTIFICATION_COSC_PROCESSED_DEFENDANT);
+        assertThat(handler.handledEvents()).contains(CREATE_DASHBOARD_NOTIFICATION_COSC_NOT_PAID_FULL_DEFENDANT);
     }
 
     @Test
@@ -56,7 +56,7 @@ public class CoscFeePaidCaseNotMarkedFullPaidDefendantNotificationHandlerTest ex
         assertThat(handler.camundaActivityId(
             CallbackParamsBuilder.builder()
                 .request(CallbackRequest.builder()
-                             .eventId(CREATE_DASHBOARD_NOTIFICATION_COSC_PROCESSED_DEFENDANT.name())
+                             .eventId(CREATE_DASHBOARD_NOTIFICATION_COSC_NOT_PAID_FULL_DEFENDANT.name())
                              .build())
                 .build()))
             .isEqualTo(TASK_ID);
@@ -78,7 +78,7 @@ public class CoscFeePaidCaseNotMarkedFullPaidDefendantNotificationHandlerTest ex
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COSC_PROCESSED_DEFENDANT.name()).build()
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COSC_NOT_PAID_FULL_DEFENDANT.name()).build()
             ).build();
 
             handler.handle(params);
