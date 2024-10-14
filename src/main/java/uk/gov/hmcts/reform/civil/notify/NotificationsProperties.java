@@ -639,4 +639,7 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String notifyLRStayLifted;
+
+    @NotEmpty
+    private String notifyLRStayUpdateRequested;
 }
