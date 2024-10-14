@@ -9,12 +9,12 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.JudgeFinalOrderFormPopulator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -54,9 +54,10 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
     public static final String FAST_WITH_BAND_WITH_REASON = "This case is allocated to the Fast Track and is allocated to complexity band %s because %s.";
 
     public JudgeOrderDownloadGenerator(DocumentManagementService documentManagementService, DocumentGeneratorService documentGeneratorService,
-                                       UserService userService, LocationReferenceDataService locationRefDataService, FeatureToggleService featureToggleService,
-                                       DocumentHearingLocationHelper documentHearingLocationHelper) {
-        super(documentManagementService, documentGeneratorService, userService, locationRefDataService, featureToggleService, documentHearingLocationHelper);
+                                       UserService userService, LocationReferenceDataService locationRefDataService,
+                                       DocumentHearingLocationHelper documentHearingLocationHelper, JudgeFinalOrderFormPopulator judgeFinalOrderFormPopulator) {
+        super(documentManagementService, documentGeneratorService, userService,
+              locationRefDataService, documentHearingLocationHelper, judgeFinalOrderFormPopulator);
         this.documentManagementService = documentManagementService;
         this.documentGeneratorService = documentGeneratorService;
         this.userService = userService;
