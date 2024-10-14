@@ -58,8 +58,6 @@ public class CoScNotificationForCaseNotMarkPaidInFullClaimantHandlerTest extends
         void shouldRecordScenario_whenInvokedCoScCaseNotMarkedPaidInFull() {
             CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build().toBuilder().applicant1Represented(
                 YesOrNo.NO).build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COSC_NOT_PAID_FULL_CLAIMANT.name()).build()).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
 
@@ -67,6 +65,8 @@ public class CoScNotificationForCaseNotMarkPaidInFullClaimantHandlerTest extends
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COSC_NOT_PAID_FULL_CLAIMANT.name()).build()).build();
             handler.handle(params);
 
             verify(dashboardApiClient).recordScenario(
