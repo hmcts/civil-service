@@ -59,8 +59,6 @@ class DQGeneratorFormBuilderTest {
     private DQGeneratorFormBuilder dqGeneratorFormBuilder;
 
     static final String DEFENDANT = "defendant";
-    static final String SMALL_CLAIM = "SMALL_CLAIM";
-    static final String organisationName = "Organisation name";
 
     @BeforeEach
     void setUp() {
@@ -117,7 +115,7 @@ class DQGeneratorFormBuilderTest {
     }
 
     @Test
-    void shouldCountWitnessesIncludingDefendantsForSpecClaimFullAdmission(){
+    void shouldCountWitnessesIncludingDefendantsForSpecClaimFullAdmission() {
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
@@ -137,7 +135,7 @@ class DQGeneratorFormBuilderTest {
     }
 
     @Test
-    void shouldSetApplicantsForNonClaimantResponse(){
+    void shouldSetApplicantsForNonClaimantResponse() {
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()

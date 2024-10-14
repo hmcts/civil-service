@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
-import uk.gov.hmcts.reform.civil.model.dq.DisclosureReport;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -264,21 +263,6 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         } else {
             return RequestedCourt.builder()
                 .requestHearingAtSpecificCourt(NO)
-                .build();
-        }
-    }
-
-    private DisclosureReport getDisclosureReport(DQ dq) {
-        DisclosureReport dr = dq.getDisclosureReport();
-        if (dr == null) {
-            return DisclosureReport.builder().disclosureProposalAgreed(NO)
-                .disclosureFormFiledAndServed(NO)
-                .build();
-        } else {
-            return DisclosureReport.builder()
-                .disclosureFormFiledAndServed(ofNullable(dr.getDisclosureFormFiledAndServed()).orElse(NO))
-                .disclosureProposalAgreed(ofNullable(dr.getDisclosureProposalAgreed()).orElse(NO))
-                .draftOrderNumber(dr.getDraftOrderNumber())
                 .build();
         }
     }

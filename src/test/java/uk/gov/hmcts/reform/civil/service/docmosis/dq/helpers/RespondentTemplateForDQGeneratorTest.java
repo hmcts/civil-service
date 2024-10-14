@@ -12,8 +12,12 @@ import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
@@ -57,6 +61,11 @@ class RespondentTemplateForDQGeneratorTest {
             respondentTemplateForDQGenerator.getRespondent1TemplateData(caseData, "ONE", BEARER_TOKEN);
 
         assertNotNull(result);
+        assertNotNull(result.getSolicitorReferences());
+        assertNotNull(result.getExperts());
+        assertNotNull(result.getWitnesses());
+        assertEquals(caseData.getLegacyCaseReference(), result.getReferenceNumber());
+        assertEquals(DocmosisTemplateDataUtils.toCaseName.apply(caseData), result.getCaseName());
     }
 
     @Test
@@ -76,6 +85,31 @@ class RespondentTemplateForDQGeneratorTest {
             respondentTemplateForDQGenerator.getRespondent2TemplateData(caseData, "TWO", BEARER_TOKEN);
 
         assertNotNull(result);
+        assertNotNull(result.getSolicitorReferences());
+        assertNotNull(result.getExperts());
+        assertEquals(caseData.getLegacyCaseReference(), result.getReferenceNumber());
+        assertEquals(DocmosisTemplateDataUtils.toCaseName.apply(caseData), result.getCaseName());
     }
 
+    @Test
+    void shouldReturnRespondent2TemplateDataWithFastClaim() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .respondent2DQ()
+            .respondent2SameLegalRepresentative(YES)
+            .responseClaimTrack(FAST_CLAIM.name())
+            .build()
+            .toBuilder()
+            .businessProcess(BusinessProcess.builder()
+                                 .camundaEvent("CLAIMANT_RESPONSE").build())
+            .build();
+
+        DirectionsQuestionnaireForm result =
+            respondentTemplateForDQGenerator.getRespondent2TemplateData(caseData, "TWO", BEARER_TOKEN);
+
+        assertNotNull(result);
+        assertNotNull(result.getExperts());
+        assertEquals(NO, result.getExperts().getExpertRequired());
+    }
 }
