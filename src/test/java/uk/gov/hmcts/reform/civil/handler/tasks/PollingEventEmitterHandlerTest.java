@@ -110,7 +110,7 @@ class PollingEventEmitterHandlerTest {
 
         pollingEventEmitterHandler.execute(externalTask, externalTaskService);
 
-        verify(externalTaskService, never()).complete(externalTask, null);
+        verify(externalTaskService, never()).complete(externalTask);
         verify(externalTaskService).handleFailure(
             eq(externalTask),
             eq(errorMessage),
