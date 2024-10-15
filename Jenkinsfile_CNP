@@ -85,6 +85,12 @@ withPipeline(type, product, component) {
     env.ENVIRONMENT = "preview"
     env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     loadVaultSecrets(secrets)
+
+    before('build') {
+      sh """
+      ./bin/validate-migration-files.sh ${env.CHANGE_BRANCH} ${env.CHANGE_TARGET}
+       """
+    }
   }
   onMaster {
     enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
