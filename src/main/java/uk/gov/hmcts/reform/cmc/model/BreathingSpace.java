@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.cmc.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -23,7 +23,7 @@ import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_FORM
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonNaming(value = PropertyNamingStrategy.SnakeCaseStrategy.class)
+@JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class BreathingSpace {
 
     private String bsReferenceNumber;

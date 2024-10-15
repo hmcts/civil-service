@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.properties.mediation.MediationCSVEmailConfiguration;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -30,7 +31,7 @@ import static uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment.json;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class GenerateMediationJsonAndTransferTaskHandler implements BaseExternalTaskHandler {
+public class GenerateMediationJsonAndTransferTaskHandler extends BaseExternalTaskHandler {
 
     private final MediationCasesSearchService caseSearchService;
     private final CaseDetailsConverter caseDetailsConverter;
@@ -43,9 +44,9 @@ public class GenerateMediationJsonAndTransferTaskHandler implements BaseExternal
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     @Override
-    public void handleTask(ExternalTask externalTask) {
+    public ExternalTaskData handleTask(ExternalTask externalTask) {
         if (!featureToggleService.isFeatureEnabled("carm")) {
-            return;
+            return ExternalTaskData.builder().build();
         }
         List<CaseData> inMediationCases;
         LocalDate claimMovedDate;
@@ -76,6 +77,7 @@ public class GenerateMediationJsonAndTransferTaskHandler implements BaseExternal
         } catch (Exception e) {
             log.error(e.getMessage());
         }
+        return ExternalTaskData.builder().build();
     }
 
     private Optional<EmailData> prepareEmail(MediationDTO mediationDTO) {
