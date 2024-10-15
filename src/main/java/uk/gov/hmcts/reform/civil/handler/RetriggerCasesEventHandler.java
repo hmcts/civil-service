@@ -7,6 +7,7 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
+import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import java.util.Map;
@@ -16,13 +17,13 @@ import static java.lang.Long.parseLong;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class RetriggerCasesEventHandler implements BaseExternalTaskHandler {
+public class RetriggerCasesEventHandler extends BaseExternalTaskHandler {
 
     private final CoreCaseDataService coreCaseDataService;
     private final ObjectMapper mapper;
 
     @Override
-    public void handleTask(ExternalTask externalTask) {
+    public ExternalTaskData handleTask(ExternalTask externalTask) {
         assert externalTask.getVariable("caseEvent") != null;
         assert externalTask.getVariable("caseIds") != null;
 
@@ -48,6 +49,7 @@ public class RetriggerCasesEventHandler implements BaseExternalTaskHandler {
                 log.error("ERROR Retrigger CaseId: {}. Case data: {},  {}", caseId, caseData, e.getMessage(), e);
             }
         }
+        return ExternalTaskData.builder().build();
     }
 
     private Map<String, Object> getCaseData(ExternalTask externalTask) {
