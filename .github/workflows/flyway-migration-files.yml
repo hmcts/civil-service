@@ -1,0 +1,32 @@
+name: Flyway Migration Files
+
+on:
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  validate-timestamps:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout current branch
+        uses: actions/checkout@v3
+
+      - name: Fetch base branch
+        run: |
+          git fetch origin +refs/heads/${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
+
+      - name: Validate Migration Files
+        run: |
+          MIGRATION_DIR=src/main/resources/db/migration
+
+          # Get migration files from the base branch
+          BASE_MIGRATION_FILES=$(git ls-tree -r --name-only origin/${{ github.base_ref }} -- $MIGRATION_DIR)
+
+          # Get the new migration files from the current branch
+          NEW_MIGRATION_FILES=$(git diff --name-only origin/${{ github.base_ref }} -- $MIGRATION_DIR)
+
+          # Call the validation script with the migration files
+          chmod +x bin/utils/validate-migration-filenames.sh
+          ./bin/utils/validate-migration-filenames.sh "$BASE_MIGRATION_FILES" "$NEW_MIGRATION_FILES"
