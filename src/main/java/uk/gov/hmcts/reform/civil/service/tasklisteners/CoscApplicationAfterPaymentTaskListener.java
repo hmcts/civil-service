@@ -5,7 +5,6 @@ import org.camunda.bpm.client.topic.TopicSubscriptionBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.handler.tasks.CoscApplicationAfterPaymentTaskHandler;
-import uk.gov.hmcts.reform.civil.handler.tasks.UpdateFromGACaseEventTaskHandler;
 
 @Component
 public class CoscApplicationAfterPaymentTaskListener {
