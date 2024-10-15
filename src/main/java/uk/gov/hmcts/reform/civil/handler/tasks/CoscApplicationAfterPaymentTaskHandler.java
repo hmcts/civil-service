@@ -29,7 +29,6 @@ public class CoscApplicationAfterPaymentTaskHandler extends BaseExternalTaskHand
     private final CoreCaseDataService coreCaseDataService;
     private final ObjectMapper mapper;
     private final IStateFlowEngine stateFlowEngine;
-    private CaseData data;
 
     @Override
     public ExternalTaskData  handleTask(ExternalTask externalTask) {
@@ -45,8 +44,8 @@ public class CoscApplicationAfterPaymentTaskHandler extends BaseExternalTaskHand
 
             StartEventResponse startEventResponse = coreCaseDataService.startUpdate(civilCaseId, caseEvent);
 
-            data = coreCaseDataService.submitUpdate(civilCaseId, caseDataContentFromStartEventResponse(startEventResponse, Map.of()));
-
+            var data = coreCaseDataService.submitUpdate(civilCaseId, caseDataContentFromStartEventResponse(startEventResponse, Map.of()));
+            return ExternalTaskData.builder().caseData(data).build();
         } catch (NumberFormatException ne) {
             throw new InvalidCaseDataException(
                 "Conversion to long datatype failed for general application for a case ", ne
@@ -54,11 +53,11 @@ public class CoscApplicationAfterPaymentTaskHandler extends BaseExternalTaskHand
         } catch (IllegalArgumentException | ValueMapperException e) {
             throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
         }
-        return ExternalTaskData.builder().build();
     }
 
     @Override
-    public VariableMap getVariableMap() {
+    public VariableMap getVariableMap(ExternalTaskData externalTaskData) {
+        var data = externalTaskData.caseData().orElseThrow();
         VariableMap variables = Variables.createVariables();
         var stateFlow = stateFlowEngine.evaluate(data);
         variables.putValue(FLOW_STATE, stateFlow.getState().getName());
