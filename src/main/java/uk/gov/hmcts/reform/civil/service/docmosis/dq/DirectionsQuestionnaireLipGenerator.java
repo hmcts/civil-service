@@ -12,7 +12,9 @@ import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.ExpertReportTemplate;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.LipExperts;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.LipExtraDQ;
+import uk.gov.hmcts.reform.civil.model.docmosis.dq.LipExtraDQEvidenceConfirmDetails;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
+import uk.gov.hmcts.reform.civil.model.citizenui.EvidenceConfirmDetails;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
@@ -96,6 +98,7 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
                     .giveEvidenceYourSelf(respondent1DQExtraDetails.getGiveEvidenceYourSelf())
                     .whyPhoneOrVideoHearing(respondent1DQExtraDetails.getWhyPhoneOrVideoHearing())
                     .wantPhoneOrVideoHearing(respondent1DQExtraDetails.getWantPhoneOrVideoHearing())
+                    .giveEvidenceConfirmDetails(getDetails(caseData.getCaseDataLiP().getRespondent1LiPResponse()))
                     .build())
                 .lipExperts(LipExperts.builder()
                     .details(respondent1DQExtraDetails
@@ -149,5 +152,19 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
                 .requestHearingAtSpecificCourt(NO)
                 .build();
         }
+    }
+
+    private LipExtraDQEvidenceConfirmDetails getDetails(RespondentLiPResponse respondentLiPResponse) {
+        EvidenceConfirmDetails confirmDetails = respondentLiPResponse.getRespondent1DQEvidenceConfirmDetails();
+        if (confirmDetails != null) {
+            return LipExtraDQEvidenceConfirmDetails.builder()
+                .firstName(confirmDetails.getFirstName())
+                .lastName(confirmDetails.getLastName())
+                .email(confirmDetails.getEmail())
+                .phone(confirmDetails.getPhone())
+                .jobTitle(confirmDetails.getJobTitle())
+                .build();
+        }
+        return null;
     }
 }
