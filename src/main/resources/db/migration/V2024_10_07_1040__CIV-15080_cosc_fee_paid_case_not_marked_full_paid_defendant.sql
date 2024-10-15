@@ -10,7 +10,7 @@ INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, titl
                                                   ,notification_role)
 VALUES ('Notice.AAA6.ProofofDebtPayment.Application.Defendant',
         'Awaiting claimant confirmation',
-        'Awaiting claimant confirmation',
-        '<p class="govuk-body">We''ve received your application for proof that you''ve paid your debt. The claimant will now have 30 days to confirm this. If they don''t respond in this time then the certificate will be issued automatically.</p>',
-        '<p class="govuk-body">We''ve received your application for proof that you''ve paid your debt. The claimant will now have 30 days to confirm this. If they don''t respond in this time then the certificate will be issued automatically.</p>',
+        'Aros am gadarnhad yr hawlydd',
+        '<p class="govuk-body">We''ve received your application to confirm you’ve paid a judgment debt. The person or business you owe money to now has a month to respond.</p>',
+        '<p class="govuk-body">Rydym wedi cael eich cais i gadarnhau eich bod wedi talu dyled ddyfarniad. Mae gan yr unigolyn neu''r busnes y mae arnoch arian iddynt nawr fis i ymateb.</p>',
         'DEFENDANT');
