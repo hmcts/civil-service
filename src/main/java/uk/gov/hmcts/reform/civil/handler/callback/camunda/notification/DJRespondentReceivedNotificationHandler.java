@@ -24,6 +24,7 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR_DJ_RECEIVED;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -152,7 +153,8 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
                                                           .getOrganisation()
                                                           .getOrganisationID(), caseData),
             CLAIM_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 
@@ -165,7 +167,8 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
             DEFENDANT_NAME, caseData.getDefendantDetailsSpec().getValue().getLabel(),
             CLAIMANT_EMAIL, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                          .getOrganisation()
-                                                         .getOrganisationID(), caseData)
+                                                         .getOrganisationID(), caseData),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 
@@ -178,7 +181,8 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             CLAIMANT_EMAIL, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                           .getOrganisation()
-                                                          .getOrganisationID(), caseData)
+                                                          .getOrganisationID(), caseData),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 
@@ -191,7 +195,8 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
             CLAIMANT_EMAIL, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                           .getOrganisation()
-                                                          .getOrganisationID(), caseData)
+                                                          .getOrganisationID(), caseData),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 
@@ -199,7 +204,8 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
         return Map.of(
             CLAIM_NUMBER_INTERIM, caseData.getLegacyCaseReference(),
             DEFENDANT_NAME_INTERIM, getPartyNameBasedOnType(caseData.getRespondent1()),
-            APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
+            APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 

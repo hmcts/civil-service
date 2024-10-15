@@ -23,6 +23,7 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_INTERIM_JUDGMENT_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service
 @RequiredArgsConstructor
@@ -99,7 +100,8 @@ public class InterimJudgmentClaimantNotificationHandler extends CallbackHandler 
         return new HashMap<>(Map.of(
             LEGAL_REP_CLAIMANT, getLegalOrganizationName(caseData),
             CLAIM_NUMBER_INTERIM, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME_INTERIM, caseData.getRespondent1().getPartyName()
+            DEFENDANT_NAME_INTERIM, caseData.getRespondent1().getPartyName(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         ));
     }
 
@@ -107,7 +109,8 @@ public class InterimJudgmentClaimantNotificationHandler extends CallbackHandler 
         return new HashMap<>(Map.of(
             LEGAL_REP_CLAIMANT, getLegalOrganizationName(caseData),
             CLAIM_NUMBER_INTERIM, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME_INTERIM, caseData.getRespondent2().getPartyName()
+            DEFENDANT_NAME_INTERIM, caseData.getRespondent2().getPartyName(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         ));
     }
 
