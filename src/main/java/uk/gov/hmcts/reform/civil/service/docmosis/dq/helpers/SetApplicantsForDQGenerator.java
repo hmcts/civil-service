@@ -47,6 +47,11 @@ public class SetApplicantsForDQGenerator {
             .phoneNumber(applicant.getPartyPhone())
             .representative(representativeService
                                 .getApplicantRepresentative(caseData))
+            // remove litigationFriendName when HNL toggle is enabled
+            .litigationFriendName(
+                ofNullable(litigationFriend)
+                    .map(LitigationFriend::getFullName)
+                    .orElse(""))
             .litigationFriendFirstName(
                 ofNullable(litigationFriend)
                     .map(LitigationFriend::getFirstName)
@@ -77,6 +82,11 @@ public class SetApplicantsForDQGenerator {
             .phoneNumber(applicant.getPartyPhone())
             .representative(representativeService
                                 .getApplicantRepresentative(caseData))
+            // remove litigationFriendName when HNL toggle is enabled
+            .litigationFriendName(
+                ofNullable(litigationFriend)
+                    .map(LitigationFriend::getFullName)
+                    .orElse(""))
             .litigationFriendFirstName(
                 ofNullable(litigationFriend)
                     .map(LitigationFriend::getFirstName)
