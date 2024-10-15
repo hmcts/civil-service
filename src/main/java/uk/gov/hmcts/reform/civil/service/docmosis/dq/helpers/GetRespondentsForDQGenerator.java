@@ -149,11 +149,6 @@ public class GetRespondentsForDQGenerator {
             .emailAddress(respondent.getPartyEmail())
             .phoneNumber(respondent.getPartyPhone())
             .representative(respondentRepresentative)
-            // remove litigationFriendName when HNL toggle is enabled
-            .litigationFriendName(
-                ofNullable(litigationFriend)
-                    .map(LitigationFriend::getFullName)
-                    .orElse(""))
             .litigationFriendFirstName(
                 ofNullable(litigationFriend)
                     .map(LitigationFriend::getFirstName)
@@ -179,11 +174,6 @@ public class GetRespondentsForDQGenerator {
             .emailAddress(caseData.getRespondent2().getPartyEmail())
             .phoneNumber(caseData.getRespondent2().getPartyPhone())
             .representative(representativeService.getRespondent1Representative(caseData))
-            // remove litigationFriendName when HNL toggle is enabled
-            .litigationFriendName(
-                ofNullable(caseData.getRespondent2LitigationFriend())
-                    .map(LitigationFriend::getFullName)
-                    .orElse(""))
             .litigationFriendFirstName(
                 ofNullable(caseData.getRespondent2LitigationFriend())
                     .map(LitigationFriend::getFirstName)
@@ -209,11 +199,6 @@ public class GetRespondentsForDQGenerator {
             .emailAddress(caseData.getRespondent1().getPartyEmail())
             .phoneNumber(caseData.getRespondent1().getPartyPhone())
             .representative(representativeService.getRespondent1Representative(caseData))
-            // remove litigationFriendName when HNL toggle is enabled
-            .litigationFriendName(
-                ofNullable(caseData.getRespondent1LitigationFriend())
-                    .map(LitigationFriend::getFullName)
-                    .orElse(""))
             .litigationFriendFirstName(
                 ofNullable(caseData.getRespondent1LitigationFriend())
                     .map(LitigationFriend::getFirstName)
@@ -239,11 +224,6 @@ public class GetRespondentsForDQGenerator {
             .emailAddress(caseData.getRespondent1().getPartyEmail())
             .phoneNumber(caseData.getRespondent1().getPartyPhone())
             .representative(representativeService.getRespondent1Representative(caseData))
-            // remove litigationFriendName when HNL toggle is enabled
-            .litigationFriendName(
-                ofNullable(caseData.getRespondent1LitigationFriend())
-                    .map(LitigationFriend::getFullName)
-                    .orElse(""))
             .litigationFriendFirstName(
                 ofNullable(caseData.getRespondent1LitigationFriend())
                     .map(LitigationFriend::getFirstName)
@@ -266,11 +246,6 @@ public class GetRespondentsForDQGenerator {
             .emailAddress(caseData.getRespondent2().getPartyEmail())
             .phoneNumber(caseData.getRespondent2().getPartyPhone())
             .representative(representativeService.getRespondent2Representative(caseData))
-            // remove litigationFriendName when HNL toggle is enabled
-            .litigationFriendName(
-                ofNullable(caseData.getRespondent2LitigationFriend())
-                    .map(LitigationFriend::getFullName)
-                    .orElse(""))
             .litigationFriendFirstName(
                 ofNullable(caseData.getRespondent2LitigationFriend())
                     .map(LitigationFriend::getFirstName)
@@ -301,11 +276,6 @@ public class GetRespondentsForDQGenerator {
                 .phoneNumber(respondent.getPartyPhone())
                 .representative(representativeService
                                     .getRespondent2Representative(caseData))
-                // remove litigationFriendName when HNL toggle is enabled
-                .litigationFriendName(
-                    ofNullable(litigationFriend)
-                        .map(LitigationFriend::getFullName)
-                        .orElse(""))
                 .litigationFriendFirstName(
                     ofNullable(litigationFriend)
                         .map(LitigationFriend::getFirstName)
@@ -336,11 +306,6 @@ public class GetRespondentsForDQGenerator {
                 .phoneNumber(respondent.getPartyPhone())
                 .representative(representativeService
                                     .getRespondent1Representative(caseData))
-                // remove litigationFriendName when HNL toggle is enabled
-                .litigationFriendName(
-                    ofNullable(litigationFriend)
-                        .map(LitigationFriend::getFullName)
-                        .orElse(""))
                 .litigationFriendFirstName(
                     ofNullable(litigationFriend)
                         .map(LitigationFriend::getFirstName)
