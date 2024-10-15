@@ -619,21 +619,21 @@ public class DashboardNotificationsParamsMapperTest {
 
     @Test
     void shouldMapParameters_whenCertOfSc() {
-        LocalDate fulllPaymentDate = LocalDate.now();
+        LocalDate fullPaymentDate = LocalDate.now();
         CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build().toBuilder()
             .applicant1Represented(YesOrNo.NO)
-            .certOfSC(CertOfSC.builder().defendantFinalPaymentDate(fulllPaymentDate).build())
+            .certOfSC(CertOfSC.builder().defendantFinalPaymentDate(fullPaymentDate).build())
             .build();
 
         Map<String, Object> result =
             mapper.mapCaseDataToParams(caseData, null);
         assertThat(result).extracting("coscFullPaymentDateEn")
-            .isEqualTo(DateUtils.formatDate(fulllPaymentDate));
+            .isEqualTo(DateUtils.formatDate(fullPaymentDate));
         assertThat(result).extracting("coscFullPaymentDateCy")
-            .isEqualTo(DateUtils.formatDateInWelsh(fulllPaymentDate));
+            .isEqualTo(DateUtils.formatDateInWelsh(fullPaymentDate));
         assertThat(result).extracting("coscNotificationDateEn")
-            .isEqualTo(DateUtils.formatDate(fulllPaymentDate));
+            .isEqualTo(DateUtils.formatDate(fullPaymentDate));
         assertThat(result).extracting("coscNotificationDateCy")
-            .isEqualTo(DateUtils.formatDateInWelsh(fulllPaymentDate));
+            .isEqualTo(DateUtils.formatDateInWelsh(fullPaymentDate));
     }
 }
