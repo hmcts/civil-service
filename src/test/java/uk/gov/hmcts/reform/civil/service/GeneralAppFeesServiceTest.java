@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -835,5 +836,45 @@ class GeneralAppFeesServiceTest {
         assertThat(feeDto).isEqualTo(FEE_PENCE_15);
         assertThat(keywordCaptor.getValue())
             .hasToString(CERT_OF_SATISFACTION_OR_CANCEL);
+    }
+
+    @Test
+    void should_RespondentAgreed() {
+        GeneralApplication ga = GeneralApplication.builder()
+            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.YES).build()).build();
+        assertThat(feesService.getRespondentAgreed(ga)).isTrue();
+    }
+
+    @Test
+    void should_RespondentNotAgreed() {
+        GeneralApplication ga = GeneralApplication.builder()
+            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.NO).build()).build();
+        assertThat(feesService.getRespondentAgreed(ga)).isFalse();
+    }
+
+    @Test
+    void should_InformOtherParty() {
+        GeneralApplication ga = GeneralApplication.builder()
+            .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build()).build();
+        assertThat(feesService.getInformOtherParty(ga)).isTrue();
+    }
+
+    @Test
+    void should_not_InformOtherParty() {
+        GeneralApplication ga = GeneralApplication.builder()
+            .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build()).build();
+        assertThat(feesService.getInformOtherParty(ga)).isFalse();
+    }
+
+    @Test
+    void shouldBeFree_when_CUI_ConsentedLateThan14DaysAdjournVacateApplicationIsBeingMade() {
+        GeneralApplication ga = GeneralApplication.builder()
+            .generalAppType(GAApplicationType.builder().types(List.of(ADJOURN_HEARING)).build())
+            .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
+            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.YES).build())
+            .build();
+
+        Fee fee = feesService.getFeeForGA(ga, LocalDate.now().plusDays(15));
+        assertThat(fee.getCode()).isEqualTo(FREE_REF);
     }
 }
