@@ -35,7 +35,6 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState.ISSUED;
 import static uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection.PAY_IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection.PAY_IN_INSTALMENTS;
-import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_DAY;
 import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
 
 @Service
@@ -49,7 +48,6 @@ public class DashboardNotificationsParamsMapper {
     public static final String CLAIMANT1_ACCEPTED_REPAYMENT_PLAN_WELSH = "derbyn";
     public static final String CLAIMANT1_REJECTED_REPAYMENT_PLAN_WELSH = "gwrthod";
     public static final String ORDER_DOCUMENT = "orderDocument";
-    public static final int CLAIM_SETTLED_OBJECTION_DEADLINE_DAYS = 19;
     private final FeatureToggleService featureToggleService;
     private final ClaimantResponseUtils claimantResponseUtils;
 
@@ -81,7 +79,6 @@ public class DashboardNotificationsParamsMapper {
 
         if (nonNull(caseData.getApplicant1ResponseDeadline())) {
             LocalDateTime applicant1ResponseDeadline = caseData.getApplicant1ResponseDeadline();
-            params.put("applicant1ResponseDeadline", applicant1ResponseDeadline);
             params.put("applicant1ResponseDeadlineEn", DateUtils.formatDate(applicant1ResponseDeadline));
             params.put("applicant1ResponseDeadlineCy",
                        DateUtils.formatDateInWelsh(applicant1ResponseDeadline.toLocalDate()));
@@ -102,7 +99,6 @@ public class DashboardNotificationsParamsMapper {
         }
         if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
             LocalDate whenWillThisAmountBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
-            params.put("respondent1AdmittedAmountPaymentDeadline", whenWillThisAmountBePaid.atTime(END_OF_DAY));
             params.put("respondent1AdmittedAmountPaymentDeadlineEn", DateUtils.formatDate(whenWillThisAmountBePaid));
             params.put(
                 "respondent1AdmittedAmountPaymentDeadlineCy",
@@ -118,7 +114,6 @@ public class DashboardNotificationsParamsMapper {
 
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
             LocalDate respondentResponseDeadline = caseData.getRespondent1ResponseDeadline().toLocalDate();
-            params.put("respondent1ResponseDeadline", caseData.getRespondent1ResponseDeadline());
             params.put("respondent1ResponseDeadlineEn", DateUtils.formatDate(respondentResponseDeadline));
             params.put("respondent1ResponseDeadlineCy", DateUtils.formatDateInWelsh(respondentResponseDeadline));
         }
@@ -145,14 +140,11 @@ public class DashboardNotificationsParamsMapper {
         getClaimSettledAmount(caseData).ifPresent(amount -> params.put("claimSettledAmount", amount));
 
         getClaimSettleDate(caseData).ifPresent(date -> {
-            params.put("claimSettledObjectionsDeadline",
-                       date.plusDays(CLAIM_SETTLED_OBJECTION_DEADLINE_DAYS).atTime(END_OF_DAY));
             params.put("claimSettledDateEn", DateUtils.formatDate(date));
             params.put("claimSettledDateCy", DateUtils.formatDateInWelsh(date));
         });
 
         getRespondToSettlementAgreementDeadline(caseData).ifPresent(date -> {
-            params.put("respondent1SettlementAgreementDeadline", date.atTime(END_OF_DAY));
             params.put("respondent1SettlementAgreementDeadlineEn", DateUtils.formatDate(date));
             params.put("respondent1SettlementAgreementDeadlineCy", DateUtils.formatDateInWelsh(date));
             params.put("claimantSettlementAgreementEn", getClaimantRepaymentPlanDecision(caseData));
@@ -161,8 +153,6 @@ public class DashboardNotificationsParamsMapper {
 
         LocalDate claimSettleDate = caseData.getApplicant1ClaimSettleDate();
         if (nonNull(claimSettleDate)) {
-            params.put("applicant1ClaimSettledObjectionsDeadline",
-                       claimSettleDate.plusDays(CLAIM_SETTLED_OBJECTION_DEADLINE_DAYS).atTime(END_OF_DAY));
             params.put("applicant1ClaimSettledDateEn", DateUtils.formatDate(claimSettleDate));
             params.put("applicant1ClaimSettledDateCy", DateUtils.formatDateInWelsh(claimSettleDate));
         }
@@ -195,7 +185,6 @@ public class DashboardNotificationsParamsMapper {
 
         if (nonNull(caseData.getHearingDueDate())) {
             LocalDate date = caseData.getHearingDueDate();
-            params.put("hearingDueDate", date.atTime(END_OF_DAY));
             params.put("hearingDueDateEn", DateUtils.formatDate(date));
             params.put("hearingDueDateCy", DateUtils.formatDateInWelsh(date));
         }
@@ -222,7 +211,6 @@ public class DashboardNotificationsParamsMapper {
 
         if (nonNull(caseData.getHearingDate())) {
             LocalDate date = caseData.getHearingDate().minusWeeks(4);
-            params.put("trialArrangementDeadline", date.atTime(END_OF_DAY));
             params.put("trialArrangementDeadlineEn", DateUtils.formatDate(date));
             params.put("trialArrangementDeadlineCy", DateUtils.formatDateInWelsh(date));
         }
@@ -248,7 +236,6 @@ public class DashboardNotificationsParamsMapper {
         }
 
         if (nonNull(caseData.getRequestForReconsiderationDeadline())) {
-            params.put("requestForReconsiderationDeadline", caseData.getRequestForReconsiderationDeadline());
             params.put("requestForReconsiderationDeadlineEn",
                        DateUtils.formatDate(caseData.getRequestForReconsiderationDeadline()));
             params.put("requestForReconsiderationDeadlineCy",
@@ -265,8 +252,6 @@ public class DashboardNotificationsParamsMapper {
             params.put("applicationFee",
                        "£" + this.removeDoubleZeros(String.valueOf(MonetaryConversions.penniesToPounds(caseData.getGeneralAppPBADetails().getFee().getCalculatedAmountInPence()))));
         }
-        // Ensures that notifications whose template specifies this will be prioritised when sorting
-        params.put("priorityNotificationDeadline", LocalDateTime.now());
 
         return params;
     }
