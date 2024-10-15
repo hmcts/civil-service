@@ -87,6 +87,7 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
         return HearingNoticeHmc.builder()
             .title(getHearingTypeTitleText(caseData, hearing))
             .hearingSiteName(nonNull(caseManagementLocation) ? caseManagementLocation.getExternalShortName() : null)
+            .caseManagementLocation(nonNull(caseManagementLocation) ? LocationReferenceDataService.getDisplayEntry(caseManagementLocation) : null)
             .hearingLocation(hearingLocation)
             .caseNumber(caseData.getCcdCaseReference())
             .creationDate(LocalDate.now())

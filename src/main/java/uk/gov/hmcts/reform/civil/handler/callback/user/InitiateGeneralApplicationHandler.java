@@ -287,7 +287,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CallbackResponse setFeesAndPBA(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (isCoscEnabledAndUserNotLip(callbackParams)) {
+        if (caseData.getGeneralAppTypeLR() != null && isCoscEnabledAndUserNotLip(callbackParams)) {
             caseData = caseData.toBuilder().generalAppType(GAApplicationType.builder().types(GATypeHelper.getGATypes(
                 caseData.getGeneralAppTypeLR().getTypes())).build()).build();
         }
@@ -355,7 +355,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 .build();
             caseData = updatedCaseData;
         }
-        if (isCoscEnabledAndUserNotLip(callbackParams)) {
+        if (caseData.getGeneralAppTypeLR() != null && isCoscEnabledAndUserNotLip(callbackParams)) {
             var generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
             CaseData updatedCaseData = caseData.toBuilder()
                 .generalAppType(GAApplicationType.builder().types(generalAppTypes).build())
