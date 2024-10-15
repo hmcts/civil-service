@@ -7,7 +7,8 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import static java.util.Objects.nonNull;
 
-public abstract class AbstractNotifyManageStayDefendantHandler extends AbstractNotifyManageStayHandler{
+public abstract class AbstractNotifyManageStayDefendantHandler extends AbstractNotifyManageStayHandler {
+
     public AbstractNotifyManageStayDefendantHandler(NotificationService notificationService, NotificationsProperties notificationsProperties) {
         super(notificationService, notificationsProperties);
     }

@@ -5,11 +5,11 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
-public abstract class AbstractNotifyManageStayClaimantHandler extends AbstractNotifyManageStayHandler{
+public abstract class AbstractNotifyManageStayClaimantHandler extends AbstractNotifyManageStayHandler {
+    
     public AbstractNotifyManageStayClaimantHandler(NotificationService notificationService, NotificationsProperties notificationsProperties) {
         super(notificationService, notificationsProperties);
     }
-
 
     @Override
     protected String getRecipient(CallbackParams callbackParams) {
