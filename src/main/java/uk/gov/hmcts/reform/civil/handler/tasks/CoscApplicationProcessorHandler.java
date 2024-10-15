@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.CoscApplicationProcessorEvent;
+import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.CoscApplicationSearchService;
 
@@ -21,10 +22,9 @@ public class CoscApplicationProcessorHandler extends BaseExternalTaskHandler {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final FeatureToggleService featureToggleService;
 
-    @Override
-    public void handleTask(ExternalTask externalTask) {
+    public ExternalTaskData handleTask(ExternalTask externalTask) {
         if (!featureToggleService.isCoSCEnabled()) {
-            return;
+            return ExternalTaskData.builder().build();
         }
 
         List<CaseDetails> cases = coscApplicationSearchService.getCases();
@@ -38,5 +38,6 @@ public class CoscApplicationProcessorHandler extends BaseExternalTaskHandler {
                 log.error("COSC Application Processor Job failed to process case with id: '{}'", caseDetails.getId(), e);
             }
         });
+        return ExternalTaskData.builder().build();
     }
 }
