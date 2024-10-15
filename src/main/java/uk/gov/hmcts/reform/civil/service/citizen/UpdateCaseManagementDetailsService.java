@@ -106,7 +106,6 @@ public class UpdateCaseManagementDetailsService {
     }
 
     private void updateApplicant1RequestedCourtDetails(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> availableLocations) {
-        log.info("Incoming Court location: {}", caseData.getApplicant1DQ().getApplicant1DQRequestedCourt());
         Optional.ofNullable(caseData.getApplicant1DQ())
             .ifPresent(dq -> Optional.ofNullable(dq.getApplicant1DQRequestedCourt())
                 .ifPresent(requestedCourt -> builder.applicant1DQ(
