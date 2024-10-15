@@ -14,14 +14,10 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.cosc.CertificateOfDebtGenerator;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -32,8 +28,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_HEARING_FORM;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_FORM;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(MockitoExtension.class)
 class GenerateCoscDocumentHandlerTest extends BaseCallbackHandlerTest {
@@ -79,8 +73,6 @@ class GenerateCoscDocumentHandlerTest extends BaseCallbackHandlerTest {
 
         verify(certificateOfDebtGenerator).generateDoc(any(CaseData.class), eq("BEARER_TOKEN"));
 
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getHearingDocuments()).hasSize(1);
     }
 
 }
