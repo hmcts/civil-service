@@ -38,22 +38,6 @@ import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.DetermineLoggedInSolicitor;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.HandleAdmitPartOfClaim;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.HandleDefendAllClaim;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.HandleRespondentResponseTypeForSpec;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.PopulateRespondent1Copy;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.RespondToClaimSpecUtils;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.SetApplicantResponseDeadline;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.SetGenericResponseTypeFlag;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.SetUploadTimelineTypeFlag;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.ValidateDateOfBirth;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.ValidateLengthOfUnemployment;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.ValidateMediationUnavailableDates;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.ValidateRespondentExperts;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.ValidateRespondentPaymentDate;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.ValidateRespondentWitnesses;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.ValidateUnavailableDates;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.CounterClaimConfirmationText;
@@ -173,23 +157,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     CourtLocationUtils.class,
     StateFlowEngine.class,
     AssignCategoryId.class,
-    FrcDocumentsUtils.class,
-    DetermineLoggedInSolicitor.class,
-    HandleAdmitPartOfClaim.class,
-    HandleDefendAllClaim.class,
-    HandleRespondentResponseTypeForSpec.class,
-    PopulateRespondent1Copy.class,
-    RespondToClaimSpecUtils.class,
-    SetApplicantResponseDeadline.class,
-    SetGenericResponseTypeFlag.class,
-    SetUploadTimelineTypeFlag.class,
-    ValidateMediationUnavailableDates.class,
-    ValidateUnavailableDates.class,
-    ValidateDateOfBirth.class,
-    ValidateRespondentPaymentDate.class,
-    ValidateLengthOfUnemployment.class,
-    ValidateRespondentWitnesses.class,
-    ValidateRespondentExperts.class
+    FrcDocumentsUtils.class
 })
 class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -1181,7 +1149,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         Witnesses actualRespondent1DQWitnesses = objectMapper.convertValue(response.getData().get(
             "respondent1DQWitnesses"), new TypeReference<>() {
-            });
+        });
         Witness actualRespondent1Witness = unwrapElements(actualRespondent1DQWitnesses.getDetails()).get(0);
         assertThat(actualRespondent1Witness.getPartyID()).isNotNull();
         assertThat(actualRespondent1Witness.getFirstName()).isEqualTo("Witness");
@@ -1194,7 +1162,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         Witnesses actualRespondent2DQWitnesses = objectMapper.convertValue(response.getData().get(
             "respondent2DQWitnesses"), new TypeReference<>() {
-            });
+        });
         Witness respondent2Witness = unwrapElements(actualRespondent2DQWitnesses.getDetails()).get(0);
         assertThat(respondent2Witness.getPartyID()).isNotNull();
         assertThat(respondent2Witness.getFirstName()).isEqualTo("Witness");
@@ -1495,13 +1463,13 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getData())
             .extracting("respondent1DQFixedRecoverableCostsIntermediate")
             .extracting("frcSupportingDocument")
-            .extracting("category_id")
+            .extracting("categoryID")
             .isEqualTo(DQ_DEF1.getValue());
 
         assertThat(response.getData())
             .extracting("respondent2DQFixedRecoverableCostsIntermediate")
             .extracting("frcSupportingDocument")
-            .extracting("category_id")
+            .extracting("categoryID")
             .isEqualTo(DQ_DEF2.getValue());
     }
 
@@ -1539,7 +1507,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getData())
             .extracting("respondent1DQFixedRecoverableCostsIntermediate")
             .extracting("frcSupportingDocument")
-            .extracting("category_id")
+            .extracting("categoryID")
             .isEqualTo(DQ_DEF1.getValue());
     }
 
@@ -1748,7 +1716,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .extracting("PostCode")
             .isEqualTo("new postcode");
         assertThat(response.getData().get("specAoSRespondentCorrespondenceAddressdetails"))
-            .isEqualTo(Collections.emptyMap());
+            .extracting("PostCode")
+            .isNull();
     }
 
     @Test
@@ -1796,7 +1765,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .extracting("PostCode")
             .isEqualTo("new postcode");
         assertThat(response.getData().get("specAoSRespondentCorrespondenceAddressdetails"))
-            .isEqualTo(Collections.emptyMap());
+            .extracting("PostCode")
+            .isNull();
         assertEquals(
             response.getData().get("specRespondentCorrespondenceAddressdetails"),
             response.getData().get("specRespondent2CorrespondenceAddressdetails")
@@ -1846,7 +1816,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .extracting("PostCode")
             .isEqualTo("new postcode");
         assertThat(response.getData().get("specAoSRespondent2CorrespondenceAddressdetails"))
-            .isEqualTo(Collections.emptyMap());
+            .extracting("PostCode")
+            .isNull();
     }
 
     @Test
