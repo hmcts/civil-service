@@ -73,7 +73,6 @@ public class StayCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().getCaseDetailsBefore().setState("CASE_PROGRESSION");
-
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
@@ -88,7 +87,6 @@ public class StayCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .hearingDueDate(LocalDate.now()).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().getCaseDetailsBefore().setState("CASE_PROGRESSION");
-
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
