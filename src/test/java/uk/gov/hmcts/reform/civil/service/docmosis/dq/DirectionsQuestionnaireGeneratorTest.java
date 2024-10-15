@@ -924,7 +924,6 @@ class DirectionsQuestionnaireGeneratorTest {
                     .build();
                 uk.gov.hmcts.reform.civil.model.dq.Expert expert1 =
                     uk.gov.hmcts.reform.civil.model.dq.Expert.builder()
-                        .name("Expert 1")
                         .firstName("first")
                         .lastName("last")
                         .phoneNumber("07123456789")

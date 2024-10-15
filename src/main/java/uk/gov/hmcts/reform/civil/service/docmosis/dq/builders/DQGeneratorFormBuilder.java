@@ -371,9 +371,6 @@ public class DQGeneratorFormBuilder {
         Expert expertDetails;
         if (experts != null) {
             expertDetails = Expert.builder()
-                //ToDo: Remove redundant name mapping when hnl toggle removed
-                .name(experts.getExpertName())
-                //===========================================================
                 .firstName(experts.getFirstName())
                 .lastName(experts.getLastName())
                 .phoneNumber(experts.getPhoneNumber())
@@ -401,10 +398,7 @@ public class DQGeneratorFormBuilder {
         return unwrapElements(dq.getExperts().getDetails())
             .stream()
             .map(expert -> Expert.builder()
-                //ToDo: Remove redundant name mapping when hnl toggle removed
-                .name(expert.getName())
-                //===========================================================
-                .firstName(expert.getFirstName())
+               .firstName(expert.getFirstName())
                 .lastName(expert.getLastName())
                 .phoneNumber(expert.getPhoneNumber())
                 .emailAddress(expert.getEmailAddress())
