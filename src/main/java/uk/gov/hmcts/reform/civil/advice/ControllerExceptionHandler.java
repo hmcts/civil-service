@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.advice;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -89,5 +90,15 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
         String errorMessage = "Action not accepted on case with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(includesLitigantInPersonException.getMessage(), requestData.caseId(), requestData.userId()));
         return new ResponseEntity<>(includesLitigantInPersonException.getMessage(), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(FeignException.UnprocessableEntity.class)
+    public ResponseEntity<Object> handleFeignUnprocessableEntity(FeignException.UnprocessableEntity ex) {
+
+        // Create a custom error response if needed
+        String errorMessage = ex.contentUTF8();
+
+        // You can return a custom error response with a proper status code
+        return new ResponseEntity<>(errorMessage, HttpStatus.UNPROCESSABLE_ENTITY); // HTTP 422
     }
 }
