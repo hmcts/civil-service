@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -51,7 +50,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.RESPOND
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
 
 @Service
-@Getter
 @RequiredArgsConstructor
 public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWithAuth<DirectionsQuestionnaireForm> {
 
@@ -59,11 +57,11 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     private final DocumentGeneratorService documentGeneratorService;
     private final IStateFlowEngine stateFlowEngine;
     private final RepresentativeService representativeService;
-    private final FeatureToggleService featureToggleService;
+    protected final FeatureToggleService featureToggleService;
     private final LocationReferenceDataService locationRefDataService;
     private final GetRespondentsForDQGenerator respondentsForDQGeneratorTask;
     private final SetApplicantsForDQGenerator setApplicantsForDQGenerator;
-    private final DQGeneratorFormBuilder dqGeneratorFormBuilder;
+    protected final DQGeneratorFormBuilder dqGeneratorFormBuilder;
     private final RespondentTemplateForDQGenerator respondentTemplateForDQGenerator;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {

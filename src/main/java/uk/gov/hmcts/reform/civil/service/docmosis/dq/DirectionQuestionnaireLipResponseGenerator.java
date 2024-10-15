@@ -53,7 +53,7 @@ public class DirectionQuestionnaireLipResponseGenerator extends DirectionsQuesti
 
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData, String authorisation) {
-        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = getDqGeneratorFormBuilder().getDirectionsQuestionnaireFormBuilder(
+        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = dqGeneratorFormBuilder.getDirectionsQuestionnaireFormBuilder(
             caseData,
             authorisation
         );
@@ -72,7 +72,7 @@ public class DirectionQuestionnaireLipResponseGenerator extends DirectionsQuesti
     @Override
     protected DocmosisTemplates getTemplateId(CaseData caseData) {
         if ((caseData.isRespondent1NotRepresented() || caseData.isApplicantNotRepresented())
-            && getFeatureToggleService().isLipVLipEnabled()) {
+            && featureToggleService.isLipVLipEnabled()) {
             return DQ_LIP_RESPONSE;
         }
         return super.getTemplateId(caseData);

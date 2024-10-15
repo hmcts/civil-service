@@ -6,10 +6,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.ComplexityBand;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.FixedRecoverableCostsSection;
@@ -23,14 +21,13 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.builders.DQGeneratorFormBuilder;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
-import uk.gov.hmcts.reform.civil.stateflow.model.State;
-
-import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_LIP_RESPONSE;
@@ -44,7 +41,8 @@ class DirectionQuestionnaireLipResponseGeneratorTest {
     private CaseData caseData;
     @InjectMocks
     private DirectionQuestionnaireLipResponseGenerator generator;
-
+    @Mock
+    private DQGeneratorFormBuilder dqGeneratorFormBuilder;
     @Mock
     private StateFlowEngine stateFlowEngine;
     @Mock
@@ -104,12 +102,6 @@ class DirectionQuestionnaireLipResponseGeneratorTest {
             .band(ComplexityBand.BAND_1)
             .reasons("reasons")
             .build();
-        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
-        when(stateFlow.getState()).thenReturn(State.from("IN_MEDIATION"));
-        given(caseData.getCaseAccessCategory()).willReturn(CaseCategory.SPEC_CLAIM);
-        given(caseData.getBusinessProcess()).willReturn(BusinessProcess.builder()
-                                                            .camundaEvent("DEFENDANT_RESPONSE_CUI")
-                                                            .build());
         given(caseData.getApplicant1()).willReturn(Party.builder()
                                                        .partyName("app1")
                                                        .type(Party.Type.COMPANY)
@@ -118,7 +110,6 @@ class DirectionQuestionnaireLipResponseGeneratorTest {
                                                        .partyName("res1")
                                                        .type(Party.Type.COMPANY)
                                                        .build());
-        given(caseData.getRespondent1ResponseDate()).willReturn(LocalDateTime.of(2024, 10, 1, 1, 1, 1));
         given(caseData.getResponseClaimTrack()).willReturn(AllocatedTrack.INTERMEDIATE_CLAIM.name());
         given(caseData.getRespondent1DQ()).willReturn(Respondent1DQ.builder()
                                                          .respondent1DQFixedRecoverableCostsIntermediate(
@@ -139,6 +130,9 @@ class DirectionQuestionnaireLipResponseGeneratorTest {
                                                                  .details("details")
                                                                  .build())
                                                          .build());
+        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder formBuilder = DirectionsQuestionnaireForm.builder();
+        when(dqGeneratorFormBuilder.getDirectionsQuestionnaireFormBuilder(any(CaseData.class), anyString()))
+            .thenReturn(formBuilder);
         //When
         DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, AUTH);
 
@@ -161,13 +155,6 @@ class DirectionQuestionnaireLipResponseGeneratorTest {
 
     @Test
     void shouldGenerateTemplateDataForMultiTrack() {
-        //Given
-        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
-        when(stateFlow.getState()).thenReturn(State.from("IN_MEDIATION"));
-        given(caseData.getCaseAccessCategory()).willReturn(CaseCategory.SPEC_CLAIM);
-        given(caseData.getBusinessProcess()).willReturn(BusinessProcess.builder()
-                                                            .camundaEvent("DEFENDANT_RESPONSE_CUI")
-                                                            .build());
         given(caseData.getApplicant1()).willReturn(Party.builder()
                                                        .partyName("app1")
                                                        .type(Party.Type.COMPANY)
@@ -176,7 +163,6 @@ class DirectionQuestionnaireLipResponseGeneratorTest {
                                                         .partyName("res1")
                                                         .type(Party.Type.COMPANY)
                                                         .build());
-        given(caseData.getRespondent1ResponseDate()).willReturn(LocalDateTime.of(2024, 10, 1, 1, 1, 1));
         given(caseData.getResponseClaimTrack()).willReturn(AllocatedTrack.MULTI_CLAIM.name());
         given(caseData.getRespondent1DQ()).willReturn(Respondent1DQ.builder()
                                                           .specRespondent1DQDisclosureOfElectronicDocuments(
@@ -195,6 +181,9 @@ class DirectionQuestionnaireLipResponseGeneratorTest {
                                                                   .details("details")
                                                                   .build())
                                                           .build());
+        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder formBuilder = DirectionsQuestionnaireForm.builder();
+        when(dqGeneratorFormBuilder.getDirectionsQuestionnaireFormBuilder(any(CaseData.class), anyString()))
+            .thenReturn(formBuilder);
         //When
         DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, AUTH);
 
