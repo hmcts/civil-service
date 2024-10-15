@@ -99,6 +99,7 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
         switch (caseEvent) {
             case GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC, GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC ->
                 assignCategoryId.assignCategoryIdToCaseDocument(caseDocument, DocCategory.CLAIMANT1_DETAILS_OF_CLAIM.getValue());
+            default -> { /* Do nothing */ }
         }
     }
 }
