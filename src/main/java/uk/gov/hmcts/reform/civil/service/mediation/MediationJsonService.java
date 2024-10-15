@@ -23,6 +23,9 @@ import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.mediation.helpers.PartyDetailPopulator;
+import uk.gov.hmcts.reform.civil.service.mediation.helpers.RepresentedLitigantPopulator;
+import uk.gov.hmcts.reform.civil.service.mediation.helpers.UnrepresentedLitigantPopulator;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -30,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -46,9 +50,10 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 @AllArgsConstructor
 public class MediationJsonService {
 
-    private final OrganisationService organisationService;
+    private final PartyDetailPopulator partyDetailPopulator;
+    private final RepresentedLitigantPopulator representedLitigantPopulator;
+    private final UnrepresentedLitigantPopulator unrepresentedLitigantPopulator;
 
-    private static final String PAPER_RESPONSE = "N";
     private static final String DATE_FORMAT = "yyyy-MM-dd";
 
     public MediationCase generateJsonContent(CaseData caseData) {
@@ -71,10 +76,15 @@ public class MediationJsonService {
     }
 
     private boolean buildCaseFlags(CaseData caseData) {
-        return checkForActiveCaseFlags(caseData) || checkApplicant1DQRequirements(caseData)
-            || checkRespondent1DQRequirements(caseData) || checkRespondent2DQRequirements(caseData)
-            || checkApplicant2DQRequirements(caseData) || checkLiPApplicantIsWelsh(caseData)
-            || checkLiPDefendantIsWelsh(caseData);
+        return Stream.of(
+            checkForActiveCaseFlags(caseData),
+            checkApplicant1DQRequirements(caseData),
+            checkRespondent1DQRequirements(caseData),
+            checkRespondent2DQRequirements(caseData),
+            checkApplicant2DQRequirements(caseData),
+            checkLiPApplicantIsWelsh(caseData),
+            checkLiPDefendantIsWelsh(caseData)
+        ).anyMatch(Boolean::booleanValue);
     }
 
     private boolean checkLiPApplicantIsWelsh(CaseData caseData) {
@@ -86,47 +96,58 @@ public class MediationJsonService {
     }
 
     private boolean checkApplicant1DQRequirements(CaseData caseData) {
-        if (caseData.getApplicant1DQ() != null) {
-            Applicant1DQ applicant1DQ = caseData.getApplicant1DQ();
 
-            return welshOrBilingualLanguage(applicant1DQ.getWelshLanguageRequirements())
-                || vulnerabilityAdjustmentRequired(applicant1DQ.getVulnerabilityQuestions())
-                || supportWithAccessNeedsRequired(applicant1DQ.getApplicant1DQHearingSupport());
+        if (caseData.getApplicant1DQ() == null) {
+            return false;
         }
-        return false;
+
+        return Stream.of(
+            welshOrBilingualLanguage(caseData.getApplicant1DQ().getWelshLanguageRequirements()),
+            vulnerabilityAdjustmentRequired(caseData.getApplicant1DQ().getVulnerabilityQuestions()),
+            supportWithAccessNeedsRequired(caseData.getApplicant1DQ().getApplicant1DQHearingSupport())
+        ).anyMatch(Boolean::booleanValue);
     }
+
 
     private boolean checkApplicant2DQRequirements(CaseData caseData) {
-        if (caseData.getApplicant2DQ() != null) {
-            Applicant2DQ applicant2DQ = caseData.getApplicant2DQ();
 
-            return welshOrBilingualLanguage(applicant2DQ.getWelshLanguageRequirements())
-                || vulnerabilityAdjustmentRequired(applicant2DQ.getVulnerabilityQuestions())
-                || supportWithAccessNeedsRequired(applicant2DQ.getApplicant2DQHearingSupport());
+        if (caseData.getApplicant2DQ() == null) {
+            return false;
         }
-        return false;
+
+        return Stream.of(
+            welshOrBilingualLanguage(caseData.getApplicant2DQ().getWelshLanguageRequirements()),
+            vulnerabilityAdjustmentRequired(caseData.getApplicant2DQ().getVulnerabilityQuestions()),
+            supportWithAccessNeedsRequired(caseData.getApplicant2DQ().getApplicant2DQHearingSupport())
+        ).anyMatch(Boolean::booleanValue);
     }
+
 
     private boolean checkRespondent1DQRequirements(CaseData caseData) {
-        if (caseData.getRespondent1DQ() != null) {
-            Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
 
-            return welshOrBilingualLanguage(respondent1DQ.getWelshLanguageRequirements())
-                || vulnerabilityAdjustmentRequired(respondent1DQ.getVulnerabilityQuestions())
-                || supportWithAccessNeedsRequired(respondent1DQ.getRespondent1DQHearingSupport());
+        if (caseData.getRespondent1DQ() == null) {
+            return false;
         }
-        return false;
+
+        return Stream.of(
+            welshOrBilingualLanguage(caseData.getRespondent1DQ().getWelshLanguageRequirements()),
+            vulnerabilityAdjustmentRequired(caseData.getRespondent1DQ().getVulnerabilityQuestions()),
+            supportWithAccessNeedsRequired(caseData.getRespondent1DQ().getRespondent1DQHearingSupport())
+        ).anyMatch(Boolean::booleanValue);
     }
 
-    private boolean checkRespondent2DQRequirements(CaseData caseData) {
-        if (caseData.getRespondent2DQ() != null) {
-            Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
 
-            return welshOrBilingualLanguage(respondent2DQ.getWelshLanguageRequirements())
-                || vulnerabilityAdjustmentRequired(respondent2DQ.getVulnerabilityQuestions())
-                || supportWithAccessNeedsRequired(respondent2DQ.getRespondent2DQHearingSupport());
+    private boolean checkRespondent2DQRequirements(CaseData caseData) {
+
+        if (caseData.getRespondent2DQ() == null) {
+            return false;
         }
-        return false;
+
+        return Stream.of(
+            welshOrBilingualLanguage(caseData.getRespondent2DQ().getWelshLanguageRequirements()),
+            vulnerabilityAdjustmentRequired(caseData.getRespondent2DQ().getVulnerabilityQuestions()),
+            supportWithAccessNeedsRequired(caseData.getRespondent2DQ().getRespondent2DQHearingSupport())
+        ).anyMatch(Boolean::booleanValue);
     }
 
     private boolean supportWithAccessNeedsRequired(HearingSupport hearingSupport) {
@@ -226,33 +247,10 @@ public class MediationJsonService {
 
     private MediationLitigant buildUnrepresentedLitigant(Party party, String originalMediationContactPerson,
                                                          MediationLiPCarm mediationLiPCarm) {
-        List<MediationUnavailability> dateRangeToAvoid = getDateRangeToAvoid(mediationLiPCarm);
-
-        String mediationContactName = getUnrepresentedLitigantMediationContactName(
-            party, originalMediationContactPerson, mediationLiPCarm);
-
-        String mediationEmail = YES.equals(mediationLiPCarm.getIsMediationEmailCorrect())
-            ? party.getPartyEmail() : mediationLiPCarm.getAlternativeMediationEmail();
-
-        String mediationPhone = YES.equals(mediationLiPCarm.getIsMediationPhoneCorrect())
-            ? party.getPartyPhone() : mediationLiPCarm.getAlternativeMediationTelephone();
-
-        String partyRole = party.getFlags() != null ? party.getFlags().getRoleOnCase() : null;
-        return MediationLitigant.builder()
-            .partyID(party.getPartyID())
-            .partyRole(partyRole)
-            .partyType(party.getType())
-            .partyName(party.getPartyName())
-            .paperResponse(PAPER_RESPONSE)
-            .represented(false)
-            .solicitorOrgName(null)
-            .litigantEmail(party.getPartyEmail())
-            .litigantTelephone(party.getPartyPhone())
-            .mediationContactName(mediationContactName)
-            .mediationContactNumber(mediationPhone)
-            .mediationContactEmail(mediationEmail)
-            .dateRangeToAvoid(dateRangeToAvoid)
-            .build();
+        var unrepresentedLitigantBuilder = MediationLitigant.builder();
+        partyDetailPopulator.populator(unrepresentedLitigantBuilder, party);
+        unrepresentedLitigantPopulator.populator(unrepresentedLitigantBuilder, party, originalMediationContactPerson, mediationLiPCarm);
+        return unrepresentedLitigantBuilder.build();
     }
 
     private MediationLitigant buildRepresentedLitigant(Party party,
@@ -260,99 +258,14 @@ public class MediationJsonService {
                                                        MediationAvailability mediationAvailability,
                                                        OrganisationPolicy organisationPolicy, String solicitorEmail) {
 
-        String solicitorOrgName = getSolicitorOrgName(organisationPolicy);
-        String partyRole = party.getFlags() != null ? party.getFlags().getRoleOnCase() : null;
-        String mediationContactName = getMediationContactName(mediationContactInformation);
-        String mediationContactNumber = mediationContactInformation != null
-            ? mediationContactInformation.getTelephoneNumber() : null;
-        String mediationEmail = mediationContactInformation != null
-            ? mediationContactInformation.getEmailAddress() : null;
-
-        List<MediationUnavailability> dateRangeToAvoid = getDateRangeToAvoid(mediationAvailability);
-
-        return MediationLitigant.builder()
-            .partyID(party.getPartyID())
-            .partyRole(partyRole)
-            .partyType(party.getType())
-            .partyName(party.getPartyName())
-            .paperResponse(PAPER_RESPONSE)
-            .represented(true)
-            .solicitorOrgName(solicitorOrgName)
-            .litigantEmail(solicitorEmail)
-            .litigantTelephone(null)
-            .mediationContactName(mediationContactName)
-            .mediationContactNumber(mediationContactNumber)
-            .mediationContactEmail(mediationEmail)
-            .dateRangeToAvoid(dateRangeToAvoid)
-            .build();
-    }
-
-    private List<MediationUnavailability> toMediationUnavailableDates(List<Element<UnavailableDate>> unavailableDatesForMediation) {
-        List<UnavailableDate> unavailableDates = unwrapElements(unavailableDatesForMediation);
-        List<MediationUnavailability> toMediationUnavailability = new ArrayList<>();
-        for (UnavailableDate unavailableDate : unavailableDates) {
-            if (SINGLE_DATE.equals(unavailableDate.getUnavailableDateType())) {
-                toMediationUnavailability.add(MediationUnavailability.builder()
-                                                  .dateFrom(formatDate(unavailableDate.getDate()))
-                                                  .dateTo(formatDate(unavailableDate.getDate()))
-                                                  .build());
-            }
-            if (DATE_RANGE.equals(unavailableDate.getUnavailableDateType())) {
-                toMediationUnavailability.add(MediationUnavailability.builder()
-                                                  .dateFrom(formatDate(unavailableDate.getFromDate()))
-                                                  .dateTo(formatDate(unavailableDate.getToDate()))
-                                                  .build());
-            }
-        }
-        return toMediationUnavailability;
-    }
-
-    private List<MediationUnavailability> getDateRangeToAvoid(MediationAvailability mediationAvailability) {
-        if (mediationAvailability != null && YES.equals(mediationAvailability.getIsMediationUnavailablityExists())) {
-            return toMediationUnavailableDates(mediationAvailability.getUnavailableDatesForMediation());
-        }
-        return List.of(MediationUnavailability.builder().build());
-    }
-
-    private List<MediationUnavailability> getDateRangeToAvoid(MediationLiPCarm mediationLiPCarm) {
-        if (YES.equals(mediationLiPCarm.getHasUnavailabilityNextThreeMonths())) {
-            return toMediationUnavailableDates(mediationLiPCarm.getUnavailableDatesForMediation());
-        }
-        return List.of(MediationUnavailability.builder().build());
+        var representedLitigantBuilder = MediationLitigant.builder();
+        partyDetailPopulator.populator(representedLitigantBuilder, party);
+        representedLitigantPopulator.populator(representedLitigantBuilder, mediationContactInformation, mediationAvailability, organisationPolicy, solicitorEmail);
+        return representedLitigantBuilder.build();
     }
 
     private String formatDate(LocalDate unavailableDate) {
         return unavailableDate.format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK));
     }
 
-    @Nullable
-    private String getMediationContactName(MediationContactInformation mediationContactInformation) {
-        return mediationContactInformation != null
-            ? String.format("%s %s", mediationContactInformation.getFirstName(), mediationContactInformation.getLastName())
-            : null;
-    }
-
-    @Nullable
-    private String getSolicitorOrgName(OrganisationPolicy organisationPolicy) {
-        String orgId = organisationPolicy.getOrganisation().getOrganisationID();
-        Optional<Organisation> organisation = organisationService.findOrganisationById(orgId);
-        Organisation solicitorOrgDetails = organisation.orElse(null);
-        return solicitorOrgDetails != null ? solicitorOrgDetails.getName() : null;
-    }
-
-    private boolean isIndividualOrSoleTrader(Party party) {
-        return Party.Type.INDIVIDUAL.equals(party.getType())
-            || Party.Type.SOLE_TRADER.equals(party.getType());
-    }
-
-    private String getUnrepresentedLitigantMediationContactName(Party party,
-                                                                 String originalMediationContactPerson,
-                                                                 MediationLiPCarm mediationLiPCarm) {
-        if (isIndividualOrSoleTrader(party)) {
-            return party.getPartyName();
-        } else {
-            return YES.equals(mediationLiPCarm.getIsMediationContactNameCorrect())
-                ? originalMediationContactPerson : mediationLiPCarm.getAlternativeMediationContactPerson();
-        }
-    }
 }
