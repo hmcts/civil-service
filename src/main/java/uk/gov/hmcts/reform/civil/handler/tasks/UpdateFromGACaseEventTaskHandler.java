@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
@@ -37,7 +38,7 @@ import static java.util.Optional.ofNullable;
 
 @RequiredArgsConstructor
 @Component
-public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler {
+public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
 
     private static final String GA_DOC_SUFFIX = "Document";
     private static final String GA_ADDL_DOC_SUFFIX = "Doc";
@@ -58,7 +59,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
     private final Logger log = LoggerFactory.getLogger(UpdateFromGACaseEventTaskHandler.class);
 
     @Override
-    public void handleTask(ExternalTask externalTask) {
+    public ExternalTaskData handleTask(ExternalTask externalTask) {
         try {
             ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
 
@@ -70,22 +71,23 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
                     .orElseThrow(() -> new InvalidCaseDataException(
                         "General application parent case link not found"));
 
-            generalAppCaseData = caseDetailsConverter.toGACaseData(coreCaseDataService
+            var generalAppCaseData = caseDetailsConverter.toGACaseData(coreCaseDataService
                 .getCase(parseLong(generalAppCaseId)));
 
             StartEventResponse startEventResponse = coreCaseDataService.startUpdate(
                 civilCaseId,
                 variables.getCaseEvent()
             );
-            civilCaseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
+            var caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
 
-            data = coreCaseDataService.submitUpdate(
+            coreCaseDataService.submitUpdate(
                 civilCaseId,
                 CaseDataContentConverter.caseDataContentFromStartEventResponse(
                     startEventResponse,
-                    getUpdatedCaseData(civilCaseData, generalAppCaseData)
+                    getUpdatedCaseData(caseData, generalAppCaseData)
                 )
             );
+            return ExternalTaskData.builder().caseData(caseData).generalApplicationCaseData(generalAppCaseData).build();
         } catch (NumberFormatException ne) {
             throw new InvalidCaseDataException(
                 "Conversion to long datatype failed for general application for a case ", ne

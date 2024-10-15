@@ -141,7 +141,6 @@ import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationTypeLR;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
@@ -548,7 +547,6 @@ public class CaseDataBuilder {
     private YesOrNo generalAppVaryJudgementType;
     private Document generalAppN245FormUpload;
     private GAApplicationType generalAppType;
-    private GAApplicationTypeLR generalAppTypeLR;
     private GAHearingDateGAspec generalAppHearingDate;
 
     private ChangeOfRepresentation changeOfRepresentation;
@@ -740,11 +738,6 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder generalAppType(GAApplicationType generalAppType) {
         this.generalAppType = generalAppType;
-        return this;
-    }
-
-    public CaseDataBuilder generalAppTypeLR(GAApplicationTypeLR generalAppTypeLR) {
-        this.generalAppTypeLR = generalAppTypeLR;
         return this;
     }
 
