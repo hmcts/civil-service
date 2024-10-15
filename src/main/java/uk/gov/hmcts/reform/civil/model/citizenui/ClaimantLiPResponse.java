@@ -25,6 +25,7 @@ public class ClaimantLiPResponse {
     private ClaimantResponseOnCourtDecisionType claimantResponseOnCourtDecision;
     private String applicant1RejectedRepaymentReason;
     private LocalDate applicant1SuggestedImmediatePaymentDeadLine;
+    private EvidenceConfirmDetails applicant1DQEvidenceConfirmDetails;
 
     @JsonIgnore
     public boolean hasApplicant1SignedSettlementAgreement() {
