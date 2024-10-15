@@ -18,7 +18,7 @@ import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataC
 
 @RequiredArgsConstructor
 @Component
-public class CoscApplicationAfterPaymentTaskHandler implements BaseExternalTaskHandler {
+public class CoscApplicationAfterPaymentTaskHandler extends BaseExternalTaskHandler {
 
     private final CoreCaseDataService coreCaseDataService;
     private final ObjectMapper mapper;

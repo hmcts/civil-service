@@ -15,7 +15,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class CoscApplicationProcessorHandler implements BaseExternalTaskHandler {
+public class CoscApplicationProcessorHandler extends BaseExternalTaskHandler {
 
     private final CoscApplicationSearchService coscApplicationSearchService;
     private final ApplicationEventPublisher applicationEventPublisher;
