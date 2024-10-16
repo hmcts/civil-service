@@ -78,7 +78,7 @@ ERROR_FILES=()
 
 for FILE in ${NEW_MIGRATION_FILES}; do
   TIMESTAMP=$(echo "${FILE}" | grep -oP 'V\K[0-9]{4}_[0-9]{2}_[0-9]{2}_[0-9]{4}')
-  if ! [[ "${TIMESTAMP}" > "${LATEST_BASE_TIMESTAMP}" ]]; then
+  if [[ "${TIMESTAMP}" <= "${LATEST_BASE_TIMESTAMP}" ]]; then
     ERROR_FILES+=("${FILE}")
   fi
 done
