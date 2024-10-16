@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.callback;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -13,10 +13,10 @@ import java.util.Map;
 
 import static java.util.Optional.ofNullable;
 
+@Slf4j
 public abstract class CallbackHandler {
 
     private static final String DEFAULT = "default";
-    private static final Logger LOG = LoggerFactory.getLogger(CallbackHandler.class);
 
     protected abstract Map<String, Callback> callbacks();
 
@@ -68,8 +68,8 @@ public abstract class CallbackHandler {
         callbackKey = callbackKey(callbackParams.getVersion(), callbackParams.getType(), callbackParams.getPageId());
 
         if (ofNullable(callbacks().get(callbackKey)).isEmpty()) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("No implementation found for {}", callbackKey);
+            if (log.isDebugEnabled()) {
+                log.debug("No implementation found for {}", callbackKey);
             }
             callbackKey = callbackKey(callbackParams.getType(), callbackParams.getPageId());
         }

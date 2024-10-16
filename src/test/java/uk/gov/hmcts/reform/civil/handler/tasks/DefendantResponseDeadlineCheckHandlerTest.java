@@ -90,7 +90,7 @@ class DefendantResponseDeadlineCheckHandlerTest {
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(externalTaskService, never()).complete(mockTask, null);
+        verify(externalTaskService, never()).complete(mockTask);
         verify(externalTaskService).handleFailure(
             eq(mockTask),
             eq(errorMessage),

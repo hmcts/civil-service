@@ -30,6 +30,7 @@ public class HearingNoticeHmc implements MappableObject {
     private final String defendant2Reference;
     private final String feeAmount;
     private final String hearingSiteName;
+    private final String caseManagementLocation;
     private final String hearingLocation;
     private final String hearingDays;
     private final String totalHearingDuration;

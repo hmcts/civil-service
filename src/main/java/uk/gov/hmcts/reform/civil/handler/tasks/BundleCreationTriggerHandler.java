@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.search.BundleCreationTriggerService;
@@ -19,7 +20,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class BundleCreationTriggerHandler implements BaseExternalTaskHandler {
+public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
 
     private final BundleCreationTriggerService bundleCreationTriggerService;
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -27,7 +28,7 @@ public class BundleCreationTriggerHandler implements BaseExternalTaskHandler {
     private final CoreCaseDataService coreCaseDataService;
 
     @Override
-    public void handleTask(ExternalTask externalTask) {
+    public ExternalTaskData handleTask(ExternalTask externalTask) {
         List<CaseDetails> cases = bundleCreationTriggerService.getCases();
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
@@ -43,6 +44,7 @@ public class BundleCreationTriggerHandler implements BaseExternalTaskHandler {
                 log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
             }
         });
+        return ExternalTaskData.builder().build();
     }
 
     boolean getIsBundleCreatedForHearingDate(Long caseId) {
