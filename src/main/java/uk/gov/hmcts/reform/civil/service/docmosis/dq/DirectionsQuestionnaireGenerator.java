@@ -7,47 +7,29 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
-import uk.gov.hmcts.reform.civil.model.dq.DQ;
-import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGeneratorWithAuth;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.builders.DQGeneratorFormBuilder;
-import uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers.GetRespondentsForDQGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers.RespondentTemplateForDQGenerator;
-import uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers.SetApplicantsForDQGenerator;
-import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V1_FAST_TRACK_INT;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V2_DS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V2_DS_FAST_TRACK_INT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL;
-import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
 
 @Service
 @RequiredArgsConstructor
@@ -55,12 +37,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
-    private final IStateFlowEngine stateFlowEngine;
-    private final RepresentativeService representativeService;
     protected final FeatureToggleService featureToggleService;
-    private final LocationReferenceDataService locationRefDataService;
-    private final GetRespondentsForDQGenerator respondentsForDQGeneratorTask;
-    private final SetApplicantsForDQGenerator setApplicantsForDQGenerator;
     protected final DQGeneratorFormBuilder dqGeneratorFormBuilder;
     private final RespondentTemplateForDQGenerator respondentTemplateForDQGenerator;
 
@@ -224,7 +201,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     static final String DEFENDANT = "defendant";
 
     private String getFileName(CaseData caseData, DocmosisTemplates templateId) {
-        boolean isRespondent = isRespondentState(caseData);
+        boolean isRespondent = dqGeneratorFormBuilder.isRespondentState(caseData);
         String userPrefix = isRespondent ? DEFENDANT : "claimant";
         return String.format(templateId.getDocumentTitle(), userPrefix, caseData.getLegacyCaseReference());
     }
@@ -237,32 +214,6 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         );
 
         return builder.build();
-    }
-
-    static final String SMALL_CLAIM = "SMALL_CLAIM";
-    static final String organisationName = "Organisation name";
-
-    protected RequestedCourt getRequestedCourt(DQ dq, String authorisation) {
-        RequestedCourt rc = dq.getRequestedCourt();
-        if (rc != null && null !=  rc.getCaseLocation()) {
-            List<LocationRefData> courtLocations = (locationRefDataService
-                .getCourtLocationsByEpimmsIdAndCourtType(authorisation,
-                    rc.getCaseLocation().getBaseLocation()
-                ));
-            RequestedCourt.RequestedCourtBuilder builder = RequestedCourt.builder()
-                .requestHearingAtSpecificCourt(YES)
-                .reasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt());
-            courtLocations.stream()
-                .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
-                .findFirst().ifPresent(court -> builder
-                    .responseCourtCode(court.getCourtLocationCode())
-                    .responseCourtName(court.getCourtName()));
-            return builder.build();
-        } else {
-            return RequestedCourt.builder()
-                .requestHearingAtSpecificCourt(NO)
-                .build();
-        }
     }
 
     public static boolean isClaimantResponse(CaseData caseData) {
@@ -279,21 +230,5 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                     && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())) // 2v1 scenario
             || (YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2()) // 1v2 scenario
                     && YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2()));
-    }
-
-    private Boolean isRespondentState(CaseData caseData) {
-        if (isClaimantResponse(caseData)) {
-            return false;
-        }
-        String state = stateFlowEngine.evaluate(caseData).getState().getName();
-
-        return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION
-            || state.equals(FULL_DEFENCE.fullName())
-            || state.equals(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())
-            || state.equals(ALL_RESPONSES_RECEIVED.fullName())
-            || state.equals(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE.fullName())
-            || state.equals(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName())
-            || state.equals(RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.fullName());
     }
 }

@@ -7,49 +7,34 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.docmosis.FixedRecoverableCostsSection;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
-import uk.gov.hmcts.reform.civil.model.docmosis.dq.Expert;
-import uk.gov.hmcts.reform.civil.model.docmosis.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.Hearing;
-import uk.gov.hmcts.reform.civil.model.docmosis.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
 import uk.gov.hmcts.reform.civil.model.dq.FutureApplications;
-import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
-import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.Witness;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers.GetRespondentsForDQGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers.RespondentTemplateForDQGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers.SetApplicantsForDQGenerator;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
-import uk.gov.hmcts.reform.civil.utils.ElementUtils;
-import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
-import java.text.NumberFormat;
-import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
@@ -66,7 +51,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGE
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL;
-import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 @Component
@@ -76,9 +60,9 @@ public class DQGeneratorFormBuilder {
     private final IStateFlowEngine stateFlowEngine;
     private final RepresentativeService representativeService;
     private final FeatureToggleService featureToggleService;
-    private final LocationReferenceDataService locationRefDataService;
     private final GetRespondentsForDQGenerator respondentsForDQGeneratorTask;
     private final SetApplicantsForDQGenerator setApplicantsForDQGenerator;
+    private final RespondentTemplateForDQGenerator respondentTemplateForDQGenerator;
     static final String DEFENDANT = "defendant";
     static final String SMALL_CLAIM = "SMALL_CLAIM";
     static final String organisationName = "Organisation name";
@@ -106,7 +90,7 @@ public class DQGeneratorFormBuilder {
             setApplicantsForDQGenerator.setApplicants(builder, caseData);
         }
 
-        Witnesses witnesses = getWitnesses(dq);
+        Witnesses witnesses = respondentTemplateForDQGenerator.getWitnesses(dq);
 
         Integer witnessesIncludingDefendants = null;
         String state = stateFlowEngine.evaluate(caseData).getState().getName();
@@ -129,19 +113,19 @@ public class DQGeneratorFormBuilder {
                                                  ? dq.getDisclosureOfElectronicDocuments() : dq.getSpecDisclosureOfElectronicDocuments())
             .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                     ? dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
-            .experts(!specAndSmallClaim ? getExperts(dq) : getSmallClaimExperts(dq, caseData, null))
+            .experts(!specAndSmallClaim ? respondentTemplateForDQGenerator.getExperts(dq) : respondentTemplateForDQGenerator.getSmallClaimExperts(dq, caseData, null))
             .witnesses(witnesses)
             .witnessesIncludingDefendants(witnessesIncludingDefendants)
             .hearing(getHearing(dq))
             //Remove hearingSupport after hnl released
-            .hearingSupport(getHearingSupport(dq))
+            .hearingSupport(respondentTemplateForDQGenerator.getHearingSupport(dq))
             .support(dq.getHearingSupport())
             .furtherInformation(getFurtherInformation(dq, caseData))
-            .welshLanguageRequirements(getWelshLanguageRequirements(dq))
+            .welshLanguageRequirements(respondentTemplateForDQGenerator.getWelshLanguageRequirements(dq))
             .statementOfTruth(dq.getStatementOfTruth())
             .disclosureReport(shouldDisplayDisclosureReport(caseData) ? dq.getDisclosureReport() : null)
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
-            .requestedCourt(getRequestedCourt(dq, authorisation));
+            .requestedCourt(respondentTemplateForDQGenerator.getRequestedCourt(dq, authorisation));
         return builder;
     }
 
@@ -222,7 +206,7 @@ public class DQGeneratorFormBuilder {
         return statementOfTruth;
     }
 
-    private Boolean isRespondentState(CaseData caseData) {
+    public Boolean isRespondentState(CaseData caseData) {
         if (isClaimantResponse(caseData)) {
             return false;
         }
@@ -257,22 +241,6 @@ public class DQGeneratorFormBuilder {
                 return caseData.getRespondent1DQ();
             }
         }
-    }
-
-    private Witnesses getWitnesses(DQ dq) {
-        var witnesses = dq.getWitnesses();
-        if (witnesses == null) {
-            return Witnesses.builder().witnessesToAppear(NO)
-                .details(Collections.emptyList())
-                .build();
-        }
-        List<Witness> witnessesList = ofNullable(witnesses.getDetails())
-            .map(ElementUtils::unwrapElements)
-            .orElseGet(Collections::emptyList);
-        return Witnesses.builder()
-            .witnessesToAppear(witnesses.getWitnessesToAppear())
-            .details(witnessesList)
-            .build();
     }
 
     private int countWitnessesIncludingDefendant(Witnesses witnesses, CaseData caseData) {
@@ -341,131 +309,17 @@ public class DQGeneratorFormBuilder {
             .build();
     }
 
-    private Experts getExperts(DQ dq) {
-        var experts = dq.getExperts();
-        if (experts == null) {
-            return Experts.builder().expertRequired(NO)
-                .details(Collections.emptyList())
-                .build();
-        }
-        return Experts.builder()
-            .expertRequired(experts.getExpertRequired())
-            .expertReportsSent(
-                ofNullable(experts.getExpertReportsSent())
-                    .map(ExpertReportsSent::getDisplayedValue)
-                    .orElse(""))
-            .jointExpertSuitable(experts.getJointExpertSuitable())
-            .details(getExpertsDetails(dq))
-            .build();
-    }
-
-    private Experts getSmallClaimExperts(DQ dq, CaseData caseData, String defendantIdentifier) {
-        var experts = dq.getSmallClaimExperts();
-        YesOrNo expertRequired = defendantIdentifier == null || defendantIdentifier.equals("ONE")
-            ? caseData.getResponseClaimExpertSpecRequired()
-            : caseData.getResponseClaimExpertSpecRequired2();
-        if (isClaimantResponse(caseData)) {
-            expertRequired = caseData.getApplicantMPClaimExpertSpecRequired() != null
-                ? caseData.getApplicantMPClaimExpertSpecRequired() : caseData.getApplicant1ClaimExpertSpecRequired();
-        }
-        Expert expertDetails;
-        if (experts != null) {
-            expertDetails = Expert.builder()
-                .firstName(experts.getFirstName())
-                .lastName(experts.getLastName())
-                .phoneNumber(experts.getPhoneNumber())
-                .emailAddress(experts.getEmailAddress())
-                .formattedCost(MonetaryConversions.penniesToPounds(experts.getEstimatedCost()).toString())
-                .fieldOfExpertise(experts.getFieldofExpertise())
-                .whyRequired(experts.getWhyRequired())
-                .build();
-        } else {
-            expertDetails = Expert.builder().build();
-        }
-
-        return Experts.builder()
-            .expertRequired(caseData.isRespondent1NotRepresented() ? YesOrNo.NO : expertRequired)
-            .expertReportsSent(null)
-            .jointExpertSuitable(null)
-            .details(caseData.isRespondent1NotRepresented() && dq.getExperts() != null ? getExpertsDetails(dq) : List.of(expertDetails))
-            .build();
-    }
-
-    private List<Expert> getExpertsDetails(DQ dq) {
-        if (dq.getExperts().getDetails() == null) {
-            return Collections.emptyList();
-        }
-        return unwrapElements(dq.getExperts().getDetails())
-            .stream()
-            .map(expert -> Expert.builder()
-               .firstName(expert.getFirstName())
-                .lastName(expert.getLastName())
-                .phoneNumber(expert.getPhoneNumber())
-                .emailAddress(expert.getEmailAddress())
-                .fieldOfExpertise(expert.getFieldOfExpertise())
-                .whyRequired(expert.getWhyRequired())
-                .formattedCost(NumberFormat.getCurrencyInstance(Locale.UK)
-                                   .format(MonetaryConversions.penniesToPounds(expert.getEstimatedCost())))
-                .build())
-            .collect(toList());
-    }
-
     private Hearing getHearing(DQ dq) {
         var hearing = dq.getHearing();
         if (hearing != null) {
             return Hearing.builder()
-                .hearingLength(getHearingLength(dq))
+                .hearingLength(respondentTemplateForDQGenerator.getHearingLength(dq))
                 .unavailableDatesRequired(hearing.getUnavailableDatesRequired())
                 .unavailableDates(unwrapElements(hearing.getUnavailableDates()))
                 .build();
         } else {
             return null;
         }
-    }
-
-    private String getHearingSupport(DQ dq) {
-        var stringBuilder = new StringBuilder();
-        ofNullable(dq.getHearingSupport())
-            .map(HearingSupport::getRequirements)
-            .orElse(List.of())
-            .forEach(requirement -> {
-                var hearingSupport = dq.getHearingSupport();
-                stringBuilder.append(requirement.getDisplayedValue());
-                switch (requirement) {
-                    case SIGN_INTERPRETER:
-                        stringBuilder.append(" - ").append(hearingSupport.getSignLanguageRequired());
-                        break;
-                    case LANGUAGE_INTERPRETER:
-                        stringBuilder.append(" - ").append(hearingSupport.getLanguageToBeInterpreted());
-                        break;
-                    case OTHER_SUPPORT:
-                        stringBuilder.append(" - ").append(hearingSupport.getOtherSupport());
-                        break;
-                    default:
-                        break;
-                }
-                stringBuilder.append("\n");
-            });
-        return stringBuilder.toString().trim();
-    }
-
-    private WelshLanguageRequirements getWelshLanguageRequirements(DQ dq) {
-        var welshLanguageRequirements = dq.getWelshLanguageRequirements();
-        if (welshLanguageRequirements == null) {
-            return WelshLanguageRequirements.builder()
-                .evidence("")
-                .court("")
-                .documents("")
-                .build();
-        }
-        return WelshLanguageRequirements.builder()
-            .evidence(ofNullable(
-                welshLanguageRequirements.getEvidence()).map(Language::getDisplayedValue).orElse(""))
-            .court(ofNullable(
-                welshLanguageRequirements.getCourt()).map(Language::getDisplayedValue).orElse(""))
-            .documents(ofNullable(
-                welshLanguageRequirements.getDocuments()).map(Language::getDisplayedValue).orElse(""))
-            .build();
     }
 
     private boolean shouldDisplayDisclosureReport(CaseData caseData) {
@@ -477,44 +331,6 @@ public class DQGeneratorFormBuilder {
             return false;
         }
         return true;
-    }
-
-    private String getHearingLength(DQ dq) {
-        var hearing = dq.getHearing();
-        if (hearing == null || hearing.getHearingLength() == null) {
-            return null;
-        }
-        switch (hearing.getHearingLength()) {
-            case LESS_THAN_DAY:
-                return hearing.getHearingLengthHours() + " hours";
-            case ONE_DAY:
-                return "One day";
-            default:
-                return hearing.getHearingLengthDays() + " days";
-        }
-    }
-
-    protected RequestedCourt getRequestedCourt(DQ dq, String authorisation) {
-        RequestedCourt rc = dq.getRequestedCourt();
-        if (rc != null && null !=  rc.getCaseLocation()) {
-            List<LocationRefData> courtLocations = (locationRefDataService
-                .getCourtLocationsByEpimmsIdAndCourtType(authorisation,
-                                                         rc.getCaseLocation().getBaseLocation()
-                ));
-            RequestedCourt.RequestedCourtBuilder builder = RequestedCourt.builder()
-                .requestHearingAtSpecificCourt(YES)
-                .reasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt());
-            courtLocations.stream()
-                .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
-                .findFirst().ifPresent(court -> builder
-                    .responseCourtCode(court.getCourtLocationCode())
-                    .responseCourtName(court.getCourtName()));
-            return builder.build();
-        } else {
-            return RequestedCourt.builder()
-                .requestHearingAtSpecificCourt(NO)
-                .build();
-        }
     }
 
     private boolean isRespondent2(CaseData caseData) {

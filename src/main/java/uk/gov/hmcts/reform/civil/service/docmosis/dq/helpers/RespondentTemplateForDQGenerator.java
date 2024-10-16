@@ -122,7 +122,7 @@ public class RespondentTemplateForDQGenerator {
             .build();
     }
 
-    private Experts getExperts(DQ dq) {
+    public Experts getExperts(DQ dq) {
         var experts = dq.getExperts();
         if (experts == null) {
             return Experts.builder().expertRequired(NO)
@@ -140,7 +140,7 @@ public class RespondentTemplateForDQGenerator {
             .build();
     }
 
-    private List<Expert> getExpertsDetails(DQ dq) {
+    public List<Expert> getExpertsDetails(DQ dq) {
         if (dq.getExperts().getDetails() == null) {
             return Collections.emptyList();
         }
@@ -159,7 +159,7 @@ public class RespondentTemplateForDQGenerator {
             .collect(toList());
     }
 
-    private Witnesses getWitnesses(DQ dq) {
+    public Witnesses getWitnesses(DQ dq) {
         var witnesses = dq.getWitnesses();
         if (witnesses == null) {
             return Witnesses.builder().witnessesToAppear(NO)
@@ -191,7 +191,7 @@ public class RespondentTemplateForDQGenerator {
         return true;
     }
 
-    protected RequestedCourt getRequestedCourt(DQ dq, String authorisation) {
+    public RequestedCourt getRequestedCourt(DQ dq, String authorisation) {
         RequestedCourt rc = dq.getRequestedCourt();
         if (rc != null && null !=  rc.getCaseLocation()) {
             List<LocationRefData> courtLocations = (locationRefDataService
@@ -214,7 +214,7 @@ public class RespondentTemplateForDQGenerator {
         }
     }
 
-    private String getHearingLength(DQ dq) {
+    public String getHearingLength(DQ dq) {
         var hearing = dq.getHearing();
         if (hearing == null || hearing.getHearingLength() == null) {
             return null;
@@ -242,7 +242,7 @@ public class RespondentTemplateForDQGenerator {
         }
     }
 
-    private Experts getSmallClaimExperts(DQ dq, CaseData caseData, String defendantIdentifier) {
+    public Experts getSmallClaimExperts(DQ dq, CaseData caseData, String defendantIdentifier) {
         var experts = dq.getSmallClaimExperts();
         YesOrNo expertRequired = defendantIdentifier == null || defendantIdentifier.equals("ONE")
             ? caseData.getResponseClaimExpertSpecRequired()
@@ -283,7 +283,7 @@ public class RespondentTemplateForDQGenerator {
             || "CLAIMANT_RESPONSE_CUI".equals(businessProcess);
     }
 
-    private String getHearingSupport(DQ dq) {
+    public String getHearingSupport(DQ dq) {
         var stringBuilder = new StringBuilder();
         ofNullable(dq.getHearingSupport())
             .map(HearingSupport::getRequirements)
@@ -309,7 +309,7 @@ public class RespondentTemplateForDQGenerator {
         return stringBuilder.toString().trim();
     }
 
-    private WelshLanguageRequirements getWelshLanguageRequirements(DQ dq) {
+    public WelshLanguageRequirements getWelshLanguageRequirements(DQ dq) {
         var welshLanguageRequirements = dq.getWelshLanguageRequirements();
         if (welshLanguageRequirements == null) {
             return WelshLanguageRequirements.builder()

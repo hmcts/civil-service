@@ -67,7 +67,6 @@ public class SetApplicantsForDQGenerator {
                                               .map(LitigationFriend::getEmailAddress)
                                               .orElse(""))
             .legalRepHeading(legalRepHeading);
-
         return applicant2PartyBuilder.build();
     }
 

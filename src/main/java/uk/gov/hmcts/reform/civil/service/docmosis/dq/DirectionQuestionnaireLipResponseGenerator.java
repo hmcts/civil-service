@@ -8,13 +8,8 @@ import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.builders.DQGeneratorFormBuilder;
-import uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers.GetRespondentsForDQGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers.RespondentTemplateForDQGenerator;
-import uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers.SetApplicantsForDQGenerator;
-import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,24 +23,14 @@ public class DirectionQuestionnaireLipResponseGenerator extends DirectionsQuesti
 
     public DirectionQuestionnaireLipResponseGenerator(DocumentManagementService documentManagementService,
                                                       DocumentGeneratorService documentGeneratorService,
-                                                      IStateFlowEngine stateFlowEngine,
-                                                      RepresentativeService representativeService,
                                                       FeatureToggleService featureToggleService,
-                                                      LocationReferenceDataService locationRefDataService,
-                                                      GetRespondentsForDQGenerator respondentsForDQGeneratorTask,
-                                                      SetApplicantsForDQGenerator setApplicantsForDQGenerator,
                                                       DQGeneratorFormBuilder dqGeneratorFormBuilder,
                                                       RespondentTemplateForDQGenerator respondentTemplateForDQGenerator) {
 
         super(
             documentManagementService,
             documentGeneratorService,
-            stateFlowEngine,
-            representativeService,
             featureToggleService,
-            locationRefDataService,
-            respondentsForDQGeneratorTask,
-            setApplicantsForDQGenerator,
             dqGeneratorFormBuilder,
             respondentTemplateForDQGenerator
         );
