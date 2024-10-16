@@ -141,7 +141,7 @@ public class InitiateGeneralApplicationServiceHelper {
                                  GeneralAppFeesService feesService) {
 
         LocalDate lipUrgentdate = LocalDate.now();
-        for(int i=0; i<LIP_URGENT_DAYS; i++) {
+        for (int i = 0; i < LIP_URGENT_DAYS; i++) {
             while (!workingDayIndicator.isWorkingDay(lipUrgentdate)) {
                 lipUrgentdate = lipUrgentdate.plusDays(1);
             }
