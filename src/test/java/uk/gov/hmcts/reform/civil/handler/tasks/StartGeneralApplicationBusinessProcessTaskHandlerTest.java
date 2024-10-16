@@ -50,7 +50,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.START_BUSINESS_PROCES
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.STARTED;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
-import static uk.gov.hmcts.reform.civil.handler.tasks.StartGeneralApplicationBusinessProcessTaskHandler.FLOW_STATE;
+import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_STATE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(SpringExtension.class)
