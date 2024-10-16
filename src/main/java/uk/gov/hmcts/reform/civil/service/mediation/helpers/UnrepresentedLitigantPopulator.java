@@ -5,7 +5,6 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.citizenui.MediationLiPCarm;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationLitigant;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationUnavailability;
 
@@ -60,10 +59,6 @@ public class UnrepresentedLitigantPopulator {
         return isIndividualOrSoleTrader(party)
             ? party.getPartyName()
             : getContactName(mediationLiPCarm, originalMediationContactPerson);
-    }
-
-    private boolean isMediationUnavailable(MediationAvailability mediationAvailability) {
-        return mediationAvailability != null && YES.equals(mediationAvailability.getIsMediationUnavailablityExists());
     }
 
     private List<MediationUnavailability> toMediationUnavailableDates(List<Element<UnavailableDate>> unavailableDatesForMediation) {

@@ -2,59 +2,41 @@ package uk.gov.hmcts.reform.civil.service.mediation;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
 import uk.gov.hmcts.reform.civil.model.caseflags.PartyFlags;
 import uk.gov.hmcts.reform.civil.model.citizenui.MediationLiPCarm;
-import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
-import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.VulnerabilityQuestions;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.service.mediation.helpers.PartyDetailPopulator;
+import uk.gov.hmcts.reform.civil.service.mediation.helpers.PartyDetailsPopulator;
 import uk.gov.hmcts.reform.civil.service.mediation.helpers.RepresentedLitigantPopulator;
 import uk.gov.hmcts.reform.civil.service.mediation.helpers.UnrepresentedLitigantPopulator;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.Language.BOTH;
 import static uk.gov.hmcts.reform.civil.enums.dq.Language.WELSH;
-import static uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType.DATE_RANGE;
-import static uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType.SINGLE_DATE;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagsHearingsUtils.getAllActiveCaseLevelFlags;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagsHearingsUtils.getAllActiveFlags;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 @Slf4j
 @Service
 @AllArgsConstructor
 public class MediationJsonService {
 
-    private final PartyDetailPopulator partyDetailPopulator;
+    private final PartyDetailsPopulator partyDetailsPopulator;
     private final RepresentedLitigantPopulator representedLitigantPopulator;
     private final UnrepresentedLitigantPopulator unrepresentedLitigantPopulator;
-
-    private static final String DATE_FORMAT = "yyyy-MM-dd";
 
     public MediationCase generateJsonContent(CaseData caseData) {
         List<MediationLitigant> litigantList = new ArrayList<>();
@@ -108,7 +90,6 @@ public class MediationJsonService {
         ).anyMatch(Boolean::booleanValue);
     }
 
-
     private boolean checkApplicant2DQRequirements(CaseData caseData) {
 
         if (caseData.getApplicant2DQ() == null) {
@@ -122,7 +103,6 @@ public class MediationJsonService {
         ).anyMatch(Boolean::booleanValue);
     }
 
-
     private boolean checkRespondent1DQRequirements(CaseData caseData) {
 
         if (caseData.getRespondent1DQ() == null) {
@@ -135,7 +115,6 @@ public class MediationJsonService {
             supportWithAccessNeedsRequired(caseData.getRespondent1DQ().getRespondent1DQHearingSupport())
         ).anyMatch(Boolean::booleanValue);
     }
-
 
     private boolean checkRespondent2DQRequirements(CaseData caseData) {
 
@@ -248,7 +227,7 @@ public class MediationJsonService {
     private MediationLitigant buildUnrepresentedLitigant(Party party, String originalMediationContactPerson,
                                                          MediationLiPCarm mediationLiPCarm) {
         var unrepresentedLitigantBuilder = MediationLitigant.builder();
-        partyDetailPopulator.populator(unrepresentedLitigantBuilder, party);
+        partyDetailsPopulator.populator(unrepresentedLitigantBuilder, party);
         unrepresentedLitigantPopulator.populator(unrepresentedLitigantBuilder, party, originalMediationContactPerson, mediationLiPCarm);
         return unrepresentedLitigantBuilder.build();
     }
@@ -259,13 +238,9 @@ public class MediationJsonService {
                                                        OrganisationPolicy organisationPolicy, String solicitorEmail) {
 
         var representedLitigantBuilder = MediationLitigant.builder();
-        partyDetailPopulator.populator(representedLitigantBuilder, party);
+        partyDetailsPopulator.populator(representedLitigantBuilder, party);
         representedLitigantPopulator.populator(representedLitigantBuilder, mediationContactInformation, mediationAvailability, organisationPolicy, solicitorEmail);
         return representedLitigantBuilder.build();
-    }
-
-    private String formatDate(LocalDate unavailableDate) {
-        return unavailableDate.format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK));
     }
 
 }

@@ -1,12 +1,11 @@
 package uk.gov.hmcts.reform.civil.service.mediation.helpers;
 
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationLitigant;
 
 @Component
-public class PartyDetailPopulator {
+public class PartyDetailsPopulator {
 
     private static final String PAPER_RESPONSE = "N";
 
