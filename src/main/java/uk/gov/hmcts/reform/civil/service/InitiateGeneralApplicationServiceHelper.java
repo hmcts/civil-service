@@ -140,16 +140,15 @@ public class InitiateGeneralApplicationServiceHelper {
                                  CaseData caseData,
                                  GeneralAppFeesService feesService) {
 
-        LocalDate lipUrgentdate = LocalDate.now();
-        for (int i = 0; i < LIP_URGENT_DAYS; i++) {
-            while (!workingDayIndicator.isWorkingDay(lipUrgentdate)) {
-                lipUrgentdate = lipUrgentdate.plusDays(1);
-            }
-        }
+        LocalDate startDate = LocalDate.now();
+        LocalDate lipUrgentEndDate = LocalDate.now().plusDays(LIP_URGENT_DAYS);
+
+        long noOfHoliday = startDate.datesUntil(lipUrgentEndDate)
+            .filter(date -> !workingDayIndicator.isWorkingDay(date)).count();
 
         if (Objects.nonNull(isGaAppSameAsParentCaseClLip)
                 && Objects.nonNull(caseData.getHearingDate())
-                && lipUrgentdate.isAfter(caseData.getHearingDate())) {
+                && lipUrgentEndDate.plusDays(noOfHoliday).isAfter(caseData.getHearingDate())) {
 
             applicationBuilder.generalAppUrgencyRequirement(
                     GAUrgencyRequirement
