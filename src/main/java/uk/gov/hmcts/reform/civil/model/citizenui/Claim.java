@@ -66,8 +66,6 @@ public interface Claim {
 
     boolean hasSdoBeenDrawn();
 
-    boolean isMoreDetailsRequired();
-
     boolean isMediationSuccessful();
 
     boolean isMediationUnsuccessful();
@@ -182,11 +180,9 @@ public interface Claim {
     }
 
     boolean isTrialArrangementStatusActive();
-
     boolean isTrialScheduledNoPaymentStatusActive();
 
     boolean isTrialScheduledPaymentPaidStatusActive();
-
     default boolean isHwfFullRemission() {
         return false;
     }

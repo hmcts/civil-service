@@ -94,9 +94,6 @@ public enum DashboardClaimStatus {
     HEARING_FORM_GENERATED_RELISTING(
         Claim::isTrialScheduledPaymentPaidStatusActive
     ),
-    MORE_DETAILS_REQUIRED(
-        Claim::isMoreDetailsRequired
-    ),
     IN_MEDIATION(
         Claim::isMediationPending
     ),

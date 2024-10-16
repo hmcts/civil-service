@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
@@ -125,8 +126,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     public boolean isSDOOrderCreated() {
         Optional<LocalDateTime> lastNonSdoOrderTime = getTimeOfLastNonSDOOrder();
         Optional<LocalDateTime> sdoTime = getSDOTime();
-        return caseData.getHearingDate() == null
-            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+        return CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && !isSDOOrderLegalAdviserCreated()
             && !isSDOOrderInReview()
             && !isSDOOrderInReviewOtherParty()
@@ -141,7 +141,6 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
         Optional<LocalDateTime> lastNonSdoOrderTime = getTimeOfLastNonSDOOrder();
         Optional<LocalDateTime> sdoTime = getSDOTime();
         return featureToggleService.isCaseProgressionEnabled()
-            && caseData.getHearingDate() == null
             && isSDOMadeByLegalAdviser()
             && !isSDOOrderInReview()
             && !isSDOOrderInReviewOtherParty()
@@ -149,17 +148,6 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
             && sdoTime.isPresent()
             && (lastNonSdoOrderTime.isEmpty()
             || sdoTime.get().isAfter(lastNonSdoOrderTime.get()));
-    }
-
-    @Override
-    public boolean isMoreDetailsRequired() {
-        Optional<LocalDateTime> lastOrder = getTimeOfLastNonSDOOrder();
-        Optional<LocalDateTime> sdoTime = getSDOTime();
-        return sdoTime.isPresent()
-            && caseData.getHearingDate() == null
-            && featureToggleService.isCaseProgressionEnabled()
-            && (lastOrder.isEmpty()
-            || lastOrder.get().isBefore(sdoTime.get()));
     }
 
     @Override
@@ -205,27 +193,12 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     }
 
     @Override
-    public boolean isTrialArrangementStatusActive() {
-        Optional<LocalDate> hearingDate = getHearingDate();
-        if (caseData.isFastTrackClaim()
-            && hearingDate.isPresent()
-            && isHearingLessThanDaysAway(DAY_LIMIT)) {
-            Optional<LocalDateTime> lastOrder = getTimeOfLastNonSDOOrder();
-            return lastOrder.isEmpty()
-                || hearingDate.get().minusDays(DAY_LIMIT)
-                .isAfter(lastOrder.get().toLocalDate());
-        } else {
-            return false;
-        }
-    }
-
-    @Override
     public boolean isTrialScheduledNoPaymentStatusActive() {
         Optional<LocalDateTime> hearingScheduledDate = getWhenWasHearingScheduled();
         Optional<LocalDateTime> orderDate = getTimeOfLastNonSDOOrder();
-        return !isHearingLessThanDaysAway(DAY_LIMIT)
-            && CaseState.HEARING_READINESS.equals(caseData.getCcdState())
+        return CaseState.HEARING_READINESS.equals(caseData.getCcdState())
             && (hearingScheduledDate.isPresent())
+            && !isTrialArrangementStatusActive()
             && (orderDate.isEmpty()
             || orderDate.get().isBefore(hearingScheduledDate.get()));
     }
@@ -234,10 +207,27 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     public boolean isTrialScheduledPaymentPaidStatusActive() {
         Optional<LocalDateTime> hearingScheduledDate = getWhenWasHearingScheduled();
         Optional<LocalDateTime> orderDate = getTimeOfLastNonSDOOrder();
-        return !isHearingLessThanDaysAway(DAY_LIMIT)
-            && CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.equals(caseData.getCcdState())
+        return CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.equals(caseData.getCcdState())
             && (hearingScheduledDate.isPresent())
+            && !isTrialArrangementStatusActive()
             && (orderDate.isEmpty()
             || orderDate.get().isBefore(hearingScheduledDate.get()));
+    }
+
+    @Override
+    public boolean isTrialArrangementStatusActive() {
+        Optional<LocalDate> hearingDate = getHearingDate();
+        if (caseData.isFastTrackClaim()
+            && (CaseState.HEARING_READINESS.equals(caseData.getCcdState()) || CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.equals(caseData.getCcdState()))
+            && hearingDate.isPresent()
+            && YesOrNo.YES.equals(caseData.getTrialReadyNotified())
+            && isHearingLessThanDaysAway(DAY_LIMIT)) {
+            Optional<LocalDateTime> lastOrder = getTimeOfLastNonSDOOrder();
+            return lastOrder.isEmpty()
+                || hearingDate.get().minusDays(DAY_LIMIT)
+                .isAfter(lastOrder.get().toLocalDate());
+        } else {
+            return false;
+        }
     }
 }

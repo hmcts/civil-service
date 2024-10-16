@@ -419,6 +419,9 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         Optional<LocalDateTime> orderTime = getTimeOfLastNonSDOOrder();
         return caseData.isFastTrackClaim()
             && caseData.getTrialReadyRespondent1() != null
+            && (CaseState.HEARING_READINESS.equals(caseData.getCcdState()) || CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.equals(caseData.getCcdState()))
+            && !isBundleCreatedStatusActive()
+            && isHearingLessThanDaysAway(DAY_LIMIT)
             && (eventTime.isPresent())
             && (orderTime.isEmpty() || eventTime.get().isAfter(orderTime.get()));
     }

@@ -114,6 +114,9 @@ class DashboardClaimStatusFactoryTest {
         );
         // times passes until there's only 6 weeks to hearing
         caseData = passDays(caseData, eventHistory, 14);
+        caseData = caseData.toBuilder().trialReadyNotified(YesOrNo.YES).build();
+        caseData = caseData.toBuilder().ccdState(CaseState.HEARING_READINESS).build();
+
         shouldRequireTrialArrangements(caseData, eventHistory);
         applyOrderIfPosition(9, orderPosition, orderType,
                              caseData, eventHistory
@@ -203,14 +206,16 @@ class DashboardClaimStatusFactoryTest {
         );
 
         // wait until 6 weeks to hearing
-        caseData = passDays(caseData, eventHistory, 14);
+        caseData = passDays(caseData, eventHistory, 15);
         caseData = applyOrderIfPosition(5, orderPosition, orderType,
                                         caseData, eventHistory
         );
+        caseData = caseData.toBuilder().ccdState(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING).build();
         caseData = submitClaimantHearingArrangements(caseData, eventHistory);
         caseData = applyOrderIfPosition(6, orderPosition, orderType,
                                         caseData, eventHistory
         );
+        caseData = caseData.toBuilder().ccdState(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING).build();
         caseData = submitDefendantHearingArrangements(caseData, eventHistory);
         caseData = applyOrderIfPosition(7, orderPosition, orderType,
                                         caseData, eventHistory
