@@ -22,7 +22,6 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType.DATE_RANGE;
 import static uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType.SINGLE_DATE;
-import static uk.gov.hmcts.reform.civil.utils.DateUtils.formatDate;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 @Component

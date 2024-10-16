@@ -39,12 +39,11 @@ public class MediationJsonService {
     private final UnrepresentedLitigantPopulator unrepresentedLitigantPopulator;
 
     public MediationCase generateJsonContent(CaseData caseData) {
+        log.info("Generate JSON content for case ID {}", caseData.getCcdCaseReference());
         List<MediationLitigant> litigantList = new ArrayList<>();
 
-        // caseFlags
         boolean activeCaseFlags = buildCaseFlags(caseData);
 
-        // litigants
         buildLitigantFields(caseData, litigantList);
 
         return MediationCase.builder()
@@ -58,6 +57,7 @@ public class MediationJsonService {
     }
 
     private boolean buildCaseFlags(CaseData caseData) {
+        log.info("Build case flags for case ID {}", caseData.getCcdCaseReference());
         return Stream.of(
             checkForActiveCaseFlags(caseData),
             checkApplicant1DQRequirements(caseData),
@@ -70,15 +70,17 @@ public class MediationJsonService {
     }
 
     private boolean checkLiPApplicantIsWelsh(CaseData caseData) {
+        log.info("Check LiP Application is Welsh for case ID {}", caseData.getCcdCaseReference());
         return caseData.isClaimantBilingual();
     }
 
     private boolean checkLiPDefendantIsWelsh(CaseData caseData) {
+        log.info("Check LiP Defendant is Welsh for case ID {}", caseData.getCcdCaseReference());
         return caseData.isRespondentResponseBilingual();
     }
 
     private boolean checkApplicant1DQRequirements(CaseData caseData) {
-
+        log.info("Check Applicant 1 DQ requirements for case ID {}", caseData.getCcdCaseReference());
         if (caseData.getApplicant1DQ() == null) {
             return false;
         }
@@ -91,7 +93,7 @@ public class MediationJsonService {
     }
 
     private boolean checkApplicant2DQRequirements(CaseData caseData) {
-
+        log.info("Check Applicant 2 DQ requirements for case ID {}", caseData.getCcdCaseReference());
         if (caseData.getApplicant2DQ() == null) {
             return false;
         }
@@ -104,7 +106,7 @@ public class MediationJsonService {
     }
 
     private boolean checkRespondent1DQRequirements(CaseData caseData) {
-
+        log.info("Check Respondent 1 DQ requirements for case ID {}", caseData.getCcdCaseReference());
         if (caseData.getRespondent1DQ() == null) {
             return false;
         }
@@ -117,7 +119,7 @@ public class MediationJsonService {
     }
 
     private boolean checkRespondent2DQRequirements(CaseData caseData) {
-
+        log.info("Cehck Respondent 2 DQ requirements for case ID {}", caseData.getCcdCaseReference());
         if (caseData.getRespondent2DQ() == null) {
             return false;
         }
@@ -154,6 +156,7 @@ public class MediationJsonService {
     }
 
     private boolean checkForActiveCaseFlags(CaseData caseData) {
+        log.info("Check for active case flags for case ID {}", caseData.getCcdCaseReference());
         List<FlagDetail> allActiveCaseLevelFlags = getAllActiveCaseLevelFlags(caseData);
         List<PartyFlags> allActivePartyLevelFlags = getAllActiveFlags(caseData);
 
@@ -161,6 +164,7 @@ public class MediationJsonService {
     }
 
     private void buildLitigantFields(CaseData caseData, List<MediationLitigant> litigantList) {
+        log.info("Build litigant fields for case ID {}", caseData.getCcdCaseReference());
         litigantList.add(buildApplicant1Fields(caseData));
         if (caseData.getApplicant2() != null) {
             litigantList.add(buildApplicant2Fields(caseData));
@@ -172,6 +176,7 @@ public class MediationJsonService {
     }
 
     private MediationLitigant buildApplicant1Fields(CaseData caseData) {
+        log.info("Build Applicant 1 fields for case ID {}", caseData.getCcdCaseReference());
         if (NO.equals(caseData.getApplicant1Represented())) {
             return buildUnrepresentedLitigant(caseData.getApplicant1(),
                                               caseData.getCaseDataLiP().getApplicant1AdditionalLipPartyDetails() != null
@@ -188,6 +193,7 @@ public class MediationJsonService {
     }
 
     private MediationLitigant buildApplicant2Fields(CaseData caseData) {
+        log.info("Build Applicant 2 fields for case ID {}", caseData.getCcdCaseReference());
         return buildRepresentedLitigant(caseData.getApplicant2(),
                                         caseData.getApp1MediationContactInfo(), caseData.getApp1MediationAvailability(),
                                         caseData.getApplicant2OrganisationPolicy() != null
@@ -198,6 +204,7 @@ public class MediationJsonService {
     }
 
     private MediationLitigant buildRespondent1Fields(CaseData caseData) {
+        log.info("Build Respondent 1 fields for case ID {}", caseData.getCcdCaseReference());
         if (YES.equals(caseData.getRespondent1Represented())) {
             return buildRepresentedLitigant(caseData.getRespondent1(),
                                             caseData.getResp1MediationContactInfo(), caseData.getResp1MediationAvailability(),
@@ -212,6 +219,7 @@ public class MediationJsonService {
     }
 
     private MediationLitigant buildRespondent2Fields(CaseData caseData) {
+        log.info("Build Respondent 2 fields for case ID {}", caseData.getCcdCaseReference());
         if (YES.equals(caseData.getRespondent2SameLegalRepresentative())) {
             return buildRepresentedLitigant(caseData.getRespondent2(),
                                             caseData.getResp1MediationContactInfo(), caseData.getResp1MediationAvailability(),
