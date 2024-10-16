@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.common.SpecifiedParty;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimFormForSpec;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.TimelineEventDetailsDocmosis;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
@@ -152,13 +153,11 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
                 ? caseData.getSameRateInterestSelection().getDifferentRateReason()
                 : "The claimant reserves the right to claim interest under "
                 + "Section 69 of the County Courts Act 1984" : null)
-            .interestFromDate(caseData.getInterestFromSpecificDate() != null
-                                  ? caseData.getInterestFromSpecificDate() :
-                                 localDateTime.toLocalDate())
+            .interestFromDate(getInterestFromDate(caseData))
             .whenAreYouClaimingInterestFrom(caseData.getInterestClaimFrom() != null
                                                 ? caseData.getInterestClaimFrom().name()
                 .equals("FROM_CLAIM_SUBMIT_DATE")
-                ? "From the date the claim was issued"
+                ? "From the date the claim was submitted"
                 : caseData.getInterestFromSpecificDateDescription() : null)
             .interestEndDate(localDateTime.toLocalDate())
             .interestEndDateDescription(caseData.getBreakDownInterestDescription() != null
@@ -182,6 +181,14 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
                                                          .getOrganisationName())
             .defendantResponseDeadlineDate(getResponseDeadline(caseData))
             .build();
+    }
+
+    private static LocalDate getInterestFromDate(CaseData caseData) {
+        if(caseData.getInterestClaimFrom() == null) {
+            return null;
+        }
+        return caseData.getInterestClaimFrom().equals(InterestClaimFromType.FROM_A_SPECIFIC_DATE) ?
+            caseData.getInterestFromSpecificDate() : caseData.getSubmittedDate().toLocalDate();
     }
 
     public SealedClaimFormForSpec getTemplateDataBulkClaim(CaseData caseData) {
