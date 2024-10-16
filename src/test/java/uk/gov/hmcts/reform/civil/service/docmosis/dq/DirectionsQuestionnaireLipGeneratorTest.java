@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.DQExtraDetailsLip;
+import uk.gov.hmcts.reform.civil.model.citizenui.EvidenceConfirmDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.ExpertLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ExpertReportLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.HearingSupportLip;
@@ -193,6 +194,36 @@ class DirectionsQuestionnaireLipGeneratorTest {
         DirectionsQuestionnaireForm form = generator.getTemplateData(caseData, BEARER_TOKEN);
         //Then
         assertNotNull(form.getLipExtraDQ());
+    }
+
+    @Test
+    void shouldGenerateLipGiveEvidenceYourselfConfirmDetails_whenTheyExist() {
+        //Given
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+            .caseDataLiP(CaseDataLiP
+                             .builder()
+                             .respondent1LiPResponse(
+                                 RespondentLiPResponse
+                                     .builder()
+                                     .respondent1DQExtraDetails(
+                                         DQExtraDetailsLip.builder()
+                                             .giveEvidenceYourSelf(YesOrNo.YES)
+                                             .build())
+                                     .respondent1DQEvidenceConfirmDetails(EvidenceConfirmDetails
+                                                                              .builder()
+                                                                              .firstName("Sam")
+                                                                              .lastName("Wise")
+                                                                              .phone("07788994455")
+                                                                              .email("sam@wise.come")
+                                                                              .jobTitle("wise man")
+                                                                              .build())
+                                     .build())
+                             .build())
+            .build();
+        //When
+        DirectionsQuestionnaireForm form = generator.getTemplateData(caseData, BEARER_TOKEN);
+        //Then
+        assertNotNull(form.getLipExtraDQ().getGiveEvidenceConfirmDetails());
     }
 
     @Test
