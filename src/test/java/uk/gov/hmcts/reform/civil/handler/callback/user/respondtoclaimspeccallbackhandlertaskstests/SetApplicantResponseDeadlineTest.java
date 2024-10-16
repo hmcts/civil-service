@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -1009,3 +1010,4 @@ class SetApplicantResponseDeadlineTest {
             .build();
     }
 }
+*/

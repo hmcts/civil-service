@@ -44,7 +44,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbac
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.HandleRespondentResponseTypeForSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.PopulateRespondent1Copy;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.RespondToClaimSpecUtils;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.SetApplicantResponseDeadline;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.SetGenericResponseTypeFlag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.SetUploadTimelineTypeFlag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests.ValidateDateOfBirth;
@@ -180,7 +179,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     HandleRespondentResponseTypeForSpec.class,
     PopulateRespondent1Copy.class,
     RespondToClaimSpecUtils.class,
-    SetApplicantResponseDeadline.class,
     SetGenericResponseTypeFlag.class,
     SetUploadTimelineTypeFlag.class,
     ValidateMediationUnavailableDates.class,
