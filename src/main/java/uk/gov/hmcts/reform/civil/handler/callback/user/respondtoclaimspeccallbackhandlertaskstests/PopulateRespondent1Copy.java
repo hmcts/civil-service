@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.CaseTask;
@@ -48,54 +47,29 @@ public class PopulateRespondent1Copy implements CaseTask {
     private final ObjectMapper objectMapper;
     private final RespondToClaimSpecUtils respondToClaimSpecUtils;
 
+    private static final String UNKNOWN_MP_SCENARIO = "Unknown mp scenario";
+
     public CallbackResponse execute(CallbackParams callbackParams) {
-        log.info("Executing PopulateRespondent1Copy task with case data: {}", callbackParams.getCaseData().getCcdCaseReference());
-        CaseData caseData = callbackParams.getCaseData();
+        var caseData = callbackParams.getCaseData();
         Set<DefendantResponseShowTag> initialShowTags = getInitialShowTags(callbackParams);
-        CaseData.CaseDataBuilder<?, ?> updatedCaseData = initialiseCaseDataBuilder(caseData, initialShowTags);
-
-        updateCarmFields(caseData, updatedCaseData);
-        updateRespondentDetails(caseData, updatedCaseData);
-        updateCourtLocations(callbackParams, initialShowTags, updatedCaseData);
-
-        CallbackResponse response = buildCallbackResponse(updatedCaseData);
-        log.info("Completed PopulateRespondent1Copy task for case data: {}", callbackParams.getCaseData().getCcdCaseReference());
-        return response;
-    }
-
-    private CaseData.CaseDataBuilder<?, ?> initialiseCaseDataBuilder(CaseData caseData, Set<DefendantResponseShowTag> initialShowTags) {
-        log.debug("Initialising case data builder with initial show tags: {}", initialShowTags);
-        return caseData.toBuilder()
+        var updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1())
             .respondent1ClaimResponseTestForSpec(caseData.getRespondent1ClaimResponseTypeForSpec())
             .respondent2ClaimResponseTestForSpec(caseData.getRespondent2ClaimResponseTypeForSpec())
             .showConditionFlags(initialShowTags);
-    }
-
-    private void updateCarmFields(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
         if (toggleService.isCarmEnabledForCase(caseData)) {
-            log.debug("CARM is enabled for case: {}", caseData.getCcdCaseReference());
             updatedCaseData.showCarmFields(YES);
         } else {
-            log.debug("CARM is not enabled for case: {}", caseData.getCcdCaseReference());
             updatedCaseData.showCarmFields(NO);
         }
-    }
 
-    private void updateRespondentDetails(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
-        log.debug("Updating respondent details for case: {}", caseData.getCcdCaseReference());
         updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build());
 
         ofNullable(caseData.getRespondent2())
-            .ifPresent(r2 -> {
-                log.debug("Updating respondent 2 details for case: {}", caseData.getCcdCaseReference());
-                updatedCaseData.respondent2Copy(r2)
-                    .respondent2DetailsForClaimDetailsTab(r2.toBuilder().flags(null).build());
-            });
-    }
+            .ifPresent(r2 -> updatedCaseData.respondent2Copy(r2)
+                .respondent2DetailsForClaimDetailsTab(r2.toBuilder().flags(null).build())
+            );
 
-    private void updateCourtLocations(CallbackParams callbackParams, Set<DefendantResponseShowTag> initialShowTags, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
-        log.debug("Updating court locations for case: {}", callbackParams.getCaseData().getCcdCaseReference());
         DynamicList courtLocationList = courtLocationUtils.getLocationsFromList(respondToClaimSpecUtils.getLocationData(callbackParams));
         if (initialShowTags.contains(CAN_ANSWER_RESPONDENT_1)) {
             updatedCaseData.respondent1DQ(Respondent1DQ.builder()
@@ -113,10 +87,7 @@ public class PopulateRespondent1Copy implements CaseTask {
                                                       .build())
                                               .build());
         }
-    }
 
-    private CallbackResponse buildCallbackResponse(CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
-        log.debug("Building callback response for case: {}", updatedCaseData.build().getCcdCaseReference());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
@@ -125,71 +96,31 @@ public class PopulateRespondent1Copy implements CaseTask {
     private Set<DefendantResponseShowTag> getInitialShowTags(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         MultiPartyScenario mpScenario = getMultiPartyScenario(caseData);
-        log.debug("Determining initial show tags for case: {} with scenario: {}", caseData.getCcdCaseReference(), mpScenario);
-
-        return switch (mpScenario) {
-            case ONE_V_ONE, TWO_V_ONE -> handleOneOrTwoVOneScenario();
-            case ONE_V_TWO_ONE_LEGAL_REP -> handleOneVTwoOneLegalRepScenario();
-            case ONE_V_TWO_TWO_LEGAL_REP -> handleOneVTwoTwoLegalRepScenario(callbackParams);
-        };
-    }
-
-    private Set<DefendantResponseShowTag> handleOneOrTwoVOneScenario() {
-        log.debug("Handling ONE_V_ONE or TWO_V_ONE scenario");
         Set<DefendantResponseShowTag> set = EnumSet.noneOf(DefendantResponseShowTag.class);
-        addRespondent1Tag(set);
-        return set;
-    }
-
-    private Set<DefendantResponseShowTag> handleOneVTwoOneLegalRepScenario() {
-        log.debug("Handling ONE_V_TWO_ONE_LEGAL_REP scenario");
-        Set<DefendantResponseShowTag> set = EnumSet.noneOf(DefendantResponseShowTag.class);
-        addRespondent1Tag(set);
-        addRespondent2Tag(set);
-        return set;
-    }
-
-    private Set<DefendantResponseShowTag> handleOneVTwoTwoLegalRepScenario(CallbackParams callbackParams) {
-        log.debug("Handling ONE_V_TWO_TWO_LEGAL_REP scenario");
-        Set<DefendantResponseShowTag> set = EnumSet.noneOf(DefendantResponseShowTag.class);
-        UserInfo userInfo = getUserInfo(callbackParams);
-        List<String> roles = getUserRoles(callbackParams, userInfo);
-
-        if (isRolePresent(roles, RESPONDENTSOLICITORONE)) {
-            addRespondent1Tag(set);
+        switch (mpScenario) {
+            case ONE_V_ONE, TWO_V_ONE:
+                set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1);
+                break;
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1);
+                set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2);
+                break;
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+                List<String> roles = coreCaseUserService.getUserCaseRoles(
+                    callbackParams.getCaseData().getCcdCaseReference().toString(),
+                    userInfo.getUid()
+                );
+                if (roles.contains(RESPONDENTSOLICITORONE.getFormattedName())) {
+                    set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1);
+                }
+                if (roles.contains(RESPONDENTSOLICITORTWO.getFormattedName())) {
+                    set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2);
+                }
+                break;
+            default:
+                throw new UnsupportedOperationException(UNKNOWN_MP_SCENARIO);
         }
-        if (isRolePresent(roles, RESPONDENTSOLICITORTWO)) {
-            addRespondent2Tag(set);
-        }
-
         return set;
-    }
-
-    private UserInfo getUserInfo(CallbackParams callbackParams) {
-        log.debug("Fetching user info for token");
-        return userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-    }
-
-    private List<String> getUserRoles(CallbackParams callbackParams, UserInfo userInfo) {
-        log.debug("Fetching user roles for case: {}", callbackParams.getCaseData().getCcdCaseReference());
-        return coreCaseUserService.getUserCaseRoles(
-            callbackParams.getCaseData().getCcdCaseReference().toString(),
-            userInfo.getUid()
-        );
-    }
-
-    private boolean isRolePresent(List<String> roles, CaseRole caseRole) {
-        log.debug("Checking if role {} is present", caseRole);
-        return roles.contains(caseRole.getFormattedName());
-    }
-
-    private void addRespondent1Tag(Set<DefendantResponseShowTag> set) {
-        log.debug("Adding CAN_ANSWER_RESPONDENT_1 tag");
-        set.add(CAN_ANSWER_RESPONDENT_1);
-    }
-
-    private void addRespondent2Tag(Set<DefendantResponseShowTag> set) {
-        log.debug("Adding CAN_ANSWER_RESPONDENT_2 tag");
-        set.add(CAN_ANSWER_RESPONDENT_2);
     }
 }

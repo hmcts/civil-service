@@ -25,25 +25,18 @@ public class ValidateUnavailableDates implements CaseTask {
     private final UnavailableDateValidator unavailableDateValidator;
 
     public CallbackResponse execute(CallbackParams callbackParams) {
-        log.info("Executing ValidateUnavailableDates task with callbackParams: {}", callbackParams);
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors;
-
         if (SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
-            log.info("Processing SMALL_CLAIM track for caseData: {}", caseData);
             SmallClaimHearing smallClaimHearing = caseData.getRespondent1DQ().getRespondent1DQHearingSmallClaim();
             if (YES.equals(caseData.getIsRespondent2())) {
-                log.info("Respondent 2 is involved, using Respondent 2 DQ");
                 smallClaimHearing = caseData.getRespondent2DQ().getRespondent2DQHearingSmallClaim();
             }
             errors = unavailableDateValidator.validateSmallClaimsHearing(smallClaimHearing);
-            log.info("Validation errors for SMALL_CLAIM: {}", errors);
 
         } else {
-            log.info("Processing non-SMALL_CLAIM track for caseData: {}", caseData);
             Hearing hearingLRspec = caseData.getRespondent1DQ().getRespondent1DQHearingFastClaim();
             errors = unavailableDateValidator.validateFastClaimHearing(hearingLRspec);
-            log.info("Validation errors for non-SMALL_CLAIM: {}", errors);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

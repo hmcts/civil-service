@@ -22,32 +22,14 @@ public class ValidateRespondentPaymentDate implements CaseTask {
     private final PaymentDateValidator paymentDateValidator;
 
     public CallbackResponse execute(CallbackParams callbackParams) {
-        log.info("Executing ValidateRespondentPaymentDate task with callbackParams: {}", callbackParams);
-
         CaseData caseData = callbackParams.getCaseData();
-        log.debug("Retrieved CaseData: {}", caseData);
 
-        RespondToClaimAdmitPartLRspec respondSpec = Optional
-            .ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
-            .orElseGet(() -> {
-                log.warn("RespondToClaimAdmitPartLRspec is missing. Using default values.");
-                return RespondToClaimAdmitPartLRspec.builder().build();
-            });
+        List<String> errors = paymentDateValidator
+            .validate(Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
+                          .orElseGet(() -> RespondToClaimAdmitPartLRspec.builder().build()));
 
-        log.debug("RespondToClaimAdmitPartLRspec to validate: {}", respondSpec);
-
-        List<String> errors = paymentDateValidator.validate(respondSpec);
-        if (!errors.isEmpty()) {
-            log.warn("Validation errors found: {}", errors);
-        } else {
-            log.info("Payment date validation passed with no errors.");
-        }
-
-        AboutToStartOrSubmitCallbackResponse response = AboutToStartOrSubmitCallbackResponse.builder()
+        return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
-
-        log.info("Completed ValidateRespondentPaymentDate task with response: {}", response);
-        return response;
     }
 }

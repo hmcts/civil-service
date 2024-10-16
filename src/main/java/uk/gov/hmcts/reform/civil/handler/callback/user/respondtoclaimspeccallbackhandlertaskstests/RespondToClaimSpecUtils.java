@@ -156,10 +156,8 @@ public class RespondToClaimSpecUtils {
     }
 
     public boolean isRespondent2HasSameLegalRep(CaseData caseData) {
-        boolean condition = caseData.getRespondent2SameLegalRepresentative() != null
+        return caseData.getRespondent2SameLegalRepresentative() != null
             && caseData.getRespondent2SameLegalRepresentative() == YES;
-        log.debug("Does Respondent 2 have the same legal representative for case ID {}: {}", caseData.getCcdCaseReference(), condition);
-        return condition;
     }
 
     void removeWhoDisputesAndWhoPaidLess(Set<DefendantResponseShowTag> tags) {
@@ -304,25 +302,18 @@ public class RespondToClaimSpecUtils {
 
     public List<LocationRefData> getLocationData(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        log.debug("Fetching location data with auth token for callback");
-        List<LocationRefData> locations = locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
-        log.debug("Retrieved {} location data entries", locations.size());
-        return locations;
+        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }
 
     public boolean isSolicitorRepresentsOnlyOneOfRespondents(CallbackParams callbackParams, CaseRole caseRole) {
-        log.debug("Checking if solicitor represents only one of the respondents for case role '{}' and callback ID: {}",
-                  caseRole, callbackParams.getCaseData().getCcdCaseReference());
         CaseData caseData = callbackParams.getCaseData();
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
-        boolean condition = stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)
+        return stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)
             && coreCaseUserService.userHasCaseRole(
             caseData.getCcdCaseReference().toString(),
             userInfo.getUid(),
             caseRole
         );
-        log.debug("Solicitor represents only one respondent condition for case ID {}: {}", caseData.getCcdCaseReference(), condition);
-        return condition;
     }
 }

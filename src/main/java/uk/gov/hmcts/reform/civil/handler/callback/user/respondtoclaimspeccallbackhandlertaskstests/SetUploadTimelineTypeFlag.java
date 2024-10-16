@@ -28,58 +28,29 @@ public class SetUploadTimelineTypeFlag implements CaseTask {
     private final ObjectMapper objectMapper;
 
     public CallbackResponse execute(CallbackParams callbackParams) {
-        log.info("Executing SetUploadTimelineTypeFlag task");
         CaseData caseData = callbackParams.getCaseData();
-
-        CaseData.CaseDataBuilder<?, ?> updatedData = initializeUpdatedData(caseData);
-        Set<DefendantResponseShowTag> updatedShowConditions = getUpdatedShowConditions(caseData);
-
-        updateShowConditionsForTimeline(caseData, updatedShowConditions);
-
-        updatedData.showConditionFlags(updatedShowConditions);
-        log.debug("Updated show conditions: {}", updatedShowConditions);
-
-        CallbackResponse response = AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.build().toMap(objectMapper))
-            .build();
-        log.info("SetUploadTimelineTypeFlag task completed");
-        return response;
-    }
-
-    private CaseData.CaseDataBuilder<?, ?> initializeUpdatedData(CaseData caseData) {
-        log.debug("Initializing updated data for CaseData");
-        return caseData.toBuilder();
-    }
-
-    private Set<DefendantResponseShowTag> getUpdatedShowConditions(CaseData caseData) {
-        log.debug("Getting updated show conditions for CaseData");
+        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
         Set<DefendantResponseShowTag> updatedShowConditions = new HashSet<>(caseData.getShowConditionFlags());
-        updatedShowConditions.removeIf(EnumSet.of(TIMELINE_UPLOAD, TIMELINE_MANUALLY)::contains);
-        return updatedShowConditions;
-    }
+        updatedShowConditions.removeIf(EnumSet.of(
+            TIMELINE_UPLOAD,
+            TIMELINE_MANUALLY
+        )::contains);
 
-    private void updateShowConditionsForTimeline(CaseData caseData, Set<DefendantResponseShowTag> updatedShowConditions) {
-        log.debug("Updating show conditions for timeline");
-        if (isTimelineUpload(caseData)) {
-            log.info("Timeline upload condition met");
+        if ((YES.equals(caseData.getIsRespondent1())
+            && caseData.getSpecClaimResponseTimelineList() == TimelineUploadTypeSpec.UPLOAD)
+            || (YES.equals(caseData.getIsRespondent2())
+            && caseData.getSpecClaimResponseTimelineList2() == TimelineUploadTypeSpec.UPLOAD)) {
             updatedShowConditions.add(TIMELINE_UPLOAD);
-        } else if (isTimelineManual(caseData)) {
-            log.info("Timeline manual condition met");
+        } else if ((YES.equals(caseData.getIsRespondent1())
+            && caseData.getSpecClaimResponseTimelineList() == TimelineUploadTypeSpec.MANUAL)
+            || (YES.equals(caseData.getIsRespondent2())
+            && caseData.getSpecClaimResponseTimelineList2() == TimelineUploadTypeSpec.MANUAL)) {
             updatedShowConditions.add(TIMELINE_MANUALLY);
         }
-    }
+        updatedData.showConditionFlags(updatedShowConditions);
 
-    private boolean isTimelineUpload(CaseData caseData) {
-        boolean result = (YES.equals(caseData.getIsRespondent1()) && caseData.getSpecClaimResponseTimelineList() == TimelineUploadTypeSpec.UPLOAD)
-            || (YES.equals(caseData.getIsRespondent2()) && caseData.getSpecClaimResponseTimelineList2() == TimelineUploadTypeSpec.UPLOAD);
-        log.debug("isTimelineUpload: {}", result);
-        return result;
-    }
-
-    private boolean isTimelineManual(CaseData caseData) {
-        boolean result = (YES.equals(caseData.getIsRespondent1()) && caseData.getSpecClaimResponseTimelineList() == TimelineUploadTypeSpec.MANUAL)
-            || (YES.equals(caseData.getIsRespondent2()) && caseData.getSpecClaimResponseTimelineList2() == TimelineUploadTypeSpec.MANUAL);
-        log.debug("isTimelineManual: {}", result);
-        return result;
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedData.build().toMap(objectMapper))
+            .build();
     }
 }
