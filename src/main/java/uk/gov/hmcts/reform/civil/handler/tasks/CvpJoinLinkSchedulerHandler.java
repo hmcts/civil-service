@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.CvpJoinLinkEvent;
+import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.CaseHearingDateSearchService;
 
@@ -15,14 +16,14 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class CvpJoinLinkSchedulerHandler implements BaseExternalTaskHandler {
+public class CvpJoinLinkSchedulerHandler extends BaseExternalTaskHandler {
 
     private final CaseHearingDateSearchService searchService;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final FeatureToggleService featureToggleService;
 
     @Override
-    public void handleTask(ExternalTask externalTask) {
+    public ExternalTaskData handleTask(ExternalTask externalTask) {
         if (featureToggleService.isAutomatedHearingNoticeEnabled()) {
 
             List<CaseDetails> cases = searchService.getCases();
@@ -37,5 +38,6 @@ public class CvpJoinLinkSchedulerHandler implements BaseExternalTaskHandler {
                 }
             });
         }
+        return ExternalTaskData.builder().build();
     }
 }

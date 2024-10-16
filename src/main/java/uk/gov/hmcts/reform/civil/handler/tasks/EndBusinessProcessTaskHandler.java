@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.exceptions.NotRetryableException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 
@@ -22,7 +23,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_BUSINESS_PROCESS;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class EndBusinessProcessTaskHandler implements BaseExternalTaskHandler {
+public class EndBusinessProcessTaskHandler extends BaseExternalTaskHandler {
 
     public static final String NOT_RETRYABLE_MESSAGE = "Stopping multiple calls, END_BUSINESS_PROCESS already performed.";
     private final CoreCaseDataService coreCaseDataService;
@@ -30,7 +31,7 @@ public class EndBusinessProcessTaskHandler implements BaseExternalTaskHandler {
     private final ObjectMapper mapper;
 
     @Override
-    public void handleTask(ExternalTask externalTask) {
+    public ExternalTaskData handleTask(ExternalTask externalTask) {
         ExternalTaskInput externalTaskInput = mapper.convertValue(
             externalTask.getAllVariables(),
             ExternalTaskInput.class
@@ -44,6 +45,7 @@ public class EndBusinessProcessTaskHandler implements BaseExternalTaskHandler {
         } else {
             coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
         }
+        return ExternalTaskData.builder().build();
     }
 
     private CaseDataContent caseDataContent(StartEventResponse startEventResponse, BusinessProcess businessProcess) {
