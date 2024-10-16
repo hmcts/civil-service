@@ -90,12 +90,13 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLi
         if (caseData.isPartAdmitPayImmediatelyAccepted()
             || (featureToggleService.isLipVLipEnabled() && caseData.isClaimantDontWantToProceedWithFulLDefenceFD())) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIM_LEGAL_ORG_NAME_SPEC, caseData.getRespondent1().getPartyName(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
