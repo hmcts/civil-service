@@ -61,6 +61,9 @@ public class RepresentedLitigantPopulator {
 
     @Nullable
     private String getSolicitorOrgName(OrganisationPolicy organisationPolicy) {
+        if (organisationPolicy.getOrganisation() == null) {
+            return null;
+        }
         String orgId = organisationPolicy.getOrganisation().getOrganisationID();
         Optional<Organisation> organisation = organisationService.findOrganisationById(orgId);
         Organisation solicitorOrgDetails = organisation.orElse(null);
