@@ -373,7 +373,7 @@ dependencies {
     exclude group: 'uk.gov.hmcts.reform', module: 'java-logging'
     exclude group: 'uk.gov.hmcts.reform', module: 'service-auth-provider-client'
   }
-  implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.2.0-RELEASE'
+  implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.2.1-RELEASE'
   implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.1'
   implementation group: 'com.sendgrid', name: 'sendgrid-java', version: '4.10.3'
 
