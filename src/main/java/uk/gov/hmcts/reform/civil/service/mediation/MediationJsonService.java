@@ -119,7 +119,7 @@ public class MediationJsonService {
     }
 
     private boolean checkRespondent2DQRequirements(CaseData caseData) {
-        log.info("Cehck Respondent 2 DQ requirements for case ID {}", caseData.getCcdCaseReference());
+        log.info("Check Respondent 2 DQ requirements for case ID {}", caseData.getCcdCaseReference());
         if (caseData.getRespondent2DQ() == null) {
             return false;
         }
