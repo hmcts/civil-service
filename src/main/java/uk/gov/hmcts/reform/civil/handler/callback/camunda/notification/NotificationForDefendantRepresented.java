@@ -71,7 +71,8 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
         var caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         CaseData caseData = callbackParams.getCaseData();
         Map<String, Object> notificationTemplateMapping = setNotificationMapping(caseData, caseEvent);
-        if (!notificationTemplateMapping.isEmpty() && isNotEmpty(notificationTemplateMapping.get(EMAIL_MAP_ID).toString())) {
+        if (!notificationTemplateMapping.isEmpty() && notificationTemplateMapping.get(EMAIL_MAP_ID) != null
+            && isNotEmpty(notificationTemplateMapping.get(EMAIL_MAP_ID).toString())) {
             notificationService.sendMail(
                 notificationTemplateMapping.get(EMAIL_MAP_ID).toString(),
                 notificationTemplateMapping.get(TEMPLATE_MAP_ID).toString(),
