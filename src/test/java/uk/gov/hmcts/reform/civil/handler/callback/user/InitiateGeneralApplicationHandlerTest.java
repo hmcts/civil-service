@@ -902,6 +902,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSet275Fees_whenVaryApplicationIsUnConsentedCoscEnabled() {
+            //Add cosc tests
             given(feesService.getFeeForGA(any()))
                 .willReturn(Fee.builder()
                                 .code(FEE_CODE)

@@ -9,6 +9,7 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -23,15 +24,14 @@ import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataC
 
 @RequiredArgsConstructor
 @Component
-public class CoscApplicationAfterPaymentTaskHandler implements BaseExternalTaskHandler {
+public class CoscApplicationAfterPaymentTaskHandler extends BaseExternalTaskHandler {
 
     private final CoreCaseDataService coreCaseDataService;
     private final ObjectMapper mapper;
     private final IStateFlowEngine stateFlowEngine;
-    private CaseData data;
 
     @Override
-    public void handleTask(ExternalTask externalTask) {
+    public ExternalTaskData  handleTask(ExternalTask externalTask) {
         try {
             ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
 
@@ -44,8 +44,8 @@ public class CoscApplicationAfterPaymentTaskHandler implements BaseExternalTaskH
 
             StartEventResponse startEventResponse = coreCaseDataService.startUpdate(civilCaseId, caseEvent);
 
-            data = coreCaseDataService.submitUpdate(civilCaseId, caseDataContentFromStartEventResponse(startEventResponse, Map.of()));
-
+            var data = coreCaseDataService.submitUpdate(civilCaseId, caseDataContentFromStartEventResponse(startEventResponse, Map.of()));
+            return ExternalTaskData.builder().caseData(data).build();
         } catch (NumberFormatException ne) {
             throw new InvalidCaseDataException(
                 "Conversion to long datatype failed for general application for a case ", ne
@@ -56,7 +56,8 @@ public class CoscApplicationAfterPaymentTaskHandler implements BaseExternalTaskH
     }
 
     @Override
-    public VariableMap getVariableMap() {
+    public VariableMap getVariableMap(ExternalTaskData externalTaskData) {
+        var data = externalTaskData.caseData().orElseThrow();
         VariableMap variables = Variables.createVariables();
         var stateFlow = stateFlowEngine.evaluate(data);
         variables.putValue(FLOW_STATE, stateFlow.getState().getName());
