@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,13 +54,17 @@ class DismissCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
                                             .value(DynamicListElement.builder()
                                                        .label("Both")
                                                        .build()).build())
-            .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO).build();
+            .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO)
+            .hearingDate(LocalDate.now())
+            .hearingDueDate(LocalDate.now()).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-        assertThat(((Map)response.getData().get("businessProcess")).get("camundaEvent"))
+        assertThat(((Map<?, ?>)response.getData().get("businessProcess")).get("camundaEvent"))
             .isEqualTo(CaseEvent.DISMISS_CASE.name());
+        assertThat(response.getData()).extracting("hearingDate").isNull();
+        assertThat(response.getData()).extracting("hearingDueDate").isNull();
     }
 
     @Test
