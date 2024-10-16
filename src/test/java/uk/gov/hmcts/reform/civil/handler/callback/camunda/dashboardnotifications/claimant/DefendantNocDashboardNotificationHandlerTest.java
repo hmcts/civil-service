@@ -104,11 +104,7 @@ public class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHa
 
             handler.handle(params);
 
-            verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
-                caseData.getCcdCaseReference().toString(),
-                "CLAIMANT",
-                "BEARER_TOKEN"
-            );
+            deleteNotificationsForCaseIdentifierAndRole(caseData);
 
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
@@ -139,11 +135,7 @@ public class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHa
 
             handler.handle(params);
 
-            verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
-                caseData.getCcdCaseReference().toString(),
-                "CLAIMANT",
-                "BEARER_TOKEN"
-            );
+            deleteNotificationsForCaseIdentifierAndRole(caseData);
 
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
@@ -176,11 +168,7 @@ public class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHa
 
             handler.handle(params);
 
-            verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
-                caseData.getCcdCaseReference().toString(),
-                "CLAIMANT",
-                "BEARER_TOKEN"
-            );
+            deleteNotificationsForCaseIdentifierAndRole(caseData);
 
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
@@ -216,11 +204,7 @@ public class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHa
 
             handler.handle(params);
 
-            verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
-                caseData.getCcdCaseReference().toString(),
-                "CLAIMANT",
-                "BEARER_TOKEN"
-            );
+            deleteNotificationsForCaseIdentifierAndRole(caseData);
 
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
@@ -255,11 +239,7 @@ public class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHa
 
             handler.handle(params);
 
-            verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
-                caseData.getCcdCaseReference().toString(),
-                "CLAIMANT",
-                "BEARER_TOKEN"
-            );
+            deleteNotificationsForCaseIdentifierAndRole(caseData);
 
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
@@ -291,11 +271,7 @@ public class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHa
 
             handler.handle(params);
 
-            verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
-                caseData.getCcdCaseReference().toString(),
-                "CLAIMANT",
-                "BEARER_TOKEN"
-            );
+            deleteNotificationsForCaseIdentifierAndRole(caseData);
 
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
@@ -328,11 +304,7 @@ public class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHa
 
             handler.handle(params);
 
-            verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
-                caseData.getCcdCaseReference().toString(),
-                "CLAIMANT",
-                "BEARER_TOKEN"
-            );
+            deleteNotificationsForCaseIdentifierAndRole(caseData);
 
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
@@ -349,5 +321,12 @@ public class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHa
             );
         }
 
+        private void deleteNotificationsForCaseIdentifierAndRole(CaseData caseData) {
+            verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
+                caseData.getCcdCaseReference().toString(),
+                "CLAIMANT",
+                "BEARER_TOKEN"
+            );
+        }
     }
 }
