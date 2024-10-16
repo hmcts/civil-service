@@ -118,8 +118,8 @@ public class UnrepresentedLitigantPopulatorTest {
         assertThat(litigant.getMediationContactEmail()).isEqualTo("party@email.com");
         assertThat(litigant.getMediationContactNumber()).isEqualTo("123456789");
         assertThat(litigant.getDateRangeToAvoid()).hasSize(1); // Single unavailable date
-        assertThat(litigant.getDateRangeToAvoid().get(0).getDateFrom()).isEqualTo("10 June 2024");
-        assertThat(litigant.getDateRangeToAvoid().get(0).getDateTo()).isEqualTo("10 June 2024");
+        assertThat(litigant.getDateRangeToAvoid().get(0).getDateFrom()).isEqualTo("2024-06-10");
+        assertThat(litigant.getDateRangeToAvoid().get(0).getDateTo()).isEqualTo("2024-06-10");
     }
 
     @Test

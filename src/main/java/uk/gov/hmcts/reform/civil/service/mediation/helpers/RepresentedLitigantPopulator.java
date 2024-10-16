@@ -12,8 +12,11 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationLitigant;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationUnavailability;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -26,6 +29,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 public class RepresentedLitigantPopulator {
 
     private final OrganisationService organisationService;
+
+    private static final String DATE_FORMAT = "yyyy-MM-dd";
 
     public RepresentedLitigantPopulator(OrganisationService organisationService) {
         this.organisationService = organisationService;
@@ -103,5 +108,9 @@ public class RepresentedLitigantPopulator {
 
     private List<MediationUnavailability> getDefaultUnavailableList() {
         return List.of(MediationUnavailability.builder().build());
+    }
+
+    private String formatDate(LocalDate unavailableDate) {
+        return unavailableDate.format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK));
     }
 }

@@ -8,17 +8,21 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationLitigant;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationUnavailability;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType.DATE_RANGE;
 import static uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType.SINGLE_DATE;
-import static uk.gov.hmcts.reform.civil.utils.DateUtils.formatDate;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 @Component
 public class UnrepresentedLitigantPopulator {
+
+    private static final String DATE_FORMAT = "yyyy-MM-dd";
 
     public MediationLitigant.MediationLitigantBuilder populator(MediationLitigant.MediationLitigantBuilder builder,
                                                                 Party party,
@@ -92,4 +96,7 @@ public class UnrepresentedLitigantPopulator {
             : mediationLiPCarm.getAlternativeMediationContactPerson();
     }
 
+    private String formatDate(LocalDate unavailableDate) {
+        return unavailableDate.format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK));
+    }
 }

@@ -134,8 +134,8 @@ public class RepresentedLitigantPopulatorTest {
         MediationLitigant litigant = representedLitigantPopulator.populator(builder, contactInfo, mediationAvailability, organisationPolicy, solicitorEmail).build();
 
         assertThat(litigant.getDateRangeToAvoid()).hasSize(1);
-        assertThat(litigant.getDateRangeToAvoid().get(0).getDateFrom()).isEqualTo("10 June 2024");
-        assertThat(litigant.getDateRangeToAvoid().get(0).getDateTo()).isEqualTo("10 June 2024");
+        assertThat(litigant.getDateRangeToAvoid().get(0).getDateFrom()).isEqualTo("2024-06-10");
+        assertThat(litigant.getDateRangeToAvoid().get(0).getDateTo()).isEqualTo("2024-06-10");
     }
 
     private MediationLitigant addMediationInfoRepresented(MediationLitigant litigant) {
