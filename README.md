@@ -123,6 +123,7 @@ For more details about the functional test labels available, the tests that run 
 
 You can generate contracts as follows:
 
+
 ```
 ./gradlew contract
 ```
