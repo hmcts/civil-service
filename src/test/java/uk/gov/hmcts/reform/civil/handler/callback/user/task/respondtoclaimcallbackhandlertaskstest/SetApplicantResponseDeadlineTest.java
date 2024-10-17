@@ -109,9 +109,6 @@ public class SetApplicantResponseDeadlineTest {
         LocalDateTime deadline = responseDate.plusDays(4);
 
         when(time.now()).thenReturn(responseDate);
-        when(deadlinesCalculator.calculateApplicantResponseDeadline(any(LocalDateTime.class), any(AllocatedTrack.class)))
-            .thenReturn(deadline);
-
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
 
         CallbackRequest callbackRequest = CallbackRequest
@@ -151,8 +148,6 @@ public class SetApplicantResponseDeadlineTest {
         LocalDateTime deadline = responseDate.plusDays(4);
 
         when(time.now()).thenReturn(responseDate);
-        when(deadlinesCalculator.calculateApplicantResponseDeadline(any(LocalDateTime.class), any(AllocatedTrack.class)))
-            .thenReturn(deadline);
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -197,8 +192,6 @@ public class SetApplicantResponseDeadlineTest {
         LocalDateTime deadline = responseDate.plusDays(4);
 
         when(time.now()).thenReturn(responseDate);
-        when(deadlinesCalculator.calculateApplicantResponseDeadline(any(LocalDateTime.class), any(AllocatedTrack.class)))
-            .thenReturn(deadline);
 
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
