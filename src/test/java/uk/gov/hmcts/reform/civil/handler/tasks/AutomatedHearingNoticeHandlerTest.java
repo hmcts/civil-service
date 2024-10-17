@@ -100,7 +100,7 @@ class AutomatedHearingNoticeHandlerTest {
         handler.execute(mockTask, externalTaskService);
 
         verifyNoInteractions(hearingsService);
-        verify(externalTaskService).complete(mockTask);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @Test
@@ -132,7 +132,7 @@ class AutomatedHearingNoticeHandlerTest {
                 .dispatchedHearingIds(List.of())
                 .build().toMap(mapper)
         );
-        verify(externalTaskService).complete(mockTask);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @Test
@@ -166,7 +166,7 @@ class AutomatedHearingNoticeHandlerTest {
                 .build().toMap(mapper)
         );
 
-        verify(externalTaskService).complete(mockTask);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @Test
@@ -207,7 +207,7 @@ class AutomatedHearingNoticeHandlerTest {
                 .build().toMap(mapper)
         );
 
-        verify(externalTaskService).complete(mockTask);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @Test
@@ -231,7 +231,7 @@ class AutomatedHearingNoticeHandlerTest {
             .dispatchedHearingIds(List.of(HEARING_ID))
             .build().toMap(mapper));
         verifyNoInteractions(messageCorrelationBuilder);
-        verify(externalTaskService).complete(mockTask);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     private UnNotifiedHearingResponse createUnnotifiedHearings(List<String> hearingIds) {
