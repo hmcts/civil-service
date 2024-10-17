@@ -7,6 +7,7 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
@@ -18,13 +19,13 @@ import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataC
 
 @RequiredArgsConstructor
 @Component
-public class CoscApplicationAfterPaymentTaskHandler implements BaseExternalTaskHandler {
+public class CoscApplicationAfterPaymentTaskHandler extends BaseExternalTaskHandler {
 
     private final CoreCaseDataService coreCaseDataService;
     private final ObjectMapper mapper;
 
     @Override
-    public void handleTask(ExternalTask externalTask) {
+    public ExternalTaskData  handleTask(ExternalTask externalTask) {
         try {
             ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
 
@@ -46,5 +47,6 @@ public class CoscApplicationAfterPaymentTaskHandler implements BaseExternalTaskH
         } catch (IllegalArgumentException | ValueMapperException e) {
             throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
         }
+        return ExternalTaskData.builder().build();
     }
 }
