@@ -44,7 +44,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
-import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @ExtendWith(MockitoExtension.class)
@@ -359,7 +358,7 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name"
             );
@@ -368,7 +367,7 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @NotNull
         private Map<String, String> getNotificationDataMapLRvLiP(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
             );
@@ -378,7 +377,7 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         public Map<String, String> getNotificationDataMapSpec(CaseData caseData, CaseEvent caseEvent) {
             return Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
                 PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"

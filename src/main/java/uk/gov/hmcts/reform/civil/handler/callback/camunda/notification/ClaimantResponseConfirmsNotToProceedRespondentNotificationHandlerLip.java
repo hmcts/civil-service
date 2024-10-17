@@ -95,7 +95,7 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLi
             );
         }
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIM_LEGAL_ORG_NAME_SPEC, caseData.getRespondent1().getPartyName(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );

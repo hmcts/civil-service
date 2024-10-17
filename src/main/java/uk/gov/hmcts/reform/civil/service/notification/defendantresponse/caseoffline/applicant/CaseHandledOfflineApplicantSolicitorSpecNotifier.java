@@ -81,7 +81,7 @@ public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandle
     public Map<String, String> addPropertiesSpec(CaseData caseData) {
         return Map.of(
             CLAIM_NAME_SPEC, getLegalOrganisationName(caseData),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
@@ -89,7 +89,7 @@ public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandle
     public Map<String, String> addPropertiesSpec1v2DiffSol(CaseData caseData) {
         return Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }

@@ -84,7 +84,7 @@ public class CaseTakenOfflineRespondentNotificationHandler extends CallbackHandl
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return new HashMap<>(Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         ));
     }

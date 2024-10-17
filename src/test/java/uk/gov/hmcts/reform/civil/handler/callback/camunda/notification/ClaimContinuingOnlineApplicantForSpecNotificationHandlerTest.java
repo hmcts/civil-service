@@ -43,7 +43,6 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
-import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @ExtendWith(MockitoExtension.class)
@@ -191,7 +190,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
             Map<String, String> properties = new HashMap<>(Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, ORG_NAME,
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
                 CLAIM_DETAILS_NOTIFICATION_DEADLINE,
                 formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE),

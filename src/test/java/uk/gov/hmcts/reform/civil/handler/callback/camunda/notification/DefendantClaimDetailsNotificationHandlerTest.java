@@ -129,7 +129,7 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
 
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONSE_DEADLINE, formatLocalDate(caseData.getClaimDetailsNotificationDeadline().toLocalDate(), DATE),
                 RESPONSE_DEADLINE_PLUS_28, formatLocalDate(
                     deadlinesCalculator.plus14DaysDeadline(caseData.getRespondent1ResponseDeadline())

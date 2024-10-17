@@ -169,7 +169,7 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLipTest e
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Mr. Sole Trader"
             );

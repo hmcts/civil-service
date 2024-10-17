@@ -64,7 +64,7 @@ public class NotificationUtils {
         CaseData caseData, OrganisationPolicy organisationPolicy, OrganisationService organisationService) {
         if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                 CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(organisationPolicy, organisationService)
@@ -74,7 +74,7 @@ public class NotificationUtils {
                 ? caseData.getClaimant1ClaimResponseTypeForSpec().getDisplayedValue()
                 : caseData.getRespondent1ClaimResponseTypeToApplicant2().toString();
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 REASON, SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                     ? caseData.getClaimant1ClaimResponseTypeForSpec().getDisplayedValue()
                     : caseData.getRespondent1ClaimResponseType().getDisplayedValue()
@@ -87,7 +87,7 @@ public class NotificationUtils {
         } else {
             //1v2 template is used and expects different data
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
                 RESPONDENT_ONE_RESPONSE, SPEC_CLAIM.equals(caseData.getCaseAccessCategory())

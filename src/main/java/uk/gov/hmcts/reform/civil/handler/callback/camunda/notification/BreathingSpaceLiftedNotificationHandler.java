@@ -86,7 +86,7 @@ public class BreathingSpaceLiftedNotificationHandler extends CallbackHandler imp
 
     public Map<String, String> addPropertiesForRespondent(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
@@ -107,7 +107,7 @@ public class BreathingSpaceLiftedNotificationHandler extends CallbackHandler imp
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
