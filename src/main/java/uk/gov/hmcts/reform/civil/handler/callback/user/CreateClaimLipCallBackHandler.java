@@ -92,7 +92,6 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         caseDataBuilder.submittedDate(time.now());
         // Add back Pip in post to temporary pass the email event
         caseDataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
@@ -114,6 +113,7 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
             caseDataBuilder.claimType(ClaimType.FLIGHT_DELAY);
         }
 
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<LocationRefData> locations = (locationRefDataService
             .getCourtLocationsByEpimmsIdAndCourtType(authToken, epimmsId));
 
