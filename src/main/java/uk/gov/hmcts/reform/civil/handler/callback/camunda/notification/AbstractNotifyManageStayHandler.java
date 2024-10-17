@@ -38,11 +38,20 @@ public abstract class AbstractNotifyManageStayHandler extends CallbackHandler im
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
+    protected String getNotificationTemplate(CaseData caseData) {
+        if (isLiP(caseData)) {
+            return isBilingual(caseData) ?
+                notificationsProperties.getNotifyLipUpdateTemplateBilingual() :
+                notificationsProperties.getNotifyLipUpdateTemplate();
+        }
+        return notificationsProperties.getNotifyLRStayLifted();
+    }
+
     protected abstract String getReferenceTemplate();
 
     protected abstract String getRecipient(CallbackParams callbackParams);
 
-    protected abstract String getNotificationTemplate(CaseData caseData);
+    protected abstract boolean isBilingual(CaseData caseData);
 
     protected abstract boolean isLiP(CaseData caseData);
 
