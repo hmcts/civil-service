@@ -18,6 +18,11 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_TAKEN_OFFLINE;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 
@@ -56,7 +61,7 @@ public class CaseTakenOfflineApplicantNotificationHandler extends CallbackHandle
 
         notificationService.sendMail(
             caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            notificationsProperties.getSolicitorCaseTakenOffline(),
+            getTemplate(caseData),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
@@ -70,5 +75,19 @@ public class CaseTakenOfflineApplicantNotificationHandler extends CallbackHandle
             CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
+    }
+
+    private String getTemplate(CaseData caseData) {
+        return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && ONE_V_ONE.equals(getMultiPartyScenario(caseData))
+            && bothPartiesRepresented(caseData)
+            && caseData.getApplicant1ResponseDeadline() != null
+            ? notificationsProperties.getSolicitorCaseTakenOfflineNoApplicantResponse()
+            : notificationsProperties.getSolicitorCaseTakenOffline();
+    }
+
+    private boolean bothPartiesRepresented(CaseData caseData) {
+        return YES.equals(caseData.getRespondent1Represented())
+            && (caseData.getApplicant1Represented() == null || YES.equals(caseData.getApplicant1Represented()));
     }
 }
