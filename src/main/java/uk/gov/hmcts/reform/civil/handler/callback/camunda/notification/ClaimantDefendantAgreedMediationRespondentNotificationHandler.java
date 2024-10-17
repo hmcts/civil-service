@@ -19,7 +19,10 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT2_MEDIATION_AGREEMENT;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.*;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.shouldSendMediationNotificationDefendant1LRCarm;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.shouldSendMediationNotificationDefendant2LRCarm;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -92,14 +95,14 @@ public class ClaimantDefendantAgreedMediationRespondentNotificationHandler exten
     public Map<String, String> addProperties(CaseData caseData) {
         if (caseData.isRespondent1NotRepresented()) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         } else {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIM_LEGAL_ORG_NAME_SPEC,
                 getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService),
                 CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),

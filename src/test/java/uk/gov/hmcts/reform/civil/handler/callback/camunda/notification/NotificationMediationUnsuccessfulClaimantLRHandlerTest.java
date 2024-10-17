@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -45,8 +46,10 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationMediationUnsuccessfulClaimantLRHandler.TASK_ID_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
 class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbackHandlerTest {
@@ -80,7 +83,6 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
         private static final String APPLICANT_PARTY_EMAIL = "mike@party.com";
         private static final String DEFENDANT_PARTY_NAME = "Randy";
         private static final String DEFENDANT_2_PARTY_NAME = "Peaches";
-        private static final String REFERENCE_NUMBER = "8372942374";
         private static final Long CCD_REFERENCE_NUMBER = 123456789L;
         private static final String EMAIL_TEMPLATE = "test-notification-id";
         private static final String EMAIL_LIP_TEMPLATE = "test-notification-lip-id";
@@ -89,33 +91,16 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
         private static final String CARM_NO_ATTENDANCE_MAIL_TEMPLATE = "carm-test--no-attendance-notification-id";
         private static final String CLAIMANT_TEXT = "your claim against ";
 
-        private static final Map<String, String> PROPERTY_MAP = Map.of(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME,
-                                                                       DEFENDANT_NAME, DEFENDANT_PARTY_NAME,
-                                                                       CLAIM_REFERENCE_NUMBER, REFERENCE_NUMBER);
-        private static final Map<String, String> PROPERTY_LIP_MAP = Map.of(CLAIMANT_NAME, APPLICANT_PARTY_NAME,
-                                                                           RESPONDENT_NAME, DEFENDANT_PARTY_NAME,
-                                                                           CLAIM_REFERENCE_NUMBER, REFERENCE_NUMBER);
-        private static final Map<String, String> CARM_PROPERTY_MAP = Map.of(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME,
-                                                                       PARTY_NAME, CLAIMANT_TEXT + DEFENDANT_PARTY_NAME,
-                                                                       CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
-        private static final Map<String, String> CARM_1V2_PROPERTY_MAP = Map.of(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME,
-                                                                       PARTY_NAME, CLAIMANT_TEXT + DEFENDANT_PARTY_NAME + " and " + DEFENDANT_2_PARTY_NAME,
-                                                                       CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
-        private static final Map<String, String> CARM_LIP_CLAIMANT_PROPERTY_MAP = Map.of(PARTY_NAME, APPLICANT_PARTY_NAME,
-                                                                       CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
-        private static final Map<String, String> CARM_NO_ATTENDANCE_CLAIMANT_PROPERTY_MAP = Map.of(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME,
-                                                                       CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
-
         @Test
         void shouldSendNotificationToClaimantLr_whenEventIsCalled() {
             //Given
             CaseData caseData = CaseData.builder()
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).build())
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
-                .legacyCaseReference(REFERENCE_NUMBER)
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.YES)
+                .ccdCaseReference(CCD_REFERENCE_NUMBER)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
@@ -130,7 +115,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
             );
             assertThat(targetEmail.getAllValues().get(0)).isEqualTo(CLAIMANT_EMAIL_ADDRESS);
             assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_TEMPLATE);
-            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(PROPERTY_MAP);
+            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getPropertyMap(caseData));
         }
 
         @Test
@@ -142,7 +127,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                                 .partyEmail(CLAIMANT_EMAIL_ADDRESS)
                                 .build())
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).build())
-                .legacyCaseReference(REFERENCE_NUMBER)
+                .ccdCaseReference(CCD_REFERENCE_NUMBER)
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)
@@ -160,7 +145,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
             );
             assertThat(targetEmail.getAllValues().get(0)).isEqualTo(CLAIMANT_EMAIL_ADDRESS);
             assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_LIP_TEMPLATE);
-            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(PROPERTY_LIP_MAP);
+            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getPropertyLipMap(caseData));
         }
 
         @Test
@@ -172,12 +157,12 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                                 .partyEmail(CLAIMANT_EMAIL_ADDRESS)
                                 .build())
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).build())
-                .legacyCaseReference(REFERENCE_NUMBER)
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)
                 .claimantBilingualLanguagePreference("BOTH")
                 .respondent1Represented(YesOrNo.NO)
+                .ccdCaseReference(CCD_REFERENCE_NUMBER)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
@@ -191,7 +176,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
             );
             assertThat(targetEmail.getAllValues().get(0)).isEqualTo(CLAIMANT_EMAIL_ADDRESS);
             assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_LIP_TEMPLATE);
-            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(PROPERTY_LIP_MAP);
+            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getPropertyLipMap(caseData));
         }
 
         @Test
@@ -216,11 +201,10 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 CaseData caseData = CaseData.builder()
                     .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).build())
                     .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
-                    .legacyCaseReference(REFERENCE_NUMBER)
-                    .ccdCaseReference(CCD_REFERENCE_NUMBER)
                     .addApplicant2(YesOrNo.NO)
                     .addRespondent2(YesOrNo.NO)
                     .applicant1Represented(YesOrNo.YES)
+                    .ccdCaseReference(CCD_REFERENCE_NUMBER)
                     .mediation(Mediation.builder()
                                    .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
                     .build();
@@ -238,7 +222,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 );
                 assertThat(targetEmail.getAllValues().get(0)).isEqualTo(CLAIMANT_EMAIL_ADDRESS);
                 assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(CARM_MAIL_TEMPLATE);
-                assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(CARM_PROPERTY_MAP);
+                assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getCarmPropertyMap(caseData));
             }
 
             @ParameterizedTest
@@ -251,12 +235,11 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                     .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).build())
                     .respondent2(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_2_PARTY_NAME).build())
                     .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
-                    .legacyCaseReference(REFERENCE_NUMBER)
-                    .ccdCaseReference(CCD_REFERENCE_NUMBER)
                     .addApplicant2(YesOrNo.NO)
                     .addRespondent2(YesOrNo.YES)
                     .applicant1Represented(YesOrNo.YES)
                     .respondent2SameLegalRepresentative(YesOrNo.YES)
+                    .ccdCaseReference(CCD_REFERENCE_NUMBER)
                     .mediation(Mediation.builder()
                                    .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
                     .build();
@@ -274,7 +257,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 );
                 assertThat(targetEmail.getAllValues().get(0)).isEqualTo(CLAIMANT_EMAIL_ADDRESS);
                 assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(CARM_MAIL_TEMPLATE);
-                assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(CARM_1V2_PROPERTY_MAP);
+                assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getCarm1v2PropertyMap(caseData));
             }
 
             @ParameterizedTest
@@ -287,12 +270,11 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                     .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).build())
                     .respondent2(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_2_PARTY_NAME).build())
                     .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
-                    .legacyCaseReference(REFERENCE_NUMBER)
-                    .ccdCaseReference(CCD_REFERENCE_NUMBER)
                     .addApplicant2(YesOrNo.NO)
                     .addRespondent2(YesOrNo.YES)
                     .applicant1Represented(YesOrNo.YES)
                     .respondent2SameLegalRepresentative(YesOrNo.NO)
+                    .ccdCaseReference(CCD_REFERENCE_NUMBER)
                     .mediation(Mediation.builder()
                                    .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
                     .build();
@@ -310,7 +292,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 );
                 assertThat(targetEmail.getAllValues().get(0)).isEqualTo(CLAIMANT_EMAIL_ADDRESS);
                 assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(CARM_MAIL_TEMPLATE);
-                assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(CARM_1V2_PROPERTY_MAP);
+                assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getCarm1v2PropertyMap(caseData));
             }
 
             @ParameterizedTest
@@ -323,11 +305,10 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                     .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME)
                                     .partyEmail(APPLICANT_PARTY_EMAIL).build())
                     .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).build())
-                    .legacyCaseReference(REFERENCE_NUMBER)
-                    .ccdCaseReference(CCD_REFERENCE_NUMBER)
                     .addApplicant2(YesOrNo.NO)
                     .addRespondent2(YesOrNo.NO)
                     .applicant1Represented(YesOrNo.NO)
+                    .ccdCaseReference(CCD_REFERENCE_NUMBER)
                     .mediation(Mediation.builder()
                                    .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
                     .build();
@@ -344,7 +325,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 );
                 assertThat(targetEmail.getAllValues().get(0)).isEqualTo(APPLICANT_PARTY_EMAIL);
                 assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(CARM_LIP_MAIL_TEMPLATE);
-                assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(CARM_LIP_CLAIMANT_PROPERTY_MAP);
+                assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getCarmLipClaimantPropertyMap(caseData));
             }
 
             @ParameterizedTest
@@ -357,11 +338,10 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                     .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME)
                                     .partyEmail(APPLICANT_PARTY_EMAIL).build())
                     .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).build())
-                    .legacyCaseReference(REFERENCE_NUMBER)
-                    .ccdCaseReference(CCD_REFERENCE_NUMBER)
                     .addApplicant2(YesOrNo.NO)
                     .addRespondent2(YesOrNo.NO)
                     .applicant1Represented(YesOrNo.NO)
+                    .ccdCaseReference(CCD_REFERENCE_NUMBER)
                     .mediation(Mediation.builder()
                                    .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
                     .claimantBilingualLanguagePreference("BOTH")
@@ -379,7 +359,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 );
                 assertThat(targetEmail.getAllValues().get(0)).isEqualTo(APPLICANT_PARTY_EMAIL);
                 assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(CARM_LIP_MAIL_TEMPLATE);
-                assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(CARM_LIP_CLAIMANT_PROPERTY_MAP);
+                assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getCarmLipClaimantPropertyMap(caseData));
             }
 
             @ParameterizedTest
@@ -389,11 +369,10 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 CaseData caseData = CaseData.builder()
                     .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).build())
                     .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
-                    .legacyCaseReference(REFERENCE_NUMBER)
-                    .ccdCaseReference(CCD_REFERENCE_NUMBER)
                     .addApplicant2(YesOrNo.NO)
                     .addRespondent2(YesOrNo.NO)
                     .applicant1Represented(YesOrNo.YES)
+                    .ccdCaseReference(CCD_REFERENCE_NUMBER)
                     .mediation(Mediation.builder()
                                    .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
                     .build();
@@ -411,7 +390,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 );
                 assertThat(targetEmail.getAllValues().get(0)).isEqualTo(CLAIMANT_EMAIL_ADDRESS);
                 assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(CARM_NO_ATTENDANCE_MAIL_TEMPLATE);
-                assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(CARM_NO_ATTENDANCE_CLAIMANT_PROPERTY_MAP);
+                assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getCarmNoAttendancePropertyMap(caseData));
             }
 
             @Test
@@ -420,11 +399,10 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 CaseData caseData = CaseData.builder()
                     .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).build())
                     .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
-                    .legacyCaseReference(REFERENCE_NUMBER)
-                    .ccdCaseReference(CCD_REFERENCE_NUMBER)
                     .addApplicant2(YesOrNo.NO)
                     .addRespondent2(YesOrNo.NO)
                     .applicant1Represented(YesOrNo.YES)
+                    .ccdCaseReference(CCD_REFERENCE_NUMBER)
                     .mediation(Mediation.builder()
                                    .mediationUnsuccessfulReasonsMultiSelect(List.of(NOT_CONTACTABLE_CLAIMANT_ONE, NOT_CONTACTABLE_DEFENDANT_ONE)).build())
                     .build();
@@ -442,7 +420,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 );
                 assertThat(targetEmail.getAllValues().get(0)).isEqualTo(CLAIMANT_EMAIL_ADDRESS);
                 assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(CARM_NO_ATTENDANCE_MAIL_TEMPLATE);
-                assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(CARM_NO_ATTENDANCE_CLAIMANT_PROPERTY_MAP);
+                assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getCarmNoAttendancePropertyMap(caseData));
             }
 
             @ParameterizedTest
@@ -452,11 +430,10 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 CaseData caseData = CaseData.builder()
                     .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).build())
                     .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
-                    .legacyCaseReference(REFERENCE_NUMBER)
-                    .ccdCaseReference(CCD_REFERENCE_NUMBER)
                     .addApplicant2(YesOrNo.YES)
                     .addRespondent2(YesOrNo.NO)
                     .applicant1Represented(YesOrNo.YES)
+                    .ccdCaseReference(CCD_REFERENCE_NUMBER)
                     .mediation(Mediation.builder()
                                    .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
                     .build();
@@ -474,7 +451,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 );
                 assertThat(targetEmail.getAllValues().get(0)).isEqualTo(CLAIMANT_EMAIL_ADDRESS);
                 assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(CARM_NO_ATTENDANCE_MAIL_TEMPLATE);
-                assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(CARM_NO_ATTENDANCE_CLAIMANT_PROPERTY_MAP);
+                assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getCarmNoAttendancePropertyMap(caseData));
             }
 
             @Test
@@ -483,11 +460,10 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 CaseData caseData = CaseData.builder()
                     .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).build())
                     .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
-                    .legacyCaseReference(REFERENCE_NUMBER)
-                    .ccdCaseReference(CCD_REFERENCE_NUMBER)
                     .addApplicant2(YesOrNo.YES)
                     .addRespondent2(YesOrNo.NO)
                     .applicant1Represented(YesOrNo.YES)
+                    .ccdCaseReference(CCD_REFERENCE_NUMBER)
                     .mediation(Mediation.builder()
                                    .mediationUnsuccessfulReasonsMultiSelect(List.of(NOT_CONTACTABLE_CLAIMANT_TWO, NOT_CONTACTABLE_DEFENDANT_ONE)).build())
                     .build();
@@ -505,8 +481,66 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 );
                 assertThat(targetEmail.getAllValues().get(0)).isEqualTo(CLAIMANT_EMAIL_ADDRESS);
                 assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(CARM_NO_ATTENDANCE_MAIL_TEMPLATE);
-                assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(CARM_NO_ATTENDANCE_CLAIMANT_PROPERTY_MAP);
+                assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getCarmNoAttendancePropertyMap(caseData));
             }
         }
+
+        @NotNull
+        private  Map<String, String> getPropertyMap(CaseData caseData) {
+            return Map.of(
+                CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME,
+                DEFENDANT_NAME, DEFENDANT_PARTY_NAME,
+                CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString(),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            );
+        };
+
+        @NotNull
+        private  Map<String, String> getPropertyLipMap(CaseData caseData) {
+            return Map.of(
+                CLAIMANT_NAME, APPLICANT_PARTY_NAME,
+                RESPONDENT_NAME, DEFENDANT_PARTY_NAME,
+                CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString(),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            );
+        };
+
+        @NotNull
+        private  Map<String, String> getCarmPropertyMap(CaseData caseData) {
+            return Map.of(
+                CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME,
+                PARTY_NAME, CLAIMANT_TEXT + DEFENDANT_PARTY_NAME,
+                CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString(),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            );
+        };
+
+        @NotNull
+        private  Map<String, String> getCarm1v2PropertyMap(CaseData caseData) {
+            return Map.of(
+                CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME,
+                PARTY_NAME, CLAIMANT_TEXT + DEFENDANT_PARTY_NAME + " and " + DEFENDANT_2_PARTY_NAME,
+                CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString(),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            );
+        };
+
+        @NotNull
+        private  Map<String, String> getCarmLipClaimantPropertyMap(CaseData caseData) {
+            return Map.of(
+                PARTY_NAME, APPLICANT_PARTY_NAME,
+                CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString(),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            );
+        };
+
+        @NotNull
+        private  Map<String, String> getCarmNoAttendancePropertyMap(CaseData caseData) {
+            return Map.of(
+                CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME,
+                CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString(),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            );
+        };
     }
 }

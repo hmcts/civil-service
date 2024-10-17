@@ -34,12 +34,9 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DJApplicantReceivedNotificationHandler.TASK_ID;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.APPLICANT_ONE_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_NUMBER;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_APPLICANT1;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_SPECIFIED;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.*;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @ExtendWith(MockitoExtension.class)
@@ -140,7 +137,7 @@ class DJApplicantReceivedNotificationHandlerTest {
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
                 "test-template-requested-id",
-                getNotificationDataMapForRequested(),
+                getNotificationDataMapForRequested(caseData),
                 "default-judgment-applicant-requested-notification-000DC001"
             );
         }
@@ -207,17 +204,19 @@ class DJApplicantReceivedNotificationHandlerTest {
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
                 LEGAL_ORG_SPECIFIED, "Test Org Name",
-                CLAIM_NUMBER, LEGACY_CASE_REFERENCE,
-                DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+                CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
+                DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
 
         @NotNull
-        private Map<String, String> getNotificationDataMapForRequested() {
+        private Map<String, String> getNotificationDataMapForRequested(CaseData caseData) {
             return Map.of(
                 LEGAL_ORG_APPLICANT1, "Test Org Name",
-                CLAIM_NUMBER, LEGACY_CASE_REFERENCE,
-                DEFENDANT_NAME, "David"
+                CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
+                DEFENDANT_NAME, "David",
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
 
@@ -225,8 +224,9 @@ class DJApplicantReceivedNotificationHandlerTest {
         public Map<String, String> getLipvLiPData(CaseData caseData) {
             return Map.of(
                 APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-                CLAIM_NUMBER, LEGACY_CASE_REFERENCE,
-                DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+                CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
+                DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
 
         }
