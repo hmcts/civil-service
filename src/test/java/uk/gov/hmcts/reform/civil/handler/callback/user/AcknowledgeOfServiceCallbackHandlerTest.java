@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 
@@ -21,11 +20,13 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -38,10 +39,13 @@ import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGEMENT_OF_SERVICE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 
 @SpringBootTest(classes = {
     AcknowledgeOfServiceCallbackHandler.class,
@@ -65,6 +69,8 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
     private DeadlinesCalculator deadlinesCalculator;
     @MockBean
     private Time time;
+    @MockBean
+    private CaseDetailsConverter caseDetailsConverter;
 
     public static final String REFERENCE_NUMBER = "000MC001";
 
@@ -210,75 +216,106 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void aboutToSubmit_NewResponseDeadline() {
+            // Given: Create current case data with a mocked respondent1Copy
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .respondent1Copy(Party.builder().partyName("Party 2").primaryAddress(
-                                                                        Address
-                                                                            .builder()
-                                                                            .addressLine1("Triple street")
-                                                                            .postCode("Postcode")
-                                                                            .build())
+                    Address
+                        .builder()
+                        .addressLine1("Triple street")
+                        .postCode("Postcode")
+                        .build())
                                      .build())
+                .respondent1ResponseDeadline(LocalDateTime.now().plusDays(10))
                 .build();
+
+            Address address = Address.builder()
+                .postCode("E11 5BB")
+                .build();
+
+            CaseData oldCaseData = CaseDataBuilder.builder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .applicant2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .respondent2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .build();
+
+            // Ensure that oldCaseData is returned when caseDetailsConverter is called
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
+
+            // Create callback parameters
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
-            CallbackRequest request = CallbackRequest.builder()
-                .build();
-            params = params.toBuilder().request(request).build();
 
-            Mockito.when(deadlinesCalculator.plus14DaysAt4pmDeadline(caseData.getRespondent1ResponseDeadline()))
-                                            .thenReturn(caseData.getRespondent1ResponseDeadline()
-                                                            .plusDays(14)
-                                                            .withHour(16)
-                                                            .withMinute(0)
-                                                            .withSecond(1));
+            // Mock the deadlines calculator to return a new response deadline
+            LocalDateTime expectedNewDeadline = caseData.getRespondent1ResponseDeadline()
+                .plusDays(14)
+                .withHour(16)
+                .withMinute(0)
+                .withSecond(0);
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(any(LocalDateTime.class)))
+                .thenReturn(expectedNewDeadline);
 
-            String newDeadline = LocalDateTime.now().plusDays(28).withHour(16).withMinute(0).withSecond(1).truncatedTo(ChronoUnit.SECONDS).toString();
-
+            // When: the handler processes the about to submit event
             CallbackResponse response = handler.handle(params);
+
+            // Then: Check the response data for the updated respondent1ResponseDeadline
             assertThat(((AboutToStartOrSubmitCallbackResponse) response)
                            .getData().get("respondent1ResponseDeadline"))
-                .hasToString(newDeadline);
+                .hasToString(expectedNewDeadline.toString());
         }
 
         @Test
         void aboutToSubmit_NewResponseDeadline1v2() {
+            // Given: Create current case data with two respondent copies and an initial response deadline
+            LocalDateTime initialDeadline = LocalDateTime.now().plusDays(10); // Set initial deadline for the test
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .multiPartyClaimTwoDefendantSolicitors()
-                .respondent1Copy(Party.builder().partyName("Party 2").primaryAddress(
-                        Address
-                            .builder()
-                            .addressLine1("Triple street")
-                            .postCode("Postcode")
-                            .build())
+                .multiPartyClaimTwoDefendantSolicitors() // Simulate 1v2 scenario with two defendant solicitors
+                .respondent1Copy(Party.builder()
+                                     .partyName("Party 2")
+                                     .primaryAddress(Address.builder()
+                                                         .addressLine1("Triple street")
+                                                         .postCode("Postcode")
+                                                         .build())
                                      .build())
-                .respondent2Copy(Party.builder().partyName("Respondent 2").primaryAddress(
-                        Address
-                            .builder()
-                            .addressLine1("Triple street")
-                            .postCode("Postcode")
-                            .build())
+                .respondent2Copy(Party.builder()
+                                     .partyName("Respondent 2")
+                                     .primaryAddress(Address.builder()
+                                                         .addressLine1("Triple street")
+                                                         .postCode("Postcode")
+                                                         .build())
                                      .build())
+                .respondent1ResponseDeadline(initialDeadline) // Initialize respondent1's response deadline
                 .build();
+
+            // Mock old case data before changes
+            Address address = Address.builder()
+                .postCode("E11 5BB")
+                .build();
+            CaseData oldCaseData = CaseDataBuilder.builder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .applicant2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .respondent2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .build();
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
+
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
-            CallbackRequest request = CallbackRequest.builder()
-                .build();
-            params = params.toBuilder().request(request).build();
 
-            Mockito.when(deadlinesCalculator.plus14DaysAt4pmDeadline(caseData.getRespondent1ResponseDeadline()))
-                .thenReturn(caseData.getRespondent1ResponseDeadline()
-                                .plusDays(14)
-                                .withHour(16)
-                                .withMinute(0)
-                                .withSecond(1));
+            // Mock the deadlines calculator to return a new response deadline
+            LocalDateTime expectedNewDeadline = initialDeadline.plusDays(14).withHour(16).withMinute(0).withSecond(1);
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(any(LocalDateTime.class)))
+                .thenReturn(expectedNewDeadline);
 
-            String newDeadline = LocalDateTime.now().plusDays(28).withHour(16).withMinute(0).withSecond(1).truncatedTo(ChronoUnit.SECONDS).toString();
-
+            // When: the handler processes the about to submit event
             CallbackResponse response = handler.handle(params);
+
+            // Then: Check the response data for the updated respondent1ResponseDeadline
             assertThat(((AboutToStartOrSubmitCallbackResponse) response)
                            .getData().get("respondent1ResponseDeadline"))
-                .hasToString(newDeadline);
+                .hasToString(expectedNewDeadline.toString());
         }
+
     }
 
     @Nested

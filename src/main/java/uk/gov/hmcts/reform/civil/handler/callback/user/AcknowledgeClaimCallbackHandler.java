@@ -12,16 +12,17 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.utils.PersistDataUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -71,7 +72,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final Time time;
     private final UserService userService;
-    private final FeatureToggleService featureToggleService;
+    private final CaseDetailsConverter caseDetailsConverter;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -168,26 +169,28 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse setNewResponseDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+
+        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
+
+        PersistDataUtils.persistPartyAddress(oldCaseData, caseData);
+
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
+        PersistDataUtils.persistFlagsForParties(oldCaseData, caseData, caseDataBuilder);
+
         LocalDateTime respondent1ResponseDeadline = caseData.getRespondent1ResponseDeadline();
         LocalDateTime respondent2ResponseDeadline = caseData.getRespondent2ResponseDeadline();
-
-        final var updatedRespondent1 = caseData.getRespondent1().toBuilder()
-            .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
-            .flags(caseData.getRespondent1Copy().getFlags())
-            .build();
-
-        CaseData.CaseDataBuilder caseDataUpdated = caseData.toBuilder();
 
         // casefileview changes need to assign documents into specific folders, this is help determine
         // which user is "creating" the document and therefore which folder to move the documents
         // into, when document is generated in GenerateAcknowledgementOfClaimCallbackHandler
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        caseDataUpdated.respondent2DocumentGeneration(null);
+        caseDataBuilder.respondent2DocumentGeneration(null);
         if (!coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
                                                      .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
             && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
                                                        .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
-            caseDataUpdated.respondent2DocumentGeneration("userRespondent2");
+            caseDataBuilder.respondent2DocumentGeneration("userRespondent2");
         }
 
         LocalDateTime newDeadlineRespondent1 = deadlinesCalculator.plus14DaysDeadline(respondent1ResponseDeadline);
@@ -202,11 +205,10 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         /* for 1v1 */
         if (caseData.getAddApplicant2() != null && caseData.getAddApplicant2().equals(NO)
             && caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(NO)) {
-            caseDataUpdated
+            caseDataBuilder
                 .respondent1AcknowledgeNotificationDate(time.now())
                 .respondent1ResponseDeadline(newDeadlineRespondent1)
                 .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
-                .respondent1(updatedRespondent1)
                 .respondent1Copy(null)
                 .solicitorReferencesCopy(null)
                 .nextDeadline(newDeadlineRespondent1.toLocalDate())
@@ -215,11 +217,10 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         }
         //for 2v1
         if (caseData.getAddApplicant2() != null && caseData.getAddApplicant2().equals(YES)) {
-            caseDataUpdated
+            caseDataBuilder
                 .respondent1AcknowledgeNotificationDate(time.now())
                 .respondent1ResponseDeadline(newDeadlineRespondent1)
                 .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
-                .respondent1(updatedRespondent1)
                 .respondent1Copy(null)
                 .solicitorReferencesCopy(null)
                 .respondent1ClaimResponseIntentionType(caseData.getRespondent1ClaimResponseIntentionType())
@@ -231,18 +232,15 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         } else if (caseData.getAddRespondent2() != null && caseData.getRespondent2() != null
             && respondent2HasSameLegalRep(caseData)) {
             //1v2 same
-            var updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
-                .flags(caseData.getRespondent2Copy().getFlags())
-                .build();
+            PersistDataUtils.persistPartyAddress(oldCaseData, caseData);
 
-            caseDataUpdated.respondent1AcknowledgeNotificationDate(time.now())
+            PersistDataUtils.persistFlagsForParties(oldCaseData, caseData, caseDataBuilder);
+
+            caseDataBuilder.respondent1AcknowledgeNotificationDate(time.now())
                 .respondent2AcknowledgeNotificationDate(time.now())
                 .respondent1ResponseDeadline(newDeadlineRespondent1)
                 .respondent2ResponseDeadline(newDeadlineRespondent1)
                 .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
-                .respondent1(updatedRespondent1)
-                .respondent2(updatedRespondent2)
                 .respondent1Copy(null)
                 .respondent2Copy(null)
                 .solicitorReferencesCopy(null)
@@ -256,8 +254,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             && respondent1Check.equals(YES) && !respondent2HasSameLegalRep(caseData)) {
             //1v2 diff login 1
 
-            caseDataUpdated.respondent1AcknowledgeNotificationDate(time.now())
-                .respondent1(updatedRespondent1)
+            caseDataBuilder.respondent1AcknowledgeNotificationDate(time.now())
                 .solicitorReferences(caseData.getSolicitorReferencesCopy())
                 .respondent2(caseData.getRespondent2Copy())
                 .respondent1ClaimResponseIntentionType(caseData.getRespondent1ClaimResponseIntentionType())
@@ -276,14 +273,13 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
         } else if (caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(YES)
             && respondent1Check.equals(NO) && !respondent2HasSameLegalRep(caseData)) {
-            var updatedRespondent2 = caseData.getRespondent2Copy().toBuilder()
-                .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
-                .flags(caseData.getRespondent2Copy().getFlags())
-                .build();
+
+            PersistDataUtils.persistPartyAddress(oldCaseData, caseData);
+
+            PersistDataUtils.persistFlagsForParties(oldCaseData, caseData, caseDataBuilder);
             //1v2 diff login 2
-            caseDataUpdated
+            caseDataBuilder
                 .respondent2AcknowledgeNotificationDate(time.now())
-                .respondent2(updatedRespondent2)
                 .solicitorReferences(caseData.getSolicitorReferencesCopy())
                 .respondent1Copy(null)
                 .respondent2Copy(null)
@@ -301,7 +297,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .build();
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataUpdated.build().toMap(objectMapper))
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
