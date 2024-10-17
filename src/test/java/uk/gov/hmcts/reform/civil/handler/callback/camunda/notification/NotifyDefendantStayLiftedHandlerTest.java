@@ -111,7 +111,7 @@ class NotifyDefendantStayLiftedHandlerTest {
                 "defendant2@hmcts.net",
                 "solicitor-template",
                 Map.of(
-                    "claimantvdefendant" , "Mr. John Rambo V Jack Jackson",
+                    "claimantvdefendant", "Mr. John Rambo V Jack Jackson",
                     "claimReferenceNumber", "1594901956117591",
                     "name", "Jim Jameson"
                 ),
@@ -122,7 +122,7 @@ class NotifyDefendantStayLiftedHandlerTest {
                 "defendant@hmcts.net",
                 "solicitor-template",
                 Map.of(
-                    "claimantvdefendant" , "Mr. John Rambo V Jack Jackson",
+                    "claimantvdefendant", "Mr. John Rambo V Jack Jackson",
                     "claimReferenceNumber", "1594901956117591",
                     "name", "Jack Jackson"
                 ),
