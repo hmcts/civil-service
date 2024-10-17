@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.dq.DocumentsToBeConsideredSectio
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.HearingLipSupportRequirements;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.LipExperts;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.LipExtraDQ;
+import uk.gov.hmcts.reform.civil.model.docmosis.dq.LipExtraDQEvidenceConfirmDetails;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfElectronicDocuments;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfNonElectronicDocuments;
 
@@ -23,6 +24,8 @@ import static uk.gov.hmcts.reform.civil.model.docmosis.dq.ExpertReportTemplate.t
 public abstract class DQLipFormMapper {
 
     protected abstract List<HearingLipSupportRequirements> toHearingSupportRequirements(Optional<CaseDataLiP> caseDataLiPOptional);
+
+    protected abstract LipExtraDQEvidenceConfirmDetails toEvidenceConfirmDetails(Optional<CaseDataLiP> caseDataLiPOptional);
 
     protected abstract DQExtraDetailsLip getDQExtraDetails(Optional<CaseDataLiP> caseDataLiPOptional);
 
@@ -43,6 +46,7 @@ public abstract class DQLipFormMapper {
         builder.hearingLipSupportRequirements(toHearingSupportRequirements(caseDataLiPOptional));
         var dqExtraDetails = getDQExtraDetails(caseDataLiPOptional);
         var expertLip = getExpertLip(dqExtraDetails);
+        var lipExtraDQEvidenceConfirmDetails = toEvidenceConfirmDetails(caseDataLiPOptional);
         if (dqExtraDetails != null) {
             builder.lipExtraDQ(LipExtraDQ.builder().triedToSettle(dqExtraDetails.getTriedToSettle())
                                    .requestExtra4weeks(dqExtraDetails.getRequestExtra4weeks())
@@ -53,6 +57,7 @@ public abstract class DQLipFormMapper {
                                    .giveEvidenceYourSelf(dqExtraDetails.getGiveEvidenceYourSelf())
                                    .whyPhoneOrVideoHearing(dqExtraDetails.getWhyPhoneOrVideoHearing())
                                    .wantPhoneOrVideoHearing(dqExtraDetails.getWantPhoneOrVideoHearing())
+                                   .giveEvidenceConfirmDetails(lipExtraDQEvidenceConfirmDetails)
                                    .build())
                 .lipExperts(LipExperts.builder()
                                 .details(expertLip.map(ExpertLiP::getUnwrappedDetails).map(Collection::stream)
