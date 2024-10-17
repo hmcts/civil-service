@@ -279,9 +279,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CaseData oldCaseData = CaseDataBuilder.builder()
                 .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
-                .applicant2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
                 .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
-                .respondent2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
                 .build();
             when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
 
@@ -311,9 +309,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CaseData oldCaseData = CaseDataBuilder.builder()
                 .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
-                .applicant2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
                 .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
-                .respondent2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
                 .build();
             when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
             // When
@@ -340,9 +336,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CaseData oldCaseData = CaseDataBuilder.builder()
                 .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
-                .applicant2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
                 .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
-                .respondent2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
                 .build();
             when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
             // When
@@ -372,9 +366,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CaseData oldCaseData = CaseDataBuilder.builder()
                 .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(testAddress).build())
-                .applicant2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(testAddress).build())
                 .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(testAddress).build())
-                .respondent2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(testAddress).build())
                 .build();
             when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
 
@@ -402,9 +394,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CaseData oldCaseData = CaseDataBuilder.builder()
                 .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
-                .applicant2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
                 .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
-                .respondent2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
                 .build();
             when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
 
@@ -442,9 +432,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CaseData oldCaseData = CaseDataBuilder.builder()
                 .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
-                .applicant2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
                 .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
-                .respondent2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
                 .build();
             when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
 
@@ -485,9 +473,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CaseData oldCaseData = CaseDataBuilder.builder()
                 .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
-                .applicant2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
                 .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
-                .respondent2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
                 .build();
             when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
 
@@ -529,9 +515,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CaseData oldCaseData = CaseDataBuilder.builder()
                 .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
-                .applicant2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
                 .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
-                .respondent2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
                 .build();
             when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
 
@@ -576,9 +560,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CaseData oldCaseData = CaseDataBuilder.builder()
                 .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
-                .applicant2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
                 .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
-                .respondent2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
                 .build();
             when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
 
@@ -621,9 +603,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CaseData oldCaseData = CaseDataBuilder.builder()
                 .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
-                .applicant2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
                 .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
-                .respondent2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
                 .build();
             when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
 
