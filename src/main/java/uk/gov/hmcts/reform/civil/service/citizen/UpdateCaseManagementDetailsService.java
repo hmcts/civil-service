@@ -109,7 +109,9 @@ public class UpdateCaseManagementDetailsService {
         Optional.ofNullable(caseData.getApplicant1DQ())
             .ifPresent(dq -> Optional.ofNullable(dq.getApplicant1DQRequestedCourt())
                 .ifPresent(requestedCourt -> builder.applicant1DQ(
-                    dq.toBuilder().applicant1DQRequestedCourt(correctCaseLocation(requestedCourt, availableLocations))
+                    dq.toBuilder().applicant1DQRequestedCourt(correctCaseLocation(requestedCourt, availableLocations,
+                                                                                  builder
+                        ))
                         .build())));
     }
 
@@ -118,12 +120,12 @@ public class UpdateCaseManagementDetailsService {
             Optional.ofNullable(caseData.getRespondent1DQ())
                 .ifPresent(dq -> Optional.ofNullable(dq.getRespondent1DQRequestedCourt())
                     .ifPresent(requestedCourt -> builder.respondent1DQ(
-                        dq.toBuilder().respondent1DQRequestedCourt(correctCaseLocation(requestedCourt, availableLocations))
+                        dq.toBuilder().respondent1DQRequestedCourt(correctCaseLocation(requestedCourt, availableLocations, builder))
                             .build())));
         }
     }
 
-    private RequestedCourt correctCaseLocation(RequestedCourt requestedCourt, List<LocationRefData> locations) {
+    private RequestedCourt correctCaseLocation(RequestedCourt requestedCourt, List<LocationRefData> locations, CaseData.CaseDataBuilder<?, ?> builder) {
         if (requestedCourt.getCaseLocation() == null || requestedCourt.getCaseLocation().getBaseLocation() == null) {
             return requestedCourt;
         }
@@ -131,6 +133,7 @@ public class UpdateCaseManagementDetailsService {
         LocationRefData preferredLocation = locations.stream()
             .filter(locationRefData -> courtLocationUtils.checkLocation(locationRefData, locationLabel))
             .findFirst().orElseThrow(RuntimeException::new);
+        builder.locationName(preferredLocation.getSiteName()).build();
         return requestedCourt.toBuilder()
             .responseCourtCode(preferredLocation.getCourtLocationCode())
             .caseLocation(LocationHelper.buildCaseLocation(preferredLocation))
