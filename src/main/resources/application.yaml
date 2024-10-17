@@ -457,6 +457,8 @@ notifications:
   notifyLRCaseDismissed: "4fa16416-650a-4af3-8305-e21fd63a8754"
   notifyLRStayLifted: "a9cdde1e-6e11-44b2-bf8e-83e1f64a5735"
   notifyLRStayUpdateRequested: "2bf8e191-d0aa-4cc3-9c54-42245c1d56a2"
+  notifyLipStayUpdateRequested: "a08532c7-67f5-4c4f-a30d-81c4c0508ffc"
+  notifyLipBilingualStayUpdateRequested: "95e2509e-7e8a-4c59-a756-605286b88847"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
