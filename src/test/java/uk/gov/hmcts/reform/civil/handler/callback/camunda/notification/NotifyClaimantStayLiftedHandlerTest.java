@@ -76,6 +76,7 @@ class NotifyClaimantStayLiftedHandlerTest {
             "respondentSolicitor@hmcts.net",
             "solicitor-template",
             Map.of(
+                "claimantvdefendant" , "John Doe V Jack Jackson",
                 "claimReferenceNumber", "1594901956117591",
                 "name", "John Doe"
             ),
