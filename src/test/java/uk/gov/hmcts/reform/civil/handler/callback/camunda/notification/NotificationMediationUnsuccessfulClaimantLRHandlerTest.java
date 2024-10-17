@@ -167,7 +167,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
             //When
-            given(notificationsProperties.getMediationUnsuccessfulClaimantLIPWelshTemplate()).willReturn(EMAIL_LIP_TEMPLATE);
+            given(notificationsProperties.getMediationUnsuccessfulClaimantLIPWelshTemplate()).willReturn(
+                EMAIL_LIP_TEMPLATE);
             notificationHandler.handle(params);
             //Then
             verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -182,7 +183,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
         @Test
         void shouldReturnCorrectCamundaActivityId_whenInvoked() {
             assertThat(notificationHandler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
-                NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build())).isEqualTo(TASK_ID_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR);
+                NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build())).isEqualTo(
+                TASK_ID_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR);
         }
 
         @Nested
@@ -350,7 +352,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                     .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
 
                 //When
-                given(notificationsProperties.getMediationUnsuccessfulLIPTemplateWelsh()).willReturn(CARM_LIP_MAIL_TEMPLATE);
+                given(notificationsProperties.getMediationUnsuccessfulLIPTemplateWelsh()).willReturn(
+                    CARM_LIP_MAIL_TEMPLATE);
                 notificationHandler.handle(params);
                 //Then
                 verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -380,7 +383,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                     .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
 
                 //When
-                given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(CARM_NO_ATTENDANCE_MAIL_TEMPLATE);
+                given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(
+                    CARM_NO_ATTENDANCE_MAIL_TEMPLATE);
                 given(organisationDetailsService.getApplicantLegalOrganisationName(any())).willReturn(ORGANISATION_NAME);
                 notificationHandler.handle(params);
                 //Then
@@ -404,13 +408,17 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                     .applicant1Represented(YesOrNo.YES)
                     .ccdCaseReference(CCD_REFERENCE_NUMBER)
                     .mediation(Mediation.builder()
-                                   .mediationUnsuccessfulReasonsMultiSelect(List.of(NOT_CONTACTABLE_CLAIMANT_ONE, NOT_CONTACTABLE_DEFENDANT_ONE)).build())
+                                   .mediationUnsuccessfulReasonsMultiSelect(List.of(
+                                       NOT_CONTACTABLE_CLAIMANT_ONE,
+                                       NOT_CONTACTABLE_DEFENDANT_ONE
+                                   )).build())
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
 
                 //When
-                given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(CARM_NO_ATTENDANCE_MAIL_TEMPLATE);
+                given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(
+                    CARM_NO_ATTENDANCE_MAIL_TEMPLATE);
                 given(organisationDetailsService.getApplicantLegalOrganisationName(any())).willReturn(ORGANISATION_NAME);
                 notificationHandler.handle(params);
                 //Then
@@ -441,7 +449,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                     .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
 
                 //When
-                given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(CARM_NO_ATTENDANCE_MAIL_TEMPLATE);
+                given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(
+                    CARM_NO_ATTENDANCE_MAIL_TEMPLATE);
                 given(organisationDetailsService.getApplicantLegalOrganisationName(any())).willReturn(ORGANISATION_NAME);
                 notificationHandler.handle(params);
                 //Then
@@ -465,13 +474,17 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                     .applicant1Represented(YesOrNo.YES)
                     .ccdCaseReference(CCD_REFERENCE_NUMBER)
                     .mediation(Mediation.builder()
-                                   .mediationUnsuccessfulReasonsMultiSelect(List.of(NOT_CONTACTABLE_CLAIMANT_TWO, NOT_CONTACTABLE_DEFENDANT_ONE)).build())
+                                   .mediationUnsuccessfulReasonsMultiSelect(List.of(
+                                       NOT_CONTACTABLE_CLAIMANT_TWO,
+                                       NOT_CONTACTABLE_DEFENDANT_ONE
+                                   )).build())
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
 
                 //When
-                given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(CARM_NO_ATTENDANCE_MAIL_TEMPLATE);
+                given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(
+                    CARM_NO_ATTENDANCE_MAIL_TEMPLATE);
                 given(organisationDetailsService.getApplicantLegalOrganisationName(any())).willReturn(ORGANISATION_NAME);
                 notificationHandler.handle(params);
                 //Then
@@ -486,61 +499,73 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
         }
 
         @NotNull
-        private  Map<String, String> getPropertyMap(CaseData caseData) {
+        private Map<String, String> getPropertyMap(CaseData caseData) {
             return Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME,
                 DEFENDANT_NAME, DEFENDANT_PARTY_NAME,
                 CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString(),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
-        };
+        }
+
+        ;
 
         @NotNull
-        private  Map<String, String> getPropertyLipMap(CaseData caseData) {
+        private Map<String, String> getPropertyLipMap(CaseData caseData) {
             return Map.of(
                 CLAIMANT_NAME, APPLICANT_PARTY_NAME,
                 RESPONDENT_NAME, DEFENDANT_PARTY_NAME,
                 CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString(),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
-        };
+        }
+
+        ;
 
         @NotNull
-        private  Map<String, String> getCarmPropertyMap(CaseData caseData) {
+        private Map<String, String> getCarmPropertyMap(CaseData caseData) {
             return Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME,
                 PARTY_NAME, CLAIMANT_TEXT + DEFENDANT_PARTY_NAME,
                 CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString(),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
-        };
+        }
+
+        ;
 
         @NotNull
-        private  Map<String, String> getCarm1v2PropertyMap(CaseData caseData) {
+        private Map<String, String> getCarm1v2PropertyMap(CaseData caseData) {
             return Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME,
                 PARTY_NAME, CLAIMANT_TEXT + DEFENDANT_PARTY_NAME + " and " + DEFENDANT_2_PARTY_NAME,
                 CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString(),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
-        };
+        }
+
+        ;
 
         @NotNull
-        private  Map<String, String> getCarmLipClaimantPropertyMap(CaseData caseData) {
+        private Map<String, String> getCarmLipClaimantPropertyMap(CaseData caseData) {
             return Map.of(
                 PARTY_NAME, APPLICANT_PARTY_NAME,
                 CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString(),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
-        };
+        }
+
+        ;
 
         @NotNull
-        private  Map<String, String> getCarmNoAttendancePropertyMap(CaseData caseData) {
+        private Map<String, String> getCarmNoAttendancePropertyMap(CaseData caseData) {
             return Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME,
                 CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString(),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
-        };
+        }
+
+        ;
     }
 }
