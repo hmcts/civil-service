@@ -307,6 +307,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         }
         BigDecimal fixedCost = calculateFixedCosts(caseData);
         BigDecimal theOverallTotal = calculateOverallTotal(caseData, interest, claimFeePounds, fixedCost);
+
         StringBuilder repaymentBreakdown = buildRepaymentBreakdown(
             caseData,
             interest,
