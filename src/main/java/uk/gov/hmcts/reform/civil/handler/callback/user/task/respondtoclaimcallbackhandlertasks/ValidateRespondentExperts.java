@@ -34,7 +34,6 @@ public class ValidateRespondentExperts implements CaseTask, ExpertsValidator {
         this.userService = userService;
     }
 
-    @Override
     public CallbackResponse execute(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
