@@ -109,8 +109,7 @@ public class UpdateCaseManagementDetailsService {
         Optional.ofNullable(caseData.getApplicant1DQ())
             .ifPresent(dq -> Optional.ofNullable(dq.getApplicant1DQRequestedCourt())
                 .ifPresent(requestedCourt -> builder.applicant1DQ(
-                    dq.toBuilder().applicant1DQRequestedCourt(correctCaseLocation(requestedCourt, availableLocations
-                        ))
+                    dq.toBuilder().applicant1DQRequestedCourt(correctCaseLocation(requestedCourt, availableLocations))
                         .build())));
     }
 
