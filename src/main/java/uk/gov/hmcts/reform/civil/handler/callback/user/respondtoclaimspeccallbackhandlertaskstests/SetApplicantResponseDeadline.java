@@ -108,48 +108,48 @@ public class SetApplicantResponseDeadline implements CaseTask {
 
         if (NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())) {
             updatedRespondent1 = caseData.getRespondent1().toBuilder()
-                .primaryAddress(caseData.getSpecAoSApplicantCorrespondenceAddressdetails()).build();
+                    .primaryAddress(caseData.getSpecAoSApplicantCorrespondenceAddressdetails()).build();
         } else {
             updatedRespondent1 = caseData.getRespondent1().toBuilder()
-                .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
-                .build();
+                    .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
+                    .build();
         }
 
         if (caseData.getRespondent1Copy() != null) {
             updatedRespondent1 =
-                updatedRespondent1.toBuilder().flags(caseData.getRespondent1Copy().getFlags()).build();
+                    updatedRespondent1.toBuilder().flags(caseData.getRespondent1Copy().getFlags()).build();
         }
 
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
-            .respondent1(updatedRespondent1)
-            .respondent1Copy(null);
+                .respondent1(updatedRespondent1)
+                .respondent1Copy(null);
 
-        if (respondToClaimSpecUtils.isRespondent2HasSameLegalRep(caseData)
-            && caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == YES) {
+        if (respondent2HasSameLegalRep(caseData)
+                && caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == YES) {
             updatedData.respondent2ClaimResponseTypeForSpec(caseData.getRespondent1ClaimResponseTypeForSpec());
             updatedData
-                .respondent2ResponseDate(responseDate);
+                    .respondent2ResponseDate(responseDate);
         }
 
         // if present, persist the 2nd respondent address in the same fashion as above, i.e ignore for 1v1
         if (ofNullable(caseData.getRespondent2()).isPresent()
-            && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
+                && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
             var updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
-                .flags(caseData.getRespondent2Copy().getFlags())
-                .build();
+                    .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
+                    .flags(caseData.getRespondent2Copy().getFlags())
+                    .build();
             updatedData.respondent2(updatedRespondent2).respondent2Copy(null);
             updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
         }
 
         if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
-            && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
-            && ifResponseTypeIsPartOrFullAdmission(caseData)) {
+                && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
+                && ifResponseTypeIsPartOrFullAdmission(caseData)) {
             LocalDate whenBePaid = deadlineCalculatorService.calculateExtendedDeadline(
-                LocalDate.now(),
-                RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
+                    LocalDate.now(),
+                    RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
             updatedData.respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                                          .whenWillThisAmountBePaid(whenBePaid).build());
+                    .whenWillThisAmountBePaid(whenBePaid).build());
         }
 
         CaseRole respondentTwoCaseRoleToCheck;
@@ -158,11 +158,11 @@ public class SetApplicantResponseDeadline implements CaseTask {
 
         if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, respondentTwoCaseRoleToCheck)) {
             updatedData.respondent2ResponseDate(responseDate)
-                .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
+                    .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
 
             if (caseData.getRespondent1ResponseDate() != null) {
                 updatedData
-                    .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate));
+                        .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate));
             }
 
             // 1v1, 2v1
@@ -171,109 +171,109 @@ public class SetApplicantResponseDeadline implements CaseTask {
             // moving statement of truth value to correct field, this was not possible in mid event.
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Respondent2DQ.Respondent2DQBuilder dq = caseData.getRespondent2DQ().toBuilder()
-                .respondent2DQStatementOfTruth(statementOfTruth);
+                    .respondent2DQStatementOfTruth(statementOfTruth);
             handleCourtLocationForRespondent2DQ(caseData, updatedData, dq, callbackParams);
             updatedData.respondent2DQ(dq.build());
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
         } else {
             updatedData
-                .respondent1ResponseDate(responseDate)
-                .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate))
-                .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
+                    .respondent1ResponseDate(responseDate)
+                    .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate))
+                    .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
 
             if (caseData.getRespondent2() != null && caseData.getRespondent2Copy() != null) {
                 Party updatedRespondent2;
 
                 if (NO.equals(caseData.getSpecAoSRespondent2HomeAddressRequired())) {
                     updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                        .primaryAddress(caseData.getSpecAoSRespondent2HomeAddressDetails()).build();
+                            .primaryAddress(caseData.getSpecAoSRespondent2HomeAddressDetails()).build();
                 } else {
                     updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                        .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress()).build();
+                            .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress()).build();
                 }
 
                 updatedData
-                    .respondent2(updatedRespondent2.toBuilder()
-                                     .flags(caseData.getRespondent2Copy().getFlags()).build())
-                    .respondent2Copy(null);
+                        .respondent2(updatedRespondent2.toBuilder()
+                                .flags(caseData.getRespondent2Copy().getFlags()).build())
+                        .respondent2Copy(null);
                 updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
             }
 
             // moving statement of truth value to correct field, this was not possible in mid event.
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Respondent1DQ.Respondent1DQBuilder dq = caseData.getRespondent1DQ().toBuilder()
-                .respondent1DQStatementOfTruth(statementOfTruth)
-                .respondent1DQWitnesses(Witnesses.builder()
-                                            .witnessesToAppear(caseData.getRespondent1DQWitnessesRequiredSpec())
-                                            .details(caseData.getRespondent1DQWitnessesDetailsSpec())
-                                            .build());
+                    .respondent1DQStatementOfTruth(statementOfTruth)
+                    .respondent1DQWitnesses(Witnesses.builder()
+                            .witnessesToAppear(caseData.getRespondent1DQWitnessesRequiredSpec())
+                            .details(caseData.getRespondent1DQWitnessesDetailsSpec())
+                            .build());
             handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
             updatedData.respondent1DQ(dq.build());
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
         }
         if (solicitorHasCaseRole(callbackParams, respondentTwoCaseRoleToCheck)
-            && FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
+                && FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
             updatedData.defenceAdmitPartPaymentTimeRouteRequired(null);
         }
 
         if (caseData.getRespondent1DQWitnessesSmallClaim() != null) {
             updatedData.respondent1DQ(
-                updatedData.build().getRespondent1DQ().toBuilder().respondent1DQWitnesses(
-                    caseData.getRespondent1DQWitnessesSmallClaim()).build());
+                    updatedData.build().getRespondent1DQ().toBuilder().respondent1DQWitnesses(
+                            caseData.getRespondent1DQWitnessesSmallClaim()).build());
         }
 
         if (caseData.getRespondent2DQWitnessesSmallClaim() != null) {
             updatedData.respondent2DQ(
-                updatedData.build().getRespondent2DQ().toBuilder().respondent2DQWitnesses(
-                    caseData.getRespondent2DQWitnessesSmallClaim()).build());
+                    updatedData.build().getRespondent2DQ().toBuilder().respondent2DQWitnesses(
+                            caseData.getRespondent2DQWitnessesSmallClaim()).build());
         }
 
         if (caseData.getRespondent1DQ() != null
-            && YES.equals(caseData.getResponseClaimExpertSpecRequired())
-            && caseData.getRespondent1DQ().getSmallClaimExperts() != null) {
+                && YES.equals(caseData.getResponseClaimExpertSpecRequired())
+                && caseData.getRespondent1DQ().getSmallClaimExperts() != null) {
             Expert expert = fromSmallClaimExpertDetails(caseData.getRespondent1DQ().getSmallClaimExperts());
             updatedData.respondent1DQ(
-                updatedData.build().getRespondent1DQ().toBuilder()
-                    .respondent1DQExperts(Experts.builder()
-                                              .expertRequired(caseData.getResponseClaimExpertSpecRequired())
-                                              .details(wrapElements(expert))
-                                              .build())
-                    .build());
+                    updatedData.build().getRespondent1DQ().toBuilder()
+                            .respondent1DQExperts(Experts.builder()
+                                    .expertRequired(caseData.getResponseClaimExpertSpecRequired())
+                                    .details(wrapElements(expert))
+                                    .build())
+                            .build());
         } else if (caseData.getRespondent1DQ() != null
-            && NO.equals(caseData.getResponseClaimExpertSpecRequired())) {
+                && NO.equals(caseData.getResponseClaimExpertSpecRequired())) {
             updatedData.respondent1DQ(
-                updatedData.build().getRespondent1DQ().toBuilder()
-                    .respondent1DQExperts(Experts.builder()
-                                              .expertRequired(caseData.getResponseClaimExpertSpecRequired())
-                                              .build())
-                    .build());
+                    updatedData.build().getRespondent1DQ().toBuilder()
+                            .respondent1DQExperts(Experts.builder()
+                                    .expertRequired(caseData.getResponseClaimExpertSpecRequired())
+                                    .build())
+                            .build());
         }
 
         if (caseData.getRespondent2DQ() != null
-            && YES.equals(caseData.getResponseClaimExpertSpecRequired2())
-            && caseData.getRespondent2DQ().getSmallClaimExperts() != null) {
+                && YES.equals(caseData.getResponseClaimExpertSpecRequired2())
+                && caseData.getRespondent2DQ().getSmallClaimExperts() != null) {
             Expert expert = fromSmallClaimExpertDetails(caseData.getRespondent2DQ().getSmallClaimExperts());
             updatedData.respondent2DQ(
-                updatedData.build().getRespondent2DQ().toBuilder()
-                    .respondent2DQExperts(Experts.builder()
-                                              .expertRequired(caseData.getResponseClaimExpertSpecRequired2())
-                                              .details(wrapElements(expert))
-                                              .build())
-                    .build());
+                    updatedData.build().getRespondent2DQ().toBuilder()
+                            .respondent2DQExperts(Experts.builder()
+                                    .expertRequired(caseData.getResponseClaimExpertSpecRequired2())
+                                    .details(wrapElements(expert))
+                                    .build())
+                            .build());
         } else if (caseData.getRespondent2DQ() != null
-            && NO.equals(caseData.getResponseClaimExpertSpecRequired2())) {
+                && NO.equals(caseData.getResponseClaimExpertSpecRequired2())) {
             updatedData.respondent2DQ(
-                updatedData.build().getRespondent2DQ().toBuilder()
-                    .respondent2DQExperts(Experts.builder()
-                                              .expertRequired(caseData.getResponseClaimExpertSpecRequired())
-                                              .build())
-                    .build());
+                    updatedData.build().getRespondent2DQ().toBuilder()
+                            .respondent2DQExperts(Experts.builder()
+                                    .expertRequired(caseData.getResponseClaimExpertSpecRequired())
+                                    .build())
+                            .build());
         }
 
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(updatedData,
-                                                                        toggleService.isUpdateContactDetailsEnabled());
+                toggleService.isUpdateContactDetailsEnabled());
 
         updatedData.respondent1DetailsForClaimDetailsTab(updatedData.build().getRespondent1().toBuilder().flags(null).build());
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
@@ -297,160 +297,50 @@ public class SetApplicantResponseDeadline implements CaseTask {
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         updatedData.respondent2DocumentGeneration(null);
         if (!coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
-                                                     .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
-            && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
-                                                       .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
+                .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
+                && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
+                .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
             updatedData.respondent2DocumentGeneration("userRespondent2");
         }
 
         updateCorrespondenceAddress(callbackParams, updatedData, caseData);
 
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
-            && isAwaitingAnotherDefendantResponse(caseData)) {
+                && isAwaitingAnotherDefendantResponse(caseData)) {
 
             if (isDefending(caseData)) {
                 assembleResponseDocumentsSpec(caseData, updatedData);
             }
 
             return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedData.build().toMap(objectMapper))
-                .build();
-        } else if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
-            && !isAwaitingAnotherDefendantResponse(caseData)) {
-            if (!FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-                || !FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
-                return AboutToStartOrSubmitCallbackResponse.builder()
                     .data(updatedData.build().toMap(objectMapper))
-                    .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
                     .build();
+        } else if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
+                && !isAwaitingAnotherDefendantResponse(caseData)) {
+            if (!FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                    || !FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                        .data(updatedData.build().toMap(objectMapper))
+                        .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
+                        .build();
             }
         } else if (getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP && twoVsOneDivergent(caseData)) {
             return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedData.build().toMap(objectMapper))
-                .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
-                .build();
+                    .data(updatedData.build().toMap(objectMapper))
+                    .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
+                    .build();
         } else if (getMultiPartyScenario(caseData) == TWO_V_ONE && twoVsOneDivergent(caseData)) {
             return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedData.build().toMap(objectMapper))
-                .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
-                .build();
+                    .data(updatedData.build().toMap(objectMapper))
+                    .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
+                    .build();
         }
         assembleResponseDocumentsSpec(caseData, updatedData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.build().toMap(objectMapper))
-            .state(CaseState.AWAITING_APPLICANT_INTENTION.name())
-            .build();
-    }
-
-    private boolean ifResponseTypeIsPartOrFullAdmission(CaseData caseData) {
-        return (RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || RespondentResponseTypeSpec.PART_ADMISSION.equals(
-            caseData.getRespondent2ClaimResponseTypeForSpec())
-            ) || (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || RespondentResponseTypeSpec.FULL_ADMISSION.equals(
-            caseData.getRespondent2ClaimResponseTypeForSpec())
-            );
-    }
-
-    private void updateCorrespondenceAddress(CallbackParams callbackParams,
-                                             CaseData.CaseDataBuilder<?, ?> updatedCaseData,
-                                             CaseData caseData) {
-        if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORONE)
-            && caseData.getSpecAoSRespondentCorrespondenceAddressRequired() == YesOrNo.NO) {
-            Address newAddress = caseData.getSpecAoSRespondentCorrespondenceAddressdetails();
-            updatedCaseData.specRespondentCorrespondenceAddressdetails(newAddress)
-                .specAoSRespondentCorrespondenceAddressdetails(Address.builder().build());
-            if (getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP) {
-                // to keep with heading tab
-                updatedCaseData.specRespondent2CorrespondenceAddressdetails(newAddress);
-            }
-        } else if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORTWO)
-            && caseData.getSpecAoSRespondent2CorrespondenceAddressRequired() == YesOrNo.NO) {
-            updatedCaseData.specRespondent2CorrespondenceAddressdetails(
-                    caseData.getSpecAoSRespondent2CorrespondenceAddressdetails())
-                .specAoSRespondent2CorrespondenceAddressdetails(Address.builder().build());
-        }
-    }
-
-    private LocalDateTime getApplicant1ResponseDeadline(LocalDateTime responseDate) {
-        return deadlinesCalculator.calculateApplicantResponseDeadlineSpec(responseDate);
-    }
-
-    private void handleCourtLocationForRespondent2DQ(CaseData caseData, CaseData.CaseDataBuilder updatedCase,
-                                                     Respondent2DQ.Respondent2DQBuilder dq,
-                                                     CallbackParams callbackParams) {
-        Optional<LocationRefData> optCourtLocation = getCourtLocationDefendant2(caseData, callbackParams);
-        if (optCourtLocation.isPresent()) {
-            LocationRefData courtLocation = optCourtLocation.get();
-            dq.respondent2DQRequestedCourt(caseData.getRespondent2DQ().getRespondToCourtLocation2().toBuilder()
-                                               .responseCourtLocations(null)
-                                               .caseLocation(LocationHelper.buildCaseLocation(courtLocation))
-                                               .responseCourtCode(courtLocation.getCourtLocationCode()).build())
-                .respondToCourtLocation2(RequestedCourt.builder()
-                                             .responseCourtLocations(null)
-                                             .responseCourtCode(courtLocation.getCourtLocationCode())
-                                             .reasonForHearingAtSpecificCourt(
-                                                 caseData.getRespondent2DQ().getRespondToCourtLocation2()
-                                                     .getReasonForHearingAtSpecificCourt()
-                                             )
-                                             .build());
-            updatedCase.responseClaimCourtLocation2Required(YES);
-        } else {
-            updatedCase.responseClaimCourtLocation2Required(NO);
-        }
-    }
-
-    private void handleCourtLocationForRespondent1DQ(CaseData caseData,
-                                                     Respondent1DQ.Respondent1DQBuilder dq,
-                                                     CallbackParams callbackParams) {
-        Optional<LocationRefData> optCourtLocation = getCourtLocationDefendant1(caseData, callbackParams);
-        // data for court location
-        if (optCourtLocation.isPresent()) {
-            LocationRefData courtLocation = optCourtLocation.get();
-
-            dq.respondent1DQRequestedCourt(caseData.getRespondent1DQ()
-                                               .getRespondToCourtLocation().toBuilder()
-                                               .reasonForHearingAtSpecificCourt(
-                                                   caseData.getRespondent1DQ()
-                                                       .getRespondToCourtLocation()
-                                                       .getReasonForHearingAtSpecificCourt())
-                                               .responseCourtLocations(null)
-                                               .caseLocation(LocationHelper.buildCaseLocation(courtLocation))
-                                               .responseCourtCode(courtLocation.getCourtLocationCode()).build());
-            dq.respondToCourtLocation(RequestedCourt.builder()
-                                          .responseCourtLocations(null)
-                                          .responseCourtCode(courtLocation.getCourtLocationCode())
-
-                                          .build())
-                .responseClaimCourtLocationRequired(YES);
-        } else {
-            dq.responseClaimCourtLocationRequired(NO);
-        }
-    }
-
-    private boolean solicitorHasCaseRole(CallbackParams callbackParams, CaseRole caseRole) {
-        CaseData caseData = callbackParams.getCaseData();
-        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-
-        return coreCaseUserService.userHasCaseRole(
-            caseData.getCcdCaseReference().toString(),
-            userInfo.getUid(),
-            caseRole
-        );
-    }
-
-    private boolean isAwaitingAnotherDefendantResponse(CaseData caseData) {
-        return caseData.getRespondent1ClaimResponseTypeForSpec() == null
-            || caseData.getRespondent2ClaimResponseTypeForSpec() == null;
-    }
-
-    private boolean isDefending(CaseData caseData) {
-        return FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
-            || PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()
-        );
+                .data(updatedData.build().toMap(objectMapper))
+                .state(CaseState.AWAITING_APPLICANT_INTENTION.name())
+                .build();
     }
 
     private void assembleResponseDocumentsSpec(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
@@ -526,11 +416,153 @@ public class SetApplicantResponseDeadline implements CaseTask {
         clearTempDocuments(updatedCaseData);
     }
 
+    private boolean respondent2HasSameLegalRep(CaseData caseData) {
+        return caseData.getRespondent2SameLegalRepresentative() != null
+            && caseData.getRespondent2SameLegalRepresentative() == YES;
+    }
+
+    private boolean ifResponseTypeIsPartOrFullAdmission(CaseData caseData) {
+        return (RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.PART_ADMISSION.equals(
+            caseData.getRespondent2ClaimResponseTypeForSpec())
+            ) || (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.FULL_ADMISSION.equals(
+            caseData.getRespondent2ClaimResponseTypeForSpec())
+            );
+    }
+
+    private boolean solicitorRepresentsOnlyOneOfRespondents(CallbackParams callbackParams, CaseRole caseRole) {
+        CaseData caseData = callbackParams.getCaseData();
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+
+        return stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)
+            && coreCaseUserService.userHasCaseRole(
+            caseData.getCcdCaseReference().toString(),
+            userInfo.getUid(),
+            caseRole
+        );
+    }
+
+    private LocalDateTime getApplicant1ResponseDeadline(LocalDateTime responseDate) {
+        return deadlinesCalculator.calculateApplicantResponseDeadlineSpec(responseDate);
+    }
+
+    private void handleCourtLocationForRespondent2DQ(CaseData caseData, CaseData.CaseDataBuilder updatedCase,
+                                                     Respondent2DQ.Respondent2DQBuilder dq,
+                                                     CallbackParams callbackParams) {
+        Optional<LocationRefData> optCourtLocation = getCourtLocationDefendant2(caseData, callbackParams);
+        if (optCourtLocation.isPresent()) {
+            LocationRefData courtLocation = optCourtLocation.get();
+            dq.respondent2DQRequestedCourt(caseData.getRespondent2DQ().getRespondToCourtLocation2().toBuilder()
+                                               .responseCourtLocations(null)
+                                               .caseLocation(LocationHelper.buildCaseLocation(courtLocation))
+                                               .responseCourtCode(courtLocation.getCourtLocationCode()).build())
+                .respondToCourtLocation2(RequestedCourt.builder()
+                                             .responseCourtLocations(null)
+                                             .responseCourtCode(courtLocation.getCourtLocationCode())
+                                             .reasonForHearingAtSpecificCourt(
+                                                 caseData.getRespondent2DQ().getRespondToCourtLocation2()
+                                                     .getReasonForHearingAtSpecificCourt()
+                                             )
+                                             .build());
+            updatedCase.responseClaimCourtLocation2Required(YES);
+        } else {
+            updatedCase.responseClaimCourtLocation2Required(NO);
+        }
+    }
+
+    private void handleCourtLocationForRespondent1DQ(CaseData caseData,
+                                                     Respondent1DQ.Respondent1DQBuilder dq,
+                                                     CallbackParams callbackParams) {
+        Optional<LocationRefData> optCourtLocation = getCourtLocationDefendant1(caseData, callbackParams);
+        // data for court location
+        if (optCourtLocation.isPresent()) {
+            LocationRefData courtLocation = optCourtLocation.get();
+
+            dq.respondent1DQRequestedCourt(caseData.getRespondent1DQ()
+                                               .getRespondToCourtLocation().toBuilder()
+                                               .reasonForHearingAtSpecificCourt(
+                                                   caseData.getRespondent1DQ()
+                                                       .getRespondToCourtLocation()
+                                                       .getReasonForHearingAtSpecificCourt())
+                                               .responseCourtLocations(null)
+                                               .caseLocation(LocationHelper.buildCaseLocation(courtLocation))
+                                               .responseCourtCode(courtLocation.getCourtLocationCode()).build());
+            dq.respondToCourtLocation(RequestedCourt.builder()
+                                          .responseCourtLocations(null)
+                                          .responseCourtCode(courtLocation.getCourtLocationCode())
+
+                                          .build())
+                .responseClaimCourtLocationRequired(YES);
+        } else {
+            dq.responseClaimCourtLocationRequired(NO);
+        }
+    }
+
+    private boolean solicitorHasCaseRole(CallbackParams callbackParams, CaseRole caseRole) {
+        CaseData caseData = callbackParams.getCaseData();
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+
+        return coreCaseUserService.userHasCaseRole(
+            caseData.getCcdCaseReference().toString(),
+            userInfo.getUid(),
+            caseRole
+        );
+    }
+
+    private void updateCorrespondenceAddress(CallbackParams callbackParams,
+                                             CaseData.CaseDataBuilder<?, ?> updatedCaseData,
+                                             CaseData caseData) {
+        if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORONE)
+            && caseData.getSpecAoSRespondentCorrespondenceAddressRequired() == YesOrNo.NO) {
+            Address newAddress = caseData.getSpecAoSRespondentCorrespondenceAddressdetails();
+            updatedCaseData.specRespondentCorrespondenceAddressdetails(newAddress)
+                .specAoSRespondentCorrespondenceAddressdetails(Address.builder().build());
+            if (getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP) {
+                // to keep with heading tab
+                updatedCaseData.specRespondent2CorrespondenceAddressdetails(newAddress);
+            }
+        } else if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORTWO)
+            && caseData.getSpecAoSRespondent2CorrespondenceAddressRequired() == YesOrNo.NO) {
+            updatedCaseData.specRespondent2CorrespondenceAddressdetails(
+                    caseData.getSpecAoSRespondent2CorrespondenceAddressdetails())
+                .specAoSRespondent2CorrespondenceAddressdetails(Address.builder().build());
+        }
+    }
+
+    private boolean isAwaitingAnotherDefendantResponse(CaseData caseData) {
+        return caseData.getRespondent1ClaimResponseTypeForSpec() == null
+            || caseData.getRespondent2ClaimResponseTypeForSpec() == null;
+    }
+
+    private boolean isDefending(CaseData caseData) {
+        return FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+            || PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()
+        );
+    }
+
     private boolean twoVsOneDivergent(CaseData caseData) {
         return (!FULL_DEFENCE.equals(caseData.getClaimant1ClaimResponseTypeForSpec())
             && FULL_DEFENCE.equals(caseData.getClaimant2ClaimResponseTypeForSpec()))
             || (!FULL_DEFENCE.equals(caseData.getClaimant2ClaimResponseTypeForSpec())
             && FULL_DEFENCE.equals(caseData.getClaimant1ClaimResponseTypeForSpec()));
+    }
+
+    private void clearTempDocuments(CaseData.CaseDataBuilder<?, ?> builder) {
+        CaseData caseData = builder.build();
+        // these documents are added to defendantUploads, if we do not remove/null the original,
+        // case file view will show duplicate documents
+        builder.respondent1SpecDefenceResponseDocument(null);
+        builder.respondent2SpecDefenceResponseDocument(null);
+
+        if (nonNull(caseData.getRespondent1DQ())) {
+            builder.respondent1DQ(builder.build().getRespondent1DQ().toBuilder().respondent1DQDraftDirections(null).build());
+        }
+        if (nonNull(caseData.getRespondent2DQ())) {
+            builder.respondent2DQ(builder.build().getRespondent2DQ().toBuilder().respondent2DQDraftDirections(null).build());
+        }
     }
 
     private Optional<LocationRefData> getCourtLocationDefendant2(CaseData caseData, CallbackParams callbackParams) {
@@ -557,32 +589,5 @@ public class SetApplicantResponseDeadline implements CaseTask {
         } else {
             return Optional.empty();
         }
-    }
-
-    private void clearTempDocuments(CaseData.CaseDataBuilder<?, ?> builder) {
-        CaseData caseData = builder.build();
-        // these documents are added to defendantUploads, if we do not remove/null the original,
-        // case file view will show duplicate documents
-        builder.respondent1SpecDefenceResponseDocument(null);
-        builder.respondent2SpecDefenceResponseDocument(null);
-
-        if (nonNull(caseData.getRespondent1DQ())) {
-            builder.respondent1DQ(builder.build().getRespondent1DQ().toBuilder().respondent1DQDraftDirections(null).build());
-        }
-        if (nonNull(caseData.getRespondent2DQ())) {
-            builder.respondent2DQ(builder.build().getRespondent2DQ().toBuilder().respondent2DQDraftDirections(null).build());
-        }
-    }
-
-    private boolean solicitorRepresentsOnlyOneOfRespondents(CallbackParams callbackParams, CaseRole caseRole) {
-        CaseData caseData = callbackParams.getCaseData();
-        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-
-        return stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)
-            && coreCaseUserService.userHasCaseRole(
-            caseData.getCcdCaseReference().toString(),
-            userInfo.getUid(),
-            caseRole
-        );
     }
 }

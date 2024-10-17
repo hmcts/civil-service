@@ -55,7 +55,8 @@ class HandleDefendAllClaimTest {
         handleDefendAllClaim = new HandleDefendAllClaim(
             objectMapper,
             toggleService,
-            paymentDateValidator
+            paymentDateValidator,
+            respondToClaimSpecUtilsDisputeDetails
         );
     }
 

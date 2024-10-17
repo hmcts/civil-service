@@ -21,13 +21,22 @@ public class HandleRespondentResponseTypeForSpec implements CaseTask {
     private final ObjectMapper objectMapper;
 
     public CallbackResponse execute(CallbackParams callbackParams) {
+        log.info("Executing HandleRespondentResponseTypeForSpec with callbackParams: {}", callbackParams);
+
         CaseData caseData = callbackParams.getCaseData();
+        log.debug("Initial CaseData: {}", caseData);
+
         if (caseData.getRespondent1ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION
             || caseData.getRespondent2ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION) {
+            log.info("Setting specDefenceFullAdmittedRequired to NO as one or both respondents did not fully admit.");
             caseData = caseData.toBuilder().specDefenceFullAdmittedRequired(NO).build();
         }
-        return AboutToStartOrSubmitCallbackResponse.builder()
+
+        CallbackResponse response = AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
+
+        log.debug("CallbackResponse: {}", response);
+        return response;
     }
 }

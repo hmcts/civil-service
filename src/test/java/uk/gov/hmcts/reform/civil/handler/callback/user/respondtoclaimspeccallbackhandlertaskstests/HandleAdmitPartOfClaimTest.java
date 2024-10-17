@@ -31,13 +31,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN;
@@ -248,7 +248,7 @@ class HandleAdmitPartOfClaimTest {
         );
     }
 
-    /*@Test
+    @Test
     void shouldUpdateShowConditionFlagsCorrectly() {
         Party respondent1 = Party.builder().type(Party.Type.INDIVIDUAL).build();
         CaseData caseData = CaseData.builder()
@@ -261,7 +261,7 @@ class HandleAdmitPartOfClaimTest {
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
-        lenient().when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
+        when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
 
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(
@@ -273,7 +273,7 @@ class HandleAdmitPartOfClaimTest {
             assertTrue(((AboutToStartOrSubmitCallbackResponse) response).getData().get("showConditionFlags").toString().contains(
                 "WHEN_WILL_CLAIM_BE_PAID"));
         }
-    }*/
+    }
 
     @Test
     void shouldUpdateAllocatedTrackCorrectly() {
@@ -553,7 +553,7 @@ class HandleAdmitPartOfClaimTest {
             "NEED_FINANCIAL_DETAILS_2"));
     }
 
-    /*@Test
+    @Test
     void shouldReturnTrueWhenAllConditionsAreMet() {
 
         CaseData caseData = CaseData.builder()
@@ -575,16 +575,16 @@ class HandleAdmitPartOfClaimTest {
             .request(callbackRequest)
             .build();
 
-        lenient().when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
+        when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
 
         CallbackResponse response = handleAdmitPartOfClaim.execute(callbackParams);
 
         assertTrue(((AboutToStartOrSubmitCallbackResponse) response).getData().containsKey("showConditionFlags"));
         assertTrue(((AboutToStartOrSubmitCallbackResponse) response).getData().get("showConditionFlags").toString().contains(
             "WHEN_WILL_CLAIM_BE_PAID"));
-    }*/
+    }
 
-    /*@Test
+    @Test
     void shouldAddWhy1DoesNotPayImmediatelyWhenRespondent1DoesNotPayImmediately() {
 
         Party respondent1 = Party.builder().type(Party.Type.INDIVIDUAL).build();
@@ -613,9 +613,9 @@ class HandleAdmitPartOfClaimTest {
         assertTrue(((AboutToStartOrSubmitCallbackResponse) response).getData().containsKey("showConditionFlags"));
         assertTrue(((AboutToStartOrSubmitCallbackResponse) response).getData().get("showConditionFlags").toString().contains(
             "WHY_1_DOES_NOT_PAY_IMMEDIATELY"));
-    }*/
+    }
 
-    /*@Test
+    @Test
     void shouldAddWhy2DoesNotPayImmediatelyWhenRespondent2DoesNotPayImmediately() {
 
         Party respondent2 = Party.builder().type(Party.Type.INDIVIDUAL).build();
@@ -642,9 +642,9 @@ class HandleAdmitPartOfClaimTest {
         assertTrue(((AboutToStartOrSubmitCallbackResponse) response).getData().containsKey("showConditionFlags"));
         assertTrue(((AboutToStartOrSubmitCallbackResponse) response).getData().get("showConditionFlags").toString().contains(
             "WHY_2_DOES_NOT_PAY_IMMEDIATELY"));
-    }*/
+    }
 
-    /*@Test
+    @Test
     void shouldUpdateShowConditionFlagsCorrectly_WhenSingleLegalRepresentative() {
         Party respondent1 = Party.builder().type(Party.Type.COMPANY).build();
         CaseData caseData = CaseData.builder()
@@ -657,7 +657,7 @@ class HandleAdmitPartOfClaimTest {
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
-        lenient().when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
+        when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
 
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(
@@ -669,7 +669,7 @@ class HandleAdmitPartOfClaimTest {
             assertTrue(((AboutToStartOrSubmitCallbackResponse) response).getData().get("showConditionFlags").toString().contains(
                 "WHEN_WILL_CLAIM_BE_PAID"));
         }
-    }*/
+    }
 
     @Test
     void shouldReturnFalseWhenRespondentIsOrganisation() {
@@ -686,7 +686,7 @@ class HandleAdmitPartOfClaimTest {
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
 
-        lenient().when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
+        when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
 
         CallbackResponse response = handleAdmitPartOfClaim.execute(callbackParams);
 
@@ -710,7 +710,7 @@ class HandleAdmitPartOfClaimTest {
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
-        lenient().when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
+        when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
 
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(
@@ -723,7 +723,7 @@ class HandleAdmitPartOfClaimTest {
         }
     }
 
-    /*@Test
+    @Test
     void shouldShowNeedFinancialDetailsForRespondent1_WhenIndividualRespondentAndOneVTwoOneLegalRep() {
 
         Party respondent1 = Party.builder().type(Party.Type.INDIVIDUAL).build();
@@ -739,7 +739,7 @@ class HandleAdmitPartOfClaimTest {
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
-        lenient().when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
+        when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
 
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(TWO_V_ONE);
@@ -749,7 +749,7 @@ class HandleAdmitPartOfClaimTest {
             assertFalse(((AboutToStartOrSubmitCallbackResponse) response).getData().get("showConditionFlags").toString().contains(
                 "NEED_FINANCIAL_DETAILS_1"));
         }
-    }*/
+    }
 
     @Test
     void shouldReturnFalseWhenAnyConditionFailsForNonCorporatePartyAndScenario() {
@@ -770,7 +770,7 @@ class HandleAdmitPartOfClaimTest {
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
-        lenient().when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
+        when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
 
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(
@@ -801,7 +801,7 @@ class HandleAdmitPartOfClaimTest {
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
-        lenient().when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
+        when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
 
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(
@@ -831,7 +831,7 @@ class HandleAdmitPartOfClaimTest {
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
-        lenient().when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
+        when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
 
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(
@@ -863,7 +863,7 @@ class HandleAdmitPartOfClaimTest {
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
-        lenient().when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
+        when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
 
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(
@@ -894,7 +894,7 @@ class HandleAdmitPartOfClaimTest {
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
-        lenient().when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
+        when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
 
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(
@@ -924,7 +924,7 @@ class HandleAdmitPartOfClaimTest {
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
-        lenient().when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
+        when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
 
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(
@@ -953,7 +953,7 @@ class HandleAdmitPartOfClaimTest {
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
-        lenient().when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
+        when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
 
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(
@@ -982,7 +982,7 @@ class HandleAdmitPartOfClaimTest {
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
-        lenient().when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
+        when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
 
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(
@@ -995,7 +995,7 @@ class HandleAdmitPartOfClaimTest {
         }
     }
 
-    /*@Test
+    @Test
     void shouldUpdateShowConditionFlagsCorrectlyWhenMultipleLegalRepresentatives() {
         Party respondent1 = Party.builder().type(Party.Type.INDIVIDUAL).build();
         CaseData caseData = CaseData.builder()
@@ -1010,7 +1010,7 @@ class HandleAdmitPartOfClaimTest {
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
-        lenient().when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
+        when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
 
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(
@@ -1022,7 +1022,7 @@ class HandleAdmitPartOfClaimTest {
             assertTrue(((AboutToStartOrSubmitCallbackResponse) response).getData().get("showConditionFlags").toString().contains(
                 "WHEN_WILL_CLAIM_BE_PAID"));
         }
-    }*/
+    }
 
     @Test
     void shouldAddNeedFinancialDetails2WhenScenarioIsOneVTwoTwoLegalRepAndSameSolicitorResponseIsNo() {
@@ -1045,7 +1045,7 @@ class HandleAdmitPartOfClaimTest {
             .build();
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
-        lenient().when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
+        when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
 
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(
@@ -1077,7 +1077,7 @@ class HandleAdmitPartOfClaimTest {
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
-        lenient().when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
+        when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
 
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(
@@ -1142,7 +1142,7 @@ class HandleAdmitPartOfClaimTest {
         assertTrue(((AboutToStartOrSubmitCallbackResponse) response).getData().containsKey("showConditionFlags"));
     }
 
-    /*@Test
+    @Test
     void shouldUpdateShowConditionFlagsCorrectlyForRespondentOneWithImmediatePayment() {
         Party respondent1 = Party.builder().type(Party.Type.INDIVIDUAL).build();
         CaseData caseData = CaseData.builder()
@@ -1157,7 +1157,7 @@ class HandleAdmitPartOfClaimTest {
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
-        lenient().when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
+        when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
 
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(
@@ -1169,9 +1169,9 @@ class HandleAdmitPartOfClaimTest {
             assertTrue(((AboutToStartOrSubmitCallbackResponse) response).getData().get("showConditionFlags").toString().contains(
                 "WHEN_WILL_CLAIM_BE_PAID"));
         }
-    }*/
+    }
 
-    /*@Test
+    @Test
     void shouldUpdateShowConditionFlagsCorrectlyForRespondentOneWithRepaymentPlan() {
         Party respondent1 = Party.builder().type(Party.Type.INDIVIDUAL).build();
         CaseData caseData = CaseData.builder()
@@ -1184,7 +1184,7 @@ class HandleAdmitPartOfClaimTest {
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
-        lenient().when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
+        when(respondToClaimSpecUtils.isWhenWillClaimBePaidShown(any())).thenReturn(true);
 
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(
@@ -1196,7 +1196,7 @@ class HandleAdmitPartOfClaimTest {
             assertTrue(((AboutToStartOrSubmitCallbackResponse) response).getData().get("showConditionFlags").toString().contains(
                 "WHEN_WILL_CLAIM_BE_PAID"));
         }
-    }*/
+    }
 
     @Test
     void shouldUpdateSpecPaidOrDisputeStatusToNoCorrectlyWhenFullOrMoreThanClaimedPaid() {

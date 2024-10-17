@@ -38,55 +38,91 @@ public class ValidateDateOfBirth implements CaseTask {
     private final RespondToClaimSpecUtils respondToClaimSpecUtils;
 
     public CallbackResponse execute(CallbackParams callbackParams) {
-        Party respondent = callbackParams.getCaseData().getRespondent1();
-        if (respondent == null && callbackParams.getCaseData().getRespondent2() != null) {
-            respondent = callbackParams.getCaseData().getRespondent2();
-        }
-        List<String> errors = dateOfBirthValidator.validate(respondent);
-
+        log.info("Executing ValidateDateOfBirth task");
         CaseData caseData = callbackParams.getCaseData();
+        Party respondent = getRespondent(caseData);
+        log.debug("Respondent data: {}", respondent);
+
+        List<String> errors = dateOfBirthValidator.validate(respondent);
+        log.debug("Date of birth validation errors: {}", errors);
+
         errors.addAll(correspondenceAddressCorrect(caseData));
+        log.debug("Total errors after address validation: {}", errors);
+
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
-        if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))
-            && YES.equals(caseData.getAddRespondent2())) {
-            if (respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
-                && respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
-                updatedData.sameSolicitorSameResponse(YES).build();
-            } else {
-                updatedData.sameSolicitorSameResponse(NO).build();
-            }
-        } else if (ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
-            && YES.equals(caseData.getAddRespondent2())) {
-            if (NO.equals(caseData.getRespondentResponseIsSame())) {
-                updatedData.sameSolicitorSameResponse(NO).build();
-            } else {
-                updatedData.sameSolicitorSameResponse(YES).build();
-            }
+        updateSameSolicitorResponse(caseData, updatedData, callbackParams);
 
-        }
-
+        log.info("Validation completed with errors: {}", errors);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .errors(errors)
             .build();
     }
 
+    private Party getRespondent(CaseData caseData) {
+        Party respondent = caseData.getRespondent1();
+        if (respondent == null && caseData.getRespondent2() != null) {
+            respondent = caseData.getRespondent2();
+        }
+        log.debug("Selected respondent: {}", respondent);
+        return respondent;
+    }
+
+    private void updateSameSolicitorResponse(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData, CallbackParams callbackParams) {
+        if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData)) && YES.equals(caseData.getAddRespondent2())) {
+            if (respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
+                && respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
+                updatedData.sameSolicitorSameResponse(YES).build();
+                log.info("Both respondents have the same solicitor");
+            } else {
+                updatedData.sameSolicitorSameResponse(NO).build();
+                log.info("Respondents have different solicitors");
+            }
+        } else if (ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData)) && YES.equals(caseData.getAddRespondent2())) {
+            if (NO.equals(caseData.getRespondentResponseIsSame())) {
+                updatedData.sameSolicitorSameResponse(NO).build();
+                log.info("Respondents have different responses");
+            } else {
+                updatedData.sameSolicitorSameResponse(YES).build();
+                log.info("Respondents have the same response");
+            }
+        }
+    }
+
     private List<String> correspondenceAddressCorrect(CaseData caseData) {
-        if (caseData.getIsRespondent1() == YesOrNo.YES
-            && caseData.getSpecAoSRespondentCorrespondenceAddressRequired() == YesOrNo.NO) {
+        if (caseData.getIsRespondent1() == YesOrNo.YES) {
+            log.debug("Validating respondent 1 address");
+            return validateRespondent1Address(caseData);
+        } else if (caseData.getIsRespondent2() == YesOrNo.YES) {
+            log.debug("Validating respondent 2 address");
+            return validateRespondent2Address(caseData);
+        }
+        return Collections.emptyList();
+    }
+
+    private List<String> validateRespondent1Address(CaseData caseData) {
+        if (caseData.getSpecAoSRespondentCorrespondenceAddressRequired() == YesOrNo.NO) {
+            log.debug("Respondent 1 correspondence address is not required");
             return postcodeValidator.validate(
                 Optional.ofNullable(caseData.getSpecAoSRespondentCorrespondenceAddressdetails())
                     .map(Address::getPostCode)
                     .orElse(null)
             );
-        } else if (caseData.getIsRespondent2() == YesOrNo.YES
-            && caseData.getSpecAoSRespondent2CorrespondenceAddressRequired() == YesOrNo.NO) {
+        }
+        log.debug("Validating respondent 1 correspondence address");
+        return Collections.emptyList();
+    }
+
+    private List<String> validateRespondent2Address(CaseData caseData) {
+        if (caseData.getSpecAoSRespondent2CorrespondenceAddressRequired() == YesOrNo.NO) {
+            log.debug("Respondent 2 correspondence address is not required");
             return postcodeValidator.validate(
                 Optional.ofNullable(caseData.getSpecAoSRespondent2CorrespondenceAddressdetails())
                     .map(Address::getPostCode)
                     .orElse(null)
             );
         }
+        log.debug("Validating respondent 2 correspondence address");
         return Collections.emptyList();
     }
 }

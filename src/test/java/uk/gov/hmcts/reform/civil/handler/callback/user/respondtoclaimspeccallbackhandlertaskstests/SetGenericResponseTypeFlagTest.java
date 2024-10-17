@@ -19,10 +19,12 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -91,7 +93,7 @@ class SetGenericResponseTypeFlagTest {
         assertEquals("Yes", response.getData().get(SPEC_FULL_ADMISSION_OR_PART_ADMISSION));
     }
 
-    /*@Test
+    @Test
     void shouldSetGenericResponseTypeFlagForOneVTwoOneLegalRepScenario() {
         CaseData caseData = CaseData.builder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
@@ -103,7 +105,7 @@ class SetGenericResponseTypeFlagTest {
         assertEquals("No", response.getData().get(RESPONDENT_RESPONSE_IS_SAME));
         assertEquals("No", response.getData().get(SAME_SOLICITOR_SAME_RESPONSE));
         assertEquals("FULL_DEFENCE", response.getData().get(RESPONDENT_CLAIM_RESPONSE_TYPE_GENERIC));
-    }*/
+    }
 
     @Test
     void shouldSetGenericResponseTypeFlagForOneVTwoTwoLegalRepScenario() {
@@ -266,7 +268,7 @@ class SetGenericResponseTypeFlagTest {
         assertEquals("COUNTER_ADMIT_OR_ADMIT_PART", response.getData().get(MULTI_PARTY_RESPONSE_TYPE_FLAGS));
     }
 
-    /*@Test
+    @Test
     void shouldHandleDifferentResponseForOneVTwoOneLegalRep() {
         CaseData caseData = CaseData.builder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
@@ -276,7 +278,7 @@ class SetGenericResponseTypeFlagTest {
         AboutToStartOrSubmitCallbackResponse response = executeWithMockedScenario(caseData, ONE_V_TWO_ONE_LEGAL_REP);
 
         assertEquals("FULL_DEFENCE", response.getData().get(RESPONDENT_CLAIM_RESPONSE_TYPE_GENERIC));
-    }*/
+    }
 
     @Test
     void shouldNotSetCounterAdmitOrAdmitPartFlagWhenOnlyOneClaimantHasCounterClaim() {
@@ -353,7 +355,7 @@ class SetGenericResponseTypeFlagTest {
         assertEquals("No", response.getData().get(SPEC_FULL_ADMISSION_OR_PART_ADMISSION));
     }
 
-    /*@Test
+    @Test
     void shouldSetFullDefenceFlagWhenRespondent1HasCounterClaimInOneVTwoOneLegalRepScenario() {
         CaseData caseData = CaseData.builder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
@@ -362,9 +364,9 @@ class SetGenericResponseTypeFlagTest {
         AboutToStartOrSubmitCallbackResponse response = executeWithMockedScenario(caseData, ONE_V_TWO_ONE_LEGAL_REP);
 
         assertEquals("NOT_FULL_DEFENCE", response.getData().get(MULTI_PARTY_RESPONSE_TYPE_FLAGS));
-    }*/
+    }
 
-    /*@Test
+    @Test
     void shouldSetFullDefenceFlagWhenBothRespondentsHaveFullDefenceInOneVTwoOneLegalRepScenario() {
         CaseData caseData = CaseData.builder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
@@ -374,9 +376,9 @@ class SetGenericResponseTypeFlagTest {
         AboutToStartOrSubmitCallbackResponse response = executeWithMockedScenario(caseData, ONE_V_TWO_ONE_LEGAL_REP);
 
         assertEquals("FULL_DEFENCE", response.getData().get(MULTI_PARTY_RESPONSE_TYPE_FLAGS));
-    }*/
+    }
 
-    /*@Test
+    @Test
     void shouldSetFullDefenceFlagWhenBothRespondentsHaveCounterClaimInOneVTwoOneLegalRepScenario() {
         CaseData caseData = CaseData.builder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
@@ -386,9 +388,9 @@ class SetGenericResponseTypeFlagTest {
         AboutToStartOrSubmitCallbackResponse response = executeWithMockedScenario(caseData, ONE_V_TWO_ONE_LEGAL_REP);
 
         assertEquals("COUNTER_ADMIT_OR_ADMIT_PART", response.getData().get(MULTI_PARTY_RESPONSE_TYPE_FLAGS));
-    }*/
+    }
 
-    /*@Test
+    @Test
     void shouldHandleDifferentResponsesForRespondentsInOneVTwoOneLegalRepScenario() {
         CaseData caseData = CaseData.builder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
@@ -398,7 +400,7 @@ class SetGenericResponseTypeFlagTest {
         AboutToStartOrSubmitCallbackResponse response = executeWithMockedScenario(caseData, ONE_V_TWO_ONE_LEGAL_REP);
 
         assertEquals("FULL_DEFENCE", response.getData().get(RESPONDENT_CLAIM_RESPONSE_TYPE_GENERIC));
-    }*/
+    }
 
     @Test
     void shouldSetGenericResponseTypeFlagWhenBothRespondentsHavePartAdmissionInOneVTwoTwoLegalRepScenario() {
@@ -585,7 +587,7 @@ class SetGenericResponseTypeFlagTest {
         assertEquals("COUNTER_ADMIT_OR_ADMIT_PART", response.getData().get(MULTI_PARTY_RESPONSE_TYPE_FLAGS));
     }
 
-    /*@Test
+    @Test
     void shouldSetGenericResponseTypeFlagWhenRespondent2HasFullDefenceAndSameResponseInOneVTwoOneLegalRepScenario() {
         CaseData caseData = CaseData.builder()
             .showConditionFlags(EnumSet.of(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2))
@@ -597,7 +599,7 @@ class SetGenericResponseTypeFlagTest {
 
         assertEquals("FULL_DEFENCE", response.getData().get(RESPONDENT_CLAIM_RESPONSE_TYPE_GENERIC));
         assertEquals("FULL_DEFENCE", response.getData().get(MULTI_PARTY_RESPONSE_TYPE_FLAGS));
-    }*/
+    }
 
     @Test
     void shouldNotSetSpecFullAdmissionOrPartAdmissionWhenRespondent2HasNoAdmission() {
@@ -611,7 +613,7 @@ class SetGenericResponseTypeFlagTest {
         assertEquals("No", response.getData().get(SPEC_FULL_ADMISSION_OR_PART_ADMISSION));
     }
 
-    /*@Test
+    @Test
     void shouldNotSetFullDefenceFlagWhenRespondent1ClaimResponseTypeIsNotCounterClaim() {
         CaseData caseData = CaseData.builder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
@@ -621,7 +623,7 @@ class SetGenericResponseTypeFlagTest {
         AboutToStartOrSubmitCallbackResponse response = executeWithMockedScenario(caseData, ONE_V_TWO_ONE_LEGAL_REP);
 
         assertEquals("COUNTER_ADMIT_OR_ADMIT_PART", response.getData().get(MULTI_PARTY_RESPONSE_TYPE_FLAGS));
-    }*/
+    }
 
     @Test
     void shouldSetGenericResponseTypeFlagForOneVTwoTwoLegalRepScenarioWithRespondent2NotResponding() {
@@ -655,7 +657,7 @@ class SetGenericResponseTypeFlagTest {
         assertEquals("COUNTER_ADMIT_OR_ADMIT_PART", response.getData().get(MULTI_PARTY_RESPONSE_TYPE_FLAGS));
     }
 
-    /*@Test
+    @Test
     void shouldAddSomeoneDisputesWhenIsSomeoneDisputesReturnsTrue() {
         CaseData caseData = CaseData.builder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
@@ -668,7 +670,7 @@ class SetGenericResponseTypeFlagTest {
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) setGenericResponseTypeFlag.execute(callbackParams);
 
         assertTrue(((List<?>) response.getData().get("showConditionFlags")).contains("SOMEONE_DISPUTES"));
-    }*/
+    }
 
     private CallbackParams buildCallbackParams(CaseData caseData) {
         return CallbackParams.builder()

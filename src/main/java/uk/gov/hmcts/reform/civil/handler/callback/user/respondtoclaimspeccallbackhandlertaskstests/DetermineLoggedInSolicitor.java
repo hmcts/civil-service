@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.CaseTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -31,56 +32,60 @@ public class DetermineLoggedInSolicitor implements CaseTask {
     private final ObjectMapper objectMapper;
 
     public CallbackResponse execute(CallbackParams callbackParams) {
-        var caseData = callbackParams.getCaseData();
+        log.info("Executing DetermineLoggedInSolicitor task for case ID: {}", callbackParams.getCaseData().getCcdCaseReference());
 
-        var updatedCaseData = caseData.toBuilder();
-        if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORONE)) {
-            updatedCaseData.isRespondent1(YES);
-            updatedCaseData.isRespondent2(NO);
-            updatedCaseData.isApplicant1(NO);
-        } else if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORTWO)) {
-            updatedCaseData.isRespondent1(NO);
-            updatedCaseData.isRespondent2(YES);
-            updatedCaseData.isApplicant1(NO);
-        } else if (solicitorHasCaseRole(callbackParams, APPLICANTSOLICITORONE)) {
-            updatedCaseData.isRespondent1(NO);
-            updatedCaseData.isRespondent2(NO);
-            updatedCaseData.isApplicant1(YES);
-        }
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
 
-        if (YES.equals(caseData.getIsRespondent2())) {
-            if (caseData.getRespondent2DetailsForClaimDetailsTab() != null
-                && ("Company".equals(caseData.getRespondent2DetailsForClaimDetailsTab().getPartyTypeDisplayValue())
-                || "Organisation".equals(
-                caseData.getRespondent2DetailsForClaimDetailsTab().getPartyTypeDisplayValue()))) {
-                updatedCaseData.neitherCompanyNorOrganisation(NO);
-            } else {
-                updatedCaseData.neitherCompanyNorOrganisation(YES);
-            }
-        } else {
-            if ((caseData.getRespondent1DetailsForClaimDetailsTab() != null
-                && ("Company".equals(caseData.getRespondent1DetailsForClaimDetailsTab().getPartyTypeDisplayValue())
-                || "Organisation".equals(
-                caseData.getRespondent1DetailsForClaimDetailsTab().getPartyTypeDisplayValue())))) {
-                updatedCaseData.neitherCompanyNorOrganisation(NO);
-            } else {
-                updatedCaseData.neitherCompanyNorOrganisation(YES);
-            }
-        }
+        updateSolicitorRoles(callbackParams, updatedCaseData);
+        updateCompanyOrOrganisationFlag(caseData, updatedCaseData);
+
+        log.info("DetermineLoggedInSolicitor task completed for case ID: {}", caseData.getCcdCaseReference());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
     }
 
-    private boolean solicitorHasCaseRole(CallbackParams callbackParams, CaseRole caseRole) {
+    private void updateSolicitorRoles(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+        log.debug("Updating solicitor roles for case ID: {}", callbackParams.getCaseData().getCcdCaseReference());
+
+        if (isSolicitorWithCaseRole(callbackParams, RESPONDENTSOLICITORONE)) {
+            log.info("User is RESPONDENTSOLICITORONE for case ID: {}", callbackParams.getCaseData().getCcdCaseReference());
+            updatedCaseData.isRespondent1(YES).isRespondent2(NO).isApplicant1(NO);
+        } else if (isSolicitorWithCaseRole(callbackParams, RESPONDENTSOLICITORTWO)) {
+            log.info("User is RESPONDENTSOLICITORTWO for case ID: {}", callbackParams.getCaseData().getCcdCaseReference());
+            updatedCaseData.isRespondent1(NO).isRespondent2(YES).isApplicant1(NO);
+        } else if (isSolicitorWithCaseRole(callbackParams, APPLICANTSOLICITORONE)) {
+            log.info("User is APPLICANTSOLICITORONE for case ID: {}", callbackParams.getCaseData().getCcdCaseReference());
+            updatedCaseData.isRespondent1(NO).isRespondent2(NO).isApplicant1(YES);
+        }
+    }
+
+    private void updateCompanyOrOrganisationFlag(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+        log.debug("Updating company or organisation flag for case ID: {}", caseData.getCcdCaseReference());
+
+        boolean isRespondent2 = YES.equals(caseData.getIsRespondent2());
+        Party respondentDetails = isRespondent2 ? caseData.getRespondent2DetailsForClaimDetailsTab() : caseData.getRespondent1DetailsForClaimDetailsTab();
+        boolean isCompanyOrOrganisation = respondentDetails != null
+            && ("Company".equals(respondentDetails.getPartyTypeDisplayValue()) || "Organisation".equals(respondentDetails.getPartyTypeDisplayValue()));
+
+        updatedCaseData.neitherCompanyNorOrganisation(isCompanyOrOrganisation ? NO : YES);
+
+        log.info("Company or organisation flag updated to {} for case ID: {}", isCompanyOrOrganisation ? NO : YES, caseData.getCcdCaseReference());
+    }
+
+    private boolean isSolicitorWithCaseRole(CallbackParams callbackParams, CaseRole caseRole) {
         CaseData caseData = callbackParams.getCaseData();
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
-        return coreCaseUserService.userHasCaseRole(
+        boolean hasRole = coreCaseUserService.userHasCaseRole(
             caseData.getCcdCaseReference().toString(),
             userInfo.getUid(),
             caseRole
         );
+
+        log.debug("User {} has role {}: {}", userInfo.getUid(), caseRole, hasRole);
+        return hasRole;
     }
 }
