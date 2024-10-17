@@ -362,7 +362,7 @@ dependencies {
 
   implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.1.7'
 
-  implementation group: 'com.github.hmcts', name: 'ccd-client', version: '4.9.5-SPRING2'
+  implementation group: 'com.github.hmcts', name: 'ccd-client', version: '5.0.3'
   implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
   implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '3.0.23'
   implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version:'7.4'
