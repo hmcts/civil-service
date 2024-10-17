@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.AssembleDocumentsForDeadlineResponse;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.SetApplicantResponseDeadline;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.UpdateDataRespondentDeadlineResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -92,6 +93,9 @@ public class SetApplicantResponseDeadlineTest {
     private  LocationReferenceDataService locationRefDataService;
 
     @Mock
+    private AssembleDocumentsForDeadlineResponse assembleDocumentsForDeadlineResponse;
+
+    @Mock
     private  CourtLocationUtils courtLocationUtils;
 
     @BeforeEach
@@ -107,6 +111,7 @@ public class SetApplicantResponseDeadlineTest {
         LocalDateTime responseDate = LocalDateTime.now();
         LocalDateTime deadline = responseDate.plusDays(4);
 
+        when(deadlinesCalculator.calculateApplicantResponseDeadline(any(LocalDateTime.class))).thenReturn(deadline);
         when(time.now()).thenReturn(responseDate);
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
 
@@ -146,6 +151,7 @@ public class SetApplicantResponseDeadlineTest {
         LocalDateTime responseDate = LocalDateTime.now();
         LocalDateTime deadline = responseDate.plusDays(4);
 
+        when(deadlinesCalculator.calculateApplicantResponseDeadline(any(LocalDateTime.class))).thenReturn(deadline);
         when(time.now()).thenReturn(responseDate);
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
@@ -191,7 +197,7 @@ public class SetApplicantResponseDeadlineTest {
         LocalDateTime deadline = responseDate.plusDays(4);
 
         when(time.now()).thenReturn(responseDate);
-
+        when(deadlinesCalculator.calculateApplicantResponseDeadline(any(LocalDateTime.class))).thenReturn(deadline);
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
