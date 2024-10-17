@@ -108,7 +108,7 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         void setup() {
             now = LocalDateTime.now();
             given(time.now()).willReturn(now);
-            given(deadlinesCalculator.calculateApplicantResponseDeadline(any(), any())).willReturn(respondToDeadline);
+            given(deadlinesCalculator.calculateApplicantResponseDeadline(any())).willReturn(respondToDeadline);
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
             when(featureToggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
         }
