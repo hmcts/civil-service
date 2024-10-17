@@ -333,6 +333,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         return ((caseData.isHWFTypeHearing() && caseData.getCcdState() == CaseState.HEARING_READINESS)
             || (caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED && caseData.isHWFTypeClaimIssued()))
             && caseData.getHwFEvent() == hwfEvent
+            && !isHwfPaymentOutcome()
             && (eventTime.isPresent())
             && (orderTime.isEmpty() || eventTime.get().isAfter(orderTime.get()));
     }
