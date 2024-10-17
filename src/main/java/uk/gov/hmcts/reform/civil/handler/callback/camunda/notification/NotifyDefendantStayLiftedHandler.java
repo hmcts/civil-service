@@ -60,8 +60,4 @@ public class NotifyDefendantStayLiftedHandler extends AbstractNotifyManageStayDe
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         return NOTIFY_DEFENDANT2_STAY_LIFTED.equals(caseEvent);
     }
-
-    protected boolean isBilingual(CaseData caseData) {
-        return caseData.isRespondentResponseBilingual();
-    }
 }

@@ -40,4 +40,8 @@ public abstract class AbstractNotifyManageStayDefendantHandler extends AbstractN
     }
 
     protected abstract boolean isRespondentSolicitor2(CallbackParams callbackParams);
+
+    protected boolean isBilingual(CaseData caseData) {
+        return caseData.isRespondentResponseBilingual();
+    }
 }
