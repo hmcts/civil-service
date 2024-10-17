@@ -220,11 +220,11 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .respondent1Copy(Party.builder().partyName("Party 2").primaryAddress(
-                    Address
-                        .builder()
-                        .addressLine1("Triple street")
-                        .postCode("Postcode")
-                        .build())
+                                                                        Address
+                                                                            .builder()
+                                                                            .addressLine1("Triple street")
+                                                                            .postCode("Postcode")
+                                                                            .build())
                                      .build())
                 .respondent1ResponseDeadline(LocalDateTime.now().plusDays(10))
                 .build();
@@ -239,21 +239,17 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
                 .build();
 
-            // Ensure that oldCaseData is returned when caseDetailsConverter is called
             when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
 
             String newDeadline = LocalDateTime.now().plusDays(28).withHour(16).withMinute(0).withSecond(1).truncatedTo(
                 ChronoUnit.SECONDS).toString();
-            // Create callback parameters
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
 
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(any(LocalDateTime.class)))
                 .thenReturn(LocalDateTime.parse(newDeadline));
 
-            // When: the handler processes the about to submit event
             CallbackResponse response = handler.handle(params);
 
-            // Then: Check the response data for the updated respondent1ResponseDeadline
             assertThat(((AboutToStartOrSubmitCallbackResponse) response)
                            .getData().get("respondent1ResponseDeadline"))
                 .hasToString(newDeadline);
@@ -305,14 +301,11 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             String newDeadline = LocalDateTime.now().plusDays(28).withHour(16).withMinute(0).withSecond(1).truncatedTo(ChronoUnit.SECONDS).toString();
 
-            // Mock the deadlines calculator to return a new response deadline
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(any(LocalDateTime.class)))
                 .thenReturn(LocalDateTime.parse(newDeadline));
 
-            // When: the handler processes the about to submit event
             CallbackResponse response = handler.handle(params);
 
-            // Then: Check the response data for the updated respondent1ResponseDeadline
             assertThat(((AboutToStartOrSubmitCallbackResponse) response)
                            .getData().get("respondent1ResponseDeadline"))
                 .hasToString(newDeadline);
