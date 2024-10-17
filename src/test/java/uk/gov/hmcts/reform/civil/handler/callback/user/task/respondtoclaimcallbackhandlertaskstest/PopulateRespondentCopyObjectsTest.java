@@ -7,7 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.testcontainers.shaded.com.fasterxml.jackson.core.type.TypeReference;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.PopulateRespondentCopyObjects;
@@ -23,7 +22,6 @@ import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,7 +34,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 
 @ExtendWith(SpringExtension.class)
-public class PopulateRespondentCopyObjectsTest  {
+public class PopulateRespondentCopyObjectsTest {
 
     @Mock
     private ObjectMapper objectMapper;
@@ -88,7 +86,6 @@ public class PopulateRespondentCopyObjectsTest  {
 
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) populateRespondentCopyObjects.execute(callbackParams);
-
 
         assertThat(response.getErrors()).isNull();
     }
@@ -176,7 +173,7 @@ public class PopulateRespondentCopyObjectsTest  {
 
         CallbackParams callbackParams = CallbackParams.builder()
             .caseData(caseData)
-        .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"))
+            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"))
             .build();
 
         AboutToStartOrSubmitCallbackResponse response =
