@@ -534,7 +534,6 @@
           ],
           "description": ""
         },
-
         "defaultJudgment": {
           "$id": "#/properties/events/properties/defaultJudgment",
           "anyOf": [
