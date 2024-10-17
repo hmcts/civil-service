@@ -254,17 +254,22 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private CallbackResponse partialPayment(CallbackParams callbackParams) {
-
         var caseData = callbackParams.getCaseData();
 
-        var totalIncludeInterest = caseData.getTotalClaimAmount().doubleValue()
-            +  Optional.ofNullable(caseData.getTotalInterest()).orElse(BigDecimal.ZERO).doubleValue();
+        BigDecimal claimFeeAmount = Optional.ofNullable(caseData.getClaimFee())
+            .map(fee -> MonetaryConversions.penniesToPounds(fee.getCalculatedAmountInPence()))
+            .orElse(BigDecimal.ZERO);
+
+        BigDecimal totalIncludeInterestAndFee = caseData.getTotalClaimAmount()
+            .add(Optional.ofNullable(caseData.getTotalInterest()).orElse(BigDecimal.ZERO))
+            .add(claimFeeAmount);
+
         List<String> errors = new ArrayList<>();
 
         if (caseData.getPartialPayment() == YesOrNo.YES) {
-            var partialPaymentPennies = new BigDecimal(caseData.getPartialPaymentAmount());
-            var partialPaymentPounds = MonetaryConversions.penniesToPounds(partialPaymentPennies).doubleValue();
-            if (partialPaymentPounds >= totalIncludeInterest) {
+            BigDecimal partialPaymentPounds = MonetaryConversions.penniesToPounds(new BigDecimal(caseData.getPartialPaymentAmount()));
+
+            if (partialPaymentPounds.compareTo(totalIncludeInterestAndFee) >= 0) {
                 errors.add("The amount already paid exceeds the full claim amount");
             }
         }
@@ -272,7 +277,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
-
     }
 
     private CallbackResponse validatePaymentDateDeadline(CallbackParams callbackParams) {
