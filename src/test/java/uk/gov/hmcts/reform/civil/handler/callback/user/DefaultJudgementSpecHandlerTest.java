@@ -75,7 +75,6 @@ import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
     JacksonAutoConfiguration.class,
     ValidationAutoConfiguration.class,
     CaseDetailsConverter.class,
-    InterestCalculator.class,
     FeesService.class,
     DefaultJudgmentOnlineMapper.class,
     RoboticsAddressMapper.class,
@@ -198,14 +197,15 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             assertThat(response.getErrors().contains("Default judgment cannot be applied for while claim is "
-                                                         + "in breathing space"));
+                + "in breathing space"));
         }
 
         @Test
         void shouldReturnError_WhenAboutToStartInvokeWhenRespondentResponseLanguageIsBilingual() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .breathing(BreathingSpaceInfo.builder().lift(null).build())
-                .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
+                .caseDataLiP(
+                    CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
                 .build();
 
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
@@ -245,10 +245,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2SameLegalRepresentative(YES)
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Both")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("Both")
+                        .build())
+                    .build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -264,10 +264,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2SameLegalRepresentative(YES)
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Test User")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("Test User")
+                        .build())
+                    .build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -280,10 +280,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Test User")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("Test User")
+                        .build())
+                    .build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -300,12 +300,12 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2SameLegalRepresentative(YES)
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Test User")
-                                                     .label("Test User2")
-                                                     .label("Both Defendants")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("Test User")
+                        .label("Test User2")
+                        .label("Both Defendants")
+                        .build())
+                    .build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -322,12 +322,12 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2SameLegalRepresentative(YES)
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Test User")
-                                                     .label("Test User2")
-                                                     .label("Both Defendants")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("Test User")
+                        .label("Test User2")
+                        .label("Both Defendants")
+                        .build())
+                    .build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -344,10 +344,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2SameLegalRepresentative(YES)
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Steve Rodgers")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("Steve Rodgers")
+                        .build())
+                    .build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -366,10 +366,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .addRespondent2(NO)
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Steve Rodgers")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("Steve Rodgers")
+                        .build())
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -392,10 +392,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .applicant2(PartyBuilder.builder().individual().build())
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Steve Rodgers")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("Steve Rodgers")
+                        .build())
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -418,10 +418,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2SameLegalRepresentative(YES)
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Steve Rodgers")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("Steve Rodgers")
+                        .build())
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -439,12 +439,12 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2SameLegalRepresentative(YES)
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Test User")
-                                                     .label("Test User2")
-                                                     .label("Both Defendants")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("Test User")
+                        .label("Test User2")
+                        .label("Both Defendants")
+                        .build())
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -627,12 +627,13 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(100)
                 );
+            Fee fee = Fee.builder()
+                .calculatedAmountInPence(BigDecimal.valueOf(100))
+                .version("1")
+                .code("CODE")
+                .build();
             when(feesService.getFeeDataByTotalClaimAmount(any()))
-                .thenReturn(Fee.builder()
-                                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                                .version("1")
-                                .code("CODE")
-                                .build());
+                .thenReturn(fee);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .partialPayment(YesOrNo.YES)
@@ -642,10 +643,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .paymentConfirmationDecisionSpec(YesOrNo.YES)
                 .partialPayment(YesOrNo.YES)
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Test User")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("Test User")
+                        .build())
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -669,6 +670,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 + " £1222.00";
 
             assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
+
         }
 
         @Test
@@ -678,10 +680,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 );
             when(feesService.getFeeDataByTotalClaimAmount(any()))
                 .thenReturn(Fee.builder()
-                                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                                .version("1")
-                                .code("CODE")
-                                .build());
+                    .calculatedAmountInPence(BigDecimal.valueOf(100))
+                    .version("1")
+                    .code("CODE")
+                    .build());
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .partialPayment(YesOrNo.YES)
@@ -691,10 +693,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .paymentConfirmationDecisionSpec(YesOrNo.YES)
                 .partialPayment(YesOrNo.YES)
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Test User")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("Test User")
+                        .build())
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -726,10 +728,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 );
             when(feesService.getFeeDataByTotalClaimAmount(any()))
                 .thenReturn(Fee.builder()
-                                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                                .version("1")
-                                .code("CODE")
-                                .build());
+                    .calculatedAmountInPence(BigDecimal.valueOf(100))
+                    .version("1")
+                    .code("CODE")
+                    .build());
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .partialPayment(YesOrNo.YES)
@@ -739,10 +741,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .paymentConfirmationDecisionSpec(YesOrNo.YES)
                 .partialPayment(YesOrNo.YES)
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Test User")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("Test User")
+                        .build())
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             String test = "The judgment will order " + caseData.getDefendantDetailsSpec().getValue().getLabel()
@@ -774,10 +776,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 );
             when(feesService.getFeeDataByTotalClaimAmount(any()))
                 .thenReturn(Fee.builder()
-                                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                                .version("1")
-                                .code("CODE")
-                                .build());
+                    .calculatedAmountInPence(BigDecimal.valueOf(100))
+                    .version("1")
+                    .code("CODE")
+                    .build());
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .partialPayment(YesOrNo.YES)
@@ -785,10 +787,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .partialPaymentAmount("100")
                 .totalClaimAmount(BigDecimal.valueOf(5001))
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Test User")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("Test User")
+                        .build())
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -816,10 +818,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 );
             when(feesService.getFeeDataByTotalClaimAmount(any()))
                 .thenReturn(Fee.builder()
-                                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                                .version("1")
-                                .code("CODE")
-                                .build());
+                    .calculatedAmountInPence(BigDecimal.valueOf(100))
+                    .version("1")
+                    .code("CODE")
+                    .build());
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
@@ -830,12 +832,12 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .partialPaymentAmount("100")
                 .totalClaimAmount(BigDecimal.valueOf(5001))
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Test User")
-                                                     .label("Test User2")
-                                                     .label("Both Defendants")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("Test User")
+                        .label("Test User2")
+                        .label("Both Defendants")
+                        .build())
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -862,10 +864,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 );
             when(feesService.getFeeDataByTotalClaimAmount(any()))
                 .thenReturn(Fee.builder()
-                                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                                .version("1")
-                                .code("CODE")
-                                .build());
+                    .calculatedAmountInPence(BigDecimal.valueOf(100))
+                    .version("1")
+                    .code("CODE")
+                    .build());
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
@@ -876,34 +878,36 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .paymentConfirmationDecisionSpec(YesOrNo.YES)
                 .partialPayment(YesOrNo.YES)
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Test User")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("Test User")
+                        .build())
+                    .build())
                 .specRespondent1Represented(NO)
                 .respondent1Represented(null)
 
                 .build();
             CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            String test = "The Judgement request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.\n"
-                + "### Claim amount \n"
-                + " £1010.00\n"
-                + " ### Claim interest amount \n"
-                + "£100.00\n"
-                + " ### Fixed cost amount \n"
-                + "£112.00\n"
-                + "### Claim fee amount \n"
-                + " £1.00\n"
-                + " ## Subtotal \n"
-                + " £1223.00\n"
-                + "\n"
-                + " ### Amount already paid \n"
-                + "£1.00\n"
-                + " ## Total still owed \n"
-                + " £1222.00";
+            String test =
+                "The Judgement request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.\n"
+                    + "### Claim amount \n"
+                    + " £1010.00\n"
+                    + " ### Claim interest amount \n"
+                    + "£100.00\n"
+                    + " ### Fixed cost amount \n"
+                    + "£112.00\n"
+                    + "### Claim fee amount \n"
+                    + " £1.00\n"
+                    + " ## Subtotal \n"
+                    + " £1223.00\n"
+                    + "\n"
+                    + " ### Amount already paid \n"
+                    + "£1.00\n"
+                    + " ## Total still owed \n"
+                    + " £1222.00";
 
             assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
+
         }
 
         @Test
@@ -913,10 +917,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 );
             when(feesService.getFeeDataByTotalClaimAmount(any()))
                 .thenReturn(Fee.builder()
-                                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                                .version("1")
-                                .code("CODE")
-                                .build());
+                    .calculatedAmountInPence(BigDecimal.valueOf(100))
+                    .version("1")
+                    .code("CODE")
+                    .build());
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
@@ -927,38 +931,43 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .paymentConfirmationDecisionSpec(YesOrNo.YES)
                 .partialPayment(YesOrNo.YES)
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Test User")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("Test User")
+                        .build())
+                    .build())
                 .specRespondent1Represented(NO)
                 .respondent1Represented(null)
                 .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
-                                           .outstandingFeeInPounds(BigDecimal.ZERO)
-                                           .build())
+                    .outstandingFeeInPounds(BigDecimal.ZERO)
+                    .build())
                 .hwfFeeType(FeeType.CLAIMISSUED)
                 .build();
             CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            String test = "The Judgement request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.\n"
-                + "### Claim amount \n"
-                + " £1010.00\n"
-                + " ### Claim interest amount \n"
-                + "£100.00\n"
-                + " ### Fixed cost amount \n"
-                + "£112.00\n"
-                + "### Claim fee amount \n"
-                + " £0.00\n"
-                + " ## Subtotal \n"
-                + " £1222.00\n"
-                + "\n"
-                + " ### Amount already paid \n"
-                + "£1.00\n"
-                + " ## Total still owed \n"
-                + " £1221.00";
+            String test =
+                "The Judgement request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.\n"
+                    + "### Claim amount \n"
+                    + " £1010.00\n"
+                    + " ### Claim interest amount \n"
+                    + "£100.00\n"
+                    + " ### Fixed cost amount \n"
+                    + "£112.00\n"
+                    + "### Claim fee amount \n"
+                    + " £0.00\n"
+                    + " ## Subtotal \n"
+                    + " £1222.00\n"
+                    + "\n"
+                    + " ### Amount already paid \n"
+                    + "£1.00\n"
+                    + " ## Total still owed \n"
+                    + " £1221.00";
 
             assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
         }
+    }
+
+    private static void assertInterestIsPopulated(AboutToStartOrSubmitCallbackResponse response, int val) {
+        assertThat(response.getData().get("totalInterest")).isEqualTo(BigDecimal.valueOf(val));
     }
 
     @Nested
@@ -1004,10 +1013,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("John Smith")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("John Smith")
+                        .build())
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, caseDataBefore.toMap(mapper));
 
@@ -1018,6 +1027,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("businessProcess").isNotNull();
             assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_SPEC.name());
             assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+            assertInterestIsPopulated(response, 0);
         }
 
         @Test
@@ -1049,10 +1059,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("John Smith")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("John Smith")
+                        .build())
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, caseDataBefore.toMap(mapper));
 
@@ -1070,6 +1080,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("activeJudgment")).extracting("isRegisterWithRTL").isEqualTo("Yes");
             assertThat(response.getData().get("activeJudgment")).extracting("defendant1Name").isEqualTo("Mr. Sole Trader");
             assertThat(response.getData().get("activeJudgment")).extracting("defendant1Address").isNotNull();
+            assertInterestIsPopulated(response, 0);
 
         }
 
@@ -1107,10 +1118,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Both Defendants")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("Both Defendants")
+                        .build())
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, caseDataBefore.toMap(mapper));
 
@@ -1131,6 +1142,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("activeJudgment")).extracting("defendant2Name").isEqualTo("Mr. John Rambo");
             assertThat(response.getData().get("activeJudgment")).extracting("defendant2Address").isNotNull();
             assertThat(response.getData().get("activeJudgment")).extracting("defendant2Dob").isNotNull();
+            assertInterestIsPopulated(response, 0);
 
         }
 
@@ -1168,10 +1180,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .partialPayment(YES)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("John Smith")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("John Smith")
+                        .build())
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, caseDataBefore.toMap(mapper));
 
@@ -1192,6 +1204,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("activeJudgment")).extracting("defendant2Name").isEqualTo("Mr. John Rambo");
             assertThat(response.getData().get("activeJudgment")).extracting("defendant2Address").isNotNull();
             assertThat(response.getData().get("activeJudgment")).extracting("defendant2Dob").isNotNull();
+            assertInterestIsPopulated(response, 0);
 
         }
 
@@ -1218,10 +1231,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .applicant2(PartyBuilder.builder().individual().build())
                 .addApplicant2(YesOrNo.YES)
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("John Smith")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("John Smith")
+                        .build())
+                    .build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, caseDataBefore.toMap(mapper));
@@ -1232,6 +1245,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("businessProcess").isNotNull();
             assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_SPEC.name());
             assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+
         }
 
         @Test
@@ -1266,10 +1280,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .partialPayment(YES)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("John Smith")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("John Smith")
+                        .build())
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, caseDataBefore.toMap(mapper));
 
@@ -1280,6 +1294,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("businessProcess").isNotNull();
             assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
             assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+            assertInterestIsPopulated(response, 0);
         }
     }
 
@@ -1315,18 +1330,18 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .addRespondent2(YesOrNo.YES)
                 .respondent2SameLegalRepresentative(YesOrNo.YES)
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("John Smith")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("John Smith")
+                        .build())
+                    .build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
             assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
-                                                                          .confirmationHeader(header)
-                                                                          .confirmationBody(String.format(body))
-                                                                          .build());
+                .confirmationHeader(header)
+                .confirmationBody(String.format(body))
+                .build());
         }
 
         @Test
@@ -1341,19 +1356,19 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .addRespondent2(YesOrNo.YES)
                 .respondent2SameLegalRepresentative(YesOrNo.YES)
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Both")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("Both")
+                        .build())
+                    .build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
             assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
-                                                                          .confirmationHeader(
-                                                                              "# Default Judgment Granted ")
-                                                                          .confirmationBody(String.format(body))
-                                                                          .build());
+                .confirmationHeader(
+                    "# Default Judgment Granted ")
+                .confirmationBody(String.format(body))
+                .build());
         }
 
         @Test
@@ -1367,11 +1382,11 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
             assertThat(caseData.isLRvLipOneVOne()).isTrue();
             assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
-                                                                          .confirmationHeader(
-                                                                              JUDGMENT_REQUESTED_HEADER)
-                                                                          .confirmationBody(String.format(
-                                                                              JUDGMENT_REQUESTED_LIP_CASE))
-                                                                          .build());
+                .confirmationHeader(
+                    JUDGMENT_REQUESTED_HEADER)
+                .confirmationBody(String.format(
+                    JUDGMENT_REQUESTED_LIP_CASE))
+                .build());
         }
 
         @Test
@@ -1389,10 +1404,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
             assertThat(caseData.isLRvLipOneVOne()).isTrue();
             assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
-                                                                          .confirmationHeader(
-                                                                              JUDGMENT_GRANTED_HEADER)
-                                                                          .confirmationBody(format(body))
-                                                                          .build());
+                .confirmationHeader(
+                    JUDGMENT_GRANTED_HEADER)
+                .confirmationBody(format(body))
+                .build());
         }
     }
 
