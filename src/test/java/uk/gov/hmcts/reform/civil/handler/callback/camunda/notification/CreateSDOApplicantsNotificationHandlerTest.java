@@ -39,7 +39,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
-import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 @ExtendWith(MockitoExtension.class)
 class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -150,7 +149,7 @@ class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHandlerTest
         @NotNull
         private Map<String, String> getNotificationDataMap() {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
                 PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
             );
@@ -168,7 +167,7 @@ class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHandlerTest
         @NotNull
         private Map<String, String> getNotificationDataMapStatement() {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 CLAIM_LEGAL_ORG_NAME_SPEC, "test name",
                 PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
             );
@@ -222,7 +221,7 @@ class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHandlerTest
         @NotNull
         private Map<String, String> getNotificationDataMap() {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
                 PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
             );

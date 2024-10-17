@@ -476,7 +476,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     "template-id-multiparty",
                     Map.of("legalOrgName", r2Org.getName(),
                            "partyReferences", "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided",
-                        "claimReferenceNumber", caseData.getLegacyCaseReference()),
+                        "claimReferenceNumber", caseData.getCcdCaseReference().toString()),
                     "defendant-response-case-handed-offline-respondent-notification-000DC001"
                 );
             }
@@ -613,14 +613,14 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
         if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                 CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
             );
         } else if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue()
                     .concat(" against " + caseData.getApplicant1().getPartyName())
                     .concat(" and " + caseData.getRespondent1ClaimResponseTypeToApplicant2())
@@ -632,7 +632,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
             //1v2 template is used and expects different data
             return Map.of(
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
                 RESPONDENT_ONE_RESPONSE, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
@@ -645,7 +645,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
     private Map<String, String> getNotificationDataMapSpec(CaseData caseData) {
         return Map.of(
             "defendantLR", "Signer Name",
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
         );
     }
@@ -671,6 +671,6 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
         assertThat(caseHandledOfflineRespondentSolicitorSpecNotifier.addPropertiesSpec1v2DiffSol(caseData,
             CaseHandledOfflineRecipient.RESPONDENT_SOLICITOR2))
             .containsEntry("legalOrgName", "Signer Name")
-            .containsEntry("claimReferenceNumber", "000DC001");
+            .containsEntry("claimReferenceNumber", "1594901956117591");
     }
 }

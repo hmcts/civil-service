@@ -79,7 +79,7 @@ class FullDefenceApplicantSolicitorOneCCUnspecNotifierTest {
         if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)
             || getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                 ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack())
@@ -87,7 +87,7 @@ class FullDefenceApplicantSolicitorOneCCUnspecNotifierTest {
         } else {
             //if there are 2 respondents on the case, concatenate the names together for the template subject line
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONDENT_NAME,
                 getPartyNameBasedOnType(caseData.getRespondent1())
                     .concat(" and ")

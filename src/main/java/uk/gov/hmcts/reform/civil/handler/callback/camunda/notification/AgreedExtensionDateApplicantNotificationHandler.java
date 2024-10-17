@@ -107,7 +107,7 @@ public class AgreedExtensionDateApplicantNotificationHandler extends CallbackHan
         }
 
         return new HashMap<>(Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             AGREED_EXTENSION_DATE, formatLocalDate(extensionDate.toLocalDate(), DATE),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             DEFENDANT_NAME, fetchDefendantName(caseData)

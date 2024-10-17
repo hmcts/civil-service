@@ -119,7 +119,7 @@ public class AcknowledgeClaimApplicantNotificationHandler extends CallbackHandle
         }
 
         return new HashMap<>(Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONDENT_NAME, getPartyNameBasedOnType(respondent),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             RESPONSE_DEADLINE, formatLocalDate(responseDeadline.toLocalDate(), DATE),

@@ -208,7 +208,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return new HashMap<>(Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         ));
     }
@@ -216,7 +216,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
     public Map<String, String> addPropertiesSpec(CaseData caseData, CaseEvent caseEvent) {
         return Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
@@ -225,7 +225,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
 
     public Map<String, String> addPropertiesLRvLip(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );

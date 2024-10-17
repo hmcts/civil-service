@@ -69,12 +69,12 @@ public abstract class AbstractCreateSDORespondentNotificationSender implements N
     public Map<String, String> addProperties(CaseData caseData) {
         if (caseData.isRespondentResponseBilingual()) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONDENT_NAME, getRespondentLegalName(caseData)
             );
         }
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalName(caseData),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );

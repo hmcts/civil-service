@@ -101,7 +101,7 @@ public class AgreedExtensionDateApplicantForSpecNotificationHandler
                     .getOrganisation().getOrganisationID(),
                 caseData
             ),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             AGREED_EXTENSION_DATE, formatLocalDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension(), DATE),
             DEFENDANT_NAME, fetchDefendantName(caseData),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
@@ -134,7 +134,7 @@ public class AgreedExtensionDateApplicantForSpecNotificationHandler
         return Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(
                 caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID(), caseData),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             AGREED_EXTENSION_DATE, formatLocalDate(extensionDate, DATE),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );

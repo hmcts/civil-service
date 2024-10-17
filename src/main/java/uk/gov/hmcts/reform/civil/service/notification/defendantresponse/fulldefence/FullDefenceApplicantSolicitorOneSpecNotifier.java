@@ -72,7 +72,7 @@ public class FullDefenceApplicantSolicitorOneSpecNotifier extends FullDefenceSol
                 + " " + caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().getYear();
             return Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData),
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
                 WHEN_WILL_BE_PAID_IMMEDIATELY, shouldBePaidBy,
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
@@ -80,7 +80,7 @@ public class FullDefenceApplicantSolicitorOneSpecNotifier extends FullDefenceSol
         } else {
             return Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData),
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );

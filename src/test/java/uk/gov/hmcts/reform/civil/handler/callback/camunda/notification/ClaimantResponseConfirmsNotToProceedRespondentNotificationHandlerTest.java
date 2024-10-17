@@ -199,7 +199,7 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
                 CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData)
             );
@@ -235,7 +235,7 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
     public Map<String, String> getNotificationDataMapSpec(CaseData caseData, CaseEvent caseEvent) {
         return Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
         );
@@ -245,7 +245,7 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
     public Map<String, String> getNotificationDataMapSpecPartAdmit(CaseData caseData) {
         return Map.of(
             CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
             CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData)
         );

@@ -128,7 +128,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         Map<String, String> map = new HashMap<>();
-        map.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
+        map.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
         map.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
         map.put(CLAIM_DETAILS_NOTIFICATION_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline()
                                                                          .toLocalDate(), DATE));

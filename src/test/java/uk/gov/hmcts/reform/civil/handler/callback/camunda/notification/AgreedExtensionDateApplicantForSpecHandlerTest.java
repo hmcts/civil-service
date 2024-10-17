@@ -43,7 +43,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
-import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.fetchDefendantName;
 
 @ExtendWith(MockitoExtension.class)
@@ -395,7 +394,7 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
         private Map<String, String> getNotificationDataMap(LocalDate extensionDate) {
             return Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 AGREED_EXTENSION_DATE, formatLocalDate(extensionDate, DATE),
                 DEFENDANT_NAME, fetchDefendantName(caseData),
                 PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
@@ -406,7 +405,7 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
         private Map<String, String> getNotificationDataMapRespondent1v2(LocalDate extensionDate) {
             return Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 AGREED_EXTENSION_DATE, formatLocalDate(extensionDate, DATE),
                 PARTY_REFERENCES, "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided"
             );
@@ -416,7 +415,7 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
         private Map<String, String> getNotificationDataMapRespondent1v1(LocalDate extensionDate) {
             return Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 AGREED_EXTENSION_DATE, formatLocalDate(extensionDate, DATE),
                 PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
             );

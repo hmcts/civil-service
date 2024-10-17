@@ -158,7 +158,7 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
     public Map<String, String> addProperties(CaseData caseData) {
 
         return new HashMap<>(Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONSE_DEADLINE, formatLocalDate(caseData
                                                                      .getRespondent1ResponseDeadline()
                                                                      .toLocalDate(), DATE),

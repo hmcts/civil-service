@@ -135,7 +135,7 @@ public class BreathingSpaceLiftedNotificationHandlerTest extends BaseCallbackHan
 
     private Map<String, String> addPropertiesForApplicant(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData),
             PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
@@ -152,7 +152,7 @@ public class BreathingSpaceLiftedNotificationHandlerTest extends BaseCallbackHan
 
     private Map<String, String> addPropertiesForRespondent(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData),
             PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
