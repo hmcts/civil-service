@@ -15,7 +15,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 @Service
 @RequiredArgsConstructor
 public class FeatureToggleService {
-    // comment temporary
+    
     private final FeatureToggleApi featureToggleApi;
 
     public boolean isFeatureEnabled(String feature) {
