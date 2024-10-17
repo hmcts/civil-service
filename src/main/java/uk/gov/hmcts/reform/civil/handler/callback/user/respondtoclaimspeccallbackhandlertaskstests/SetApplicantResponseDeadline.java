@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -586,3 +587,4 @@ public class SetApplicantResponseDeadline implements CaseTask {
         );
     }
 }
+*/
