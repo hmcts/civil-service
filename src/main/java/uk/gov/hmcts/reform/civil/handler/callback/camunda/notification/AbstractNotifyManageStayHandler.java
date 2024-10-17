@@ -40,9 +40,8 @@ public abstract class AbstractNotifyManageStayHandler extends CallbackHandler im
 
     protected String getNotificationTemplate(CaseData caseData) {
         if (isLiP(caseData)) {
-            return isBilingual(caseData) ?
-                notificationsProperties.getNotifyLipUpdateTemplateBilingual() :
-                notificationsProperties.getNotifyLipUpdateTemplate();
+            return isBilingual(caseData) ? notificationsProperties.getNotifyLipUpdateTemplateBilingual()
+                : notificationsProperties.getNotifyLipUpdateTemplate();
         }
         return notificationsProperties.getNotifyLRStayLifted();
     }
