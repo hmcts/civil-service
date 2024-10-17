@@ -152,7 +152,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
     SubmitClaimTask.class
 },
     properties = {"reference.database.enabled=false"})
-class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
+class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String REFERENCE_NUMBER = "000MC001";
 
