@@ -172,9 +172,11 @@ public interface Claim {
     boolean isBundleCreatedStatusActive();
 
     boolean isTrialArrangementStatusActive();
+
     boolean isTrialScheduledNoPaymentStatusActive();
 
     boolean isTrialScheduledPaymentPaidStatusActive();
+
     default boolean isHwfFullRemission() {
         return false;
     }
