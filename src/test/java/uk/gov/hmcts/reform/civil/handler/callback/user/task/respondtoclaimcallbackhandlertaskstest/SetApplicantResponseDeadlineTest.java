@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.UpdateDataRespondentDeadlineResponse;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.SetApplicantResponseDeadline;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -51,6 +52,9 @@ public class SetApplicantResponseDeadlineTest {
 
     @InjectMocks
     private SetApplicantResponseDeadline setApplicantResponseDeadline;
+
+    @Mock
+    private UpdateDataRespondentDeadlineResponse updateDataRespondentDeadlineResponse;
 
     @Mock
     private  Time time;

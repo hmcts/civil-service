@@ -102,7 +102,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         return populateRespondentCopyObjects.execute(callbackParams);
     }
 
-    private boolean solicitorRepresentsOnlyOneOrBothRespondents(CallbackParams callbackParams, CaseRole caseRole) {
+    private boolean isSolicitorRepresentingOnlyOneOrBothRespondents(CallbackParams callbackParams, CaseRole caseRole) {
         CaseData caseData = callbackParams.getCaseData();
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         return stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)
@@ -144,9 +144,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         CaseData.CaseDataBuilder<?, ?> updatedData =
             caseData.toBuilder().multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.NOT_FULL_DEFENCE);
 
-        var isRespondent1 = YES;
-        if (solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
-            //1V2 Different Solicitors + Respondent 2 only
+        YesOrNo isRespondent1 = YES;
+        if (isSolicitorRepresentingOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
             isRespondent1 = NO;
         }
 
@@ -157,7 +156,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         }
 
         List<String> errors = new ArrayList<>();
-        if (isFullDefenceForBothDefendants(caseData) && respondent2HasSameLegalRep(caseData)) {
+        if (isFullDefenceForBothDefendants(caseData) && isRespondent2SameLegalRep(caseData)) {
             errors.add(
                 "It is not possible to respond for both defendants with Reject all of the claim. "
                     + "Please go back and select single response option."
@@ -173,9 +172,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        // resetting statement of truth field, this resets in the page, but the data is still sent to the db.
-        // setting null here does not clear, need to overwrite with value.
-        // must be to do with the way XUI cache data entered through the lifecycle of an event.
         CaseData updatedCaseData = caseData.toBuilder()
             .uiStatementOfTruth(StatementOfTruth.builder().role("").build())
             .build();
@@ -190,7 +186,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     }
 
-    private boolean respondent2HasSameLegalRep(CaseData caseData) {
+    private boolean isRespondent2SameLegalRep(CaseData caseData) {
         return caseData.getRespondent2SameLegalRepresentative() != null
             && caseData.getRespondent2SameLegalRepresentative() == YES;
     }
@@ -200,8 +196,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         String claimNumber = caseData.getLegacyCaseReference();
         String body;
 
-        //catch scenario 1v2 Diff Sol - 1 Response Received
-        //responseDeadline has not been set yet
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
             && isAwaitingAnotherDefendantResponse(caseData)) {
             body = "Once the other defendant's legal representative has submitted their defence, we will send the "
@@ -229,10 +223,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             || caseData.getRespondent2ClaimResponseType() == null;
     }
 
-    private boolean solicitorRepresentsOnlyOneOfRespondents(CallbackParams callbackParams, CaseRole caseRole) {
-        return solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, caseRole);
-    }
-
     private boolean isFullDefenceForBothDefendants(CaseData caseData) {
         return (caseData.getRespondent1ClaimResponseType() != null
             && caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE))
@@ -258,7 +248,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private boolean isSameSolicitorAndAnyRespondentResponseIsMatchingType(CaseData caseData,
                                                                           RespondentResponseType type) {
-        return respondent2HasSameLegalRep(caseData)
+        return isRespondent2SameLegalRep(caseData)
             && (type.equals(caseData.getRespondent1ClaimResponseType())
             || type.equals(caseData.getRespondent2ClaimResponseType()));
     }

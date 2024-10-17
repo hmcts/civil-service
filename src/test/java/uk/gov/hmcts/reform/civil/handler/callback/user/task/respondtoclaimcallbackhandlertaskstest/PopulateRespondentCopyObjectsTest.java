@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.PopulateRespondentCopyObjects;
@@ -33,8 +33,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 
-@ExtendWith(SpringExtension.class)
-public class PopulateRespondentCopyObjectsTest {
+@ExtendWith(MockitoExtension.class)
+public class PopulateRespondentCopyObjectsTest  {
 
     @Mock
     private ObjectMapper objectMapper;
@@ -56,9 +56,6 @@ public class PopulateRespondentCopyObjectsTest {
 
     @Mock
     private StateFlow mockedStateFlow;
-
-    @Mock
-    private LocationReferenceDataService locationRefDataService;
 
     @InjectMocks
     private PopulateRespondentCopyObjects populateRespondentCopyObjects;

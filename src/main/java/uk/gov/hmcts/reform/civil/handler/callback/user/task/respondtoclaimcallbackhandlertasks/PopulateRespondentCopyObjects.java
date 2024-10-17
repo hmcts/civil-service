@@ -43,7 +43,6 @@ public class PopulateRespondentCopyObjects implements CaseTask {
         "There is a problem"
             + "\n"
             + "You have already submitted the defendant's response";
-    private final LocationReferenceDataService locationReferenceDataService;
     private final IStateFlowEngine stateFlowEngine;
     private final CoreCaseUserService coreCaseUserService;
     private final UserService userService;
@@ -51,7 +50,6 @@ public class PopulateRespondentCopyObjects implements CaseTask {
 
     public PopulateRespondentCopyObjects(ObjectMapper objectMapper,
                                          CourtLocationUtils courtLocationUtils,
-                                         LocationReferenceDataService locationReferenceDataService,
                                          IStateFlowEngine stateFlowEngine,
                                          CoreCaseUserService coreCaseUserService,
                                          UserService userService,
@@ -59,7 +57,6 @@ public class PopulateRespondentCopyObjects implements CaseTask {
 
         this.objectMapper = objectMapper;
         this.courtLocationUtils = courtLocationUtils;
-        this.locationReferenceDataService = locationReferenceDataService;
         this.stateFlowEngine = stateFlowEngine;
         this.coreCaseUserService = coreCaseUserService;
         this.userService = userService;
@@ -70,14 +67,14 @@ public class PopulateRespondentCopyObjects implements CaseTask {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime dateTime = LocalDateTime.now();
 
-        CallbackResponse errorResponse = checkSubmitError(callbackParams, caseData, dateTime);
+        CallbackResponse errorResponse = getErrorResponse(callbackParams, caseData, dateTime);
         if (errorResponse != null) {
             return errorResponse;
         }
 
-        var isRespondent1 = findOutIsRespondent1(callbackParams);
+        YesOrNo isRespondent1 = checkRespondent1YesOrNo(callbackParams);
 
-        List<LocationRefData> locations = fetchLocationData(callbackParams);
+        List<LocationRefData> locations = getLocationData(callbackParams);
 
         RequestedCourt requestedCourt1 = createRequestedCourt(locations, caseData);
 
@@ -88,15 +85,13 @@ public class PopulateRespondentCopyObjects implements CaseTask {
             .build();
     }
 
-    private CallbackResponse checkSubmitError(CallbackParams callbackParams,
+    private CallbackResponse getErrorResponse(CallbackParams callbackParams,
                                               CaseData caseData,
                                               LocalDateTime dateTime) {
-        // Show error message if defendant tries to submit response again
-        if (hasDefendantAlreadySubmitted(callbackParams, caseData)) {
+        if (isSubmissionForDefendantAlreadySubmitted(callbackParams, caseData)) {
             return createErrorResponse(ERROR_DEFENDANT_RESPONSE_SUBMITTED);
         }
 
-        // Show error message if defendant tries to submit a response after deadline has passed
         if (isResponseSubmissionPassedDeadline(callbackParams, caseData, dateTime)) {
             return createErrorResponse("You cannot submit a response now as you have passed your deadline");
         }
@@ -104,10 +99,9 @@ public class PopulateRespondentCopyObjects implements CaseTask {
         return null;
     }
 
-    private YesOrNo findOutIsRespondent1(CallbackParams callbackParams) {
+    private YesOrNo checkRespondent1YesOrNo(CallbackParams callbackParams) {
         YesOrNo isRespondent1 = YES;
-        if (solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
-            // 1V2 Different Solicitors + Respondent 2 only
+        if (isSolicitorRepresentingOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
             isRespondent1 = NO;
         }
         return isRespondent1;
@@ -120,7 +114,7 @@ public class PopulateRespondentCopyObjects implements CaseTask {
     }
 
     private CaseData.CaseDataBuilder updateCaseData(CaseData caseData, YesOrNo isRespondent1, RequestedCourt requestedCourt1) {
-        var updatedCaseData = caseData.toBuilder()
+        CaseData.CaseDataBuilder updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1())
             .isRespondent1(isRespondent1)
             .respondent1DQ(Respondent1DQ.builder()
@@ -148,32 +142,32 @@ public class PopulateRespondentCopyObjects implements CaseTask {
 
     private RequestedCourt createRequestedCourt(List<LocationRefData> locations, CaseData caseData) {
         DynamicList courtLocationList = courtLocationUtils.getLocationsFromList(locations);
-        RequestedCourt.RequestedCourtBuilder requestedCourt1 = RequestedCourt.builder();
-        requestedCourt1.responseCourtLocations(courtLocationList);
+        RequestedCourt.RequestedCourtBuilder requestedCourt = RequestedCourt.builder();
+        requestedCourt.responseCourtLocations(courtLocationList);
 
         Optional.ofNullable(caseData.getCourtLocation())
             .map(CourtLocation::getApplicantPreferredCourt)
             .flatMap(applicantCourt -> locations.stream()
                 .filter(locationRefData -> applicantCourt.equals(locationRefData.getCourtLocationCode()))
                 .findFirst())
-            .ifPresent(locationRefData -> requestedCourt1
+            .ifPresent(locationRefData -> requestedCourt
                 .otherPartyPreferredSite(locationRefData.getCourtLocationCode()
                                              + " " + locationRefData.getSiteName()));
-        return requestedCourt1.build();
+        return requestedCourt.build();
     }
 
-    private boolean hasDefendantAlreadySubmitted(CallbackParams callbackParams, CaseData caseData) {
+    private boolean isSubmissionForDefendantAlreadySubmitted(CallbackParams callbackParams, CaseData caseData) {
         return isSolicitorForRespondent1WithResponseDate(callbackParams, caseData)
             || isSolicitorForRespondent2WithResponseDate(callbackParams, caseData);
     }
 
     private boolean isSolicitorForRespondent2WithResponseDate(CallbackParams callbackParams, CaseData caseData) {
-        return solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
+        return isSolicitorRepresentingOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO)
             && caseData.getRespondent2ResponseDate() != null;
     }
 
     private boolean isSolicitorForRespondent1WithResponseDate(CallbackParams callbackParams, CaseData caseData) {
-        return solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)
+        return isSolicitorRepresentingOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORONE)
             && caseData.getRespondent1ResponseDate() != null;
     }
 
@@ -181,8 +175,8 @@ public class PopulateRespondentCopyObjects implements CaseTask {
                                                        CaseData caseData,
                                                        LocalDateTime dateTime) {
 
-        var respondent1ResponseDeadline = caseData.getRespondent1ResponseDeadline();
-        var respondent2ResponseDeadline = caseData.getRespondent2ResponseDeadline();
+        LocalDateTime respondent1ResponseDeadline = caseData.getRespondent1ResponseDeadline();
+        LocalDateTime respondent2ResponseDeadline = caseData.getRespondent2ResponseDeadline();
 
         return (isRespondent1PassedDeadline(caseData, callbackParams, dateTime, respondent1ResponseDeadline)
             || isRespondent2PassedDeadline(caseData, callbackParams, dateTime, respondent2ResponseDeadline));
@@ -192,7 +186,7 @@ public class PopulateRespondentCopyObjects implements CaseTask {
                                                 CallbackParams callbackParams,
                                                 LocalDateTime dateTime,
                                                 LocalDateTime respondent1ResponseDeadline) {
-        return solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)
+        return isSolicitorRepresentingOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORONE)
             && caseData.getRespondent1ResponseDate() == null
             && respondent1ResponseDeadline != null
             && dateTime.toLocalDate().isAfter(respondent1ResponseDeadline.toLocalDate());
@@ -202,13 +196,13 @@ public class PopulateRespondentCopyObjects implements CaseTask {
                                                 CallbackParams callbackParams,
                                                 LocalDateTime dateTime,
                                                 LocalDateTime respondent2ResponseDeadline) {
-        return solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
+        return isSolicitorRepresentingOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO)
             && caseData.getRespondent2ResponseDate() == null
             && respondent2ResponseDeadline != null
             && dateTime.toLocalDate().isAfter(respondent2ResponseDeadline.toLocalDate());
     }
 
-    private boolean solicitorRepresentsOnlyOneOrBothRespondents(CallbackParams callbackParams, CaseRole caseRole) {
+    private boolean isSolicitorRepresentingOneOrBothRespondents(CallbackParams callbackParams, CaseRole caseRole) {
         CaseData caseData = callbackParams.getCaseData();
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         return stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)
@@ -219,11 +213,7 @@ public class PopulateRespondentCopyObjects implements CaseTask {
         );
     }
 
-    private boolean solicitorRepresentsOnlyOneOfRespondents(CallbackParams callbackParams, CaseRole caseRole) {
-        return solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, caseRole);
-    }
-
-    private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
+    private List<LocationRefData> getLocationData(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }

@@ -41,32 +41,28 @@ public class ValidateRespondentExperts implements CaseTask, ExpertsValidator {
             return validateExperts(caseData.getRespondent1DQ());
         }
 
-        if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
+        if (isSolicitorRepresentingOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
             return validateExperts(caseData.getRespondent1DQ());
         }
 
-        if (solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
+        if (isSolicitorRepresentingOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
             return validateExperts(caseData.getRespondent2DQ());
 
         }
-        if (hasRespondent2DifferentResponseAndExperts(caseData)) {
+        if (isRespondent2ResponseAndExpertsDifferent(caseData)) {
             return validateExperts(caseData.getRespondent2DQ());
         }
 
         return validateExperts(caseData.getRespondent1DQ());
     }
 
-    private boolean hasRespondent2DifferentResponseAndExperts(CaseData caseData) {
-        return (respondent2HasSameLegalRep(caseData)
+    private boolean isRespondent2ResponseAndExpertsDifferent(CaseData caseData) {
+        return (isRespondent2HasSameLegalRep(caseData)
             && (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO)
             && (caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getRespondent2DQExperts() != null));
     }
 
-    private boolean solicitorRepresentsOnlyOneOfRespondents(CallbackParams callbackParams, CaseRole caseRole) {
-        return solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, caseRole);
-    }
-
-    private boolean solicitorRepresentsOnlyOneOrBothRespondents(CallbackParams callbackParams, CaseRole caseRole) {
+    private boolean isSolicitorRepresentingOnlyOneOrBothRespondents(CallbackParams callbackParams, CaseRole caseRole) {
         CaseData caseData = callbackParams.getCaseData();
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         return stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)
@@ -77,7 +73,7 @@ public class ValidateRespondentExperts implements CaseTask, ExpertsValidator {
         );
     }
 
-    private boolean respondent2HasSameLegalRep(CaseData caseData) {
+    private boolean isRespondent2HasSameLegalRep(CaseData caseData) {
         return caseData.getRespondent2SameLegalRepresentative() != null
             && caseData.getRespondent2SameLegalRepresentative() == YES;
     }

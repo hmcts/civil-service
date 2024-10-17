@@ -41,30 +41,26 @@ public class ValidateRespondentWitnesses implements CaseTask, WitnessesValidator
             return validateWitnesses(caseData.getRespondent1DQ());
         }
 
-        if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
+        if (isSolicitorRepresentingOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
             return validateWitnesses(caseData.getRespondent1DQ());
 
         }
-        if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
+        if (isSolicitorRepresentingOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
             return validateWitnesses(caseData.getRespondent2DQ());
         }
 
-        if (hasRespondent2DifferentResponseAndWitnesses(caseData)) {
+        if (isRespondent2ResponseAndWitnessesDifferent(caseData)) {
             return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
         }
 
         return validateWitnesses(caseData.getRespondent1DQ());
     }
 
-    private boolean hasRespondent2DifferentResponseAndWitnesses(CaseData caseData) {
+    private boolean isRespondent2ResponseAndWitnessesDifferent(CaseData caseData) {
         return respondent2HasSameLegalRep(caseData)
             && caseData.getRespondentResponseIsSame() == NO
             && caseData.getRespondent2DQ() != null
             && caseData.getRespondent2DQ().getRespondent2DQWitnesses() != null;
-    }
-
-    private boolean solicitorRepresentsOnlyOneOfRespondents(CallbackParams callbackParams, CaseRole caseRole) {
-        return solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, caseRole);
     }
 
     private boolean respondent2HasSameLegalRep(CaseData caseData) {
@@ -72,7 +68,7 @@ public class ValidateRespondentWitnesses implements CaseTask, WitnessesValidator
             && caseData.getRespondent2SameLegalRepresentative() == YES;
     }
 
-    private boolean solicitorRepresentsOnlyOneOrBothRespondents(CallbackParams callbackParams, CaseRole caseRole) {
+    private boolean isSolicitorRepresentingOneOrBothRespondents(CallbackParams callbackParams, CaseRole caseRole) {
         CaseData caseData = callbackParams.getCaseData();
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         return stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)

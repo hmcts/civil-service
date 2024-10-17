@@ -48,8 +48,8 @@ public class ValidateUnavailableDates implements CaseTask {
         Hearing hearing = caseData.getRespondent1DQ().getHearing();
 
         if (!ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
-            && (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
-            || hasRespondent2DifferentResponseAndHearing(caseData))) {
+            && (isSolicitorRepresentingOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO)
+            || isRespondent2ResponseAndHearingDifferent(caseData))) {
             hearing = caseData.getRespondent2DQ().getHearing();
         }
 
@@ -60,24 +60,20 @@ public class ValidateUnavailableDates implements CaseTask {
             .build();
     }
 
-    private boolean hasRespondent2DifferentResponseAndHearing(CaseData caseData) {
-        return respondent2HasSameLegalRep(caseData)
+    private boolean isRespondent2ResponseAndHearingDifferent(CaseData caseData) {
+        return isRespondent2SameLegalRep(caseData)
             && caseData.getRespondentResponseIsSame() != null
             && caseData.getRespondentResponseIsSame() == NO
             && caseData.getRespondent2DQ() != null
             && caseData.getRespondent2DQ().getHearing() != null;
     }
 
-    private boolean respondent2HasSameLegalRep(CaseData caseData) {
+    private boolean isRespondent2SameLegalRep(CaseData caseData) {
         return caseData.getRespondent2SameLegalRepresentative() != null
             && caseData.getRespondent2SameLegalRepresentative() == YES;
     }
 
-    private boolean solicitorRepresentsOnlyOneOfRespondents(CallbackParams callbackParams, CaseRole caseRole) {
-        return solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, caseRole);
-    }
-
-    private boolean solicitorRepresentsOnlyOneOrBothRespondents(CallbackParams callbackParams, CaseRole caseRole) {
+    private boolean isSolicitorRepresentingOneOrBothRespondents(CallbackParams callbackParams, CaseRole caseRole) {
         CaseData caseData = callbackParams.getCaseData();
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         return stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)
