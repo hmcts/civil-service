@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.properties.mediation.MediationCSVEmailConfiguration;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
@@ -28,7 +29,7 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandler {
+public class GenerateCsvAndTransferTaskHandler extends BaseExternalTaskHandler {
 
     private final MediationCasesSearchService caseSearchService;
     private final CaseDetailsConverter caseDetailsConverter;
@@ -42,7 +43,7 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
     private final RuntimeService runtimeService;
 
     @Override
-    public void handleTask(ExternalTask externalTask) {
+    public ExternalTaskData handleTask(ExternalTask externalTask) {
 
         List<CaseData> inMediationCases;
         LocalDate claimMovedDate;
@@ -73,6 +74,7 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
         } catch (Exception e) {
             log.error(e.getMessage());
         }
+        return ExternalTaskData.builder().build();
     }
 
     private Optional<EmailData> prepareEmail(String generateCsvData) {
