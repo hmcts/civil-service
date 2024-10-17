@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
@@ -27,6 +28,17 @@ public class NotifyClaimantStayLiftedHandler extends AbstractNotifyManageStayCla
     }
 
     @Override
+    protected String getNotificationTemplate(CaseData caseData) {
+        if (isLiP(caseData)) {
+            return isBilingual(caseData)
+                ? notificationsProperties.getNotifyLipUpdateTemplateBilingual()
+                : notificationsProperties.getNotifyLipUpdateTemplate();
+        } else {
+            return notificationsProperties.getNotifyLRStayLifted();
+        }
+    }
+
+    @Override
     public String camundaActivityId(CallbackParams callbackParams) {
         return TASK_ID;
     }
@@ -36,4 +48,7 @@ public class NotifyClaimantStayLiftedHandler extends AbstractNotifyManageStayCla
         return EVENTS;
     }
 
+    protected boolean isBilingual(CaseData caseData) {
+        return caseData.isClaimantBilingual();
+    }
 }
