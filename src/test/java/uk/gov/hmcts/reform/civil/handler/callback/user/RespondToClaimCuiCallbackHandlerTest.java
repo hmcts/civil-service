@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 
 import java.math.BigDecimal;
@@ -71,6 +72,8 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
     FeatureToggleService featureToggleService;
     @MockBean
     OrganisationService organisationService;
+    @MockBean
+    UpdateCaseManagementDetailsService updateCaseManagementDetailsService;
     @Autowired
     private RespondToClaimCuiCallbackHandler handler;
     @Autowired
