@@ -78,6 +78,7 @@ class CoreCaseDataServiceTest {
     private static final String USER_AUTH_TOKEN = "Bearer user-xyz";
     private static final String SERVICE_AUTH_TOKEN = "Bearer service-xyz";
     private static final String CASE_TYPE = "CIVIL";
+    private static final String CMC_CASE_TYPE = "MoneyClaimCase";
     private static final String GENERAL_APPLICATION_CASE_TYPE = "GENERALAPPLICATION";
     private static final Integer RETURNED_NUMBER_OF_CASES = 10;
 
@@ -351,6 +352,34 @@ class CoreCaseDataServiceTest {
             service.getCCDDataBasedOnIndex(USER_AUTH_TOKEN, 0, "data.defendantUserDetails.email");
             verify(coreCaseDataApi).searchCases(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, CASE_TYPE, query);
             verify(userService, never()).getUserDetails(USER_AUTH_TOKEN);
+        }
+    }
+
+    @Nested
+    class SearchCMCCases {
+
+        @BeforeEach
+        void setUp() {
+            when(authTokenGenerator.generate()).thenReturn(SERVICE_AUTH_TOKEN);
+        }
+
+        @Test
+        void shouldReturnCases_WhenSearchingCasesAsSystemUpdateUser() {
+            when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword())).thenReturn(USER_AUTH_TOKEN);
+
+            Query query = new Query(QueryBuilders.matchQuery("previousServiceCaseReference", "000MC001"), emptyList(), 0);
+
+            List<CaseDetails> cases = List.of(CaseDetails.builder().id(1L).build());
+            SearchResult searchResult = SearchResult.builder().cases(cases).build();
+
+            when(coreCaseDataApi.searchCases(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, CMC_CASE_TYPE, query.toString()))
+                .thenReturn(searchResult);
+
+            List<CaseDetails> casesFound = service.searchCMCCases(query).getCases();
+
+            assertThat(casesFound).isEqualTo(cases);
+            verify(coreCaseDataApi).searchCases(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, CMC_CASE_TYPE, query.toString());
+            verify(userService).getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         }
     }
 
