@@ -14,9 +14,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentPaidInFullOnlineMapper;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
-import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 
 import java.time.LocalDate;
@@ -27,7 +24,6 @@ import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHECK_AND_MARK_PAID_IN_FULL;
-import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID;
 
 @Service
 @RequiredArgsConstructor
@@ -69,19 +65,11 @@ public class CheckAndMarkDefendantPaidInFullCallbackHandler extends CallbackHand
         if (nonNull(judgementPaidDate)) {
             runtimeService.setVariable(caseData.getBusinessProcess().getProcessInstanceId(), SEND_DETAILS_CJES, false);
         } else {
-            LocalDate certSCPaymentDate = caseData.getGeneralApplications().stream()
-                .filter(app -> app.getValue().getGeneralAppType().getTypes().contains(CONFIRM_CCJ_DEBT_PAID))
-                .findFirst()
-                .map(Element::getValue)
-                .map(GeneralApplication::getCertOfSC)
-                .map(CertOfSC::getDefendantFinalPaymentDate)
-                .orElseThrow(() -> new IllegalArgumentException("Cosc was not found."));
-
             runtimeService.setVariable(caseData.getBusinessProcess().getProcessInstanceId(), SEND_DETAILS_CJES, true);
             caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
             caseData.setActiveJudgment(paidInFullJudgmentOnlineMapper.addUpdateActiveJudgment(
                 caseData,
-                certSCPaymentDate
+                caseData.getCertOfSC().getDefendantFinalPaymentDate()
             ));
             caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(caseData.getActiveJudgment()));
         }

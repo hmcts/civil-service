@@ -15,14 +15,9 @@ import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentPaidInFullOnlin
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
-import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
-import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.UUID;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -30,8 +25,6 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID;
-import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
 
 @ExtendWith(MockitoExtension.class)
 class CheckAndMarkDefendantPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -60,24 +53,8 @@ class CheckAndMarkDefendantPaidInFullCallbackHandlerTest extends BaseCallbackHan
 
     @Test
     void shouldSetSendToCjesProcessVariableToFalse_whenDefendantPaidInFull() {
-
-        LocalDate markedPaymentDate = LocalDate.of(2024, 9, 20);
-        UUID genAppId = UUID.randomUUID();
         CaseData caseData = CaseData.builder()
             .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
-            .generalApplications(
-                List.of(
-                    Element.<GeneralApplication>builder()
-                        .id(genAppId)
-                        .value(GeneralApplication.builder()
-                                   .generalAppType(GAApplicationType.builder().types(List.of(CONFIRM_CCJ_DEBT_PAID)).build())
-                                   .certOfSC(CertOfSC.builder()
-                                                 .defendantFinalPaymentDate(markedPaymentDate)
-                                                 .build())
-                                   .build())
-                        .build()
-                )
-            )
             .activeJudgment(JudgmentDetails.builder()
                                 .fullyPaymentMadeDate(LocalDate.of(2024, 9, 20))
                                 .issueDate(LocalDate.of(2024, 9, 9))
@@ -97,25 +74,17 @@ class CheckAndMarkDefendantPaidInFullCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldUpdateJudgmentAndSetSendToCjesProcessVariableToTrue_whenJudgmentPaidDateProvided() {
         LocalDate markedPaymentDate = LocalDate.of(2024, 9, 20);
-        UUID genAppId = UUID.randomUUID();
         JudgmentDetails activeJudgementWithoutPayment = JudgmentDetails.builder()
             .issueDate(LocalDate.of(2024, 9, 9))
             .totalAmount("900000")
             .orderedAmount("900000")
             .build();
-        var proofOfDebtApp = Element.<GeneralApplication>builder()
-            .id(genAppId)
-            .value(GeneralApplication.builder()
-                       .generalAppType(GAApplicationType.builder().types(List.of(CONFIRM_CCJ_DEBT_PAID)).build())
-                       .certOfSC(CertOfSC.builder()
-                                     .defendantFinalPaymentDate(markedPaymentDate)
-                                     .build())
-                       .build())
-            .build();
 
         CaseData caseData = CaseData.builder()
             .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
-            .generalApplications(List.of(proofOfDebtApp))
+            .certOfSC(CertOfSC.builder()
+                                    .defendantFinalPaymentDate(markedPaymentDate)
+                                    .build())
             .activeJudgment(activeJudgementWithoutPayment)
             .build();
 
@@ -134,37 +103,4 @@ class CheckAndMarkDefendantPaidInFullCallbackHandlerTest extends BaseCallbackHan
         verify(runtimeService, times(1)).setVariable(PROCESS_INSTANCE_ID, SEND_DETAILS_CJES, true);
     }
 
-    @Test
-    void shouldThrowException_whenGeneralApplicationNotFound() {
-        CaseData caseData = CaseData.builder()
-            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
-            .generalApplications(List.of())
-            .build();
-
-        var params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
-
-        IllegalArgumentException exception = org.junit.jupiter.api.Assertions.assertThrows(
-            IllegalArgumentException.class,
-            () -> handler.handle(params)
-        );
-
-        assertEquals("Cosc was not found.", exception.getMessage());
-    }
-
-    @Test
-    void shouldThrowException_whenNotProofOfDebtGeneralApplication() {
-        CaseData caseData = CaseData.builder()
-            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
-            .generalAppType(GAApplicationType.builder().types(List.of(SUMMARY_JUDGEMENT)).build())
-            .build();
-
-        var params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
-
-        IllegalArgumentException exception = org.junit.jupiter.api.Assertions.assertThrows(
-            IllegalArgumentException.class,
-            () -> handler.handle(params)
-        );
-
-        assertEquals("Cosc was not found.", exception.getMessage());
-    }
 }
