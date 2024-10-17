@@ -1686,7 +1686,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
         }
 
-
         @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_when1v2SameSolicitorResponseIsTheSame() {
             //Given

@@ -100,10 +100,7 @@ public class SetApplicantResponseDeadlineTest {
 
     @BeforeEach
     void setUp() {
-        objectMapper = new ObjectMapper();
-
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-
     }
 
     @Test
