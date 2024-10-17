@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CaseAssignmentApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRole;
 import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -45,6 +46,7 @@ public class InitiateGeneralApplicationServiceHelper {
     private final UserRoleCaching userRoleCaching;
     private final AuthTokenGenerator authTokenGenerator;
     private final UserService userService;
+    private final WorkingDayIndicator workingDayIndicator;
     private final CrossAccessUserConfiguration crossAccessUserConfiguration;
     public static final String APPLICANT_ID = "001";
     public static final String RESPONDENT_ID = "002";
@@ -137,9 +139,17 @@ public class InitiateGeneralApplicationServiceHelper {
                                  GeneralApplication generalApplication,
                                  CaseData caseData,
                                  GeneralAppFeesService feesService) {
+
+        LocalDate startDate = LocalDate.now();
+        LocalDate lipUrgentEndDate = LocalDate.now().plusDays(LIP_URGENT_DAYS);
+
+        long noOfHoliday = startDate.datesUntil(lipUrgentEndDate)
+            .filter(date -> !workingDayIndicator.isWorkingDay(date)).count();
+
         if (Objects.nonNull(isGaAppSameAsParentCaseClLip)
                 && Objects.nonNull(caseData.getHearingDate())
-                && LocalDate.now().plusDays(LIP_URGENT_DAYS).isAfter(caseData.getHearingDate())) {
+                && caseData.getHearingDate().isBefore(lipUrgentEndDate.plusDays(noOfHoliday))) {
+
             applicationBuilder.generalAppUrgencyRequirement(
                     GAUrgencyRequirement
                             .builder()

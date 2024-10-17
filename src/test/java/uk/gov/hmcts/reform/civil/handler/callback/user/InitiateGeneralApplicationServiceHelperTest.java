@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRole;
 import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -79,6 +80,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
     @Mock
     private CrossAccessUserConfiguration crossAccessUserConfiguration;
+
+    @Mock
+    private WorkingDayIndicator workingDayIndicator;
 
     @Mock
     protected IdamClient idamClient;

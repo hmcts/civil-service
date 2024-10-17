@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
 import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
@@ -152,6 +153,9 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     private FeatureToggleService featureToggleService;
 
     @MockBean
+    private WorkingDayIndicator workingDayIndicator;
+
+    @MockBean
     private CoreCaseEventDataService coreCaseEventDataService;
 
     @MockBean
@@ -166,6 +170,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             anyInt()
         ))
             .thenReturn(weekdayDate);
+
+        when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
 
         when(organisationApi.findUserOrganisation(any(), any()))
             .thenReturn(uk.gov.hmcts.reform.civil.prd.model.Organisation
