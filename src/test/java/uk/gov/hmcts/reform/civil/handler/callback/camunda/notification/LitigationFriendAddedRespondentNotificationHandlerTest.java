@@ -14,20 +14,23 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
+import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_LITIGATION_FRIEND_ADDED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_LITIGATION_FRIEND_ADDED;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
-import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 
 @ExtendWith(MockitoExtension.class)
 class LitigationFriendAddedRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -37,6 +40,9 @@ class LitigationFriendAddedRespondentNotificationHandlerTest extends BaseCallbac
 
     @Mock
     private NotificationsProperties notificationsProperties;
+
+    @Mock
+    private OrganisationService organisationService;
 
     @InjectMocks
     private LitigationFriendAddedRespondentNotificationHandler handler;
@@ -57,6 +63,9 @@ class LitigationFriendAddedRespondentNotificationHandlerTest extends BaseCallbac
             CallbackParams params = CallbackParamsBuilder.builder().of(
                 ABOUT_TO_SUBMIT, caseData).request(request).build();
 
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+
             handler.handle(params);
 
             verify(notificationService).sendMail(
@@ -75,6 +84,9 @@ class LitigationFriendAddedRespondentNotificationHandlerTest extends BaseCallbac
             CallbackParams params = CallbackParamsBuilder.builder().of(
                 ABOUT_TO_SUBMIT, caseData).request(request).build();
 
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+
             handler.handle(params);
 
             verify(notificationService).sendMail(
@@ -88,8 +100,9 @@ class LitigationFriendAddedRespondentNotificationHandlerTest extends BaseCallbac
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                PARTY_REFERENCES, buildPartiesReferences(caseData)
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
             );
         }
     }
