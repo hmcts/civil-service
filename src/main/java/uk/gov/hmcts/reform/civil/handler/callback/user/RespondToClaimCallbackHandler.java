@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -49,6 +50,7 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
+import uk.gov.hmcts.reform.civil.utils.PersistDataUtils;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
@@ -118,6 +120,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final AssignCategoryId assignCategoryId;
     private final FrcDocumentsUtils frcDocumentsUtils;
+    private final CaseDetailsConverter caseDetailsConverter;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -355,25 +358,16 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         }
 
         // persist respondent address (ccd issue)
-        var updatedRespondent1 = caseData.getRespondent1().toBuilder()
-            .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
-            .flags(caseData.getRespondent1Copy().getFlags())
-            .build();
+        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
+
+        PersistDataUtils.persistPartyAddress(oldCaseData, caseData);
+
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
+        PersistDataUtils.persistFlagsForParties(oldCaseData, caseData, caseDataBuilder);
 
         CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder = caseData.toBuilder()
-            .respondent1(updatedRespondent1)
             .respondent1Copy(null);
-
-        // if present, persist the 2nd respondent address in the same fashion as above, i.e ignore for 1v1
-        if (ofNullable(caseData.getRespondent2()).isPresent()
-            && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
-            var updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
-                .flags(caseData.getRespondent2Copy().getFlags())
-                .build();
-
-            updatedCaseDataBuilder.respondent2(updatedRespondent2).respondent2Copy(null);
-        }
 
         LocalDateTime responseDate = time.now();
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
