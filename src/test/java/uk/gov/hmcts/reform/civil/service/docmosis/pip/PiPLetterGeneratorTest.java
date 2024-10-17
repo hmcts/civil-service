@@ -88,6 +88,7 @@ class PiPLetterGeneratorTest {
     private static final String CUI_URL = "CUI response url";
     private static final PiPLetter LETTER_TEMPLATE_DATA = PiPLetter.builder()
         .pin(PIN)
+        .ccdCaseNumber("1234123412341234")
         .claimantName(CLAIMANT_FULL_NAME)
         .claimReferenceNumber(CLAIM_REFERENCE)
         .issueDate(LocalDate.now())
@@ -147,6 +148,7 @@ class PiPLetterGeneratorTest {
     private CaseData buildCaseData(YesOrNo respondent1Represented, ServedDocumentFiles servedDocumentFiles) {
         return CaseData.builder()
             .legacyCaseReference(CLAIM_REFERENCE)
+            .ccdCaseReference(1234123412341234L)
             .applicant1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
                             .individualTitle("Mr.")
