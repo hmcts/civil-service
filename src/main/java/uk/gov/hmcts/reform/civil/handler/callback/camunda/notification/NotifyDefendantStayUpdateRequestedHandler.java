@@ -41,10 +41,6 @@ public class NotifyDefendantStayUpdateRequestedHandler extends AbstractNotifyMan
         }
     }
 
-    protected boolean isBilingual(CaseData caseData) {
-        return caseData.isRespondentResponseBilingual();
-    }
-
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;

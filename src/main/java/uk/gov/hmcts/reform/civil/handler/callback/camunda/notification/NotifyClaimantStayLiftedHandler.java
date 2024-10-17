@@ -47,8 +47,4 @@ public class NotifyClaimantStayLiftedHandler extends AbstractNotifyManageStayCla
     public List<CaseEvent> handledEvents() {
         return EVENTS;
     }
-
-    protected boolean isBilingual(CaseData caseData) {
-        return caseData.isClaimantBilingual();
-    }
 }
