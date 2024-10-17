@@ -117,6 +117,7 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
                 "defendant2@hmcts.net",
                 "solicitor-template",
                 Map.of(
+                    "claimantvdefendant", "Mr. John Rambo V Jack Jackson",
                     "claimReferenceNumber", "1594901956117591",
                     "name", "Jim Jameson"
                 ),
@@ -127,6 +128,7 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
                 "defendant@hmcts.net",
                 "solicitor-template",
                 Map.of(
+                    "claimantvdefendant", "Mr. John Rambo V Jack Jackson",
                     "claimReferenceNumber", "1594901956117591",
                     "name", "Jack Jackson"
                 ),
@@ -158,7 +160,7 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
             .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT_STAY_UPDATE_REQUESTED.toString()).build()).build();
 
         if (ENGLISH.equals(language)) {
-            when(notificationsProperties.getNotifyLipStayUpdateRequested()).thenReturn("lip-template");
+            when(notificationsProperties.getNotifyLipStayUpdateRequested()).thenReturn("default-template");
         } else {
             when(notificationsProperties.getNotifyLipBilingualStayUpdateRequested()).thenReturn("bilingual-template");
         }
