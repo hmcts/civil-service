@@ -90,7 +90,7 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
                 when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             }
             CaseData caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
-            caseData = caseData.toBuilder().ccdState(caseState).build();
+            caseData = caseData.toBuilder().ccdState(caseState).applicant1Represented(YesOrNo.NO).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE.name()).build()
             ).build();
@@ -176,6 +176,7 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck()
                 .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
+                .applicant1Represented(YesOrNo.NO)
                 .applicant1AcceptPartAdmitPaymentPlanSpec(null)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .build().toBuilder().ccdState(CaseState.AWAITING_APPLICANT_INTENTION).build();
@@ -206,6 +207,7 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()
                 .ccdCaseReference(1234L)
+                .applicant1Represented(YesOrNo.NO)
                 .caseDataLiP(CaseDataLiP.builder()
                                  .applicant1LiPResponse(ClaimantLiPResponse.builder()
                                                             .applicant1SignedSettlementAgreement(YesOrNo.YES).build()
@@ -317,6 +319,7 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()
                 .ccdCaseReference(1234L)
+                .applicant1Represented(YesOrNo.NO)
                 .caseDataLiP(CaseDataLiP.builder()
                                  .applicant1LiPResponse(ClaimantLiPResponse.builder()
                                                             .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
@@ -351,6 +354,7 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
+            .applicant1Represented(YesOrNo.NO)
             .ccdCaseReference(1234L)
             .ccdState(CaseState.CASE_STAYED)
             .applicant1ProceedWithClaim(YesOrNo.NO)

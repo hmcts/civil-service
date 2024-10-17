@@ -2,12 +2,14 @@ package uk.gov.hmcts.reform.civil.service.docmosis.judgmentonline;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
-import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
@@ -16,14 +18,19 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
+import uk.gov.hmcts.reform.civil.model.docmosis.judgmentonline.JudgmentByAdmissionLiPDefendantLetter;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
+import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -33,9 +40,15 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.OTHER;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_ORDER;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_ADMISSION_PIN_IN_POST_LIP_DEFENDANT_LETTER;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {
+    JudgmentByAdmissionPiPLetterGenerator.class,
+    JacksonAutoConfiguration.class
+})
 class JudgmentByAdmissionPiPLetterGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
@@ -75,26 +88,29 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
         .build();
     private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
 
-    @Mock
-    private UnsecuredDocumentManagementService documentManagementService;
+    @MockBean
+    private SecuredDocumentManagementService documentManagementService;
 
-    @Mock
+    @MockBean
     private DocumentGeneratorService documentGeneratorService;
 
-    @Mock
+    @MockBean
     private IdamClient idamClient;
 
-    @InjectMocks
+    @Autowired
     private JudgmentByAdmissionPiPLetterGenerator generator;
 
-    @Mock
+    @MockBean
     private BulkPrintService bulkPrintService;
 
-    @Mock
+    @MockBean
     private DocumentDownloadService documentDownloadService;
 
-    @Mock
+    @MockBean
     private PinInPostConfiguration pipInPostConfiguration;
+
+    @MockBean
+    private GeneralAppFeesService generalAppFeesService;
 
     private static final String forename = "Judge";
 
@@ -113,6 +129,8 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
         given(documentDownloadService.downloadDocument(any(), any()))
             .willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
         when(pipInPostConfiguration.getRespondToClaimUrl()).thenReturn("Response URL");
+        when(generalAppFeesService.getFeeForJOWithApplicationType(any())).thenReturn(Fee.builder().calculatedAmountInPence(
+            BigDecimal.valueOf(1000)).build());
 
         byte[] letterContentByteData = generator.generateAndPrintJudgmentByAdmissionLetter(CASE_DATA, BEARER_TOKEN);
 
@@ -127,5 +145,20 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
                 JUDGMENT_BY_ADMISSION_LETTER,
                 List.of(CASE_DATA.getRespondent1().getPartyName())
             );
+    }
+
+    @Test
+    void shouldGetTemplateFeesCorrectly() {
+        //Given
+        when(generalAppFeesService.getFeeForJOWithApplicationType(VARY_ORDER))
+            .thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(1500)).build());
+        when(generalAppFeesService.getFeeForJOWithApplicationType(OTHER))
+            .thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(1400)).build());
+        //When
+        JudgmentByAdmissionLiPDefendantLetter judgmentByAdmissionLiPDefendantLetter
+            = generator.getTemplateData(CASE_DATA);
+        //Then
+        assertThat(judgmentByAdmissionLiPDefendantLetter.getVaryJudgmentFee()).isEqualTo("£15.00");
+        assertThat(judgmentByAdmissionLiPDefendantLetter.getCertifOfSatisfactionFee()).isEqualTo("£14.00");
     }
 }

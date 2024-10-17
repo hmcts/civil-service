@@ -54,7 +54,7 @@ public class UploadHearingDocumentsClaimantScenarioTest extends DashboardBaseInt
                 jsonPath("$[0].titleCy").value("Llwytho dogfennau"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Gallwch <a href=\"{UPLOAD_HEARING_DOCUMENTS}\" " +
-                        "class=\"govuk-link\">lanlwytho a chyflwyno dogfennau</a> i gefnogi eich cais. Dilynwch y cyfarwyddiadau a nodir yn y " +
+                        "class=\"govuk-link\">lwytho a chyflwyno dogfennau</a> i gefnogi eich hawliad. Dilynwch y cyfarwyddiadau a nodir yn y " +
                         "<a href=\"{VIEW_ORDERS_AND_NOTICES}\" class=\"govuk-link\">gorchymyn cyfarwyddiadau</a>. Ni chaiff y barnwr ystyried unrhyw ddogfennau a gyflwynir ar ôl y dyddiadau cau yn y gorchymyn cyfarwyddiadau.</p>"
                 )
             );
