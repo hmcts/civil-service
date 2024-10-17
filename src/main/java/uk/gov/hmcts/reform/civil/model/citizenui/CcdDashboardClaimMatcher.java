@@ -141,6 +141,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
         Optional<LocalDateTime> lastNonSdoOrderTime = getTimeOfLastNonSDOOrder();
         Optional<LocalDateTime> sdoTime = getSDOTime();
         return featureToggleService.isCaseProgressionEnabled()
+            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && isSDOMadeByLegalAdviser()
             && !isSDOOrderInReview()
             && !isSDOOrderInReviewOtherParty()
@@ -210,6 +211,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
         return CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.equals(caseData.getCcdState())
             && (hearingScheduledDate.isPresent())
             && !isTrialArrangementStatusActive()
+            && !isBundleCreatedStatusActive()
             && (orderDate.isEmpty()
             || orderDate.get().isBefore(hearingScheduledDate.get()));
     }
@@ -221,7 +223,8 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
             && (CaseState.HEARING_READINESS.equals(caseData.getCcdState()) || CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.equals(caseData.getCcdState()))
             && hearingDate.isPresent()
             && YesOrNo.YES.equals(caseData.getTrialReadyNotified())
-            && isHearingLessThanDaysAway(DAY_LIMIT)) {
+            && isHearingLessThanDaysAway(DAY_LIMIT)
+            && !isBundleCreatedStatusActive()) {
             Optional<LocalDateTime> lastOrder = getTimeOfLastNonSDOOrder();
             return lastOrder.isEmpty()
                 || hearingDate.get().minusDays(DAY_LIMIT)
@@ -229,5 +232,17 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public boolean isBundleCreatedStatusActive() {
+        Optional<LocalDateTime> bundleDate = getBundleCreationDate();
+        Optional<LocalDateTime> lastOrderDate = getTimeOfLastNonSDOOrder();
+        return isHearingScheduled()
+            && caseData.getCcdState() == CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING
+            && isHearingLessThanDaysAway(3 * 7)
+            && bundleDate.isPresent()
+            && (lastOrderDate.isEmpty()
+            || lastOrderDate.get().isBefore(bundleDate.get()));
     }
 }

@@ -88,26 +88,32 @@ class DashboardClaimStatusFactoryTest {
         caseData = applyOrderIfPosition(2, orderPosition, orderType,
                                         caseData, eventHistory
         );
+        caseData = caseData.toBuilder().ccdState(CaseState.HEARING_READINESS).build();
         caseData = requestHwF(caseData, eventHistory);
         caseData = applyOrderIfPosition(3, orderPosition, orderType,
                                         caseData, eventHistory
         );
+        caseData = caseData.toBuilder().ccdState(CaseState.HEARING_READINESS).build();
         caseData = invalidHwFReferenceNumber(caseData, eventHistory);
         caseData = applyOrderIfPosition(4, orderPosition, orderType,
                                         caseData, eventHistory
         );
+        caseData = caseData.toBuilder().ccdState(CaseState.HEARING_READINESS).build();
         caseData = updatedHwFReferenceNumber(caseData, eventHistory);
         caseData = applyOrderIfPosition(5, orderPosition, orderType,
                                         caseData, eventHistory
         );
+        caseData = caseData.toBuilder().ccdState(CaseState.HEARING_READINESS).build();
         caseData = moreInformationRequiredHwF(caseData, eventHistory);
         caseData = applyOrderIfPosition(6, orderPosition, orderType,
                                         caseData, eventHistory
         );
+        caseData = caseData.toBuilder().ccdState(CaseState.HEARING_READINESS).build();
         caseData = hwfRejected(caseData, eventHistory);
         caseData = applyOrderIfPosition(7, orderPosition, orderType,
                                         caseData, eventHistory
         );
+        caseData = caseData.toBuilder().ccdState(CaseState.HEARING_READINESS).build();
         caseData = payHearingFee(caseData, eventHistory);
         caseData = applyOrderIfPosition(8, orderPosition, orderType,
                                         caseData, eventHistory
@@ -143,22 +149,27 @@ class DashboardClaimStatusFactoryTest {
         caseData = applyOrderIfPosition(3, orderPosition, orderType,
                                         caseData, eventHistory
         );
+        caseData = caseData.toBuilder().ccdState(CaseState.HEARING_READINESS).build();
         caseData = invalidHwFReferenceNumber(caseData, eventHistory);
         caseData = applyOrderIfPosition(4, orderPosition, orderType,
                                         caseData, eventHistory
         );
+        caseData = caseData.toBuilder().ccdState(CaseState.HEARING_READINESS).build();
         caseData = updatedHwFReferenceNumber(caseData, eventHistory);
         caseData = applyOrderIfPosition(5, orderPosition, orderType,
                                         caseData, eventHistory
         );
+        caseData = caseData.toBuilder().ccdState(CaseState.HEARING_READINESS).build();
         caseData = moreInformationRequiredHwF(caseData, eventHistory);
         caseData = applyOrderIfPosition(6, orderPosition, orderType,
                                         caseData, eventHistory
         );
+        caseData = caseData.toBuilder().ccdState(CaseState.HEARING_READINESS).build();
         caseData = hwfRejected(caseData, eventHistory);
         caseData = applyOrderIfPosition(7, orderPosition, orderType,
                                         caseData, eventHistory
         );
+        caseData = caseData.toBuilder().ccdState(CaseState.HEARING_READINESS).build();
         caseData = payHearingFee(caseData, eventHistory);
         caseData = applyOrderIfPosition(8, orderPosition, orderType,
                                         caseData, eventHistory
@@ -223,6 +234,7 @@ class DashboardClaimStatusFactoryTest {
 
         // wait until 3 weeks to hearing
         caseData = passDays(caseData, eventHistory, 21);
+        caseData = caseData.toBuilder().ccdState(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING).build();
         caseData = createBundle(caseData, eventHistory);
         caseData = applyOrderIfPosition(8, orderPosition, orderType,
                                         caseData, eventHistory

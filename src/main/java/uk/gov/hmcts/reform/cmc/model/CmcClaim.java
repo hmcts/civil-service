@@ -617,4 +617,9 @@ public class CmcClaim implements Claim {
     public boolean isTrialScheduledPaymentPaidStatusActive() {
         return false;
     }
+
+    @Override
+    public boolean isBundleCreatedStatusActive() {
+        return false;
+    }
 }

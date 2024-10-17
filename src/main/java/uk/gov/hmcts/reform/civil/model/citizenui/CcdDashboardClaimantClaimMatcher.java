@@ -330,7 +330,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     public boolean isHwFEvent(CaseEvent hwfEvent) {
         Optional<LocalDateTime> eventTime = getTimeOfMostRecentEventOfType(EnumSet.of(hwfEvent));
         Optional<LocalDateTime> orderTime = getTimeOfLastNonSDOOrder();
-        return (caseData.isHWFTypeHearing()
+        return ((caseData.isHWFTypeHearing() && caseData.getCcdState() == CaseState.HEARING_READINESS)
             || (caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED && caseData.isHWFTypeClaimIssued()))
             && caseData.getHwFEvent() == hwfEvent
             && (eventTime.isPresent())
@@ -386,7 +386,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
                 && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get()
                 .isAfter(orderTime.get()));
         }
-        return (caseData.isHWFTypeHearing()
+        return ((caseData.isHWFTypeHearing() && caseData.getCcdState() == CaseState.HEARING_READINESS)
             || (caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED && caseData.isHWFTypeClaimIssued()))
             && CaseEvent.FEE_PAYMENT_OUTCOME == caseData.getHwFEvent()
             && ((eventTime = getTimeOfMostRecentEventOfType(EnumSet.of(CaseEvent.FEE_PAYMENT_OUTCOME))).isPresent())

@@ -169,15 +169,7 @@ public interface Claim {
 
     Optional<LocalDateTime> getWhenWasHearingScheduled();
 
-    default boolean isBundleCreatedStatusActive() {
-        Optional<LocalDateTime> bundleDate = getBundleCreationDate();
-        Optional<LocalDateTime> lastOrderDate = getTimeOfLastNonSDOOrder();
-        return isHearingScheduled()
-            && isHearingLessThanDaysAway(3 * 7)
-            && bundleDate.isPresent()
-            && (lastOrderDate.isEmpty()
-            || lastOrderDate.get().isBefore(bundleDate.get()));
-    }
+    boolean isBundleCreatedStatusActive();
 
     boolean isTrialArrangementStatusActive();
     boolean isTrialScheduledNoPaymentStatusActive();
