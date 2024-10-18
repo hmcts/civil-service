@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
@@ -49,6 +50,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     @Value("${case-flags.logging.enabled:false}")
     private boolean caseFlagsLoggingEnabled;
+    private final UpdateCaseManagementDetailsService updateCaseManagementLocationDetailsService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -89,6 +91,10 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(
             builder, featureToggleService.isUpdateContactDetailsEnabled());
 
+        updateCaseManagementLocationDetailsService.updateRespondent1RequestedCourtDetails(caseData, builder,
+                                                                                          updateCaseManagementLocationDetailsService
+                                                                                              .fetchLocationData(callbackParams));
+
         CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));
@@ -112,7 +118,6 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseDocument dummyDocument = new CaseDocument(null, null, null, 0, null, null, null);
         LocalDateTime responseDate = time.now();
-        AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
         return caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_CUI))
             .respondent1ResponseDate(responseDate)
@@ -120,8 +125,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             .respondent1ClaimResponseDocumentSpec(dummyDocument)
             .responseClaimTrack(AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null, featureToggleService, caseData).name())
             .applicant1ResponseDeadline(deadlinesCalculator.calculateApplicantResponseDeadline(
-                responseDate,
-                allocatedTrack
+                responseDate
             ))
             .build();
     }
