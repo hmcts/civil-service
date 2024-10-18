@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.claimform.ClaimFormGenerator;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -37,6 +39,8 @@ class GenerateLipClaimFormCallBackHandlerTest extends BaseCallbackHandlerTest {
     private ClaimFormGenerator claimFormGenerator;
     @Mock
     private SystemGeneratedDocumentService systemGeneratedDocumentService;
+    @Mock
+    private AssignCategoryId assignCategoryId;
     @Mock
     private ObjectMapper mapper;
     @InjectMocks
@@ -79,6 +83,7 @@ class GenerateLipClaimFormCallBackHandlerTest extends BaseCallbackHandlerTest {
 
         // Then
         verify(claimFormGenerator).generate(caseData, BEARER_TOKEN, CaseEvent.GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC);
+        verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.CLAIMANT1_DETAILS_OF_CLAIM.getValue()));
 
     }
 
@@ -99,6 +104,7 @@ class GenerateLipClaimFormCallBackHandlerTest extends BaseCallbackHandlerTest {
 
         //Then
         verify(claimFormGenerator).generate(caseData, BEARER_TOKEN, CaseEvent.GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC);
+        verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.CLAIMANT1_DETAILS_OF_CLAIM.getValue()));
 
     }
 
