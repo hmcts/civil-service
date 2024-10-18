@@ -87,8 +87,9 @@ public class InterimJudgmentClaimantNotificationHandlerTest extends BaseCallback
         private Map<String, String> getNotificationDataMap() {
             return Map.of(
                 "Legal Rep Claimant", "Test Org Name",
-                "Claim number", "000DC001",
-                "Defendant Name", "Mr. Sole Trader"
+                "Claim number", "1594901956117591",
+                "Defendant Name", "Mr. Sole Trader",
+                "partyReferences", "Claimant reference: 12345 - Defendant reference: 6789"
             );
         }
     }
