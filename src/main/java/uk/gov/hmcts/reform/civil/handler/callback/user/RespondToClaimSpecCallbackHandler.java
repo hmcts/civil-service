@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenera
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -65,6 +66,7 @@ import uk.gov.hmcts.reform.civil.utils.DQResponseDocumentUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+import uk.gov.hmcts.reform.civil.utils.PersistDataUtils;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
@@ -172,6 +174,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private final DeadlineExtensionCalculatorService deadlineCalculatorService;
     private final FrcDocumentsUtils frcDocumentsUtils;
     private final DQResponseDocumentUtils dqResponseDocumentUtils;
+    private final CaseDetailsConverter caseDetailsConverter;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -1353,19 +1356,21 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDate = time.now();
         Party updatedRespondent1;
+        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
 
         if (NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())) {
             updatedRespondent1 = caseData.getRespondent1().toBuilder()
                 .primaryAddress(caseData.getSpecAoSApplicantCorrespondenceAddressdetails()).build();
         } else {
-            updatedRespondent1 = caseData.getRespondent1().toBuilder()
-                .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
-                .build();
+            updatedRespondent1 = caseData.getRespondent1().toBuilder().build();
+            PersistDataUtils.persistPartyAddress(oldCaseData, caseData);
         }
 
         if (caseData.getRespondent1Copy() != null) {
-            updatedRespondent1 =
-                updatedRespondent1.toBuilder().flags(caseData.getRespondent1Copy().getFlags()).build();
+            updatedRespondent1 = caseData.getRespondent1().toBuilder().build();
+            CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
+            PersistDataUtils.persistFlagsForParties(oldCaseData, caseData, caseDataBuilder);
         }
 
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
