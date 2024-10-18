@@ -1436,8 +1436,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         when(time.now()).thenReturn(responseDate);
         when(deadlinesCalculator.calculateApplicantResponseDeadline(
-            any(LocalDateTime.class),
-            any(AllocatedTrack.class)
+            any(LocalDateTime.class)
         )).thenReturn(deadline);
 
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -1483,8 +1482,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         when(time.now()).thenReturn(responseDate);
         when(deadlinesCalculator.calculateApplicantResponseDeadline(
-            any(LocalDateTime.class),
-            any(AllocatedTrack.class)
+            any(LocalDateTime.class)
         )).thenReturn(deadline);
 
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -1521,8 +1519,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         when(time.now()).thenReturn(responseDate);
         when(deadlinesCalculator.calculateApplicantResponseDeadline(
-            any(LocalDateTime.class),
-            any(AllocatedTrack.class)
+            any(LocalDateTime.class)
         )).thenReturn(deadline);
 
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -1597,8 +1594,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         when(time.now()).thenReturn(responseDate);
         when(deadlinesCalculator.calculateApplicantResponseDeadline(
-            any(LocalDateTime.class),
-            any(AllocatedTrack.class)
+            any(LocalDateTime.class)
         )).thenReturn(deadline);
 
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
