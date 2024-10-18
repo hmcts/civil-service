@@ -56,16 +56,18 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
                 flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
             })
             .moveTo(FULL_DEFENCE_PROCEED)
-            .onlyWhen(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
-                .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim))
+            .onlyWhen(fullDefenceProceed
+                          .and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()).or(declinedMediation))
+                          .and(applicantOutOfTime.negate()).and(demageMultiClaim))
             .set((c, flags) -> {
                 flags.put(FlowFlag.IS_MULTI_TRACK.name(), true);
                 flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
                 flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
             })
             .moveTo(FULL_DEFENCE_PROCEED)
-            .onlyWhen(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
-                .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate()))
+            .onlyWhen(fullDefenceProceed
+                          .and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()).or(declinedMediation))
+                          .and(applicantOutOfTime.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate()))
             .set((c, flags) -> {
                 flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
                 flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
