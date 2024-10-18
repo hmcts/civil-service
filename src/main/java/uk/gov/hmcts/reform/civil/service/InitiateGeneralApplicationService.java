@@ -254,6 +254,10 @@ public class InitiateGeneralApplicationService {
                 applicationBuilder.generalAppSubmittedDateGAspec(time.now());
             }
         }
+        if (featureToggleService.isCoSCEnabled()
+            && caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID)) {
+            applicationBuilder.certOfSC(caseData.getCertOfSC());
+        }
         applicationBuilder.caseNameGaInternal(caseData.getCaseNameHmctsInternal());
         return helper.setRespondentDetailsIfPresent(applicationBuilder.build(), caseData, userDetails);
     }
