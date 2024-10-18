@@ -503,6 +503,69 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isEmpty();
         }
+
+        /*@Test
+        void shouldReturnError_whenPartialPaymentExceedsTotalAmount() {
+            BigDecimal claimAmount = new BigDecimal(2000);
+            BigDecimal interestAmount = new BigDecimal(100);
+            BigDecimal claimFeeAmount = new BigDecimal(50);
+            BigDecimal partialPaymentAmount = new BigDecimal(2200);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .totalClaimAmount(claimAmount)
+                .totalInterest(interestAmount)
+                .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(claimFeeAmount.multiply(new BigDecimal(100)).longValue())).build())
+                .partialPayment(YesOrNo.YES)
+                .partialPaymentAmount(partialPaymentAmount.multiply(new BigDecimal(100)).toString())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).contains("The amount already paid exceeds the full claim amount");
+        }
+
+        @Test
+        void shouldNotReturnError_whenPartialPaymentIsLessThanTotalAmount() {
+            BigDecimal claimAmount = new BigDecimal(2000);
+            BigDecimal interestAmount = new BigDecimal(100);
+            BigDecimal claimFeeAmount = new BigDecimal(50);
+            BigDecimal partialPaymentAmount = new BigDecimal(2100);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .totalClaimAmount(claimAmount)
+                .totalInterest(interestAmount)
+                .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(claimFeeAmount.multiply(new BigDecimal(100)).longValue())).build())
+                .partialPayment(YesOrNo.YES)
+                .partialPaymentAmount(partialPaymentAmount.multiply(new BigDecimal(100)).toString())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldNotReturnError_whenPartialPaymentIsEqualToTotalAmount() {
+            BigDecimal claimAmount = new BigDecimal(2000);
+            BigDecimal interestAmount = new BigDecimal(100);
+            BigDecimal claimFeeAmount = new BigDecimal(50);
+            BigDecimal partialPaymentAmount = new BigDecimal(2150);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .totalClaimAmount(claimAmount)
+                .totalInterest(interestAmount)
+                .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(claimFeeAmount.multiply(new BigDecimal(100)).longValue())).build())
+                .partialPayment(YesOrNo.YES)
+                .partialPaymentAmount(partialPaymentAmount.multiply(new BigDecimal(100)).toString())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }*/
     }
 
     @Nested
