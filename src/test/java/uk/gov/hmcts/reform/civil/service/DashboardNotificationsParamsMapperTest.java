@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -645,6 +646,26 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("priorityNotificationDeadline")
             .asInstanceOf(InstanceOfAssertFactories.LOCAL_DATE_TIME).isBetween(today.atStartOfDay(), today.plusDays(1).atStartOfDay());
+    }
+
+    @Test
+    void shouldMapParameters_whenCertOfSc() {
+        LocalDate fullPaymentDate = LocalDate.now();
+        CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build().toBuilder()
+            .applicant1Represented(YesOrNo.NO)
+            .certOfSC(CertOfSC.builder().defendantFinalPaymentDate(fullPaymentDate).build())
+            .build();
+
+        Map<String, Object> result =
+            mapper.mapCaseDataToParams(caseData, null);
+        assertThat(result).extracting("coscFullPaymentDateEn")
+            .isEqualTo(DateUtils.formatDate(fullPaymentDate));
+        assertThat(result).extracting("coscFullPaymentDateCy")
+            .isEqualTo(DateUtils.formatDateInWelsh(fullPaymentDate));
+        assertThat(result).extracting("coscNotificationDateEn")
+            .isEqualTo(DateUtils.formatDate(fullPaymentDate));
+        assertThat(result).extracting("coscNotificationDateCy")
+            .isEqualTo(DateUtils.formatDateInWelsh(fullPaymentDate));
     }
 }
 
