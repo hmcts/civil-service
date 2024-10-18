@@ -8,9 +8,8 @@ import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
-import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.builders.DQGeneratorFormBuilder;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers.RespondentTemplateForDQGenerator;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,23 +23,22 @@ public class DirectionQuestionnaireLipResponseGenerator extends DirectionsQuesti
 
     public DirectionQuestionnaireLipResponseGenerator(DocumentManagementService documentManagementService,
                                                       DocumentGeneratorService documentGeneratorService,
-                                                      IStateFlowEngine stateFlowEngine,
-                                                      RepresentativeService representativeService,
                                                       FeatureToggleService featureToggleService,
-                                                      LocationReferenceDataService locationRefDataService) {
+                                                      DQGeneratorFormBuilder dqGeneratorFormBuilder,
+                                                      RespondentTemplateForDQGenerator respondentTemplateForDQGenerator) {
+
         super(
             documentManagementService,
             documentGeneratorService,
-            stateFlowEngine,
-            representativeService,
             featureToggleService,
-            locationRefDataService
+            dqGeneratorFormBuilder,
+            respondentTemplateForDQGenerator
         );
     }
 
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData, String authorisation) {
-        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = getDirectionsQuestionnaireFormBuilder(
+        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = dqGeneratorFormBuilder.getDirectionsQuestionnaireFormBuilder(
             caseData,
             authorisation
         );
@@ -59,18 +57,16 @@ public class DirectionQuestionnaireLipResponseGenerator extends DirectionsQuesti
     @Override
     protected DocmosisTemplates getTemplateId(CaseData caseData) {
         if ((caseData.isRespondent1NotRepresented() || caseData.isApplicantNotRepresented())
-            && getFeatureToggleService().isLipVLipEnabled()) {
+            && featureToggleService.isLipVLipEnabled()) {
             return DQ_LIP_RESPONSE;
         }
         return super.getTemplateId(caseData);
     }
 
-    @Override
     protected List<Party> getApplicants(CaseData caseData) {
         return List.of(Party.toLipParty(caseData.getApplicant1()));
     }
 
-    @Override
     protected List<Party> getRespondents(CaseData caseData, String defendantIdentifier) {
         return List.of(Party.toLipParty(caseData.getRespondent1()));
     }
