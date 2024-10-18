@@ -383,8 +383,8 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         if (Optional.ofNullable(caseData.getHearingFeePaymentDetails())
             .map(p -> p.getStatus() == PaymentStatus.SUCCESS).orElse(
                 Boolean.FALSE) || caseData.hearingFeePaymentDoneWithHWF()) {
-            return CaseState.HEARING_READINESS.equals(CaseState.HEARING_READINESS) &&
-                (eventTime = getTimeOfMostRecentEventOfType(
+            return CaseState.HEARING_READINESS.equals(CaseState.HEARING_READINESS)
+                && (eventTime = getTimeOfMostRecentEventOfType(
                 EnumSet.of(CaseEvent.CITIZEN_HEARING_FEE_PAYMENT, CaseEvent.FEE_PAYMENT_OUTCOME))).isPresent()
                 && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get()
                 .isAfter(orderTime.get()));
