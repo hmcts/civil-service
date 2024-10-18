@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -10,12 +9,12 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers.JudgeFinalOrderFormPopulator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -31,7 +30,6 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.BLANK
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FIX_DATE_CCMC_DOCX;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FIX_DATE_CMC_DOCX;
 
-@Slf4j
 @Service
 public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFinalOrderForm> {
 
@@ -56,9 +54,10 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
     public static final String FAST_WITH_BAND_WITH_REASON = "This case is allocated to the Fast Track and is allocated to complexity band %s because %s.";
 
     public JudgeOrderDownloadGenerator(DocumentManagementService documentManagementService, DocumentGeneratorService documentGeneratorService,
-                                       UserService userService, LocationReferenceDataService locationRefDataService, FeatureToggleService featureToggleService,
-                                       DocumentHearingLocationHelper documentHearingLocationHelper) {
-        super(documentManagementService, documentGeneratorService, userService, locationRefDataService, featureToggleService, documentHearingLocationHelper);
+                                       UserService userService, LocationReferenceDataService locationRefDataService,
+                                       DocumentHearingLocationHelper documentHearingLocationHelper, JudgeFinalOrderFormPopulator judgeFinalOrderFormPopulator) {
+        super(documentManagementService, documentGeneratorService, userService,
+              locationRefDataService, documentHearingLocationHelper, judgeFinalOrderFormPopulator);
         this.documentManagementService = documentManagementService;
         this.documentGeneratorService = documentGeneratorService;
         this.userService = userService;
@@ -136,7 +135,7 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
         return JudgeFinalOrderForm.builder()
             .judgeNameTitle(userDetails.getFullName())
             .courtName(caseManagementLocationDetails.getExternalShortName())
-            .caseNumber(caseData.getCcdCaseReference().toString())
+            .caseNumber(nonNull(caseData.getCcdCaseReference()) ? caseData.getCcdCaseReference().toString() : null)
             .claimant1Name(caseData.getApplicant1().getPartyName())
             .claimant2Name(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
             .defendant1Name(caseData.getRespondent1().getPartyName())

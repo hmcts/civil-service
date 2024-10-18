@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
@@ -13,10 +15,12 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter;
 
@@ -34,7 +38,7 @@ import static java.util.Optional.ofNullable;
 
 @RequiredArgsConstructor
 @Component
-public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler {
+public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
 
     private static final String GA_DOC_SUFFIX = "Document";
     private static final String GA_ADDL_DOC_SUFFIX = "Doc";
@@ -46,13 +50,16 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
+    private final FeatureToggleService featureToggleService;
 
     private CaseData generalAppCaseData;
     private CaseData civilCaseData;
     private CaseData data;
 
+    private final Logger log = LoggerFactory.getLogger(UpdateFromGACaseEventTaskHandler.class);
+
     @Override
-    public void handleTask(ExternalTask externalTask) {
+    public ExternalTaskData handleTask(ExternalTask externalTask) {
         try {
             ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
 
@@ -64,22 +71,23 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
                     .orElseThrow(() -> new InvalidCaseDataException(
                         "General application parent case link not found"));
 
-            generalAppCaseData = caseDetailsConverter.toGACaseData(coreCaseDataService
+            var generalAppCaseData = caseDetailsConverter.toGACaseData(coreCaseDataService
                 .getCase(parseLong(generalAppCaseId)));
 
             StartEventResponse startEventResponse = coreCaseDataService.startUpdate(
                 civilCaseId,
                 variables.getCaseEvent()
             );
-            civilCaseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
+            var caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
 
-            data = coreCaseDataService.submitUpdate(
+            coreCaseDataService.submitUpdate(
                 civilCaseId,
                 CaseDataContentConverter.caseDataContentFromStartEventResponse(
                     startEventResponse,
-                    getUpdatedCaseData(civilCaseData, generalAppCaseData)
+                    getUpdatedCaseData(caseData, generalAppCaseData)
                 )
             );
+            return ExternalTaskData.builder().caseData(caseData).generalApplicationCaseData(generalAppCaseData).build();
         } catch (NumberFormatException ne) {
             throw new InvalidCaseDataException(
                 "Conversion to long datatype failed for general application for a case ", ne
@@ -217,7 +225,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
      *                           add 'get' to the name then call getter to access related Civil document field.
      *                           when update output, use name as key to hold to-be-update collection
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "java:S3776"})
     protected void updateDocCollection(Map<String, Object> output, CaseData generalAppCaseData, String fromGaList,
                                        CaseData civilCaseData, String toCivilList) throws Exception {
         Method gaGetter = ReflectionUtils.findMethod(CaseData.class,
@@ -236,10 +244,40 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
                     civilDocs.add(gaDoc);
                 }
             }
-        } else if (gaDocs != null && gaDocs.size() == 1 && checkIfDocumentExists(civilDocs, gaDocs) < 1) {
-            civilDocs.addAll(gaDocs);
+        } else if (featureToggleService.isGaForLipsEnabled() && (civilCaseData.isRespondent1LiP() || civilCaseData.isRespondent2LiP()
+            || civilCaseData.isApplicantNotRepresented()) && (gaDocs != null && (fromGaList.equals("gaDraftDocument")))) {
+
+            checkDraftDocumentsInMainCase(civilDocs, gaDocs);
+        } else {
+            if (gaDocs != null && gaDocs.size() == 1 && checkIfDocumentExists(civilDocs, gaDocs) < 1) {
+                civilDocs.addAll(gaDocs);
+            }
         }
         output.put(toCivilList, civilDocs.isEmpty() ? null : civilDocs);
+    }
+
+    protected List<Element<?>> checkDraftDocumentsInMainCase(List<Element<?>> civilDocs, List<Element<?>> gaDocs) {
+        List<UUID> ids = gaDocs.stream().map(Element::getId).toList();
+        List<Element<?>> civilDocsCopy = newArrayList();
+
+        for (Element<?> civilDoc : civilDocs) {
+            if (!ids.contains(civilDoc.getId())) {
+                civilDocsCopy.add(civilDoc);
+            }
+        }
+
+        List<UUID> civilIds = civilDocs.stream().map(Element::getId).toList();
+        for (Element<?> gaDoc : gaDocs) {
+            if (!civilIds.contains(gaDoc.getId())) {
+                civilDocsCopy.add(gaDoc);
+            }
+        }
+
+        civilDocs.clear();
+        civilDocs.addAll(civilDocsCopy);
+        civilDocsCopy.clear();
+
+        return civilDocs;
     }
 
     protected boolean canViewClaimant(CaseData civilCaseData, CaseData generalAppCaseData) {
@@ -247,6 +285,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
         if (isNull(gaAppDetails)) {
             return false;
         }
+
         return gaAppDetails.stream()
             .anyMatch(civilGaData -> generalAppCaseData.getCcdCaseReference()
                 .equals(parseLong(civilGaData.getValue().getCaseLink().getCaseReference())));
@@ -262,6 +301,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
         if (isNull(gaAppDetails)) {
             return false;
         }
+
         return gaAppDetails.stream()
             .anyMatch(civilGaData -> generalAppCaseData.getCcdCaseReference()
                 .equals(parseLong(civilGaData.getValue().getCaseLink().getCaseReference())));

@@ -11,16 +11,20 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_STAY;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STAY_LIFTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STAY_UPDATE_REQUESTED;
 
 @Service
 @RequiredArgsConstructor
@@ -63,15 +67,19 @@ public class ManageStayCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse manageStay(CallbackParams callbackParams) {
-
         CaseData caseData = callbackParams.getCaseData();
-
-        CaseState newState = LIFT_STAY.equals(caseData.getManageStayOption())
-            ? STATE_MAP.getOrDefault(caseData.getPreStayState(), caseData.getCcdState())
-            : caseData.getCcdState();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        CaseState newState;
+        if (nonNull(caseData.getManageStayOption()) && caseData.getManageStayOption().equals(LIFT_STAY)) {
+            caseDataBuilder.businessProcess(BusinessProcess.ready(STAY_LIFTED));
+            newState = STATE_MAP.getOrDefault(caseData.getPreStayState(), caseData.getCcdState());
+        } else {
+            caseDataBuilder.businessProcess(BusinessProcess.ready(STAY_UPDATE_REQUESTED));
+            newState = caseData.getCcdState();
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(mapper))
+            .data(caseDataBuilder.build().toMap(mapper))
             .state(newState.name())
             .build();
     }

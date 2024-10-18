@@ -239,6 +239,7 @@ notifications:
   claimantSolicitorSpecCaseWillProgressOffline: "cf44ff15-4958-4c0d-b0d4-fed9a7692d00"
   claimantSolicitorClaimContinuingOnlineCos: "71a640d2-bb74-48c1-b799-2ea4776186bc"
   solicitorCaseTakenOffline: "19690194-6baf-4a70-94d6-018d0710c759"
+  solicitorCaseTakenOfflineNoApplicantResponse: "5bc7ac8b-3bbf-489e-877d-29d3d68863d9"
   solicitorLitigationFriendAdded: "b798572d-393a-482b-a479-21bbf28ccb2c"
   claimantSolicitorClaimContinuingOnlineForSpec: "cbc491af-e194-4582-934e-329f815d897d"
   claimantSolicitorClaimContinuingOnline1v2ForSpec: "1d734510-6a06-4372-aff2-d5da8bf19f72"
@@ -455,6 +456,8 @@ notifications:
   notifyLRBundleRestitched: "f42c83ed-03ce-4b1c-95b7-958045293793"
   notifyLRCaseStayed: "c5e40526-e3f6-4d98-8881-b00c9bc4f200"
   notifyLRCaseDismissed: "4fa16416-650a-4af3-8305-e21fd63a8754"
+  notifyLRStayLifted: "a9cdde1e-6e11-44b2-bf8e-83e1f64a5735"
+  notifyLRStayUpdateRequested: "2bf8e191-d0aa-4cc3-9c54-42245c1d56a2"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
