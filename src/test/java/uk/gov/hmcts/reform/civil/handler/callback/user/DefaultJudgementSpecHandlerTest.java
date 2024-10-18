@@ -504,7 +504,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors()).isEmpty();
         }
 
-        /*@Test
+        @Test
         void shouldReturnError_whenPartialPaymentExceedsTotalAmount() {
             BigDecimal claimAmount = new BigDecimal(2000);
             BigDecimal interestAmount = new BigDecimal(100);
@@ -565,7 +565,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isEmpty();
-        }*/
+        }
     }
 
     @Nested
