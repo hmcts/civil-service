@@ -322,7 +322,6 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1Represented(YesOrNo.NO)
                 .caseDataLiP(CaseDataLiP.builder()
                                  .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                            .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
                                                             .claimantResponseOnCourtDecision(
                                                                 ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE)
                                                             .build()
