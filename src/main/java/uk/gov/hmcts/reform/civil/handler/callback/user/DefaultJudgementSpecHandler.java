@@ -256,9 +256,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private CallbackResponse partialPayment(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
 
-        BigDecimal claimFeeAmount = Optional.ofNullable(caseData.getClaimFee())
-            .map(fee -> MonetaryConversions.penniesToPounds(fee.getCalculatedAmountInPence()))
-            .orElse(BigDecimal.ZERO);
+        BigDecimal claimFeeAmount = MonetaryConversions.penniesToPounds(caseData.getCalculatedClaimFeeInPence());
 
         BigDecimal totalIncludeInterestAndFee = caseData.getTotalClaimAmount()
             .add(Optional.ofNullable(caseData.getTotalInterest()).orElse(BigDecimal.ZERO))
