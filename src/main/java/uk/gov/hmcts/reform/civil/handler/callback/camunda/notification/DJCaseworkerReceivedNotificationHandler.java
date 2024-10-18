@@ -90,7 +90,7 @@ public class DJCaseworkerReceivedNotificationHandler extends CallbackHandler imp
         final BigDecimal partialPayment = getPartialPayment(caseData);
         final BigDecimal total = amountClaimed.add(amountOfCosts).subtract(partialPayment);
         return new HashMap<>(Map.of(
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
             PAYMENT_TYPE, getPaymentTypeField(caseData, total),
             AMOUNT_CLAIMED, amountClaimed.toString(),
             RESPONDENT, caseData.getDefendantDetailsSpec().getValue().getLabel(),

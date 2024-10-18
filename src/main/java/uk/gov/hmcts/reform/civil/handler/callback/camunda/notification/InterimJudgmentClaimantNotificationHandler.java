@@ -99,7 +99,7 @@ public class InterimJudgmentClaimantNotificationHandler extends CallbackHandler 
     public Map<String, String> addProperties(final CaseData caseData) {
         return new HashMap<>(Map.of(
             LEGAL_REP_CLAIMANT, getLegalOrganizationName(caseData),
-            CLAIM_NUMBER_INTERIM, caseData.getLegacyCaseReference(),
+            CLAIM_NUMBER_INTERIM, caseData.getCcdCaseReference().toString(),
             DEFENDANT_NAME_INTERIM, caseData.getRespondent1().getPartyName(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         ));
@@ -108,7 +108,7 @@ public class InterimJudgmentClaimantNotificationHandler extends CallbackHandler 
     public Map<String, String> addPropertiesDefendant2(final CaseData caseData) {
         return new HashMap<>(Map.of(
             LEGAL_REP_CLAIMANT, getLegalOrganizationName(caseData),
-            CLAIM_NUMBER_INTERIM, caseData.getLegacyCaseReference(),
+            CLAIM_NUMBER_INTERIM, caseData.getCcdCaseReference().toString(),
             DEFENDANT_NAME_INTERIM, caseData.getRespondent2().getPartyName(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         ));

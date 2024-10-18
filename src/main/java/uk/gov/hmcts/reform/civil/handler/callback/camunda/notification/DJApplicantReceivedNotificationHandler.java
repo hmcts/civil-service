@@ -144,7 +144,7 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             LEGAL_ORG_SPECIFIED, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                                .getOrganisation()
                                                                .getOrganisationID(), caseData),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
@@ -163,7 +163,7 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             LEGAL_ORG_APPLICANT1, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                               .getOrganisation()
                                                               .getOrganisationID(), caseData),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
             DEFENDANT_NAME, caseData.getDefendantDetailsSpec().getValue().getLabel(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
@@ -174,7 +174,7 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             LEGAL_ORG_SPECIFIED, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                               .getOrganisation()
                                                               .getOrganisationID(), caseData),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
@@ -185,7 +185,7 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             LEGAL_ORG_SPECIFIED, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                               .getOrganisation()
                                                               .getOrganisationID(), caseData),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );

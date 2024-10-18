@@ -208,15 +208,18 @@ public class NotificationUtils {
         boolean addRespondent2Reference = ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData));
 
         stringBuilder.append(buildClaimantReferenceEmailSubject(caseData));
+        if (stringBuilder.length() > 0) {
+            stringBuilder.append(" - ");
+        }
 
         Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor1Reference)
             .ifPresentOrElse(ref -> {
-                if (stringBuilder.length() > 0) {
-                    stringBuilder.append(" - ");
-                }
                 stringBuilder.append(addRespondent2Reference ? "Defendant 1 reference: " : "Defendant reference: ");
                 stringBuilder.append(solicitorReferences.getRespondentSolicitor1Reference());
-            }, () -> stringBuilder.append(REFERENCE_NOT_PROVIDED));
+            }, () -> {
+                stringBuilder.append(addRespondent2Reference ? "Defendant 1 reference: " : "Defendant reference: ");
+                stringBuilder.append(REFERENCE_NOT_PROVIDED);
+            });
 
         if (addRespondent2Reference) {
             if (stringBuilder.length() > 0) {

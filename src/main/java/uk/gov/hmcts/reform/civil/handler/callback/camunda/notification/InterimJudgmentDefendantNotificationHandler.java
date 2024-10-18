@@ -106,7 +106,7 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
     public Map<String, String> addProperties(final CaseData caseData) {
         return Map.of(
             LEGAL_ORG_DEF, getLegalOrganizationName(caseData),
-            CLAIM_NUMBER_INTERIM, caseData.getLegacyCaseReference(),
+            CLAIM_NUMBER_INTERIM, caseData.getCcdCaseReference().toString(),
             DEFENDANT_NAME_INTERIM, caseData.getRespondent1().getPartyName(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
@@ -115,7 +115,7 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
     public Map<String, String> addPropertiesDefendant2(final CaseData caseData) {
         return Map.of(
             LEGAL_ORG_DEF, getLegalOrganizationNameDefendant2(caseData),
-            CLAIM_NUMBER_INTERIM, caseData.getLegacyCaseReference(),
+            CLAIM_NUMBER_INTERIM, caseData.getCcdCaseReference().toString(),
             DEFENDANT_NAME_INTERIM, caseData.getRespondent2().getPartyName(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
