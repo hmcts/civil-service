@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
 import uk.gov.hmcts.reform.civil.service.notification.robotics.RoboticsNotifier;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
@@ -53,6 +52,8 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartySce
     NotifyRoboticsOnCaseHandedOfflineHandler.class,
     RoboticsNotifier.class,
     JsonSchemaValidationService.class,
+    SimpleStateFlowEngine.class,
+    SimpleStateFlowBuilder.class,
     RoboticsDataMapper.class,
     RoboticsAddressMapper.class,
     AddressLinesMapper.class,
@@ -60,9 +61,6 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartySce
     EventHistoryMapper.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
-    StateFlowEngine.class,
-    SimpleStateFlowEngine.class,
-    SimpleStateFlowBuilder.class,
     TransitionsTestConfiguration.class,
     OrganisationService.class
 })
