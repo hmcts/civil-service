@@ -269,7 +269,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         if (caseData.getPartialPayment() == YesOrNo.YES) {
             BigDecimal partialPaymentPounds = MonetaryConversions.penniesToPounds(new BigDecimal(caseData.getPartialPaymentAmount()));
 
-            if (partialPaymentPounds.compareTo(totalIncludeInterestAndFee) >= 0) {
+            if (partialPaymentPounds.compareTo(totalIncludeInterestAndFee) > 0) {
                 errors.add("The amount already paid exceeds the full claim amount");
             }
         }
