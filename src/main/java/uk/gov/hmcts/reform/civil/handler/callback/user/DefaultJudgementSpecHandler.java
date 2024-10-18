@@ -82,7 +82,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private final FeatureToggleService toggleService;
     private final DefaultJudgmentOnlineMapper djOnlineMapper;
     private final CaseDetailsConverter caseDetailsConverter;
-    BigDecimal theOverallTotal;
     private final Time time;
     private final FeatureToggleService featureToggleService;
 
@@ -307,23 +306,28 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             claimFeePounds = MonetaryConversions.penniesToPounds(claimfee.getCalculatedAmountInPence());
         }
         BigDecimal fixedCost = calculateFixedCosts(caseData);
+        BigDecimal theOverallTotal = calculateOverallTotal(caseData, interest, claimFeePounds, fixedCost);
+
         StringBuilder repaymentBreakdown = buildRepaymentBreakdown(
             caseData,
             interest,
             claimFeePounds,
             fixedCost,
-            callbackParams
+            callbackParams,
+            theOverallTotal
         );
 
         caseDataBuilder.repaymentSummaryObject(repaymentBreakdown.toString());
+        caseDataBuilder.defaultJudgementOverallTotal(theOverallTotal);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
-    @NotNull
-    private StringBuilder buildRepaymentBreakdown(CaseData caseData, BigDecimal interest, BigDecimal claimFeePounds,
-                                                  BigDecimal fixedCost, CallbackParams callbackParams) {
+    private BigDecimal calculateOverallTotal(CaseData caseData,
+                                             BigDecimal interest,
+                                             BigDecimal claimFeePounds,
+                                             BigDecimal fixedCost) {
 
         BigDecimal partialPaymentPounds = getPartialPayment(caseData);
         //calculate the relevant total, total claim value + interest if any, claim fee for case,
@@ -334,7 +338,22 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         if (caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.YES) {
             subTotal = subTotal.add(fixedCost);
         }
-        theOverallTotal = subTotal.subtract(partialPaymentPounds);
+        BigDecimal theOverallTotal = subTotal.subtract(partialPaymentPounds);
+        return theOverallTotal;
+    }
+
+    @NotNull
+    private StringBuilder buildRepaymentBreakdown(CaseData caseData, BigDecimal interest,
+                                                  BigDecimal claimFeePounds, BigDecimal fixedCost,
+                                                  CallbackParams callbackParams, BigDecimal theOverallTotal) {
+
+        var subTotal = caseData.getTotalClaimAmount()
+            .add(interest)
+            .add(claimFeePounds);
+        if (caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.YES) {
+            subTotal = subTotal.add(fixedCost);
+        }
+
         //creates  the text on the page, based on calculated values
         StringBuilder repaymentBreakdown = new StringBuilder();
         if (caseData.isLRvLipOneVOne()
@@ -367,6 +386,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
                 "\n ## Subtotal \n £").append(subTotal.setScale(2))
             .append("\n");
 
+        BigDecimal partialPaymentPounds = getPartialPayment(caseData);
+
         if (caseData.getPartialPayment() == YesOrNo.YES) {
             repaymentBreakdown.append("\n ### Amount already paid \n").append("£").append(
                 partialPaymentPounds.setScale(2));
@@ -395,6 +416,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         String formattedDeadline = formatLocalDateTime(LocalDateTime.now().plusDays(30), DATE);
         caseDataBuilder.currentDatebox(formattedDeadline);
         //set the calculated repayment owed
+        var theOverallTotal = caseData.getDefaultJudgementOverallTotal();
         caseDataBuilder.repaymentDue(theOverallTotal.toString());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -437,6 +459,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         String nextState;
 
+        caseDataBuilder.defaultJudgementOverallTotal(null);
+
         if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC));
@@ -449,6 +473,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
         // persist party flags (ccd issue)
         persistFlagsForParties(oldCaseData, caseData, caseDataBuilder);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(nextState)
