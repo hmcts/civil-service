@@ -4,6 +4,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
@@ -221,6 +222,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
         Optional<LocalDate> hearingDate = getHearingDate();
         if (caseData.isFastTrackClaim()
             && (CaseState.HEARING_READINESS.equals(caseData.getCcdState()) || CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.equals(caseData.getCcdState()))
+            && !ListingOrRelisting.RELISTING.equals(caseData.getListingOrRelisting())
             && hearingDate.isPresent()
             && YesOrNo.YES.equals(caseData.getTrialReadyNotified())
             && isHearingLessThanDaysAway(DAY_LIMIT)

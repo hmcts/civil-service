@@ -633,12 +633,16 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void givenClaimStatusInHearingReadinessAndHWFFeePaymentOutcome_WhenGetStatus_thenReturnHearingFeePaidStatus() {
         HelpWithFeesDetails hwfDetails = HelpWithFeesDetails.builder()
-            .hwfCaseEvent(CaseEvent.FEE_PAYMENT_OUTCOME).build();
+            .hwfCaseEvent(CaseEvent.FULL_REMISSION_HWF).build();
         CaseData caseData = CaseData.builder()
             .ccdState(CaseState.HEARING_READINESS)
             .hearingHwfDetails(hwfDetails)
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
             .hwfFeeType(
                 FeeType.HEARING)
+            .hearingHelpFeesReferenceNumber("123")
+            .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder().hwfFullRemissionGrantedForHearingFee(YesOrNo.YES).build())
             .build();
 
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(

@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
@@ -378,20 +379,16 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     @Override
     public boolean isHwfPaymentOutcome() {
         Optional<LocalDateTime> eventTime;
-        Optional<LocalDateTime> orderTime = getTimeOfLastNonSDOOrder();
+        Optional<LocalDateTime> orderTime;
         if (Optional.ofNullable(caseData.getHearingFeePaymentDetails())
             .map(p -> p.getStatus() == PaymentStatus.SUCCESS).orElse(
-                Boolean.FALSE)) {
+                Boolean.FALSE) || caseData.hearingFeePaymentDoneWithHWF()) {
             return ((eventTime = getTimeOfMostRecentEventOfType(
                 EnumSet.of(CaseEvent.CITIZEN_HEARING_FEE_PAYMENT, CaseEvent.FEE_PAYMENT_OUTCOME))).isPresent())
                 && ((orderTime = getTimeOfLastNonSDOOrder()).isEmpty() || eventTime.get()
                 .isAfter(orderTime.get()));
         }
-        return ((caseData.isHWFTypeHearing() && caseData.getCcdState() == CaseState.HEARING_READINESS)
-            || (caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED && caseData.isHWFTypeClaimIssued()))
-            && CaseEvent.FEE_PAYMENT_OUTCOME == caseData.getHwFEvent()
-            && ((eventTime = getTimeOfMostRecentEventOfType(EnumSet.of(CaseEvent.FEE_PAYMENT_OUTCOME))).isPresent())
-            && (orderTime.isEmpty() || eventTime.get().isAfter(orderTime.get()));
+        return false;
     }
 
     @Override
@@ -437,6 +434,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         Optional<LocalDateTime> orderTime = getTimeOfLastNonSDOOrder();
         return caseData.isFastTrackClaim()
             && caseData.getTrialReadyApplicant() != null
+            && !ListingOrRelisting.RELISTING.equals(caseData.getListingOrRelisting())
             && (CaseState.HEARING_READINESS.equals(caseData.getCcdState()) || CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.equals(caseData.getCcdState()))
             && !isBundleCreatedStatusActive()
             && isHearingLessThanDaysAway(DAY_LIMIT)
