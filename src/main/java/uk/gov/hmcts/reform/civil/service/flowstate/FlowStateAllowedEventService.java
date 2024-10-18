@@ -1824,7 +1824,7 @@ public class FlowStateAllowedEventService {
                 FULL_REMISSION_HWF,
                 UPDATE_HELP_WITH_FEE_NUMBER,
                 INVALID_HWF_REFERENCE,
-                AMEND_RESTITCH_BUNDLE                
+                AMEND_RESTITCH_BUNDLE
             )
         ),
         entry(
@@ -1840,7 +1840,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                INITIATE_GENERAL_APPLICATION
 
             )
         ),
