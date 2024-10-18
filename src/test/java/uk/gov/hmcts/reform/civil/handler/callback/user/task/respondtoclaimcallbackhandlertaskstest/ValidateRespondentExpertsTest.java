@@ -33,7 +33,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
-public class ValidateRespondentExpertsTest {
+class ValidateRespondentExpertsTest {
 
     @InjectMocks
     private ValidateRespondentExperts validateRespondentExperts;
@@ -68,7 +68,7 @@ public class ValidateRespondentExpertsTest {
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) validateRespondentExperts.execute(callbackParams);
 
-        assertEquals(response.getErrors().isEmpty(), true);
+        assertEquals(true, response.getErrors().isEmpty());
         assertThat(response).isNotNull();
 
     }
@@ -98,7 +98,7 @@ public class ValidateRespondentExpertsTest {
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) validateRespondentExperts.execute(callbackParams);
 
-        assertEquals(response.getErrors().isEmpty(), true);
+        assertEquals(true, response.getErrors().isEmpty());
         assertThat(response).isNotNull();
     }
 
@@ -128,7 +128,7 @@ public class ValidateRespondentExpertsTest {
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) validateRespondentExperts.execute(callbackParams);
 
-        assertEquals(response.getErrors().isEmpty(), true);
+        assertEquals(true, response.getErrors().isEmpty());
         assertThat(response).isNotNull();
     }
 
@@ -158,7 +158,7 @@ public class ValidateRespondentExpertsTest {
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) validateRespondentExperts.execute(callbackParams);
 
-        assertEquals(response.getErrors().isEmpty(), true);
+        assertEquals(true, response.getErrors().isEmpty());
         assertThat(response).isNotNull();
     }
 
@@ -185,7 +185,7 @@ public class ValidateRespondentExpertsTest {
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) validateRespondentExperts.execute(callbackParams);
 
-        assertEquals(response.getErrors().isEmpty(), false);
+        assertEquals(false, response.getErrors().isEmpty());
         assertThat(response).isNotNull();
     }
 }

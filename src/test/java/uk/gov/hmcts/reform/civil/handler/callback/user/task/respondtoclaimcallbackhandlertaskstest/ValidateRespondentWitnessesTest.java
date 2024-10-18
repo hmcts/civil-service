@@ -33,7 +33,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
-public class ValidateRespondentWitnessesTest {
+class ValidateRespondentWitnessesTest {
 
     @InjectMocks
     private ValidateRespondentWitnesses validateRespondentWitnesses;
@@ -68,7 +68,7 @@ public class ValidateRespondentWitnessesTest {
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) validateRespondentWitnesses.execute(callbackParams);
 
-        assertEquals(response.getErrors().isEmpty(), true);
+        assertEquals(true, response.getErrors().isEmpty());
         assertThat(response).isNotNull();
 
     }

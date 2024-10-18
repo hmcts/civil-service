@@ -53,12 +53,9 @@ public class SetApplicantResponseDeadline implements CaseTask {
     private final FeatureToggleService toggleService;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final IStateFlowEngine stateFlowEngine;
-    private final AssignCategoryId assignCategoryId;
     private final ObjectMapper objectMapper;
     private final CoreCaseUserService coreCaseUserService;
     private final UserService userService;
-    private final LocationReferenceDataService locationRefDataService;
-    private final CourtLocationUtils courtLocationUtils;
     private final UpdateDataRespondentDeadlineResponse updateDataRespondentDeadlineResponse;
     private final AssembleDocumentsForDeadlineResponse assembleDocumentsForDeadlineResponse;
 
@@ -82,12 +79,9 @@ public class SetApplicantResponseDeadline implements CaseTask {
         this.toggleService = toggleService;
         this.caseFlagsInitialiser = caseFlagsInitialiser;
         this.stateFlowEngine = stateFlowEngine;
-        this.assignCategoryId = assignCategoryId;
         this.objectMapper = objectMapper;
         this.coreCaseUserService = coreCaseUserService;
         this.userService = userService;
-        this.locationRefDataService = locationRefDataService;
-        this.courtLocationUtils = courtLocationUtils;
         this.updateDataRespondentDeadlineResponse = updateDataRespondentDeadlineResponse;
         this.assembleDocumentsForDeadlineResponse = assembleDocumentsForDeadlineResponse;
     }

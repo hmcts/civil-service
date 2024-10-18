@@ -78,7 +78,7 @@ public class PopulateRespondentCopyObjects implements CaseTask {
 
         RequestedCourt requestedCourt1 = createRequestedCourt(locations, caseData);
 
-        CaseData.CaseDataBuilder updatedCaseData = updateCaseData(caseData, isRespondent1, requestedCourt1);
+        CaseData.CaseDataBuilder<?, ?> updatedCaseData = updateCaseData(caseData, isRespondent1, requestedCourt1);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
@@ -113,8 +113,8 @@ public class PopulateRespondentCopyObjects implements CaseTask {
             .build();
     }
 
-    private CaseData.CaseDataBuilder updateCaseData(CaseData caseData, YesOrNo isRespondent1, RequestedCourt requestedCourt1) {
-        CaseData.CaseDataBuilder updatedCaseData = caseData.toBuilder()
+    private CaseData.CaseDataBuilder<?, ?> updateCaseData(CaseData caseData, YesOrNo isRespondent1, RequestedCourt requestedCourt1) {
+        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1())
             .isRespondent1(isRespondent1)
             .respondent1DQ(Respondent1DQ.builder()

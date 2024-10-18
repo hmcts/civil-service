@@ -34,7 +34,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 
 @ExtendWith(MockitoExtension.class)
-public class PopulateRespondentCopyObjectsTest  {
+class PopulateRespondentCopyObjectsTest  {
 
     @Mock
     private ObjectMapper objectMapper;

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
@@ -14,17 +13,8 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
-import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
-import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
-import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -39,41 +29,12 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @Component
 public class UpdateDataRespondentDeadlineResponse {
 
-    private final Time time;
-    private final DeadlinesCalculator deadlinesCalculator;
-    private final FrcDocumentsUtils frcDocumentsUtils;
-    private final FeatureToggleService toggleService;
-    private final CaseFlagsInitialiser caseFlagsInitialiser;
-    private final IStateFlowEngine stateFlowEngine;
-    private final AssignCategoryId assignCategoryId;
-    private final ObjectMapper objectMapper;
-    private final CoreCaseUserService coreCaseUserService;
-    private final UserService userService;
     private final LocationReferenceDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
 
-    public UpdateDataRespondentDeadlineResponse(Time time,
-                                                DeadlinesCalculator deadlinesCalculator,
-                                                FrcDocumentsUtils frcDocumentsUtils,
-                                                FeatureToggleService toggleService,
-                                                CaseFlagsInitialiser caseFlagsInitialiser,
-                                                IStateFlowEngine stateFlowEngine,
-                                                AssignCategoryId assignCategoryId,
-                                                ObjectMapper objectMapper,
-                                                CoreCaseUserService coreCaseUserService,
-                                                UserService userService,
-                                                LocationReferenceDataService locationRefDataService,
+    public UpdateDataRespondentDeadlineResponse(LocationReferenceDataService locationRefDataService,
                                                 CourtLocationUtils courtLocationUtils) {
-        this.time = time;
-        this.deadlinesCalculator = deadlinesCalculator;
-        this.frcDocumentsUtils = frcDocumentsUtils;
-        this.toggleService = toggleService;
-        this.caseFlagsInitialiser = caseFlagsInitialiser;
-        this.stateFlowEngine = stateFlowEngine;
-        this.assignCategoryId = assignCategoryId;
-        this.objectMapper = objectMapper;
-        this.coreCaseUserService = coreCaseUserService;
-        this.userService = userService;
+
         this.locationRefDataService = locationRefDataService;
         this.courtLocationUtils = courtLocationUtils;
     }
@@ -103,7 +64,7 @@ public class UpdateDataRespondentDeadlineResponse {
                                                LocalDateTime applicant1Deadline) {
         updatedData.respondent2ResponseDate(responseDate)
             .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
-        updateRespondent2StatementOfTruth(callbackParams, updatedData, responseDate, caseData);
+        updateRespondent2StatementOfTruth(callbackParams, updatedData, caseData);
         setApplicantDeadLineIfRespondent1DateExist(caseData, updatedData, applicant1Deadline);
     }
 
@@ -121,7 +82,7 @@ public class UpdateDataRespondentDeadlineResponse {
         updateRespondent1StatementOfTruth(callbackParams, caseData, updatedData);
     }
 
-    private void updateRespondent2StatementOfTruth(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> updatedData, LocalDateTime responseDate, CaseData caseData) {
+    private void updateRespondent2StatementOfTruth(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> updatedData, CaseData caseData) {
 
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
         Respondent2DQ.Respondent2DQBuilder dq = caseData.getRespondent2DQ().toBuilder()

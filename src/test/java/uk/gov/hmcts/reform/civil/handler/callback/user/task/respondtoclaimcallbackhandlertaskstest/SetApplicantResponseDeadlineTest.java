@@ -48,7 +48,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
-public class SetApplicantResponseDeadlineTest {
+class SetApplicantResponseDeadlineTest {
 
     @InjectMocks
     private SetApplicantResponseDeadline setApplicantResponseDeadline;
