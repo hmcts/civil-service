@@ -25,6 +25,7 @@ public class PiPLetter implements MappableObject {
     private final BigDecimal totalAmountOfClaim;
     private final String claimReferenceNumber;
     private final String pin;
+    private final String ccdCaseNumber;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
     private final LocalDate responseDeadline;
