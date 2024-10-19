@@ -187,6 +187,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
     private List<GeneralApplicationTypes> getGeneralApplicationTypes(CallbackParams callbackParams, CaseData caseData) {
         List<GeneralApplicationTypes> generalAppTypes;
+        log.info("Case data {} for inisitate general applicaiton : ", caseData);
         if (caseData.getGeneralAppTypeLR() != null && isCoscEnabledAndUserNotLip(callbackParams)) {
             generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
         } else {
