@@ -168,9 +168,11 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CallbackResponse gaValidateConsent(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        var generalAppTypes = caseData.getGeneralAppType().getTypes();
+        var generalAppTypes = Objects.nonNull(caseData.getGeneralAppType());
         if (caseData.getGeneralAppTypeLR() != null && isCoscEnabledAndUserNotLip(callbackParams)) {
             generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
+        } else {
+            generalAppTypes = caseData.getGeneralAppTypes.getTypes();
         }
         var consent = Objects.nonNull(caseData.getGeneralAppRespondentAgreement())
                                 && YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed());
@@ -204,9 +206,11 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 
-        var generalAppTypes = caseData.getGeneralAppType().getTypes();
+        var generalAppTypes = Objects.nonNull(caseData.getGeneralAppType());
         if (caseData.getGeneralAppTypeLR() != null && isCoscEnabledAndUserNotLip(callbackParams)) {
             generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
+        } else {
+            generalAppTypes = caseData.getGeneralAppType().getTypes();
         }
 
         if (generalAppTypes.size() > 1
