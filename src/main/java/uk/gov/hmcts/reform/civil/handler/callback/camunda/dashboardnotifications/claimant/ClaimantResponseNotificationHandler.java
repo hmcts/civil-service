@@ -92,6 +92,7 @@ public class ClaimantResponseNotificationHandler extends DashboardCallbackHandle
             Optional.ofNullable(caseData)
                 .map(CaseData::getCaseDataLiP)
                 .map(CaseDataLiP::getApplicant1LiPResponse)
+                .filter(ClaimantLiPResponse::hasApplicant1RequestedCcj)
                 .filter(ClaimantLiPResponse::hasClaimantRejectedCourtDecision)
                 .isPresent();
     }
