@@ -1335,7 +1335,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                ADD_CASE_NOTE
             )
         ),
 
@@ -1369,7 +1370,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                ADD_CASE_NOTE
             )
         ),
         entry(
@@ -1410,7 +1412,8 @@ public class FlowStateAllowedEventService {
                 PARTIAL_REMISSION_HWF_GRANTED,
                 FULL_REMISSION_HWF,
                 UPDATE_HELP_WITH_FEE_NUMBER,
-                INVALID_HWF_REFERENCE
+                INVALID_HWF_REFERENCE,
+                ADD_CASE_NOTE
             )
         ),
 
@@ -1450,16 +1453,19 @@ public class FlowStateAllowedEventService {
             PART_ADMIT_REJECT_REPAYMENT.fullName(),
             List.of(
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                REQUEST_JUDGEMENT_ADMISSION_SPEC
+                REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                ADD_CASE_NOTE
             )
         ),
         entry(
             PART_ADMIT_PROCEED.fullName(),
-            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)
+            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                    ADD_CASE_NOTE)
         ),
         entry(
             PART_ADMIT_NOT_PROCEED.fullName(),
-            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)
+            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                    ADD_CASE_NOTE)
         ),
         entry(
             PART_ADMIT_PAY_IMMEDIATELY.fullName(),
@@ -1469,24 +1475,29 @@ public class FlowStateAllowedEventService {
                 LIP_CLAIM_SETTLED,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                ADD_CASE_NOTE
             )
         ),
         entry(
             PART_ADMIT_AGREE_SETTLE.fullName(),
-            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)
+            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                    ADD_CASE_NOTE)
         ),
         entry(
             FULL_ADMIT_PAY_IMMEDIATELY.fullName(),
-            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)
+            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                    ADD_CASE_NOTE)
         ),
         entry(
             FULL_ADMIT_PROCEED.fullName(),
-            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)
+            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                    ADD_CASE_NOTE)
         ),
         entry(
             FULL_ADMIT_NOT_PROCEED.fullName(),
-            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)
+            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                    ADD_CASE_NOTE)
         ),
         entry(
             FULL_ADMIT_JUDGMENT_ADMISSION.fullName(),
@@ -1494,7 +1505,8 @@ public class FlowStateAllowedEventService {
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                 EDIT_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
-                SET_ASIDE_JUDGMENT
+                SET_ASIDE_JUDGMENT,
+                ADD_CASE_NOTE
             )
         ),
         entry(
@@ -1557,7 +1569,8 @@ public class FlowStateAllowedEventService {
                 PARTIAL_REMISSION_HWF_GRANTED,
                 FULL_REMISSION_HWF,
                 UPDATE_HELP_WITH_FEE_NUMBER,
-                INVALID_HWF_REFERENCE
+                INVALID_HWF_REFERENCE,
+                ADD_CASE_NOTE
             )
         ),
 
@@ -1583,7 +1596,8 @@ public class FlowStateAllowedEventService {
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
                 DISCONTINUE_CLAIM_CLAIMANT,
-                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                ADD_CASE_NOTE
             )
         ),
         entry(
@@ -1692,7 +1706,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                ADD_CASE_NOTE
             )
         ),
         entry(
@@ -1841,8 +1856,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
+                ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION
-
             )
         ),
         entry(
@@ -1991,7 +2006,8 @@ public class FlowStateAllowedEventService {
                 SETTLE_CLAIM_MARK_PAID_FULL,
                 LIP_CLAIM_SETTLED,
                 DISCONTINUE_CLAIM_CLAIMANT,
-                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                ADD_CASE_NOTE
             )
         ),
         entry(
@@ -1999,7 +2015,8 @@ public class FlowStateAllowedEventService {
             List.of(
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                 REQUEST_JUDGEMENT_ADMISSION_SPEC,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                ADD_CASE_NOTE
             )
         ),
         entry(
@@ -2018,7 +2035,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                ADD_CASE_NOTE
             )
         ),
         entry(
@@ -2032,7 +2050,8 @@ public class FlowStateAllowedEventService {
                 UPDATE_HELP_WITH_FEE_NUMBER,
                 INVALID_HWF_REFERENCE,
                 NO_REMISSION_HWF,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                ADD_CASE_NOTE
             )
         ),
         entry(
@@ -2040,14 +2059,16 @@ public class FlowStateAllowedEventService {
             List.of(
                 INITIATE_GENERAL_APPLICATION,
                 ADD_UNAVAILABLE_DATES,
-                CHANGE_SOLICITOR_EMAIL
+                CHANGE_SOLICITOR_EMAIL,
+                ADD_CASE_NOTE
             )
         ),
         entry(
             SIGN_SETTLEMENT_AGREEMENT.fullName(),
             List.of(
                 REQUEST_JUDGEMENT_ADMISSION_SPEC,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                ADD_CASE_NOTE
             )
         ),
         entry(
