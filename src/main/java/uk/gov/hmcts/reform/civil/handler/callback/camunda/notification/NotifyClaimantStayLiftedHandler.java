@@ -35,5 +35,4 @@ public class NotifyClaimantStayLiftedHandler extends AbstractNotifyManageStayCla
     public List<CaseEvent> handledEvents() {
         return EVENTS;
     }
-
 }
