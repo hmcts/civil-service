@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -76,6 +77,7 @@ public class ManageStayCallbackHandler extends CallbackHandler {
         } else {
             caseDataBuilder.businessProcess(BusinessProcess.ready(STAY_UPDATE_REQUESTED));
             newState = caseData.getCcdState();
+            caseDataBuilder.manageStayUpdateRequestDate(LocalDate.now());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
