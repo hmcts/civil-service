@@ -176,21 +176,24 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
         private Map<String, String> getNotificationDataMap() {
             return Map.of(
                 "legalOrgName", "Test Org Name",
-                "claimReferenceNumber", "000DC001"
+                "claimReferenceNumber", "1594901956117591",
+                "partyReferences", "Claimant reference: 12345 - Defendant reference: 6789"
             );
         }
 
         private Map<String, String> getNotificationDataMapRes1() {
             return Map.of(
                 "legalOrgName", "Mr. Sole Trader",
-                "claimReferenceNumber", "000DC001"
+                "claimReferenceNumber", "1594901956117591",
+                "partyReferences", "Claimant reference: 12345 - Defendant reference: 6789"
             );
         }
 
         private Map<String, String> getNotificationDataMapRes2() {
             return Map.of(
                 "legalOrgName", "Mr. John Rambo",
-                "claimReferenceNumber", "000DC001"
+                "claimReferenceNumber", "1594901956117591",
+                "partyReferences", "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: 01234"
             );
         }
     }
