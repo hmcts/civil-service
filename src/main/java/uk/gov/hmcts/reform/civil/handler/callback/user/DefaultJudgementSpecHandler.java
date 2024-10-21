@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.DefaultJudgmentOnlineMa
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.RegistrationInformation;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -194,7 +195,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(errors.isEmpty()
-                      ? caseDataBuilder.build().toMap(objectMapper) : null)
+                ? caseDataBuilder.build().toMap(objectMapper) : null)
             .build();
     }
 
@@ -246,7 +247,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         var acceptanceSpec = callbackParams.getRequest().getCaseDetails().getData().get("CPRAcceptance");
         if (Objects.isNull(acceptanceSpec) && Objects.isNull(acceptance2DefSpec)) {
             listErrors.add("To apply for default judgment, all of the statements must apply to the defendant "
-                               + "- if they do not apply, close this page and apply for default judgment when they do");
+                + "- if they do not apply, close this page and apply for default judgment when they do");
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(listErrors)
@@ -258,7 +259,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
 
         var totalIncludeInterest = caseData.getTotalClaimAmount().doubleValue()
-            +  Optional.ofNullable(caseData.getTotalInterest()).orElse(BigDecimal.ZERO).doubleValue();
+            + Optional.ofNullable(caseData.getTotalInterest()).orElse(BigDecimal.ZERO).doubleValue();
         List<String> errors = new ArrayList<>();
 
         if (caseData.getPartialPayment() == YesOrNo.YES) {
@@ -299,7 +300,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         BigDecimal totalInterest = caseData.getTotalInterest() != null ? caseData.getTotalInterest() : BigDecimal.ZERO;
         var claimWithInterest = caseData.getTotalClaimAmount().add(totalInterest);
-        var claimfee = feesService.getFeeDataByTotalClaimAmount(claimWithInterest);
+        Fee claimfee = feesService.getFeeDataByTotalClaimAmount(claimWithInterest);
         BigDecimal claimFeePounds;
         if (caseData.getOutstandingFeeInPounds() != null) {
             claimFeePounds = caseData.getOutstandingFeeInPounds();
@@ -314,7 +315,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             fixedCost,
             callbackParams
         );
-
         caseDataBuilder.repaymentSummaryObject(repaymentBreakdown.toString());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -435,6 +435,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         }
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.totalInterest(interestCalculator.calculateInterest(caseData));
         String nextState;
 
         if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
