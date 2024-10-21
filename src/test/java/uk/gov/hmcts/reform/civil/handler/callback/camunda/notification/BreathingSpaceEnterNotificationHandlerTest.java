@@ -25,6 +25,7 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CASE_ID;
 
 @ExtendWith(SpringExtension.class)
 class BreathingSpaceEnterNotificationHandlerTest {
@@ -55,6 +56,7 @@ class BreathingSpaceEnterNotificationHandlerTest {
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("legacy ref")
+            .ccdCaseReference(CASE_ID)
             .respondent1(Party.builder()
                              .type(Party.Type.COMPANY)
                              .companyName("company name")
@@ -80,7 +82,7 @@ class BreathingSpaceEnterNotificationHandlerTest {
             eq(recipient),
             eq(templateId),
             argThat(
-                map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getLegacyCaseReference())
+                map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getCcdCaseReference().toString())
                     && map.get(NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC).equals(organisationName)
                     && map.get("defendantName").equals(caseData.getRespondent1().getPartyName())),
             argThat(string -> string.contains(caseData.getLegacyCaseReference()))
@@ -103,6 +105,7 @@ class BreathingSpaceEnterNotificationHandlerTest {
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("legacy ref")
+            .ccdCaseReference(CASE_ID)
             .respondent2(Party.builder()
                              .type(Party.Type.COMPANY)
                              .companyName("company name")
@@ -128,7 +131,7 @@ class BreathingSpaceEnterNotificationHandlerTest {
             eq(recipient),
             eq(templateId),
             argThat(
-                map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getLegacyCaseReference())
+                map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getCcdCaseReference().toString())
                     && map.get(NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC).equals(organisationName)
                     && map.get("defendantName").equals(caseData.getRespondent2().getPartyName())),
             argThat(string -> string.contains(caseData.getLegacyCaseReference()))
@@ -151,6 +154,7 @@ class BreathingSpaceEnterNotificationHandlerTest {
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("legacy ref")
+            .ccdCaseReference(CASE_ID)
             .respondent2(Party.builder()
                              .type(Party.Type.COMPANY)
                              .companyName("company name")
@@ -178,7 +182,7 @@ class BreathingSpaceEnterNotificationHandlerTest {
             eq(recipient),
             eq(templateId),
             argThat(
-                map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getLegacyCaseReference())
+                map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getCcdCaseReference().toString())
                     && map.get(NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC).equals(organisationName)
                     && map.get("defendantName").equals(caseData.getRespondent2().getPartyName())),
             argThat(string -> string.contains(caseData.getLegacyCaseReference()))
@@ -201,6 +205,7 @@ class BreathingSpaceEnterNotificationHandlerTest {
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("legacy ref")
+            .ccdCaseReference(CASE_ID)
             .respondent2(Party.builder()
                              .type(Party.Type.COMPANY)
                              .companyName("company name")
@@ -228,7 +233,7 @@ class BreathingSpaceEnterNotificationHandlerTest {
             eq(null),
             eq(templateId),
             argThat(
-                map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getLegacyCaseReference())
+                map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getCcdCaseReference().toString())
                     && map.get(NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC).equals(organisationName)
                     && map.get("defendantName").equals(caseData.getRespondent2().getPartyName())),
             argThat(string -> string.contains(caseData.getLegacyCaseReference()))
@@ -247,6 +252,7 @@ class BreathingSpaceEnterNotificationHandlerTest {
         String solicitorName = "solicitor name";
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("legacy ref")
+            .ccdCaseReference(CASE_ID)
             .applicant1(Party.builder()
                             .type(Party.Type.COMPANY)
                             .companyName("company name")
@@ -277,7 +283,7 @@ class BreathingSpaceEnterNotificationHandlerTest {
             eq(recipient),
             eq(templateId),
             argThat(
-                map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getLegacyCaseReference())
+                map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getCcdCaseReference().toString())
                     && map.get(NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC).equals(solicitorName)),
             argThat(string -> string.contains(caseData.getLegacyCaseReference()))
         );

@@ -29,7 +29,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
-import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CASE_ID;
 
 class FullDefenceRespondentSolicitorOneCCSpecNotifierTest {
 
@@ -109,15 +110,17 @@ class FullDefenceRespondentSolicitorOneCCSpecNotifierTest {
         return Map.of(
             "defendantName", "Mr. Sole Trader",
             CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-            CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE
+            CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
+            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
         );
     }
 
     private Map<String, String> getNotificationDataMapSpec() {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+            CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
             "defendantName", "Mr. Sole Trader",
-            CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name"
+            CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
+            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
         );
     }
 }

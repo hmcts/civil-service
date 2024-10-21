@@ -32,9 +32,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
-import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.NOTIFICATION_DEADLINE;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
 class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -137,10 +136,10 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
 
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 "defendantName", "Mr. Sole Trader",
                 "claimDetailsNotificationDeadline", formatLocalDate(NOTIFICATION_DEADLINE.toLocalDate(), DATE),
-                PARTY_REFERENCES, buildPartiesReferences(caseData)
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
 
