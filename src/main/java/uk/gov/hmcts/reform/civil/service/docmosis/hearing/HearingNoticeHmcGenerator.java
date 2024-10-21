@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.hearing.HearingNoticeHmc;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
@@ -48,6 +49,7 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
     private final LocationReferenceDataService locationRefDataService;
     private final HearingFeesService hearingFeesService;
     private final AssignCategoryId assignCategoryId;
+    private final FeatureToggleService featureToggleService;
 
     public List<CaseDocument> generate(CaseData caseData, HearingGetResponse hearing, String authorisation, String hearingLocation, String hearingId) {
 
@@ -69,8 +71,9 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
 
     public HearingNoticeHmc getHearingNoticeTemplateData(CaseData caseData, HearingGetResponse hearing, String bearerToken,
                                                          String hearingLocation, String hearingId) {
-        var paymentFailed = caseData.getHearingFeePaymentDetails() == null
-            || caseData.getHearingFeePaymentDetails().getStatus().equals(PaymentStatus.FAILED);
+        var paymentFailed = (caseData.getHearingFeePaymentDetails() == null
+            || caseData.getHearingFeePaymentDetails().getStatus().equals(PaymentStatus.FAILED))
+            && (!featureToggleService.isCaseProgressionEnabled() || !caseData.hearingFeePaymentDoneWithHWF());
         var hearingType = hearing.getHearingDetails().getHearingType();
         var feeAmount = paymentFailed && hearingFeeRequired(hearingType)
             ? HearingUtils.formatHearingFee(HearingFeeUtils.calculateAndApplyFee(hearingFeesService, caseData, caseData.getAssignedTrack())) : null;
@@ -84,6 +87,7 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
         return HearingNoticeHmc.builder()
             .title(getHearingTypeTitleText(caseData, hearing))
             .hearingSiteName(nonNull(caseManagementLocation) ? caseManagementLocation.getExternalShortName() : null)
+            .caseManagementLocation(nonNull(caseManagementLocation) ? LocationReferenceDataService.getDisplayEntry(caseManagementLocation) : null)
             .hearingLocation(hearingLocation)
             .caseNumber(caseData.getCcdCaseReference())
             .creationDate(LocalDate.now())

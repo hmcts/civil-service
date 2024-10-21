@@ -100,6 +100,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SET_ASIDE_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STAY_CASE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CASE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_STAY;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRANSFER_ONLINE_CASE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
@@ -245,25 +246,26 @@ public class FlowStateAllowedEventService {
 
         entry(
             CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-            List.of(NOC_REQUEST,
-                    APPLY_NOC_DECISION,
-                    ADD_CASE_NOTE,
-                    INITIATE_GENERAL_APPLICATION,
-                    CREATE_SDO,
-                    NotSuitable_SDO,
-                    REQUEST_FOR_RECONSIDERATION,
-                    migrateCase,
-                    CREATE_CLAIM_SPEC_AFTER_PAYMENT,
-                    CREATE_CLAIM_AFTER_PAYMENT,
-                    TRANSFER_ONLINE_CASE,
-                    RECORD_JUDGMENT,
-                    EDIT_JUDGMENT,
-                    JUDGMENT_PAID_IN_FULL,
-                    SET_ASIDE_JUDGMENT,
-                    SETTLE_CLAIM,
-                    SETTLE_CLAIM_MARK_PAID_FULL,
-                    DISCONTINUE_CLAIM_CLAIMANT,
-                    VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+            List.of(
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
+                ADD_CASE_NOTE,
+                INITIATE_GENERAL_APPLICATION,
+                CREATE_SDO,
+                NotSuitable_SDO,
+                REQUEST_FOR_RECONSIDERATION,
+                migrateCase,
+                CREATE_CLAIM_SPEC_AFTER_PAYMENT,
+                CREATE_CLAIM_AFTER_PAYMENT,
+                TRANSFER_ONLINE_CASE,
+                RECORD_JUDGMENT,
+                EDIT_JUDGMENT,
+                JUDGMENT_PAID_IN_FULL,
+                SET_ASIDE_JUDGMENT,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL,
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
             )
         ),
 
@@ -383,7 +385,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY
             )
         ),
 
@@ -421,7 +424,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY
             )
         ),
 
@@ -459,7 +463,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY
             )
         ),
 
@@ -506,7 +511,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY
             )
         ),
 
@@ -537,7 +543,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY
             )
         ),
 
@@ -568,7 +575,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY
             )
         ),
 
@@ -599,7 +607,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY
             )
         ),
 
@@ -627,7 +636,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY
             )
         ),
 
@@ -655,7 +665,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY
             )
         ),
 
@@ -740,7 +751,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY
             )
         ),
 
@@ -766,7 +778,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY
             )
         ),
         entry(
@@ -983,7 +996,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY
             )
         ),
         entry(
@@ -1028,7 +1042,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 AMEND_RESTITCH_BUNDLE,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY
             )
         ),
         entry(
@@ -1164,7 +1179,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY
             )
         ),
         entry(
@@ -1210,7 +1226,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY
             )
         ),
         entry(
@@ -1239,7 +1256,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY
             )
         ),
 
@@ -1282,7 +1300,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY
             )
         ),
 
@@ -1315,7 +1334,9 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY,
+                ADD_CASE_NOTE
             )
         ),
 
@@ -1348,10 +1369,11 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY,
+                ADD_CASE_NOTE
             )
         ),
-
         entry(
             PART_ADMISSION.fullName(),
             List.of(
@@ -1382,7 +1404,16 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY,
+                MORE_INFORMATION_HWF,
+                FEE_PAYMENT_OUTCOME,
+                NO_REMISSION_HWF,
+                PARTIAL_REMISSION_HWF_GRANTED,
+                FULL_REMISSION_HWF,
+                UPDATE_HELP_WITH_FEE_NUMBER,
+                INVALID_HWF_REFERENCE,
+                ADD_CASE_NOTE
             )
         ),
 
@@ -1422,16 +1453,19 @@ public class FlowStateAllowedEventService {
             PART_ADMIT_REJECT_REPAYMENT.fullName(),
             List.of(
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                REQUEST_JUDGEMENT_ADMISSION_SPEC
+                REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                ADD_CASE_NOTE
             )
         ),
         entry(
             PART_ADMIT_PROCEED.fullName(),
-            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)
+            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                    ADD_CASE_NOTE)
         ),
         entry(
             PART_ADMIT_NOT_PROCEED.fullName(),
-            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)
+            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                    ADD_CASE_NOTE)
         ),
         entry(
             PART_ADMIT_PAY_IMMEDIATELY.fullName(),
@@ -1440,24 +1474,30 @@ public class FlowStateAllowedEventService {
                 CLAIMANT_RESPONSE_CUI,
                 LIP_CLAIM_SETTLED,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY,
+                ADD_CASE_NOTE
             )
         ),
         entry(
             PART_ADMIT_AGREE_SETTLE.fullName(),
-            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)
+            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                    ADD_CASE_NOTE)
         ),
         entry(
             FULL_ADMIT_PAY_IMMEDIATELY.fullName(),
-            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)
+            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                    ADD_CASE_NOTE)
         ),
         entry(
             FULL_ADMIT_PROCEED.fullName(),
-            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)
+            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                    ADD_CASE_NOTE)
         ),
         entry(
             FULL_ADMIT_NOT_PROCEED.fullName(),
-            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)
+            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                    ADD_CASE_NOTE)
         ),
         entry(
             FULL_ADMIT_JUDGMENT_ADMISSION.fullName(),
@@ -1465,7 +1505,8 @@ public class FlowStateAllowedEventService {
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                 EDIT_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
-                SET_ASIDE_JUDGMENT
+                SET_ASIDE_JUDGMENT,
+                ADD_CASE_NOTE
             )
         ),
         entry(
@@ -1520,7 +1561,16 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY,
+                MORE_INFORMATION_HWF,
+                FEE_PAYMENT_OUTCOME,
+                NO_REMISSION_HWF,
+                PARTIAL_REMISSION_HWF_GRANTED,
+                FULL_REMISSION_HWF,
+                UPDATE_HELP_WITH_FEE_NUMBER,
+                INVALID_HWF_REFERENCE,
+                ADD_CASE_NOTE
             )
         ),
 
@@ -1546,7 +1596,8 @@ public class FlowStateAllowedEventService {
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
                 DISCONTINUE_CLAIM_CLAIMANT,
-                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                ADD_CASE_NOTE
             )
         ),
         entry(
@@ -1637,7 +1688,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY
             )
         ),
         entry(
@@ -1653,7 +1705,9 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY,
+                ADD_CASE_NOTE
             )
         ),
         entry(
@@ -1672,7 +1726,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY
             )
         ),
         entry(
@@ -1727,7 +1782,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 AMEND_RESTITCH_BUNDLE,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY
             )
         ),
         entry(
@@ -1774,7 +1830,16 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY,
+                MORE_INFORMATION_HWF,
+                FEE_PAYMENT_OUTCOME,
+                NO_REMISSION_HWF,
+                PARTIAL_REMISSION_HWF_GRANTED,
+                FULL_REMISSION_HWF,
+                UPDATE_HELP_WITH_FEE_NUMBER,
+                INVALID_HWF_REFERENCE,
+                AMEND_RESTITCH_BUNDLE
             )
         ),
         entry(
@@ -1789,7 +1854,9 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY,
+                ADD_CASE_NOTE
 
             )
         ),
@@ -1837,7 +1904,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 LIP_CLAIM_SETTLED,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY
             )
         ),
         entry(
@@ -1854,7 +1922,8 @@ public class FlowStateAllowedEventService {
                 LIP_CLAIM_SETTLED,
                 AMEND_RESTITCH_BUNDLE,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY
             )
         ),
         entry(
@@ -1937,7 +2006,8 @@ public class FlowStateAllowedEventService {
                 SETTLE_CLAIM_MARK_PAID_FULL,
                 LIP_CLAIM_SETTLED,
                 DISCONTINUE_CLAIM_CLAIMANT,
-                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                ADD_CASE_NOTE
             )
         ),
         entry(
@@ -1945,7 +2015,8 @@ public class FlowStateAllowedEventService {
             List.of(
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                 REQUEST_JUDGEMENT_ADMISSION_SPEC,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                ADD_CASE_NOTE
             )
         ),
         entry(
@@ -1963,7 +2034,9 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
-                DISMISS_CASE
+                DISMISS_CASE,
+                MANAGE_STAY,
+                ADD_CASE_NOTE
             )
         ),
         entry(
@@ -1977,7 +2050,8 @@ public class FlowStateAllowedEventService {
                 UPDATE_HELP_WITH_FEE_NUMBER,
                 INVALID_HWF_REFERENCE,
                 NO_REMISSION_HWF,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                ADD_CASE_NOTE
             )
         ),
         entry(
@@ -1985,14 +2059,16 @@ public class FlowStateAllowedEventService {
             List.of(
                 INITIATE_GENERAL_APPLICATION,
                 ADD_UNAVAILABLE_DATES,
-                CHANGE_SOLICITOR_EMAIL
+                CHANGE_SOLICITOR_EMAIL,
+                ADD_CASE_NOTE
             )
         ),
         entry(
             SIGN_SETTLEMENT_AGREEMENT.fullName(),
             List.of(
                 REQUEST_JUDGEMENT_ADMISSION_SPEC,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                ADD_CASE_NOTE
             )
         ),
         entry(

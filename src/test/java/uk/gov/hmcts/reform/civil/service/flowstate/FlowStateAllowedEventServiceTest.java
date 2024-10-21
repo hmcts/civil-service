@@ -29,10 +29,33 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.of;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGEMENT_OF_SERVICE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CUI_UPLOAD_MEDIATION_DOCUMENTS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_CUI;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EXTEND_RESPONSE_DEADLINE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FULL_REMISSION_HWF;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIP_CLAIM_SETTLED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_STAY;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MORE_INFORMATION_HWF;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_CUI_FOR_DEADLINE_EXTENSION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_CUI_FOR_DEADLINE_EXTENSION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESET_PIN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARK_PAID_FULL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_MEDIATION_DOCUMENTS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.VALIDATE_DISCONTINUE_CLAIM_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UpdateNextHearingInfo;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HEARING_DETAILS;
@@ -121,25 +144,45 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.COUNTER
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DRAFT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_AGREE_REPAYMENT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_JUDGMENT_ADMISSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_NOT_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_PAY_IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_REJECT_REPAYMENT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_NOT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_MEDIATION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.MEDIATION_UNSUCCESSFUL_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_AGREE_REPAYMENT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_AGREE_SETTLE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_NOT_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_NOT_SETTLED_NO_MEDIATION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_PAY_IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_REJECT_REPAYMENT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PREPARE_FOR_HEARING_CONDUCT_HEARING;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SIGN_SETTLEMENT_AGREEMENT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SPEC_DRAFT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_SDO;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SDO_NOT_DRAWN;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT;
@@ -148,6 +191,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
     StateFlowEngine.class,
+
     SimpleStateFlowEngine.class,
     SimpleStateFlowBuilder.class,
     TransitionsTestConfiguration.class,
@@ -397,7 +441,8 @@ class FlowStateAllowedEventServiceTest {
                         asyncStitchingComplete,
                         COURT_OFFICER_ORDER,
                         STAY_CASE,
-                        DISMISS_CASE
+                        DISMISS_CASE,
+                        MANAGE_STAY
                     }
                 ),
                 of(
@@ -434,7 +479,8 @@ class FlowStateAllowedEventServiceTest {
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         COURT_OFFICER_ORDER,
                         STAY_CASE,
-                        DISMISS_CASE
+                        DISMISS_CASE,
+                        MANAGE_STAY
                     }
                 ),
                 of(
@@ -471,7 +517,8 @@ class FlowStateAllowedEventServiceTest {
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         COURT_OFFICER_ORDER,
                         STAY_CASE,
-                        DISMISS_CASE
+                        DISMISS_CASE,
+                        MANAGE_STAY
 
                     }
                 ),
@@ -518,7 +565,8 @@ class FlowStateAllowedEventServiceTest {
                         BUNDLE_CREATION_NOTIFICATION,
                         COURT_OFFICER_ORDER,
                         STAY_CASE,
-                        DISMISS_CASE
+                        DISMISS_CASE,
+                        MANAGE_STAY
                     }
                 ),
                 of(
@@ -548,7 +596,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         STAY_CASE,
-                        DISMISS_CASE
+                        DISMISS_CASE,
+                        MANAGE_STAY
                     }
                 ),
                 of(
@@ -578,7 +627,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         STAY_CASE,
-                        DISMISS_CASE
+                        DISMISS_CASE,
+                        MANAGE_STAY
                     }
                 ),
                 of(
@@ -608,7 +658,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         STAY_CASE,
-                        DISMISS_CASE
+                        DISMISS_CASE,
+                        MANAGE_STAY
                     }
                 ),
                 of(
@@ -635,7 +686,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         STAY_CASE,
-                        DISMISS_CASE
+                        DISMISS_CASE,
+                        MANAGE_STAY
                     }
                 ),
                 of(
@@ -662,7 +714,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         STAY_CASE,
-                        DISMISS_CASE
+                        DISMISS_CASE,
+                        MANAGE_STAY
                     }
                 ),
                 of(
@@ -744,7 +797,8 @@ class FlowStateAllowedEventServiceTest {
                         REFER_JUDGE_DEFENCE_RECEIVED,
                         COURT_OFFICER_ORDER,
                         STAY_CASE,
-                        DISMISS_CASE
+                        DISMISS_CASE,
+                        MANAGE_STAY
                     }
                 ),
                 of(
@@ -769,7 +823,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         STAY_CASE,
-                        DISMISS_CASE
+                        DISMISS_CASE,
+                        MANAGE_STAY
                     }
                 ),
                 of(
@@ -953,7 +1008,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         STAY_CASE,
-                        DISMISS_CASE
+                        DISMISS_CASE,
+                        MANAGE_STAY
                     }
                 ),
                 of(
@@ -1006,7 +1062,8 @@ class FlowStateAllowedEventServiceTest {
                         COURT_OFFICER_ORDER,
                         AMEND_RESTITCH_BUNDLE,
                         STAY_CASE,
-                        DISMISS_CASE
+                        DISMISS_CASE,
+                        MANAGE_STAY
                     }
                 )
             );
@@ -1031,10 +1088,10 @@ class FlowStateAllowedEventServiceTest {
         @ArgumentsSource(GetAllowedCaseEventForFlowStateArguments.class)
         void shouldReturnTrue_whenEventIsAllowedAtGivenState(FlowState.Main flowState, CaseEvent... caseEvents) {
             Arrays.stream(caseEvents).forEach(caseEvent ->
-                assertTrue(flowStateAllowedEventService.isAllowedOnState(
-                    flowState.fullName(),
-                    caseEvent
-                ))
+                                                  assertTrue(flowStateAllowedEventService.isAllowedOnState(
+                                                      flowState.fullName(),
+                                                      caseEvent
+                                                  ))
             );
         }
 
@@ -1048,6 +1105,1050 @@ class FlowStateAllowedEventServiceTest {
         })
         void shouldReturnFalse_whenEventIsNotAllowedAtGivenState(FlowState.Main flowState, CaseEvent caseEvent) {
             assertFalse(flowStateAllowedEventService.isAllowedOnState(flowState.fullName(), caseEvent));
+        }
+    }
+
+    static class GetAllowedCaseEventForFlowStateArgumentsSpec implements ArgumentsProvider {
+
+        @Override
+        @SneakyThrows
+        public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
+            return Stream.of(
+                of(
+                    DRAFT,
+                    new CaseEvent[] {
+                        CREATE_CLAIM,
+                        CREATE_LIP_CLAIM,
+                        migrateCase
+                    }
+                ),
+                of(
+                    SPEC_DRAFT,
+                    new CaseEvent[] {
+                        CREATE_CLAIM_SPEC,
+                        CREATE_LIP_CLAIM,
+                        migrateCase
+                    }
+                ),
+                of(
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL,
+                    new CaseEvent[] {
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
+                        ADD_CASE_NOTE,
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO,
+                        NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
+                        migrateCase,
+                        CREATE_CLAIM_SPEC_AFTER_PAYMENT,
+                        CREATE_CLAIM_AFTER_PAYMENT,
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        DISCONTINUE_CLAIM_CLAIMANT,
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        RECORD_JUDGMENT,
+                        EDIT_JUDGMENT,
+                        JUDGMENT_PAID_IN_FULL,
+                        SET_ASIDE_JUDGMENT
+                    }
+                ),
+                of(
+                    CLAIM_ISSUED_PAYMENT_FAILED,
+                    new CaseEvent[] {
+                        ENTER_BREATHING_SPACE_SPEC,
+                        LIFT_BREATHING_SPACE_SPEC,
+                        RESUBMIT_CLAIM,
+                        WITHDRAW_CLAIM,
+                        DISCONTINUE_CLAIM,
+                        AMEND_PARTY_DETAILS,
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO,
+                        NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
+                        migrateCase,
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        DISCONTINUE_CLAIM_CLAIMANT,
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        RECORD_JUDGMENT,
+                        EDIT_JUDGMENT,
+                        JUDGMENT_PAID_IN_FULL,
+                        SET_ASIDE_JUDGMENT
+                    }
+                ),
+                of(
+                    CLAIM_ISSUED,
+                    new CaseEvent[] {
+                        ENTER_BREATHING_SPACE_SPEC,
+                        LIFT_BREATHING_SPACE_SPEC,
+                        NOTIFY_DEFENDANT_OF_CLAIM,
+                        ADD_DEFENDANT_LITIGATION_FRIEND,
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        ADD_OR_AMEND_CLAIM_DOCUMENTS,
+                        ADD_CASE_NOTE,
+                        AMEND_PARTY_DETAILS,
+                        ACKNOWLEDGEMENT_OF_SERVICE,
+                        INFORM_AGREED_EXTENSION_DATE,
+                        INFORM_AGREED_EXTENSION_DATE_SPEC,
+                        NOTIFY_DEFENDANT_CUI_FOR_DEADLINE_EXTENSION,
+                        NOTIFY_CLAIMANT_CUI_FOR_DEADLINE_EXTENSION,
+                        EXTEND_RESPONSE_DEADLINE,
+                        DEFENDANT_RESPONSE_SPEC,
+                        DEFENDANT_RESPONSE_CUI,
+                        RESET_PIN,
+                        DISMISS_CLAIM,
+                        DISCONTINUE_CLAIM,
+                        WITHDRAW_CLAIM,
+                        DEFAULT_JUDGEMENT_SPEC,
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO,
+                        HEARING_SCHEDULED,
+                        NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
+                        EVIDENCE_UPLOAD_JUDGE,
+                        TRIAL_READY_CHECK,
+                        TRIAL_READY_NOTIFICATION,
+                        MOVE_TO_DECISION_OUTCOME,
+                        CREATE_CLAIM_SPEC_AFTER_PAYMENT,
+                        CREATE_CLAIM_AFTER_PAYMENT,
+                        EVIDENCE_UPLOAD_APPLICANT,
+                        migrateCase,
+                        EVIDENCE_UPLOAD_RESPONDENT,
+                        BUNDLE_CREATION_NOTIFICATION,
+                        CHANGE_SOLICITOR_EMAIL,
+                        LIP_CLAIM_SETTLED,
+                        asyncStitchingComplete,
+                        TRANSFER_ONLINE_CASE,
+                        INVALID_HWF_REFERENCE,
+                        RECORD_JUDGMENT,
+                        EDIT_JUDGMENT,
+                        JUDGMENT_PAID_IN_FULL,
+                        SET_ASIDE_JUDGMENT,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        DISCONTINUE_CLAIM_CLAIMANT,
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        STAY_CASE,
+                        DISMISS_CASE,
+                        MANAGE_STAY
+                    }
+                ),
+                of(
+                    CLAIM_NOTIFIED,
+                    new CaseEvent[] {
+                        ACKNOWLEDGEMENT_OF_SERVICE,
+                        ENTER_BREATHING_SPACE_SPEC,
+                        LIFT_BREATHING_SPACE_SPEC,
+                        INFORM_AGREED_EXTENSION_DATE,
+                        INFORM_AGREED_EXTENSION_DATE_SPEC,
+                        EXTEND_RESPONSE_DEADLINE,
+                        DEFENDANT_RESPONSE_SPEC,
+                        DEFENDANT_RESPONSE_CUI,
+                        RESET_PIN,
+                        NOTIFY_DEFENDANT_OF_CLAIM_DETAILS,
+                        ADD_DEFENDANT_LITIGATION_FRIEND,
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        ADD_OR_AMEND_CLAIM_DOCUMENTS,
+                        AMEND_PARTY_DETAILS,
+                        DISMISS_CLAIM,
+                        DISCONTINUE_CLAIM,
+                        WITHDRAW_CLAIM,
+                        DEFAULT_JUDGEMENT_SPEC,
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO,
+                        NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
+                        HEARING_SCHEDULED,
+                        TRIAL_READY_CHECK,
+                        TRIAL_READY_NOTIFICATION,
+                        MOVE_TO_DECISION_OUTCOME,
+                        EVIDENCE_UPLOAD_JUDGE,
+                        EVIDENCE_UPLOAD_APPLICANT,
+                        migrateCase,
+                        EVIDENCE_UPLOAD_RESPONDENT,
+                        BUNDLE_CREATION_NOTIFICATION,
+                        CHANGE_SOLICITOR_EMAIL,
+                        LIP_CLAIM_SETTLED,
+                        asyncStitchingComplete,
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        DISCONTINUE_CLAIM_CLAIMANT,
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        STAY_CASE,
+                        DISMISS_CASE,
+                        MANAGE_STAY
+                    }
+                ),
+                of(
+                    NOTIFICATION_ACKNOWLEDGED,
+                    new CaseEvent[] {
+                        DEFENDANT_RESPONSE,
+                        ENTER_BREATHING_SPACE_SPEC,
+                        LIFT_BREATHING_SPACE_SPEC,
+                        ADD_DEFENDANT_LITIGATION_FRIEND,
+                        WITHDRAW_CLAIM,
+                        DISCONTINUE_CLAIM,
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        INFORM_AGREED_EXTENSION_DATE,
+                        AMEND_PARTY_DETAILS,
+                        DISMISS_CLAIM,
+                        DEFAULT_JUDGEMENT_SPEC,
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO,
+                        NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
+                        migrateCase,
+                        CHANGE_SOLICITOR_EMAIL,
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        DISCONTINUE_CLAIM_CLAIMANT,
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        STAY_CASE,
+                        DISMISS_CASE,
+                        MANAGE_STAY
+                    }
+                ),
+                of(
+                    NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION,
+                    new CaseEvent[] {
+                        DEFENDANT_RESPONSE,
+                        ENTER_BREATHING_SPACE_SPEC,
+                        LIFT_BREATHING_SPACE_SPEC,
+                        ADD_DEFENDANT_LITIGATION_FRIEND,
+                        WITHDRAW_CLAIM,
+                        DISCONTINUE_CLAIM,
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        AMEND_PARTY_DETAILS,
+                        DISMISS_CLAIM,
+                        DEFAULT_JUDGEMENT_SPEC,
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO,
+                        NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
+                        migrateCase,
+                        CHANGE_SOLICITOR_EMAIL,
+                        LIP_CLAIM_SETTLED,
+                        TRANSFER_ONLINE_CASE,
+                        GENERATE_DIRECTIONS_ORDER,
+                        EVIDENCE_UPLOAD_APPLICANT,
+                        EVIDENCE_UPLOAD_RESPONDENT,
+                        EVIDENCE_UPLOAD_JUDGE,
+                        TRIAL_READINESS,
+                        HEARING_SCHEDULED,
+                        TRIAL_READY_CHECK,
+                        TRIAL_READY_NOTIFICATION,
+                        MOVE_TO_DECISION_OUTCOME,
+                        HEARING_FEE_UNPAID,
+                        HEARING_FEE_PAID,
+                        BUNDLE_CREATION_NOTIFICATION,
+                        COURT_OFFICER_ORDER,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        DISCONTINUE_CLAIM_CLAIMANT,
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        STAY_CASE,
+                        DISMISS_CASE,
+                        MANAGE_STAY
+                    }
+                ),
+                of(
+                    FULL_DEFENCE,
+                    new CaseEvent[] {
+                        CLAIMANT_RESPONSE,
+                        CLAIMANT_RESPONSE_SPEC,
+                        ENTER_BREATHING_SPACE_SPEC,
+                        LIFT_BREATHING_SPACE_SPEC,
+                        WITHDRAW_CLAIM,
+                        ADD_DEFENDANT_LITIGATION_FRIEND,
+                        DISCONTINUE_CLAIM,
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        AMEND_PARTY_DETAILS,
+                        TAKE_CASE_OFFLINE,
+                        APPLICATION_OFFLINE_UPDATE_CLAIM,
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO,
+                        NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
+                        migrateCase,
+                        DEFAULT_JUDGEMENT_SPEC,
+                        CHANGE_SOLICITOR_EMAIL,
+                        LIP_CLAIM_SETTLED,
+                        CLAIMANT_RESPONSE_CUI,
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        DISCONTINUE_CLAIM_CLAIMANT,
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        STAY_CASE,
+                        DISMISS_CASE,
+                        MANAGE_STAY,
+                        ADD_CASE_NOTE
+                    }
+                ),
+                of(
+                    FULL_ADMISSION,
+                    new CaseEvent[] {
+                        CLAIMANT_RESPONSE_SPEC,
+                        ENTER_BREATHING_SPACE_SPEC,
+                        LIFT_BREATHING_SPACE_SPEC,
+                        WITHDRAW_CLAIM,
+                        ADD_DEFENDANT_LITIGATION_FRIEND,
+                        DISCONTINUE_CLAIM,
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        AMEND_PARTY_DETAILS,
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO,
+                        NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
+                        APPLICATION_OFFLINE_UPDATE_CLAIM,
+                        migrateCase,
+                        DEFAULT_JUDGEMENT_SPEC,
+                        REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                        CHANGE_SOLICITOR_EMAIL,
+                        LIP_CLAIM_SETTLED,
+                        CLAIMANT_RESPONSE_CUI,
+                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        DISCONTINUE_CLAIM_CLAIMANT,
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        STAY_CASE,
+                        DISMISS_CASE,
+                        MANAGE_STAY,
+                        ADD_CASE_NOTE
+                    }
+                ),
+                of(
+                    PART_ADMISSION,
+                    new CaseEvent[] {
+                        DEFENDANT_RESPONSE_CUI,
+                        CLAIMANT_RESPONSE_SPEC,
+                        CLAIMANT_RESPONSE_CUI,
+                        ENTER_BREATHING_SPACE_SPEC,
+                        LIFT_BREATHING_SPACE_SPEC,
+                        WITHDRAW_CLAIM,
+                        ADD_DEFENDANT_LITIGATION_FRIEND,
+                        DISCONTINUE_CLAIM,
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        AMEND_PARTY_DETAILS,
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO,
+                        NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
+                        APPLICATION_OFFLINE_UPDATE_CLAIM,
+                        migrateCase,
+                        DEFAULT_JUDGEMENT_SPEC,
+                        CHANGE_SOLICITOR_EMAIL,
+                        REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                        LIP_CLAIM_SETTLED,
+                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        DISCONTINUE_CLAIM_CLAIMANT,
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        STAY_CASE,
+                        DISMISS_CASE,
+                        MANAGE_STAY,
+                        MORE_INFORMATION_HWF,
+                        FEE_PAYMENT_OUTCOME,
+                        NO_REMISSION_HWF,
+                        PARTIAL_REMISSION_HWF_GRANTED,
+                        FULL_REMISSION_HWF,
+                        UPDATE_HELP_WITH_FEE_NUMBER,
+                        INVALID_HWF_REFERENCE,
+                        ADD_CASE_NOTE
+                    }
+                ),
+                of(
+                    DIVERGENT_RESPOND_GO_OFFLINE,
+                    new CaseEvent[] {
+                        APPLICATION_OFFLINE_UPDATE_CLAIM,
+                        migrateCase
+                    }
+                ),
+                of(
+                    COUNTER_CLAIM,
+                    new CaseEvent[] {
+                        ENTER_BREATHING_SPACE_SPEC,
+                        LIFT_BREATHING_SPACE_SPEC,
+                        WITHDRAW_CLAIM,
+                        ADD_DEFENDANT_LITIGATION_FRIEND,
+                        DISCONTINUE_CLAIM,
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        AMEND_PARTY_DETAILS,
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO,
+                        NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
+                        migrateCase,
+                        CHANGE_SOLICITOR_EMAIL,
+                        LIP_CLAIM_SETTLED,
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        DISCONTINUE_CLAIM_CLAIMANT,
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                    }
+                ),
+                of(
+                    PART_ADMIT_REJECT_REPAYMENT,
+                    new CaseEvent[] {
+                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                        ADD_CASE_NOTE
+                    }
+                ),
+                of(
+                    PART_ADMIT_PROCEED,
+                    new CaseEvent[] {
+                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        ADD_CASE_NOTE
+                    }
+                ),
+                of(
+                    PART_ADMIT_NOT_PROCEED,
+                    new CaseEvent[] {
+                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        ADD_CASE_NOTE
+                    }
+                ),
+                of(
+                    PART_ADMIT_PAY_IMMEDIATELY,
+                    new CaseEvent[] {
+                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        CLAIMANT_RESPONSE_CUI,
+                        LIP_CLAIM_SETTLED,
+                        STAY_CASE,
+                        DISMISS_CASE,
+                        MANAGE_STAY,
+                        ADD_CASE_NOTE
+                    }
+                ),
+                of(
+                    PART_ADMIT_AGREE_SETTLE,
+                    new CaseEvent[] {
+                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        ADD_CASE_NOTE
+                    }
+                ),
+                of(
+                    FULL_ADMIT_PAY_IMMEDIATELY,
+                    new CaseEvent[] {
+                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        ADD_CASE_NOTE
+                    }
+                ),
+                of(
+                    FULL_ADMIT_PROCEED,
+                    new CaseEvent[] {
+                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT
+                    }
+                ),
+                of(
+                    FULL_ADMIT_NOT_PROCEED,
+                    new CaseEvent[] {
+                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        ADD_CASE_NOTE
+                    }
+                ),
+                of(
+                    FULL_ADMIT_JUDGMENT_ADMISSION,
+                    new CaseEvent[] {
+                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        EDIT_JUDGMENT,
+                        JUDGMENT_PAID_IN_FULL,
+                        SET_ASIDE_JUDGMENT,
+                        ADD_CASE_NOTE
+                    }
+                ),
+                of(
+                    FULL_DEFENCE_PROCEED,
+                    new CaseEvent[] {
+                        ADD_DEFENDANT_LITIGATION_FRIEND,
+                        ENTER_BREATHING_SPACE_SPEC,
+                        LIFT_BREATHING_SPACE_SPEC,
+                        WITHDRAW_CLAIM,
+                        DISCONTINUE_CLAIM,
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        AMEND_PARTY_DETAILS,
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO,
+                        NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
+                        HEARING_SCHEDULED,
+                        TRIAL_READY_CHECK,
+                        TRIAL_READY_NOTIFICATION,
+                        MOVE_TO_DECISION_OUTCOME,
+                        HEARING_FEE_UNPAID,
+                        HEARING_FEE_PAID,
+                        REFER_TO_JUDGE,
+                        migrateCase,
+                        TAKE_CASE_OFFLINE,
+                        GENERATE_DIRECTIONS_ORDER,
+                        TRIAL_READINESS,
+                        EVIDENCE_UPLOAD_APPLICANT,
+                        EVIDENCE_UPLOAD_RESPONDENT,
+                        EVIDENCE_UPLOAD_JUDGE,
+                        TRIAL_READINESS,
+                        BUNDLE_CREATION_NOTIFICATION,
+                        ADD_CASE_NOTE,
+                        CHANGE_SOLICITOR_EMAIL,
+                        ADD_UNAVAILABLE_DATES,
+                        SET_ASIDE_JUDGMENT,
+                        JUDGMENT_PAID_IN_FULL,
+                        REFER_JUDGE_DEFENCE_RECEIVED,
+                        RECORD_JUDGMENT,
+                        LIP_CLAIM_SETTLED,
+                        TRANSFER_ONLINE_CASE,
+                        asyncStitchingComplete,
+                        CLAIMANT_RESPONSE_CUI,
+                        UPLOAD_MEDIATION_DOCUMENTS,
+                        CUI_UPLOAD_MEDIATION_DOCUMENTS,
+                        REQUEST_FOR_RECONSIDERATION,
+                        DECISION_ON_RECONSIDERATION_REQUEST,
+                        EDIT_JUDGMENT,
+                        COURT_OFFICER_ORDER,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        DISCONTINUE_CLAIM_CLAIMANT,
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        STAY_CASE,
+                        DISMISS_CASE,
+                        MANAGE_STAY,
+                        MORE_INFORMATION_HWF,
+                        FEE_PAYMENT_OUTCOME,
+                        NO_REMISSION_HWF,
+                        PARTIAL_REMISSION_HWF_GRANTED,
+                        FULL_REMISSION_HWF,
+                        UPDATE_HELP_WITH_FEE_NUMBER,
+                        INVALID_HWF_REFERENCE
+                    }
+                ),
+                of(
+                    FULL_DEFENCE_NOT_PROCEED,
+                    new CaseEvent[] {
+                        ADD_DEFENDANT_LITIGATION_FRIEND,
+                        ENTER_BREATHING_SPACE_SPEC,
+                        LIFT_BREATHING_SPACE_SPEC,
+                        WITHDRAW_CLAIM,
+                        DISCONTINUE_CLAIM,
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        AMEND_PARTY_DETAILS,
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO,
+                        NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
+                        REFER_TO_JUDGE,
+                        migrateCase,
+                        CHANGE_SOLICITOR_EMAIL,
+                        LIP_CLAIM_SETTLED,
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        DISCONTINUE_CLAIM_CLAIMANT,
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        ADD_CASE_NOTE
+                    }
+                ),
+                of(
+                    CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE,
+                    new CaseEvent[] {
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        migrateCase
+                    }
+                ),
+                of(
+                    CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE,
+                    new CaseEvent[] {
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        migrateCase
+                    }
+                ),
+                of(
+                    PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA,
+                    new CaseEvent[] {
+                        TAKE_CASE_OFFLINE,
+                        APPLICATION_OFFLINE_UPDATE_CLAIM,
+                        migrateCase,
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        DISCONTINUE_CLAIM_CLAIMANT,
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                    }
+                ),
+                of(
+                    PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA,
+                    new CaseEvent[] {
+                        DISMISS_CLAIM,
+                        migrateCase,
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        DISCONTINUE_CLAIM_CLAIMANT,
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                    }
+                ),
+                of(
+                    PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA,
+                    new CaseEvent[] {
+                        DISMISS_CLAIM,
+                        migrateCase,
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        DISCONTINUE_CLAIM_CLAIMANT,
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                    }
+                ),
+                of(
+                    PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA,
+                    new CaseEvent[] {
+                        DISMISS_CLAIM,
+                        migrateCase,
+                        ADD_CASE_NOTE
+                    }
+                ),
+                of(
+                    AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED,
+                    new CaseEvent[] {
+                        DEFENDANT_RESPONSE_SPEC,
+                        DEFENDANT_RESPONSE_CUI,
+                        RESET_PIN,
+                        ACKNOWLEDGE_CLAIM,
+                        ENTER_BREATHING_SPACE_SPEC,
+                        LIFT_BREATHING_SPACE_SPEC,
+                        INFORM_AGREED_EXTENSION_DATE,
+                        ADD_DEFENDANT_LITIGATION_FRIEND,
+                        WITHDRAW_CLAIM,
+                        DISCONTINUE_CLAIM,
+                        AMEND_PARTY_DETAILS,
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        DISMISS_CLAIM,
+                        ADD_CASE_NOTE,
+                        CHANGE_SOLICITOR_EMAIL,
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO,
+                        NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
+                        migrateCase,
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        DISCONTINUE_CLAIM_CLAIMANT,
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        STAY_CASE,
+                        DISMISS_CASE,
+                        MANAGE_STAY
+                    }
+                ),
+                of(
+                    AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED,
+                    new CaseEvent[] {
+                        DEFENDANT_RESPONSE_SPEC,
+                        DEFENDANT_RESPONSE_CUI,
+                        RESET_PIN,
+                        migrateCase,
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        DISCONTINUE_CLAIM_CLAIMANT,
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        STAY_CASE,
+                        DISMISS_CASE,
+                        MANAGE_STAY
+                    }
+                ),
+                of(
+                    IN_MEDIATION,
+                    new CaseEvent[] {
+                        MEDIATION_SUCCESSFUL,
+                        MEDIATION_UNSUCCESSFUL,
+                        CREATE_SDO,
+                        CHANGE_SOLICITOR_EMAIL,
+                        ADD_UNAVAILABLE_DATES,
+                        LIP_CLAIM_SETTLED,
+                        INITIATE_GENERAL_APPLICATION,
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        DISCONTINUE_CLAIM_CLAIMANT,
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        STAY_CASE,
+                        DISMISS_CASE,
+                        MANAGE_STAY
+                    }
+                ),
+                of(
+                    IN_HEARING_READINESS,
+                    new CaseEvent[] {
+                        ADD_DEFENDANT_LITIGATION_FRIEND,
+                        ENTER_BREATHING_SPACE_SPEC,
+                        LIFT_BREATHING_SPACE_SPEC,
+                        WITHDRAW_CLAIM,
+                        DISCONTINUE_CLAIM,
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        AMEND_PARTY_DETAILS,
+                        ADD_CASE_NOTE,
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO,
+                        NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
+                        HEARING_SCHEDULED,
+                        TRIAL_READY_CHECK,
+                        TRIAL_READY_NOTIFICATION,
+                        MOVE_TO_DECISION_OUTCOME,
+                        HEARING_FEE_UNPAID,
+                        HEARING_FEE_PAID,
+                        REFER_TO_JUDGE,
+                        migrateCase,
+                        TAKE_CASE_OFFLINE,
+                        GENERATE_DIRECTIONS_ORDER,
+                        TRIAL_READINESS,
+                        EVIDENCE_UPLOAD_APPLICANT,
+                        EVIDENCE_UPLOAD_RESPONDENT,
+                        EVIDENCE_UPLOAD_JUDGE,
+                        TRIAL_READINESS,
+                        BUNDLE_CREATION_NOTIFICATION,
+                        CHANGE_SOLICITOR_EMAIL,
+                        ADD_UNAVAILABLE_DATES,
+                        LIP_CLAIM_SETTLED,
+                        asyncStitchingComplete,
+                        UPLOAD_MEDIATION_DOCUMENTS,
+                        MORE_INFORMATION_HWF,
+                        FEE_PAYMENT_OUTCOME,
+                        NO_REMISSION_HWF,
+                        CUI_UPLOAD_MEDIATION_DOCUMENTS,
+                        TRANSFER_ONLINE_CASE,
+                        PARTIAL_REMISSION_HWF_GRANTED,
+                        FULL_REMISSION_HWF,
+                        UPDATE_HELP_WITH_FEE_NUMBER,
+                        INVALID_HWF_REFERENCE,
+                        COURT_OFFICER_ORDER,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        DISCONTINUE_CLAIM_CLAIMANT,
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        AMEND_RESTITCH_BUNDLE,
+                        STAY_CASE,
+                        DISMISS_CASE,
+                        MANAGE_STAY
+                    }
+                ),
+                of(
+                    PART_ADMIT_NOT_SETTLED_NO_MEDIATION,
+                    new CaseEvent[] {
+                        ADD_DEFENDANT_LITIGATION_FRIEND,
+                        ENTER_BREATHING_SPACE_SPEC,
+                        LIFT_BREATHING_SPACE_SPEC,
+                        WITHDRAW_CLAIM,
+                        DISCONTINUE_CLAIM,
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        AMEND_PARTY_DETAILS,
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO,
+                        NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
+                        HEARING_SCHEDULED,
+                        TRIAL_READY_CHECK,
+                        TRIAL_READY_NOTIFICATION,
+                        MOVE_TO_DECISION_OUTCOME,
+                        HEARING_FEE_UNPAID,
+                        HEARING_FEE_PAID,
+                        REFER_TO_JUDGE,
+                        migrateCase,
+                        TAKE_CASE_OFFLINE,
+                        GENERATE_DIRECTIONS_ORDER,
+                        TRIAL_READINESS,
+                        EVIDENCE_UPLOAD_APPLICANT,
+                        EVIDENCE_UPLOAD_RESPONDENT,
+                        EVIDENCE_UPLOAD_JUDGE,
+                        TRIAL_READINESS,
+                        BUNDLE_CREATION_NOTIFICATION,
+                        ADD_CASE_NOTE,
+                        CHANGE_SOLICITOR_EMAIL,
+                        ADD_UNAVAILABLE_DATES,
+                        LIP_CLAIM_SETTLED,
+                        asyncStitchingComplete,
+                        CLAIMANT_RESPONSE_CUI,
+                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        TRANSFER_ONLINE_CASE,
+                        COURT_OFFICER_ORDER,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        DISCONTINUE_CLAIM_CLAIMANT,
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        STAY_CASE,
+                        DISMISS_CASE,
+                        MANAGE_STAY,
+                        MORE_INFORMATION_HWF,
+                        FEE_PAYMENT_OUTCOME,
+                        NO_REMISSION_HWF,
+                        PARTIAL_REMISSION_HWF_GRANTED,
+                        FULL_REMISSION_HWF,
+                        UPDATE_HELP_WITH_FEE_NUMBER,
+                        INVALID_HWF_REFERENCE,
+                        AMEND_RESTITCH_BUNDLE
+                    }
+                ),
+                of(
+                    RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL,
+                    new CaseEvent[] {
+                        CHANGE_SOLICITOR_EMAIL,
+                        EXTEND_RESPONSE_DEADLINE,
+                        LIP_CLAIM_SETTLED,
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        DISCONTINUE_CLAIM_CLAIMANT,
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        STAY_CASE,
+                        DISMISS_CASE,
+                        MANAGE_STAY,
+                        ADD_CASE_NOTE
+                    }
+                ),
+                of(
+                    MEDIATION_UNSUCCESSFUL_PROCEED,
+                    new CaseEvent[] {
+                        ADD_DEFENDANT_LITIGATION_FRIEND,
+                        ENTER_BREATHING_SPACE_SPEC,
+                        LIFT_BREATHING_SPACE_SPEC,
+                        WITHDRAW_CLAIM,
+                        DISCONTINUE_CLAIM,
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        AMEND_PARTY_DETAILS,
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO,
+                        NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
+                        HEARING_SCHEDULED,
+                        TRIAL_READY_CHECK,
+                        TRIAL_READY_NOTIFICATION,
+                        MOVE_TO_DECISION_OUTCOME,
+                        HEARING_FEE_UNPAID,
+                        HEARING_FEE_PAID,
+                        REFER_TO_JUDGE,
+                        migrateCase,
+                        TAKE_CASE_OFFLINE,
+                        GENERATE_DIRECTIONS_ORDER,
+                        TRIAL_READINESS,
+                        EVIDENCE_UPLOAD_APPLICANT,
+                        EVIDENCE_UPLOAD_RESPONDENT,
+                        EVIDENCE_UPLOAD_JUDGE,
+                        TRIAL_READINESS,
+                        BUNDLE_CREATION_NOTIFICATION,
+                        CHANGE_SOLICITOR_EMAIL,
+                        ADD_UNAVAILABLE_DATES,
+                        asyncStitchingComplete,
+                        UPLOAD_MEDIATION_DOCUMENTS,
+                        CUI_UPLOAD_MEDIATION_DOCUMENTS,
+                        TRANSFER_ONLINE_CASE,
+                        COURT_OFFICER_ORDER,
+                        ADD_CASE_NOTE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        DISCONTINUE_CLAIM_CLAIMANT,
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        LIP_CLAIM_SETTLED,
+                        STAY_CASE,
+                        DISMISS_CASE,
+                        MANAGE_STAY
+                    }
+                ),
+                of(
+                    PREPARE_FOR_HEARING_CONDUCT_HEARING,
+                    new CaseEvent[] {
+                        asyncStitchingComplete,
+                        UPLOAD_MEDIATION_DOCUMENTS,
+                        CUI_UPLOAD_MEDIATION_DOCUMENTS,
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        DISCONTINUE_CLAIM_CLAIMANT,
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        LIP_CLAIM_SETTLED,
+                        AMEND_RESTITCH_BUNDLE,
+                        STAY_CASE,
+                        DISMISS_CASE,
+                        MANAGE_STAY
+                    }
+                ),
+                of(
+                    TAKEN_OFFLINE_BY_STAFF,
+                    new CaseEvent[] {
+                        ADD_CASE_NOTE,
+                        APPLICATION_OFFLINE_UPDATE_CLAIM,
+                        migrateCase
+                    }
+                ),
+                of(
+                    TAKEN_OFFLINE_UNREGISTERED_DEFENDANT,
+                    new CaseEvent[] {
+                        ADD_CASE_NOTE,
+                        APPLICATION_OFFLINE_UPDATE_CLAIM,
+                        migrateCase
+                    }
+                ),
+                of(
+                    TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT,
+                    new CaseEvent[] {
+                        ADD_CASE_NOTE,
+                        APPLICATION_OFFLINE_UPDATE_CLAIM,
+                        migrateCase
+                    }
+                ),
+                of(
+                    TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT,
+                    new CaseEvent[] {
+                        ADD_CASE_NOTE,
+                        APPLICATION_OFFLINE_UPDATE_CLAIM,
+                        migrateCase
+                    }
+                ),
+                of(
+                    TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE,
+                    new CaseEvent[] {
+                        ADD_CASE_NOTE,
+                        APPLICATION_OFFLINE_UPDATE_CLAIM,
+                        migrateCase
+                    }
+                ),
+                of(
+                    TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED,
+                    new CaseEvent[] {
+                        ADD_CASE_NOTE,
+                        APPLICATION_OFFLINE_UPDATE_CLAIM,
+                        migrateCase
+                    }
+                ),
+                of(
+                    TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED,
+                    new CaseEvent[] {
+                        ADD_CASE_NOTE,
+                        APPLICATION_OFFLINE_UPDATE_CLAIM,
+                        migrateCase
+                    }
+                ),
+                of(
+                    TAKEN_OFFLINE_SDO_NOT_DRAWN,
+                    new CaseEvent[] {
+                        ADD_CASE_NOTE,
+                        migrateCase
+                    }
+                ),
+                of(
+                    TAKEN_OFFLINE_AFTER_SDO,
+                    new CaseEvent[] {
+                        ADD_CASE_NOTE,
+                        AMEND_PARTY_DETAILS
+                    }
+                ),
+                of(
+                    PART_ADMIT_AGREE_REPAYMENT,
+                    new CaseEvent[] {
+                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        LIP_CLAIM_SETTLED,
+                        DISCONTINUE_CLAIM_CLAIMANT,
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        ADD_CASE_NOTE
+                    }
+                ),
+                of(
+                    FULL_ADMIT_REJECT_REPAYMENT,
+                    new CaseEvent[] {
+                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                        LIP_CLAIM_SETTLED,
+                        ADD_CASE_NOTE
+                    }
+                ),
+                of(
+                    FULL_ADMIT_AGREE_REPAYMENT,
+                    new CaseEvent[] {
+                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                        TRANSFER_ONLINE_CASE,
+                        EDIT_JUDGMENT,
+                        JUDGMENT_PAID_IN_FULL,
+                        SET_ASIDE_JUDGMENT,
+                        SETTLE_CLAIM,
+                        LIP_CLAIM_SETTLED,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        DISCONTINUE_CLAIM_CLAIMANT,
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        STAY_CASE,
+                        DISMISS_CASE,
+                        MANAGE_STAY,
+                        ADD_CASE_NOTE
+                    }
+                ),
+                of(
+                    PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC,
+                    new CaseEvent[] {
+                        UPLOAD_TRANSLATED_DOCUMENT,
+                        MORE_INFORMATION_HWF,
+                        PARTIAL_REMISSION_HWF_GRANTED,
+                        FEE_PAYMENT_OUTCOME,
+                        FULL_REMISSION_HWF,
+                        UPDATE_HELP_WITH_FEE_NUMBER,
+                        INVALID_HWF_REFERENCE,
+                        NO_REMISSION_HWF,
+                        LIP_CLAIM_SETTLED,
+                        ADD_CASE_NOTE
+                    }
+                ),
+                of(
+                    CASE_STAYED,
+                    new CaseEvent[] {
+                        INITIATE_GENERAL_APPLICATION,
+                        ADD_UNAVAILABLE_DATES,
+                        CHANGE_SOLICITOR_EMAIL,
+                        ADD_CASE_NOTE
+                    }
+                ),
+                of(
+                    SIGN_SETTLEMENT_AGREEMENT,
+                    new CaseEvent[] {
+                        REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                        LIP_CLAIM_SETTLED,
+                        ADD_CASE_NOTE
+                    }
+                ),
+                of(
+                    CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE,
+                    new CaseEvent[] {
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        ADD_CASE_NOTE
+                    }
+                )
+            );
+        }
+    }
+
+    @Nested
+    class IsEventAllowedOnFlowStateSpec {
+
+        @ParameterizedTest
+        @ArgumentsSource(GetAllowedCaseEventForFlowStateArgumentsSpec.class)
+        void shouldReturnTrue_whenEventIsAllowedAtGivenState(FlowState.Main flowState, CaseEvent... caseEvents) {
+            Arrays.stream(caseEvents).forEach(caseEvent ->
+                                                  assertTrue(flowStateAllowedEventService.isAllowedOnStateForSpec(
+                                                      flowState.fullName(),
+                                                      caseEvent
+                                                  ))
+            );
         }
     }
 
@@ -1205,6 +2306,24 @@ class FlowStateAllowedEventServiceTest {
                         FULL_DEFENCE_PROCEED.fullName(),
                         IN_HEARING_READINESS.fullName()
                     }
+                ),
+                of(
+                    MANAGE_STAY,
+                    new String[] {
+                        NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
+                        FULL_ADMISSION.fullName(),
+                        CLAIM_DETAILS_NOTIFIED.fullName(),
+                        CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
+                        IN_MEDIATION.fullName(),
+                        NOTIFICATION_ACKNOWLEDGED.fullName(),
+                        AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
+                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
+                        PART_ADMISSION.fullName(),
+                        FULL_DEFENCE_NOT_PROCEED.fullName(),
+                        FULL_DEFENCE.fullName(),
+                        FULL_DEFENCE_PROCEED.fullName(),
+                        IN_HEARING_READINESS.fullName()
+                    }
                 )
 
             );
@@ -1299,7 +2418,7 @@ class FlowStateAllowedEventServiceTest {
                 ),
                 of(false, CaseDetailsBuilder.builder().atStateProceedsOffline1v1().build(), AMEND_PARTY_DETAILS),
                 of(true, CaseDetailsBuilder.builder().atStateAwaitingRespondentAcknowledgement1v1().build(),
-                    AMEND_PARTY_DETAILS
+                   AMEND_PARTY_DETAILS
                 ),
                 of(
                     true,
