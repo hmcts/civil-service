@@ -114,7 +114,7 @@ allprojects {
       // solves CVE-2022-25857
       dependencySet(
         group: 'org.yaml',
-        version: '2.2'
+        version: '2.3'
       ) {
         entry 'snakeyaml'
       }
@@ -357,7 +357,7 @@ dependencies {
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-openfeign-core'
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.2'
 
-  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.3'
+  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.5'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
   implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.1.7'
@@ -424,7 +424,7 @@ dependencies {
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.15.4'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.15.5'
   testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.14.19'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
