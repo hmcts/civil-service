@@ -1912,7 +1912,8 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
@@ -2144,10 +2145,10 @@ class FlowStateAllowedEventServiceTest {
         @ArgumentsSource(GetAllowedCaseEventForFlowStateArgumentsSpec.class)
         void shouldReturnTrue_whenEventIsAllowedAtGivenState(FlowState.Main flowState, CaseEvent... caseEvents) {
             Arrays.stream(caseEvents).forEach(caseEvent ->
-                                                  assertTrue(flowStateAllowedEventService.isAllowedOnStateForSpec(
-                                                      flowState.fullName(),
-                                                      caseEvent
-                                                  ))
+                assertTrue(flowStateAllowedEventService.isAllowedOnStateForSpec(
+                    flowState.fullName(),
+                    caseEvent
+                ))
             );
         }
     }
