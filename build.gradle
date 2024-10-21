@@ -11,7 +11,7 @@ plugins {
   id 'org.sonarqube' version '5.1.0.4882'
   id 'au.com.dius.pact' version '4.2.14'
   id "io.freefair.lombok" version "8.10.2"
-  id 'com.github.hmcts.rse-cft-lib' version '0.19.1335'
+  id 'com.github.hmcts.rse-cft-lib' version '0.19.1417'
   id "org.flywaydb.flyway" version "10.17.2"
 }
 
@@ -347,7 +347,7 @@ dependencies {
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.4'
   implementation group: 'javax.persistence', name: 'javax.persistence-api'
 
-  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.45.4'
+  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.46.0'
   implementation group: 'org.jdbi', name: 'jdbi3-spring4', version: '3.19.0'
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
@@ -425,7 +425,7 @@ dependencies {
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
   testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.15.5'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.14.19'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.15.5'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
