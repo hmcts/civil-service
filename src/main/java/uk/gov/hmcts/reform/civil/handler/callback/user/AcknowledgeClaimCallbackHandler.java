@@ -92,12 +92,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse populateRespondentCopyObjects(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        var updatedCaseData = caseData.toBuilder()
-            .respondent1Copy(caseData.getRespondent1());
-
-        if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            updatedCaseData.respondent2Copy(caseData.getRespondent2());
-        }
+        var caseDateBuilder = caseData.toBuilder();
 
         // Show error message if defendant tries to submit response again ONE_V_TWO_TWO_LEGAL_REP
         if ((solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORONE)
@@ -122,10 +117,10 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         if (solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
             isRespondent1 = NO;
         }
-        updatedCaseData.solicitorReferencesCopy(caseData.getSolicitorReferences());
-        updatedCaseData.isRespondent1(isRespondent1);
+        caseDateBuilder.solicitorReferencesCopy(caseData.getSolicitorReferences());
+        caseDateBuilder.isRespondent1(isRespondent1);
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.build().toMap(objectMapper))
+            .data(caseDateBuilder.build().toMap(objectMapper))
             .build();
 
     }
@@ -209,7 +204,6 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .respondent1AcknowledgeNotificationDate(time.now())
                 .respondent1ResponseDeadline(newDeadlineRespondent1)
                 .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
-                .respondent1Copy(null)
                 .solicitorReferencesCopy(null)
                 .nextDeadline(newDeadlineRespondent1.toLocalDate())
                 .caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(caseData))
@@ -221,7 +215,6 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .respondent1AcknowledgeNotificationDate(time.now())
                 .respondent1ResponseDeadline(newDeadlineRespondent1)
                 .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
-                .respondent1Copy(null)
                 .solicitorReferencesCopy(null)
                 .respondent1ClaimResponseIntentionType(caseData.getRespondent1ClaimResponseIntentionType())
                 .respondent1ClaimResponseIntentionTypeApplicant2(
@@ -241,8 +234,6 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .respondent1ResponseDeadline(newDeadlineRespondent1)
                 .respondent2ResponseDeadline(newDeadlineRespondent1)
                 .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
-                .respondent1Copy(null)
-                .respondent2Copy(null)
                 .solicitorReferencesCopy(null)
                 .respondent1ClaimResponseIntentionType(caseData.getRespondent1ClaimResponseIntentionType())
                 .respondent2ClaimResponseIntentionType(caseData.getRespondent2ClaimResponseIntentionType())
@@ -256,11 +247,9 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
             caseDataBuilder.respondent1AcknowledgeNotificationDate(time.now())
                 .solicitorReferences(caseData.getSolicitorReferencesCopy())
-                .respondent2(caseData.getRespondent2Copy())
                 .respondent1ClaimResponseIntentionType(caseData.getRespondent1ClaimResponseIntentionType())
                 .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
                 .respondent1ResponseDeadline(newDeadlineRespondent1)
-                .respondent1Copy(null)
                 .solicitorReferencesCopy(null)
                 .isRespondent1(null)
                 .caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(caseData))
@@ -281,8 +270,6 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             caseDataBuilder
                 .respondent2AcknowledgeNotificationDate(time.now())
                 .solicitorReferences(caseData.getSolicitorReferencesCopy())
-                .respondent1Copy(null)
-                .respondent2Copy(null)
                 .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
                 .respondent2ResponseDeadline(newDeadlineRespondent2)
                 .respondent2ClaimResponseIntentionType(caseData.getRespondent2ClaimResponseIntentionType())

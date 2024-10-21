@@ -1129,7 +1129,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         var caseData = callbackParams.getCaseData();
         Set<DefendantResponseShowTag> initialShowTags = getInitialShowTags(callbackParams);
         var updatedCaseData = caseData.toBuilder()
-            .respondent1Copy(caseData.getRespondent1())
             .respondent1ClaimResponseTestForSpec(caseData.getRespondent1ClaimResponseTypeForSpec())
             .respondent2ClaimResponseTestForSpec(caseData.getRespondent2ClaimResponseTypeForSpec())
             .showConditionFlags(initialShowTags);
@@ -1142,7 +1141,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build());
 
         ofNullable(caseData.getRespondent2())
-            .ifPresent(r2 -> updatedCaseData.respondent2Copy(r2)
+            .ifPresent(r2 -> updatedCaseData
                 .respondent2DetailsForClaimDetailsTab(r2.toBuilder().flags(null).build())
             );
 
@@ -1366,16 +1365,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             PersistDataUtils.persistPartyAddress(oldCaseData, caseData);
         }
 
-        if (caseData.getRespondent1Copy() != null) {
-            updatedRespondent1 = caseData.getRespondent1().toBuilder().build();
-            CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-
-            PersistDataUtils.persistFlagsForParties(oldCaseData, caseData, caseDataBuilder);
-        }
-
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
-            .respondent1(updatedRespondent1)
-            .respondent1Copy(null);
+            .respondent1(updatedRespondent1);
 
         if (respondent2HasSameLegalRep(caseData)
             && caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == YES) {
@@ -1385,14 +1376,11 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         }
 
         // if present, persist the 2nd respondent address in the same fashion as above, i.e ignore for 1v1
-        if (ofNullable(caseData.getRespondent2()).isPresent()
-            && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
-            var updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
-                .flags(caseData.getRespondent2Copy().getFlags())
-                .build();
-            updatedData.respondent2(updatedRespondent2).respondent2Copy(null);
-            updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
+        if (ofNullable(caseData.getRespondent2()).isPresent()) {
+            PersistDataUtils.persistPartyAddress(oldCaseData, caseData);
+
+            CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+            PersistDataUtils.persistFlagsForParties(oldCaseData, caseData, caseDataBuilder);
         }
 
         if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
@@ -1435,22 +1423,16 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate))
                 .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
 
-            if (caseData.getRespondent2() != null && caseData.getRespondent2Copy() != null) {
+            if (caseData.getRespondent2() != null) {
                 Party updatedRespondent2;
 
                 if (NO.equals(caseData.getSpecAoSRespondent2HomeAddressRequired())) {
                     updatedRespondent2 = caseData.getRespondent2().toBuilder()
                         .primaryAddress(caseData.getSpecAoSRespondent2HomeAddressDetails()).build();
                 } else {
-                    updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                        .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress()).build();
+                    CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+                    PersistDataUtils.persistFlagsForParties(caseData, oldCaseData, caseDataBuilder);
                 }
-
-                updatedData
-                    .respondent2(updatedRespondent2.toBuilder()
-                                     .flags(caseData.getRespondent2Copy().getFlags()).build())
-                    .respondent2Copy(null);
-                updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
             }
 
             // moving statement of truth value to correct field, this was not possible in mid event.

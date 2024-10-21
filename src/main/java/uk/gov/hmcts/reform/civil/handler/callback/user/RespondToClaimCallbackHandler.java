@@ -181,7 +181,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         }
 
         var updatedCaseData = caseData.toBuilder()
-            .respondent1Copy(caseData.getRespondent1())
             .isRespondent1(isRespondent1);
 
         List<LocationRefData> locations = fetchLocationData(callbackParams);
@@ -216,7 +215,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             updatedCaseData
-                .respondent2Copy(caseData.getRespondent2())
                 .respondent2DetailsForClaimDetailsTab(updatedCaseData.build().getRespondent2()
                                                           .toBuilder().flags(null).build());
         }
@@ -352,11 +350,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (ofNullable(caseData.getRespondent1Copy()).isPresent()
-            && (caseData.getRespondent1Copy().getPrimaryAddress() == null)) {
-            throw new IllegalArgumentException("Primary Address cannot be empty");
-        }
-
         // persist respondent address (ccd issue)
         CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
 
@@ -366,8 +359,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
         PersistDataUtils.persistFlagsForParties(oldCaseData, caseData, caseDataBuilder);
 
-        CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder = caseData.toBuilder()
-            .respondent1Copy(null);
+        CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder = caseData.toBuilder();
 
         LocalDateTime responseDate = time.now();
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
@@ -469,16 +461,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                     .nextDeadline(applicant1Deadline.toLocalDate());
             }
             // if present, persist the 2nd respondent address in the same fashion as above, i.e ignore for 1v1
-            if (ofNullable(caseData.getRespondent2()).isPresent()
-                && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
-                var updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                    .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
-                    .build();
-
-                updatedCaseDataBuilder
-                    .respondent2(updatedRespondent2)
-                    .respondent2Copy(null)
-                    .respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
+            if (ofNullable(caseData.getRespondent2()).isPresent()) {
+                PersistDataUtils.persistPartyAddress(oldCaseData, caseData);
 
                 if (caseData.getRespondent2ResponseDate() == null) {
                     updatedCaseDataBuilder.nextDeadline(caseData.getRespondent2ResponseDeadline().toLocalDate());

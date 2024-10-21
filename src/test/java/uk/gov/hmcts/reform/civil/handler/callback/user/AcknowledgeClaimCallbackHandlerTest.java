@@ -357,8 +357,6 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             String address = "address line 1";
             var expectedAddress = AddressBuilder.defaults().addressLine1(address).build();
             caseData = caseData.toBuilder()
-                .respondent1Copy(caseData.getRespondent1().toBuilder().primaryAddress(expectedAddress).build())
-                .respondent2Copy(caseData.getRespondent2().toBuilder().primaryAddress(expectedAddress).build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             Address testAddress = Address.builder()
@@ -382,7 +380,6 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetNewResponseDeadlineAndUpdateBusinessProcess_whenInvokedFor1v1() {
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
                 .addApplicant2(NO)
                 .addRespondent2(NO)
                 .build();
@@ -420,7 +417,6 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetNewResponseDeadlineAndUpdateBusinessProcess_whenInvokedFor2v1() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
                 .addApplicant2(YES)
                 .applicant2(PartyBuilder.builder().individual().build())
                 .build();

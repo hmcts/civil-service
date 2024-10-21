@@ -76,12 +76,10 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
         var caseData = callbackParams.getCaseData();
         LocalDateTime dateTime = LocalDateTime.now();
         var updatedCaseData = caseData.toBuilder()
-            .respondent1Copy(caseData.getRespondent1())
             .build();
 
         ofNullable(caseData.getRespondent2())
             .ifPresent(r2 -> updatedCaseData.toBuilder()
-                .respondent2Copy(r2)
                 .respondent2DetailsForClaimDetailsTab(r2.toBuilder().flags(null).build()).build());
 
         List<String> errors = new ArrayList<>();
@@ -134,22 +132,10 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
             .respondent1AcknowledgeNotificationDate(time.now())
             .respondent1ResponseDeadline(newResponseDate)
             .businessProcess(BusinessProcess.ready(ACKNOWLEDGEMENT_OF_SERVICE))
-            .respondent1Copy(null)
             .specRespondentCorrespondenceAddressRequired(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())
             .specRespondentCorrespondenceAddressdetails(caseData.getSpecAoSApplicantCorrespondenceAddressdetails())
             .respondentSolicitor1ServiceAddressRequired(caseData.getSpecAoSRespondentCorrespondenceAddressRequired())
             .respondentSolicitor1ServiceAddress(caseData.getSpecAoSRespondentCorrespondenceAddressdetails());
-
-        // if present, persist the 2nd respondent address in the same fashion as above, i.e ignore for 1v1
-        if (ofNullable(caseData.getRespondent2()).isPresent()
-            && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
-            var updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
-                .flags(caseData.getRespondent2Copy().getFlags())
-                .build();
-            caseDataBuilder.respondent2(updatedRespondent2).respondent2Copy(null);
-            caseDataBuilder.respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
-        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
