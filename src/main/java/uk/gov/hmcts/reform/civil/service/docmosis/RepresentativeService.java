@@ -83,6 +83,11 @@ public class RepresentativeService {
             Optional.ofNullable(caseData.getRespondentSolicitor2ServiceAddress())
                 .ifPresent(representativeBuilder::serviceAddress);
 
+            if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                && caseData.getSpecRespondent2CorrespondenceAddressdetails() != null) {
+                representativeBuilder.serviceAddress(caseData.getSpecRespondent2CorrespondenceAddressdetails());
+            }
+
             return representativeBuilder
                 .emailAddress(caseData.getRespondentSolicitor2EmailAddress())
                 .build();

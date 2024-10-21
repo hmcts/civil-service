@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
@@ -38,6 +38,8 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
+import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.helpers.ReferenceNumberAndCourtDetailsPopulator;
+import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.helpers.StatementOfTruthPopulator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 
@@ -55,6 +57,11 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(SpringExtension.class)
+@SpringBootTest(classes = {
+    SealedClaimResponseFormGeneratorForSpec.class,
+    ReferenceNumberAndCourtDetailsPopulator.class,
+    StatementOfTruthPopulator.class,
+})
 public class SealedClaimResponseFormGeneratorForSpecTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
@@ -64,22 +71,24 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
                                                                        .epimmsId("000000").build());
     private static final CaseData CASE_DATA_WITH_RESPONDENT1 = getCaseDataWithRespondent1Data();
     private static final CaseData CASE_DATA_WITH_MULTI_PARTY = getCaseDataWithMultiParty();
-
-    @InjectMocks
+    @Autowired
     private SealedClaimResponseFormGeneratorForSpec generator;
-
-    @Mock
+    @MockBean
     private RepresentativeService representativeService;
-    @Mock
+    @MockBean
     private DocumentGeneratorService documentGeneratorService;
-    @Mock
+    @MockBean
     private DocumentManagementService documentManagementService;
     @MockBean
     private CourtLocationUtils courtLocationUtils;
-    @Mock
+    @MockBean
     private LocationReferenceDataService locationRefDataService;
-    @Mock
+    @MockBean
     private FeatureToggleService featureToggleService;
+    @Autowired
+    private ReferenceNumberAndCourtDetailsPopulator referenceNumberPopulator;
+    @Autowired
+    private StatementOfTruthPopulator statementOfTruthPopulator;
     @Captor
     private ArgumentCaptor<DocmosisTemplates> docmosisTemplatesArgumentCaptor;
     @Captor

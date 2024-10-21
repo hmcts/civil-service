@@ -40,4 +40,6 @@ public class NotificationTemplateEntity implements Serializable {
     private Date createdAt;
     @Schema(name = "time_to_live")
     private String timeToLive;
+    @Schema(name = "deadline_param")
+    private String deadlineParam;
 }

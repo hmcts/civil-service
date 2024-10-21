@@ -1,0 +1,19 @@
+name: Flyway Migration Files
+
+on:
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  validate-timestamps:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout current branch
+        uses: actions/checkout@v3
+
+      - name: Validate Migration Files
+        run: |
+          chmod +x bin/validate-migration-files.sh
+          ./bin/validate-migration-files.sh "${{ github.head_ref }}" "${{ github.base_ref }}"

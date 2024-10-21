@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_STAY;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STAY_LIFTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STAY_UPDATE_REQUESTED;
 
 @Service
 @RequiredArgsConstructor
@@ -73,6 +74,7 @@ public class ManageStayCallbackHandler extends CallbackHandler {
             caseDataBuilder.businessProcess(BusinessProcess.ready(STAY_LIFTED));
             newState = STATE_MAP.getOrDefault(caseData.getPreStayState(), caseData.getCcdState());
         } else {
+            caseDataBuilder.businessProcess(BusinessProcess.ready(STAY_UPDATE_REQUESTED));
             newState = caseData.getCcdState();
         }
 
