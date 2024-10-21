@@ -11,13 +11,16 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimform.ClaimFormGenerator;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.List;
 import java.util.Map;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -36,7 +39,9 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
     );
     private final ObjectMapper objectMapper;
     private final ClaimFormGenerator claimFormGenerator;
+    private final AssignCategoryId assignCategoryId;
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
+    private final AssignCategoryId assignCategoryId;
     private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::generateClaimForm);
 
     @Override
@@ -57,8 +62,12 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
             callbackParams.getParams().get(BEARER_TOKEN).toString(),
             caseEvent
         );
+        assignCategoryId.assignCategoryIdToCaseDocument(caseDocument, "detailsOfClaim");
 
         CaseData updatedCaseData = updateCaseData(caseData, caseDocument, caseEvent);
+
+        assignCategoryId(caseDocument, caseEvent);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
             .build();
@@ -87,5 +96,13 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
         return caseData.toBuilder()
             .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments)
             .build();
+    }
+
+    private void assignCategoryId(CaseDocument caseDocument, CaseEvent caseEvent) {
+        switch (caseEvent) {
+            case GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC, GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC ->
+                assignCategoryId.assignCategoryIdToCaseDocument(caseDocument, DocCategory.CLAIMANT1_DETAILS_OF_CLAIM.getValue());
+            default -> { /* Do nothing */ }
+        }
     }
 }
