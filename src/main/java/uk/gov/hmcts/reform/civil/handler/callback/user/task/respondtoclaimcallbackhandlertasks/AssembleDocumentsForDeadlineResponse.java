@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
@@ -17,6 +18,7 @@ import java.util.List;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
 
 @Component
+@Slf4j
 public class AssembleDocumentsForDeadlineResponse {
 
     private final AssignCategoryId assignCategoryId;
@@ -26,6 +28,7 @@ public class AssembleDocumentsForDeadlineResponse {
     }
 
     void assembleResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+        log.info("Assembling response documents for case ID: {}", caseData.getCcdCaseReference());
         List<Element<CaseDocument>> defendantUploads = new ArrayList<>();
         assembleRespondent1ResponseDocuments(caseData, updatedCaseData, defendantUploads);
         assembleRespondent2ResponseDocuments(caseData, updatedCaseData, defendantUploads);

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -22,6 +23,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 
 @Component
+@Slf4j
 public class ValidateRespondentExperts implements CaseTask, ExpertsValidator {
 
     private final IStateFlowEngine stateFlowEngine;
@@ -36,6 +38,7 @@ public class ValidateRespondentExperts implements CaseTask, ExpertsValidator {
 
     public CallbackResponse execute(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        log.info("Validating respondent experts for Case ID {}:", caseData.getCcdCaseReference());
 
         if (ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
             return validateExperts(caseData.getRespondent1DQ());

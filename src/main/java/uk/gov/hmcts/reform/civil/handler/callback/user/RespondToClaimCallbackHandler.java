@@ -129,8 +129,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private CallbackResponse validateDateOfBirth(CallbackParams callbackParams) {
         Party respondent = callbackParams.getCaseData().getRespondent1();
+        log.info("Respondent birth date: {}", respondent.getDateOfBirth());
         List<String> errors = dateOfBirthValidator.validate(respondent);
-
         ofNullable(callbackParams.getCaseData().getRespondent2())
             .ifPresent(party -> errors.addAll(dateOfBirthValidator.validate(party)));
 
@@ -171,7 +171,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
+        log.info("Resetting statement of truth for Case ID: {}", caseData.getCcdCaseReference());
         CaseData updatedCaseData = caseData.toBuilder()
             .uiStatementOfTruth(StatementOfTruth.builder().role("").build())
             .build();

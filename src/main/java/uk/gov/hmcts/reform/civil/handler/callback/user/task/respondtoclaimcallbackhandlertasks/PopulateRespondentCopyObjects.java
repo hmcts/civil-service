@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -35,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 
 @Component
+@Slf4j
 public class PopulateRespondentCopyObjects implements CaseTask {
 
     private final ObjectMapper objectMapper;
@@ -65,6 +67,7 @@ public class PopulateRespondentCopyObjects implements CaseTask {
 
     public CallbackResponse execute(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        log.info("Populating respondent copy objects", caseData.getCcdCaseReference());
         LocalDateTime dateTime = LocalDateTime.now();
 
         CallbackResponse errorResponse = getErrorResponse(callbackParams, caseData, dateTime);

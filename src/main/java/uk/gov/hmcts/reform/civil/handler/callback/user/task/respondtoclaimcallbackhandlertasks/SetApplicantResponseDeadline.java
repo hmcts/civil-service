@@ -17,10 +17,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
-import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
-import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -65,12 +62,9 @@ public class SetApplicantResponseDeadline implements CaseTask {
                                         FeatureToggleService toggleService,
                                         CaseFlagsInitialiser caseFlagsInitialiser,
                                         IStateFlowEngine stateFlowEngine,
-                                        AssignCategoryId assignCategoryId,
                                         ObjectMapper objectMapper,
                                         CoreCaseUserService coreCaseUserService,
                                         UserService userService,
-                                        LocationReferenceDataService locationRefDataService,
-                                        CourtLocationUtils courtLocationUtils,
                                         UpdateDataRespondentDeadlineResponse updateDataRespondentDeadlineResponse,
                                         AssembleDocumentsForDeadlineResponse assembleDocumentsForDeadlineResponse) {
         this.time = time;
@@ -189,7 +183,7 @@ public class SetApplicantResponseDeadline implements CaseTask {
     }
 
     private static void nullPlaceHolderDocuments(CaseData.CaseDataBuilder<?, ?> updatedData, CaseData caseData) {
-        log.info("Null placeholder documents");
+        log.info("Null placeholder documents for Case ID: {}", caseData.getCcdCaseReference());
         updatedData.respondent1ClaimResponseDocument(null);
         updatedData.respondent2ClaimResponseDocument(null);
         if (caseData.getRespondent1() != null
