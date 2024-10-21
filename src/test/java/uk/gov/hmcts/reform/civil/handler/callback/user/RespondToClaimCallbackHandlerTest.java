@@ -163,6 +163,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private CaseFlagsInitialiser caseFlagInitialiser;
+    @MockBean
+    private CaseDetailsConverter caseDetailsConverter;
 
     @Nested
     class AboutToStartCallback {

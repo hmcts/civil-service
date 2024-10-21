@@ -656,8 +656,6 @@ public class CaseDataBuilderSpec {
             .claimNotificationDeadline(claimNotificationDeadline)
             .takenOfflineDate(takenOfflineDate)
             //workaround fields
-            .respondent1Copy(respondent1Copy)
-            .respondent2Copy(respondent2Copy)
             .respondent1OrganisationIDCopy(respondent1OrganisationIDCopy)
             .respondent2OrganisationIDCopy(respondent2OrganisationIDCopy)
             .respondent1PinToPostLRspec(respondent1PinToPostLRspec)

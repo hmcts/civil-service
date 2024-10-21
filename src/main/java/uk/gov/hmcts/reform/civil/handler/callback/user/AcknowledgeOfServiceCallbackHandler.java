@@ -10,12 +10,14 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.utils.PersistDataUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.DefendantAddressValidator;
@@ -52,6 +54,7 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
     private final ObjectMapper objectMapper;
     private final PostcodeValidator postcodeValidator;
     private final Time time;
+    private final CaseDetailsConverter caseDetailsConverter;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -73,12 +76,10 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
         var caseData = callbackParams.getCaseData();
         LocalDateTime dateTime = LocalDateTime.now();
         var updatedCaseData = caseData.toBuilder()
-            .respondent1Copy(caseData.getRespondent1())
             .build();
 
         ofNullable(caseData.getRespondent2())
             .ifPresent(r2 -> updatedCaseData.toBuilder()
-                .respondent2Copy(r2)
                 .respondent2DetailsForClaimDetailsTab(r2.toBuilder().flags(null).build()).build());
 
         List<String> errors = new ArrayList<>();
@@ -119,32 +120,22 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
         LocalDateTime newResponseDate = deadlinesCalculator.plus14DaysAt4pmDeadline(responseDeadline);
-        var updatedRespondent1 = caseData.getRespondent1().toBuilder()
-            .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
-            .flags(caseData.getRespondent1Copy().getFlags())
-            .build();
+        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
+
+        PersistDataUtils.persistPartyAddress(oldCaseData, caseData);
+
+        CaseData.CaseDataBuilder caseDataUpdated = caseData.toBuilder();
+
+        PersistDataUtils.persistFlagsForParties(oldCaseData, caseData, caseDataUpdated);
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder()
             .respondent1AcknowledgeNotificationDate(time.now())
             .respondent1ResponseDeadline(newResponseDate)
             .businessProcess(BusinessProcess.ready(ACKNOWLEDGEMENT_OF_SERVICE))
-            .respondent1(updatedRespondent1)
-            .respondent1Copy(null)
             .specRespondentCorrespondenceAddressRequired(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())
             .specRespondentCorrespondenceAddressdetails(caseData.getSpecAoSApplicantCorrespondenceAddressdetails())
             .respondentSolicitor1ServiceAddressRequired(caseData.getSpecAoSRespondentCorrespondenceAddressRequired())
             .respondentSolicitor1ServiceAddress(caseData.getSpecAoSRespondentCorrespondenceAddressdetails());
-
-        // if present, persist the 2nd respondent address in the same fashion as above, i.e ignore for 1v1
-        if (ofNullable(caseData.getRespondent2()).isPresent()
-            && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
-            var updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
-                .flags(caseData.getRespondent2Copy().getFlags())
-                .build();
-            caseDataBuilder.respondent2(updatedRespondent2).respondent2Copy(null);
-            caseDataBuilder.respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
-        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
