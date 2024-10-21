@@ -11,17 +11,15 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.docmosis.cosc.CertificateOfDebtGenerator;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @Service
 @RequiredArgsConstructor
@@ -53,24 +51,18 @@ public class GenerateCoscDocumentHandler extends CallbackHandler {
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        buildDocument(callbackParams, caseDataBuilder, caseData);
+        buildDocument(callbackParams, caseDataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
-    private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
-                               CaseData caseData) {
+    private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         CaseDocument caseDocument = coscDocumentGenerartor.generateDoc(
             callbackParams.getCaseData(),
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-        List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
-        systemGeneratedCaseDocuments.add(element(caseDocument));
-        if (!isEmpty(caseData.getHearingDocuments())) {
-            systemGeneratedCaseDocuments.addAll(caseData.getHearingDocuments());
-        }
+        caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(caseDocument));
     }
-
 }

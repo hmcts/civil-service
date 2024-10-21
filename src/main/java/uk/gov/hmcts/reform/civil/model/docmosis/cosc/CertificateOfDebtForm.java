@@ -6,8 +6,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 
-import java.time.LocalDate;
-
 @Getter
 @Builder
 @AllArgsConstructor
@@ -20,9 +18,9 @@ public class CertificateOfDebtForm implements MappableObject {
     private final String defendantAddress;
     private final String defendantFullNameFromJudgment;
     private final String defendantAddressFromJudgment;
-    private LocalDate applicationIssuedDate;
-    private LocalDate judgmentOrderDate;
-    private LocalDate dateFinalPaymentMade;
+    private String applicationIssuedDate;
+    private String judgmentOrderDate;
+    private String dateFinalPaymentMade;
     private String judgmentTotalAmount;
     private String judgmentStatusText;
 }
