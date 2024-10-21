@@ -103,8 +103,7 @@ public class FeatureToggleService {
     }
 
     public boolean isCarmEnabledForCase(CaseData caseData) {
-        boolean isSpecClaim = SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
-        return isSpecClaim;
+        return SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
     }
 
     public boolean isGaForLipsEnabled() {
