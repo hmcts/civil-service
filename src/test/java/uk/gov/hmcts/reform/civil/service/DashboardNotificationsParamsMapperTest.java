@@ -207,6 +207,8 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo("1 April 2024");
         assertThat(result).extracting("hearingDueDateCy")
             .isEqualTo("1 Ebrill 2024");
+        assertThat(result).extracting("requestForReconsiderationDeadline")
+            .isEqualTo(LocalDateTime.of(2024, 4, 1, 10, 20));
         assertThat(result).extracting("requestForReconsiderationDeadlineEn")
             .isEqualTo("1 April 2024");
         assertThat(result).extracting("requestForReconsiderationDeadlineCy")
@@ -435,6 +437,8 @@ public class DashboardNotificationsParamsMapperTest {
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
         assertThat(result).extracting("claimSettledAmount").isEqualTo("£1000.50");
+        assertThat(result).extracting("claimSettledObjectionsDeadline").isEqualTo(LocalDate.parse("2023-04-17")
+                                                                        .atTime(END_OF_DAY));
         assertThat(result).extracting("claimSettledDateEn").isEqualTo("29 March 2023");
         assertThat(result).extracting("claimSettledDateCy").isEqualTo("29 Mawrth 2023");
     }
@@ -635,12 +639,23 @@ public class DashboardNotificationsParamsMapperTest {
     }
 
     @Test
+    public void shouldContainDefaultNotificationsDeadline() {
+        LocalDate today = LocalDate.now();
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
+
+        assertThat(result).extracting("priorityNotificationDeadline")
+            .asInstanceOf(InstanceOfAssertFactories.LOCAL_DATE_TIME).isBetween(today.atStartOfDay(), today.plusDays(1).atStartOfDay());
+    }
+
+    @Test
     void shouldMapParameters_whenCertOfSc() {
         LocalDate fullPaymentDate = LocalDate.now();
         CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build().toBuilder()
             .applicant1Represented(YesOrNo.NO)
             .certOfSC(CertOfSC.builder().defendantFinalPaymentDate(fullPaymentDate).build())
             .build();
+
         Map<String, Object> result =
             mapper.mapCaseDataToParams(caseData, null);
         assertThat(result).extracting("coscFullPaymentDateEn")
@@ -652,15 +667,5 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("coscNotificationDateCy")
             .isEqualTo(DateUtils.formatDateInWelsh(fullPaymentDate));
     }
-
-    @Test
-    public void shouldContainDefaultNotificationsDeadline() {
-        LocalDate today = LocalDate.now();
-
-        Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
-
-        assertThat(result).extracting("priorityNotificationDeadline")
-            .asInstanceOf(InstanceOfAssertFactories.LOCAL_DATE_TIME).isBetween(today.atStartOfDay(), today.plusDays(1).atStartOfDay());
-    }
-
 }
+
