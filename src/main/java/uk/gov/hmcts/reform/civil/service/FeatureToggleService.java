@@ -103,12 +103,7 @@ public class FeatureToggleService {
     }
 
     public boolean isCarmEnabledForCase(CaseData caseData) {
-        ZoneId zoneId = ZoneId.systemDefault();
-        long epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
-        boolean isSpecClaim = SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
-        return isSpecClaim && featureToggleApi.isFeatureEnabled("carm")
-            && featureToggleApi.isFeatureEnabledForDate("cam-enabled-for-case",
-                                                        epoch, false);
+        return SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
     }
 
     public boolean isGaForLipsEnabled() {
