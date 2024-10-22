@@ -45,9 +45,9 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
     @Override
     void setUpTransitions() {
         this.moveTo(IN_MEDIATION).onlyWhen((agreedToMediation.and(allAgreedToLrMediationSpec.negate()))
-                // for carm cases, fullDefenceProcced is tracked with lipFullDefenceProceed
-                // and move to in mediation if applicant does not settle
-                .or(lipFullDefenceProceed.and(isCarmApplicableLipCase).and(not(fullDefenceProceed))))
+                                               // for carm cases, fullDefenceProcced is tracked with lipFullDefenceProceed
+                                               // and move to in mediation if applicant does not settle
+                                               .or(isCarmApplicableLipCase.and(lipFullDefenceProceed.or(fullDefenceProceed))))
             .moveTo(FULL_DEFENCE_PROCEED)
             .onlyWhen(fullDefenceProceed.and(allAgreedToLrMediationSpec).and(agreedToMediation.negate()).and(declinedMediation.negate()))
             .set((c, flags) -> {
