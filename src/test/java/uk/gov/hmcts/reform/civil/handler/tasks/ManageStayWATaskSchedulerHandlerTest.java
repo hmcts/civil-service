@@ -14,6 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.ManageStayWATaskEvent;
 import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.ManageStayUpdateRequestedSearchService;
 
 import java.util.List;
@@ -46,6 +47,8 @@ class ManageStayWATaskSchedulerHandlerTest {
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private ManageStayWATaskSchedulerHandler handler;
@@ -54,6 +57,17 @@ class ManageStayWATaskSchedulerHandlerTest {
     void init() {
         when(mockTask.getTopicName()).thenReturn("test");
         when(mockTask.getWorkerId()).thenReturn("worker");
+        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+    }
+
+    @Test
+    void shouldNotInteractWithSearchServiceOrApplicationEventPublisher_whenCaseEventsToggleIsOff() {
+        when(featureToggleService.isCaseEventsEnabled()).thenReturn(false);
+
+        handler.execute(mockTask, externalTaskService);
+
+        verifyNoInteractions(searchService);
+        verifyNoInteractions(applicationEventPublisher);
     }
 
     @Test

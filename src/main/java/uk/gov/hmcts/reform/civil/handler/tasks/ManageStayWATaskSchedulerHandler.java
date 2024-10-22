@@ -6,10 +6,9 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.civil.event.DismissClaimEvent;
 import uk.gov.hmcts.reform.civil.event.ManageStayWATaskEvent;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
-import uk.gov.hmcts.reform.civil.service.search.CaseDismissedSearchService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.ManageStayUpdateRequestedSearchService;
 
 import java.util.List;
@@ -21,19 +20,27 @@ public class ManageStayWATaskSchedulerHandler extends BaseExternalTaskHandler {
 
     private final ManageStayUpdateRequestedSearchService caseSearchService;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        List<CaseDetails> cases = caseSearchService.getCases();
-        log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
+        if (featureToggleService.isCaseEventsEnabled()) {
 
-        cases.forEach(caseDetails -> {
-            try {
-                applicationEventPublisher.publishEvent(new ManageStayWATaskEvent(caseDetails.getId()));
-            } catch (Exception e) {
-                log.error("Manage Stay WA Task scheduler failed to process case with id: '{}", caseDetails.getId(), e);
-            }
-        });
+            List<CaseDetails> cases = caseSearchService.getCases();
+            log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
+
+            cases.forEach(caseDetails -> {
+                try {
+                    applicationEventPublisher.publishEvent(new ManageStayWATaskEvent(caseDetails.getId()));
+                } catch (Exception e) {
+                    log.error(
+                        "Manage Stay WA Task scheduler failed to process case with id: '{}",
+                        caseDetails.getId(),
+                        e
+                    );
+                }
+            });
+        }
         return ExternalTaskData.builder().build();
     }
 }
