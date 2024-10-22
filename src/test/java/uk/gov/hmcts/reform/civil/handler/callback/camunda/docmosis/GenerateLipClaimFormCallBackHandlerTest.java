@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDateTime;
 import java.util.Map;
-import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
