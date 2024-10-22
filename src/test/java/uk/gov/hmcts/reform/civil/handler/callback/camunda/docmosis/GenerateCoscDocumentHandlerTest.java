@@ -14,12 +14,9 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentAddress;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.cosc.CertificateOfDebtGenerator;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -66,13 +63,8 @@ class GenerateCoscDocumentHandlerTest extends BaseCallbackHandlerTest {
         when(certificateOfDebtGenerator.generateDoc(any(CaseData.class), anyString())).thenReturn(document);
 
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31Days().toBuilder()
+            .buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31DaysForCosc().toBuilder()
             .build();
-        JudgmentDetails activeJudgment = caseData.getActiveJudgment();
-        activeJudgment.setDefendant1Name("Test name");
-        activeJudgment.setDefendant1Address(JudgmentAddress.builder().build());
-        activeJudgment.setFullyPaymentMadeDate(LocalDate.now().plusDays(15));
-        caseData.setActiveJudgment(activeJudgment);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_HEARING_FORM.name());
 

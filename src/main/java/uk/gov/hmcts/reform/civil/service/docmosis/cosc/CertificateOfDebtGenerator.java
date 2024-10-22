@@ -91,7 +91,7 @@ public class CertificateOfDebtGenerator implements TemplateDataGenerator<Certifi
         } else if (JudgmentState.CANCELLED.equals(activeJudgment.getState())) {
             return REMOVED_AS_PAYMENT_HAS_BEEN_MADE_IN_FULL_WITHIN_ONE_MONTH_OF_JUDGMENT;
         }
-        return MARKED_TO_SHOW_THAT_THE_DEBT_IS_SATISFIED;
+        return null;
     }
 
     private String getCourtName(CaseData caseData, String authorisation) {
@@ -103,7 +103,6 @@ public class CertificateOfDebtGenerator implements TemplateDataGenerator<Certifi
             if (locationDetails != null && !locationDetails.isEmpty()) {
                 return locationDetails.get(0).getCourtName();
             }
-
         }
         return null;
     }
