@@ -200,7 +200,9 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_RESPONDENT("Scenario.AAA6.GeneralApps.ApplicationProceedsOffline.Respondent"),
     SCENARIO_AAA6_UPDATE_TASK_LIST_TRIAL_READY_FINALS_ORDERS_DEFENDANT("Scenario.AAA6.Update.TaskList.TrialReady.FinalOrders.Defendant"),
     SCENARIO_AAA6_UPDATE_TASK_LIST_TRIAL_READY_FINALS_ORDERS_CLAIMANT("Scenario.AAA6.Update.TaskList.TrialReady.FinalOrders.Claimant"),
-    SCENARIO_AAA6_JUDGEMENTS_ONLINE_ISSUED_CCJ_CLAIMANT("Scenario.AAA6.JudgmentsOnline.IssuedCCJ.Claimant");
+    SCENARIO_AAA6_JUDGEMENTS_ONLINE_ISSUED_CCJ_CLAIMANT("Scenario.AAA6.JudgmentsOnline.IssuedCCJ.Claimant"),
+    SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_CLAIMANT("Scenario.AAA6.ProofofDebtPayment.Application.Claimant"),
+    SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_DEFENDANT("Scenario.AAA6.ProofofDebtPayment.Application.Defendant");
 
     private final String scenario;
 
