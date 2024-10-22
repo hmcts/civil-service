@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.cosc.CertificateOfDebtGenerato
 
 import java.time.LocalDateTime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -71,6 +72,9 @@ class GenerateCoscDocumentHandlerTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         verify(certificateOfDebtGenerator).generateDoc(any(CaseData.class), eq("BEARER_TOKEN"));
+        assertThat(response.getData())
+            .extracting("coSCApplicationStatus")
+            .isEqualTo("PROCESSED");
 
     }
 
