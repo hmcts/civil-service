@@ -44,8 +44,6 @@ class GenerateLipClaimFormCallBackHandlerTest extends BaseCallbackHandlerTest {
     private AssignCategoryId assignCategoryId;
     @Mock
     private ObjectMapper mapper;
-    @Mock
-    private AssignCategoryId assignCategoryId;
     @InjectMocks
     private GenerateLipClaimFormCallBackHandler handler;
 
