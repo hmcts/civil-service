@@ -35,8 +35,6 @@ public class CoScNotificationForCasePaidInFullGenerateCertificateDefendantScenar
                                 .build())
             .build();
 
-        when(featureToggleService.isCoSCEnabled()).thenReturn(true);
-
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created

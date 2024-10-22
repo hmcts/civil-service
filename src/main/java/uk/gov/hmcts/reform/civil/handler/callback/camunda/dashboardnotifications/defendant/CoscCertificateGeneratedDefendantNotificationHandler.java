@@ -15,7 +15,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 @Service
 public class CoscCertificateGeneratedDefendantNotificationHandler extends DashboardCallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(CaseEvent.DB_NOTIFY_COSC_GEN_FOR_DEFENDANT);
+    private static final List<CaseEvent> EVENTS = Collections.singletonList(CaseEvent.CREATE_DASHBOARD_NOTIFICATION_COSC_GEN_FOR_DEFENDANT);
     private static final String TASK_ID = "GenerateDashboardNotificationCoSCCertificateGenerated";
 
     public CoscCertificateGeneratedDefendantNotificationHandler(DashboardApiClient dashboardApiClient,
@@ -41,6 +41,6 @@ public class CoscCertificateGeneratedDefendantNotificationHandler extends Dashbo
 
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
-        return featureToggleService.isCoSCEnabled() && caseData.isRespondent1NotRepresented();
+        return caseData.isRespondent1NotRepresented();
     }
 }
