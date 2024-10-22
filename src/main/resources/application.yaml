@@ -357,8 +357,8 @@ notifications:
   notifyApplicantLiPMediationSuccessfulTemplate: "cea37b8b-ff8a-4ca7-9025-c50a8f3e3e22" // CIV-15466
   notifyApplicantLiPMediationSuccessfulWelshTemplate: "c35c2757-7109-4aaa-b8ec-646f5f921966" // CIV-15466
   notifyRespondentLiPMediationSuccessfulTemplate: "4dd7f0ed-87b8-4e38-a85b-ab166181bb17" // CIV-15466
-  notifyRespondentLiPMediationSuccessfulTemplateWelsh: "aaa19fef-2b16-42fa-a1b9-5af699fcaa58"
-  notifyDefendantLIPClaimantSettleTheClaimTemplate: "cb89ea18-782b-4bc6-be44-2789d02ab6aa"
+  notifyRespondentLiPMediationSuccessfulTemplateWelsh: "385b1f19-f1c7-43c9-b3b5-2eaf211fbe6e" // CIV-15466
+  notifyDefendantLIPClaimantSettleTheClaimTemplate: "06d10912-a19f-47e4-95a4-293397aa9271" // CIV-15466
 
   notifyLipUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
   notifyLipUpdateTemplateBilingual: "bfc3ee2d-61c7-47f3-b857-7d59838e58e7"

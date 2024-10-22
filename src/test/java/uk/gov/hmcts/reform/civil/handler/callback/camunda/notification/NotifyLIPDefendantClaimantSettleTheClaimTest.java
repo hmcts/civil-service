@@ -51,7 +51,7 @@ public class NotifyLIPDefendantClaimantSettleTheClaimTest extends BaseCallbackHa
 
         private static final String DEFENDANT_EMAIL_ADDRESS = "defendantmail@hmcts.net";
         private static final String DEFENDANT_PARTY_NAME = "ABC ABC";
-        private static final String REFERENCE_NUMBER = "8372942374";
+        private static final Long CCD_REFERENCE_NUMBER = 8372942374L;
         private static final String EMAIL_TEMPLATE = "test-notification-id";
         private static final String CLAIMANT_ORG_NAME = "Org Name";
 
@@ -67,9 +67,9 @@ public class NotifyLIPDefendantClaimantSettleTheClaimTest extends BaseCallbackHa
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).partyEmail(
                     DEFENDANT_EMAIL_ADDRESS).build())
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(CLAIMANT_ORG_NAME).build())
-                .legacyCaseReference(REFERENCE_NUMBER)
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
+                .ccdCaseReference(CCD_REFERENCE_NUMBER)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT_CLAIMANT_SETTLE_THE_CLAIM.name()).build()).build();

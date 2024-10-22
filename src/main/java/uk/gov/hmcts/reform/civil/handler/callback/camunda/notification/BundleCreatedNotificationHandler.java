@@ -160,7 +160,8 @@ public class BundleCreatedNotificationHandler extends CallbackHandler implements
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData),
-            PARTY_NAME, partyName
+            PARTY_NAME, partyName,
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 
