@@ -111,7 +111,8 @@ public class HearingFeeUnpaidRespondentNotificationHandler extends CallbackHandl
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIMANT_V_DEFENDANT, getClaimantVDefendant(caseData),
-            PARTY_NAME, caseData.getRespondent1().getPartyName()
+            PARTY_NAME, caseData.getRespondent1().getPartyName(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 

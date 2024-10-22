@@ -30,6 +30,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT1_LIP
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @ExtendWith(MockitoExtension.class)
@@ -63,6 +65,7 @@ class NotifyDefendantLipJudgmentVariedDeterminationOfMeansNotificationHandlerTes
                                  .type(Party.Type.INDIVIDUAL).partyEmail("respondentLip@example.com").build())
                 .respondent1Represented(null)
                 .legacyCaseReference("000DC001")
+                .ccdCaseReference(12345L)
                 .specRespondent1Represented(YesOrNo.NO)
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
 
@@ -86,8 +89,9 @@ class NotifyDefendantLipJudgmentVariedDeterminationOfMeansNotificationHandlerTes
     private Map<String, String> getNotificationLipDataMap(CaseData caseData) {
         return Map.of(
             CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            PARTY_NAME, caseData.getRespondent1().getPartyName()
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            PARTY_NAME, caseData.getRespondent1().getPartyName(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 

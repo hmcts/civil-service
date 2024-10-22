@@ -322,54 +322,54 @@ notifications:
   notifyDefendantLipTemplate: "d40a8b04-b226-4232-a881-f7249a61d038"
   notifyDefendantLipWelshTemplate : "d63b744a-97c8-42bd-95a2-3d86dd703c3d"
 
-  notifyApplicantLRMediationAgreementTemplate: "73b79b0a-2258-484b-b29e-806a5fca0984" // CIV-15466
-  notifyRespondentLiPMediationAgreementTemplate: "78ba3502-e317-4a9d-bf66-3c1c2402b937" // CIV-15466
-  notifyRespondentLiPMediationAgreementTemplateWelsh: "c7098211-1e67-483e-b1dd-8802dd119f55" // CIV-15466
-  notifyRespondentLRMediationAgreementTemplate: "ad7f8e29-6eb1-4abf-897b-a396805ba952" // CIV-15466
-  respondentLipPartAdmitSettleClaimTemplate: "2cea748f-98bb-4831-a9fd-85685d904e68" // CIV-15466
-  respondentLrPartAdmitSettleClaimTemplate: "9e3114f7-db30-4344-b7b7-68766e0d3fdd" // CIV-15466
-  respondent1DefaultJudgmentRequestedTemplate: "08d2dd7a-7456-4bc1-aef4-62d8cab93300" // CIV-15466
-  respondent1LipClaimUpdatedTemplate: "cd7c0d42-621d-4eb0-b302-604c5d5c0681" // CIV-15466
-  claimantLipClaimUpdatedTemplate: "1997cd33-b568-496c-a9d4-b2c0063ecab6" // CIV-15466
-  claimantLipClaimUpdatedBilingualTemplate: "27a38162-7c4e-46a4-9463-8198f8ccfeb5" // CIV-15466
-  applicantLiPDefaultJudgmentRequested: "ade58287-9da7-4d32-b837-586ef201d802" // CIV-15466
-  applicantLiPDefaultJudgmentRequestedBilingualTemplate: "83839229-32ac-4943-aaa7-b7109f39e68c" // CIV-15466
+  notifyApplicantLRMediationAgreementTemplate: "73b79b0a-2258-484b-b29e-806a5fca0984"
+  notifyRespondentLiPMediationAgreementTemplate: "78ba3502-e317-4a9d-bf66-3c1c2402b937"
+  notifyRespondentLiPMediationAgreementTemplateWelsh: "c7098211-1e67-483e-b1dd-8802dd119f55"
+  notifyRespondentLRMediationAgreementTemplate: "ad7f8e29-6eb1-4abf-897b-a396805ba952"
+  respondentLipPartAdmitSettleClaimTemplate: "2cea748f-98bb-4831-a9fd-85685d904e68"
+  respondentLrPartAdmitSettleClaimTemplate: "9e3114f7-db30-4344-b7b7-68766e0d3fdd"
+  respondent1DefaultJudgmentRequestedTemplate: "08d2dd7a-7456-4bc1-aef4-62d8cab93300"
+  respondent1LipClaimUpdatedTemplate: "cd7c0d42-621d-4eb0-b302-604c5d5c0681"
+  claimantLipClaimUpdatedTemplate: "1997cd33-b568-496c-a9d4-b2c0063ecab6"
+  claimantLipClaimUpdatedBilingualTemplate: "27a38162-7c4e-46a4-9463-8198f8ccfeb5"
+  applicantLiPDefaultJudgmentRequested: "ade58287-9da7-4d32-b837-586ef201d802"
+  applicantLiPDefaultJudgmentRequestedBilingualTemplate: "83839229-32ac-4943-aaa7-b7109f39e68c"
 
-  hearingFeeUnpaidNoc: "e2b0118b-15cc-41c0-918c-fbbd042f8019" // CIV-15466
+  hearingFeeUnpaidNoc: "e2b0118b-15cc-41c0-918c-fbbd042f8019"
 
-  mediationUnsuccessfulClaimantLRTemplate: "698c3d4c-bd58-4725-aaba-4146730bbe10" // CIV-15466
-  mediationUnsuccessfulClaimantLIPTemplate: "dbbf1796-0922-406f-909e-442d701558ff" // CIV-15466
-  mediationUnsuccessfulClaimantLIPWelshTemplate: "1d790bfb-5134-4a89-a845-e9ba7a556661" // CIV-15466
-  mediationUnsuccessfulDefendantLIPTemplate: "73744cc7-d8ca-4222-bdd4-9f6a5827463b" // CIV-15466
-  mediationUnsuccessfulDefendantLIPBilingualTemplate: "7323521f-2921-46cc-98ba-9d78d166e65a" // CIV-15466
+  mediationUnsuccessfulClaimantLRTemplate: "698c3d4c-bd58-4725-aaba-4146730bbe10"
+  mediationUnsuccessfulClaimantLIPTemplate: "dbbf1796-0922-406f-909e-442d701558ff"
+  mediationUnsuccessfulClaimantLIPWelshTemplate: "1d790bfb-5134-4a89-a845-e9ba7a556661"
+  mediationUnsuccessfulDefendantLIPTemplate: "73744cc7-d8ca-4222-bdd4-9f6a5827463b"
+  mediationUnsuccessfulDefendantLIPBilingualTemplate: "7323521f-2921-46cc-98ba-9d78d166e65a"
 
-  mediationUnsuccessfulLRTemplate: "023204af-032f-42b9-82a3-d107254c4a7f" // CIV-15466
-  mediationUnsuccessfulLRTemplateForLipVLr: "df9f1bb5-d3bc-4fa1-a5a8-60980df99394" // CIV-15466
-  mediationUnsuccessfulLIPTemplate: "e366a7e8-e9bd-4fc8-9757-e0e9053ffc0f" // CIV-15466
-  mediationUnsuccessfulLIPTemplateWelsh: "a9546eea-3481-416c-a949-62868fe1d845" // CIV-15466
-  mediationUnsuccessfulNoAttendanceLRTemplate: "01d057e5-a28b-465f-a6a0-ef43aa97a20c" // CIV-15466
+  mediationUnsuccessfulLRTemplate: "023204af-032f-42b9-82a3-d107254c4a7f"
+  mediationUnsuccessfulLRTemplateForLipVLr: "df9f1bb5-d3bc-4fa1-a5a8-60980df99394"
+  mediationUnsuccessfulLIPTemplate: "e366a7e8-e9bd-4fc8-9757-e0e9053ffc0f"
+  mediationUnsuccessfulLIPTemplateWelsh: "a9546eea-3481-416c-a949-62868fe1d845"
+  mediationUnsuccessfulNoAttendanceLRTemplate: "01d057e5-a28b-465f-a6a0-ef43aa97a20c"
 
-  respondentLipPartAdmitSettleClaimBilingualTemplate: "7078260a-cc06-44df-888c-41f89d794746" // CIV-15466
-  notifyClaimantTranslatedDocumentUploaded: "f76562b8-26b4-486d-a98d-b48bc04508a3" // CIV-15466
-  notifyDefendantTranslatedDocumentUploaded: "3a17e756-0d46-4738-b25b-2b2ebdec3e63" // CIV-15466
+  respondentLipPartAdmitSettleClaimBilingualTemplate: "7078260a-cc06-44df-888c-41f89d794746"
+  notifyClaimantTranslatedDocumentUploaded: "f76562b8-26b4-486d-a98d-b48bc04508a3"
+  notifyDefendantTranslatedDocumentUploaded: "3a17e756-0d46-4738-b25b-2b2ebdec3e63"
 
-  notifyApplicantLRMediationSuccessfulTemplate: "c5651496-8de5-4e16-9bd7-1c10d53a2ded" // CIV-15466
-  notifyApplicantLiPMediationSuccessfulTemplate: "cea37b8b-ff8a-4ca7-9025-c50a8f3e3e22" // CIV-15466
-  notifyApplicantLiPMediationSuccessfulWelshTemplate: "c35c2757-7109-4aaa-b8ec-646f5f921966" // CIV-15466
-  notifyRespondentLiPMediationSuccessfulTemplate: "4dd7f0ed-87b8-4e38-a85b-ab166181bb17" // CIV-15466
-  notifyRespondentLiPMediationSuccessfulTemplateWelsh: "385b1f19-f1c7-43c9-b3b5-2eaf211fbe6e" // CIV-15466
-  notifyDefendantLIPClaimantSettleTheClaimTemplate: "06d10912-a19f-47e4-95a4-293397aa9271" // CIV-15466
+  notifyApplicantLRMediationSuccessfulTemplate: "c5651496-8de5-4e16-9bd7-1c10d53a2ded"
+  notifyApplicantLiPMediationSuccessfulTemplate: "cea37b8b-ff8a-4ca7-9025-c50a8f3e3e22"
+  notifyApplicantLiPMediationSuccessfulWelshTemplate: "c35c2757-7109-4aaa-b8ec-646f5f921966"
+  notifyRespondentLiPMediationSuccessfulTemplate: "4dd7f0ed-87b8-4e38-a85b-ab166181bb17"
+  notifyRespondentLiPMediationSuccessfulTemplateWelsh: "385b1f19-f1c7-43c9-b3b5-2eaf211fbe6e"
+  notifyDefendantLIPClaimantSettleTheClaimTemplate: "06d10912-a19f-47e4-95a4-293397aa9271"
 
-  notifyLipUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
-  notifyLipUpdateTemplateBilingual: "bfc3ee2d-61c7-47f3-b857-7d59838e58e7"
-  notifyUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
-  notifyClaimReconsiderationLRTemplate: "107ea708-bb51-4caa-9f56-e6fe0d9a6b9a"
-  notifySetAsideJudgmentTemplate: "5edb8dd4-94a3-4d3c-a4fc-d4f76d2b2ccb"
+  notifyLipUpdateTemplate: "ad7d6720-3ebe-443c-a030-79dec1fc9b10"
+  notifyLipUpdateTemplateBilingual: "0610a21e-00b2-42ac-a22f-49ccf95d4fbb"
+  notifyUpdateTemplate: "ad7d6720-3ebe-443c-a030-79dec1fc9b10"
+  notifyClaimReconsiderationLRTemplate: "2eb06df8-8dd9-401d-8116-9e76550050ef"
+  notifySetAsideJudgmentTemplate: "f4f7f07a-05bc-4ecf-866b-d349a747c788"
 
-  hearingNotificationLipDefendantTemplate: "9239a55e-fd08-4f03-9ba5-7d90ac35af41"
+  hearingNotificationLipDefendantTemplate: "5892d634-24d9-41d4-bc86-b123594e82fb"
 
-  notifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate: "3d302844-ecdc-47e6-8aed-971c3f42a059"
-  notifyLiPClaimantClaimSubmittedAndHelpWithFeeTemplate: "a9c1ccba-eb72-414d-8dc7-d75f33c79b28"
+  notifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate: "85e432d5-f28e-436d-a743-b9cb0c9c9dfc"
+  notifyLiPClaimantClaimSubmittedAndHelpWithFeeTemplate: "2710f46a-0854-404b-8d06-e6e59f9d9f40"
   notifyLiPClaimantDefendantResponded: "4b1325dd-51ed-4dc2-bcc6-d9afb01a3f29"
   notifyLiPClaimantDefendantChangedContactDetails: "72a14146-c897-4fc6-be4f-474266da7398"
 
@@ -419,7 +419,7 @@ notifications:
   notifyApplicantForHwfFeePaymentOutcomeInBilingual: "ca84e76e-f178-4c63-9eca-96b491cc538c"
 
   notifyDefendantLRForMediation: "feec8506-6d60-4715-8f48-43ded5d24d97"
-  notifyApplicantLRMediationTemplate: "774f34ff-eb67-4e6c-a9fe-19719890894c" // CIV-15466
+  notifyApplicantLRMediationTemplate: "774f34ff-eb67-4e6c-a9fe-19719890894c"
 
   notifyClaimantJudgmentVariedDeterminationOfMeansTemplate: "16711810-3629-4f8f-a55d-3a7dbab47ed9"
   notifyDefendantJudgmentVariedDeterminationOfMeansTemplate: "6e13b9af-2dbe-49dd-be89-71464ed551d2"

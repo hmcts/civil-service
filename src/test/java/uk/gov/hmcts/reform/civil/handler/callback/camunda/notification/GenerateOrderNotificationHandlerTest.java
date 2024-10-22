@@ -292,7 +292,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             return Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, handler.getLegalOrganizationName(caseData),
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
 
@@ -301,7 +301,8 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 PARTY_NAME, caseData.getRespondent1().getPartyName(),
-                CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
+                CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
 
@@ -310,7 +311,8 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             return Map.of(
                 CLAIM_REFERENCE_NUMBER,  caseData.getCcdCaseReference().toString(),
                 PARTY_NAME, caseData.getRespondent2().getPartyName(),
-                CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
+                CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
 
@@ -319,7 +321,8 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 PARTY_NAME, caseData.getApplicant1().getPartyName(),
-                CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
+                CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
     }

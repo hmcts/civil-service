@@ -120,7 +120,8 @@ class HearingFeeUnpaidApplicantNotificationHandlerTest {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
             CLAIMANT_V_DEFENDANT, "Rambo v Trader",
-            PARTY_NAME, caseData.getApplicant1().getPartyName()
+            PARTY_NAME, caseData.getApplicant1().getPartyName(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 

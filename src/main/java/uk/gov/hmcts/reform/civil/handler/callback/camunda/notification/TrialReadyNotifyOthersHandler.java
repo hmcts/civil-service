@@ -162,7 +162,9 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
             PARTY_NAME,
             isApplicant ? caseData.getApplicant1().getPartyName() : caseData.getRespondent1().getPartyName(),
             CLAIMANT_V_DEFENDANT,
-            getAllPartyNames(caseData)
+            getAllPartyNames(caseData),
+            PARTY_REFERENCES,
+            buildPartiesReferencesEmailSubject(caseData)
         );
     }
 

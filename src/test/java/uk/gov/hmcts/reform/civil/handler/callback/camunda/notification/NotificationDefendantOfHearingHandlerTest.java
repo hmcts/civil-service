@@ -614,7 +614,7 @@ public class NotificationDefendantOfHearingHandlerTest {
         @NotNull
         private Map<String, String> getNotificationDataMapNoReference(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 "defendantReferenceNumber", "", "hearingDate", "07-10-2022",
                 "hearingTime", "03:30pm",
                 PARTY_REFERENCES, "Claimant reference: Not provided - Defendant reference: Not provided",
@@ -647,7 +647,7 @@ public class NotificationDefendantOfHearingHandlerTest {
         @NotNull
         private Map<String, String> getNotificationLipDataMap(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 "hearingDate", "17-05-2023", "hearingTime", "11:00am",
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                 CLAIM_LEGAL_ORG_NAME_SPEC, "John Doe"
@@ -657,7 +657,7 @@ public class NotificationDefendantOfHearingHandlerTest {
         @NotNull
         private Map<String, String> getNotificationLipHmcDataMap(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 "hearingDate", "17-05-2023", "hearingTime", "01:00pm",
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                 CLAIM_LEGAL_ORG_NAME_SPEC, "John Doe"

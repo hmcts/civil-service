@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
 class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -95,7 +96,7 @@ class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHandlerTest
             verify(notificationService).sendMail(
                 "applicantLip@example.com",
                 "template-id-lip",
-                getNotificationDataMapLip(),
+                getNotificationDataMapLip(caseData),
                 "create-sdo-applicants-notification-000DC001"
             );
         }
@@ -116,7 +117,7 @@ class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHandlerTest
             verify(notificationService).sendMail(
                 "applicantLip@example.com",
                 "template-id-lip-bilingual",
-                getNotificationDataMapLip(),
+                getNotificationDataMapLip(caseData),
                 "create-sdo-applicants-notification-000DC001"
             );
         }
@@ -141,7 +142,7 @@ class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHandlerTest
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
                 "template-id-spec",
-                getNotificationDataMapStatement(),
+                getNotificationDataMapStatement(caseData),
                 "create-sdo-applicants-notification-000DC001"
             );
         }
@@ -156,20 +157,21 @@ class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHandlerTest
         }
 
         @NotNull
-        private Map<String, String> getNotificationDataMapLip() {
+        private Map<String, String> getNotificationDataMapLip(CaseData caseData) {
             return Map.of(
                 PARTY_NAME, "Mr. John Rambo",
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                CLAIMANT_V_DEFENDANT, "Mr. John Rambo V Mr. Sole Trader"
+                CLAIMANT_V_DEFENDANT, "Mr. John Rambo V Mr. Sole Trader",
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
 
         @NotNull
-        private Map<String, String> getNotificationDataMapStatement() {
+        private Map<String, String> getNotificationDataMapStatement(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 CLAIM_LEGAL_ORG_NAME_SPEC, "test name",
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
     }
@@ -192,7 +194,7 @@ class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHandlerTest
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
                 "template-id-EA",
-                getNotificationDataMap(),
+                getNotificationDataMap(caseData),
                 "create-sdo-applicants-notification-000DC001"
             );
         }
@@ -213,17 +215,17 @@ class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHandlerTest
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
                 "template-id-spec-EA",
-                getNotificationDataMap(),
+                getNotificationDataMap(caseData),
                 "create-sdo-applicants-notification-000DC001"
             );
         }
 
         @NotNull
-        private Map<String, String> getNotificationDataMap() {
+        private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
     }

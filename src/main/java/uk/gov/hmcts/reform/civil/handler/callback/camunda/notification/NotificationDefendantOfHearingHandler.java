@@ -112,7 +112,6 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
     }
 
     public Map<String, String> addPropertiesHearing(final CaseData caseData, boolean isHmc, boolean isRespondent1Lip, boolean isDefendant1) {
-        String legacyCaseRef = isRespondent1Lip ? caseData.getLegacyCaseReference() : caseData.getCcdCaseReference().toString();
         String hearingDate = NotificationUtils.getFormattedHearingDate(caseData.getHearingDate());
         String orgName = isRespondent1Lip ? caseData.getRespondent1().getPartyName() : isDefendant1
             ? getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService)
@@ -125,8 +124,8 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
                 .getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId()).getHearingStartDateTime();
             hearingTime = NotificationUtils.getFormattedHearingTime(hearingStartDateTime.toLocalTime().toString());
         }
-        return new HashMap<>(Map.of(CLAIM_REFERENCE_NUMBER, legacyCaseRef, HEARING_DATE, hearingDate, HEARING_TIME, hearingTime,
-                                    CLAIM_LEGAL_ORG_NAME_SPEC, orgName, PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)));
+        return new HashMap<>(Map.of(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(), HEARING_DATE, hearingDate, HEARING_TIME, hearingTime,
+                                    PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)));
     }
 
     public Map<String, String> addPropertiesHmc(final CaseData caseData, boolean isDefendant1) {
