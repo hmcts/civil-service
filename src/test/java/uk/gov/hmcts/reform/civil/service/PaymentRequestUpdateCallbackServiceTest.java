@@ -1,22 +1,17 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
-import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
@@ -24,9 +19,10 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
 import java.math.BigDecimal;
-import java.util.Map;
 
-import static org.mockito.Mockito.any;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -40,25 +36,19 @@ class PaymentRequestUpdateCallbackServiceTest {
     private static final Long CASE_ID = 1594901956117591L;
     private static final String REFERENCE = "123445";
     private static final String ACCOUNT_NUMBER = "123445555";
-    private static final String TOKEN = "1234";
     private static final String BUSINESS_PROCESS = "JUDICIAL_REFERRAL";
 
     @InjectMocks
     private PaymentRequestUpdateCallbackService paymentRequestUpdateCallbackService;
 
     @Mock
-    private ObjectMapper objectMapper;
-
-    @Mock
-    private CoreCaseDataService coreCaseDataService;
-
-    @Mock
-    private CaseDetailsConverter caseDetailsConverter;
+    private PaymentProcessingHelper paymentProcessingHelper;
 
     @Mock
     private UpdatePaymentStatusService updatePaymentStatusService;
 
-    private CaseData buildCaseData(CaseState state, BusinessProcessStatus businessProcessStatus, String camundaEvent, PaymentDetails paymentDetails) {
+    private CaseData buildCaseData(CaseState state, BusinessProcessStatus businessProcessStatus,
+                                   String camundaEvent, PaymentDetails paymentDetails) {
         return CaseDataBuilder.builder().receiveUpdatePaymentRequest().build().toBuilder()
             .ccdState(state)
             .businessProcess(BusinessProcess.builder()
@@ -66,13 +56,6 @@ class PaymentRequestUpdateCallbackServiceTest {
                                  .camundaEvent(camundaEvent)
                                  .build())
             .hearingFeePaymentDetails(paymentDetails)
-            .build();
-    }
-
-    private CaseDetails buildCaseDetails(CaseData caseData) {
-        return CaseDetails.builder()
-            .data(objectMapper.convertValue(caseData, new TypeReference<Map<String, Object>>() {}))
-            .id(CASE_ID)
             .build();
     }
 
@@ -89,228 +72,204 @@ class PaymentRequestUpdateCallbackServiceTest {
             .build();
     }
 
-    private StartEventResponse startEventResponse(CaseDetails caseDetails, CaseEvent event) {
-        return StartEventResponse.builder()
-            .token(TOKEN)
-            .eventId(event.name())
-            .caseDetails(caseDetails)
-            .build();
-    }
-
-    private void setupMocks(CaseDetails caseDetails, CaseData caseData, CaseEvent caseEvent) {
-        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
-        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(caseDetails, caseEvent));
-        when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
-    }
-
     @Test
     void shouldStartAndSubmitEventWithCaseDetails_Hearing() {
         CaseData caseData = buildCaseData(CaseState.CASE_PROGRESSION, BusinessProcessStatus.READY, BUSINESS_PROCESS, null);
-        CaseDetails caseDetails = buildCaseDetails(caseData);
+        String caseId = CASE_ID.toString();
 
-        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
-        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(
-            caseDetails,
-            CaseEvent.SERVICE_REQUEST_RECEIVED
-        ));
-        when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
+        when(paymentProcessingHelper.getCaseData(caseId)).thenReturn(caseData);
+        when(paymentProcessingHelper.retrievePaymentDetails(FeeType.HEARING.name(), caseData)).thenReturn(null);
+        when(paymentProcessingHelper.updateCaseDataWithPaymentDetails(eq(FeeType.HEARING.name()), eq(caseData), any(PaymentDetails.class)))
+            .thenReturn(caseData);
 
         paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), FeeType.HEARING.name());
 
-        verify(coreCaseDataService).getCase(CASE_ID);
-        verify(coreCaseDataService).startUpdate(any(), any());
-        verify(coreCaseDataService).submitUpdate(any(), any());
-    }
-
-    @Test
-    void shouldStartAndSubmitEventWithCaseDetailsForHearingAndPreviousFail() {
-        CaseData caseData = buildCaseData(CaseState.PENDING_CASE_ISSUED, null, null, null).toBuilder()
-            .claimIssuedPaymentDetails(PaymentDetails.builder().status(PaymentStatus.FAILED).build()).caseAccessCategory(SPEC_CLAIM).build();
-        CaseDetails caseDetails = buildCaseDetails(caseData);
-
-        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
-        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(
-            caseDetails,
-            CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT
-        ));
-        when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
-
-        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), FeeType.CLAIMISSUED.name());
-
-        verify(coreCaseDataService).getCase(CASE_ID);
-        verify(coreCaseDataService).startUpdate(any(), any());
-        verify(coreCaseDataService).submitUpdate(any(), any());
+        verify(paymentProcessingHelper).getCaseData(caseId);
+        verify(paymentProcessingHelper).retrievePaymentDetails(FeeType.HEARING.name(), caseData);
+        verify(paymentProcessingHelper).updateCaseDataWithPaymentDetails(eq(FeeType.HEARING.name()), eq(caseData), any(PaymentDetails.class));
+        verify(paymentProcessingHelper).createAndSubmitEvent(eq(caseData), eq(caseId), eq(FeeType.HEARING.name()), eq("PaymentRequestUpdate"));
+        verify(updatePaymentStatusService).updatePaymentStatus(eq(FeeType.HEARING), eq(caseId), any(CardPaymentStatusResponse.class));
     }
 
     @Test
     void shouldStartAndSubmitEventWithCaseDetailsForClaimIssued() {
-        CaseData caseData = buildCaseData(CaseState.PENDING_CASE_ISSUED, null, null, null).toBuilder().caseAccessCategory(SPEC_CLAIM).build();
-        CaseDetails caseDetails = buildCaseDetails(caseData);
+        CaseData caseData = buildCaseData(CaseState.PENDING_CASE_ISSUED, null, null, null)
+            .toBuilder()
+            .caseAccessCategory(SPEC_CLAIM)
+            .build();
+        String caseId = CASE_ID.toString();
 
-        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
-        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(
-            caseDetails,
-            CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT
-        ));
-        when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
-
-        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), FeeType.CLAIMISSUED.name());
-
-        verify(coreCaseDataService).getCase(CASE_ID);
-        verify(coreCaseDataService).startUpdate(any(), any());
-        verify(coreCaseDataService).submitUpdate(any(), any());
-    }
-
-    @Test
-    void shouldProceed_WhenAdditionalPaymentExist_WithPaymentFail() {
-        PaymentDetails paymentDetails = PaymentDetails.builder().status(uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED).reference(REFERENCE).build();
-        CaseData caseData = buildCaseData(CaseState.CASE_PROGRESSION, BusinessProcessStatus.READY, BUSINESS_PROCESS, paymentDetails);
-        caseData = caseData.toBuilder().applicant1Represented(YesOrNo.NO).respondent1Represented(YesOrNo.NO)
-            .claimIssuedPaymentDetails(paymentDetails).build();
-        CaseDetails caseDetails = buildCaseDetails(caseData);
-
-        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(paymentProcessingHelper.getCaseData(caseId)).thenReturn(caseData);
+        when(paymentProcessingHelper.retrievePaymentDetails(FeeType.CLAIMISSUED.name(), caseData)).thenReturn(null);
+        when(paymentProcessingHelper.updateCaseDataWithPaymentDetails(eq(FeeType.CLAIMISSUED.name()), eq(caseData), any(PaymentDetails.class)))
+            .thenReturn(caseData);
 
         paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), FeeType.CLAIMISSUED.name());
 
-        verify(coreCaseDataService).getCase(CASE_ID);
-        verify(updatePaymentStatusService).updatePaymentStatus(any(), any(), any());
+        verify(paymentProcessingHelper).getCaseData(caseId);
+        verify(paymentProcessingHelper).retrievePaymentDetails(FeeType.CLAIMISSUED.name(), caseData);
+        verify(paymentProcessingHelper).updateCaseDataWithPaymentDetails(eq(FeeType.CLAIMISSUED.name()), eq(caseData), any(PaymentDetails.class));
+        verify(paymentProcessingHelper).createAndSubmitEvent(eq(caseData), eq(caseId), eq(FeeType.CLAIMISSUED.name()), eq("PaymentRequestUpdate"));
+        verify(updatePaymentStatusService).updatePaymentStatus(eq(FeeType.CLAIMISSUED), eq(caseId), any(CardPaymentStatusResponse.class));
     }
 
     @Test
-    void shouldProceed_WhenAdditionalPaymentExist_WithPayment() {
-        PaymentDetails paymentDetails = PaymentDetails.builder().status(uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS).reference(REFERENCE).build();
-        CaseData caseData = buildCaseData(CaseState.CASE_PROGRESSION, BusinessProcessStatus.READY, BUSINESS_PROCESS, paymentDetails);
-        caseData = caseData.toBuilder().applicant1Represented(YesOrNo.NO).respondent1Represented(YesOrNo.NO).build();
-        CaseDetails caseDetails = buildCaseDetails(caseData);
+    void shouldUpdatePaymentStatusForLiPCaseWithFailedPayment() {
+        PaymentDetails failedPaymentDetails = PaymentDetails.builder()
+            .status(PaymentStatus.FAILED)
+            .reference(REFERENCE)
+            .build();
+        CaseData caseData = buildCaseData(CaseState.CASE_PROGRESSION, BusinessProcessStatus.READY, BUSINESS_PROCESS, failedPaymentDetails)
+            .toBuilder()
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .build();
+        String caseId = CASE_ID.toString();
 
-        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(paymentProcessingHelper.getCaseData(caseId)).thenReturn(caseData);
+        when(paymentProcessingHelper.isValidPaymentUpdateHearing(FeeType.HEARING.name(), caseData)).thenReturn(true);
+        when(paymentProcessingHelper.retrievePaymentDetails(FeeType.HEARING.name(), caseData)).thenReturn(failedPaymentDetails);
+        when(paymentProcessingHelper.updateCaseDataWithPaymentDetails(eq(FeeType.HEARING.name()), eq(caseData), any(PaymentDetails.class)))
+            .thenReturn(caseData);
 
-        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), FeeType.CLAIMISSUED.name());
+        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), FeeType.HEARING.name());
 
-        verify(coreCaseDataService).getCase(CASE_ID);
-        verify(coreCaseDataService, never()).startUpdate(any(), any());
-        verify(coreCaseDataService, never()).submitUpdate(any(), any());
-        verify(updatePaymentStatusService, never()).updatePaymentStatus(any(), any(), any());
+        verify(paymentProcessingHelper).getCaseData(caseId);
+        verify(paymentProcessingHelper).isValidPaymentUpdateHearing(FeeType.HEARING.name(), caseData);
+        verify(paymentProcessingHelper).retrievePaymentDetails(FeeType.HEARING.name(), caseData);
+        verify(paymentProcessingHelper).updateCaseDataWithPaymentDetails(eq(FeeType.HEARING.name()), eq(caseData), any(PaymentDetails.class));
+        verify(paymentProcessingHelper).submitCaseDataWithoutEvent(caseData, caseId);
+        verify(updatePaymentStatusService).updatePaymentStatus(eq(FeeType.HEARING), eq(caseId), any(CardPaymentStatusResponse.class));
     }
 
     @Test
-    void shouldProceed_WhenClaimIssue_PaymentNull() {
+    void shouldNotProceedWhenPaymentStatusIsNotPaid() {
+        ServiceRequestUpdateDto serviceRequestUpdateDto = buildServiceDto(NOT_PAID);
+        String feeType = FeeType.HEARING.name();
+
+        paymentRequestUpdateCallbackService.processCallback(serviceRequestUpdateDto, feeType);
+
+        verify(paymentProcessingHelper, never()).getCaseData(anyString());
+        verify(paymentProcessingHelper, never()).retrievePaymentDetails(anyString(), any(CaseData.class));
+        verify(updatePaymentStatusService, never()).updatePaymentStatus(any(), anyString(), any(CardPaymentStatusResponse.class));
+    }
+
+    @Test
+    void shouldNotProceedWhenFeeTypeIsInvalid() {
+        ServiceRequestUpdateDto serviceRequestUpdateDto = buildServiceDto(PAID);
+        String invalidFeeType = "INVALID_FEE_TYPE";
+
+        paymentRequestUpdateCallbackService.processCallback(serviceRequestUpdateDto, invalidFeeType);
+
+        verify(paymentProcessingHelper, never()).getCaseData(anyString());
+        verify(updatePaymentStatusService, never()).updatePaymentStatus(any(), anyString(), any(CardPaymentStatusResponse.class));
+    }
+
+    @Test
+    void shouldNotUpdatePaymentWhenAlreadySuccessForNonLiPCase() {
+        PaymentDetails successfulPaymentDetails = PaymentDetails.builder()
+            .status(PaymentStatus.SUCCESS)
+            .reference(REFERENCE)
+            .build();
+        CaseData caseData = buildCaseData(CaseState.CASE_PROGRESSION, BusinessProcessStatus.READY, BUSINESS_PROCESS, successfulPaymentDetails);
+        String caseId = CASE_ID.toString();
+
+        when(paymentProcessingHelper.getCaseData(caseId)).thenReturn(caseData);
+        when(paymentProcessingHelper.retrievePaymentDetails(FeeType.HEARING.name(), caseData)).thenReturn(successfulPaymentDetails);
+
+        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), FeeType.HEARING.name());
+
+        verify(paymentProcessingHelper).getCaseData(caseId);
+        verify(paymentProcessingHelper).retrievePaymentDetails(FeeType.HEARING.name(), caseData);
+        verify(paymentProcessingHelper, never()).updateCaseDataWithPaymentDetails(anyString(), any(CaseData.class), any(PaymentDetails.class));
+        verify(paymentProcessingHelper, never()).createAndSubmitEvent(any(CaseData.class), anyString(), anyString(), anyString());
+        verify(updatePaymentStatusService, never()).updatePaymentStatus(any(), anyString(), any(CardPaymentStatusResponse.class));
+    }
+
+    @Test
+    void shouldUpdatePaymentStatusForLiPCaseWhenPaymentDetailsAreNull() {
         CaseData caseData = buildCaseData(CaseState.CASE_PROGRESSION, BusinessProcessStatus.READY, BUSINESS_PROCESS, null)
-            .toBuilder().claimIssuedPaymentDetails(null).build();
-        caseData = caseData.toBuilder().applicant1Represented(YesOrNo.NO).respondent1Represented(YesOrNo.NO).build();
-        CaseDetails caseDetails = buildCaseDetails(caseData);
+            .toBuilder()
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .build();
+        String caseId = CASE_ID.toString();
 
-        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
-
-        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), FeeType.CLAIMISSUED.name());
-
-        verify(coreCaseDataService).getCase(CASE_ID);
-        verify(updatePaymentStatusService).updatePaymentStatus(any(), any(), any());
-    }
-
-    @Test
-    void shouldProceed_WhenAdditionalPaymentExist_WithPaymentFailForClaimIssued() {
-        PaymentDetails paymentDetails = PaymentDetails.builder().status(uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED).reference(REFERENCE).build();
-        CaseData caseData = buildCaseData(CaseState.PENDING_CASE_ISSUED, null, null, paymentDetails).toBuilder().caseAccessCategory(SPEC_CLAIM).build();
-        CaseDetails caseDetails = buildCaseDetails(caseData);
-
-        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
-        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(
-            caseDetails,
-            CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT
-        ));
-        when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
-
-        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), FeeType.CLAIMISSUED.name());
-
-        verify(coreCaseDataService).getCase(CASE_ID);
-        verify(coreCaseDataService).startUpdate(any(), any());
-        verify(coreCaseDataService).submitUpdate(any(), any());
-    }
-
-    @Test
-    void shouldCallUpdatePaymentServiceWhenLipVLipAndHearingFeeDetailsAreNull() {
-        CaseData caseData = buildCaseData(CaseState.CASE_PROGRESSION, BusinessProcessStatus.READY,
-                                          BUSINESS_PROCESS, null).toBuilder().applicant1Represented(YesOrNo.NO).respondent1Represented(YesOrNo.NO).build();
-        CaseDetails caseDetails = buildCaseDetails(caseData);
-
-        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(paymentProcessingHelper.getCaseData(caseId)).thenReturn(caseData);
+        when(paymentProcessingHelper.isValidPaymentUpdateHearing(FeeType.HEARING.name(), caseData)).thenReturn(true);
+        when(paymentProcessingHelper.retrievePaymentDetails(FeeType.HEARING.name(), caseData)).thenReturn(null);
+        when(paymentProcessingHelper.updateCaseDataWithPaymentDetails(eq(FeeType.HEARING.name()), eq(caseData), any(PaymentDetails.class)))
+            .thenReturn(caseData);
 
         paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), FeeType.HEARING.name());
 
-        verify(coreCaseDataService).getCase(CASE_ID);
-        verify(coreCaseDataService, never()).startUpdate(any(), any());
-        verify(coreCaseDataService, never()).submitUpdate(any(), any());
-        verify(updatePaymentStatusService).updatePaymentStatus(any(), any(), any());
+        verify(paymentProcessingHelper).getCaseData(caseId);
+        verify(paymentProcessingHelper).isValidPaymentUpdateHearing(FeeType.HEARING.name(), caseData);
+        verify(paymentProcessingHelper).retrievePaymentDetails(FeeType.HEARING.name(), caseData);
+        verify(paymentProcessingHelper).updateCaseDataWithPaymentDetails(eq(FeeType.HEARING.name()), eq(caseData), any(PaymentDetails.class));
+        verify(paymentProcessingHelper).submitCaseDataWithoutEvent(caseData, caseId);
+        verify(updatePaymentStatusService).updatePaymentStatus(eq(FeeType.HEARING), eq(caseId), any(CardPaymentStatusResponse.class));
     }
 
     @Test
-    void shouldNotCallUpdatePaymentServiceWhenLipVLipAndHearingFeeDetailsAreNotNull() {
-        CaseData caseData = buildCaseData(CaseState.CASE_PROGRESSION, BusinessProcessStatus.READY,
-                                          BUSINESS_PROCESS,
-                                          PaymentDetails.builder().status(PaymentStatus.SUCCESS).build())
-            .toBuilder().applicant1Represented(YesOrNo.NO).respondent1Represented(YesOrNo.NO).build();
+    void shouldNotProceedWhenLiPCaseAndPaymentAlreadySuccess() {
+        PaymentDetails successfulPaymentDetails = PaymentDetails.builder()
+            .status(PaymentStatus.SUCCESS)
+            .reference(REFERENCE)
+            .build();
+        CaseData caseData = buildCaseData(CaseState.CASE_PROGRESSION, BusinessProcessStatus.READY, BUSINESS_PROCESS, successfulPaymentDetails)
+            .toBuilder()
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .build();
+        String caseId = CASE_ID.toString();
 
-        CaseDetails caseDetails = buildCaseDetails(caseData);
-
-        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(paymentProcessingHelper.getCaseData(caseId)).thenReturn(caseData);
+        when(paymentProcessingHelper.isValidPaymentUpdateHearing(FeeType.HEARING.name(), caseData)).thenReturn(false);
 
         paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), FeeType.HEARING.name());
 
-        verify(coreCaseDataService).getCase(CASE_ID);
-        verify(coreCaseDataService, never()).startUpdate(any(), any());
-        verify(coreCaseDataService, never()).submitUpdate(any(), any());
-        verify(updatePaymentStatusService, never()).updatePaymentStatus(any(), any(), any());
+        verify(paymentProcessingHelper).getCaseData(caseId);
+        verify(paymentProcessingHelper).isValidPaymentUpdateHearing(FeeType.HEARING.name(), caseData);
+        verify(paymentProcessingHelper, never()).updateCaseDataWithPaymentDetails(anyString(), any(CaseData.class), any(PaymentDetails.class));
+        verify(updatePaymentStatusService, never()).updatePaymentStatus(any(), anyString(), any(CardPaymentStatusResponse.class));
     }
 
     @Test
-    void shouldNotCallUpdatePaymentServiceWhenLRvLR() {
-        CaseData caseData = buildCaseData(CaseState.CASE_PROGRESSION, BusinessProcessStatus.READY,
-                                          BUSINESS_PROCESS, null).toBuilder().applicant1Represented(YesOrNo.YES).respondent1Represented(YesOrNo.YES).build();
-        CaseDetails caseDetails = buildCaseDetails(caseData);
+    void shouldNotProceedWhenCaseIsNotLiPAndPaymentAlreadySuccess() {
+        PaymentDetails successfulPaymentDetails = PaymentDetails.builder()
+            .status(PaymentStatus.SUCCESS)
+            .reference(REFERENCE)
+            .build();
+        CaseData caseData = buildCaseData(CaseState.CASE_PROGRESSION, BusinessProcessStatus.READY, BUSINESS_PROCESS, successfulPaymentDetails)
+            .toBuilder()
+            .applicant1Represented(YesOrNo.YES)
+            .respondent1Represented(YesOrNo.YES)
+            .build();
+        String caseId = CASE_ID.toString();
 
-        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
-        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(
-            caseDetails,
-            CaseEvent.SERVICE_REQUEST_RECEIVED
-        ));
-        when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
+        when(paymentProcessingHelper.getCaseData(caseId)).thenReturn(caseData);
+        when(paymentProcessingHelper.retrievePaymentDetails(FeeType.HEARING.name(), caseData)).thenReturn(successfulPaymentDetails);
 
         paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), FeeType.HEARING.name());
 
-        verify(coreCaseDataService).getCase(CASE_ID);
-        verify(coreCaseDataService).startUpdate(any(), any());
-        verify(coreCaseDataService).submitUpdate(any(), any());
-        verify(updatePaymentStatusService, never()).updatePaymentStatus(any(), any(), any());
+        verify(paymentProcessingHelper).getCaseData(caseId);
+        verify(paymentProcessingHelper).retrievePaymentDetails(FeeType.HEARING.name(), caseData);
+        verify(paymentProcessingHelper, never()).updateCaseDataWithPaymentDetails(anyString(), any(CaseData.class), any(PaymentDetails.class));
+        verify(paymentProcessingHelper, never()).createAndSubmitEvent(any(CaseData.class), anyString(), anyString(), anyString());
+        verify(updatePaymentStatusService, never()).updatePaymentStatus(any(), anyString(), any(CardPaymentStatusResponse.class));
     }
 
     @Test
-    void shouldNotProceed_WhenPaymentFailed() {
-        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(NOT_PAID), FeeType.HEARING.name());
+    void shouldNotProceedWhenFeeTypeIsNotHearingOrClaimIssued() {
+        ServiceRequestUpdateDto serviceRequestUpdateDto = buildServiceDto(PAID);
+        String invalidFeeType = "OTHER_FEE_TYPE";
+        String caseId = CASE_ID.toString();
 
-        verify(coreCaseDataService, never()).getCase(CASE_ID);
-        verify(coreCaseDataService, never()).startUpdate(any(), any());
-        verify(coreCaseDataService, never()).submitUpdate(any(), any());
-    }
+        paymentRequestUpdateCallbackService.processCallback(serviceRequestUpdateDto, invalidFeeType);
 
-    @Test
-    void shouldNotProceed_WhenPaymentFailedForClaimIssued() {
-        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(NOT_PAID), FeeType.CLAIMISSUED.name());
-
-        verify(coreCaseDataService, never()).getCase(CASE_ID);
-        verify(coreCaseDataService, never()).startUpdate(any(), any());
-        verify(coreCaseDataService, never()).submitUpdate(any(), any());
+        verify(paymentProcessingHelper, never()).getCaseData(caseId);
+        verify(paymentProcessingHelper, never()).retrievePaymentDetails(anyString(), any(CaseData.class));
+        verify(updatePaymentStatusService, never()).updatePaymentStatus(any(), anyString(), any(CardPaymentStatusResponse.class));
     }
 }

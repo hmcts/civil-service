@@ -1,134 +1,128 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
-import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 
-import java.util.Map;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_CLAIM_ISSUE_PAYMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_HEARING_FEE_PAYMENT;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 
 @ExtendWith(MockitoExtension.class)
 class UpdatePaymentStatusServiceTest {
 
     @InjectMocks
-    UpdatePaymentStatusService updatePaymentStatusService;
+    private UpdatePaymentStatusService updatePaymentStatusService;
 
     @Mock
-    CaseDetailsConverter caseDetailsConverter;
-
-    @Mock
-    ObjectMapper objectMapper;
-
-    @Mock
-    private CoreCaseDataService coreCaseDataService;
-
-    public static final String BUSINESS_PROCESS = "JUDICIAL_REFERRAL";
-    private static final Long CASE_ID = 1594901956117591L;
-    public static final String TOKEN = "1234";
+    private PaymentProcessingHelper paymentProcessingHelper;
 
     @Test
-    public void shouldSubmitCitizenHearingFeePaymentEventIfFeeTypeIsHearing() {
+    void shouldUpdatePaymentStatusAndSubmitEventForNonLiPCase() {
+        String caseReference = "1594901956117591";
+        FeeType feeType = FeeType.HEARING;
+        CaseData caseData = mock(CaseData.class);
+        PaymentDetails existingPaymentDetails = mock(PaymentDetails.class);
+        PaymentDetails.PaymentDetailsBuilder paymentDetailsBuilder = PaymentDetails.builder();
 
-        CaseData caseData = CaseDataBuilder.builder().receiveUpdatePaymentRequest().build();
-        caseData = caseData.toBuilder()
-            .ccdState(CASE_PROGRESSION)
-            .businessProcess(BusinessProcess.builder()
-                                 .status(BusinessProcessStatus.READY)
-                                 .camundaEvent(BUSINESS_PROCESS)
-                                 .build())
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1Represented(YesOrNo.NO)
-            .hearingFeePaymentDetails(null)
+        CardPaymentStatusResponse cardPaymentStatusResponse = CardPaymentStatusResponse.builder()
+            .paymentReference("1234")
+            .status(PaymentStatus.SUCCESS.name())
             .build();
-        CaseDetails caseDetails = buildCaseDetails(caseData);
 
-        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
-        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(
-            caseDetails,
-            CITIZEN_HEARING_FEE_PAYMENT
-        ));
-        when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
+        when(paymentProcessingHelper.getCaseData(caseReference)).thenReturn(caseData);
+        when(paymentProcessingHelper.retrievePaymentDetails(feeType.name(), caseData)).thenReturn(existingPaymentDetails);
+        when(existingPaymentDetails.toBuilder()).thenReturn(paymentDetailsBuilder);
 
-        updatePaymentStatusService.updatePaymentStatus(FeeType.HEARING, String.valueOf(CASE_ID), getCardPaymentStatusResponse());
+        PaymentDetails paymentDetails = paymentDetailsBuilder
+            .status(PaymentStatus.valueOf(cardPaymentStatusResponse.getStatus().toUpperCase()))
+            .reference(cardPaymentStatusResponse.getPaymentReference())
+            .errorCode(cardPaymentStatusResponse.getErrorCode())
+            .errorMessage(cardPaymentStatusResponse.getErrorDescription())
+            .build();
 
-        verify(coreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
-        verify(coreCaseDataService).startUpdate(String.valueOf(CASE_ID), CITIZEN_HEARING_FEE_PAYMENT);
-        verify(coreCaseDataService).submitUpdate(any(), any());
+        when(paymentProcessingHelper.updateCaseDataWithPaymentDetails(feeType.name(), caseData, paymentDetails))
+            .thenReturn(caseData);
 
+        when(caseData.isLipvLipOneVOne()).thenReturn(false);
+
+        updatePaymentStatusService.updatePaymentStatus(feeType, caseReference, cardPaymentStatusResponse);
+
+        verify(paymentProcessingHelper).getCaseData(caseReference);
+        verify(paymentProcessingHelper).retrievePaymentDetails(feeType.name(), caseData);
+        verify(existingPaymentDetails).toBuilder();
+        verify(paymentProcessingHelper).updateCaseDataWithPaymentDetails(feeType.name(), caseData, paymentDetails);
+        verify(caseData).isLipvLipOneVOne();
+        verify(paymentProcessingHelper).createAndSubmitEvent(caseData, caseReference, feeType.name(), "UpdatePaymentStatus");
+        verifyNoMoreInteractions(paymentProcessingHelper);
     }
 
     @Test
-    public void shouldSubmitCitizenClaimIssuedFeePaymentEventIfFeeTypeIsClaimIssued() {
+    void shouldUpdatePaymentStatusAndSubmitCaseDataWithoutEventForLiPCase() {
+        String caseReference = "1594901956117591";
+        FeeType feeType = FeeType.CLAIMISSUED;
+        CaseData caseData = mock(CaseData.class);
+        PaymentDetails existingPaymentDetails = mock(PaymentDetails.class);
+        PaymentDetails.PaymentDetailsBuilder paymentDetailsBuilder = PaymentDetails.builder();
 
-        CaseData caseData = CaseDataBuilder.builder().receiveUpdatePaymentRequest().build();
-        caseData = caseData.toBuilder()
-            .ccdState(CASE_PROGRESSION)
-            .businessProcess(BusinessProcess.builder()
-                                 .status(BusinessProcessStatus.READY)
-                                 .camundaEvent(BUSINESS_PROCESS)
-                                 .build())
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1Represented(YesOrNo.NO)
-            .hearingFeePaymentDetails(null)
+        CardPaymentStatusResponse cardPaymentStatusResponse = CardPaymentStatusResponse.builder()
+            .paymentReference("5678")
+            .status(PaymentStatus.SUCCESS.name())
             .build();
-        CaseDetails caseDetails = buildCaseDetails(caseData);
 
-        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
-        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(
-            caseDetails,
-            CITIZEN_CLAIM_ISSUE_PAYMENT
-        ));
-        when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
+        when(paymentProcessingHelper.getCaseData(caseReference)).thenReturn(caseData);
+        when(paymentProcessingHelper.retrievePaymentDetails(feeType.name(), caseData)).thenReturn(existingPaymentDetails);
+        when(existingPaymentDetails.toBuilder()).thenReturn(paymentDetailsBuilder);
 
-        updatePaymentStatusService.updatePaymentStatus(FeeType.CLAIMISSUED, String.valueOf(CASE_ID), getCardPaymentStatusResponse());
-
-        verify(coreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
-        verify(coreCaseDataService).startUpdate(String.valueOf(CASE_ID), CITIZEN_CLAIM_ISSUE_PAYMENT);
-        verify(coreCaseDataService).submitUpdate(any(), any());
-
-    }
-
-    private CaseDetails buildCaseDetails(CaseData caseData) {
-        return CaseDetails.builder()
-            .data(objectMapper.convertValue(caseData,
-                                            new TypeReference<Map<String, Object>>() {}))
-            .id(Long.valueOf(CASE_ID)).build();
-    }
-
-    private StartEventResponse startEventResponse(CaseDetails caseDetails, CaseEvent event) {
-        return StartEventResponse.builder()
-            .token(TOKEN)
-            .eventId(event.name())
-            .caseDetails(caseDetails)
+        PaymentDetails paymentDetails = paymentDetailsBuilder
+            .status(PaymentStatus.valueOf(cardPaymentStatusResponse.getStatus().toUpperCase()))
+            .reference(cardPaymentStatusResponse.getPaymentReference())
+            .errorCode(cardPaymentStatusResponse.getErrorCode())
+            .errorMessage(cardPaymentStatusResponse.getErrorDescription())
             .build();
+
+        when(paymentProcessingHelper.updateCaseDataWithPaymentDetails(feeType.name(), caseData, paymentDetails))
+            .thenReturn(caseData);
+
+        when(caseData.isLipvLipOneVOne()).thenReturn(true);
+
+        updatePaymentStatusService.updatePaymentStatus(feeType, caseReference, cardPaymentStatusResponse);
+
+        verify(paymentProcessingHelper).getCaseData(caseReference);
+        verify(paymentProcessingHelper).retrievePaymentDetails(feeType.name(), caseData);
+        verify(existingPaymentDetails).toBuilder();
+        verify(paymentProcessingHelper).updateCaseDataWithPaymentDetails(feeType.name(), caseData, paymentDetails);
+        verify(caseData).isLipvLipOneVOne();
+        verify(paymentProcessingHelper).submitCaseDataWithoutEvent(caseData, caseReference);
+        verifyNoMoreInteractions(paymentProcessingHelper);
     }
 
-    private CardPaymentStatusResponse getCardPaymentStatusResponse() {
-        return CardPaymentStatusResponse.builder().paymentReference("1234").status(PaymentStatus.SUCCESS.name()).build();
+    @Test
+    void shouldThrowCaseDataUpdateExceptionWhenExceptionOccurs() {
+        String caseReference = "1594901956117591";
+        FeeType feeType = FeeType.HEARING;
+        CardPaymentStatusResponse cardPaymentStatusResponse = CardPaymentStatusResponse.builder()
+            .paymentReference("1234")
+            .status(PaymentStatus.SUCCESS.name())
+            .build();
+
+        when(paymentProcessingHelper.getCaseData(caseReference)).thenThrow(new RuntimeException("Test exception"));
+
+        assertThrows(CaseDataUpdateException.class, () ->
+            updatePaymentStatusService.updatePaymentStatus(feeType, caseReference, cardPaymentStatusResponse)
+        );
+
+        verify(paymentProcessingHelper).getCaseData(caseReference);
+        verifyNoMoreInteractions(paymentProcessingHelper);
     }
 }
