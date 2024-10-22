@@ -48,8 +48,9 @@ class CertificateOfDebtGeneratorTest {
 
     @BeforeEach
     void setup() {
-        certificateOfDebtGenerator = new CertificateOfDebtGenerator(documentManagementService,documentGeneratorService,locationRefDataService);
+        certificateOfDebtGenerator = new CertificateOfDebtGenerator(documentManagementService, documentGeneratorService, locationRefDataService);
     }
+    
     @Test
     void shouldGenerateCoscDocument() {
 
