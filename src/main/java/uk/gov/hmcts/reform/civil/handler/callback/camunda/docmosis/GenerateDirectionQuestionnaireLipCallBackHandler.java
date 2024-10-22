@@ -69,9 +69,8 @@ public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHa
             CaseDocument sealedDQFormCopy = sealedDQForm.toBuilder()
                 .documentLink(sealedDQForm.getDocumentLink().toBuilder().build()).build();
             caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedDocumentService
-                            .getSystemGeneratedDocumentsWithAddedDocument(sealedDQFormCopy, caseData));
+                                                             .getSystemGeneratedDocumentsWithAddedDocument(sealedDQFormCopy, caseData));
             assignCategoryId.assignCategoryIdToCaseDocument(sealedDQFormCopy, DocCategory.APP1_DQ.getValue());
-
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
