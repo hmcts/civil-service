@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -24,11 +23,9 @@ import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DIRECTIONS_QUESTIONNAIRE;
 
@@ -91,8 +88,6 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
 
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         verify(directionsQuestionnaireLipGenerator).generate(caseData, BEARER_TOKEN);
-        verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.DQ_APP1.getValue()));
-        verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.APP1_DQ.getValue()));
     }
 
     @Test
@@ -104,8 +99,6 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
 
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         verify(directionQuestionnaireLipResponseGenerator).generate(caseData, BEARER_TOKEN);
-        verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.DQ_APP1.getValue()));
-        verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.APP1_DQ.getValue()));
     }
 
     @Test
@@ -152,19 +145,15 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
 
         verify(directionsQuestionnaireLipGenerator).generate(caseData, BEARER_TOKEN);
-        verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.DQ_APP1.getValue()));
-        verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.APP1_DQ.getValue()));
     }
 
     @Test
-    void shouldGenerateForm_whenAboutToSubmitCalled_defendantDoc() {
+    void shouldNotGenerateForm_whenAboutToSubmitCalledWithFullAdmissionWithDefendantDoc() {
         given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(directionsQuestionnaireLipGenerator);
         given(directionsQuestionnaireLipGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM_DEFENDANT);
         CaseData caseData = CaseData.builder().build();
 
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         verify(directionsQuestionnaireLipGenerator).generate(caseData, BEARER_TOKEN);
-        verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.DQ_DEF1.getValue()));
-        verifyNoMoreInteractions(assignCategoryId);
     }
 }
