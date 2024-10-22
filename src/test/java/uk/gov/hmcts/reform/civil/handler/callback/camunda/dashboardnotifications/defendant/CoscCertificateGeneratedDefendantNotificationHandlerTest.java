@@ -75,7 +75,6 @@ public class CoscCertificateGeneratedDefendantNotificationHandlerTest extends Ba
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            when(toggleService.isCoSCEnabled()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COSC_GEN_FOR_DEFENDANT.name()).build()
