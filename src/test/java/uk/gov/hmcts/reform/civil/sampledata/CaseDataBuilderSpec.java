@@ -92,7 +92,6 @@ public class CaseDataBuilderSpec {
     private String respondent1OrganisationIDCopy;
     private String respondent2OrganisationIDCopy;
 
-
     public CaseDataBuilderSpec respondentSolicitor1EmailAddress(String respondentSolicitor1EmailAddress) {
         this.respondentSolicitor1EmailAddress = respondentSolicitor1EmailAddress;
         return this;

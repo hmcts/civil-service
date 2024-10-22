@@ -903,6 +903,12 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void updateRespondent2Experts() {
                 // Given
+                CaseData oldCaseData = CaseDataBuilder.builder()
+                    .applicant1(Party.builder().build())
+                    .respondent1(Party.builder().build())
+                    .build();
+                when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
+
                 when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
                 when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
                 when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
@@ -1025,24 +1031,21 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                           .addressLine2("address line 2")
                                                           .addressLine3("address line 3")
                                                           .build());
+            CaseData oldCaseData = CaseDataBuilder.builder()
+                .applicant1(Party.builder().type(INDIVIDUAL).build())
+                .respondent1(Party.builder().type(INDIVIDUAL).build())
+                .build();
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
 
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .respondent2DQ()
                 .addRespondent2(YES)
-                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2(Party.builder().type(INDIVIDUAL).primaryAddress(Address.builder().addressLine1("new address line 1").build()).build())
                 .atSpecAoSRespondent2HomeAddressRequired(NO)
                 .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal()
                                                             .addressLine1("new address line 1")
                                                             .build())
                 .build();
-            Address address = Address.builder()
-                .postCode("E11 5BB")
-                .build();
-            CaseData oldCaseData = CaseDataBuilder.builder()
-                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
-                .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
-                .build();
-            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
 
             // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(

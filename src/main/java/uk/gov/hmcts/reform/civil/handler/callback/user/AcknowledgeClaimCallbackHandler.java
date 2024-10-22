@@ -92,7 +92,6 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse populateRespondentCopyObjects(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        var caseDateBuilder = caseData.toBuilder();
 
         // Show error message if defendant tries to submit response again ONE_V_TWO_TWO_LEGAL_REP
         if ((solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORONE)
@@ -117,6 +116,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         if (solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
             isRespondent1 = NO;
         }
+        var caseDateBuilder = caseData.toBuilder();
         caseDateBuilder.solicitorReferencesCopy(caseData.getSolicitorReferences());
         caseDateBuilder.isRespondent1(isRespondent1);
         return AboutToStartOrSubmitCallbackResponse.builder()
