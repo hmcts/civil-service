@@ -41,7 +41,6 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
     private final ClaimFormGenerator claimFormGenerator;
     private final AssignCategoryId assignCategoryId;
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
-    private final AssignCategoryId assignCategoryId;
     private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::generateClaimForm);
 
     @Override
