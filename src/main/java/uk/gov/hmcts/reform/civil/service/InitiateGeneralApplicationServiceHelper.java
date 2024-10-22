@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.utils.UserRoleUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -52,7 +53,7 @@ public class InitiateGeneralApplicationServiceHelper {
     public static final String RESPONDENT_ID = "002";
     public static final String RESPONDENT2_ID = "003";
     public static final String APPLICANT2_ID = "004";
-    private static final int LIP_URGENT_DAYS = 11;
+    private static final int LIP_URGENT_DAYS = 10;
     private static final String LIP_URGENT_REASON = "There is a hearing on the main case within 10 days";
 
     public GeneralApplication setRespondentDetailsIfPresent(GeneralApplication generalApplication,
@@ -140,7 +141,10 @@ public class InitiateGeneralApplicationServiceHelper {
                                  CaseData caseData,
                                  GeneralAppFeesService feesService) {
 
-        LocalDate startDate = LocalDate.now();
+        LocalDate startDate = LocalDateTime.now().getHour() >= 16
+            ? LocalDate.now().plusDays(1)
+            : LocalDate.now();
+
         LocalDate lipUrgentEndDate = LocalDate.now().plusDays(LIP_URGENT_DAYS);
 
         long noOfHoliday = startDate.datesUntil(lipUrgentEndDate)
