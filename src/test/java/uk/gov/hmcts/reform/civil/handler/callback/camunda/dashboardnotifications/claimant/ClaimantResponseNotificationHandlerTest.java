@@ -26,7 +26,6 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.ClaimantResponseOnCourtDecisionType;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -322,7 +321,6 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1Represented(YesOrNo.NO)
                 .caseDataLiP(CaseDataLiP.builder()
                                  .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                            .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
                                                             .claimantResponseOnCourtDecision(
                                                                 ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE)
                                                             .build()
