@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.CoscApplicationStatus;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -19,6 +20,8 @@ import uk.gov.hmcts.reform.civil.service.docmosis.cosc.CertificateOfDebtGenerato
 
 import java.time.LocalDateTime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -71,6 +74,9 @@ class GenerateCoscDocumentHandlerTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         verify(certificateOfDebtGenerator).generateDoc(any(CaseData.class), eq("BEARER_TOKEN"));
+        assertThat(response.getData())
+            .extracting("coSCApplicationStatus")
+            .isEqualTo("PROCESSED");
 
     }
 
