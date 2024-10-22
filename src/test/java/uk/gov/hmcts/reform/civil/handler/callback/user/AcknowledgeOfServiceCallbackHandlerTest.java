@@ -219,13 +219,6 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
         void aboutToSubmit_NewResponseDeadline() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .respondent1Copy(Party.builder().partyName("Party 2").primaryAddress(
-                                                                        Address
-                                                                            .builder()
-                                                                            .addressLine1("Triple street")
-                                                                            .postCode("Postcode")
-                                                                            .build())
-                                     .build())
                 .respondent1ResponseDeadline(LocalDateTime.now().plusDays(10))
                 .build();
 
@@ -262,20 +255,6 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .respondent1Copy(Party.builder().partyName("Party 2").primaryAddress(
-                        Address
-                            .builder()
-                            .addressLine1("Triple street")
-                            .postCode("Postcode")
-                            .build())
-                                     .build())
-                .respondent2Copy(Party.builder().partyName("Respondent 2").primaryAddress(
-                        Address
-                            .builder()
-                            .addressLine1("Triple street")
-                            .postCode("Postcode")
-                            .build())
-                                     .build())
                 .respondent1ResponseDeadline(initialDeadline)
                 .build();
 

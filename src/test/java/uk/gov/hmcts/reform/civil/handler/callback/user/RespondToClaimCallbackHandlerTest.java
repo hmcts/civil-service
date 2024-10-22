@@ -189,8 +189,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
             //Then
             assertThat(response.getErrors()).isNull();
-            assertThat(response.getData().get("respondent1Copy")).isEqualTo(response.getData().get("respondent1"));
-            assertThat(response.getData().get("respondent2Copy")).isEqualTo(response.getData().get("respondent2"));
         }
 
         @Test
@@ -203,9 +201,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
             //Then
             assertThat(response.getErrors()).isNull();
-            assertThat(response.getData().get("respondent1Copy")).isEqualTo(response.getData().get("respondent1"));
-            assertThat(response.getData().get("respondent2Copy")).isNull();
-            assertThat(response.getData().get("respondent2Copy")).isNull();
         }
 
         @Test
@@ -1295,8 +1290,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimTwoDefendantSolicitors()
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
@@ -1314,8 +1307,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimTwoDefendantSolicitors()
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
@@ -1333,8 +1324,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimTwoDefendantSolicitors()
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
@@ -1351,7 +1340,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .multiPartyClaimOneDefendantSolicitor()
                 .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                 .respondentResponseIsSame(YES)
-                .respondent1Copy(PartyBuilder.builder().individual().build())
                 .build();
 
             when(featureToggleService.isHmcEnabled()).thenReturn(true);
@@ -1372,7 +1360,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .multiPartyClaimOneDefendantSolicitor()
                 .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                 .respondentResponseIsSame(YES)
-                .respondent1Copy(PartyBuilder.builder().individual().build())
                 .build();
 
             when(featureToggleService.isHmcEnabled()).thenReturn(false);
@@ -1398,7 +1385,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .multiPartyClaimOneDefendantSolicitor()
                 .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                 .respondentResponseIsSame(YES)
-                .respondent1Copy(PartyBuilder.builder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
@@ -1426,8 +1412,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .multiPartyClaimOneDefendantSolicitor()
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .respondentResponseIsSame(NO)
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
@@ -1458,8 +1442,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .respondentResponseIsSame(NO)
                 .respondent2SameLegalRepresentative(NO)
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
@@ -1490,8 +1472,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .respondentResponseIsSame(NO)
                 .respondent2SameLegalRepresentative(NO)
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
@@ -1517,14 +1497,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .addRespondent2(NO)
                 .respondent2SameLegalRepresentative(NO)
-                .respondent1Copy(PartyBuilder.builder()
-                    .individual()
-                    .legalRepHeading()
-                    .build())
-                .respondent2Copy(PartyBuilder.builder()
-                    .individual()
-                    .legalRepHeading()
-                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
@@ -1550,8 +1522,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .addRespondent2(null)
                 .respondent2SameLegalRepresentative(NO)
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
@@ -1577,14 +1547,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(NO)
-                .respondent1Copy(PartyBuilder.builder()
-                    .individual()
-                    .legalRepHeading()
-                    .build())
-                .respondent2Copy(PartyBuilder.builder()
-                    .individual()
-                    .legalRepHeading()
-                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
@@ -1613,8 +1575,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .respondentResponseIsSame(NO)
                 .respondent2ClaimResponseType(COUNTER_CLAIM)
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
@@ -1655,8 +1615,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         RequestedCourt.builder()
                             .build()).build())
                 .respondentResponseIsSame(NO)
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
@@ -1683,8 +1641,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .multiPartyClaimOneDefendantSolicitor()
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .respondentResponseIsSame(NO)
-                .respondent1Copy(PartyBuilder.builder().individualNoPrimaryAddress("john").build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
@@ -1707,8 +1663,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 //respondent1ClaimResponseType is copied into respondent2ClaimResponseType via handler
                 .atStateRespondentFullDefence()
                 .respondentResponseIsSame(YES)
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1737,8 +1691,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                 .respondent2Responds(FULL_DEFENCE)
                 .respondent2DQ()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
@@ -1765,8 +1717,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .multiPartyClaimTwoDefendantSolicitors()
                 .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                 .respondent2Responds(FULL_DEFENCE)
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
@@ -1792,8 +1742,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimTwoDefendantSolicitors()
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1829,8 +1777,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimTwoDefendantSolicitors()
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1853,8 +1799,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimTwoDefendantSolicitors()
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .removeSolicitorReferences()
                 .build();
 
@@ -1877,8 +1821,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimTwoDefendantSolicitors()
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build().toBuilder()
                 .build();
             var beforeCaseData = Map.of("solicitorReferences",
@@ -1916,8 +1858,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimTwoDefendantSolicitors()
                 .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting2ndRespondentResponse()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1941,8 +1881,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimTwoDefendantSolicitors()
                 .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting1stRespondentResponse()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1969,14 +1907,11 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             String address = "test address";
             var expectedAddress = AddressBuilder.defaults().addressLine1(address).build();
             caseData = caseData.toBuilder()
-                .respondent1Copy(caseData.getRespondent1().toBuilder().primaryAddress(expectedAddress).build())
-                .respondent2Copy(caseData.getRespondent2().toBuilder().primaryAddress(expectedAddress).build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
-            assertThat(response.getData()).doesNotContainKey("respondent1Copy");
             assertThat(response.getData())
                 .extracting("respondent1").extracting("primaryAddress").extracting("AddressLine1").isEqualTo(address);
             assertThat(response.getData())
@@ -1993,8 +1928,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimDetailsNotified()
                 .respondent1ClaimResponseTypeToApplicant1(FULL_DEFENCE)
                 .respondent1ClaimResponseTypeToApplicant2(FULL_DEFENCE)
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
@@ -2025,8 +1958,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimDetailsNotified()
                 .respondent1ClaimResponseTypeToApplicant1(FULL_DEFENCE)
                 .respondent1ClaimResponseTypeToApplicant2(FULL_DEFENCE)
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
@@ -2064,8 +1995,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1ClaimResponseTypeToApplicant1(FULL_DEFENCE)
                 .respondent1ClaimResponseTypeToApplicant2(FULL_DEFENCE)
                 .respondent2ClaimResponseType(FULL_DEFENCE)
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -2106,8 +2035,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1ClaimResponseTypeToApplicant2(FULL_DEFENCE)
                 .respondent1ClaimResponseType(COUNTER_CLAIM)
                 .respondent2ClaimResponseType(FULL_DEFENCE)
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -2139,8 +2066,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2ClaimResponseType(COUNTER_CLAIM)
                 .respondent1ClaimResponseTypeToApplicant1(FULL_DEFENCE)
                 .respondent1ClaimResponseTypeToApplicant2(FULL_DEFENCE)
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
@@ -2154,29 +2079,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).doesNotHaveToString("respondent2ResponseDate");
         }
 
-        @Test
-        void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_whenRespondent2CopyIsNull() {
-            //Given
-            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimTwoApplicants()
-                .respondentResponseIsSame(YES)
-                .atStateClaimDetailsNotified()
-                .respondent1ClaimResponseType(FULL_DEFENCE)
-                .respondent1ClaimResponseTypeToApplicant1(FULL_DEFENCE)
-                .respondent1ClaimResponseTypeToApplicant2(FULL_DEFENCE)
-                .respondent2Copy(PartyBuilder.builder().individual().build())
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            //When
-            //Then
-            assertThrows(
-                NullPointerException.class,
-                () -> handler.handle(params)
-            );
-        }
-
         @Nested
         class ResetStatementOfTruth {
 
@@ -2187,7 +2089,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 //Given
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
-                    .respondent1Copy(PartyBuilder.builder().individual().build())
                     .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
                     .build();
                 CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -2215,7 +2116,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                     .build()
                     .toBuilder()
-                    .respondent1Copy(PartyBuilder.builder().individual().build())
                     .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
                     .build();
                 CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -2250,7 +2150,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
-                        .respondent1Copy(PartyBuilder.builder().individual().build())
                         .respondent1DQ(
                             Respondent1DQ.builder().respondent1DQRequestedCourt(
                                 RequestedCourt.builder()
@@ -2305,8 +2204,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .multiPartyClaimOneDefendantSolicitor()
                         .atStateRespondentFullDefence()
                         .respondentResponseIsSame(YES)
-                        .respondent1Copy(PartyBuilder.builder().individual().build())
-                        .respondent2Copy(PartyBuilder.builder().individual().build())
                         .respondent1DQ(
                             Respondent1DQ.builder().respondent1DQRequestedCourt(
                                 RequestedCourt.builder()
@@ -2357,8 +2254,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .multiPartyClaimOneDefendantSolicitor()
                         .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                         .respondentResponseIsSame(NO)
-                        .respondent1Copy(PartyBuilder.builder().individual().build())
-                        .respondent2Copy(PartyBuilder.builder().individual().build())
                         .respondent1DQ(
                             Respondent1DQ.builder().respondent1DQRequestedCourt(
                                 RequestedCourt.builder()
@@ -2446,8 +2341,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                         )
                                     )
                                     .build()).build())
-                        .respondent1Copy(PartyBuilder.builder().individual().build())
-                        .respondent2Copy(PartyBuilder.builder().individual().build())
                         .build();
 
                     CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -2483,8 +2376,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 RequestedCourt.builder()
                                     .responseCourtLocations(DynamicList.builder().build())
                                     .build()).build())
-                        .respondent1Copy(PartyBuilder.builder().individual().build())
-                        .respondent2Copy(PartyBuilder.builder().individual().build())
                         .build();
 
                     CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -2511,8 +2402,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                             Respondent2DQ.builder().respondent2DQRequestedCourt(
                                 RequestedCourt.builder()
                                     .build()).build())
-                        .respondent1Copy(PartyBuilder.builder().individual().build())
-                        .respondent2Copy(PartyBuilder.builder().individual().build())
                         .build();
 
                     CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -2541,8 +2430,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting2ndRespondentResponse()
-                        .respondent1Copy(PartyBuilder.builder().individual().build())
-                        .respondent2Copy(PartyBuilder.builder().individual().build())
                         .respondent1DQ(
                             Respondent1DQ.builder().respondent1DQRequestedCourt(
                                 RequestedCourt.builder()
@@ -2585,8 +2472,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting2ndRespondentResponse()
-                        .respondent1Copy(PartyBuilder.builder().individual().build())
-                        .respondent2Copy(PartyBuilder.builder().individual().build())
                         .respondent1DQ(
                             Respondent1DQ.builder().respondent1DQRequestedCourt(
                                 RequestedCourt.builder()
@@ -2612,7 +2497,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     //Given
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
-                        .respondent1Copy(PartyBuilder.builder().individual().build())
                         .respondent1DQ(
                             Respondent1DQ.builder().respondent1DQRequestedCourt(
                                 RequestedCourt.builder()
@@ -2642,8 +2526,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting2ndRespondentResponse()
-                        .respondent1Copy(PartyBuilder.builder().individual().build())
-                        .respondent2Copy(PartyBuilder.builder().individual().build())
                         .respondent1DQ(
                             Respondent1DQ.builder().respondent1DQRequestedCourt(
                                 RequestedCourt.builder()

@@ -122,10 +122,6 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
-            assertThat(response.getData())
-                .containsEntry("respondent1Copy", response.getData().get("respondent1"));
-            assertThat(response.getData())
-                .containsEntry("respondent2Copy", response.getData().get("respondent2"));
         }
 
         @Test
@@ -173,9 +169,6 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
-            assertThat(response.getData())
-                .containsEntry("respondent1Copy", response.getData().get("respondent1"));
-            assertThat(response.getData().get("respondent2Copy")).isNull();
         }
 
     }
@@ -270,7 +263,6 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimDetailsNotified()
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
-                .respondent1Copy(PartyBuilder.builder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
@@ -300,8 +292,6 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(YES)
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             Address address = Address.builder()
@@ -328,7 +318,6 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             Address address = Address.builder()
@@ -456,8 +445,6 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .multiPartyClaimTwoDefendantSolicitors().build().toBuilder()
                 .build();
 
@@ -499,8 +486,6 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateNotificationAcknowledged1v2SameSolicitor()
                 .addRespondent2(YES)
                 .respondent2(PartyBuilder.builder().individual().build())
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .respondent2SameLegalRepresentative(YES)
                 .build();
 
@@ -545,8 +530,6 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2SameLegalRepresentative(NO)
                 .respondent2Represented(YES)
                 .respondent2(PartyBuilder.builder().individual().build())
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -583,8 +566,6 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetCaseListDisplayDefendantSolicitorReferences() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .multiPartyClaimTwoDefendantSolicitors().build().toBuilder()
                 .solicitorReferencesCopy(SolicitorReferences.builder()
                     .respondentSolicitor1Reference("abc")

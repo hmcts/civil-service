@@ -92,9 +92,6 @@ public class CaseDataBuilderSpec {
     private String respondent1OrganisationIDCopy;
     private String respondent2OrganisationIDCopy;
 
-    //workaround fields
-    protected Party respondent1Copy;
-    protected Party respondent2Copy;
 
     public CaseDataBuilderSpec respondentSolicitor1EmailAddress(String respondentSolicitor1EmailAddress) {
         this.respondentSolicitor1EmailAddress = respondentSolicitor1EmailAddress;
