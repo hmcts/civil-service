@@ -79,13 +79,14 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                         sealedForm.getDocumentName(),
                         caseData
                 );
-                assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.DEF1_DEFENSE_DQ.getValue());
+
                 CaseDocument updatedStitchedDoc = stitchedDocument.toBuilder().documentType(DEFENDANT_DEFENCE).build();
                 caseDataBuilder.respondent1ClaimResponseDocumentSpec(updatedStitchedDoc)
                         .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
                                 updatedStitchedDoc,
                                 caseData
                         ));
+                assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.DEF1_DEFENSE_DQ.getValue());
             }
         } else {
             caseDataBuilder.respondent1ClaimResponseDocumentSpec(sealedForm)
