@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.civil.service.docmosis;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -9,12 +12,15 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.handler.callback.user.InitiateGeneralApplicationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.cosc.CertificateOfDebtForm;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.cosc.CertificateOfDebtGenerator;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,8 +36,10 @@ class CertificateOfDebtGeneratorTest {
     private DocumentGeneratorService documentGeneratorService;
     @Mock
     private DocumentManagementService documentManagementService;
-    @InjectMocks
+    @Mock
     private CertificateOfDebtGenerator certificateOfDebtGenerator;
+    @Mock
+    private LocationReferenceDataService locationRefDataService;
     private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
     private static final String REFERENCE_NUMBER = "000MC015";
@@ -43,6 +51,10 @@ class CertificateOfDebtGeneratorTest {
         .documentType(DocumentType.CERTIFICATE_OF_DEBT_PAYMENT)
         .build();
 
+    @BeforeEach
+    void setup() {
+        certificateOfDebtGenerator = new CertificateOfDebtGenerator(documentManagementService,documentGeneratorService,locationRefDataService);
+    }
     @Test
     void shouldGenerateCoscDocument() {
 

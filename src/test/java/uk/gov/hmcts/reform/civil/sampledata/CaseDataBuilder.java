@@ -6284,7 +6284,9 @@ public class CaseDataBuilder {
                                       .confirmFullPaymentMade(List.of("CONFIRMED"))
                                       .build())
             .joIsRegisteredWithRTL(YES)
-            .locationName("Barnet Court")
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                   .baseLocation("231596")
+                                   .region("2").build())
             .legacyCaseReference("000MC015")
             .activeJudgment(JudgmentDetails.builder().issueDate(LocalDate.now()).build())
             .build();
@@ -6298,6 +6300,8 @@ public class CaseDataBuilder {
             .defendant1Address(JudgmentAddress.builder().build())
             .fullyPaymentMadeDate(LocalDate.now().plusDays(15))
             .state(JudgmentState.CANCELLED)
+            .totalAmount("90000")
+            .issueDate(LocalDate.now())
             .issueDate(LocalDate.now()).build();
         caseData.setActiveJudgment(activeJudgment);
         return caseData;
@@ -6310,6 +6314,7 @@ public class CaseDataBuilder {
             .defendant1Address(JudgmentAddress.builder().build())
             .fullyPaymentMadeDate(LocalDate.now().plusDays(15))
             .state(JudgmentState.CANCELLED)
+            .totalAmount("90000")
             .issueDate(LocalDate.now()).build();
         caseData.setActiveJudgment(activeJudgment);
         return caseData;
