@@ -34,35 +34,35 @@ public class GenerateCoscDocumentHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
 
     @Override
-    protected Map<String, Callback> callbacks() {
-        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::generateClaimForm);
-    }
-
-    @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
     }
 
     @Override
-    public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+    protected Map<String, Callback> callbacks() {
+        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::generateCoscDocument);
     }
 
-    private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        buildDocument(callbackParams, caseDataBuilder);
+    private CallbackResponse generateCoscDocument(CallbackParams callbackParams) {
+        CaseData caseDataInfo = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseDataInfo.toBuilder();
+        buildCoscDocument(callbackParams, caseDataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
-    private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+    private void buildCoscDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         CaseDocument caseDocument = coscDocumentGenerartor.generateDoc(
             callbackParams.getCaseData(),
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
         caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(caseDocument));
+    }
+
+    @Override
+    public String camundaActivityId(CallbackParams callbackParams) {
+        return TASK_ID;
     }
 }
