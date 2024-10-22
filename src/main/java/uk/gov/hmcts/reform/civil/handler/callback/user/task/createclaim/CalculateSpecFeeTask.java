@@ -74,9 +74,7 @@ public class CalculateSpecFeeTask {
 
     private void calculateAndUpdateClaimFee(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
-        BigDecimal totalClaimAmountWithInterest = caseData.getTotalClaimAmount().add(interest);
-
-        caseDataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(totalClaimAmountWithInterest))
+        caseDataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount()))
             .totalInterest(interest);
     }
 
