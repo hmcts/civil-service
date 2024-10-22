@@ -33,6 +33,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_STAY;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STAY_LIFTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STAY_UPDATE_REQUESTED;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
 
@@ -134,6 +135,9 @@ public class ManageStayCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getState()).isEqualTo(CASE_STAYED.name());
+            assertThat(response.getData()).extracting("businessProcess")
+                .extracting("status", "camundaEvent")
+                .containsExactly(READY.name(), STAY_UPDATE_REQUESTED.name());
         }
 
         private static Stream<Arguments> provideCaseStatesForLiftStay() {
