@@ -3,10 +3,10 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.CP.Stay.Lifted.Claimant',
-        '{}',
+        '{"Notice.AAA6.CP.Case.Stayed.Claimant"}',
         '{"Notice.AAA6.CP.Stay.Lifted.Claimant": []}'),
        ('Scenario.AAA6.CP.Stay.Lifted.Defendant',
-        '{}',
+        '{"Notice.AAA6.CP.Case.Stayed.Defendant"}',
         '{"Notice.AAA6.CP.Stay.Lifted.Defendant": []}');
 
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
