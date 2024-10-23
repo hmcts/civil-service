@@ -33,11 +33,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_FOR_RECORD_JUDGMENT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @ExtendWith(MockitoExtension.class)
@@ -66,6 +68,7 @@ class RecordJudgmentDeterminationMeansApplicantNotificationHandlerTest extends B
                                                                                             .build())
                 .addApplicant2(YesOrNo.NO)
                 .legacyCaseReference("000DC001")
+                .ccdCaseReference(12345L)
                 .addRespondent2(YesOrNo.NO)
                 .respondent1(Party.builder().type(Party.Type.INDIVIDUAL)
                                  .partyName("Test")
@@ -98,6 +101,7 @@ class RecordJudgmentDeterminationMeansApplicantNotificationHandlerTest extends B
                                  .type(Party.Type.INDIVIDUAL).partyEmail("respondentLip@example.com").build())
                 .applicant1Represented(YesOrNo.NO)
                 .legacyCaseReference("000DC001")
+                .ccdCaseReference(12345L)
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .build();
 
@@ -117,17 +121,19 @@ class RecordJudgmentDeterminationMeansApplicantNotificationHandlerTest extends B
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 LEGAL_ORG_NAME, ORG_NAME,
-                DEFENDANT_NAME, NotificationUtils.getDefendantNameBasedOnCaseType(caseData)
+                DEFENDANT_NAME, NotificationUtils.getDefendantNameBasedOnCaseType(caseData),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
 
         private Map<String, String> addPropertiesLip(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 PARTY_NAME, caseData.getApplicant1().getPartyName(),
-                CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
+                CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
     }

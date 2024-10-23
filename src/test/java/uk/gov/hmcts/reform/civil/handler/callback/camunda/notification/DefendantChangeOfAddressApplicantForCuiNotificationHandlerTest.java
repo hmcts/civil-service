@@ -33,6 +33,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.FRONTEND_URL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @ExtendWith(MockitoExtension.class)
@@ -99,7 +100,7 @@ class DefendantChangeOfAddressApplicantForCuiNotificationHandlerTest extends Bas
             verify(notificationService).sendMail(
                 PARTY_EMAIL,
                 TEMPLATE_ID,
-                getNotificationDataMapForLiPClaimant(),
+                getNotificationDataMapForLiPClaimant(caseData),
                 REFERENCE
             );
         }
@@ -110,18 +111,19 @@ class DefendantChangeOfAddressApplicantForCuiNotificationHandlerTest extends Bas
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
 
         @NotNull
-        private Map<String, String> getNotificationDataMapForLiPClaimant() {
+        private Map<String, String> getNotificationDataMapForLiPClaimant(CaseData caseData) {
             return Map.of(
                 CLAIMANT_NAME, APPLICANT_NAME,
-                CLAIM_REFERENCE_NUMBER, REFERENCE_NUMBER,
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONDENT_NAME, DEFENDANT_NAME,
                 FRONTEND_URL, FRONTEND_CUI_URL,
-                EXTERNAL_ID, EXTERNAL_CASE_ID
+                EXTERNAL_ID, EXTERNAL_CASE_ID,
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
     }

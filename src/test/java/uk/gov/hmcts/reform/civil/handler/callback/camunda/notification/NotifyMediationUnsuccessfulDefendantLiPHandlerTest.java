@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -38,6 +39,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
 class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHandlerTest {
@@ -66,24 +69,12 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
         private static final String DEFENDANT_EMAIL_ADDRESS = "defendantmail@hmcts.net";
         private static final String CLAIMANT_ORG_NAME = "Org Name";
         private static final String DEFENDANT_PARTY_NAME = "Lets party";
-        private static final String REFERENCE_NUMBER = "8372942374";
         private static final Long CCD_REFERENCE_NUMBER = 123456789L;
         private static final String EMAIL_TEMPLATE = "test-notification-id";
         private static final String CARM_EMAIL_TEMPLATE = "carm-test-notification-id";
         private static final String BILINGUAL_EMAIL_TEMPLATE = "test-notification-bilingual-id";
         private static final String BILINGUAL_SELECTION = "BOTH";
         private static final String ENGLISH_SELECTION = "ENGLISH";
-
-        private static final Map<String, String> PROPERTY_MAP = Map.of(
-            DEFENDANT_NAME, DEFENDANT_PARTY_NAME,
-            CLAIM_REFERENCE_NUMBER, REFERENCE_NUMBER,
-            CLAIMANT_NAME, CLAIMANT_ORG_NAME
-        );
-
-        private static final Map<String, String> CARM_PROPERTY_MAP = Map.of(
-            PARTY_NAME, DEFENDANT_PARTY_NAME,
-            CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString()
-        );
 
         @ParameterizedTest
         @EnumSource(value = MediationUnsuccessfulReason.class, names = {"PARTY_WITHDRAWS", "APPOINTMENT_NO_AGREEMENT",
@@ -96,7 +87,6 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).partyEmail(
                     DEFENDANT_EMAIL_ADDRESS).build())
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(CLAIMANT_ORG_NAME).build())
-                .legacyCaseReference(REFERENCE_NUMBER)
                 .ccdCaseReference(CCD_REFERENCE_NUMBER)
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
@@ -114,7 +104,7 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
             );
             assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_EMAIL_ADDRESS);
             assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(CARM_EMAIL_TEMPLATE);
-            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(CARM_PROPERTY_MAP);
+            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getCarmPropertyMap(caseData));
         }
 
         @ParameterizedTest
@@ -128,7 +118,6 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).partyEmail(
                     DEFENDANT_EMAIL_ADDRESS).build())
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(CLAIMANT_ORG_NAME).build())
-                .legacyCaseReference(REFERENCE_NUMBER)
                 .ccdCaseReference(CCD_REFERENCE_NUMBER)
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
@@ -147,7 +136,7 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
             );
             assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_EMAIL_ADDRESS);
             assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(CARM_EMAIL_TEMPLATE);
-            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(CARM_PROPERTY_MAP);
+            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getCarmPropertyMap(caseData));
         }
 
         @Test
@@ -157,9 +146,9 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).partyEmail(
                     DEFENDANT_EMAIL_ADDRESS).build())
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(CLAIMANT_ORG_NAME).build())
-                .legacyCaseReference(REFERENCE_NUMBER)
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
+                .ccdCaseReference(CCD_REFERENCE_NUMBER)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_LIP.name()).build()).build();
@@ -173,7 +162,7 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
             );
             assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_EMAIL_ADDRESS);
             assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_TEMPLATE);
-            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(PROPERTY_MAP);
+            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getPropertyMap(caseData));
         }
 
         @Test
@@ -183,7 +172,7 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).partyEmail(
                     DEFENDANT_EMAIL_ADDRESS).build())
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(CLAIMANT_ORG_NAME).build())
-                .legacyCaseReference(REFERENCE_NUMBER)
+                .ccdCaseReference(CCD_REFERENCE_NUMBER)
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
                 .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(BILINGUAL_SELECTION).build()).build())
@@ -200,7 +189,7 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
             );
             assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_EMAIL_ADDRESS);
             assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(BILINGUAL_EMAIL_TEMPLATE);
-            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(PROPERTY_MAP);
+            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getPropertyMap(caseData));
         }
 
         @Test
@@ -210,7 +199,7 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).partyEmail(
                     DEFENDANT_EMAIL_ADDRESS).build())
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(CLAIMANT_ORG_NAME).build())
-                .legacyCaseReference(REFERENCE_NUMBER)
+                .ccdCaseReference(CCD_REFERENCE_NUMBER)
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
                 .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(ENGLISH_SELECTION).build()).build())
@@ -227,7 +216,7 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
             );
             assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_EMAIL_ADDRESS);
             assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_TEMPLATE);
-            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(PROPERTY_MAP);
+            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getPropertyMap(caseData));
         }
 
         @Test
@@ -236,7 +225,7 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
             CaseData caseData = CaseData.builder()
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).build())
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(CLAIMANT_NAME).build())
-                .legacyCaseReference(REFERENCE_NUMBER)
+                .ccdCaseReference(CCD_REFERENCE_NUMBER)
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
                 .build();
@@ -250,5 +239,25 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
                                                            notificationDataMap.capture(), reference.capture()
             );
         }
+
+        @NotNull
+        private  Map<String, String> getPropertyMap(CaseData caseData) {
+            return Map.of(
+                DEFENDANT_NAME, DEFENDANT_PARTY_NAME,
+                CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString(),
+                CLAIMANT_NAME, CLAIMANT_ORG_NAME,
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            );
+        }
+
+        @NotNull
+        private  Map<String, String> getCarmPropertyMap(CaseData caseData) {
+            return Map.of(
+                PARTY_NAME, DEFENDANT_PARTY_NAME,
+                CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString(),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            );
+        }
+
     }
 }

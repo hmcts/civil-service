@@ -37,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CASE_ID;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
 class HearingFeeUnpaidRespondentNotificationHandlerTest {
@@ -98,7 +99,7 @@ class HearingFeeUnpaidRespondentNotificationHandlerTest {
             verify(notificationService).sendMail(
                 "sole.trader@email.com",
                 TEMPLATE_ID,
-                getNotificationLipDataMap(),
+                getNotificationLipDataMap(caseData),
                 "hearing-fee-unpaid-defendantLip-notification-000DC001"
             );
         }
@@ -129,11 +130,12 @@ class HearingFeeUnpaidRespondentNotificationHandlerTest {
     }
 
     @NotNull
-    private Map<String, String> getNotificationLipDataMap() {
+    private Map<String, String> getNotificationLipDataMap(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
             CLAIMANT_V_DEFENDANT, "Rambo v Trader",
-            PARTY_NAME, "Mr. Sole Trader"
+            PARTY_NAME, "Mr. Sole Trader",
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 

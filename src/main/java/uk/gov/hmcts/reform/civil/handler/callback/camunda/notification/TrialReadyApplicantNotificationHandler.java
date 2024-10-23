@@ -114,7 +114,8 @@ public class TrialReadyApplicantNotificationHandler extends CallbackHandler impl
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_NAME, caseData.getApplicant1().getPartyName(),
-            CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
+            CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 

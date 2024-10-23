@@ -28,8 +28,9 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.Cl
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.FRONTEND_URL;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
-import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
 class ClaimantLipRequestJudgementByAdmissionRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -66,7 +67,7 @@ class ClaimantLipRequestJudgementByAdmissionRespondentNotificationHandlerTest ex
             verify(notificationService).sendMail(
                 "sole.trader@email.com",
                 "template-id",
-                getNotificationDataMap(),
+                getNotificationDataMap(caseData),
                 "request-judgement-by-admission-respondent-notification-000DC001"
             );
         }
@@ -78,12 +79,13 @@ class ClaimantLipRequestJudgementByAdmissionRespondentNotificationHandlerTest ex
         }
 
         @NotNull
-        private Map<String, String> getNotificationDataMap() {
+        private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
                 RESPONDENT_NAME, "Mr. Sole Trader",
                 CLAIMANT_NAME, "Mr. John Rambo",
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                FRONTEND_URL, "dummy_cui_front_end_url"
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                FRONTEND_URL, "dummy_cui_front_end_url",
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
     }

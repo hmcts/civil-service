@@ -23,6 +23,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -130,7 +131,8 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
     public Map<String, String> addProperties(CaseData caseData) {
 
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganisationName(caseData),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
         );
@@ -141,6 +143,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
         return Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganisationName(caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
         );
     }
@@ -149,6 +152,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
         return Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganisationName(caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             DEFENDANT_NAME_ONE, getPartyNameBasedOnType(caseData.getRespondent1()),
             DEFENDANT_NAME_TWO, getPartyNameBasedOnType(caseData.getRespondent2())
         );
@@ -157,7 +161,8 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
     public Map<String, String> lipProperties(CaseData caseData) {
         return Map.of(
             PARTY_NAME, caseData.getApplicant1().getPartyName(),
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 
@@ -166,7 +171,8 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
         return Map.of(
             CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
             RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 

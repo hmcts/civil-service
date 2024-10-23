@@ -25,6 +25,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
 public class NotifyClaimantLipHelpWithFeesNotificationHandlerTest {
@@ -90,9 +92,10 @@ public class NotifyClaimantLipHelpWithFeesNotificationHandlerTest {
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIMANT_NAME, "Mr. John Rambo",
-                CLAIMANT_V_DEFENDANT, "Mr. John Rambo V Mr. Sole Trader"
+                CLAIMANT_V_DEFENDANT, "Mr. John Rambo V Mr. Sole Trader",
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
     }

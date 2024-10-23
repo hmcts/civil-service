@@ -28,8 +28,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.FRONTEND_URL;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.FRONTEND_URL;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
 public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
@@ -87,7 +90,7 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
             verify(notificationService, times(1)).sendMail(
                 CLAIMANT_EMAIL_ID,
                 EMAIL_TEMPLATE_NO_HWF,
-                getNotificationDataMap(),
+                getNotificationDataMap(caseData),
                 REFERENCE_NUMBER
             );
         }
@@ -119,7 +122,7 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
             verify(notificationService, times(0)).sendMail(
                 CLAIMANT_EMAIL_ID,
                 EMAIL_TEMPLATE_NO_HWF,
-                getNotificationDataMap(),
+                getNotificationDataMap(caseData),
                 REFERENCE_NUMBER
             );
         }
@@ -152,7 +155,7 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
             verify(notificationService, times(1)).sendMail(
                 CLAIMANT_EMAIL_ID_INDIVIDUAL,
                 EMAIL_TEMPLATE_HWF,
-                getNotificationDataMap(),
+                getNotificationDataMap(caseData),
                 REFERENCE_NUMBER
             );
         }
@@ -184,7 +187,7 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
             verify(notificationService, times(1)).sendMail(
                 CLAIMANT_EMAIL_ID_INDIVIDUAL,
                 EMAIL_TEMPLATE_NO_HWF,
-                getNotificationDataMap(),
+                getNotificationDataMap(caseData),
                 REFERENCE_NUMBER
             );
         }
@@ -217,7 +220,7 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
             verify(notificationService, times(1)).sendMail(
                 CLAIMANT_EMAIL_ID_INDIVIDUAL,
                 EMAIL_TEMPLATE_NO_HWF_BILINGUAL,
-                getNotificationDataMap(),
+                getNotificationDataMap(caseData),
                 REFERENCE_NUMBER
             );
         }
@@ -253,16 +256,18 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
             verify(notificationService, times(1)).sendMail(
                 CLAIMANT_EMAIL_ID_INDIVIDUAL,
                 EMAIL_TEMPLATE_HWF_BILINGUAL,
-                getNotificationDataMap(),
+                getNotificationDataMap(caseData),
                 REFERENCE_NUMBER
             );
         }
 
-        private Map<String, String> getNotificationDataMap() {
+        private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIMANT_NAME, CLAIMANT,
                 DEFENDANT_NAME, RESPONDENT_NAME,
-                FRONTEND_URL, FRONTEND_CUI_URL
+                FRONTEND_URL, FRONTEND_CUI_URL,
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
 

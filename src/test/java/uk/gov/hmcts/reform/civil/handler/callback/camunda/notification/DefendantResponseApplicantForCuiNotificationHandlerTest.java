@@ -29,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @ExtendWith(MockitoExtension.class)
@@ -152,7 +153,7 @@ class DefendantResponseApplicantForCuiNotificationHandlerTest extends BaseCallba
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIM_LEGAL_ORG_NAME_SPEC, CLAIM_LEGAL_ORG_NAME,
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
 
@@ -162,16 +163,17 @@ class DefendantResponseApplicantForCuiNotificationHandlerTest extends BaseCallba
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 CLAIM_LEGAL_ORG_NAME_SPEC, CLAIM_LEGAL_ORG_NAME,
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
 
         @NotNull
         private Map<String, String> getNotificationDataMapForLiPClaimant(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
     }

@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @ExtendWith(MockitoExtension.class)
@@ -292,7 +293,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             return Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, handler.getLegalOrganizationName(caseData),
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
 
@@ -301,7 +302,8 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 PARTY_NAME, caseData.getRespondent1().getPartyName(),
-                CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
+                CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
 
@@ -310,7 +312,8 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             return Map.of(
                 CLAIM_REFERENCE_NUMBER,  caseData.getCcdCaseReference().toString(),
                 PARTY_NAME, caseData.getRespondent2().getPartyName(),
-                CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
+                CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
 
@@ -319,7 +322,8 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 PARTY_NAME, caseData.getApplicant1().getPartyName(),
-                CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
+                CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
     }

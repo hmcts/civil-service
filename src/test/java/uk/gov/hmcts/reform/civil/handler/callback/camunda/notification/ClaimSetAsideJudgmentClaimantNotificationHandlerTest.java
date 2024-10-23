@@ -35,7 +35,9 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME_INTERIM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASON_FROM_CASEWORKER;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @ExtendWith(MockitoExtension.class)
@@ -102,6 +104,7 @@ public class ClaimSetAsideJudgmentClaimantNotificationHandlerTest extends BaseCa
                                  .type(Party.Type.INDIVIDUAL).partyEmail("respondentLip@example.com").build())
                 .applicant1Represented(YesOrNo.NO)
                 .legacyCaseReference("000DC001")
+                .ccdCaseReference(12345L)
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
                 .build();
@@ -128,18 +131,20 @@ public class ClaimSetAsideJudgmentClaimantNotificationHandlerTest extends BaseCa
     @NotNull
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             LEGAL_ORG_NAME, "Test Org Name",
             REASON_FROM_CASEWORKER, "test error",
-            DEFENDANT_NAME_INTERIM, "Mr. Sole Trader"
+            DEFENDANT_NAME_INTERIM, "Mr. Sole Trader",
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 
     private Map<String, String> getNotificationDataMapLip(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
-            PARTY_NAME, caseData.getApplicant1().getPartyName()
+            PARTY_NAME, caseData.getApplicant1().getPartyName(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 }

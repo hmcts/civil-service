@@ -45,6 +45,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
 class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -263,7 +264,8 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData),
-                PARTY_NAME, "John Doe"
+                PARTY_NAME, "John Doe",
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
     }
@@ -282,6 +284,7 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
         assertThat(properties).containsEntry("claimReferenceNumber", "1594901956117591");
         assertThat(properties).containsEntry("claimantvdefendant", "John Doe V Jack Jackson");
         assertThat(properties).containsEntry("name", "John Doe");
+        assertThat(properties).containsEntry("partyReferences", "Claimant reference: 12345 - Defendant reference: 6789");
     }
 
     @Test
@@ -298,5 +301,6 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
         assertThat(properties).containsEntry("claimReferenceNumber", "1594901956117591");
         assertThat(properties).containsEntry("claimantvdefendant", "John Doe V Jack Jackson");
         assertThat(properties).containsEntry("name", "Jack Jackson");
+        assertThat(properties).containsEntry("partyReferences", "Claimant reference: 12345 - Defendant reference: 6789");
     }
 }

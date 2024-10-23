@@ -153,8 +153,9 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
     public Map<String, String> addLipvsLiPProperties(CaseData caseData) {
         return Map.of(
             APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+            CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
+            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 

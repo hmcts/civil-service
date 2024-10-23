@@ -18,6 +18,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT1_FOR_REQUEST_JUDGEMENT_BY_ADMISSION_LIP_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -72,8 +73,9 @@ public class ClaimantLipRequestJudgementByAdmissionRespondentNotificationHandler
         return Map.of(
             CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl()
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 

@@ -185,7 +185,8 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_NAME, getPartyName(caseData),
-            CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
+            CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 

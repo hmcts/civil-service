@@ -75,9 +75,10 @@ public class DefendantResponseApplicantForCuiNotificationHandler
 
     private Map<String, String> addPropertiesForLipClaimant(CaseData caseData) {
         Map<String, String> properties = new HashMap<>();
-        properties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
+        properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
         properties.put(CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()));
         properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
+        properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
         return properties;
     }
 
@@ -85,11 +86,11 @@ public class DefendantResponseApplicantForCuiNotificationHandler
     public Map<String, String> addProperties(CaseData caseData) {
         Map<String, String> properties = new HashMap<>();
         properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
-        properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData));
         if (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
             properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
         }
+        properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
         return properties;
     }
 
