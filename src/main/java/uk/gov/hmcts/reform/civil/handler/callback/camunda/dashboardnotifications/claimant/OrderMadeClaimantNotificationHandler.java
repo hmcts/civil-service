@@ -94,8 +94,10 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
 
     @Override
     protected String getScenario(CaseData caseData, CallbackParams callbackParams) {
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         if (isSDOEvent(callbackParams)
             && isEligibleForReconsideration(caseData)) {
+            deleteNotificationAndInactiveTasks(caseData,authToken);
             return SCENARIO_AAA6_CP_SDO_MADE_BY_LA_CLAIMANT.getScenario();
         }
         if (isCarmApplicableCase(caseData)
@@ -115,10 +117,13 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
         }
         if (isFinalOrderIssued(callbackParams)) {
             if (isOrderMadeFastTrackTrialNotResponded(caseData)) {
+                deleteNotificationAndInactiveTasks(caseData,authToken);
                 return SCENARIO_AAA6_UPDATE_TASK_LIST_TRIAL_READY_FINALS_ORDERS_CLAIMANT.getScenario();
             }
+            deleteNotificationAndInactiveTasks(caseData,authToken);
             return SCENARIO_AAA6_UPDATE_DASHBOARD_CLAIMANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS.getScenario();
         }
+        deleteNotificationAndInactiveTasks(caseData,authToken);
         return SCENARIO_AAA6_CP_ORDER_MADE_CLAIMANT.getScenario();
     }
 
@@ -153,5 +158,20 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
 
     private boolean isOrderMadeFastTrackTrialNotResponded(CaseData caseData) {
         return SdoHelper.isFastTrack(caseData) && isNull(caseData.getTrialReadyApplicant());
+    }
+
+    private void deleteNotificationAndInactiveTasks(CaseData caseData, String authToken) {
+
+        dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "CLAIMANT",
+            authToken
+        );
+
+        dashboardApiClient.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "CLAIMANT",
+            authToken
+        );
     }
 }

@@ -180,6 +180,8 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
 
             handler.handle(params);
 
+            // Then
+            verifyDeleteNotificationsAndTaskListUpdates(caseData);
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA6.CP.OrderMade.Defendant",
@@ -482,6 +484,9 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
 
             handler.handle(params);
             HashMap<String, Object> scenarioParams = new HashMap<>();
+
+            // Then
+            verifyDeleteNotificationsAndTaskListUpdates(caseData);
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA6.Update.Defendant.TaskList.UploadDocuments.FinalOrders",
@@ -507,6 +512,9 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
 
             handler.handle(params);
             HashMap<String, Object> scenarioParams = new HashMap<>();
+
+            // Then
+            verifyDeleteNotificationsAndTaskListUpdates(caseData);
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA6.Update.TaskList.TrialReady.FinalOrders.Defendant",
@@ -533,6 +541,7 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
 
             handler.handle(params);
             HashMap<String, Object> scenarioParams = new HashMap<>();
+
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA6.Update.Defendant.TaskList.UploadDocuments.FinalOrders",
@@ -540,5 +549,18 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
+    }
+
+    private void verifyDeleteNotificationsAndTaskListUpdates(CaseData caseData) {
+        verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "CLAIMANT",
+            "BEARER_TOKEN"
+        );
+        verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "CLAIMANT",
+            "BEARER_TOKEN"
+        );
     }
 }
