@@ -439,19 +439,16 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
                 .drawDirectionsOrderRequired(YesOrNo.NO)
                 .build();
 
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT.name())
                     .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
 
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
-
             handler.handle(params);
 
             // Then
             verifyDeleteNotificationsAndTaskListUpdates(caseData);
-
+            HashMap<String, Object> scenarioParams = new HashMap<>();
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA6.Update.TaskList.TrialReady.FinalOrders.Claimant",
@@ -469,8 +466,6 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
                 .trialReadyApplicant(YesOrNo.YES)
                 .build();
 
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT.name())
                     .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
@@ -481,7 +476,7 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
 
             // Then
             verifyDeleteNotificationsAndTaskListUpdates(caseData);
-
+            HashMap<String, Object> scenarioParams = new HashMap<>();
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA6.Update.Claimant.TaskList.UploadDocuments.FinalOrders",
