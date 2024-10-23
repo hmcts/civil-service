@@ -109,8 +109,8 @@ public class InterestCalculator {
         if (caseData.getInterestClaimUntil().equals(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE)) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
             return caseData.getSubmittedDate().toLocalDate().format(formatter);
-        } else if (caseData.getInterestClaimOptions() == null ||
-            caseData.getInterestClaimOptions().equals(InterestClaimOptions.BREAK_DOWN_INTEREST)) {
+        } else if (caseData.getInterestClaimOptions() == null
+            || caseData.getInterestClaimOptions().equals(InterestClaimOptions.BREAK_DOWN_INTEREST)) {
             return null;
         }
         StringBuilder description = new StringBuilder("Interest will accrue at the daily rate of £");
