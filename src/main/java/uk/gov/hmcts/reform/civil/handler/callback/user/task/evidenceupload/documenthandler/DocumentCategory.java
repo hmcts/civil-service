@@ -63,7 +63,8 @@ public enum DocumentCategory {
     RESPONDENT_ONE_WITNESS_STATEMENT("RespondentOneWitnessStatement"),
     RESPONDENT_TWO_WITNESS_STATEMENT("RespondentTwoWitnessStatement"),
     RESPONDENT_ONE_WITNESS_SUMMARY("RespondentOneWitnessSummary"),
-    RESPONDENT_TWO_WITNESS_SUMMARY("RespondentTwoWitnessSummary");
+    RESPONDENT_TWO_WITNESS_SUMMARY("RespondentTwoWitnessSummary"),
+    BUNDLE_EVIDENCE_UPLOAD("bundles");
 
     private final String categoryId;
 

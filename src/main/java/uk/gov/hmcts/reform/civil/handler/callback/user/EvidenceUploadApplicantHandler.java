@@ -56,7 +56,7 @@ public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
     CallbackResponse validateValues(CallbackParams callbackParams, CaseData caseData) {
         if (Objects.nonNull(caseData.getCaseTypeFlag())
             && caseData.getCaseTypeFlag().equals("ApplicantTwoFields")) {
-            return validateValuesParty(caseData.getDocumentForDisclosureRes2(),
+            return validateValuesParty(caseData.getDocumentForDisclosureApp2(),
                 caseData.getDocumentWitnessStatementApp2(),
                 caseData.getDocumentWitnessSummaryApp2(),
                 caseData.getDocumentHearsayNoticeApp2(),
@@ -65,7 +65,8 @@ public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
                 caseData.getDocumentJointStatementApp2(),
                 caseData.getDocumentQuestionsApp2(),
                 caseData.getDocumentAnswersApp2(),
-                caseData.getDocumentEvidenceForTrialApp2());
+                caseData.getDocumentEvidenceForTrialApp2(),
+                caseData.getBundleEvidence());
         } else {
             return validateValuesParty(caseData.getDocumentForDisclosure(),
                 caseData.getDocumentWitnessStatement(),
@@ -76,7 +77,8 @@ public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
                 caseData.getDocumentJointStatement(),
                 caseData.getDocumentQuestions(),
                 caseData.getDocumentAnswers(),
-                caseData.getDocumentEvidenceForTrial());
+                caseData.getDocumentEvidenceForTrial(),
+                caseData.getBundleEvidence());
         }
     }
 }

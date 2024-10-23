@@ -5,7 +5,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.RespondentSolicitorTwoDocumentHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.RespondentTwoSolicitorDocumentHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -19,8 +19,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploa
 @Slf4j
 @Order(11)
 public class RespondentTwoScheduleOfCostsDocumentHandler extends
-    RespondentSolicitorTwoDocumentHandler<UploadEvidenceDocumentType> {
-
+    RespondentTwoSolicitorDocumentHandler<UploadEvidenceDocumentType> {
 
     public RespondentTwoScheduleOfCostsDocumentHandler() {
         super(RESPONDENT_TWO_SCHEDULE_OF_COSTS, EvidenceUploadType.COSTS);

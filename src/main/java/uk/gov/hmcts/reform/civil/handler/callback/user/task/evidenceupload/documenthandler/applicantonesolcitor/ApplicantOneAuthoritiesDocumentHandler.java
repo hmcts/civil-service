@@ -5,7 +5,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.ApplicantSolicitorOneDocumentHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.ApplicantOneSolicitorDocumentHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType.AUTHORITIES;
-import static uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType.TRIAL_SKELETON;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_ONE_TRIAL_SKELETON;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_TWO_TRIAL_SKELETON;
 
@@ -22,8 +21,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploa
 @Slf4j
 @Order(10)
 public class ApplicantOneAuthoritiesDocumentHandler extends
-    ApplicantSolicitorOneDocumentHandler<UploadEvidenceDocumentType> {
-
+    ApplicantOneSolicitorDocumentHandler<UploadEvidenceDocumentType> {
 
     public ApplicantOneAuthoritiesDocumentHandler(DocumentTypeBuilder<UploadEvidenceDocumentType> documentTypeBuilder) {
         super(APPLICANT_ONE_TRIAL_SKELETON, APPLICANT_TWO_TRIAL_SKELETON, AUTHORITIES, documentTypeBuilder);

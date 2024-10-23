@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.enums.caseprogression;
 public enum EvidenceUploadType {
 
     DISCLOSURE_LIST("Disclosure list", "%s - Disclosure list"),
-    DOCUMENTS_FOR_DISCLOSURE( "Document for disclosure", "%s - Documents for disclosure"),
+    DOCUMENTS_FOR_DISCLOSURE("Document for disclosure", "%s - Documents for disclosure"),
     EXPERT_REPORT("Experts report", "%s - Expert's report"),
     PRE_TRIAL_SUMMARY("Pre Trial Summary", "%s - Case Summary"),
     JOINT_STATEMENT("Joint report", "%s - Joint Statement of Experts / Single Joint Expert Report"),
@@ -21,7 +21,8 @@ public enum EvidenceUploadType {
     WITNESS_HEARSAY("Hearsay evidence", "%s - Notice of the intention to rely on hearsay evidence"),
     WITNESS_REFERRED(" referred to in the statement of ", "%s - Documents referred to in the statement"),
     NOTICE_OF_INTENTION("Notice of Intention", "Witness evidence"),
-    DOCUMENTS_REFERRED("Documents Referred", "Witness evidence");
+    DOCUMENTS_REFERRED("Documents Referred", "Witness evidence"),
+    BUNDLE_EVIDENCE("Bundle evidence", "%s - Bundle");
 
     String documentTypeDisplayName;
     String notifictationTextRegEx;

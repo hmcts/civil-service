@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.ApplicantSolicitorOneDocumentHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.ApplicantOneSolicitorDocumentHandler;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
@@ -17,7 +17,7 @@ import java.util.List;
 @Component
 @Order(5)
 public class ApplicantOneExpertJointStatmementDocumentHandler extends
-    ApplicantSolicitorOneDocumentHandler<UploadEvidenceExpert> {
+    ApplicantOneSolicitorDocumentHandler<UploadEvidenceExpert> {
 
     public ApplicantOneExpertJointStatmementDocumentHandler(DocumentTypeBuilder<UploadEvidenceExpert> documentTypeBuilder) {
         super(DocumentCategory.APPLICANT_ONE_EXPERT_JOINT_STATEMENT, DocumentCategory.APPLICANT_TWO_EXPERT_JOINT_STATEMENT,

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.ApplicantSolicitorOneDocumentHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.ApplicantOneSolicitorDocumentHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -19,7 +19,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploa
 @Component
 @Order(7)
 public class ApplicantOneExpertAnswersDocumentHandler extends
-    ApplicantSolicitorOneDocumentHandler<UploadEvidenceExpert> {
+    ApplicantOneSolicitorDocumentHandler<UploadEvidenceExpert> {
 
     public ApplicantOneExpertAnswersDocumentHandler(DocumentTypeBuilder<UploadEvidenceExpert> documentTypeBuilder) {
         super(APPLICANT_ONE_EXPERT_ANSWERS, APPLICANT_TWO_EXPERT_ANSWERS, EvidenceUploadType.ANSWERS_FOR_EXPERTS,
@@ -45,7 +45,6 @@ public class ApplicantOneExpertAnswersDocumentHandler extends
     protected void renameDocuments(List<Element<UploadEvidenceExpert>> documentUploads) {
         renameUploadEvidenceExpert(documentUploads, false);
     }
-
 
     @Override
     protected void addDocumentsToCopyToCaseData(CaseData.CaseDataBuilder<?, ?> builder, List<Element<UploadEvidenceExpert>> evidenceDocsToAdd) {

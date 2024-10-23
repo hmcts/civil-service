@@ -29,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 public abstract class DocumentHandler<T> {
 
     protected static final String SPACE = " ";
+    private static final String HYPHEN = "-";
     protected static final String END = ".";
     protected static final String DATE_FORMAT = "dd-MM-yyyy";
     protected final DocumentCategory documentCategory;
@@ -65,6 +66,18 @@ public abstract class DocumentHandler<T> {
     private void setCategoryId(Element<T> document) {
         Document documentToAddId = getDocument(document);
         documentToAddId.setCategoryID(documentCategory.getCategoryId());
+    }
+
+    protected <T> void renameUploadEvidenceBundleType(final List<Element<T>> documentUpload) {
+        documentUpload.forEach(x -> {
+            UploadEvidenceDocumentType type = (UploadEvidenceDocumentType) x.getValue();
+            String ext = FilenameUtils.getExtension(type.getDocumentUpload().getDocumentFileName());
+            String newName = type.getDocumentIssuedDate().format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK))
+                + HYPHEN
+                + type.getBundleName()
+                + END + ext;
+            type.getDocumentUpload().setDocumentFileName(newName);
+        });
     }
 
     protected <T> void renameUploadEvidenceDocumentType(final List<Element<T>> documentUpload, String prefix) {
@@ -148,9 +161,9 @@ public abstract class DocumentHandler<T> {
         renameUploadEvidenceDocumentType(documentUploads, evidenceUploadType.getDocumentTypeDisplayName());
     }
 
-    public  void addUploadDocList(CaseData.CaseDataBuilder caseDataBuilder, CaseData caseData) {
+    public void addUploadDocList(CaseData.CaseDataBuilder caseDataBuilder, CaseData caseData) {
 
-        if (getDocumentList(caseData) == null || getDocumentList(caseData).isEmpty()){
+        if (getDocumentList(caseData) == null || getDocumentList(caseData).isEmpty()) {
             return;
         }
         Optional<Bundle> bundleDetails = caseData.getCaseBundles().stream().map(IdValue::getValue)
@@ -211,15 +224,14 @@ public abstract class DocumentHandler<T> {
         });
     }
 
-    abstract protected List<Element<T>> getDocumentList(CaseData caseData);
+    protected abstract List<Element<T>> getDocumentList(CaseData caseData);
+    
+    protected abstract Document getDocument(Element<T> element);
 
+    protected abstract LocalDateTime getDocumentDateTime(Element<T> element);
 
-    abstract protected Document getDocument(Element<T> element);
+    protected abstract List<Element<UploadEvidenceDocumentType>> getDocsUploadedAfterBundle(CaseData caseData);
 
-    abstract protected LocalDateTime getDocumentDateTime(Element<T> element);
-
-    abstract protected List<Element<UploadEvidenceDocumentType>> getDocsUploadedAfterBundle(CaseData caseData);
-
-    abstract protected void applyDocumentUpdateToCollection(CaseData.CaseDataBuilder<?, ?> caseDetailsBuilder,
+    protected abstract void applyDocumentUpdateToCollection(CaseData.CaseDataBuilder<?, ?> caseDetailsBuilder,
                                                             List<Element<UploadEvidenceDocumentType>> finalAdditionalBundleDoc);
 }

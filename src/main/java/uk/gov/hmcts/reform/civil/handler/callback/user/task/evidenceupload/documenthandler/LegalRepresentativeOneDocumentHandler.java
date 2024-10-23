@@ -16,13 +16,14 @@ public abstract class LegalRepresentativeOneDocumentHandler<T> extends DocumentH
     private final DocumentCategory legalRepresentativeTwoDocumentCategory;
     protected final DocumentTypeBuilder<T> documentTypeBuilder;
 
-    public LegalRepresentativeOneDocumentHandler(DocumentCategory documentCategory, DocumentCategory legalRepresentativeTwoDocumentCategory,
-                                                 EvidenceUploadType evidenceUploadType, DocumentTypeBuilder<T> documentTypeBuilder) {
+    public LegalRepresentativeOneDocumentHandler(DocumentCategory documentCategory,
+                                                 DocumentCategory legalRepresentativeTwoDocumentCategory,
+                                                 EvidenceUploadType evidenceUploadType,
+                                                 DocumentTypeBuilder<T> documentTypeBuilder) {
         super(documentCategory, evidenceUploadType);
         this.legalRepresentativeTwoDocumentCategory = legalRepresentativeTwoDocumentCategory;
         this.documentTypeBuilder = documentTypeBuilder;
     }
-
 
     public CaseData copyLegalRep1ChangesToLegalRep2(CaseData caseData, CaseData caseDataBefore, CaseData.CaseDataBuilder builder) {
         List<Element<T>> evidenceDocsToCopy =
@@ -77,5 +78,8 @@ public abstract class LegalRepresentativeOneDocumentHandler<T> extends DocumentH
 
     protected abstract List<Element<T>> getCorrespondingLegalRep2DocumentList(CaseData caseData);
 
+    public boolean shouldCopyDocumentsToLegalRep2() {
+        return true;
+    }
 
 }

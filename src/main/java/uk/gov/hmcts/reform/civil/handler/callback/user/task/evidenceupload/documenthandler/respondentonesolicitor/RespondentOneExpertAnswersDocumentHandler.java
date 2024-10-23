@@ -45,7 +45,6 @@ public class RespondentOneExpertAnswersDocumentHandler extends
         renameUploadEvidenceExpert(documentUploads, false);
     }
 
-
     @Override
     protected void addDocumentsToCopyToCaseData(CaseData.CaseDataBuilder<?, ?> builder, List<Element<UploadEvidenceExpert>> evidenceDocsToAdd) {
         builder.documentAnswersRes2(evidenceDocsToAdd);

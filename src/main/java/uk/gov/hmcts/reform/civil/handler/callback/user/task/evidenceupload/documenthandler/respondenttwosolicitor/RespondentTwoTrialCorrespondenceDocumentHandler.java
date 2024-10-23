@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.RespondentSolicitorTwoDocumentHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.RespondentTwoSolicitorDocumentHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -18,7 +18,7 @@ import java.util.List;
 @Slf4j
 @Order(12)
 public class RespondentTwoTrialCorrespondenceDocumentHandler extends
-    RespondentSolicitorTwoDocumentHandler<UploadEvidenceDocumentType> {
+    RespondentTwoSolicitorDocumentHandler<UploadEvidenceDocumentType> {
 
     public RespondentTwoTrialCorrespondenceDocumentHandler() {
         super(DocumentCategory.RESPONDENT_TWO_TRIAL_DOC_CORRESPONDENCE,

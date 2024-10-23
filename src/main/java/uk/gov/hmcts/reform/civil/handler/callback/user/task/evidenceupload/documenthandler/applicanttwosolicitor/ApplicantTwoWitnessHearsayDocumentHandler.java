@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.ApplicantSolicitorTwoDocumentHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.ApplicantTwoSolicitorDocumentHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -16,7 +16,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploa
 
 @Component
 public class ApplicantTwoWitnessHearsayDocumentHandler extends
-    ApplicantSolicitorTwoDocumentHandler<UploadEvidenceWitness> {
+    ApplicantTwoSolicitorDocumentHandler<UploadEvidenceWitness> {
 
     public ApplicantTwoWitnessHearsayDocumentHandler(DocumentTypeBuilder<UploadEvidenceWitness> documentTypeBuilder) {
         super(APPLICANT_TWO_WITNESS_HEARSAY,

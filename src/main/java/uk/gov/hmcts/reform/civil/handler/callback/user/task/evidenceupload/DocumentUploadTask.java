@@ -17,16 +17,17 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOADED;
 
 @Component
-public abstract class DocumentUploadTask<LR1 extends LegalRepresentativeOneDocumentHandler, LR2 extends DocumentHandler> {
+public abstract class DocumentUploadTask<L1 extends LegalRepresentativeOneDocumentHandler, L2 extends DocumentHandler> {
+
     private final FeatureToggleService featureToggleService;
     private final ObjectMapper objectMapper;
-    protected final List<LR1> legalRepresentativeOneDocumentHandlers;
-    protected final List<LR2> legalRepresentativeTwoDocumentHandlers;
+    protected final List<L1> legalRepresentativeOneDocumentHandlers;
+    protected final List<L2> legalRepresentativeTwoDocumentHandlers;
 
     public DocumentUploadTask(FeatureToggleService featureToggleService,
                               ObjectMapper objectMapper,
-                              List<LR1> legalRepresentativeOneDocumentHandlers,
-                              List<LR2> legalRepresentativeTwoDocumentHandlers) {
+                              List<L1> legalRepresentativeOneDocumentHandlers,
+                              List<L2> legalRepresentativeTwoDocumentHandlers) {
         this.featureToggleService = featureToggleService;
         this.objectMapper = objectMapper;
         this.legalRepresentativeOneDocumentHandlers = legalRepresentativeOneDocumentHandlers;
@@ -38,6 +39,12 @@ public abstract class DocumentUploadTask<LR1 extends LegalRepresentativeOneDocum
     private void updateDocumentListUploadedAfterBundle(CaseData.CaseDataBuilder caseDataBuilder, CaseData caseData) {
         legalRepresentativeOneDocumentHandlers.forEach(handler -> handler.addUploadDocList(caseDataBuilder, caseData));
         legalRepresentativeTwoDocumentHandlers.forEach(handler -> handler.addUploadDocList(caseDataBuilder, caseData));
+    }
+
+    private void updateDocumentListUploadedAfterBundle(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
+        if (nonNull(caseData.getCaseBundles()) && !caseData.getCaseBundles().isEmpty()) {
+            updateDocumentListUploadedAfterBundle(caseDataBuilder, caseData);
+        }
     }
 
     abstract String getSolicitorOneRole();
@@ -56,12 +63,6 @@ public abstract class DocumentUploadTask<LR1 extends LegalRepresentativeOneDocum
         return notificationString;
     }
 
-    private void updateDocumentListUploadedAfterBundle(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
-        if (nonNull(caseData.getCaseBundles()) && !caseData.getCaseBundles().isEmpty()) {
-            updateDocumentListUploadedAfterBundle(caseDataBuilder, caseData);
-        }
-    }
-
     public CallbackResponse uploadDocuments(CaseData caseData, CaseData caseDataBefore, String selectedRole) {
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
@@ -74,7 +75,7 @@ public abstract class DocumentUploadTask<LR1 extends LegalRepresentativeOneDocum
         if (selectedRole.equals(getSolicitorOneRole()) || selectedRole.equals(getSelectedValueForBoth())) {
             for (LegalRepresentativeOneDocumentHandler handler : legalRepresentativeOneDocumentHandlers) {
                 handler.handleDocuments(caseData, litigantTypeString, notificationTextBuilder);
-                if (selectedRole.equals(getSelectedValueForBoth())) {
+                if (selectedRole.equals(getSelectedValueForBoth()) && handler.shouldCopyDocumentsToLegalRep2()) {
                     caseData = handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore, caseDataBuilder);
                 }
             }

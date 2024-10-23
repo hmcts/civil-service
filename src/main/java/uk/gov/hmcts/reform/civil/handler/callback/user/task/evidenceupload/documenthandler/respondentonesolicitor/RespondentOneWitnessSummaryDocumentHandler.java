@@ -38,7 +38,6 @@ public class RespondentOneWitnessSummaryDocumentHandler extends
         return element.getValue().getCreatedDatetime();
     }
 
-
     @Override
     protected void addDocumentsToCopyToCaseData(CaseData.CaseDataBuilder<?, ?> builder, List<Element<UploadEvidenceWitness>> evidenceDocsToAdd) {
         builder.documentWitnessSummaryRes2(evidenceDocsToAdd);

@@ -8,8 +8,9 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 
 import java.util.List;
 
-public abstract class ApplicantSolicitorOneDocumentHandler<T> extends LegalRepresentativeOneDocumentHandler<T> {
-    public ApplicantSolicitorOneDocumentHandler(DocumentCategory documentCategory, DocumentCategory legalRepresentativeTwoDocumentCategory,
+public abstract class ApplicantOneSolicitorDocumentHandler<T> extends LegalRepresentativeOneDocumentHandler<T> {
+
+    public ApplicantOneSolicitorDocumentHandler(DocumentCategory documentCategory, DocumentCategory legalRepresentativeTwoDocumentCategory,
                                                 EvidenceUploadType evidenceUploadType,
                                                 DocumentTypeBuilder<T> documentTypeBuilder) {
         super(documentCategory, legalRepresentativeTwoDocumentCategory, evidenceUploadType, documentTypeBuilder);
@@ -24,7 +25,6 @@ public abstract class ApplicantSolicitorOneDocumentHandler<T> extends LegalRepre
     protected void applyDocumentUpdateToCollection(CaseData.CaseDataBuilder<?, ?> caseDetailsBuilder,
                                                    List<Element<UploadEvidenceDocumentType>> finalAdditionalBundleDoc) {
         caseDetailsBuilder.applicantDocsUploadedAfterBundle(finalAdditionalBundleDoc);
-
     }
 
 }

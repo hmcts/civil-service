@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.ApplicantSolicitorOneDocumentHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.ApplicantOneSolicitorDocumentHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -19,7 +19,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploa
 @Component
 @Order(3)
 public class ApplicantOneWitnessReferredDocumentHandler extends
-    ApplicantSolicitorOneDocumentHandler<UploadEvidenceDocumentType> {
+    ApplicantOneSolicitorDocumentHandler<UploadEvidenceDocumentType> {
 
     public ApplicantOneWitnessReferredDocumentHandler(DocumentTypeBuilder<UploadEvidenceDocumentType> documentTypeBuilder) {
         super(APPLICANT_ONE_WITNESS_REFERRED, APPLICANT_TWO_WITNESS_REFERRED, EvidenceUploadType.WITNESS_REFERRED,

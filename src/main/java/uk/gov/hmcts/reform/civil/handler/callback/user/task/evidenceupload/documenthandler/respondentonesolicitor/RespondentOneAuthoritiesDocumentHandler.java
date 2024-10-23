@@ -23,7 +23,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploa
 public class RespondentOneAuthoritiesDocumentHandler extends
     RespondentSolicitorOneDocumentHandler<UploadEvidenceDocumentType> {
 
-
     public RespondentOneAuthoritiesDocumentHandler(DocumentTypeBuilder<UploadEvidenceDocumentType> documentTypeBuilder) {
         super(RESPONDENT_ONE_TRIAL_SKELETON, RESPONDENT_TWO_TRIAL_SKELETON, EvidenceUploadType.AUTHORITIES, documentTypeBuilder);
     }

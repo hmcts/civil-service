@@ -97,6 +97,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
     RespondentEvidenceHandlerTestConfiguration.class
 })
 class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
+
     private static final String TEST_URL = "url";
     private static final String TEST_FILE_NAME = "testFileName.pdf";
     private static final String UPLOAD_TIMESTAMP = "14 Apr 2024 00:00:00";
@@ -148,12 +149,10 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         + "Defendant 2 - Documentary evidence for trial";
     private static final String PAGE_ID = "validateValuesRespondent";
 
-
     @BeforeEach
     void setup() {
         given(featureToggleService.isCaseProgressionEnabled()).willReturn(false);
     }
-
 
     @Test
     void givenAboutToStart_assignCaseProgAllocatedTrackUnSpec() {
@@ -1190,7 +1189,6 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         given(featureToggleService.isCaseProgressionEnabled()).willReturn(true);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
 
         // When
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);

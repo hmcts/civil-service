@@ -1,12 +1,10 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.applicantonesolcitor;
+package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.respondentonesolicitor;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.ApplicantOneSolicitorDocumentHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.RespondentSolicitorOneDocumentHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -14,22 +12,19 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_SCHEDULES_OF_COSTS;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_TWO_SCHEDULE_OF_COSTS;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.BUNDLE_EVIDENCE_UPLOAD;
 
 @Component
-@Slf4j
-@Order(11)
-public class ApplicantOneScheduleOfCostsDocumentHandler extends
-    ApplicantOneSolicitorDocumentHandler<UploadEvidenceDocumentType> {
+public class RespondentOneBundleDocumentHandler extends
+    RespondentSolicitorOneDocumentHandler<UploadEvidenceDocumentType> {
 
-    public ApplicantOneScheduleOfCostsDocumentHandler(DocumentTypeBuilder<UploadEvidenceDocumentType> documentTypeBuilder) {
-        super(APPLICANT_SCHEDULES_OF_COSTS, APPLICANT_TWO_SCHEDULE_OF_COSTS, EvidenceUploadType.COSTS, documentTypeBuilder);
+    public RespondentOneBundleDocumentHandler(DocumentTypeBuilder<UploadEvidenceDocumentType> documentTypeBuilder) {
+        super(BUNDLE_EVIDENCE_UPLOAD, BUNDLE_EVIDENCE_UPLOAD, EvidenceUploadType.BUNDLE_EVIDENCE, documentTypeBuilder);
     }
 
     @Override
     protected List<Element<UploadEvidenceDocumentType>> getDocumentList(CaseData caseData) {
-        return caseData.getDocumentCosts();
+        return caseData.getBundleEvidence();
     }
 
     @Override
@@ -44,17 +39,21 @@ public class ApplicantOneScheduleOfCostsDocumentHandler extends
 
     @Override
     protected void renameDocuments(List<Element<UploadEvidenceDocumentType>> documentUploads) {
-        log.info("No rename required");
+        renameUploadEvidenceBundleType(documentUploads);
     }
 
     @Override
     protected void addDocumentsToCopyToCaseData(CaseData.CaseDataBuilder<?, ?> builder, List<Element<UploadEvidenceDocumentType>> evidenceDocsToAdd) {
-        builder.documentCostsApp2(evidenceDocsToAdd);
-
+        builder.bundleEvidence(evidenceDocsToAdd);
     }
 
     @Override
     protected List<Element<UploadEvidenceDocumentType>> getCorrespondingLegalRep2DocumentList(CaseData caseData) {
-        return caseData.getDocumentCostsApp2();
+        return caseData.getBundleEvidence();
+    }
+
+    @Override
+    public boolean shouldCopyDocumentsToLegalRep2() {
+        return false;
     }
 }

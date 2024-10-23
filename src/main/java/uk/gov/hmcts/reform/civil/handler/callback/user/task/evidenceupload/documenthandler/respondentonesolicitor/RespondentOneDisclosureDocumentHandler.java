@@ -52,5 +52,4 @@ public class RespondentOneDisclosureDocumentHandler extends
         return element.getValue().getCreatedDatetime();
     }
 
-
 }

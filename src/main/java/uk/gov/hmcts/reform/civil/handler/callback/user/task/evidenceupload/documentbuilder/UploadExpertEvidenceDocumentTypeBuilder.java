@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 
 @Component
 public class UploadExpertEvidenceDocumentTypeBuilder implements DocumentTypeBuilder<UploadEvidenceExpert> {
+
     @Override
     public UploadEvidenceExpert buildElementTypeWithDocumentCopy(UploadEvidenceExpert fromValue, String categoryId) {
         Document newDoc = Document.builder()

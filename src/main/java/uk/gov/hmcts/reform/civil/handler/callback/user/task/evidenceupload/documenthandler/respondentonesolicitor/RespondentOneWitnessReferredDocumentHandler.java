@@ -41,7 +41,6 @@ public class RespondentOneWitnessReferredDocumentHandler extends
         return element.getValue().getCreatedDatetime();
     }
 
-
     @Override
     protected void addDocumentsToCopyToCaseData(CaseData.CaseDataBuilder<?, ?> builder, List<Element<UploadEvidenceDocumentType>> evidenceDocsToAdd) {
         builder.documentReferredInStatementRes2(evidenceDocsToAdd);

@@ -5,7 +5,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.RespondentSolicitorTwoDocumentHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.RespondentTwoSolicitorDocumentHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -19,7 +19,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploa
 @Slf4j
 @Order(2)
 public class RespondentTwoDisclosureDocumentHandler extends
-    RespondentSolicitorTwoDocumentHandler<UploadEvidenceDocumentType> {
+    RespondentTwoSolicitorDocumentHandler<UploadEvidenceDocumentType> {
 
     public RespondentTwoDisclosureDocumentHandler() {
         super(RESPONDENT_TWO_DISCLOSURE, EvidenceUploadType.DOCUMENTS_FOR_DISCLOSURE);
@@ -30,7 +30,6 @@ public class RespondentTwoDisclosureDocumentHandler extends
         return caseData.getDocumentForDisclosureRes2();
     }
 
-
     @Override
     protected Document getDocument(Element<UploadEvidenceDocumentType> element) {
         return element.getValue().getDocumentUpload();
@@ -40,6 +39,5 @@ public class RespondentTwoDisclosureDocumentHandler extends
     protected LocalDateTime getDocumentDateTime(Element<UploadEvidenceDocumentType> element) {
         return element.getValue().getCreatedDatetime();
     }
-
 
 }

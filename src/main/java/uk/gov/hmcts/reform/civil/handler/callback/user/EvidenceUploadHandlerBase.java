@@ -224,7 +224,8 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                          List<Element<UploadEvidenceExpert>> uploadEvidenceExpert2,
                                          List<Element<UploadEvidenceExpert>> uploadEvidenceExpert3,
                                          List<Element<UploadEvidenceExpert>> uploadEvidenceExpert4,
-                                         List<Element<UploadEvidenceDocumentType>> trialDocumentEvidence) {
+                                         List<Element<UploadEvidenceDocumentType>> trialDocumentEvidence,
+                                         List<Element<UploadEvidenceDocumentType>> bundleEvidence) {
         List<String> errors = new ArrayList<>();
 
         checkDateCorrectness(errors, uploadEvidenceDocumentType, date -> date.getValue()
@@ -274,6 +275,11 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             "Invalid date: \"Documentary evidence for trial\" "
                 + "date entered must not be in the future (10).");
 
+        checkDateCorrectnessFuture(errors, bundleEvidence, date -> date.getValue()
+                .getDocumentIssuedDate(),
+            "Invalid date: \"Bundle Hearing date\" "
+                + "date entered must not be in the past (11).");
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
@@ -292,6 +298,18 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         });
     }
 
+    <T> void checkDateCorrectnessFuture(List<String> errors, List<Element<T>> documentUpload,
+                                        Function<Element<T>, LocalDate> dateExtractor, String errorMessage) {
+        if (documentUpload == null) {
+            return;
+        }
+        documentUpload.forEach(date -> {
+            LocalDate dateToCheck = dateExtractor.apply(date);
+            if (dateToCheck.isBefore(LocalDateTime.now().toLocalDate())) {
+                errors.add(errorMessage);
+            }
+        });
+    }
 
     CallbackResponse documentUploadTime(CallbackParams callbackParams) {
         String selectedRole = getSelectedRole(callbackParams);

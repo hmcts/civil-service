@@ -4,7 +4,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.ApplicantSolicitorTwoDocumentHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.ApplicantTwoSolicitorDocumentHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -17,7 +17,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploa
 @Component
 @Order(4)
 public class ApplicantTwoExpertReportDocumentHandler extends
-    ApplicantSolicitorTwoDocumentHandler<UploadEvidenceExpert> {
+    ApplicantTwoSolicitorDocumentHandler<UploadEvidenceExpert> {
 
     public ApplicantTwoExpertReportDocumentHandler() {
         super(APPLICANT_TWO_EXPERT_REPORT, EvidenceUploadType.EXPERT_REPORT);

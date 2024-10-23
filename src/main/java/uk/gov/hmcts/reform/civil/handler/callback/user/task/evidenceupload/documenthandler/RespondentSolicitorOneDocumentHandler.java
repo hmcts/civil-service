@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import java.util.List;
 
 public abstract class RespondentSolicitorOneDocumentHandler<T> extends LegalRepresentativeOneDocumentHandler<T> {
+
     public RespondentSolicitorOneDocumentHandler(DocumentCategory documentCategory, DocumentCategory legalRepresentativeTwoDocumentCategory,
                                                  EvidenceUploadType evidenceUploadType,
                                                  DocumentTypeBuilder<T> documentTypeBuilder) {

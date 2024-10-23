@@ -46,7 +46,6 @@ public class RespondentOneScheduleOfCostsDocumentHandler extends
         log.info("No rename required");
     }
 
-
     @Override
     protected void addDocumentsToCopyToCaseData(CaseData.CaseDataBuilder<?, ?> builder, List<Element<UploadEvidenceDocumentType>> evidenceDocsToAdd) {
         builder.documentCostsRes2(evidenceDocsToAdd);

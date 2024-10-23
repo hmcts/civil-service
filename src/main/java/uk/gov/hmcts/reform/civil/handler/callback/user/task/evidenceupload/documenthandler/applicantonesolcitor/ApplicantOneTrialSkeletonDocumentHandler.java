@@ -5,7 +5,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.ApplicantSolicitorOneDocumentHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.ApplicantOneSolicitorDocumentHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -21,8 +21,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploa
 @Slf4j
 @Order(9)
 public class ApplicantOneTrialSkeletonDocumentHandler extends
-    ApplicantSolicitorOneDocumentHandler<UploadEvidenceDocumentType> {
-
+    ApplicantOneSolicitorDocumentHandler<UploadEvidenceDocumentType> {
 
     public ApplicantOneTrialSkeletonDocumentHandler(DocumentTypeBuilder<UploadEvidenceDocumentType> documentTypeBuilder) {
         super(APPLICANT_ONE_TRIAL_SKELETON, APPLICANT_TWO_TRIAL_SKELETON, TRIAL_SKELETON, documentTypeBuilder);
