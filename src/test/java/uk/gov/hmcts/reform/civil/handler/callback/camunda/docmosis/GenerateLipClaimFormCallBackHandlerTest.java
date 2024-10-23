@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimform.ClaimFormGenerator;
-import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -40,8 +39,6 @@ class GenerateLipClaimFormCallBackHandlerTest extends BaseCallbackHandlerTest {
     private SystemGeneratedDocumentService systemGeneratedDocumentService;
     @Mock
     private ObjectMapper mapper;
-    @Mock
-    private AssignCategoryId assignCategoryId;
     @InjectMocks
     private GenerateLipClaimFormCallBackHandler handler;
 
