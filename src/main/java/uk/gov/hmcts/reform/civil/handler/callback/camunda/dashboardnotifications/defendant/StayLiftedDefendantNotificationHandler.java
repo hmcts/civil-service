@@ -19,7 +19,7 @@ public class StayLiftedDefendantNotificationHandler extends CaseEventsDashboardC
 
     private static final List<CaseEvent> EVENTS =
         List.of(CREATE_DASHBOARD_NOTIFICATION_STAY_LIFTED_DEFENDANT);
-    public static final String TASK_ID = "GenerateDashboardNotificationStayLiftedDefendant";
+    public static final String TASK_ID = "DashboardNotificationStayLiftedDefendant";
 
     public StayLiftedDefendantNotificationHandler(DashboardApiClient dashboardApiClient,
                                                   DashboardNotificationsParamsMapper mapper,
