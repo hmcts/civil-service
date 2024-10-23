@@ -259,12 +259,13 @@ class InterestCalculatorTest {
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
             .sameRateInterestSelection(SameRateInterestSelection.builder()
                 .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
-            .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
+            .interestClaimFrom(InterestClaimFromType.FROM_A_SPECIFIC_DATE)
             .interestClaimUntil(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE)
             .interestFromSpecificDate(LocalDate.now().minusDays(6))
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .build();
+        caseData = caseData.toBuilder().submittedDate(LocalDateTime.of(2024, 12, 31, 1, 15)).build();
         assertThat(interestCalculator.getInterestPerDayBreakdown(caseData))
-            .isEqualTo("Interest will accrue at the daily rate of £1.10 up to the date of claim submitted");
+            .isEqualTo("31 December 2024");
     }
 }

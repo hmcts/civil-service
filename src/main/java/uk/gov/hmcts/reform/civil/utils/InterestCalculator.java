@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestType;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
@@ -104,7 +105,12 @@ public class InterestCalculator {
     }
 
     public String getInterestPerDayBreakdown(CaseData caseData) {
-        if (caseData.getInterestClaimOptions() == null || caseData.getInterestClaimOptions().equals(InterestClaimOptions.BREAK_DOWN_INTEREST)) {
+
+        if (caseData.getInterestClaimUntil().equals(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE)) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
+            return caseData.getSubmittedDate().toLocalDate().format(formatter);
+        } else if (caseData.getInterestClaimOptions() == null ||
+            caseData.getInterestClaimOptions().equals(InterestClaimOptions.BREAK_DOWN_INTEREST)) {
             return null;
         }
         StringBuilder description = new StringBuilder("Interest will accrue at the daily rate of £");

@@ -79,7 +79,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT_SPEC);
     private final ObjectMapper objectMapper;
     private final InterestCalculator interestCalculator;
-    private final FeesService feesService;
     private final FeatureToggleService toggleService;
     private final DefaultJudgmentOnlineMapper djOnlineMapper;
     private final CaseDetailsConverter caseDetailsConverter;
@@ -298,9 +297,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
-        BigDecimal totalInterest = caseData.getTotalInterest() != null ? caseData.getTotalInterest() : BigDecimal.ZERO;
-        var claimWithInterest = caseData.getTotalClaimAmount().add(totalInterest);
-        Fee claimfee = feesService.getFeeDataByTotalClaimAmount(claimWithInterest);
+        Fee claimfee = caseData.getClaimFee();
         BigDecimal claimFeePounds;
         if (caseData.getOutstandingFeeInPounds() != null) {
             claimFeePounds = caseData.getOutstandingFeeInPounds();
