@@ -198,7 +198,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         }
 
         /* for 1v1 */
-        if (applicant2andRespondent2NotAdded(caseData)) {
+        if (areApplicant2andRespondent2NotAdded(caseData)) {
             caseDataBuilder
                 .respondent1AcknowledgeNotificationDate(time.now())
                 .respondent1ResponseDeadline(newDeadlineRespondent1)
@@ -287,7 +287,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         return caseData.getAddApplicant2() != null && caseData.getAddApplicant2().equals(YES);
     }
 
-    private boolean applicant2andRespondent2NotAdded(CaseData caseData) {
+    private boolean areApplicant2andRespondent2NotAdded(CaseData caseData) {
         return caseData.getAddApplicant2() != null && caseData.getAddApplicant2().equals(NO)
             && caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(NO);
     }
@@ -297,7 +297,6 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             && caseData.getRespondent2() != null
             && respondent2HasSameLegalRep(caseData);
     }
-
 
     private boolean isRespondent1WithDifferentLegalRep(CaseData caseData, YesOrNo respondent1Check) {
         return caseData.getRespondent1() != null
@@ -313,7 +312,6 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             && respondent1Check.equals(NO)
             && !respondent2HasSameLegalRep(caseData);
     }
-
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
