@@ -76,28 +76,8 @@ java:
         - name: hmc-servicebus-shared-access-key-tf
           alias: HMC_HEARINGS_TOPIC_ACCESS_KEY
   postgresql:
-    enabled: true
-    image:
-      registry: hmctspublic.azurecr.io
-      repository: imported/bitnami/postgresql
-      tag: '11.6.0'
-    primary:
-      persistence:
-        enabled: false
-      resources:
-        requests:
-          cpu: 25m
-      initdb:
-        scripts:
-          init.sql: |
-            CREATE DATABASE cmc WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "data-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "definition-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "camunda" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-    auth:
-      username: ${POSTGRES_USER}
-      password: ${POSTGRES_PASSWORD}
+    enabled: false
+
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-xui-idam-pr
   enabled: true
@@ -286,3 +266,18 @@ wiremock:
     - name: wiremock-mocks
       mountPath: /home/wiremock/mappings
       subPath: mappings
+
+postgresql:
+  enabled: true
+  flexibleserver: civil-preview
+  setup:
+    databases:
+      - name: "pr-${CHANGE_ID}-data-store"
+      - name: "pr-${CHANGE_ID}-definition-store"
+      - name: "pr-${CHANGE_ID}-user-profile"
+      - name: "pr-${CHANGE_ID}-camunda"
+      - name: "pr-${CHANGE_ID}-role-assignment"
+      - name: "pr-${CHANGE_ID}-cft_task_db"
+      - name: "pr-${CHANGE_ID}-wa-case-event-handler"
+      - name: "pr-${CHANGE_ID}-wa_workflow_api"
+      - name: "pr-${CHANGE_ID}-cmc"

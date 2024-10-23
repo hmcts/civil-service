@@ -240,3 +240,6 @@ aac-manage-case-assignment:
 
 wiremock:
   enabled: false
+
+postgresql:
+  enabled: false

@@ -137,3 +137,6 @@ java:
 
 wiremock:
   enabled: false
+
+postgresql:
+  enabled: false
