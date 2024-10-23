@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -30,7 +31,7 @@ import static java.util.Optional.ofNullable;
 
 @Component
 @RequiredArgsConstructor
-public class StartGeneralApplicationBusinessProcessTaskHandler implements BaseExternalTaskHandler {
+public class StartGeneralApplicationBusinessProcessTaskHandler extends BaseExternalTaskHandler {
 
     public static final String BUSINESS_PROCESS = "businessProcess";
     private final CoreCaseDataService coreCaseDataService;
@@ -38,20 +39,19 @@ public class StartGeneralApplicationBusinessProcessTaskHandler implements BaseEx
     private final ObjectMapper mapper;
     private final IStateFlowEngine stateFlowEngine;
 
-    private VariableMap variables;
-
     @Override
-    public void handleTask(ExternalTask externalTask) {
+    public ExternalTaskData handleTask(ExternalTask externalTask) {
         CaseData caseData = startGeneralApplicationBusinessProcess(externalTask);
-        variables = Variables.createVariables();
+        var variables = Variables.createVariables();
         var stateFlow = stateFlowEngine.evaluate(caseData);
         variables.putValue(FLOW_STATE, stateFlow.getState().getName());
         variables.putValue(FLOW_FLAGS, stateFlow.getFlags());
+        return ExternalTaskData.builder().variables(variables).build();
     }
 
     @Override
-    public VariableMap getVariableMap() {
-        return variables;
+    public VariableMap getVariableMap(ExternalTaskData externalTaskData) {
+        return externalTaskData.getVariables();
     }
 
     private CaseData startGeneralApplicationBusinessProcess(ExternalTask externalTask) {

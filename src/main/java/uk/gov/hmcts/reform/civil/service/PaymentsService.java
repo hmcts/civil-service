@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service;
 
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
@@ -27,10 +28,10 @@ import java.util.UUID;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PaymentsService {
 
     private static final String PAYMENT_ACTION = "Case Submit";
