@@ -106,29 +106,29 @@ public class InterestCalculator {
 
     public String getInterestPerDayBreakdown(CaseData caseData) {
 
-        if (caseData.getInterestClaimUntil().equals(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE)) {
+        if (caseData.getInterestClaimUntil() != null && caseData.getInterestClaimUntil().equals(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE)) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
             return caseData.getSubmittedDate().toLocalDate().format(formatter);
         } else if (caseData.getInterestClaimOptions() == null
             || caseData.getInterestClaimOptions().equals(InterestClaimOptions.BREAK_DOWN_INTEREST)) {
             return null;
-        }
-        StringBuilder description = new StringBuilder("Interest will accrue at the daily rate of £");
-        BigDecimal interestPerDay = ZERO;
-        if (caseData.getInterestClaimOptions().equals(InterestClaimOptions.SAME_RATE_INTEREST)) {
-            if (caseData.getSameRateInterestSelection().getSameRateInterestType()
-                .equals(SameRateInterestType.SAME_RATE_INTEREST_8_PC)) {
-                interestPerDay = getInterestPerDay(caseData.getTotalClaimAmount(), EIGHT_PERCENT_INTEREST_RATE);
+        } else {
+            StringBuilder description = new StringBuilder("Interest will accrue at the daily rate of £");
+            BigDecimal interestPerDay = ZERO;
+            if (caseData.getInterestClaimOptions().equals(InterestClaimOptions.SAME_RATE_INTEREST)) {
+                if (caseData.getSameRateInterestSelection().getSameRateInterestType()
+                    .equals(SameRateInterestType.SAME_RATE_INTEREST_8_PC)) {
+                    interestPerDay = getInterestPerDay(caseData.getTotalClaimAmount(), EIGHT_PERCENT_INTEREST_RATE);
+                }
+                if (caseData.getSameRateInterestSelection().getSameRateInterestType()
+                    .equals(SameRateInterestType.SAME_RATE_INTEREST_DIFFERENT_RATE)) {
+                    interestPerDay = getInterestPerDay(caseData.getTotalClaimAmount(), caseData.getSameRateInterestSelection().getDifferentRate());
+                }
             }
-            if (caseData.getSameRateInterestSelection().getSameRateInterestType()
-                .equals(SameRateInterestType.SAME_RATE_INTEREST_DIFFERENT_RATE)) {
-                interestPerDay = getInterestPerDay(caseData.getTotalClaimAmount(), caseData.getSameRateInterestSelection().getDifferentRate());
-            }
+            description.append(interestPerDay.setScale(2, RoundingMode.HALF_UP));
+            description.append(" up to the date of judgment");
+            return description.toString();
         }
-        description.append(interestPerDay.setScale(2, RoundingMode.HALF_UP));
-        description.append(" up to the date of ");
-        description.append(caseData.getInterestClaimUntil().equals(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE) ? "claim submitted" : "judgment");
-        return description.toString();
     }
 
     private LocalDate getSubmittedDate(CaseData caseData) {
