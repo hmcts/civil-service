@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimform.ClaimFormGenerator;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DRAFT_FORM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.CLAIMANT1_DETAILS_OF_CLAIM;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +38,7 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
     );
     private final ObjectMapper objectMapper;
     private final ClaimFormGenerator claimFormGenerator;
+    private final AssignCategoryId assignCategoryId;
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
     private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::generateClaimForm);
 
@@ -57,6 +60,7 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
             callbackParams.getParams().get(BEARER_TOKEN).toString(),
             caseEvent
         );
+        assignCategoryId.assignCategoryIdToCaseDocument(caseDocument, CLAIMANT1_DETAILS_OF_CLAIM.getValue());
 
         CaseData updatedCaseData = updateCaseData(caseData, caseDocument, caseEvent);
         return AboutToStartOrSubmitCallbackResponse.builder()
