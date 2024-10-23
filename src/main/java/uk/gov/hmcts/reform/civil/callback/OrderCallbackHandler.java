@@ -28,7 +28,7 @@ public abstract class OrderCallbackHandler extends DashboardWithParamsCallbackHa
     protected boolean isEligibleForReconsideration(CaseData caseData) {
         return caseData.isSmallClaim()
             && caseData.getTotalClaimAmount().compareTo(BigDecimal.valueOf(1000)) <= 0
-            && !"CREATE_SDO".equals(caseData.getDecisionOnRequestReconsiderationOptions())
+            && !"CREATE_SDO".equals(caseData.getDecisionOnRequestReconsiderationOptions().name())
             && featureToggleService.isCaseProgressionEnabled();
     }
 
