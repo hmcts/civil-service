@@ -10,8 +10,8 @@ plugins {
   id 'com.github.ben-manes.versions' version '0.51.0'
   id 'org.sonarqube' version '5.1.0.4882'
   id 'au.com.dius.pact' version '4.2.14'
-  id "io.freefair.lombok" version "8.10"
-  id 'com.github.hmcts.rse-cft-lib' version '0.19.1335'
+  id "io.freefair.lombok" version "8.10.2"
+  id 'com.github.hmcts.rse-cft-lib' version '0.19.1423'
   id "org.flywaydb.flyway" version "10.17.2"
 }
 
@@ -19,15 +19,15 @@ group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
 
 def versions = [
-  junit             : '5.11.0',
-  junitPlatform     : '1.11.0',
+  junit             : '5.11.2',
+  junitPlatform     : '1.11.2',
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.0',
   lombok            : '1.18.34',
   springSecurity    : '5.8.14',
   camunda           : '7.20.0',
-  jackson           : '2.17.2',
-  testcontainers    : '1.20.1'
+  jackson           : '2.18.0',
+  testcontainers    : '1.20.2'
 ]
 
 allprojects {
@@ -47,7 +47,7 @@ allprojects {
 
   checkstyle {
     maxWarnings = 0
-    toolVersion = '10.18.0'
+    toolVersion = '10.18.2'
     getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
   }
 
@@ -90,7 +90,7 @@ allprojects {
   dependencyManagement {
     dependencies {
       //CVE-2018-10237 - Unbounded memory allocation
-      dependencySet(group: 'com.google.guava', version: '33.3.0-jre') {
+      dependencySet(group: 'com.google.guava', version: '33.3.1-jre') {
         entry 'guava'
       }
 
@@ -114,21 +114,12 @@ allprojects {
       // solves CVE-2022-25857
       dependencySet(
         group: 'org.yaml',
-        version: '2.2'
+        version: '2.3'
       ) {
         entry 'snakeyaml'
       }
-      // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
-      dependencySet(
-        group: 'com.amazonaws',
-        version: '1.12.770'
-      ) {
-        entry 'aws-java-sdk-core'
-        entry 'aws-java-sdk-kms'
-        entry 'aws-java-sdk-s3'
-      }
 
-      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.28') {
+      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.31') {
         entry 'tomcat-embed-core'
         entry 'tomcat-embed-el'
         entry 'tomcat-embed-websocket'
@@ -143,7 +134,7 @@ allprojects {
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.9'
-      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.15.0"
+      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.17.1"
     }
   }
 
@@ -290,7 +281,7 @@ sonarqube {
     property "sonar.projectName", "CIVIL :: service"
     property "sonar.projectKey", "civil-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/request/servlet/** , **/controllers/**, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**, **/service/PaymentsService.java, **/DashboardWithParamsCallbackHandler.java, **/advice/**"
+    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/request/servlet/** , **/controllers/**, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**, **/service/PaymentsService.java, **/DashboardWithParamsCallbackHandler.java, **/PaymentRequestUpdateCallbackService.java, **/advice/**"
     property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java, **/*CcdDashboardClaimantClaimMatcher.java, **/*CcdDashboardDefendantClaimMatcher.java"
     property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**, **/handler/callback/camunda/dashboardnotifications/claimant/CCJRequestedDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantCCJResponseNotificationHandler.java" +
       ", **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantResponseNotificationHandler.java,  **/handler/callback/camunda/dashboardnotifications/defendant/MoreTimeRequestedDashboardNotificationDefendantHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantMediationSuccessfulDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimSettledDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/HearingScheduledClaimantNotificationHandler.java"
@@ -356,7 +347,7 @@ dependencies {
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.4'
   implementation group: 'javax.persistence', name: 'javax.persistence-api'
 
-  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.45.4'
+  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.46.0'
   implementation group: 'org.jdbi', name: 'jdbi3-spring4', version: '3.19.0'
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
@@ -364,16 +355,16 @@ dependencies {
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.10.RELEASE'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-openfeign-core'
-  implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.0.3'
+  implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.2'
 
-  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.3'
+  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.5'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
-  implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.1.6'
+  implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.1.7'
 
   implementation group: 'com.github.hmcts', name: 'ccd-client', version: '4.9.5-SPRING2'
-  implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
-  implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '3.0.4'
+  implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
+  implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '3.0.23'
   implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version:'7.4'
   implementation('com.github.hmcts:fees-java-client:0.0.6') {
     exclude group: 'uk.gov.hmcts.reform', module: 'java-logging'
@@ -382,9 +373,9 @@ dependencies {
     exclude group: 'uk.gov.hmcts.reform', module: 'java-logging'
     exclude group: 'uk.gov.hmcts.reform', module: 'service-auth-provider-client'
   }
-  implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.2.0-RELEASE'
+  implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.2.1-RELEASE'
   implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.1'
-  implementation group: 'com.sendgrid', name: 'sendgrid-java', version: '4.10.2'
+  implementation group: 'com.sendgrid', name: 'sendgrid-java', version: '4.10.3'
 
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -399,16 +390,16 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core', version: versions.springSecurity
-  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.40'
+  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.41.2'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.12.6'
-  implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.0.1'
-  implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.23.1'
-  implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.23.1'
+  implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.1'
+  implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.24.1'
+  implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.24.1'
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.93'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.23'
-  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.23'
-  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.1'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.96'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.31'
+  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.25'
+  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.2'
 
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: versions.jackson
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
@@ -426,15 +417,15 @@ dependencies {
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
-  implementation group: 'com.azure', name: 'azure-core', version: '1.51.0'
-  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.3'
+  implementation group: 'com.azure', name: 'azure-core', version: '1.53.0'
+  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.5'
   implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
 
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.15.0'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.14.19'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.15.5'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.15.5'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -446,17 +437,17 @@ dependencies {
   testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.26.3'
 
   testImplementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
-  testImplementation 'com.github.hmcts:fortify-client:1.4.4:all'
+  testImplementation 'com.github.hmcts:fortify-client:1.4.5:all'
   //pact contract testing
   contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.5'
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.11.0')
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.11.0')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.11.2')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.11.2')
   contractTestImplementation sourceSets.main.runtimeClasspath
   contractTestImplementation sourceSets.test.runtimeClasspath
 
-  integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.11.0')
-  integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.11.0')
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.11.2')
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.11.2')
 
   // dashboard specific changes
 

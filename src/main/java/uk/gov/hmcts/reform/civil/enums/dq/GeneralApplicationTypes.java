@@ -19,7 +19,8 @@ public enum GeneralApplicationTypes {
     ADJOURN_HEARING("Adjourn a hearing"),
     UNLESS_ORDER("Unless order"),
     OTHER("Other"),
-    VARY_PAYMENT_TERMS_OF_JUDGMENT("Vary payment terms of judgment");
+    VARY_PAYMENT_TERMS_OF_JUDGMENT("Vary payment terms of judgment"),
+    CONFIRM_CCJ_DEBT_PAID("Confirm you've paid a judgment debt");
 
     private final String displayedValue;
 }
