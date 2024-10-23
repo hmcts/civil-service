@@ -943,7 +943,9 @@ class FlowStateAllowedEventServiceTest {
                         SETTLE_CLAIM_MARK_PAID_FULL,
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        AMEND_RESTITCH_BUNDLE,
+                        asyncStitchingComplete
                     }
                 ),
                 of(
@@ -1713,7 +1715,9 @@ class FlowStateAllowedEventServiceTest {
                     new CaseEvent[] {
                         DISMISS_CLAIM,
                         migrateCase,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        AMEND_RESTITCH_BUNDLE,
+                        asyncStitchingComplete
                     }
                 ),
                 of(
@@ -2268,7 +2272,8 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     AMEND_RESTITCH_BUNDLE,
                     new String[] {
-                        IN_HEARING_READINESS.fullName()
+                        IN_HEARING_READINESS.fullName(),
+                        PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA.fullName()
                     }
                 ),
                 of(
