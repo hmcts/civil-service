@@ -2272,7 +2272,8 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     AMEND_RESTITCH_BUNDLE,
                     new String[] {
-                        IN_HEARING_READINESS.fullName()
+                        IN_HEARING_READINESS.fullName(),
+                        PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA.fullName()
                     }
                 ),
                 of(
