@@ -547,7 +547,7 @@ class DashboardClaimStatusFactoryTest {
             .systemGeneratedCaseDocuments(List.of(Element.<CaseDocument>builder()
                                                       .value(sdoDocument).build()))
             .build();
-        if(toggleService.isCaseProgressionEnabled()){
+        if (toggleService.isCaseProgressionEnabled()) {
             checkStatus(caseData, eventHistory,
                         DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED,
                         DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED
