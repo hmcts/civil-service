@@ -37,7 +37,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DJRespondentReceivedNotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.APPLICANT_ONE_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_EMAIL;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_EMAIL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME_INTERIM;
@@ -194,7 +194,7 @@ class DJRespondentReceivedNotificationHandlerTest {
         @NotNull
         private Map<String, String> getNotificationDataMapLRvLip(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
                 DEFENDANT_NAME_INTERIM, "Company ltd",
                 APPLICANT_ONE_NAME, "Mr. John Rambo",
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
@@ -205,7 +205,7 @@ class DJRespondentReceivedNotificationHandlerTest {
         private Map<String, String> getNotificationDataMap1v1(CaseData caseData) {
             return Map.of(
                 DEFENDANT_EMAIL, "Test Org Name",
-                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
                 DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
@@ -214,7 +214,7 @@ class DJRespondentReceivedNotificationHandlerTest {
         private Map<String, String> getNotificationDataMap1v2(CaseData caseData) {
             return Map.of(
                 DEFENDANT_EMAIL, "Test Org Name",
-                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
                 DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 CLAIMANT_EMAIL, "Test Org Name",
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
@@ -225,7 +225,7 @@ class DJRespondentReceivedNotificationHandlerTest {
         private Map<String, String> getNotificationDataMap1v2fail(CaseData caseData) {
             return Map.of(
                 DEFENDANT_EMAIL, "Test Org Name",
-                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
                 DEFENDANT_NAME, "steve",
                 CLAIMANT_EMAIL, "Test Org Name",
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)

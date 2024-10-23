@@ -614,7 +614,7 @@ public class NotificationDefendantOfHearingHandlerTest {
         @NotNull
         private Map<String, String> getNotificationDataMapNoReference(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 "defendantReferenceNumber", "", "hearingDate", "07-10-2022",
                 "hearingTime", "03:30pm",
                 PARTY_REFERENCES, "Claimant reference: Not provided - Defendant reference: Not provided",
