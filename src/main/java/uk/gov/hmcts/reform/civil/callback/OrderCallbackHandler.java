@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.callback;
 
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
-import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -28,7 +27,8 @@ public abstract class OrderCallbackHandler extends DashboardWithParamsCallbackHa
 
     protected boolean isEligibleForReconsideration(CaseData caseData) {
         return caseData.isSmallClaim()
-            && (caseData.getTotalClaimAmount().compareTo(BigDecimal.valueOf(1000)) <= 0)
+            && caseData.getTotalClaimAmount().compareTo(BigDecimal.valueOf(1000)) <= 0
+            && !"CREATE_SDO".equals(caseData.getDecisionOnRequestReconsiderationOptions())
             && featureToggleService.isCaseProgressionEnabled();
     }
 
