@@ -903,7 +903,8 @@ public class FlowStateAllowedEventService {
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
                 DISCONTINUE_CLAIM_CLAIMANT,
-                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                AMEND_RESTITCH_BUNDLE
             )
         ),
         entry(
@@ -1656,7 +1657,8 @@ public class FlowStateAllowedEventService {
             List.of(
                 DISMISS_CLAIM,
                 migrateCase,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                AMEND_RESTITCH_BUNDLE
             )
         ),
         entry(

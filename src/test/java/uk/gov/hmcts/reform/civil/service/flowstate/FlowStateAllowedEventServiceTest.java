@@ -943,7 +943,8 @@ class FlowStateAllowedEventServiceTest {
                         SETTLE_CLAIM_MARK_PAID_FULL,
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        AMEND_RESTITCH_BUNDLE
                     }
                 ),
                 of(
@@ -1713,7 +1714,8 @@ class FlowStateAllowedEventServiceTest {
                     new CaseEvent[] {
                         DISMISS_CLAIM,
                         migrateCase,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        AMEND_RESTITCH_BUNDLE
                     }
                 ),
                 of(
