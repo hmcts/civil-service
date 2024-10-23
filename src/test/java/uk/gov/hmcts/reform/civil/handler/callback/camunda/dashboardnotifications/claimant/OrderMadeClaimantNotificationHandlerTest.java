@@ -119,6 +119,8 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
 
             handler.handle(params);
 
+            verifyDeleteNotificationsAndTaskListUpdates(caseData);
+
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA6.CP.OrderMade.Claimant",
@@ -391,6 +393,9 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
             ).build();
             handler.handle(params);
 
+            // Then
+            verifyDeleteNotificationsAndTaskListUpdates(caseData);
+
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA6.CP.SDOMadebyLA.Claimant",
@@ -444,6 +449,9 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
 
             handler.handle(params);
 
+            // Then
+            verifyDeleteNotificationsAndTaskListUpdates(caseData);
+
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA6.Update.TaskList.TrialReady.FinalOrders.Claimant",
@@ -471,6 +479,9 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
 
             handler.handle(params);
 
+            // Then
+            verifyDeleteNotificationsAndTaskListUpdates(caseData);
+
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA6.Update.Claimant.TaskList.UploadDocuments.FinalOrders",
@@ -478,5 +489,18 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
+    }
+
+    private void verifyDeleteNotificationsAndTaskListUpdates(CaseData caseData) {
+        verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "CLAIMANT",
+            "BEARER_TOKEN"
+        );
+        verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "CLAIMANT",
+            "BEARER_TOKEN"
+        );
     }
 }
