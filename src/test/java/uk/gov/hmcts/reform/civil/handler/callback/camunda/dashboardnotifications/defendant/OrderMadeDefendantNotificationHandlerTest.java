@@ -554,12 +554,12 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
     private void verifyDeleteNotificationsAndTaskListUpdates(CaseData caseData) {
         verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
             caseData.getCcdCaseReference().toString(),
-            "CLAIMANT",
+            "DEFENDANT",
             "BEARER_TOKEN"
         );
         verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseData.getCcdCaseReference().toString(),
-            "CLAIMANT",
+            "DEFENDANT",
             "BEARER_TOKEN"
         );
     }
