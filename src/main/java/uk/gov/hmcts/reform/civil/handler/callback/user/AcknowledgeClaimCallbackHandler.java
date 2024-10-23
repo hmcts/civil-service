@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -117,8 +118,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             isRespondent1 = NO;
         }
         var caseDateBuilder = caseData.toBuilder();
-        caseDateBuilder.solicitorReferencesCopy(caseData.getSolicitorReferences());
-        caseDateBuilder.isRespondent1(isRespondent1);
+        caseDateBuilder.solicitorReferencesCopy(caseData.getSolicitorReferences()).isRespondent1(isRespondent1);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDateBuilder.build().toMap(objectMapper))
             .build();
@@ -198,8 +198,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         }
 
         /* for 1v1 */
-        if (caseData.getAddApplicant2() != null && caseData.getAddApplicant2().equals(NO)
-            && caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(NO)) {
+        if (applicant2andRespondent2NotAdded(caseData)) {
             caseDataBuilder
                 .respondent1AcknowledgeNotificationDate(time.now())
                 .respondent1ResponseDeadline(newDeadlineRespondent1)
@@ -210,7 +209,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .build();
         }
         //for 2v1
-        if (caseData.getAddApplicant2() != null && caseData.getAddApplicant2().equals(YES)) {
+        if (isApplicant2Added(caseData)) {
             caseDataBuilder
                 .respondent1AcknowledgeNotificationDate(time.now())
                 .respondent1ResponseDeadline(newDeadlineRespondent1)
@@ -222,8 +221,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .nextDeadline(newDeadlineRespondent1.toLocalDate())
                 .caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(caseData))
                 .build();
-        } else if (caseData.getAddRespondent2() != null && caseData.getRespondent2() != null
-            && respondent2HasSameLegalRep(caseData)) {
+        } else if (isRespondent2AddedAndHasSameLegalRepresentation(caseData)) {
             //1v2 same
             PersistDataUtils.persistPartyAddress(oldCaseData, caseData);
 
@@ -240,9 +238,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .nextDeadline(newDeadlineRespondent1.toLocalDate())
                 .caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(caseData))
                 .build();
-        } else if (caseData.getRespondent1() != null && caseData.getAddRespondent2() != null
-            && caseData.getAddRespondent2().equals(YES)
-            && respondent1Check.equals(YES) && !respondent2HasSameLegalRep(caseData)) {
+        } else if (isRespondent1WithDifferentLegalRep(caseData, respondent1Check)) {
             //1v2 diff login 1
 
             caseDataBuilder.respondent1AcknowledgeNotificationDate(time.now())
@@ -260,8 +256,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                         ? caseData.getSolicitorReferencesCopy().getRespondentSolicitor1Reference() : null,
                     caseData.getRespondentSolicitor2Reference()));
 
-        } else if (caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(YES)
-            && respondent1Check.equals(NO) && !respondent2HasSameLegalRep(caseData)) {
+        } else if (isRespondent2WithDifferentLegalRep(caseData, respondent1Check)) {
 
             PersistDataUtils.persistPartyAddress(oldCaseData, caseData);
 
@@ -287,6 +282,38 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
+
+    private boolean isApplicant2Added(CaseData caseData) {
+        return caseData.getAddApplicant2() != null && caseData.getAddApplicant2().equals(YES);
+    }
+
+    private boolean applicant2andRespondent2NotAdded(CaseData caseData) {
+        return caseData.getAddApplicant2() != null && caseData.getAddApplicant2().equals(NO)
+            && caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(NO);
+    }
+
+    private boolean isRespondent2AddedAndHasSameLegalRepresentation(CaseData caseData) {
+        return caseData.getAddRespondent2() != null
+            && caseData.getRespondent2() != null
+            && respondent2HasSameLegalRep(caseData);
+    }
+
+
+    private boolean isRespondent1WithDifferentLegalRep(CaseData caseData, YesOrNo respondent1Check) {
+        return caseData.getRespondent1() != null
+            && caseData.getAddRespondent2() != null
+            && caseData.getAddRespondent2().equals(YES)
+            && respondent1Check.equals(YES)
+            && !respondent2HasSameLegalRep(caseData);
+    }
+
+    private boolean isRespondent2WithDifferentLegalRep(CaseData caseData, YesOrNo respondent1Check) {
+        return caseData.getAddRespondent2() != null
+            && caseData.getAddRespondent2().equals(YES)
+            && respondent1Check.equals(NO)
+            && !respondent2HasSameLegalRep(caseData);
+    }
+
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
