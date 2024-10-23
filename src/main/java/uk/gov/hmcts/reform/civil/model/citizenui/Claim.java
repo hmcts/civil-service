@@ -84,7 +84,9 @@ public interface Claim {
 
     boolean isPartialAdmissionRejected();
 
-    boolean isSDOOrderCreated();
+    boolean isSDOOrderCreatedCP();
+
+    boolean isSDOOrderCreatedPreCP();
 
     boolean isSDOOrderLegalAdviserCreated();
 

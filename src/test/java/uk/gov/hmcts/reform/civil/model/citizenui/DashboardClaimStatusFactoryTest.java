@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -76,7 +77,7 @@ class DashboardClaimStatusFactoryTest {
     @MethodSource("hearingFeePaidArguments")
     void shouldReturnCorrectStatus_hearingFeePaid(int orderPosition, OrderType orderType) {
         List<CaseEventDetail> eventHistory = new ArrayList<>();
-        CaseData caseData = fastClaim(eventHistory);
+        CaseData caseData = fastClaim(eventHistory, toggleService);
         caseData = passDays(caseData, eventHistory, 1);
         caseData = applyOrderIfPosition(1, orderPosition, orderType,
                                         caseData, eventHistory
@@ -130,10 +131,18 @@ class DashboardClaimStatusFactoryTest {
     }
 
     @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectStatus_fastClaimSdo(boolean caseProgressionEnabled) {
+        List<CaseEventDetail> eventHistory = new ArrayList<>();
+        Mockito.when(toggleService.isCaseProgressionEnabled()).thenReturn(caseProgressionEnabled);
+        fastClaim(eventHistory, toggleService);
+    }
+
+    @ParameterizedTest
     @MethodSource("hearingFeePaidArguments")
     void shouldReturnCorrectStatus_hearingFeePaidSmallClaim(int orderPosition, OrderType orderType) {
         List<CaseEventDetail> eventHistory = new ArrayList<>();
-        CaseData caseData = smallClaim(eventHistory);
+        CaseData caseData = smallClaim(eventHistory, toggleService);
         caseData = passDays(caseData, eventHistory, 1);
         caseData = applyOrderIfPosition(1, orderPosition, orderType,
                                         caseData, eventHistory
@@ -190,6 +199,14 @@ class DashboardClaimStatusFactoryTest {
         );
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectStatus_smallClaimSdo(boolean caseProgressionEnabled) {
+        List<CaseEventDetail> eventHistory = new ArrayList<>();
+        Mockito.when(toggleService.isCaseProgressionEnabled()).thenReturn(caseProgressionEnabled);
+        smallClaim(eventHistory, toggleService);
+    }
+
     static Stream<Arguments> hearingFeePaidArguments() {
         return positionAndOrderTypeArguments(9);
     }
@@ -198,7 +215,7 @@ class DashboardClaimStatusFactoryTest {
     @MethodSource("awaitingJudgmentArguments")
     void shouldReturnCorrectStatus_awaitingJudgment(int orderPosition, OrderType orderType) {
         List<CaseEventDetail> eventHistory = new ArrayList<>();
-        CaseData caseData = fastClaim(eventHistory);
+        CaseData caseData = fastClaim(eventHistory, toggleService);
         caseData = applyOrderIfPosition(1, orderPosition, orderType,
                                         caseData, eventHistory
         );
@@ -250,7 +267,7 @@ class DashboardClaimStatusFactoryTest {
     @MethodSource("feeNotPaidArguments")
     void shouldReturnCorrectStatus_feeNotPaid(int orderPosition, OrderType orderType) {
         List<CaseEventDetail> eventHistory = new ArrayList<>();
-        CaseData caseData = smallClaim(eventHistory);
+        CaseData caseData = smallClaim(eventHistory, toggleService);
         caseData = applyOrderIfPosition(1, orderPosition, orderType,
                                         caseData, eventHistory
         );
@@ -286,7 +303,7 @@ class DashboardClaimStatusFactoryTest {
         return caseData;
     }
 
-    private CaseData fastClaim(List<CaseEventDetail> eventHistory) {
+    private CaseData fastClaim(List<CaseEventDetail> eventHistory, FeatureToggleService toggleService) {
         eventHistory.add(CaseEventDetail.builder()
                              .createdDate(LocalDateTime.now())
                              .id(CaseEvent.CREATE_SDO.name())
@@ -304,10 +321,18 @@ class DashboardClaimStatusFactoryTest {
             .drawDirectionsOrderRequired(YesOrNo.NO)
             .claimsTrack(ClaimsTrack.fastTrack)
             .build();
-        checkStatus(caseData, eventHistory,
-                    DashboardClaimStatus.SDO_ORDER_CREATED,
-                    DashboardClaimStatus.SDO_ORDER_CREATED
-        );
+        if (toggleService.isCaseProgressionEnabled()) {
+            checkStatus(caseData, eventHistory,
+                        DashboardClaimStatus.SDO_ORDER_CREATED_CP,
+                        DashboardClaimStatus.SDO_ORDER_CREATED_CP
+            );
+        } else {
+            checkStatus(caseData, eventHistory,
+                        DashboardClaimStatus.SDO_ORDER_CREATED_PRE_CP,
+                        DashboardClaimStatus.SDO_ORDER_CREATED_PRE_CP
+            );
+        }
+
         return caseData;
     }
 
@@ -510,7 +535,7 @@ class DashboardClaimStatusFactoryTest {
         return caseData;
     }
 
-    private CaseData smallClaim(List<CaseEventDetail> eventHistory) {
+    private CaseData smallClaim(List<CaseEventDetail> eventHistory, FeatureToggleService toggleService) {
         CaseDocument sdoDocument = CaseDocument.builder()
             .documentType(DocumentType.SDO_ORDER)
             .createdDatetime(LocalDateTime.now())
@@ -522,10 +547,18 @@ class DashboardClaimStatusFactoryTest {
             .systemGeneratedCaseDocuments(List.of(Element.<CaseDocument>builder()
                                                       .value(sdoDocument).build()))
             .build();
-        checkStatus(caseData, eventHistory,
-                    DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED,
-                    DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED
-        );
+        if(toggleService.isCaseProgressionEnabled()){
+            checkStatus(caseData, eventHistory,
+                        DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED,
+                        DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED
+            );
+        } else {
+            checkStatus(caseData, eventHistory,
+                        DashboardClaimStatus.SDO_ORDER_CREATED_PRE_CP,
+                        DashboardClaimStatus.SDO_ORDER_CREATED_PRE_CP
+            );
+        }
+
         return caseData;
     }
 

@@ -3,8 +3,11 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -392,8 +395,10 @@ class CcdClaimStatusDashboardFactoryTest {
             .build();
     }
 
-    @Test
-    void given_SDOBeenDrawn_whenGetStatus_sdoOrderCreatedRequired() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void given_SDOBeenDrawn_whenGetStatus_sdoOrderCreatedRequired(boolean caseProgressionEnabled) {
+        Mockito.when(featureToggleService.isCaseProgressionEnabled()).thenReturn(caseProgressionEnabled);
         Element<CaseDocument> document = new Element<>(
             UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
             CaseDocument.builder()
@@ -409,7 +414,9 @@ class CcdClaimStatusDashboardFactoryTest {
         DashboardClaimStatus status =
             ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
                 claim, featureToggleService, Collections.emptyList()));
-        assertThat(status).isEqualTo(DashboardClaimStatus.SDO_ORDER_CREATED);
+        assertThat(status).isEqualTo(caseProgressionEnabled
+                                         ? DashboardClaimStatus.SDO_ORDER_CREATED_CP
+                                         : DashboardClaimStatus.SDO_ORDER_CREATED_PRE_CP);
     }
 
     @Test

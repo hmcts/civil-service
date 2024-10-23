@@ -124,10 +124,19 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     }
 
     @Override
-    public boolean isSDOOrderCreated() {
+    public boolean isSDOOrderCreatedPreCP() {
         Optional<LocalDateTime> lastNonSdoOrderTime = getTimeOfLastNonSDOOrder();
         Optional<LocalDateTime> sdoTime = getSDOTime();
-        return CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+        return !featureToggleService.isCaseProgressionEnabled()
+            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState());
+    }
+
+    @Override
+    public boolean isSDOOrderCreatedCP() {
+        Optional<LocalDateTime> lastNonSdoOrderTime = getTimeOfLastNonSDOOrder();
+        Optional<LocalDateTime> sdoTime = getSDOTime();
+        return featureToggleService.isCaseProgressionEnabled()
+            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && !isSDOOrderLegalAdviserCreated()
             && !isSDOOrderInReview()
             && !isSDOOrderInReviewOtherParty()

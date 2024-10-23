@@ -373,7 +373,12 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public boolean isSDOOrderCreated() {
+    public boolean isSDOOrderCreatedCP() {
+        return false;
+    }
+
+    @Override
+    public boolean isSDOOrderCreatedPreCP() {
         return false;
     }
 

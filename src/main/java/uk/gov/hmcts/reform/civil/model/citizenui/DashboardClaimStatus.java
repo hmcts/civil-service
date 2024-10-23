@@ -34,8 +34,11 @@ public enum DashboardClaimStatus {
     CLAIMANT_ACCEPTED_ADMISSION_OF_AMOUNT(
         Claim::hasClaimantAcceptedPartialAdmissionAmount
     ),
-    SDO_ORDER_CREATED(
-        Claim::isSDOOrderCreated
+    SDO_ORDER_CREATED_PRE_CP(
+        Claim::isSDOOrderCreatedPreCP
+    ),
+    SDO_ORDER_CREATED_CP(
+        Claim::isSDOOrderCreatedCP
     ),
     SDO_ORDER_LEGAL_ADVISER_CREATED(
         Claim::isSDOOrderLegalAdviserCreated
