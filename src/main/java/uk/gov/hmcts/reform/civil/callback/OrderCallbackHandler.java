@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 
 @Slf4j
@@ -28,7 +29,8 @@ public abstract class OrderCallbackHandler extends DashboardWithParamsCallbackHa
     protected boolean isEligibleForReconsideration(CaseData caseData) {
         return caseData.isSmallClaim()
             && caseData.getTotalClaimAmount().compareTo(BigDecimal.valueOf(1000)) <= 0
-            && !"CREATE_SDO".equals(caseData.getDecisionOnRequestReconsiderationOptions().name())
+            && (isNull(caseData.getDecisionOnRequestReconsiderationOptions())
+            || !"CREATE_SDO".equals(caseData.getDecisionOnRequestReconsiderationOptions().name()))
             && featureToggleService.isCaseProgressionEnabled();
     }
 
