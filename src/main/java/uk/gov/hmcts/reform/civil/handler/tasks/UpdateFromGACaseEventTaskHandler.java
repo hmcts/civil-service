@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
@@ -18,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter;
 
@@ -47,6 +50,13 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
+    private final FeatureToggleService featureToggleService;
+
+    private CaseData generalAppCaseData;
+    private CaseData civilCaseData;
+    private CaseData data;
+
+    private final Logger log = LoggerFactory.getLogger(UpdateFromGACaseEventTaskHandler.class);
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -215,7 +225,7 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
      *                           add 'get' to the name then call getter to access related Civil document field.
      *                           when update output, use name as key to hold to-be-update collection
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "java:S3776"})
     protected void updateDocCollection(Map<String, Object> output, CaseData generalAppCaseData, String fromGaList,
                                        CaseData civilCaseData, String toCivilList) throws Exception {
         Method gaGetter = ReflectionUtils.findMethod(CaseData.class,
@@ -234,10 +244,40 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
                     civilDocs.add(gaDoc);
                 }
             }
-        } else if (gaDocs != null && gaDocs.size() == 1 && checkIfDocumentExists(civilDocs, gaDocs) < 1) {
-            civilDocs.addAll(gaDocs);
+        } else if (featureToggleService.isGaForLipsEnabled() && (civilCaseData.isRespondent1LiP() || civilCaseData.isRespondent2LiP()
+            || civilCaseData.isApplicantNotRepresented()) && (gaDocs != null && (fromGaList.equals("gaDraftDocument")))) {
+
+            checkDraftDocumentsInMainCase(civilDocs, gaDocs);
+        } else {
+            if (gaDocs != null && gaDocs.size() == 1 && checkIfDocumentExists(civilDocs, gaDocs) < 1) {
+                civilDocs.addAll(gaDocs);
+            }
         }
         output.put(toCivilList, civilDocs.isEmpty() ? null : civilDocs);
+    }
+
+    protected List<Element<?>> checkDraftDocumentsInMainCase(List<Element<?>> civilDocs, List<Element<?>> gaDocs) {
+        List<UUID> ids = gaDocs.stream().map(Element::getId).toList();
+        List<Element<?>> civilDocsCopy = newArrayList();
+
+        for (Element<?> civilDoc : civilDocs) {
+            if (!ids.contains(civilDoc.getId())) {
+                civilDocsCopy.add(civilDoc);
+            }
+        }
+
+        List<UUID> civilIds = civilDocs.stream().map(Element::getId).toList();
+        for (Element<?> gaDoc : gaDocs) {
+            if (!civilIds.contains(gaDoc.getId())) {
+                civilDocsCopy.add(gaDoc);
+            }
+        }
+
+        civilDocs.clear();
+        civilDocs.addAll(civilDocsCopy);
+        civilDocsCopy.clear();
+
+        return civilDocs;
     }
 
     protected boolean canViewClaimant(CaseData civilCaseData, CaseData generalAppCaseData) {
@@ -245,6 +285,7 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
         if (isNull(gaAppDetails)) {
             return false;
         }
+
         return gaAppDetails.stream()
             .anyMatch(civilGaData -> generalAppCaseData.getCcdCaseReference()
                 .equals(parseLong(civilGaData.getValue().getCaseLink().getCaseReference())));
@@ -260,6 +301,7 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
         if (isNull(gaAppDetails)) {
             return false;
         }
+
         return gaAppDetails.stream()
             .anyMatch(civilGaData -> generalAppCaseData.getCcdCaseReference()
                 .equals(parseLong(civilGaData.getValue().getCaseLink().getCaseReference())));
