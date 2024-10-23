@@ -163,16 +163,16 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
 
     private void deleteNotificationAndInactiveTasks(CaseData caseData, String authToken) {
 
-            dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
-                caseData.getCcdCaseReference().toString(),
-                "DEFENDANT",
-                authToken
-            );
+        dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "DEFENDANT",
+            authToken
+        );
 
-            dashboardApiClient.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
-                caseData.getCcdCaseReference().toString(),
-                "DEFENDANT",
-                authToken
-            );
+        dashboardApiClient.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "DEFENDANT",
+            authToken
+        );
     }
 }
