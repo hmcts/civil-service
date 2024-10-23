@@ -25,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DRAFT_FORM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.CLAIMANT1_DETAILS_OF_CLAIM;
 
 @Service
 @RequiredArgsConstructor
@@ -59,7 +60,7 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
             callbackParams.getParams().get(BEARER_TOKEN).toString(),
             caseEvent
         );
-        assignCategoryId.assignCategoryIdToCaseDocument(caseDocument, "detailsOfClaim");
+        assignCategoryId.assignCategoryIdToCaseDocument(caseDocument, CLAIMANT1_DETAILS_OF_CLAIM.getValue());
 
         CaseData updatedCaseData = updateCaseData(caseData, caseDocument, caseEvent);
         return AboutToStartOrSubmitCallbackResponse.builder()
