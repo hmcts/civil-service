@@ -110,10 +110,10 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
     private List<DefaultJudgmentForm> getDefaultJudgmentForms(CaseData caseData, String event) {
         List<DefaultJudgmentForm> defaultJudgmentForms = new ArrayList<>();
 
-        defaultJudgmentForms.add(getDefaultJudgmentForm(caseData, caseData.getRespondent1(), event));
+        defaultJudgmentForms.add(getDefaultJudgmentForm(caseData, caseData.getRespondent1(), event, true));
         if (caseData.getRespondent2() != null) {
 
-            defaultJudgmentForms.add(getDefaultJudgmentForm(caseData, caseData.getRespondent2(), event));
+            defaultJudgmentForms.add(getDefaultJudgmentForm(caseData, caseData.getRespondent2(), event, false));
         }
 
         return defaultJudgmentForms;
@@ -122,11 +122,15 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
 
     private DefaultJudgmentForm getDefaultJudgmentForm(CaseData caseData,
                                                        uk.gov.hmcts.reform.civil.model.Party respondent,
-                                                       String event) {
+                                                       String event,
+                                                       boolean addReferenceOfSecondRes) {
         BigDecimal debtAmount = event.equals(GENERATE_DJ_FORM_SPEC.name())
             ? JudgmentsOnlineHelper.getDebtAmount(caseData, interestCalculator).setScale(2) : new BigDecimal(0);
         BigDecimal cost = event.equals(GENERATE_DJ_FORM_SPEC.name())
             ? getClaimFee(caseData) : new BigDecimal(0);
+
+        String respReference = addReferenceOfSecondRes ?  caseData.getSolicitorReferences()
+            .getRespondentSolicitor1Reference() : null;
 
         return DefaultJudgmentForm.builder()
             .caseNumber(caseData.getLegacyCaseReference())
@@ -142,8 +146,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
                                     ? null : caseData.getSolicitorReferences()
                 .getApplicantSolicitor1Reference())
             .respondentReference(Objects.isNull(caseData.getSolicitorReferences())
-                                     ? null : caseData.getSolicitorReferences()
-                .getRespondentSolicitor1Reference()).build();
+                                     ? null : respReference).build();
     }
 
     private DefaultJudgmentForm getDefaultJudgmentFormNonDivergent(CaseData caseData, String partyType) {
