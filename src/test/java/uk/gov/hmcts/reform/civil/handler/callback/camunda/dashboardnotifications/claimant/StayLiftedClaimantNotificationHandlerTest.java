@@ -43,7 +43,7 @@ public class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandl
     @Mock
     private FeatureToggleService featureToggleService;
 
-    public static final String TASK_ID = "GenerateDashboardNotificationStayLiftedClaimant";
+    public static final String TASK_ID = "DashboardNotificationStayLiftedClaimant";
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
