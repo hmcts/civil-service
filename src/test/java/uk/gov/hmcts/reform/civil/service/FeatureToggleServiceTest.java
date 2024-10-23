@@ -229,6 +229,25 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsCarmEnabled(Boolean toggleStat) {
+        var carmKey = "carm";
+        var carmDateKey = "cam-enabled-for-case";
+        givenToggle(carmKey, toggleStat);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+            .setClaimTypeToSpecClaim()
+            .build();
+
+        if (toggleStat) {
+            when(featureToggleApi.isFeatureEnabledForDate(eq(carmDateKey), anyLong(), eq(false)))
+                .thenReturn(true);
+        }
+
+        assertThat(featureToggleService.isCarmEnabledForCase(caseData)).isEqualTo(toggleStat);
+    }
+    
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenMultiOrIntermediateTrackEnabled(Boolean toggleStat) {
         var mintiKey = "minti";
         var caseFileKey = "multi-or-intermediate-track";
