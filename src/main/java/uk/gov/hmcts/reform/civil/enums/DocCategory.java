@@ -14,7 +14,8 @@ public enum DocCategory {
     DQ_DEF1("DQRespondent"),
     DQ_DEF2("DQRespondentTwo"),
     HEARING_NOTICES("hearingNotices"),
-    NOTICE_OF_DISCONTINUE("discontinueNotices");
+    NOTICE_OF_DISCONTINUE("discontinueNotices"),
+    CLAIMANT1_DETAILS_OF_CLAIM("detailsOfClaim");
 
     private final String value;
 }
