@@ -944,7 +944,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         ADD_CASE_NOTE,
-                        AMEND_RESTITCH_BUNDLE
+                        AMEND_RESTITCH_BUNDLE,
+                        asyncStitchingComplete
                     }
                 ),
                 of(
@@ -1715,7 +1716,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CLAIM,
                         migrateCase,
                         ADD_CASE_NOTE,
-                        AMEND_RESTITCH_BUNDLE
+                        AMEND_RESTITCH_BUNDLE,
+                        asyncStitchingComplete
                     }
                 ),
                 of(
