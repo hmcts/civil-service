@@ -30,6 +30,7 @@ public abstract class AbstractNotifyManageStayClaimantHandler extends AbstractNo
         return caseData.getApplicant1().getPartyName();
     }
 
+    @Override
     protected boolean isBilingual(CaseData caseData) {
         return caseData.isClaimantBilingual();
     }
