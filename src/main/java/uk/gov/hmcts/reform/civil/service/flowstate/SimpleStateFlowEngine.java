@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -17,7 +16,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-@ConditionalOnProperty(value = "stateflow.engine.simplification.enabled", havingValue = "true")
 public class SimpleStateFlowEngine implements IStateFlowEngine {
 
     protected final CaseDetailsConverter caseDetailsConverter;
