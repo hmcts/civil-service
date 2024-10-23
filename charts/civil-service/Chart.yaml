@@ -34,3 +34,7 @@ dependencies:
     version: 0.0.5
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: wiremock.enabled
+  - name: postgresql
+    version: 1.0.2
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: postgresql.enabled
