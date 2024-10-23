@@ -75,10 +75,11 @@ public class DefendantChangeOfAddressApplicantForCuiNotificationHandler
     private Map<String, String> addPropertiesForLiPClaimant(CaseData caseData) {
         return Map.of(
             CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl(),
-            EXTERNAL_ID, caseData.getCcdCaseReference().toString()
+            EXTERNAL_ID, caseData.getCcdCaseReference().toString(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 
