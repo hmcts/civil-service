@@ -1191,7 +1191,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
         if (getSystemGeneratedCaseDocuments() != null) {
             return getSystemGeneratedCaseDocuments().stream()
                 .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
-                    .getDocumentType().equals(DocumentType.SDO_ORDER)).findAny();
+                    .getDocumentType().equals(DocumentType.SDO_ORDER))
+                .sorted((doc1, doc2) -> doc2.getValue().getCreatedDatetime()
+                    .compareTo(doc1.getValue().getCreatedDatetime()))
+                .findFirst();
         }
         return Optional.empty();
     }
