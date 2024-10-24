@@ -19,11 +19,13 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizenui.HelpWithFeesForTabService;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 
@@ -32,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -55,12 +58,10 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final HelpWithFeesForTabService helpWithFeesForTabService;
     private final FeatureToggleService featureToggleService;
+    private final LocationReferenceDataService locationRefDataService;
 
     @Value("${court-location.specified-claim.epimms-id}")
     private String epimmsId;
-
-    @Value("${court-location.specified-claim.region-id}")
-    private String regionId;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -115,7 +116,19 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
         if (caseData.getIsFlightDelayClaim() == YesOrNo.YES) {
             caseDataBuilder.claimType(ClaimType.FLIGHT_DELAY);
         }
-        caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder().region(regionId).baseLocation(epimmsId).build());
+
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        List<LocationRefData> locations = (locationRefDataService
+            .getCourtLocationsByEpimmsIdAndCourtType(authToken, epimmsId));
+
+        if (!locations.isEmpty()) {
+            LocationRefData locationRefData = locations.get(0);
+            caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder()
+                                                       .region(locationRefData.getRegionId())
+                                                       .baseLocation(locationRefData.getEpimmsId())
+                                                       .build());
+            caseDataBuilder.locationName(locationRefData.getSiteName());
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();

@@ -66,6 +66,11 @@ public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHa
             assignCategoryId.assignCategoryIdToCaseDocument(sealedDQForm, DocCategory.DQ_DEF1.getValue());
         } else {
             assignCategoryId.assignCategoryIdToCaseDocument(sealedDQForm, DocCategory.DQ_APP1.getValue());
+            CaseDocument sealedDQFormCopy = sealedDQForm.toBuilder()
+                .documentLink(sealedDQForm.getDocumentLink().toBuilder().build()).build();
+            caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedDocumentService
+                                                             .getSystemGeneratedDocumentsWithAddedDocument(sealedDQFormCopy, caseData));
+            assignCategoryId.assignCategoryIdToCaseDocument(sealedDQFormCopy, DocCategory.APP1_DQ.getValue());
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
