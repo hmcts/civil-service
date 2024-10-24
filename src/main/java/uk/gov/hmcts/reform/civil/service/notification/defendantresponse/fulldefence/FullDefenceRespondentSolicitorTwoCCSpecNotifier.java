@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
@@ -55,8 +56,9 @@ public class FullDefenceRespondentSolicitorTwoCCSpecNotifier extends FullDefence
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent2())
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
 
     }
