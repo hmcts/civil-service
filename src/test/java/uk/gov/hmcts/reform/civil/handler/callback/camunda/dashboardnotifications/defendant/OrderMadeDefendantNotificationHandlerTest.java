@@ -180,8 +180,6 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
 
             handler.handle(params);
 
-            // Then
-            verifyDeleteNotificationsAndTaskListUpdates(caseData);
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA6.CP.OrderMade.Defendant",

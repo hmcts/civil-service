@@ -119,8 +119,6 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
 
             handler.handle(params);
 
-            verifyDeleteNotificationsAndTaskListUpdates(caseData);
-
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA6.CP.OrderMade.Claimant",
@@ -201,6 +199,8 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
 
             handler.handle(params);
 
+            // Then
+            verifyDeleteNotificationsAndTaskListUpdates(caseData);
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA6.Update.Claimant.TaskList.UploadDocuments.FinalOrders",
@@ -393,9 +393,6 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
             ).build();
             handler.handle(params);
 
-            // Then
-            verifyDeleteNotificationsAndTaskListUpdates(caseData);
-
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA6.CP.SDOMadebyLA.Claimant",
@@ -474,8 +471,6 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
 
             handler.handle(params);
 
-            // Then
-            verifyDeleteNotificationsAndTaskListUpdates(caseData);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
