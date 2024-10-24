@@ -9,7 +9,9 @@ import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
+import uk.gov.hmcts.reform.payments.client.models.FeeDto;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.request.CardPaymentServiceRequestDTO;
 import uk.gov.hmcts.reform.payments.response.CardPaymentServiceRequestResponse;
@@ -38,9 +40,12 @@ public class FeesPaymentService {
         CaseDetails caseDetails = coreCaseDataService.getCase(Long.valueOf(caseReference));
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
 
-        SRPbaDetails feePaymentDetails = feeType.equals(FeeType.HEARING)
-            ? caseData.getHearingFeePBADetails()
-            : caseData.getClaimIssuedPBADetails();
+        SRPbaDetails feePaymentDetails = SRPbaDetails.builder()
+            .fee(Fee.builder()
+                     .version("version")
+                     .code("FEE0202")
+                     .calculatedAmountInPence(BigDecimal.valueOf(900000)).build())
+            .serviceReqReference("2022-1655915218557").build();
 
         requireNonNull(feePaymentDetails, "Fee Payment details cannot be null");
         requireNonNull(feePaymentDetails.getServiceReqReference(), "Fee Payment service request cannot be null");
@@ -77,7 +82,7 @@ public class FeesPaymentService {
             .paymentFor(feeType.name().toLowerCase())
             .paymentAmount(cardPaymentDetails.getAmount());
 
-        if (paymentStatus.equals("Failed")) {
+        if (paymentStatus.toUpperCase().equals("Failed".toUpperCase())) {
             Arrays.asList(cardPaymentDetails.getStatusHistories()).stream()
                 .filter(h -> h.getStatus().equals(paymentStatus))
                 .findFirst()
@@ -89,7 +94,7 @@ public class FeesPaymentService {
 
         } catch (Exception e) {
 
-            log.error("Update payment status failed for claim [{}]", caseReference);
+            log.error("Update payment status failed for claim [{} , {} ]", caseReference, e.getMessage());
         }
 
         return response.build();
