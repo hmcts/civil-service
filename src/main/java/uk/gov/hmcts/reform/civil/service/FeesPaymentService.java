@@ -81,12 +81,15 @@ public class FeesPaymentService {
             .externalReference(cardPaymentDetails.getPaymentGroupReference())
             .paymentFor(feeType.name().toLowerCase())
             .paymentAmount(cardPaymentDetails.getAmount());
-
+        log.info("CardPaymentStatusResponse {}", response);
         if (paymentStatus.toUpperCase().equals("Failed".toUpperCase())) {
+            log.info("inside of if paymentStatus {}", cardPaymentDetails);
+
             Arrays.asList(cardPaymentDetails.getStatusHistories()).stream()
                 .filter(h -> h.getStatus().equals(paymentStatus))
                 .findFirst()
                 .ifPresent(h -> response.errorCode(h.getErrorCode()).errorDescription(h.getErrorMessage()));
+
         }
 
         try {
