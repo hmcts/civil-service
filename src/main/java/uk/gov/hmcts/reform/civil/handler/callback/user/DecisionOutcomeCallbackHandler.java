@@ -41,10 +41,10 @@ public class DecisionOutcomeCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse changeState(CallbackParams callbackParams) {
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        CaseData caseData = callbackParams.getCaseData().toBuilder()
-            .build();
         if (featureToggleService.isCaseProgressionEnabled()) {
+            String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+            CaseData caseData = callbackParams.getCaseData().toBuilder()
+                .build();
             CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
             deleteNotificationAndInactiveTasks(caseData, authToken);
             caseDataBuilder.businessProcess(BusinessProcess.ready(MOVE_TO_DECISION_OUTCOME));
@@ -52,7 +52,6 @@ public class DecisionOutcomeCallbackHandler extends CallbackHandler {
                 .state(DECISION_OUTCOME.name()).data(caseDataBuilder.build().toMap(objectMapper))
                 .build();
         }
-        deleteNotificationAndInactiveTasks(caseData, authToken);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .state(DECISION_OUTCOME.name())
             .build();
