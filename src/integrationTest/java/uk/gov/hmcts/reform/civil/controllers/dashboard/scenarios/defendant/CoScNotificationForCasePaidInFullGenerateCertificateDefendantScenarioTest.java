@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+
 public class CoScNotificationForCasePaidInFullGenerateCertificateDefendantScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
