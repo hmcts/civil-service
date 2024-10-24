@@ -294,6 +294,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
 
     private final String respondent1EmailAddress;
     private final YesOrNo applicant1Represented;
+    private final YesOrNo anyRepresented;
 
     /**
      * Adding for LR ITP Update.
