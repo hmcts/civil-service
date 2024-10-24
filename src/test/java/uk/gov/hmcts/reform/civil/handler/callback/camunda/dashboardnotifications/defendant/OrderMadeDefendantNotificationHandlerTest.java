@@ -47,6 +47,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
@@ -500,6 +501,35 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
             );
             String capturedSecondParam = secondParamCaptor.getValue();
             Assertions.assertNotEquals("Scenario.AAA6.CP.SDOMadebyLA.Defendant", capturedSecondParam);
+        }
+
+        @Test
+        void shouldRecordScenarioInSdoLegalAdviser_whenInvokedRFR_1000() {
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            scenarioParams.put("orderDocument", "urlDirectionsOrder");
+
+            when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .responseClaimTrack("SMALL_CLAIM")
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .applicant1Represented(YesOrNo.NO)
+                .decisionOnRequestReconsiderationOptions(null)
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name()).build()
+            ).build();
+            handler.handle(params);
+            ArgumentCaptor<String> secondParamCaptor = ArgumentCaptor.forClass(String.class);
+            verify(dashboardApiClient).recordScenario(
+                eq(caseData.getCcdCaseReference().toString()),
+                secondParamCaptor.capture(),
+                eq("BEARER_TOKEN"),
+                eq(ScenarioRequestParams.builder().params(scenarioParams).build())
+            );
+            String capturedSecondParam = secondParamCaptor.getValue();
+            Assertions.assertNotEquals("Scenario.AAA6.CP.SDOMadebyLA.Claimant", capturedSecondParam);
         }
 
         @Test
