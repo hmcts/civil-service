@@ -461,6 +461,35 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
         }
 
         @Test
+        void shouldRecordScenarioInSdoLegalAdviser_whenInvokedRFR_1000() {
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            scenarioParams.put("orderDocument", "urlDirectionsOrder");
+
+            when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .responseClaimTrack("SMALL_CLAIM")
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .applicant1Represented(YesOrNo.NO)
+                .decisionOnRequestReconsiderationOptions(null)
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name()).build()
+            ).build();
+            handler.handle(params);
+            ArgumentCaptor<String> secondParamCaptor = ArgumentCaptor.forClass(String.class);
+            verify(dashboardApiClient).recordScenario(
+                eq(caseData.getCcdCaseReference().toString()),
+                secondParamCaptor.capture(),
+                eq("BEARER_TOKEN"),
+                eq(ScenarioRequestParams.builder().params(scenarioParams).build())
+            );
+            String capturedSecondParam = secondParamCaptor.getValue();
+            Assertions.assertNotEquals("Scenario.AAA6.CP.SDOMadebyLA.Claimant", capturedSecondParam);
+        }
+
+        @Test
         void shouldRecordScenarioClaimantFinalOrderFastTrackNotReadyTrial_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
                 .applicant1Represented(YesOrNo.NO)
