@@ -80,4 +80,5 @@ public class JudgeFinalOrderForm implements MappableObject {
     // Download order
     private final YesOrNo claimTrack;
     private final String trackAndComplexityBandText;
+    private final String dateNowPlus7;
 }
