@@ -39,6 +39,7 @@ public class ManageStayCallbackHandler extends CallbackHandler {
     private static final String HEADER_CONFIRMATION_REQUEST_UPDATE = "# You have requested an update on \n\n # this case \n\n ## All parties have been notified";
     private static final String BODY_CONFIRMATION = "&nbsp;";
     private static final String LIFT_STAY = "LIFT_STAY";
+    private static final String REQUEST_UPDATE = "REQUEST_UPDATE";
 
     private static final Map<String, CaseState> STATE_MAP = Map.of(
         CaseState.IN_MEDIATION.name(), CaseState.JUDICIAL_REFERRAL,
@@ -70,16 +71,15 @@ public class ManageStayCallbackHandler extends CallbackHandler {
     private CallbackResponse manageStay(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        CaseState newState;
-        if (nonNull(caseData.getManageStayOption()) && caseData.getManageStayOption().equals(LIFT_STAY)) {
-            caseDataBuilder.businessProcess(BusinessProcess.ready(STAY_LIFTED));
-            newState = STATE_MAP.getOrDefault(caseData.getPreStayState(), caseData.getCcdState());
-        } else {
-            caseDataBuilder.businessProcess(BusinessProcess.ready(STAY_UPDATE_REQUESTED));
-            newState = caseData.getCcdState();
-            caseDataBuilder.manageStayUpdateRequestDate(LocalDate.now());
-        }
-
+        CaseState newState = nonNull(caseData.getManageStayOption()) && caseData.getManageStayOption().equals(LIFT_STAY)
+            ? STATE_MAP.getOrDefault(caseData.getPreStayState(), caseData.getCcdState())
+            : caseData.getCcdState();
+        caseDataBuilder.businessProcess(BusinessProcess.ready(
+            LIFT_STAY.equals(caseData.getManageStayOption()) ? STAY_LIFTED : STAY_UPDATE_REQUESTED
+        ));
+        caseDataBuilder.manageStayUpdateRequestDate(
+            REQUEST_UPDATE.equals(caseData.getManageStayOption()) ? LocalDate.now() : null
+        );
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(mapper))
             .state(newState.name())
