@@ -41,7 +41,9 @@ public class ClaimDetailsNotifiedTransitionBuilder extends MidTransitionBuilder 
     @Override
     void setUpTransitions() {
         this.moveTo(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION)
-            .onlyWhen(respondentTimeExtension.and(not(notificationAcknowledged)))
+            .onlyWhen(respondentTimeExtension
+                          .and(not(notificationAcknowledged))
+                          .and(not(isInHearingReadiness)))
             //Acknowledging Claim First
             .moveTo(NOTIFICATION_ACKNOWLEDGED).onlyWhen(notificationAcknowledged.and(not(isInHearingReadiness)))
             //Direct Response, without Acknowledging
