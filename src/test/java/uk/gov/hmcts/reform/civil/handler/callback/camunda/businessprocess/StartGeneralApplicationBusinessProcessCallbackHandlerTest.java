@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -27,8 +26,8 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 
@@ -45,7 +44,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     StartGeneralApplicationBusinessProcessCallbackHandler.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
-    StateFlowEngine.class,
     SimpleStateFlowEngine.class,
     SimpleStateFlowBuilder.class,
     TransitionsTestConfiguration.class})

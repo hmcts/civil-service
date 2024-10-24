@@ -113,7 +113,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
-    StateFlowEngine.class,
     SimpleStateFlowEngine.class,
     SimpleStateFlowBuilder.class,
     TransitionsTestConfiguration.class},
