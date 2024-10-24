@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.notification.defendantresponse.caseoff
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.caseoffline.CaseHandledOfflineRecipient;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
@@ -12,8 +11,6 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.is1v1Or2v1Case;
 
 public abstract class CaseHandledOfflineRespondentSolicitorNotifier implements NotificationData {
-
-    private OrganisationService organisationService;
 
     protected static final String REFERENCE_TEMPLATE =
         "defendant-response-case-handed-offline-respondent-notification-%s";
@@ -39,7 +36,7 @@ public abstract class CaseHandledOfflineRespondentSolicitorNotifier implements N
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return NotificationUtils.caseOfflineNotificationAddProperties(caseData, caseData.getRespondent1OrganisationPolicy(), organisationService);
+        return NotificationUtils.caseOfflineNotificationAddProperties(caseData);
     }
 
     public abstract void notifyRespondentSolicitorForCaseHandedOffline(CaseData caseData,

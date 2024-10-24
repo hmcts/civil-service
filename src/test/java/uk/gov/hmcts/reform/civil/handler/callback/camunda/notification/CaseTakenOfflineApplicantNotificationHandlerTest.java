@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -24,10 +23,10 @@ import java.util.Map;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 
 @ExtendWith(MockitoExtension.class)
 class CaseTakenOfflineApplicantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -37,9 +36,6 @@ class CaseTakenOfflineApplicantNotificationHandlerTest extends BaseCallbackHandl
 
     @Mock
     private NotificationsProperties notificationsProperties;
-
-    @Mock
-    private OrganisationService organisationService;
 
     @InjectMocks
     private CaseTakenOfflineApplicantNotificationHandler handler;
@@ -129,9 +125,8 @@ class CaseTakenOfflineApplicantNotificationHandlerTest extends BaseCallbackHandl
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name"
+                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
         }
     }
