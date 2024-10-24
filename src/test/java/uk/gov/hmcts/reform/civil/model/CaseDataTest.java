@@ -533,6 +533,22 @@ public class CaseDataTest {
     }
 
     @Test
+    void getSDOOrderDocument_shouldReturnLatest_WhenItPresent() {
+        CaseData caseData = CaseData.builder()
+            .systemGeneratedCaseDocuments(wrapElements(
+                CaseDocument.builder().documentType(SDO_ORDER)
+                    .createdDatetime(LocalDateTime.now().minusDays(2)).documentName("Doc1").build(),
+                CaseDocument.builder().documentType(SDO_ORDER)
+                    .createdDatetime(LocalDateTime.now().minusDays(1)).documentName("Doc2").build()
+            )).build();
+        //When
+        Optional<Element<CaseDocument>> caseDocument = caseData.getSDODocument();
+        //Then
+        assertEquals(caseDocument.get().getValue().getDocumentType(), SDO_ORDER);
+        assertEquals(caseDocument.get().getValue().getDocumentName(), "Doc2");
+    }
+
+    @Test
     void getSDOOrderDocument_WhenItsNull() {
         CaseData caseData = CaseData.builder()
                 .systemGeneratedCaseDocuments(null).build();
