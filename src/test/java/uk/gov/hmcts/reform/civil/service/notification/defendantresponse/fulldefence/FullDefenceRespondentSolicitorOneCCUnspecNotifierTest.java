@@ -22,6 +22,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 class FullDefenceRespondentSolicitorOneCCUnspecNotifierTest {
@@ -78,20 +79,20 @@ class FullDefenceRespondentSolicitorOneCCUnspecNotifierTest {
         if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)
             || getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                PARTY_REFERENCES, buildPartiesReferences(caseData),
                 ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack())
             );
         } else {
             //if there are 2 respondents on the case, concatenate the names together for the template subject line
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONDENT_NAME,
                 getPartyNameBasedOnType(caseData.getRespondent1())
                     .concat(" and ")
                     .concat(getPartyNameBasedOnType(caseData.getRespondent2())),
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                PARTY_REFERENCES, buildPartiesReferences(caseData),
                 ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack())
             );
         }

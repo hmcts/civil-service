@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
-import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CASE_ID;
+import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 class FullDefenceApplicantSolicitorOneSpecNotifierTest {
 
@@ -186,7 +186,7 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
 
     private Map<String, String> getNotificationDataMapSpec() {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
+            CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
             "defendantName", "Mr. Sole Trader",
             CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name"
         );

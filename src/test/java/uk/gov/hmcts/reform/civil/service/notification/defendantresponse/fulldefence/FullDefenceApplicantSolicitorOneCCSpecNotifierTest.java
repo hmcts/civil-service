@@ -30,8 +30,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
-import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CASE_ID;
+import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 class FullDefenceApplicantSolicitorOneCCSpecNotifierTest {
 
@@ -93,7 +92,6 @@ class FullDefenceApplicantSolicitorOneCCSpecNotifierTest {
         // Given
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("12345")
-            .ccdCaseReference(CASE_ID)
             .respondent1ResponseDate(null)
             .applicantSolicitor1ClaimStatementOfTruth(StatementOfTruth.builder()
                 .name("statementOfTruthName").build())
@@ -168,10 +166,9 @@ class FullDefenceApplicantSolicitorOneCCSpecNotifierTest {
 
     private Map<String, String> getNotificationDataMapSpec() {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
+            CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
             "defendantName", "Mr. Sole Trader",
-            CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+            CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name"
         );
     }
 

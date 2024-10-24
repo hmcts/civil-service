@@ -58,6 +58,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
+import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
@@ -124,7 +126,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 verify(notificationService).sendMail(
                     "applicantsolicitor@example.com",
                     "template-id",
-                    getNotificationDataMap(caseData, false),
+                    getNotificationDataMap(caseData),
                     "defendant-response-applicant-notification-000DC001"
                 );
             }
@@ -147,7 +149,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 verify(notificationService).sendMail(
                     "respondentsolicitor@example.com",
                     "template-id",
-                    getNotificationDataMap(caseData, false),
+                    getNotificationDataMap(caseData),
                     "defendant-response-applicant-notification-000DC001"
                 );
             }
@@ -170,7 +172,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 verify(notificationService).sendMail(
                     "respondentsolicitor2@example.com",
                     "template-id",
-                    getNotificationDataMap(caseData, false),
+                    getNotificationDataMap(caseData),
                     "defendant-response-applicant-notification-000DC001"
                 );
             }
@@ -489,7 +491,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 verify(notificationService).sendMail(
                     "applicantsolicitor@example.com",
                     "template-id",
-                    getNotificationDataMap(caseData, true),
+                    getNotificationDataMap(caseData),
                     "defendant-response-applicant-notification-000DC001"
                 );
             }
@@ -513,7 +515,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 verify(notificationService).sendMail(
                     "respondentsolicitor@example.com",
                     "template-id",
-                    getNotificationDataMap(caseData, true),
+                    getNotificationDataMap(caseData),
                     "defendant-response-applicant-notification-000DC001"
                 );
             }
@@ -537,7 +539,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 verify(notificationService).sendMail(
                     "respondentsolicitor2@example.com",
                     "template-id",
-                    getNotificationDataMap(caseData, true),
+                    getNotificationDataMap(caseData),
                     "defendant-response-applicant-notification-000DC001"
                 );
             }
@@ -564,7 +566,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 verify(notificationService).sendMail(
                     "applicantsolicitor@example.com",
                     "template-id",
-                    getNotificationDataMap(caseData, false),
+                    getNotificationDataMap(caseData),
                     "defendant-response-applicant-notification-000DC001"
                 );
             }
@@ -588,31 +590,30 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 verify(notificationService).sendMail(
                     "respondentsolicitor@example.com",
                     "template-id",
-                    getNotificationDataMap(caseData, false),
+                    getNotificationDataMap(caseData),
                     "defendant-response-applicant-notification-000DC001"
                 );
             }
         }
 
-        private Map<String, String> getNotificationDataMap(CaseData caseData, boolean is1v2DS) {
+        private Map<String, String> getNotificationDataMap(CaseData caseData) {
             if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)
                 || getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
                 return Map.of(
-                    CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                     RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                    PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                    PARTY_REFERENCES, buildPartiesReferences(caseData),
                     ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack())
                 );
             } else {
                 //if there are 2 respondents on the case, concatenate the names together for the template subject line
                 return Map.of(
-                    CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                     RESPONDENT_NAME,
                     getPartyNameBasedOnType(caseData.getRespondent1())
                         .concat(" and ")
                         .concat(getPartyNameBasedOnType(caseData.getRespondent2())),
-                    PARTY_REFERENCES, is1v2DS ? "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: 01234"
-                    : "Claimant reference: 12345 - Defendant reference: 6789",
+                    PARTY_REFERENCES, buildPartiesReferences(caseData),
                     ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack())
                 );
             }
@@ -620,16 +621,15 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
         private Map<String, String> getNotificationDataMapSpec() {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
+                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 "defendantName", "Mr. Sole Trader",
-                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name"
             );
         }
 
         private Map<String, String> getNotificationDataMapSpecCui() {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
+                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 "defendantName", "Mr. Sole Trader",
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Mr. John Rambo"
             );
@@ -639,8 +639,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
             return Map.of(
                 "defendantName", "Mr. Sole Trader",
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE
             );
         }
 

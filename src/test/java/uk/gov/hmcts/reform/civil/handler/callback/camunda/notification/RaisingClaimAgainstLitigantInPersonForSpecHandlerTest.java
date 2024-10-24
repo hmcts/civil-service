@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
@@ -21,10 +20,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_RESPONDENT_LITIGANT_IN_PERSON_SPEC;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
-import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CASE_ID;
+import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 
 @ExtendWith(MockitoExtension.class)
 class RaisingClaimAgainstLitigantInPersonForSpecHandlerTest {
@@ -39,9 +38,6 @@ class RaisingClaimAgainstLitigantInPersonForSpecHandlerTest {
 
     @Mock
     private NotificationsProperties notificationsProperties;
-
-    @Mock
-    private OrganisationService organisationService;
 
     @Test
     void shouldNotifyApplicantSolicitor_whenInvoked() {
@@ -64,9 +60,8 @@ class RaisingClaimAgainstLitigantInPersonForSpecHandlerTest {
 
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-            CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name"
+            CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+            PARTY_REFERENCES, buildPartiesReferences(caseData)
         );
     }
 

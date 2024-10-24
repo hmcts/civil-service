@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -23,10 +21,8 @@ import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.caseoffl
 import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.caseoffline.applicant.CaseHandledOfflineApplicantSolicitorUnspecNotifier;
 
 import java.util.Map;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -36,7 +32,6 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseCaseHandedOfflineApplicantNotificationHandler.TASK_ID_APPLICANT1;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASON;
@@ -44,7 +39,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_ONE_RESPONSE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_TWO_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_TWO_RESPONSE;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
@@ -68,12 +63,6 @@ class DefendantResponseCaseHandedOfflineApplicantNotificationHandlerTest extends
 
     @Autowired
     private CaseHandledOfflineApplicantSolicitorSpecNotifier caseHandledOfflineApplicantSolicitorSpecNotifier;
-
-    @BeforeEach
-    void setUp() {
-        when(organisationService.findOrganisationById(anyString()))
-            .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
-    }
 
     @Nested
     class AboutToSubmitCallback {
@@ -228,7 +217,7 @@ class DefendantResponseCaseHandedOfflineApplicantNotificationHandlerTest extends
 
                 assertThat(caseHandledOfflineApplicantSolicitorSpecNotifier.addPropertiesSpec1v2DiffSol(caseData))
                     .containsEntry("legalOrgName", "Signer Name")
-                    .containsEntry("claimReferenceNumber", "1594901956117591");
+                    .containsEntry("claimReferenceNumber", "000DC001");
 
             }
         }
@@ -245,31 +234,28 @@ class DefendantResponseCaseHandedOfflineApplicantNotificationHandlerTest extends
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
         if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name"
+                PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
         } else if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue()
                     .concat(" against " + caseData.getApplicant1().getPartyName())
                     .concat(" and " + caseData.getRespondent1ClaimResponseTypeToApplicant2())
                     .concat(" against " + caseData.getApplicant2().getPartyName()),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name"
+                PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
         } else {
             //1v2 template is used and expects different data
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
                 RESPONDENT_ONE_RESPONSE, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
                 RESPONDENT_TWO_RESPONSE, caseData.getRespondent2ClaimResponseType().getDisplayedValue(),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name"
+                PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
         }
     }
@@ -277,8 +263,7 @@ class DefendantResponseCaseHandedOfflineApplicantNotificationHandlerTest extends
     private Map<String, String> getNotificationDataMapSpec(CaseData caseData) {
         return Map.of(
             "claimantLR", "Signer Name",
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
         );
     }
 }

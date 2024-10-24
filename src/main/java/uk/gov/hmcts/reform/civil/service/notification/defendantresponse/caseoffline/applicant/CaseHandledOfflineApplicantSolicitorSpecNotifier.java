@@ -15,7 +15,6 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.is1v1Or2v1Case;
 
 @Component
@@ -28,7 +27,7 @@ public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandle
     @Autowired
     public CaseHandledOfflineApplicantSolicitorSpecNotifier(NotificationService notificationService, NotificationsProperties notificationsProperties,
                                                             OrganisationService organisationService) {
-        super(notificationService, organisationService);
+        super(notificationService);
         this.notificationService = notificationService;
         this.notificationsProperties = notificationsProperties;
         this.organisationService = organisationService;
@@ -81,16 +80,14 @@ public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandle
     public Map<String, String> addPropertiesSpec(CaseData caseData) {
         return Map.of(
             CLAIM_NAME_SPEC, getLegalOrganisationName(caseData),
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
         );
     }
 
     public Map<String, String> addPropertiesSpec1v2DiffSol(CaseData caseData) {
         return Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData),
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
         );
     }
 
