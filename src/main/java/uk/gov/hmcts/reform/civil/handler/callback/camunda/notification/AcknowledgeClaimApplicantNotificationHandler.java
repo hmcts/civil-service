@@ -14,8 +14,10 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +28,9 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseIntentionForEmail;
 
@@ -45,6 +49,7 @@ public class AcknowledgeClaimApplicantNotificationHandler extends CallbackHandle
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final OrganisationService organisationService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -69,11 +74,14 @@ public class AcknowledgeClaimApplicantNotificationHandler extends CallbackHandle
             ? getRespondentSolicitorEmailAddress(caseData)
             : caseData.getApplicantSolicitor1UserDetails().getEmail();
 
+        Map<String, String> notificationProperties = addProperties(caseData);
+        notificationProperties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getOrgName(caseData, callbackParams));
+
         if (recipient != null) {
             notificationService.sendMail(
                 recipient,
                 notificationsProperties.getRespondentSolicitorAcknowledgeClaim(),
-                addProperties(caseData),
+                notificationProperties,
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
         } else {
@@ -110,13 +118,13 @@ public class AcknowledgeClaimApplicantNotificationHandler extends CallbackHandle
             }
         }
 
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+        return new HashMap<>(Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONDENT_NAME, getPartyNameBasedOnType(respondent),
-            PARTY_REFERENCES, buildPartiesReferences(caseData),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             RESPONSE_DEADLINE, formatLocalDate(responseDeadline.toLocalDate(), DATE),
             RESPONSE_INTENTION, getResponseIntentionForEmail(caseData)
-        );
+        ));
     }
 
     private boolean isCcNotification(CallbackParams callbackParams) {
@@ -147,5 +155,11 @@ public class AcknowledgeClaimApplicantNotificationHandler extends CallbackHandle
             }
         }
         return respondentSolicitorEmailAddress;
+    }
+
+    private String getOrgName(CaseData caseData, CallbackParams callbackParams) {
+        return isCcNotification(callbackParams)
+            ? getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService)
+            : getApplicantLegalOrganizationName(caseData, organisationService);
     }
 }

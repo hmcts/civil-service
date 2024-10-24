@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.utils;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
@@ -17,10 +18,12 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASON;
@@ -31,7 +34,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 public class NotificationUtils {
@@ -39,6 +41,8 @@ public class NotificationUtils {
     private NotificationUtils() {
         //NO-OP
     }
+
+    public static String REFERENCE_NOT_PROVIDED = "Not provided";
 
     public static boolean isRespondent1(CallbackParams callbackParams, CaseEvent matchEvent) {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
@@ -57,31 +61,33 @@ public class NotificationUtils {
     }
 
     public static Map<String, String> caseOfflineNotificationAddProperties(
-        CaseData caseData) {
+        CaseData caseData, OrganisationPolicy organisationPolicy, OrganisationService organisationService) {
         if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
-                PARTY_REFERENCES, buildPartiesReferences(caseData)
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(organisationPolicy, organisationService)
             );
         } else if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
             String responseTypeToApplicant2 = SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                 ? caseData.getClaimant1ClaimResponseTypeForSpec().getDisplayedValue()
                 : caseData.getRespondent1ClaimResponseTypeToApplicant2().toString();
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 REASON, SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                     ? caseData.getClaimant1ClaimResponseTypeForSpec().getDisplayedValue()
                     : caseData.getRespondent1ClaimResponseType().getDisplayedValue()
                     .concat(" against " + caseData.getApplicant1().getPartyName())
                     .concat(" and " + responseTypeToApplicant2)
                     .concat(" against " + caseData.getApplicant2().getPartyName()),
-                PARTY_REFERENCES, buildPartiesReferences(caseData)
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(organisationPolicy, organisationService)
             );
         } else {
             //1v2 template is used and expects different data
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
                 RESPONDENT_ONE_RESPONSE, SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
@@ -90,7 +96,8 @@ public class NotificationUtils {
                 RESPONDENT_TWO_RESPONSE, SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                     ? caseData.getRespondent2ClaimResponseTypeForSpec().getDisplayedValue()
                     : caseData.getRespondent2ClaimResponseType().getDisplayedValue(),
-                PARTY_REFERENCES, buildPartiesReferences(caseData)
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(organisationPolicy, organisationService)
             );
         }
     }
@@ -176,11 +183,64 @@ public class NotificationUtils {
             caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
 
+    public static String getLegalOrganizationNameForRespondent(CaseData caseData, boolean isRespondent1, OrganisationService organisationService) {
+        String legalOrganisationName = null;
+        String id = isRespondent1 ? caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
+            : caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
+        Optional<Organisation> organisation = organisationService.findOrganisationById(id);
+        if (organisation.isPresent()) {
+            legalOrganisationName = organisation.get().getName();
+        }
+        return legalOrganisationName;
+    }
+
     public static String getApplicantEmail(CaseData caseData, boolean isApplicantLip) {
         if (isApplicantLip) {
             return caseData.getApplicant1().getPartyEmail() != null ? caseData.getApplicant1Email() : null;
         } else {
             return caseData.getApplicantSolicitor1UserDetails() != null ? caseData.getApplicantSolicitor1UserDetails().getEmail() : null;
         }
+    }
+
+    public static String buildPartiesReferencesEmailSubject(CaseData caseData) {
+        SolicitorReferences solicitorReferences = caseData.getSolicitorReferences();
+        StringBuilder stringBuilder = new StringBuilder();
+        boolean addRespondent2Reference = ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData));
+
+        stringBuilder.append(buildClaimantReferenceEmailSubject(caseData));
+
+        Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor1Reference)
+            .ifPresentOrElse(ref -> {
+                if (stringBuilder.length() > 0) {
+                    stringBuilder.append(" - ");
+                }
+                stringBuilder.append(addRespondent2Reference ? "Defendant 1 reference: " : "Defendant reference: ");
+                stringBuilder.append(solicitorReferences.getRespondentSolicitor1Reference());
+            }, () -> stringBuilder.append(REFERENCE_NOT_PROVIDED));
+
+        if (addRespondent2Reference) {
+            if (stringBuilder.length() > 0) {
+                stringBuilder.append(" - ");
+            }
+            stringBuilder.append("Defendant 2 reference: ");
+            if (caseData.getRespondentSolicitor2Reference() != null) {
+                stringBuilder.append(caseData.getRespondentSolicitor2Reference());
+            } else {
+                stringBuilder.append(REFERENCE_NOT_PROVIDED);
+            }
+        }
+        return stringBuilder.toString();
+    }
+
+    public static String buildClaimantReferenceEmailSubject(CaseData caseData) {
+        SolicitorReferences solicitorReferences = caseData.getSolicitorReferences();
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Claimant reference: ");
+        Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getApplicantSolicitor1Reference)
+            .ifPresentOrElse(ref -> {
+                stringBuilder.append(solicitorReferences.getApplicantSolicitor1Reference());
+            }, () -> stringBuilder.append(REFERENCE_NOT_PROVIDED));
+
+        return stringBuilder.toString();
     }
 }

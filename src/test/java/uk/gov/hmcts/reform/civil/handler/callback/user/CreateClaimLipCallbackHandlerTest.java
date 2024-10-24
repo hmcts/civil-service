@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -28,15 +29,17 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizenui.HelpWithFeesForTabService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -53,11 +56,11 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
     ClaimUrlsConfiguration.class,
     MockDatabaseConfiguration.class,
     ValidationAutoConfiguration.class,
-    StateFlowEngine.class,
     SimpleStateFlowEngine.class,
     SimpleStateFlowBuilder.class,
     TransitionsTestConfiguration.class,
-    InterestCalculator.class
+    InterestCalculator.class,
+    LocationReferenceDataService.class
 },
     properties = {"reference.database.enabled=false"})
 class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -85,6 +88,9 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private CreateClaimLipCallBackHandler handler;
+
+    @MockBean
+    private LocationReferenceDataService locationReferenceDataService;
 
     public static final String REFERENCE_NUMBER = "000MC001";
 
@@ -191,6 +197,9 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetCaseManagementLocation() {
+            List<LocationRefData> locations = new ArrayList<>();
+            locations.add(LocationRefData.builder().courtName("Court Name").regionId("2").epimmsId("420219").siteName("Civil National Business Centre").build());
+            when(locationReferenceDataService.getCourtLocationsByEpimmsIdAndCourtType(any(), any())).thenReturn(locations);
             CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
                 .build();
@@ -202,6 +211,9 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("caseManagementLocation.baseLocation")
                 .isEqualTo("420219");
+            assertThat(response.getData())
+                .extracting("locationName")
+                .isEqualTo("Civil National Business Centre");
         }
 
         @Test
