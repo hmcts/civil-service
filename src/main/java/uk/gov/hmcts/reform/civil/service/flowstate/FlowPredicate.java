@@ -271,10 +271,11 @@ public class FlowPredicate {
         return commonConditions;
     }
 
-    public static final Predicate<CaseData> applicantOutOfTime = caseData ->
+    public static final Predicate<CaseData> applicantOutOfTimeNotBeingTakenOffline = caseData ->
         caseData.getApplicant1ResponseDeadline() != null
             && caseData.getApplicant1ResponseDeadline().isBefore(LocalDateTime.now())
-            && caseData.getApplicant1ResponseDate() == null;
+            && caseData.getApplicant1ResponseDate() == null
+            && caseData.getTakenOfflineByStaffDate() == null;
 
     public static final Predicate<CaseData> applicantOutOfTimeProcessedByCamunda = caseData ->
         caseData.getTakenOfflineDate() != null;
