@@ -78,7 +78,7 @@ public class FeesPaymentService {
             .paymentFor(feeType.name().toLowerCase())
             .paymentAmount(cardPaymentDetails.getAmount());
         log.info("CardPaymentStatusResponse {}", response);
-        if (StringUtils.equalsIgnoreCase(paymentStatus, "FAILED") {
+        if (StringUtils.equalsIgnoreCase(paymentStatus, "FAILED")) {
             log.info("inside of if paymentStatus payment failed");
 
             Arrays.asList(cardPaymentDetails.getStatusHistories()).stream()
