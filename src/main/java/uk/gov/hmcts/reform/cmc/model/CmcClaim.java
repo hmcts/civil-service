@@ -297,11 +297,6 @@ public class CmcClaim implements Claim {
         return hasResponse() && response.isPartAdmit() && !hasClaimantResponse();
     }
 
-    @Override
-    public boolean isHearingFormGenerated() {
-        return false;
-    }
-
     @JsonIgnore
     public boolean claimantAcceptedDefendantResponse() {
         return hasClaimantResponse()
@@ -358,16 +353,6 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public boolean isBeforeHearing() {
-        return false;
-    }
-
-    @Override
-    public boolean isMoreDetailsRequired() {
-        return false;
-    }
-
-    @Override
     public boolean isMediationSuccessful() {
         return false;
     }
@@ -388,7 +373,12 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public boolean isSDOOrderCreated() {
+    public boolean isSDOOrderCreatedCP() {
+        return false;
+    }
+
+    @Override
+    public boolean isSDOOrderCreatedPreCP() {
         return false;
     }
 
@@ -570,6 +560,71 @@ public class CmcClaim implements Claim {
 
     @Override
     public boolean isCaseStayed() {
+        return false;
+    }
+
+    @Override
+    public boolean isHearingScheduled() {
+        return false;
+    }
+
+    @Override
+    public boolean isHearingLessThanDaysAway(int days) {
+        return false;
+    }
+
+    @Override
+    public boolean isAwaitingJudgment() {
+        return false;
+    }
+
+    @Override
+    public boolean trialArrangementsSubmitted() {
+        return false;
+    }
+
+    @Override
+    public boolean isOrderMade() {
+        return false;
+    }
+
+    @Override
+    public Optional<LocalDate> getHearingDate() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<LocalDateTime> getTimeOfLastNonSDOOrder() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<LocalDateTime> getBundleCreationDate() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<LocalDateTime> getWhenWasHearingScheduled() {
+        return Optional.empty();
+    }
+
+    @Override
+    public boolean isTrialArrangementStatusActive() {
+        return false;
+    }
+
+    @Override
+    public boolean isTrialScheduledNoPaymentStatusActive() {
+        return false;
+    }
+
+    @Override
+    public boolean isTrialScheduledPaymentPaidStatusActive() {
+        return false;
+    }
+
+    @Override
+    public boolean isBundleCreatedStatusActive() {
         return false;
     }
 }

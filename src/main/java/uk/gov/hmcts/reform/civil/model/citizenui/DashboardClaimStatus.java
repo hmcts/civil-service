@@ -34,8 +34,11 @@ public enum DashboardClaimStatus {
     CLAIMANT_ACCEPTED_ADMISSION_OF_AMOUNT(
         Claim::hasClaimantAcceptedPartialAdmissionAmount
     ),
-    SDO_ORDER_CREATED(
-        Claim::isSDOOrderCreated
+    SDO_ORDER_CREATED_PRE_CP(
+        Claim::isSDOOrderCreatedPreCP
+    ),
+    SDO_ORDER_CREATED_CP(
+        Claim::isSDOOrderCreatedCP
     ),
     SDO_ORDER_LEGAL_ADVISER_CREATED(
         Claim::isSDOOrderLegalAdviserCreated
@@ -49,11 +52,29 @@ public enum DashboardClaimStatus {
     DECISION_FOR_RECONSIDERATION_MADE(
         Claim::isDecisionForReconsiderationMade
     ),
+    AWAITING_JUDGMENT(
+        Claim::isAwaitingJudgment
+    ),
+    BUNDLE_CREATED(
+        Claim::isBundleCreatedStatusActive
+    ),
+    TRIAL_ARRANGEMENTS_SUBMITTED(
+        Claim::trialArrangementsSubmitted
+    ),
+    TRIAL_ARRANGEMENTS_REQUIRED(
+        Claim::isTrialArrangementStatusActive
+    ),
+    CLAIMANT_HWF_FEE_PAYMENT_OUTCOME(
+        Claim::isHwfPaymentOutcome
+    ),
     CLAIMANT_HWF_NO_REMISSION(
         Claim::isHwfNoRemission
     ),
     CLAIMANT_HWF_PARTIAL_REMISSION(
         Claim::isHwfPartialRemission
+    ),
+    CLAIMANT_HWF_FULL_REMISSION(
+        Claim::isHwfFullRemission
     ),
     CLAIMANT_HWF_UPDATED_REF_NUMBER(
         Claim::isHwfUpdatedRefNumber
@@ -67,11 +88,14 @@ public enum DashboardClaimStatus {
     HWF_MORE_INFORMATION_NEEDED(
         Claim::isHwFMoreInformationNeeded
     ),
-    CLAIMANT_HWF_FEE_PAYMENT_OUTCOME(
-        Claim::isHwfPaymentOutcome
+    HEARING_SUBMIT_HWF(
+        Claim::isHwFHearingSubmit
     ),
-    MORE_DETAILS_REQUIRED(
-        Claim::isMoreDetailsRequired
+    HEARING_FORM_GENERATED(
+        Claim::isTrialScheduledNoPaymentStatusActive
+    ),
+    HEARING_FORM_GENERATED_RELISTING(
+        Claim::isTrialScheduledPaymentPaidStatusActive
     ),
     IN_MEDIATION(
         Claim::isMediationPending
@@ -130,7 +154,6 @@ public enum DashboardClaimStatus {
     CLAIMANT_ASKED_FOR_SETTLEMENT(
         Claim::hasClaimantAskedToSignSettlementAgreement
     ),
-    HEARING_FORM_GENERATED(Claim::isHearingFormGenerated),
     REQUESTED_CCJ_BY_REDETERMINATION(
         Claim::hasCCJByRedetermination
     ),
@@ -195,7 +218,10 @@ public enum DashboardClaimStatus {
         Claim::isPaperResponse
     ),
     DEFAULT_JUDGEMENT_ISSUED(Claim::isDefaultJudgementIssued),
-    NO_STATUS(c -> false);
+    NO_STATUS(c -> false),
+    ORDER_MADE(
+        Claim::isOrderMade
+    );
 
     @Getter
     private final Predicate<Claim> claimMatcher;
