@@ -104,8 +104,6 @@ public class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHa
 
             handler.handle(params);
 
-            verifyDeleteNotificationsForCaseIdentifierAndRole(caseData);
-
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT.getScenario(),
@@ -134,8 +132,6 @@ public class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHa
             ).build();
 
             handler.handle(params);
-
-            verifyDeleteNotificationsForCaseIdentifierAndRole(caseData);
 
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
@@ -167,8 +163,6 @@ public class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHa
             ).build();
 
             handler.handle(params);
-
-            verifyDeleteNotificationsForCaseIdentifierAndRole(caseData);
 
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
@@ -204,8 +198,6 @@ public class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHa
 
             handler.handle(params);
 
-            verifyDeleteNotificationsForCaseIdentifierAndRole(caseData);
-
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT.getScenario(),
@@ -239,8 +231,6 @@ public class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHa
 
             handler.handle(params);
 
-            verifyDeleteNotificationsForCaseIdentifierAndRole(caseData);
-
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT.getScenario(),
@@ -270,8 +260,6 @@ public class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHa
             ).build();
 
             handler.handle(params);
-
-            verifyDeleteNotificationsForCaseIdentifierAndRole(caseData);
 
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
@@ -304,8 +292,6 @@ public class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHa
 
             handler.handle(params);
 
-            verifyDeleteNotificationsForCaseIdentifierAndRole(caseData);
-
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT.getScenario(),
@@ -321,12 +307,5 @@ public class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHa
             );
         }
 
-        private void verifyDeleteNotificationsForCaseIdentifierAndRole(CaseData caseData) {
-            verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
-                caseData.getCcdCaseReference().toString(),
-                "CLAIMANT",
-                "BEARER_TOKEN"
-            );
-        }
     }
 }
