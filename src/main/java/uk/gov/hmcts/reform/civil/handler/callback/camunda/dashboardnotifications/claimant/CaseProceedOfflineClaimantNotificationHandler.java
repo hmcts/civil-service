@@ -66,4 +66,19 @@ public class CaseProceedOfflineClaimantNotificationHandler extends DashboardCall
             && caseMovedInCaseManStatesCaseProgression.contains(caseData.getPreviousCCDState())
             && caseData.isLipvLipOneVOne();
     }
+
+    @Override
+    protected void beforeRecordScenario(CaseData caseData, String authToken) {
+        dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "CLAIMANT",
+            authToken
+        );
+
+        dashboardApiClient.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "CLAIMANT",
+            authToken
+        );
+    }
 }

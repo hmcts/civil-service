@@ -84,6 +84,8 @@ public class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCall
             handler.handle(params);
 
             // Then
+            verifyDeleteNotificationsAndTaskListUpdates(caseData);
+
             verify(dashboardApiClient).recordScenario(
                     caseData.getCcdCaseReference().toString(),
                     SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
@@ -113,6 +115,8 @@ public class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCall
             handler.handle(params);
 
             // Then
+            verifyDeleteNotificationsAndTaskListUpdates(caseData);
+
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
@@ -143,6 +147,8 @@ public class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCall
             handler.handle(params);
 
             // Then
+            verifyDeleteNotificationsAndTaskListUpdates(caseData);
+
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK.getScenario(),
@@ -233,6 +239,19 @@ public class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCall
                     SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
                     "BEARER_TOKEN",
                     ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        private void verifyDeleteNotificationsAndTaskListUpdates(CaseData caseData) {
+            verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
+                caseData.getCcdCaseReference().toString(),
+                "DEFENDANT",
+                "BEARER_TOKEN"
+            );
+            verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+                caseData.getCcdCaseReference().toString(),
+                "DEFENDANT",
+                "BEARER_TOKEN"
             );
         }
     }
