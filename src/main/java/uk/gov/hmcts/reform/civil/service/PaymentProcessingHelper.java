@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -20,7 +21,6 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
 @Slf4j
 @Component
@@ -71,7 +71,9 @@ public class PaymentProcessingHelper {
     private CaseEvent resolvePaymentRequestUpdateEvent(CaseData caseData, String feeType) {
         return switch (FeeType.valueOf(feeType)) {
             case HEARING -> SERVICE_REQUEST_RECEIVED;
-            case CLAIMISSUED -> SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) ? CREATE_CLAIM_SPEC_AFTER_PAYMENT : CREATE_CLAIM_AFTER_PAYMENT;
+            case CLAIMISSUED -> CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                ? CREATE_CLAIM_SPEC_AFTER_PAYMENT
+                : CREATE_CLAIM_AFTER_PAYMENT;
         };
     }
 
@@ -86,16 +88,6 @@ public class PaymentProcessingHelper {
         CaseEvent caseEvent = getEventNameFromFeeType(caseData, feeType, serviceIdentifier);
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, caseEvent);
         CaseDataContent caseDataContent = buildCaseDataContent(startEventResponse, caseData);
-        coreCaseDataService.submitUpdate(caseId, caseDataContent);
-    }
-
-    public void submitCaseDataWithoutEvent(CaseData caseData, String caseId) {
-        log.info("Submitting updated case data without event for caseId {}", caseId);
-        Map<String, Object> data = caseData.toMap(objectMapper);
-        CaseDataContent caseDataContent = CaseDataContent.builder()
-            .data(data)
-            .event(Event.builder().id("NO_EVENT").build())
-            .build();
         coreCaseDataService.submitUpdate(caseId, caseDataContent);
     }
 

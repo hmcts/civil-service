@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -28,91 +27,47 @@ class UpdatePaymentStatusServiceTest {
     private PaymentProcessingHelper paymentProcessingHelper;
 
     @Test
-    void shouldUpdatePaymentStatusAndSubmitEventForNonLiPCase() {
-        String caseReference = "1594901956117591";
+    void shouldUpdatePaymentStatusAndSubmitEvent() {
+        CaseData caseData = CaseData.builder().build();
+        String caseReference = "1234";
         FeeType feeType = FeeType.HEARING;
-        CaseData caseData = mock(CaseData.class);
-        PaymentDetails existingPaymentDetails = mock(PaymentDetails.class);
-        PaymentDetails.PaymentDetailsBuilder paymentDetailsBuilder = PaymentDetails.builder();
-
+        PaymentDetails existingPaymentDetails = PaymentDetails.builder()
+            .status(PaymentStatus.FAILED)
+            .reference("OLD REF")
+            .build();
         CardPaymentStatusResponse cardPaymentStatusResponse = CardPaymentStatusResponse.builder()
-            .paymentReference("1234")
+            .paymentReference("NEW REF")
             .status(PaymentStatus.SUCCESS.name())
             .build();
 
         when(paymentProcessingHelper.getCaseData(caseReference)).thenReturn(caseData);
         when(paymentProcessingHelper.retrievePaymentDetails(feeType.name(), caseData)).thenReturn(existingPaymentDetails);
-        when(existingPaymentDetails.toBuilder()).thenReturn(paymentDetailsBuilder);
 
-        PaymentDetails paymentDetails = paymentDetailsBuilder
-            .status(PaymentStatus.valueOf(cardPaymentStatusResponse.getStatus().toUpperCase()))
+        PaymentDetails updatedPaymentDetails = existingPaymentDetails.toBuilder()
+            .status(PaymentStatus.SUCCESS)
             .reference(cardPaymentStatusResponse.getPaymentReference())
             .errorCode(cardPaymentStatusResponse.getErrorCode())
             .errorMessage(cardPaymentStatusResponse.getErrorDescription())
             .build();
 
-        when(paymentProcessingHelper.updateCaseDataWithPaymentDetails(feeType.name(), caseData, paymentDetails))
+        when(paymentProcessingHelper.updateCaseDataWithPaymentDetails(feeType.name(), caseData, updatedPaymentDetails))
             .thenReturn(caseData);
-
-        when(caseData.isLipvLipOneVOne()).thenReturn(false);
 
         updatePaymentStatusService.updatePaymentStatus(feeType, caseReference, cardPaymentStatusResponse);
 
         verify(paymentProcessingHelper).getCaseData(caseReference);
         verify(paymentProcessingHelper).retrievePaymentDetails(feeType.name(), caseData);
-        verify(existingPaymentDetails).toBuilder();
-        verify(paymentProcessingHelper).updateCaseDataWithPaymentDetails(feeType.name(), caseData, paymentDetails);
-        verify(caseData).isLipvLipOneVOne();
+        verify(paymentProcessingHelper).updateCaseDataWithPaymentDetails(feeType.name(), caseData, updatedPaymentDetails);
         verify(paymentProcessingHelper).createAndSubmitEvent(caseData, caseReference, feeType.name(), "UpdatePaymentStatus");
         verifyNoMoreInteractions(paymentProcessingHelper);
     }
 
     @Test
-    void shouldUpdatePaymentStatusAndSubmitCaseDataWithoutEventForLiPCase() {
-        String caseReference = "1594901956117591";
-        FeeType feeType = FeeType.CLAIMISSUED;
-        CaseData caseData = mock(CaseData.class);
-        PaymentDetails existingPaymentDetails = mock(PaymentDetails.class);
-        PaymentDetails.PaymentDetailsBuilder paymentDetailsBuilder = PaymentDetails.builder();
-
-        CardPaymentStatusResponse cardPaymentStatusResponse = CardPaymentStatusResponse.builder()
-            .paymentReference("5678")
-            .status(PaymentStatus.SUCCESS.name())
-            .build();
-
-        when(paymentProcessingHelper.getCaseData(caseReference)).thenReturn(caseData);
-        when(paymentProcessingHelper.retrievePaymentDetails(feeType.name(), caseData)).thenReturn(existingPaymentDetails);
-        when(existingPaymentDetails.toBuilder()).thenReturn(paymentDetailsBuilder);
-
-        PaymentDetails paymentDetails = paymentDetailsBuilder
-            .status(PaymentStatus.valueOf(cardPaymentStatusResponse.getStatus().toUpperCase()))
-            .reference(cardPaymentStatusResponse.getPaymentReference())
-            .errorCode(cardPaymentStatusResponse.getErrorCode())
-            .errorMessage(cardPaymentStatusResponse.getErrorDescription())
-            .build();
-
-        when(paymentProcessingHelper.updateCaseDataWithPaymentDetails(feeType.name(), caseData, paymentDetails))
-            .thenReturn(caseData);
-
-        when(caseData.isLipvLipOneVOne()).thenReturn(true);
-
-        updatePaymentStatusService.updatePaymentStatus(feeType, caseReference, cardPaymentStatusResponse);
-
-        verify(paymentProcessingHelper).getCaseData(caseReference);
-        verify(paymentProcessingHelper).retrievePaymentDetails(feeType.name(), caseData);
-        verify(existingPaymentDetails).toBuilder();
-        verify(paymentProcessingHelper).updateCaseDataWithPaymentDetails(feeType.name(), caseData, paymentDetails);
-        verify(caseData).isLipvLipOneVOne();
-        verify(paymentProcessingHelper).submitCaseDataWithoutEvent(caseData, caseReference);
-        verifyNoMoreInteractions(paymentProcessingHelper);
-    }
-
-    @Test
     void shouldThrowCaseDataUpdateExceptionWhenExceptionOccurs() {
-        String caseReference = "1594901956117591";
+        String caseReference = "1234";
         FeeType feeType = FeeType.HEARING;
         CardPaymentStatusResponse cardPaymentStatusResponse = CardPaymentStatusResponse.builder()
-            .paymentReference("1234")
+            .paymentReference("NEW REF")
             .status(PaymentStatus.SUCCESS.name())
             .build();
 

@@ -41,7 +41,7 @@ public class PaymentRequestUpdateCallbackService {
         if (caseData.isLipvLipOneVOne()) {
             processLiPCase(serviceRequestUpdateDto, feeType, caseId, caseData);
         } else {
-            processNonLiPCase(serviceRequestUpdateDto, feeType, caseData);
+            processNonLiPCase(serviceRequestUpdateDto, feeType, caseId, caseData);
         }
     }
 
@@ -63,12 +63,22 @@ public class PaymentRequestUpdateCallbackService {
             || paymentProcessingHelper.isValidUpdatePaymentClaimIssue(feeType, caseData)) {
             log.info("Updating payment details for LiP case {}", caseId);
             PaymentDetails existingPaymentDetails = paymentProcessingHelper.retrievePaymentDetails(feeType, caseData);
-            updatePaymentDetailsAndStatus(
-                serviceRequestUpdateDto,
+
+            PaymentDetails updatedDetails = buildPaymentDetails(serviceRequestUpdateDto, existingPaymentDetails);
+            caseData = paymentProcessingHelper.updateCaseDataWithPaymentDetails(feeType, caseData, updatedDetails);
+
+            paymentProcessingHelper.createAndSubmitEvent(
                 caseData,
-                feeType,
                 caseId,
-                existingPaymentDetails
+                feeType,
+                "PaymentRequestUpdate"
+            );
+
+            CardPaymentStatusResponse cardPaymentStatusResponse = buildCardPaymentStatusResponse(serviceRequestUpdateDto);
+            updatePaymentStatusService.updatePaymentStatus(
+                FeeType.valueOf(feeType),
+                caseId,
+                cardPaymentStatusResponse
             );
         }
     }
@@ -76,11 +86,23 @@ public class PaymentRequestUpdateCallbackService {
     private void processNonLiPCase(
         ServiceRequestUpdateDto serviceRequestUpdateDto,
         String feeType,
+        String caseId,
         CaseData caseData
     ) {
         PaymentDetails existingPaymentDetails = paymentProcessingHelper.retrievePaymentDetails(feeType, caseData);
         if (shouldUpdatePayment(existingPaymentDetails)) {
-            updatePayment(serviceRequestUpdateDto, caseData, feeType, existingPaymentDetails);
+            log.info("Updating payment details for Non-LiP case {}", caseId);
+            PaymentDetails updatedDetails = buildPaymentDetails(serviceRequestUpdateDto, existingPaymentDetails);
+            caseData = paymentProcessingHelper.updateCaseDataWithPaymentDetails(feeType, caseData, updatedDetails);
+
+            paymentProcessingHelper.createAndSubmitEvent(
+                caseData,
+                caseId,
+                feeType,
+                "PaymentRequestUpdate"
+            );
+
+            updatePaymentStatus(serviceRequestUpdateDto, feeType);
         }
     }
 
@@ -88,36 +110,8 @@ public class PaymentRequestUpdateCallbackService {
         return paymentDetails == null || FAILED.equals(paymentDetails.getStatus());
     }
 
-    private void updatePayment(
-        ServiceRequestUpdateDto serviceRequestUpdateDto,
-        CaseData caseData,
-        String feeType,
-        PaymentDetails existingPaymentDetails
-    ) {
+    private void updatePaymentStatus(ServiceRequestUpdateDto serviceRequestUpdateDto, String feeType) {
         String caseId = serviceRequestUpdateDto.getCcdCaseNumber();
-        PaymentDetails updatedDetails = buildPaymentDetails(serviceRequestUpdateDto, existingPaymentDetails);
-        caseData = paymentProcessingHelper.updateCaseDataWithPaymentDetails(feeType, caseData, updatedDetails);
-        paymentProcessingHelper.createAndSubmitEvent(
-            caseData,
-            caseId,
-            feeType,
-            "PaymentRequestUpdate"
-        );
-        updatePaymentStatus(serviceRequestUpdateDto, feeType);
-    }
-
-    private void updatePaymentDetailsAndStatus(
-        ServiceRequestUpdateDto serviceRequestUpdateDto,
-        CaseData caseData,
-        String feeType,
-        String caseId,
-        PaymentDetails existingPaymentDetails
-    ) {
-        PaymentDetails updatedDetails = buildPaymentDetails(serviceRequestUpdateDto, existingPaymentDetails);
-        caseData = paymentProcessingHelper.updateCaseDataWithPaymentDetails(feeType, caseData, updatedDetails);
-
-        paymentProcessingHelper.submitCaseDataWithoutEvent(caseData, caseId);
-
         CardPaymentStatusResponse cardPaymentStatusResponse = buildCardPaymentStatusResponse(serviceRequestUpdateDto);
         updatePaymentStatusService.updatePaymentStatus(
             FeeType.valueOf(feeType),
@@ -152,15 +146,5 @@ public class PaymentRequestUpdateCallbackService {
             .paymentReference(serviceRequestUpdateDto.getPayment().getPaymentReference())
             .status(SUCCESS.toString())
             .build();
-    }
-
-    private void updatePaymentStatus(ServiceRequestUpdateDto serviceRequestUpdateDto, String feeType) {
-        String caseId = serviceRequestUpdateDto.getCcdCaseNumber();
-        CardPaymentStatusResponse cardPaymentStatusResponse = buildCardPaymentStatusResponse(serviceRequestUpdateDto);
-        updatePaymentStatusService.updatePaymentStatus(
-            FeeType.valueOf(feeType),
-            caseId,
-            cardPaymentStatusResponse
-        );
     }
 }

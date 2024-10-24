@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class PaymentProcessingHelperTest {
 
-    private static final Long CASE_ID = 1594901956117591L;
+    private static final Long CASE_ID = 1234L;
     private static final String TOKEN = "1234";
 
     private PaymentProcessingHelper paymentProcessingHelper;
@@ -96,15 +96,6 @@ class PaymentProcessingHelperTest {
         paymentProcessingHelper.createAndSubmitEvent(caseData, CASE_ID.toString(), FeeType.HEARING.name(), "UpdatePaymentStatus");
 
         verify(coreCaseDataService).startUpdate(any(), any());
-        verify(coreCaseDataService).submitUpdate(any(), any());
-    }
-
-    @Test
-    void shouldSubmitCaseDataWithoutEvent() {
-        CaseData caseData = CaseData.builder().build();
-
-        paymentProcessingHelper.submitCaseDataWithoutEvent(caseData, CASE_ID.toString());
-
         verify(coreCaseDataService).submitUpdate(any(), any());
     }
 

@@ -33,7 +33,7 @@ class PaymentRequestUpdateCallbackServiceTest {
 
     private static final String PAID = "Paid";
     private static final String NOT_PAID = "NotPaid";
-    private static final Long CASE_ID = 1594901956117591L;
+    private static final Long CASE_ID = 1234L;
     private static final String REFERENCE = "123445";
     private static final String ACCOUNT_NUMBER = "123445555";
     private static final String BUSINESS_PROCESS = "JUDICIAL_REFERRAL";
@@ -138,7 +138,6 @@ class PaymentRequestUpdateCallbackServiceTest {
         verify(paymentProcessingHelper).isValidPaymentUpdateHearing(FeeType.HEARING.name(), caseData);
         verify(paymentProcessingHelper).retrievePaymentDetails(FeeType.HEARING.name(), caseData);
         verify(paymentProcessingHelper).updateCaseDataWithPaymentDetails(eq(FeeType.HEARING.name()), eq(caseData), any(PaymentDetails.class));
-        verify(paymentProcessingHelper).submitCaseDataWithoutEvent(caseData, caseId);
         verify(updatePaymentStatusService).updatePaymentStatus(eq(FeeType.HEARING), eq(caseId), any(CardPaymentStatusResponse.class));
     }
 
@@ -207,7 +206,6 @@ class PaymentRequestUpdateCallbackServiceTest {
         verify(paymentProcessingHelper).isValidPaymentUpdateHearing(FeeType.HEARING.name(), caseData);
         verify(paymentProcessingHelper).retrievePaymentDetails(FeeType.HEARING.name(), caseData);
         verify(paymentProcessingHelper).updateCaseDataWithPaymentDetails(eq(FeeType.HEARING.name()), eq(caseData), any(PaymentDetails.class));
-        verify(paymentProcessingHelper).submitCaseDataWithoutEvent(caseData, caseId);
         verify(updatePaymentStatusService).updatePaymentStatus(eq(FeeType.HEARING), eq(caseId), any(CardPaymentStatusResponse.class));
     }
 
