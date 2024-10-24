@@ -1,14 +1,18 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.ArgumentCaptor;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -30,12 +34,12 @@ import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -47,7 +51,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
@@ -455,7 +458,6 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
                 .responseClaimTrack("SMALL_CLAIM")
                 .totalClaimAmount(BigDecimal.valueOf(500))
                 .respondent1Represented(YesOrNo.NO)
-                .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.YES)
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -473,24 +475,27 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
             Assertions.assertNotEquals("Scenario.AAA6.CP.SDOMadebyLA.Defendant", capturedSecondParam);
         }
 
-        @Test
-        void shouldRecordScenarioInSdoLegalAdviser_whenInvokedRFR() {
+        @ParameterizedTest
+        @MethodSource("provideCsvSource")
+        void shouldRecordScenarioInSdoLegalAdviser(BigDecimal totalClaimAmount,
+                                                   DecisionOnRequestReconsiderationOptions decisionOnRequestReconsiderationOptions,
+                                                   String expectedScenario) {
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
 
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(false);
+            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
                 .responseClaimTrack("SMALL_CLAIM")
-                .totalClaimAmount(BigDecimal.valueOf(500))
+                .totalClaimAmount(totalClaimAmount)
                 .respondent1Represented(YesOrNo.NO)
-                .decisionOnRequestReconsiderationOptions(null)
+                .decisionOnRequestReconsiderationOptions(decisionOnRequestReconsiderationOptions)
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.name()).build()
-            ).build();
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.name())
+                    .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
             handler.handle(params);
             ArgumentCaptor<String> secondParamCaptor = ArgumentCaptor.forClass(String.class);
             verify(dashboardApiClient).recordScenario(
@@ -500,36 +505,19 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
                 eq(ScenarioRequestParams.builder().params(scenarioParams).build())
             );
             String capturedSecondParam = secondParamCaptor.getValue();
-            Assertions.assertNotEquals("Scenario.AAA6.CP.SDOMadebyLA.Defendant", capturedSecondParam);
+            if (expectedScenario.startsWith("not ")) {
+                Assertions.assertNotEquals(expectedScenario.substring(4), capturedSecondParam);
+            } else {
+                Assertions.assertEquals(expectedScenario, capturedSecondParam);
+            }
         }
 
-        @Test
-        void shouldRecordScenarioInSdoLegalAdviser_whenInvokedRFR_1000() {
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-            scenarioParams.put("orderDocument", "urlDirectionsOrder");
-
-            when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
-
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .responseClaimTrack("SMALL_CLAIM")
-                .totalClaimAmount(BigDecimal.valueOf(1000))
-                .respondent1Represented(YesOrNo.NO)
-                .decisionOnRequestReconsiderationOptions(null)
-                .build();
-
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name()).build()
-            ).build();
-            handler.handle(params);
-            ArgumentCaptor<String> secondParamCaptor = ArgumentCaptor.forClass(String.class);
-            verify(dashboardApiClient).recordScenario(
-                eq(caseData.getCcdCaseReference().toString()),
-                secondParamCaptor.capture(),
-                eq("BEARER_TOKEN"),
-                eq(ScenarioRequestParams.builder().params(scenarioParams).build())
+        private static Stream<Arguments> provideCsvSource() {
+            return Stream.of(
+                Arguments.of(BigDecimal.valueOf(500), null, "Scenario.AAA6.CP.SDOMadebyLA.Defendant"),
+                Arguments.of(BigDecimal.valueOf(1000), null, "Scenario.AAA6.CP.SDOMadebyLA.Defendant"),
+                Arguments.of(BigDecimal.valueOf(1000), DecisionOnRequestReconsiderationOptions.CREATE_SDO, "not Scenario.AAA6.CP.SDOMadebyLA.Defendant")
             );
-            String capturedSecondParam = secondParamCaptor.getValue();
-            Assertions.assertNotEquals("Scenario.AAA6.CP.SDOMadebyLA.Claimant", capturedSecondParam);
         }
 
         @Test
