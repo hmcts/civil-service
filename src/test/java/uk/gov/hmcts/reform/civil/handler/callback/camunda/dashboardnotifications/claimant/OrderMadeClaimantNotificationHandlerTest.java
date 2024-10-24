@@ -188,18 +188,15 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
             CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
                 .applicant1Represented(YesOrNo.NO)
                 .build();
-
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT.name())
                     .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
 
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
-
             handler.handle(params);
 
             // Then
+            HashMap<String, Object> scenarioParams = new HashMap<>();
             verifyDeleteNotificationsAndTaskListUpdates(caseData);
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),

@@ -94,7 +94,6 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
 
     @Override
     protected String getScenario(CaseData caseData, CallbackParams callbackParams) {
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         if (isSDOEvent(callbackParams)
             && isEligibleForReconsideration(caseData)) {
             return SCENARIO_AAA6_CP_SDO_MADE_BY_LA_CLAIMANT.getScenario();
@@ -114,6 +113,7 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
         if (isSDODrawnPreCPRelease()) {
             return SCENARIO_AAA6_CLAIMANT_SDO_DRAWN_PRE_CASE_PROGRESSION.getScenario();
         }
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         if (isFinalOrderIssued(callbackParams)) {
             deleteNotificationAndInactiveTasks(caseData, authToken);
             if (isOrderMadeFastTrackTrialNotResponded(caseData)) {
