@@ -113,8 +113,9 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
         if (isSDODrawnPreCPRelease()) {
             return SCENARIO_AAA6_DEFENDANT_SDO_DRAWN_PRE_CASE_PROGRESSION.getScenario();
         }
-
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         if (isFinalOrderIssued(callbackParams)) {
+            deleteNotificationAndInactiveTasks(caseData, authToken);
             if (isOrderMadeFastTrackTrialNotResponded(caseData)) {
                 return SCENARIO_AAA6_UPDATE_TASK_LIST_TRIAL_READY_FINALS_ORDERS_DEFENDANT.getScenario();
             }
@@ -155,5 +156,20 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
 
     private boolean isOrderMadeFastTrackTrialNotResponded(CaseData caseData) {
         return SdoHelper.isFastTrack(caseData) && isNull(caseData.getTrialReadyRespondent1());
+    }
+
+    private void deleteNotificationAndInactiveTasks(CaseData caseData, String authToken) {
+
+        dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "DEFENDANT",
+            authToken
+        );
+
+        dashboardApiClient.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "DEFENDANT",
+            authToken
+        );
     }
 }
