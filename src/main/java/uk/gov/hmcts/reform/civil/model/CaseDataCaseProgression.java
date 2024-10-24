@@ -174,6 +174,7 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private DynamicList finalOrderDownloadTemplateOptions;
     private CaseDocument finalOrderDownloadTemplateDocument;
     private Document uploadOrderDocumentFromTemplate;
+    private String finalOrderTrackToggle;
 
     // judge final freeform orders
     private final FinalOrderSelection finalOrderSelection;
