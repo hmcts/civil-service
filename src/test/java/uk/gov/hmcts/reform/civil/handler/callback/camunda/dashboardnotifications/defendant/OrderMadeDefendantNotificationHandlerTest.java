@@ -513,7 +513,7 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .responseClaimTrack("SMALL_CLAIM")
                 .totalClaimAmount(BigDecimal.valueOf(1000))
-                .applicant1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
                 .decisionOnRequestReconsiderationOptions(null)
                 .build();
 
