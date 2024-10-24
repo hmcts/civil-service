@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -30,7 +31,7 @@ public abstract class OrderCallbackHandler extends DashboardWithParamsCallbackHa
         return caseData.isSmallClaim()
             && caseData.getTotalClaimAmount().compareTo(BigDecimal.valueOf(1000)) <= 0
             && (isNull(caseData.getDecisionOnRequestReconsiderationOptions())
-            || !"CREATE_SDO".equals(caseData.getDecisionOnRequestReconsiderationOptions().name()))
+            || !DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(caseData.getDecisionOnRequestReconsiderationOptions()))
             && featureToggleService.isCaseProgressionEnabled();
     }
 
