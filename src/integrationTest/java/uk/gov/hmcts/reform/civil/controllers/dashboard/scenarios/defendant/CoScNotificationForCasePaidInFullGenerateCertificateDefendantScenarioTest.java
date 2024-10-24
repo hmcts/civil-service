@@ -50,11 +50,11 @@ public class CoScNotificationForCasePaidInFullGenerateCertificateDefendantScenar
                         + "‘Orders and notices from the court’.</p>"),
                 jsonPath("$[0].titleCy").value("Cadarnhad o daliad dyled dyfarniad"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Rydych chi wedi cadarnhau''n llwyddiannus eich bod wedi talu "
-                        + "dyled y dyfarniad (CCJ) yn llawn. Bydd y gofrestr gyhoeddus yn cael ei diweddaru a gallwch"
-                        + " <a href=\"{VIEW_COSC_CERTIFICATE_URL}\" class=\"govuk-link\">nawr weld y "
-                        + "dystysgrif</a>. Dylech lawrlwytho''r dystysgrif hon ar gyfer eich cofnodion. Gellir dod o "
-                        + "hyd i''r dystysgrif yn ''Gorchmynion a hysbysiadau gan y llys’.</p>"));
+                    "<p class=\"govuk-body\">Rydych chi wedi cadarnhau’n llwyddiannus eich bod wedi talu dyled y "
+                        + "dyfarniad (CCJ) yn llawn. Bydd y gofrestr gyhoeddus yn cael ei diweddaru a gallwch <a "
+                        + "href=\"{VIEW_COSC_CERTIFICATE_URL}\" class=\"govuk-link\">nawr weld y dystysgrif</a>. "
+                        + "Dylech lawrlwytho’r dystysgrif hon ar gyfer eich cofnodion. Gellir dod o hyd i’r "
+                        + "dystysgrif yn ’Gorchmynion a hysbysiadau gan y llys’.</p>"));
     }
 
 }
