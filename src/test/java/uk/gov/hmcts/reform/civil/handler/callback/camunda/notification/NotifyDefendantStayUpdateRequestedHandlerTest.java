@@ -112,7 +112,8 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
                 "solicitor-template",
                 Map.of(
                     "claimReferenceNumber", "1594901956117591",
-                    "name", "Jim Jameson"
+                    "name", "Jim Jameson",
+                    "claimantvdefendant", "Mr. John Rambo V Jack Jackson"
                 ),
                 "stay-update-requested-defendant-notification-1594901956117591"
             );
@@ -122,7 +123,8 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
                 "solicitor-template",
                 Map.of(
                     "claimReferenceNumber", "1594901956117591",
-                    "name", "Jack Jackson"
+                    "name", "Jack Jackson",
+                    "claimantvdefendant", "Mr. John Rambo V Jack Jackson"
                 ),
                 "stay-update-requested-defendant-notification-1594901956117591"
             );

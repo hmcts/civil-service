@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.util.Map;
 
@@ -27,9 +28,7 @@ public abstract class AbstractNotifyManageStayHandler extends CallbackHandler im
 
     public CallbackResponse sendNotification(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (isLiP(caseData)) { // TODO: remove when lip notification is developed
-            return AboutToStartOrSubmitCallbackResponse.builder().build();
-        }
+
         notificationService.sendMail(
             getRecipient(callbackParams),
             getNotificationTemplate(caseData),
@@ -39,18 +38,19 @@ public abstract class AbstractNotifyManageStayHandler extends CallbackHandler im
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
+    protected String getNotificationTemplate(CaseData caseData) {
+        if (isLiP(caseData)) {
+            return isBilingual(caseData) ? notificationsProperties.getNotifyLipUpdateTemplateBilingual()
+                : notificationsProperties.getNotifyLipUpdateTemplate();
+        }
+        return notificationsProperties.getNotifyLRStayLifted();
+    }
+
     protected abstract String getReferenceTemplate();
 
     protected abstract String getRecipient(CallbackParams callbackParams);
 
-    protected String getNotificationTemplate(CaseData caseData) {
-        if (isLiP(caseData)) {
-            // TODO: add lip template
-            return null;
-        } else {
-            return notificationsProperties.getNotifyLRStayLifted();
-        }
-    }
+    protected abstract boolean isBilingual(CaseData caseData);
 
     protected abstract boolean isLiP(CaseData caseData);
 
@@ -58,7 +58,8 @@ public abstract class AbstractNotifyManageStayHandler extends CallbackHandler im
         CaseData caseData = callbackParams.getCaseData();
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            PARTY_NAME, getPartyName(callbackParams)
+            PARTY_NAME, getPartyName(callbackParams),
+            CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
         );
     }
 
@@ -68,4 +69,5 @@ public abstract class AbstractNotifyManageStayHandler extends CallbackHandler im
     }
 
     protected abstract String getPartyName(CallbackParams callbackParams);
+
 }
