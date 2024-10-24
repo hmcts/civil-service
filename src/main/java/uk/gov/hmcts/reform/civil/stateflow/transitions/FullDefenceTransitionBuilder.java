@@ -113,7 +113,7 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
 
     public static boolean getCarmEnabledForDate(CaseData caseData) {
         // Date of go live is 1st August, as we use "isAfter" we compare with 31st July
-        return caseData.getSubmittedDate().toLocalDate().isAfter(LocalDate.of(2024, 7, 31));
+        return caseData.getSubmittedDate().toLocalDate().isAfter(LocalDate.of(2024, 11, 4));
     }
 
     public static final Predicate<CaseData> takenOfflineByStaffAfterDefendantResponse =
