@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import java.time.LocalDate;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 public class CoScNotificationForCasePaidInFullGenerateCertificateDefendantScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
@@ -27,7 +27,7 @@ public class CoScNotificationForCasePaidInFullGenerateCertificateDefendantScenar
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
-            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(NO)
             .certOfSC(CertOfSC.builder().defendantFinalPaymentDate(LocalDate.now().plusDays(10)).build())
             .activeJudgment(JudgmentDetails.builder()
                                 .fullyPaymentMadeDate(LocalDate.now())
