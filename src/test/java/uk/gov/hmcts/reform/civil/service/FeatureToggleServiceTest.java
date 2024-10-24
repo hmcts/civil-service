@@ -245,7 +245,7 @@ class FeatureToggleServiceTest {
 
         assertThat(featureToggleService.isCarmEnabledForCase(caseData)).isEqualTo(toggleStat);
     }
-
+    
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenMultiOrIntermediateTrackEnabled(Boolean toggleStat) {
