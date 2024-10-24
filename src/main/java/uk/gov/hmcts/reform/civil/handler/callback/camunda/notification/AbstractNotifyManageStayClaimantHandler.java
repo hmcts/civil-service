@@ -29,4 +29,9 @@ public abstract class AbstractNotifyManageStayClaimantHandler extends AbstractNo
         CaseData caseData = callbackParams.getCaseData();
         return caseData.getApplicant1().getPartyName();
     }
+
+    @Override
+    protected boolean isBilingual(CaseData caseData) {
+        return caseData.isClaimantBilingual();
+    }
 }

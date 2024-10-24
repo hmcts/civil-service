@@ -17,6 +17,8 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -46,10 +48,14 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
 
     private CaseData caseData;
 
+    private static final String ENGLISH = "ENGLISH";
+    private static final String BILINGUAL = "BOTH";
+
     @BeforeEach
     void setUp() {
         caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson").type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
+                             .type(Party.Type.INDIVIDUAL).partyEmail("lipEmail@email.com").build())
             .respondent2(Party.builder().individualFirstName("Jim").individualLastName("Jameson").type(Party.Type.INDIVIDUAL).build())
             .build();
     }
@@ -111,6 +117,7 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
                 "defendant2@hmcts.net",
                 "solicitor-template",
                 Map.of(
+                    "claimantvdefendant", "Mr. John Rambo V Jack Jackson",
                     "claimReferenceNumber", "1594901956117591",
                     "name", "Jim Jameson"
                 ),
@@ -121,12 +128,55 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
                 "defendant@hmcts.net",
                 "solicitor-template",
                 Map.of(
+                    "claimantvdefendant", "Mr. John Rambo V Jack Jackson",
                     "claimReferenceNumber", "1594901956117591",
                     "name", "Jack Jackson"
                 ),
                 "stay-update-requested-defendant-notification-1594901956117591"
             );
         }
+        assertNotNull(response);
+    }
+
+    static Stream<Arguments> provideCaseDataLip() {
+        return Stream.of(
+            Arguments.of(BILINGUAL, "bilingual-template"),
+            Arguments.of(ENGLISH, "default-template")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideCaseDataLip")
+    void sendNotificationShouldSendEmailToLip(String language, String template) {
+
+        RespondentLiPResponse respondentLip = RespondentLiPResponse.builder()
+            .respondent1ResponseLanguage(language).build();
+        caseData = caseData.toBuilder()
+            .respondent1Represented(YesOrNo.NO)
+            .caseDataLiP(CaseDataLiP.builder()
+                             .respondent1LiPResponse(respondentLip).build())
+            .build();
+        CallbackParams params = CallbackParams.builder().caseData(caseData)
+            .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT_STAY_UPDATE_REQUESTED.toString()).build()).build();
+
+        if (ENGLISH.equals(language)) {
+            when(notificationsProperties.getNotifyLipStayUpdateRequested()).thenReturn("default-template");
+        } else {
+            when(notificationsProperties.getNotifyLipBilingualStayUpdateRequested()).thenReturn("bilingual-template");
+        }
+
+        CallbackResponse response = handler.sendNotification(params);
+
+        verify(notificationService).sendMail(
+            "lipEmail@email.com",
+            template,
+            Map.of(
+                "claimantvdefendant", "Mr. John Rambo V Jack Jackson",
+                "claimReferenceNumber", "1594901956117591",
+                "name", "Jack Jackson"
+            ),
+            "stay-update-requested-defendant-notification-1594901956117591"
+        );
         assertNotNull(response);
     }
 
