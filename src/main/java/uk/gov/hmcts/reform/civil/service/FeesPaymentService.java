@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
@@ -77,8 +78,8 @@ public class FeesPaymentService {
             .paymentFor(feeType.name().toLowerCase())
             .paymentAmount(cardPaymentDetails.getAmount());
         log.info("CardPaymentStatusResponse {}", response);
-        if (paymentStatus.toUpperCase().equals("FAILED")) {
-            log.info("inside of if paymentStatus {}", cardPaymentDetails);
+        if (StringUtils.equalsIgnoreCase(paymentStatus, "FAILED") {
+            log.info("inside of if paymentStatus payment failed");
 
             Arrays.asList(cardPaymentDetails.getStatusHistories()).stream()
                 .filter(h -> h.getStatus().equals(paymentStatus))
