@@ -127,8 +127,7 @@ class NotifyClaimantStayUpdateRequestedHandlerTest {
             Map.of(
                 "claimantvdefendant", "John Doe V Jack Jackson",
                 "claimReferenceNumber", "1594901956117591",
-                "name", "John Doe",
-                "claimantvdefendant", "John Doe V Jack Jackson"
+                "name", "John Doe"
             ),
             "stay-update-requested-claimant-notification-1594901956117591"
         );
