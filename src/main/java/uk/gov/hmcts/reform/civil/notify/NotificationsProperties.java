@@ -645,4 +645,7 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String notifyLRStayUpdateRequested;
+
+    @NotEmpty
+    private String notifyClaimantLRCoscApplied;
 }

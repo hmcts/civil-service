@@ -9,6 +9,7 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
@@ -64,10 +65,15 @@ public class CoscApplicationAfterPaymentTaskHandler extends BaseExternalTaskHand
         variables.putValue(FLOW_STATE, stateFlow.getState().getName());
         variables.putValue(FLOW_FLAGS, stateFlow.getFlags());
         variables.putValue("isJudgmentMarkedPaidInFull", checkMarkPaidInFull(data));
+        variables.putValue("isClaimantLR", isClaimantLR(data));
         return variables;
     }
 
     private boolean checkMarkPaidInFull(CaseData data) {
         return (Objects.nonNull(data.getActiveJudgment()) && (data.getActiveJudgment().getFullyPaymentMadeDate() != null));
+    }
+
+    private boolean isClaimantLR(CaseData caseData) {
+        return YesOrNo.YES.equals(caseData.getApplicant1Represented());
     }
 }
