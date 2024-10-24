@@ -92,10 +92,6 @@ public class CaseDataBuilderSpec {
     private String respondent1OrganisationIDCopy;
     private String respondent2OrganisationIDCopy;
 
-    //workaround fields
-    protected Party respondent1Copy;
-    protected Party respondent2Copy;
-
     public CaseDataBuilderSpec respondentSolicitor1EmailAddress(String respondentSolicitor1EmailAddress) {
         this.respondentSolicitor1EmailAddress = respondentSolicitor1EmailAddress;
         return this;
@@ -656,8 +652,6 @@ public class CaseDataBuilderSpec {
             .claimNotificationDeadline(claimNotificationDeadline)
             .takenOfflineDate(takenOfflineDate)
             //workaround fields
-            .respondent1Copy(respondent1Copy)
-            .respondent2Copy(respondent2Copy)
             .respondent1OrganisationIDCopy(respondent1OrganisationIDCopy)
             .respondent2OrganisationIDCopy(respondent2OrganisationIDCopy)
             .respondent1PinToPostLRspec(respondent1PinToPostLRspec)

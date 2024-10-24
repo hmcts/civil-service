@@ -93,9 +93,6 @@ public class CaseDataBuilderUnspec {
 
     private String respondent1OrganisationIDCopy;
     private String respondent2OrganisationIDCopy;
-    //workaround fields
-    protected Party respondent1Copy;
-    protected Party respondent2Copy;
 
     public CaseDataBuilderUnspec respondentSolicitor1EmailAddress(String respondentSolicitor1EmailAddress) {
         this.respondentSolicitor1EmailAddress = respondentSolicitor1EmailAddress;
@@ -392,16 +389,6 @@ public class CaseDataBuilderUnspec {
         return this;
     }
 
-    public CaseDataBuilderUnspec respondent1Copy(Party party) {
-        this.respondent1Copy = party;
-        return this;
-    }
-
-    public CaseDataBuilderUnspec respondent2Copy(Party party) {
-        this.respondent2Copy = party;
-        return this;
-    }
-
     public static CaseDataBuilderUnspec builder() {
         return new CaseDataBuilderUnspec();
     }
@@ -440,9 +427,6 @@ public class CaseDataBuilderUnspec {
             .respondent2SameLegalRepresentative(respondent2SameLegalRepresentative)
             //dates
             .submittedDate(submittedDate)
-            //workaround fields
-            .respondent1Copy(respondent1Copy)
-            .respondent2Copy(respondent2Copy)
             .respondent1OrganisationIDCopy(respondent1OrganisationIDCopy)
             .respondent2OrganisationIDCopy(respondent2OrganisationIDCopy)
             .build();

@@ -795,10 +795,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    //workaround fields
-    protected Party respondent1Copy;
-    protected Party respondent2Copy;
-
     public CaseDataBuilder respondent1ResponseDeadline(LocalDateTime deadline) {
         this.respondent1ResponseDeadline = deadline;
         return this;
@@ -5166,7 +5162,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario mpScenario, boolean isReason) {
         if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP || mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
             respondent2 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-2-party-id").build();
-            atStateClaimDetailsNotified1v1().respondent2Copy(respondent2).build();
+            atStateClaimDetailsNotified1v1().build();
             respondent2SameLegalRepresentative = mpScenario == ONE_V_TWO_ONE_LEGAL_REP ? YES : NO;
         } else {
             atStateClaimDetailsNotified1v1();
@@ -5200,7 +5196,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario mpScenario, boolean isReason) {
         if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP || mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
             respondent2 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-2-party-id").build();
-            atStateNotificationAcknowledged_1v2_BothDefendants().respondent2Copy(respondent2).build();
+            atStateNotificationAcknowledged_1v2_BothDefendants().build();
             respondent2SameLegalRepresentative = mpScenario == ONE_V_TWO_ONE_LEGAL_REP ? YES : NO;
         } else {
             atStateNotificationAcknowledged();
@@ -5220,7 +5216,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario mpScenario, boolean isReason) {
         if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP || mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
             respondent2 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-2-party-id").build();
-            atStateNotificationAcknowledged_1v2_BothDefendants().respondent2Copy(respondent2).build();
+            atStateNotificationAcknowledged_1v2_BothDefendants().build();
             respondent2SameLegalRepresentative = mpScenario == ONE_V_TWO_ONE_LEGAL_REP ? YES : NO;
             respondent1TimeExtensionDate = LocalDateTime.now();
             respondent2TimeExtensionDate = LocalDateTime.now();
@@ -5634,16 +5630,6 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder respondentResponseIsSame(YesOrNo isSame) {
         this.respondentResponseIsSame = isSame;
-        return this;
-    }
-
-    public CaseDataBuilder respondent1Copy(Party party) {
-        this.respondent1Copy = party;
-        return this;
-    }
-
-    public CaseDataBuilder respondent2Copy(Party party) {
-        this.respondent2Copy = party;
         return this;
     }
 
@@ -7745,8 +7731,6 @@ public class CaseDataBuilder {
             .trialReadyRespondent1(trialReadyRespondent1)
             .trialReadyRespondent2(trialReadyRespondent2)
             //workaround fields
-            .respondent1Copy(respondent1Copy)
-            .respondent2Copy(respondent2Copy)
             .respondToClaimAdmitPartUnemployedLRspec(respondToClaimAdmitPartUnemployedLRspec)
             .respondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec)
             .respondent1PartnerAndDependent(respondent1PartnerAndDependent)

@@ -19,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -57,6 +58,7 @@ import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.Party.Type;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
@@ -141,6 +143,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -207,6 +210,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
     @MockBean
     private DQResponseDocumentUtils dqResponseDocumentUtils;
+    @MockBean
+    private CaseDetailsConverter caseDetailsConverter;
 
     @Autowired
     private FrcDocumentsUtils frcDocumentsUtils;
@@ -340,7 +345,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceFastTrack()
                 .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .respondent2SameLegalRepresentative(NO)
                 .isRespondent2(YES)
                 .build();
@@ -372,7 +376,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceFastTrack()
                 .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(YES)
                 .isRespondent2(YES)
@@ -808,6 +811,14 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
                 .thenReturn(LocalDateTime.now());
+            Address address = Address.builder()
+                .postCode("E11 5BB")
+                .build();
+            CaseData oldCaseData = CaseDataBuilder.builder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .build();
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
 
             // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -898,6 +909,12 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void updateRespondent2Experts() {
                 // Given
+                CaseData oldCaseData = CaseDataBuilder.builder()
+                    .applicant1(Party.builder().build())
+                    .respondent1(Party.builder().build())
+                    .build();
+                when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
+
                 when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
                 when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
                 when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
@@ -972,16 +989,22 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .respondent2DQ()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
                 .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
                 .addRespondent2(YES)
                 .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .atSpecAoSRespondent2HomeAddressRequired(NO)
                 .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            Address address = Address.builder()
+                .postCode("E11 5BB")
+                .build();
+            CaseData oldCaseData = CaseDataBuilder.builder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .build();
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
             when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
                 .thenReturn(LocalDateTime.now());
 
@@ -1014,13 +1037,16 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                           .addressLine2("address line 2")
                                                           .addressLine3("address line 3")
                                                           .build());
+            CaseData oldCaseData = CaseDataBuilder.builder()
+                .applicant1(Party.builder().type(INDIVIDUAL).build())
+                .respondent1(Party.builder().type(INDIVIDUAL).build())
+                .build();
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
 
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .respondent2DQ()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
-                .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .respondent2(Party.builder().type(INDIVIDUAL).primaryAddress(Address.builder().addressLine1("new address line 1").build()).build())
                 .atSpecAoSRespondent2HomeAddressRequired(NO)
                 .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal()
                                                             .addressLine1("new address line 1")
@@ -1055,14 +1081,20 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .respondent2DQ()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
                 .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .atSpecAoSRespondent2HomeAddressRequired(YES)
                 .build();
 
             // When
+            Address address = Address.builder()
+                .postCode("E11 5BB")
+                .build();
+            CaseData oldCaseData = CaseDataBuilder.builder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .build();
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
 
@@ -1125,11 +1157,9 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
             .respondent2DQ()
-            .respondent1Copy(PartyBuilder.builder().individual().build())
             .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
             .addRespondent2(YES)
             .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2Copy(PartyBuilder.builder().individual().build())
             .atSpecAoSRespondent2HomeAddressRequired(NO)
             .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
             .build().toBuilder()
@@ -1142,6 +1172,14 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
             .thenReturn(LocalDateTime.now());
+        Address address = Address.builder()
+            .postCode("E11 5BB")
+            .build();
+        CaseData oldCaseData = CaseDataBuilder.builder()
+            .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+            .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+            .build();
+        when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
 
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1199,8 +1237,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseData.builder()
                 .caseAccessCategory(SPEC_CLAIM)
                 .ccdCaseReference(354L)
+                .applicant1(PartyBuilder.builder().individual().build())
                 .respondent1(defendant1)
-                .respondent1Copy(defendant1)
                 .respondent1DQ(
                     Respondent1DQ.builder()
                         .respondToCourtLocation(
@@ -1216,6 +1254,14 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 ))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            Address address = Address.builder()
+                .postCode("E11 5BB")
+                .build();
+            CaseData oldCaseData = CaseDataBuilder.builder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .build();
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
 
             List<LocationRefData> locations = List.of(LocationRefData.builder().build());
             when(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
@@ -1275,9 +1321,9 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .caseAccessCategory(SPEC_CLAIM)
                 .ccdCaseReference(354L)
                 .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
+                .applicant1(PartyBuilder.builder().individual().build())
                 .respondent2ClaimResponseTypeForSpec(FULL_ADMISSION)
                 .respondent1(defendant1)
-                .respondent1Copy(defendant1)
                 .respondent1DQ(
                     Respondent1DQ.builder()
                         .respondToCourtLocation(
@@ -1326,6 +1372,14 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(deadlineExtensionCalculatorService.calculateExtendedDeadline(any(), anyInt())).willReturn(whenWillPay);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            Address address = Address.builder()
+                .postCode("E11 5BB")
+                .build();
+            CaseData oldCaseData = CaseDataBuilder.builder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .build();
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
 
             // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1362,8 +1416,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseData.builder()
                 .caseAccessCategory(SPEC_CLAIM)
                 .ccdCaseReference(354L)
+                .applicant1(PartyBuilder.builder().individual().build())
                 .respondent1(defendant1)
-                .respondent1Copy(defendant1)
                 .respondent1DQ(
                     Respondent1DQ.builder()
                         .respondToCourtLocation(
@@ -1409,6 +1463,14 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .thenReturn(true);
             UserInfo userInfo = UserInfo.builder().uid("798").build();
             when(userService.getUserInfo(anyString())).thenReturn(userInfo);
+            Address address = Address.builder()
+                .postCode("E11 5BB")
+                .build();
+            CaseData oldCaseData = CaseDataBuilder.builder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .build();
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
 
             // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1457,11 +1519,17 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
             .respondent1DQWithFixedRecoverableCostsIntermediate()
             .respondent2DQWithFixedRecoverableCostsIntermediate()
-            .respondent1Copy(PartyBuilder.builder().individual().build())
-            .respondent2Copy(PartyBuilder.builder().individual().build())
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        Address address = Address.builder()
+            .postCode("E11 5BB")
+            .build();
+        CaseData oldCaseData = CaseDataBuilder.builder()
+            .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+            .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+            .build();
+        when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         //Then
@@ -1501,10 +1569,17 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
             .atStateRespondentFullDefence()
             .respondent1DQWithFixedRecoverableCostsIntermediate()
-            .respondent1Copy(PartyBuilder.builder().individual().build())
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        Address address = Address.builder()
+            .postCode("E11 5BB")
+            .build();
+        CaseData oldCaseData = CaseDataBuilder.builder()
+            .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+            .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+            .build();
+        when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         //Then
@@ -1565,8 +1640,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
             .respondent1DQWithFixedRecoverableCostsIntermediate()
             .respondent2DQWithFixedRecoverableCostsIntermediate()
-            .respondent1Copy(PartyBuilder.builder().individual().build())
-            .respondent2Copy(PartyBuilder.builder().individual().build())
             .build().toBuilder()
             .defendantResponseDocuments(existingResponseDocuments)
             .build();
@@ -1576,6 +1649,14 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             ).build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        Address address = Address.builder()
+            .postCode("E11 5BB")
+            .build();
+        CaseData oldCaseData = CaseDataBuilder.builder()
+            .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+            .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+            .build();
+        when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -1625,7 +1706,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
             .atStateRespondentFullDefence()
             .respondent1DQWithFixedRecoverableCostsIntermediate()
-            .respondent1Copy(PartyBuilder.builder().individual().build())
             .build();
         caseData = caseData.toBuilder()
             .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
@@ -1633,6 +1713,14 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             ).build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        Address address = Address.builder()
+            .postCode("E11 5BB")
+            .build();
+        CaseData oldCaseData = CaseDataBuilder.builder()
+            .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+            .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+            .build();
+        when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -1658,8 +1746,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 "binary-url").build()).build();
 
         CaseData caseData = CaseData.builder()
+            .applicant1(PartyBuilder.builder().individual().build())
             .respondent1(PartyBuilder.builder().individual().build())
-            .respondent1Copy(PartyBuilder.builder().individual().build())
             .respondent1DQ(Respondent1DQ.builder().build())
             .respondent2DQ(Respondent2DQ.builder().build())
             .ccdCaseReference(354L)
@@ -1668,6 +1756,14 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        Address address = Address.builder()
+            .postCode("E11 5BB")
+            .build();
+        CaseData oldCaseData = CaseDataBuilder.builder()
+            .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+            .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+            .build();
+        when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
 
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1691,8 +1787,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 "binary-url").build()).build();
 
         CaseData caseData = CaseData.builder()
+            .applicant1(PartyBuilder.builder().individual().build())
             .respondent1(PartyBuilder.builder().individual().build())
-            .respondent1Copy(PartyBuilder.builder().individual().build())
             .respondent1DQ(Respondent1DQ.builder().build())
             .respondent2DQ(Respondent2DQ.builder().build())
             .ccdCaseReference(354L)
@@ -1708,6 +1804,14 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        Address address = Address.builder()
+            .postCode("E11 5BB")
+            .build();
+        CaseData oldCaseData = CaseDataBuilder.builder()
+            .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+            .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+            .build();
+        when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
 
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1735,28 +1839,36 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 "binary-url").build()).build();
 
         CaseData caseData = CaseData.builder()
+            .applicant1(PartyBuilder.builder().individual().build())
             .respondent1(PartyBuilder.builder().individual().build())
-            .respondent1Copy(PartyBuilder.builder().individual().build())
             .respondent1DQ(Respondent1DQ.builder().build())
             .respondent2DQ(Respondent2DQ.builder().build())
             .ccdCaseReference(354L)
             .respondent1SpecDefenceResponseDocument(testDocument)
             .respondent2SpecDefenceResponseDocument(testDocument)
-            .isRespondent1(YesOrNo.YES)
-            .specAoSRespondentCorrespondenceAddressRequired(YesOrNo.NO)
+            .isRespondent1(YES)
+            .specAoSRespondentCorrespondenceAddressRequired(NO)
             .specAoSRespondentCorrespondenceAddressdetails(
                 Address.builder()
                     .postCode("new postcode")
                     .build()
             )
             .respondent2(Party.builder()
-                             .type(Party.Type.COMPANY)
+                             .type(Type.COMPANY)
                              .companyName("Company 3")
                              .build())
             .respondent2SameLegalRepresentative(YES)
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        Address address = Address.builder()
+            .postCode("E11 5BB")
+            .build();
+        CaseData oldCaseData = CaseDataBuilder.builder()
+            .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+            .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+            .build();
+        when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
 
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1791,8 +1903,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 "binary-url").build()).build();
 
         CaseData caseData = CaseData.builder()
+            .applicant1(PartyBuilder.builder().individual().build())
             .respondent1(PartyBuilder.builder().individual().build())
-            .respondent1Copy(PartyBuilder.builder().individual().build())
             .respondent1DQ(Respondent1DQ.builder().build())
             .respondent2DQ(Respondent2DQ.builder().build())
             .ccdCaseReference(354L)
@@ -1808,6 +1920,14 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        Address address = Address.builder()
+            .postCode("E11 5BB")
+            .build();
+        CaseData oldCaseData = CaseDataBuilder.builder()
+            .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+            .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+            .build();
+        when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
 
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1834,11 +1954,18 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .respondent2(PartyBuilder.builder().individual().build())
             .addRespondent2(YES)
             .respondent1(PartyBuilder.builder().individual().build())
-            .respondent1Copy(PartyBuilder.builder().individual().build())
             .respondent1DQ(Respondent1DQ.builder().build())
             .respondent2DQ(Respondent2DQ.builder().build())
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        Address address = Address.builder()
+            .postCode("E11 5BB")
+            .build();
+        CaseData oldCaseData = CaseDataBuilder.builder()
+            .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+            .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+            .build();
+        when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
             .handle(params);
@@ -1858,11 +1985,18 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .respondent2(PartyBuilder.builder().individual().build())
             .addRespondent2(YES)
             .respondent1(PartyBuilder.builder().individual().build())
-            .respondent1Copy(PartyBuilder.builder().individual().build())
             .respondent1DQ(Respondent1DQ.builder().build())
             .respondent2DQ(Respondent2DQ.builder().build())
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        Address address = Address.builder()
+            .postCode("E11 5BB")
+            .build();
+        CaseData oldCaseData = CaseDataBuilder.builder()
+            .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+            .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+            .build();
+        when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
             .handle(params);
@@ -2544,7 +2678,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseData.builder()
                 .respondent1(Party.builder()
                                  .partyName("name")
-                                 .type(Party.Type.INDIVIDUAL)
+                                 .type(INDIVIDUAL)
                                  .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -2580,7 +2714,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseData.builder()
                 .respondent1(Party.builder()
                                  .partyName("name")
-                                 .type(Party.Type.INDIVIDUAL)
+                                 .type(INDIVIDUAL)
                                  .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -2696,7 +2830,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
                 .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .respondent2SameLegalRepresentative(NO)
                 .respondent1DQ()
                 .build();
@@ -2730,7 +2863,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
                 .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .respondent2SameLegalRepresentative(NO)
                 .respondent1DQ()
                 .build();
@@ -2751,7 +2883,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
                 .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .respondent2SameLegalRepresentative(NO)
                 .respondent1DQ()
                 .build();
@@ -2785,7 +2916,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
                 .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .respondent2SameLegalRepresentative(NO)
                 .respondent1DQ()
                 .build();
@@ -2819,7 +2949,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
                 .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .respondent2SameLegalRepresentative(NO)
                 .respondent1DQ()
                 .build();
@@ -2853,7 +2982,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
                 .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .respondent2SameLegalRepresentative(NO)
                 .respondent1DQ()
                 .build();
@@ -2887,7 +3015,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
                 .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .respondent2SameLegalRepresentative(NO)
                 .respondent1DQ()
                 .build();
@@ -2921,7 +3048,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
                 .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .respondent2SameLegalRepresentative(NO)
                 .respondent1DQ()
                 .build();
@@ -2955,7 +3081,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
                 .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .respondent2SameLegalRepresentative(NO)
                 .respondent1DQ()
                 .build();
@@ -2989,7 +3114,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
                 .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .respondent2SameLegalRepresentative(NO)
                 .respondent1DQ()
                 .build();
@@ -3021,7 +3145,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
                 .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .respondent2SameLegalRepresentative(NO)
                 .respondent1DQ()
                 .build();
@@ -3044,7 +3167,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
                 .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .respondent2SameLegalRepresentative(NO)
                 .respondent2DQ()
                 .build();

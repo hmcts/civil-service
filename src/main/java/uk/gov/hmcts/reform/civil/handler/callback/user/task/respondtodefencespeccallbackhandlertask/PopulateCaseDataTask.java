@@ -68,7 +68,7 @@ public class PopulateCaseDataTask implements CaseTask {
             updatedCaseData.whenToBePaidText(formatLocalDate(whenBePaid, DATE));
         }
 
-        updatedCaseData.respondent1Copy(caseData.getRespondent1())
+        updatedCaseData
             .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
             .caseAccessCategory(CaseCategory.SPEC_CLAIM);
 

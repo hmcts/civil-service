@@ -259,8 +259,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData()).extracting("respondent1Copy")
-                .isNotNull();
             assertThat(response.getData()).extracting("claimantResponseScenarioFlag")
                 .isNotNull();
         }

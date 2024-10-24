@@ -226,7 +226,7 @@ below the required services for Civil are created in Preview under the developer
 for the named developer use.
 
 While connected to the VPN simply run one of the below commands from your project's (civil-service) folder:
-Note: be sure to have Docker running
+Note: be sure to have Docker running and up to date
 ```shell
 npx @hmcts/dev-env@latest && ./bin/setup-devuser-preview-env.sh
 ```
