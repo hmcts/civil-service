@@ -36,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.Cl
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.RESPONDENT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @ExtendWith(MockitoExtension.class)
@@ -178,7 +179,8 @@ class ClaimantResponseAgreedRepaymentRespondentNotificationHandlerTest extends B
     public Map<String, String> getNotificationDataMapSolicitorSpec(CaseData caseData) {
         return Map.of(
             CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, "test solicitor",
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
         );
     }
 

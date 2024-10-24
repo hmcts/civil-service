@@ -13,6 +13,7 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @AllArgsConstructor
@@ -42,14 +43,16 @@ public abstract class FullDefenceSolicitorCCSpecNotifier extends FullDefenceSoli
             && caseData.getRespondent1ClaimResponseTypeForSpec() != null) {
             return Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData),
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         } else {
             return Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData),
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent2())
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
     }
