@@ -23,7 +23,7 @@ public class FeatureToggleService {
     }
 
     public boolean isGeneralApplicationsEnabled() {
-        return false;
+        return this.featureToggleApi.isFeatureEnabled("general_applications_enabled");
     }
 
     public boolean isBulkClaimEnabled() {
@@ -59,7 +59,7 @@ public class FeatureToggleService {
     }
 
     public boolean isLipVLipEnabled() {
-        return true;
+        return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled");
     }
 
     public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
@@ -112,7 +112,7 @@ public class FeatureToggleService {
     }
 
     public boolean isGaForLipsEnabled() {
-        return true;
+        return featureToggleApi.isFeatureEnabled("GaForLips");
     }
 
     public boolean isMultiOrIntermediateTrackEnabled(CaseData caseData) {
@@ -128,7 +128,15 @@ public class FeatureToggleService {
     }
 
     public boolean isDashboardEnabledForCase(CaseData caseData) {
-       return true;
+        ZoneId zoneId = ZoneId.systemDefault();
+        long epoch;
+        if (caseData.getSubmittedDate() == null) {
+            epoch = LocalDateTime.now().atZone(zoneId).toEpochSecond();
+        } else {
+            epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
+        }
+        return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled")
+            && featureToggleApi.isFeatureEnabledForDate("is-dashboard-enabled-for-case", epoch, false);
     }
 
     public boolean isPartOfNationalRollout(String locationEpimms) {
@@ -149,6 +157,6 @@ public class FeatureToggleService {
     }
 
     public boolean isCoSCEnabled() {
-        return true;
+        return featureToggleApi.isFeatureEnabled("isCoSCEnabled");
     }
 }
