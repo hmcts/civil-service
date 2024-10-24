@@ -40,12 +40,9 @@ public class FeesPaymentService {
         CaseDetails caseDetails = coreCaseDataService.getCase(Long.valueOf(caseReference));
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
 
-        SRPbaDetails feePaymentDetails = SRPbaDetails.builder()
-            .fee(Fee.builder()
-                     .version("version")
-                     .code("FEE0202")
-                     .calculatedAmountInPence(BigDecimal.valueOf(900000)).build())
-            .serviceReqReference("2022-1655915218557").build();
+        SRPbaDetails feePaymentDetails = feeType.equals(FeeType.HEARING)
+            ? caseData.getHearingFeePBADetails()
+            : caseData.getClaimIssuedPBADetails();
 
         requireNonNull(feePaymentDetails, "Fee Payment details cannot be null");
         requireNonNull(feePaymentDetails.getServiceReqReference(), "Fee Payment service request cannot be null");
