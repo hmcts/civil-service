@@ -27,7 +27,7 @@ public class LocationReferenceDataService {
     private final AuthTokenGenerator authTokenGenerator;
     private static final String CIVIL_COURT_TYPE_ID = "10";
     private static final String IS_HEARING_LOCATION = "Y";
-    private static final String IS_CASE_MAANGEMENT_LOCATION = "Y";
+    private static final String IS_CASE_MANAGEMENT_LOCATION = "Y";
     private static final String LOCATION_TYPE = "Court";
     private static final String COURT_STATUS = "Open";
     private static final String LOCATION_REFERENCE_DATA_LOOKUP_FAILED = "Location Reference Data Lookup Failed - {}";
@@ -85,7 +85,7 @@ public class LocationReferenceDataService {
                     authTokenGenerator.generate(),
                     authToken,
                     IS_HEARING_LOCATION,
-                    IS_CASE_MAANGEMENT_LOCATION,
+                    IS_CASE_MANAGEMENT_LOCATION,
                     CIVIL_COURT_TYPE_ID,
                     LOCATION_TYPE
                 );
@@ -103,7 +103,7 @@ public class LocationReferenceDataService {
                     authTokenGenerator.generate(),
                     authToken,
                     IS_HEARING_LOCATION,
-                    IS_CASE_MAANGEMENT_LOCATION,
+                    IS_CASE_MANAGEMENT_LOCATION,
                     CIVIL_COURT_TYPE_ID,
                     LOCATION_TYPE
                 );
