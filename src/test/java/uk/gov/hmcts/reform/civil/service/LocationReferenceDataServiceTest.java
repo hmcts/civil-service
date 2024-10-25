@@ -356,6 +356,7 @@ class LocationReferenceDataServiceTest {
             when(locationReferenceDataApiClient.getCourtVenueByEpimmsId(
                 anyString(),
                 anyString(),
+                anyString(),
                 anyString()
             ))
                 .thenReturn(mockedResponse);
@@ -401,6 +402,7 @@ class LocationReferenceDataServiceTest {
         void shouldReturnEmptyList_whenEpimmsIdThrowsException() {
             when(authTokenGenerator.generate()).thenReturn("service_token");
             when(locationReferenceDataApiClient.getCourtVenueByEpimmsId(
+                anyString(),
                 anyString(),
                 anyString(),
                 anyString()
