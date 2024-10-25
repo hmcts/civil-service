@@ -342,6 +342,18 @@ class LocationReferenceDataServiceTest {
 
             assertThat(result.getEpimmsId()).isNull();
             assertThat(result.getRegionId()).isNull();
+
+            when(locationReferenceDataApiClient.getCourtVenueByName(
+                anyString(),
+                anyString(),
+                anyString()
+            ))
+                .thenReturn(List.of());
+
+            result = refDataService.getCnbcLocation("user_token");
+
+            assertThat(result.getEpimmsId()).isNull();
+            assertThat(result.getRegionId()).isNull();
         }
 
         @Test
