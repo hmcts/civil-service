@@ -21,7 +21,6 @@ import java.util.Map;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.ISSUED_ON;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.NOTIFICATION_DEADLINE;
@@ -29,6 +28,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CLAIM_ISSUED_DATE;
+import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildClaimantReference;
 
 @ExtendWith(MockitoExtension.class)
 class ClaimContinuingOnlineApplicantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -53,11 +54,10 @@ class ClaimContinuingOnlineApplicantNotificationHandlerTest extends BaseCallback
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
+                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 ISSUED_ON, formatLocalDate(CLAIM_ISSUED_DATE, DATE),
                 NOTIFICATION_DEADLINE, formatLocalDate(caseData.getClaimNotificationDeadline().toLocalDate(), DATE),
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
+                PARTY_REFERENCES, buildClaimantReference(caseData)
             );
         }
 

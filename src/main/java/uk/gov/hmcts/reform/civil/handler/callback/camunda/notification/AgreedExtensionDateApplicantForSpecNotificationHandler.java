@@ -30,7 +30,6 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.fetchDefendantName;
 
 @Service
@@ -101,10 +100,9 @@ public class AgreedExtensionDateApplicantForSpecNotificationHandler
                     .getOrganisation().getOrganisationID(),
                 caseData
             ),
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             AGREED_EXTENSION_DATE, formatLocalDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension(), DATE),
-            DEFENDANT_NAME, fetchDefendantName(caseData),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            DEFENDANT_NAME, fetchDefendantName(caseData)
         );
     }
 
@@ -134,9 +132,8 @@ public class AgreedExtensionDateApplicantForSpecNotificationHandler
         return Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(
                 caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID(), caseData),
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            AGREED_EXTENSION_DATE, formatLocalDate(extensionDate, DATE),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            AGREED_EXTENSION_DATE, formatLocalDate(extensionDate, DATE)
         );
     }
 

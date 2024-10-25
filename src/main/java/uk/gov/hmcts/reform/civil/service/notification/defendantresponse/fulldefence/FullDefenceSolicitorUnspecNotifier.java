@@ -11,7 +11,7 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.toStringValueForEma
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @RequiredArgsConstructor
@@ -42,20 +42,20 @@ public abstract class  FullDefenceSolicitorUnspecNotifier extends FullDefenceSol
     public Map<String, String> addProperties(CaseData caseData) {
         if (getMultiPartyScenario(caseData).equals(ONE_V_ONE) || getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                PARTY_REFERENCES, buildPartiesReferences(caseData),
                 ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack())
             );
         } else {
             //if there are 2 respondents on the case, concatenate the names together for the template subject line
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONDENT_NAME,
                 getPartyNameBasedOnType(caseData.getRespondent1())
                     .concat(" and ")
                     .concat(getPartyNameBasedOnType(caseData.getRespondent2())),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                PARTY_REFERENCES, buildPartiesReferences(caseData),
                 ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack())
             );
         }
