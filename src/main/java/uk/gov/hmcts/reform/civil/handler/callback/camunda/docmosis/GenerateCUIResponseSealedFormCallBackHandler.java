@@ -69,13 +69,6 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.respondent1ClaimResponseDocumentSpec(sealedForm)
-                .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
-                        sealedForm,
-                        caseData
-                ));
-        assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, DocCategory.DEF1_DEFENSE_DQ.getValue());
-
         if (stitchEnabled && caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
             if (documentMetaDataList.size() > 1) {
@@ -86,14 +79,22 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                         sealedForm.getDocumentName(),
                         caseData
                 );
-                assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.DEF1_DEFENSE_DQ.getValue());
+
                 CaseDocument updatedStitchedDoc = stitchedDocument.toBuilder().documentType(DEFENDANT_DEFENCE).build();
                 caseDataBuilder.respondent1ClaimResponseDocumentSpec(updatedStitchedDoc)
                         .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
                                 updatedStitchedDoc,
                                 caseData
                         ));
+                assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.DEF1_DEFENSE_DQ.getValue());
             }
+        } else {
+            caseDataBuilder.respondent1ClaimResponseDocumentSpec(sealedForm)
+                .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
+                    sealedForm,
+                    caseData
+                ));
+            assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, DocCategory.DEF1_DEFENSE_DQ.getValue());
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
