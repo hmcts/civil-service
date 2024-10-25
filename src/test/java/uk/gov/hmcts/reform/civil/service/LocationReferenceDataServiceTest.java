@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -287,6 +288,18 @@ class LocationReferenceDataServiceTest {
         }
 
         @Test
+        void shouldReturnLocations_whenLRDReturnsOnCnbcLocationsMoreThanError() {
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+            assertThrows(Exception.class, () -> locationReferenceDataApiClient.getCourtVenueByName(
+                null,
+                null,
+                anyString()
+            ));
+            LocationRefData result = refDataService.getCnbcLocation("user_token");
+            assertThat(result).isEqualTo(LocationRefData.builder().build());
+        }
+
+        @Test
         void shouldReturnLocations_whenLRDReturnsOnCnbcLocationsMoreThan2() {
             LocationRefData ccmccLocation = LocationRefData.builder().courtVenueId("9263").epimmsId("192282")
                 .siteName("site_name").regionId("4").region("North West").courtType("County Court")
@@ -537,9 +550,9 @@ class LocationReferenceDataServiceTest {
                 bearer
             );
             Assertions.assertTrue(opt.isPresent());
-            Assertions.assertEquals(el1.getSiteName(), opt.get().getSiteName());
-            Assertions.assertEquals(el1.getCourtAddress(), opt.get().getCourtAddress());
-            Assertions.assertEquals(el1.getPostcode(), opt.get().getPostcode());
+            assertEquals(el1.getSiteName(), opt.get().getSiteName());
+            assertEquals(el1.getCourtAddress(), opt.get().getCourtAddress());
+            assertEquals(el1.getPostcode(), opt.get().getPostcode());
         }
     }
 
