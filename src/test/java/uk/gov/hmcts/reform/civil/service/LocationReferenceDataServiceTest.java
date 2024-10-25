@@ -290,11 +290,12 @@ class LocationReferenceDataServiceTest {
         @Test
         void shouldReturnLocations_whenLRDReturnsOnCnbcLocationsMoreThanError() {
             when(authTokenGenerator.generate()).thenReturn("service_token");
-            assertThrows(Exception.class, () -> locationReferenceDataApiClient.getCourtVenueByName(
-                null,
-                null,
+            when(locationReferenceDataApiClient.getCourtVenueByName(
+                anyString(),
+                anyString(),
                 anyString()
-            ));
+            )).thenThrow(new RuntimeException());
+
             LocationRefData result = refDataService.getCnbcLocation("user_token");
             assertThat(result).isEqualTo(LocationRefData.builder().build());
         }
