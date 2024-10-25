@@ -287,27 +287,6 @@ class LocationReferenceDataServiceTest {
         }
 
         @Test
-        void shouldReturnLocations_whenLRDReturnsOneCnbcLocations() {
-            LocationRefData cnbcLocation = LocationRefData.builder().courtVenueId("9263").epimmsId("192280")
-                .siteName("site_name").regionId("4").region("North West").courtType("County Court")
-                .courtTypeId("10").locationType("COURT").courtName("COUNTY COURT MONEY CLAIMS CENTRE")
-                .venueName("CNBC").build();
-            List<LocationRefData> mockedResponse = List.of(cnbcLocation);
-            when(authTokenGenerator.generate()).thenReturn("service_token");
-            when(locationReferenceDataApiClient.getCourtVenueByName(
-                anyString(),
-                anyString(),
-                anyString()
-            ))
-                .thenReturn(mockedResponse);
-
-            LocationRefData result = refDataService.getCnbcLocation("user_token");
-
-            assertThat(result.getEpimmsId()).isEqualTo("192280");
-            assertThat(result.getRegionId()).isEqualTo("4");
-        }
-
-        @Test
         void shouldReturnLocations_whenLRDReturnsNullBody() {
             when(authTokenGenerator.generate()).thenReturn("service_token");
             when(locationReferenceDataApiClient.getCourtVenueByName(
@@ -366,6 +345,31 @@ class LocationReferenceDataServiceTest {
         }
 
         @Test
+        void shouldReturnLocations_whenLRDReturnsCourtLocationByEpimmsId() {
+            LocationRefData ccmccLocation = LocationRefData.builder().courtVenueId("9263").epimmsId("192280")
+                .siteName("site_name").regionId("4").region("North West").courtType("County Court")
+                .courtTypeId("10").locationType("COURT").courtName("COUNTY COURT MONEY CLAIMS CENTRE")
+                .venueName("CCMCC").courtLocationCode("121").build();
+            List<LocationRefData> mockedResponse = List.of(ccmccLocation);
+
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+            when(locationReferenceDataApiClient.getCourtVenueByEpimmsId(
+                anyString(),
+                anyString(),
+                anyString()
+            ))
+                .thenReturn(mockedResponse);
+
+            List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsId("user_token", "192280");
+            String prefferedCourtCode = result.stream()
+                .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
+                .toList().get(0).getCourtLocationCode();
+
+            assertThat(result).isNotNull();
+            assertThat(prefferedCourtCode).isEqualTo("121");
+        }
+
+        @Test
         void shouldReturnLocations_whenLRDReturnsCourtLocationByEpimmsIdAndCourtType() {
             LocationRefData ccmccLocation = LocationRefData.builder().courtVenueId("9263").epimmsId("192280")
                 .siteName("site_name").regionId("4").region("North West").courtType("County Court")
@@ -391,6 +395,21 @@ class LocationReferenceDataServiceTest {
 
             assertThat(result).isNotNull();
             assertThat(prefferedCourtCode).isEqualTo("121");
+        }
+
+        @Test
+        void shouldReturnEmptyList_whenEpimmsIdThrowsException() {
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+            when(locationReferenceDataApiClient.getCourtVenueByEpimmsId(
+                anyString(),
+                anyString(),
+                anyString()
+            ))
+                .thenThrow(new RestClientException("403"));
+
+            List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsId("user_token", "192280");
+
+            assertThat(result.isEmpty());
         }
 
         @Test

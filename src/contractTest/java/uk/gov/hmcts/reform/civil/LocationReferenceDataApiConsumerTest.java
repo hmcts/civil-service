@@ -134,6 +134,20 @@ public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
     }
 
     @Test
+    @PactTestFor(pactMethod = "getCourtVenueByEpimmsId")
+    public void verifyCourtVenueByEpimmsId() {
+        List<LocationRefData> response = locationReferenceDataApiClient.getCourtVenueByEpimmsId(
+            SERVICE_AUTH_TOKEN,
+            AUTHORIZATION_TOKEN,
+            "epimmsId"
+        );
+        assertThat(
+            response.get(0).getRegion(),
+            is(equalTo("regionTest123"))
+        );
+    }
+
+    @Test
     @PactTestFor(pactMethod = "getCourtVenueByEpimmsIdAndType")
     public void verifyCourtVenueByEpimmsIdAndType() {
         List<LocationRefData> response = locationReferenceDataApiClient.getCourtVenueByEpimmsIdAndType(
@@ -268,5 +282,9 @@ public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
                                         .stringType("locationType", "locationTypeTest123")
                                         .stringType("parentLocation", "parentLocationTest123"))
         ).build();
+    }
+
+    private String createJsonObject(Object obj) throws JSONException, IOException {
+        return objectMapper.writeValueAsString(obj);
     }
 }
