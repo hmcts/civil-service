@@ -96,7 +96,7 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
 
     @BeforeEach
     void setUp() {
-        given(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).willReturn(LOCATIONS);
+        given(locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(any(), any())).willReturn(LOCATIONS);
     }
 
     @Test

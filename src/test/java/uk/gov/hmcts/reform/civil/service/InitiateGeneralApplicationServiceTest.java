@@ -1063,7 +1063,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @Test
     void shouldPopulateLocationDetailsForBaseLocationWhereListIsEmptyForGaLips() {
-        when(locationRefDataService.getCourtLocationsByEpimmsId(
+        when(locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(
             any(),
             any()
         )).thenReturn(getEmptyCourLocationsRefObject());
@@ -1084,7 +1084,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @Test
     void shouldPopulateLocationDetailsForFAForLipsEnabled() {
-        when(locationRefDataService.getCourtLocationsByEpimmsId(
+        when(locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(
             any(),
             any()
         )).thenReturn(getSampleCourLocationsRefObject());

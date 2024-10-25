@@ -2880,7 +2880,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
                 .courtTypeId("10").courtLocationCode("121")
                 .epimmsId("000000").build());
-            when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(locations);
+            when(locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(any(), any())).thenReturn(locations);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceWithHearingSupport()
                 .build()

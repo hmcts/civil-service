@@ -33,7 +33,7 @@ public class ReferenceNumberAndCourtDetailsPopulator {
         }
 
         List<LocationRefData> courtLocations = (locationRefDataService
-            .getCourtLocationsByEpimmsId(
+            .getCourtLocationsByEpimmsIdAndCourtType(
                 authorisation,
                 requestedCourt));
 

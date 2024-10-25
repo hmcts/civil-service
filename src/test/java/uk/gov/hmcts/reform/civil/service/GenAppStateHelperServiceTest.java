@@ -404,7 +404,7 @@ class GenAppStateHelperServiceTest {
 
         @Test
          void updateApplicationLocationDetailsLists() {
-            when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any()))
+            when(locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(any(), any()))
                 .thenReturn(getSampleCourLocationsRefObject());
             when(genAppService.getWorkAllocationLocationDetails(any(), any()))
                 .thenReturn(getSampleCourLocationsRefObject1());
