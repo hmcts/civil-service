@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.builders.DQGeneratorFormBuilder;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,7 +44,7 @@ class DirectionQuestionnaireLipResponseGeneratorTest {
     @Mock
     private DQGeneratorFormBuilder dqGeneratorFormBuilder;
     @Mock
-    private StateFlowEngine stateFlowEngine;
+    private SimpleStateFlowEngine stateFlowEngine;
     @Mock
     private StateFlow stateFlow;
     @Mock
