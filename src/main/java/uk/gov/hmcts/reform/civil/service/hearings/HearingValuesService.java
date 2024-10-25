@@ -86,7 +86,7 @@ public class HearingValuesService {
         CaseData caseData = retrieveCaseData(caseId);
         populateMissingFields(caseId, caseData);
         isEarlyAdopter(caseData);
-        isLrVLr(caseData);
+        //isLrVLr(caseData);
 
         String baseUrl = manageCaseBaseUrlConfiguration.getManageCaseBaseUrl();
         String hmctsServiceID = getHmctsServiceID(caseData, paymentsConfiguration);
