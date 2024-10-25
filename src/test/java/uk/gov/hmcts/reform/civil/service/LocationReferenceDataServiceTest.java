@@ -174,6 +174,23 @@ class LocationReferenceDataServiceTest {
         }
 
         @Test
+        void shouldReturnLocations_whenLRDReturnsAllLocationsForGaIfErrorThenError() {
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+            when(locationReferenceDataApiClient.getCourtVenue(
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString()
+            )).thenThrow(new RuntimeException());
+
+            List<LocationRefData> courtLocations = refDataService.getCourtLocationsForGeneralApplication("user_token");
+            assertThat(courtLocations).isEmpty();
+        }
+
+
+        @Test
         void shouldReturnLocations_whenLRDReturnsNonScotlandLocations() {
             when(authTokenGenerator.generate()).thenReturn("service_token");
             when(locationReferenceDataApiClient.getCourtVenue(
@@ -260,6 +277,22 @@ class LocationReferenceDataServiceTest {
                 .getCourtLocationsForDefaultJudgments("user_token");
 
             assertThat(courtLocations).isNotNull();
+        }
+
+        @Test
+        void shouldReturnLocations_whenLRDReturnsAllLocationsForDefaultJudgmentsIfErrorThenError() {
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+            when(locationReferenceDataApiClient.getCourtVenue(
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString()
+            )).thenThrow(new RuntimeException());
+
+            List<LocationRefData> courtLocations = refDataService.getCourtLocationsForDefaultJudgments("user_token");
+            assertThat(courtLocations).isEmpty();
         }
     }
 
