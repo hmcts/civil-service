@@ -38,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @ExtendWith(MockitoExtension.class)
@@ -63,8 +64,6 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
         @Test
         void shouldNotifyRespondentSolicitor_whenInvoked() {
             when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn("template-id");
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("respondent solicitor org").build()));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -132,8 +131,6 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
         @Test
         void shouldNotifyRespondentSolicitor2_whenInvoked() {
             when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn("template-id");
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("respondent solicitor org").build()));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -153,8 +150,6 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
         @Test
         void shouldNotifyRespondentSolicitor2_whenInvoked_spec() {
             when(notificationsProperties.getRespondentSolicitorNotifyNotToProceedSpec()).thenReturn("spec-template-id");
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("respondent solicitor org").build()));
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -178,8 +173,6 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedWithCcEvent() {
             when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn("template-id");
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("respondent solicitor org").build()));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -199,9 +192,8 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData)
+                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
         }
 
@@ -235,9 +227,8 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
     public Map<String, String> getNotificationDataMapSpec(CaseData caseData, CaseEvent caseEvent) {
         return Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
         );
     }
 
@@ -245,9 +236,7 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
     public Map<String, String> getNotificationDataMapSpecPartAdmit(CaseData caseData) {
         return Map.of(
             CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData),
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-            CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData)
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
         );
     }
 

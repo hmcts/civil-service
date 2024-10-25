@@ -11,8 +11,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
-
 /**
  * When an SDO is created it is notified to applicants and defendants.
  * This class holds common code for the actual sending of the email.
@@ -69,14 +67,13 @@ public abstract class AbstractCreateSDORespondentNotificationSender implements N
     public Map<String, String> addProperties(CaseData caseData) {
         if (caseData.isRespondentResponseBilingual()) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONDENT_NAME, getRespondentLegalName(caseData)
             );
         }
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalName(caseData),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalName(caseData)
         );
     }
 }
