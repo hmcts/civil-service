@@ -133,7 +133,6 @@ public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
         );
     }
 
-
     @Test
     @PactTestFor(pactMethod = "getCourtVenueByEpimmsIdAndType")
     public void verifyCourtVenueByEpimmsIdAndType() {
