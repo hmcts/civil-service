@@ -185,7 +185,7 @@ public class LocationReferenceDataService {
             List<LocationRefData> responseEntity =
                 locationReferenceDataApiClient.getCourtVenueByLocationCode(
                     authTokenGenerator.generate(),
-                    authToken, "Y", "10", threeDigitCode, COURT_STATUS
+                    authToken, IS_CASE_MAANGEMENT_LOCATION, COURT_TYPE_ID, threeDigitCode, COURT_STATUS
                 );
             if (responseEntity == null || responseEntity.isEmpty()) {
                 return LocationRefData.builder().build();
