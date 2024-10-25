@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAParties;
@@ -131,7 +132,8 @@ public class InitiateGeneralApplicationServiceHelper {
         /*
         * Don't consider hearing date if application is represented
         * */
-        if (applicationBuilder.build().getIsGaApplicantLip().equals(YES)) {
+        if (Objects.nonNull(applicationBuilder.build().getIsGaApplicantLip())
+            && applicationBuilder.build().getIsGaApplicantLip().equals(YES)) {
             checkLipUrgency(isGaAppSameAsParentCaseClLip, applicationBuilder, caseData);
         }
 
@@ -182,6 +184,7 @@ public class InitiateGeneralApplicationServiceHelper {
         if (applnSol.getCaseRole() != null) {
             if (applnSol.getCaseRole().equals(CaseRole.CLAIMANT.getFormattedName())
                     || applnSol.getCaseRole().equals(CaseRole.DEFENDANT.getFormattedName())) {
+
                 applicationBuilder.isGaApplicantLip(YES);
                 if (applnSol.getCaseRole().equals(CaseRole.DEFENDANT.getFormattedName())) {
                     isGaAppSameAsParentCaseClLip = false;
