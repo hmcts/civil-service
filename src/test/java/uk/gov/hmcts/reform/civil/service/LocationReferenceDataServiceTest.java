@@ -287,6 +287,31 @@ class LocationReferenceDataServiceTest {
         }
 
         @Test
+        void shouldReturnLocations_whenLRDReturnsOnCnbcLocationsMoreThan2() {
+            LocationRefData ccmccLocation = LocationRefData.builder().courtVenueId("9263").epimmsId("192282")
+                .siteName("site_name").regionId("4").region("North West").courtType("County Court")
+                .courtTypeId("10").locationType("COURT").courtName("COUNTY COURT MONEY CLAIMS CENTRE")
+                .venueName("CNBC").build();
+            LocationRefData ccmccLocation2 = LocationRefData.builder().courtVenueId("9263").epimmsId("192281")
+                .siteName("site_name").regionId("4").region("North West").courtType("County Court")
+                .courtTypeId("10").locationType("COURT").courtName("NATIONAL BUSINESS CENTER")
+                .venueName("CNBC").build();
+            List<LocationRefData> mockedResponse = List.of(ccmccLocation, ccmccLocation2);
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+            when(locationReferenceDataApiClient.getCourtVenueByName(
+                anyString(),
+                anyString(),
+                anyString()
+            ))
+                .thenReturn(mockedResponse);
+
+            LocationRefData result = refDataService.getCnbcLocation("user_token");
+
+            assertThat(result.getEpimmsId()).isEqualTo("192282");
+            assertThat(result.getRegionId()).isEqualTo("4");
+        }
+
+        @Test
         void shouldReturnLocations_whenLRDReturnsOnCnbcLocations() {
             LocationRefData ccmccLocation = LocationRefData.builder().courtVenueId("9263").epimmsId("192280")
                 .siteName("site_name").regionId("4").region("North West").courtType("County Court")
@@ -305,6 +330,18 @@ class LocationReferenceDataServiceTest {
 
             assertThat(result.getEpimmsId()).isEqualTo("192280");
             assertThat(result.getRegionId()).isEqualTo("4");
+
+            when(locationReferenceDataApiClient.getCourtVenueByName(
+                anyString(),
+                anyString(),
+                anyString()
+            ))
+                .thenReturn(null);
+
+            result = refDataService.getCnbcLocation("user_token");
+
+            assertThat(result.getEpimmsId()).isNull();
+            assertThat(result.getRegionId()).isNull();
         }
 
         @Test

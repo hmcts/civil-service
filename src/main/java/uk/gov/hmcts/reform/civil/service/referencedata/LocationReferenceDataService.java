@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.apache.logging.log4j.util.Strings.concat;
 
@@ -31,6 +30,7 @@ public class LocationReferenceDataService {
     private static final String IS_CASE_MAANGEMENT_LOCATION = "Y";
     private static final String LOCATION_TYPE = "Court";
     private static final String COURT_STATUS = "Open";
+    private static final String COURT_LOCATION_LOOK_FAILED = "Location Reference Data Lookup Failed - {}";
 
     public LocationRefData getCnbcLocation(String authToken) {
         try {
@@ -50,7 +50,7 @@ public class LocationReferenceDataService {
                 return cnbcLocations.get(0);
             }
         } catch (Exception e) {
-            log.error("Location Reference Data Lookup Failed - {}", e.getMessage(), e);
+            log.error(COURT_LOCATION_LOOK_FAILED, e.getMessage(), e);
         }
         return LocationRefData.builder().build();
     }
@@ -73,7 +73,7 @@ public class LocationReferenceDataService {
                 return ccmccLocations.get(0);
             }
         } catch (Exception e) {
-            log.error("Location Reference Data Lookup Failed - {}", e.getMessage(), e);
+            log.error(COURT_LOCATION_LOOK_FAILED, e.getMessage(), e);
         }
         return LocationRefData.builder().build();
     }
@@ -91,7 +91,7 @@ public class LocationReferenceDataService {
                 );
 
         } catch (Exception e) {
-            log.error("Location Reference Data Lookup Failed - {}", e.getMessage(), e);
+            log.error(COURT_LOCATION_LOOK_FAILED, e.getMessage(), e);
         }
         return new ArrayList<>();
     }
@@ -108,9 +108,9 @@ public class LocationReferenceDataService {
                     LOCATION_TYPE
                 );
             return onlyEnglandAndWalesLocations(responseEntity)
-                .stream().sorted(Comparator.comparing(LocationRefData::getSiteName)).collect(Collectors.toList());
+                .stream().sorted(Comparator.comparing(LocationRefData::getSiteName)).toList();
         } catch (Exception e) {
-            log.error("Location Reference Data Lookup Failed - {}", e.getMessage(), e);
+            log.error(COURT_LOCATION_LOOK_FAILED, e.getMessage(), e);
         }
         return new ArrayList<>();
     }
@@ -122,21 +122,19 @@ public class LocationReferenceDataService {
                     authToken, epimmsId, COURT_TYPE_ID
                 );
         } catch (Exception e) {
-            log.error("Location Reference Data Lookup Failed - {}", e.getMessage(), e);
+            log.error(COURT_LOCATION_LOOK_FAILED, e.getMessage(), e);
         }
         return new ArrayList<>();
     }
 
     public List<LocationRefData> getCourtLocationsByEpimmsIdAndCourtType(String authToken, String epimmsId) {
         try {
-            List<LocationRefData> responseEntity =
-                locationReferenceDataApiClient.getCourtVenueByEpimmsIdAndType(
+            return locationReferenceDataApiClient.getCourtVenueByEpimmsIdAndType(
                     authTokenGenerator.generate(),
                     authToken, epimmsId, COURT_TYPE_ID
                 );
-            return responseEntity;
         } catch (Exception e) {
-            log.error("Location Reference Data Lookup Failed - {}", e.getMessage(), e);
+            log.error(COURT_LOCATION_LOOK_FAILED, e.getMessage(), e);
         }
         return new ArrayList<>();
     }
@@ -150,14 +148,12 @@ public class LocationReferenceDataService {
      */
     public List<LocationRefData> getHearingCourtLocations(String authToken) {
         try {
-            List<LocationRefData> responseEntity =
-                locationReferenceDataApiClient.getHearingVenue(
+            return locationReferenceDataApiClient.getHearingVenue(
                     authTokenGenerator.generate(),
                     authToken, IS_HEARING_LOCATION, COURT_TYPE_ID, LOCATION_TYPE
                 );
-            return responseEntity;
         } catch (Exception e) {
-            log.error("Location Reference Data Lookup Failed - {}", e.getMessage(), e);
+            log.error(COURT_LOCATION_LOOK_FAILED, e.getMessage(), e);
         }
         return new ArrayList<>();
     }
@@ -198,7 +194,7 @@ public class LocationReferenceDataService {
             List<LocationRefData> responseEntity =
                 locationReferenceDataApiClient.getCourtVenueByLocationCode(
                     authTokenGenerator.generate(),
-                    authToken, "Y", "10", threeDigitCode, "Open"
+                    authToken, "Y", "10", threeDigitCode, COURT_STATUS
                 );
             List<LocationRefData> locations = responseEntity;
             if (locations == null || locations.isEmpty()) {
@@ -208,7 +204,7 @@ public class LocationReferenceDataService {
 
             }
         } catch (Exception e) {
-            log.error("Location Reference Data Lookup Failed - {}", e.getMessage(), e);
+            log.error(COURT_LOCATION_LOOK_FAILED, e.getMessage(), e);
             throw e;
         }
 
