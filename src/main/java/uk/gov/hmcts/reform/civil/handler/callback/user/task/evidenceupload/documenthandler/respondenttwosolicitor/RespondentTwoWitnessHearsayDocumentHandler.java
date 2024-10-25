@@ -1,14 +1,13 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.respondenttwosolicitor;
 
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.RespondentTwoSolicitorDocumentHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.retriever.UploadEvidenceWitnessRetriever;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_TWO_WITNESS_HEARSAY;
@@ -17,24 +16,14 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploa
 public class RespondentTwoWitnessHearsayDocumentHandler extends
     RespondentTwoSolicitorDocumentHandler<UploadEvidenceWitness> {
 
-    public RespondentTwoWitnessHearsayDocumentHandler() {
+    public RespondentTwoWitnessHearsayDocumentHandler(UploadEvidenceWitnessRetriever uploadDocumentRetriever) {
         super(RESPONDENT_TWO_WITNESS_HEARSAY,
-            EvidenceUploadType.WITNESS_HEARSAY);
+            EvidenceUploadType.WITNESS_HEARSAY, uploadDocumentRetriever);
     }
 
     @Override
     protected List<Element<UploadEvidenceWitness>> getDocumentList(CaseData caseData) {
         return caseData.getDocumentHearsayNoticeRes2();
-    }
-
-    @Override
-    protected Document getDocument(Element<UploadEvidenceWitness> element) {
-        return element.getValue().getWitnessOptionDocument();
-    }
-
-    @Override
-    protected LocalDateTime getDocumentDateTime(Element<UploadEvidenceWitness> element) {
-        return element.getValue().getCreatedDatetime();
     }
 
     @Override

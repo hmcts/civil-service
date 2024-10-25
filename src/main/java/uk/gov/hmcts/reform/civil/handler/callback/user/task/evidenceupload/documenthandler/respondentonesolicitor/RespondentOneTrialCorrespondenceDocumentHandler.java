@@ -3,15 +3,14 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.docu
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.RespondentSolicitorOneDocumentHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.retriever.UploadEvidenceDocumentRetriever;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_ONE_TRIAL_DOC_CORRESPONDENCE;
@@ -23,24 +22,15 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploa
 public class RespondentOneTrialCorrespondenceDocumentHandler extends
     RespondentSolicitorOneDocumentHandler<UploadEvidenceDocumentType> {
 
-    public RespondentOneTrialCorrespondenceDocumentHandler(DocumentTypeBuilder<UploadEvidenceDocumentType> documentTypeBuilder) {
+    public RespondentOneTrialCorrespondenceDocumentHandler(DocumentTypeBuilder<UploadEvidenceDocumentType> documentTypeBuilder,
+                                                           UploadEvidenceDocumentRetriever uploadDocumentRetriever) {
         super(RESPONDENT_ONE_TRIAL_DOC_CORRESPONDENCE, RESPONDENT_TWO_TRIAL_DOC_CORRESPONDENCE,
-            EvidenceUploadType.TRIAL_CORRESPONDENCE, documentTypeBuilder);
+            EvidenceUploadType.TRIAL_CORRESPONDENCE, documentTypeBuilder, uploadDocumentRetriever);
     }
 
     @Override
     protected List<Element<UploadEvidenceDocumentType>> getDocumentList(CaseData caseData) {
         return caseData.getDocumentEvidenceForTrialRes();
-    }
-
-    @Override
-    protected Document getDocument(Element<UploadEvidenceDocumentType> element) {
-        return element.getValue().getDocumentUpload();
-    }
-
-    @Override
-    protected LocalDateTime getDocumentDateTime(Element<UploadEvidenceDocumentType> element) {
-        return element.getValue().getCreatedDatetime();
     }
 
     @Override

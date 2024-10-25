@@ -2,14 +2,13 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.docu
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.RespondentTwoSolicitorDocumentHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.retriever.UploadEvidenceExpertRetriever;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_TWO_EXPERT_JOINT_STATEMENT;
@@ -19,9 +18,9 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploa
 public class RespondentTwoExpertJointStatmementDocumentHandler extends
     RespondentTwoSolicitorDocumentHandler<UploadEvidenceExpert> {
 
-    public RespondentTwoExpertJointStatmementDocumentHandler() {
+    public RespondentTwoExpertJointStatmementDocumentHandler(UploadEvidenceExpertRetriever uploadDocumentRetriever) {
         super(RESPONDENT_TWO_EXPERT_JOINT_STATEMENT,
-            EvidenceUploadType.JOINT_STATEMENT);
+            EvidenceUploadType.JOINT_STATEMENT, uploadDocumentRetriever);
     }
 
     @Override
@@ -30,17 +29,7 @@ public class RespondentTwoExpertJointStatmementDocumentHandler extends
     }
 
     @Override
-    protected Document getDocument(Element<UploadEvidenceExpert> element) {
-        return element.getValue().getExpertDocument();
-    }
-
-    @Override
-    protected LocalDateTime getDocumentDateTime(Element<UploadEvidenceExpert> element) {
-        return element.getValue().getCreatedDatetime();
-    }
-
-    @Override
     protected void renameDocuments(List<Element<UploadEvidenceExpert>> documentUploads) {
-        renameUploadReportExpert(documentUploads, evidenceUploadType.getDocumentTypeDisplayName(),  false);
+        renameUploadReportExpert(documentUploads, evidenceUploadType.getDocumentTypeDisplayName(), false);
     }
 }

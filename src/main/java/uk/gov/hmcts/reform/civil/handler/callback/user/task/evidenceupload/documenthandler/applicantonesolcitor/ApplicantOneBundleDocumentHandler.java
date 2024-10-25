@@ -1,15 +1,14 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.applicantonesolcitor;
 
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.ApplicantOneSolicitorDocumentHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.retriever.UploadEvidenceDocumentRetriever;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.BUNDLE_EVIDENCE_UPLOAD;
@@ -18,23 +17,14 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploa
 public class ApplicantOneBundleDocumentHandler extends
     ApplicantOneSolicitorDocumentHandler<UploadEvidenceDocumentType> {
 
-    public ApplicantOneBundleDocumentHandler(DocumentTypeBuilder<UploadEvidenceDocumentType> documentTypeBuilder) {
-        super(BUNDLE_EVIDENCE_UPLOAD, BUNDLE_EVIDENCE_UPLOAD, EvidenceUploadType.BUNDLE_EVIDENCE, documentTypeBuilder);
+    public ApplicantOneBundleDocumentHandler(DocumentTypeBuilder<UploadEvidenceDocumentType> documentTypeBuilder,
+                                             UploadEvidenceDocumentRetriever uploadDocumentRetriever) {
+        super(BUNDLE_EVIDENCE_UPLOAD, BUNDLE_EVIDENCE_UPLOAD, EvidenceUploadType.BUNDLE_EVIDENCE, documentTypeBuilder, uploadDocumentRetriever);
     }
 
     @Override
     protected List<Element<UploadEvidenceDocumentType>> getDocumentList(CaseData caseData) {
         return caseData.getBundleEvidence();
-    }
-
-    @Override
-    protected Document getDocument(Element<UploadEvidenceDocumentType> element) {
-        return element.getValue().getDocumentUpload();
-    }
-
-    @Override
-    protected LocalDateTime getDocumentDateTime(Element<UploadEvidenceDocumentType> element) {
-        return element.getValue().getCreatedDatetime();
     }
 
     @Override

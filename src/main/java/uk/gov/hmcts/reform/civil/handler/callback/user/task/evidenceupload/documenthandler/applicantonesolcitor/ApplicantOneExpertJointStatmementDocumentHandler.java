@@ -2,16 +2,15 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.docu
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.ApplicantOneSolicitorDocumentHandler;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.retriever.UploadEvidenceExpertRetriever;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -19,9 +18,10 @@ import java.util.List;
 public class ApplicantOneExpertJointStatmementDocumentHandler extends
     ApplicantOneSolicitorDocumentHandler<UploadEvidenceExpert> {
 
-    public ApplicantOneExpertJointStatmementDocumentHandler(DocumentTypeBuilder<UploadEvidenceExpert> documentTypeBuilder) {
+    public ApplicantOneExpertJointStatmementDocumentHandler(DocumentTypeBuilder<UploadEvidenceExpert> documentTypeBuilder,
+                                                            UploadEvidenceExpertRetriever uploadEvidenceExpertRetriever) {
         super(DocumentCategory.APPLICANT_ONE_EXPERT_JOINT_STATEMENT, DocumentCategory.APPLICANT_TWO_EXPERT_JOINT_STATEMENT,
-            EvidenceUploadType.JOINT_STATEMENT, documentTypeBuilder);
+            EvidenceUploadType.JOINT_STATEMENT, documentTypeBuilder, uploadEvidenceExpertRetriever);
     }
 
     @Override
@@ -30,18 +30,8 @@ public class ApplicantOneExpertJointStatmementDocumentHandler extends
     }
 
     @Override
-    protected Document getDocument(Element<UploadEvidenceExpert> element) {
-        return element.getValue().getExpertDocument();
-    }
-
-    @Override
-    protected LocalDateTime getDocumentDateTime(Element<UploadEvidenceExpert> element) {
-        return element.getValue().getCreatedDatetime();
-    }
-
-    @Override
     protected void renameDocuments(List<Element<UploadEvidenceExpert>> documentUploads) {
-        renameUploadReportExpert(documentUploads, evidenceUploadType.getDocumentTypeDisplayName(),  false);
+        renameUploadReportExpert(documentUploads, evidenceUploadType.getDocumentTypeDisplayName(), false);
     }
 
     @Override

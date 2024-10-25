@@ -2,16 +2,15 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.docu
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.RespondentSolicitorOneDocumentHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.retriever.UploadEvidenceExpertRetriever;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -19,25 +18,16 @@ import java.util.List;
 public class RespondentOneExpertAnswersDocumentHandler extends
     RespondentSolicitorOneDocumentHandler<UploadEvidenceExpert> {
 
-    public RespondentOneExpertAnswersDocumentHandler(DocumentTypeBuilder<UploadEvidenceExpert> documentTypeBuilder) {
+    public RespondentOneExpertAnswersDocumentHandler(DocumentTypeBuilder<UploadEvidenceExpert> documentTypeBuilder,
+                                                     UploadEvidenceExpertRetriever uploadDocumentRetriever) {
         super(DocumentCategory.RESPONDENT_ONE_EXPERT_ANSWERS, DocumentCategory.RESPONDENT_TWO_EXPERT_ANSWERS,
             EvidenceUploadType.ANSWERS_FOR_EXPERTS,
-            documentTypeBuilder);
+            documentTypeBuilder, uploadDocumentRetriever);
     }
 
     @Override
     protected List<Element<UploadEvidenceExpert>> getDocumentList(CaseData caseData) {
         return caseData.getDocumentAnswersRes();
-    }
-
-    @Override
-    protected Document getDocument(Element<UploadEvidenceExpert> element) {
-        return element.getValue().getExpertDocument();
-    }
-
-    @Override
-    protected LocalDateTime getDocumentDateTime(Element<UploadEvidenceExpert> element) {
-        return element.getValue().getCreatedDatetime();
     }
 
     @Override

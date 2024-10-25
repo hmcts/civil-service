@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.retriever.UploadDocumentRetriever;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
@@ -34,10 +35,13 @@ public abstract class DocumentHandler<T> {
     protected static final String DATE_FORMAT = "dd-MM-yyyy";
     protected final DocumentCategory documentCategory;
     protected final EvidenceUploadType evidenceUploadType;
+    private final UploadDocumentRetriever<T> uploadDocumentRetriever;
 
-    public DocumentHandler(DocumentCategory documentCategory, EvidenceUploadType evidenceUploadType) {
+    public DocumentHandler(DocumentCategory documentCategory, EvidenceUploadType evidenceUploadType,
+                           UploadDocumentRetriever<T> uploadDocumentRetriever) {
         this.documentCategory = documentCategory;
         this.evidenceUploadType = evidenceUploadType;
+        this.uploadDocumentRetriever = uploadDocumentRetriever;
     }
 
     public <T> void handleDocuments(CaseData caseData, String litigantType, StringBuilder notificationStringBuilder) {
@@ -48,7 +52,7 @@ public abstract class DocumentHandler<T> {
         LocalDateTime halfFivePmYesterday = LocalDateTime.of(LocalDate.now().minusDays(1), LocalTime.of(17, 30));
         getDocumentList(caseData).forEach(document -> {
             setCategoryId(document);
-            LocalDateTime dateTime = getDocumentDateTime(document);
+            LocalDateTime dateTime = uploadDocumentRetriever.getDocumentDateTime(document);
             buildNotificationText(litigantType, notificationStringBuilder, dateTime, halfFivePmYesterday);
         });
     }
@@ -64,7 +68,7 @@ public abstract class DocumentHandler<T> {
     }
 
     private void setCategoryId(Element<T> document) {
-        Document documentToAddId = getDocument(document);
+        Document documentToAddId = uploadDocumentRetriever.getDocument(document);
         documentToAddId.setCategoryID(documentCategory.getCategoryId());
     }
 
@@ -189,8 +193,8 @@ public abstract class DocumentHandler<T> {
         List<Element<UploadEvidenceDocumentType>> additionalBundleDocs = getDocsUploadedAfterBundle(caseData);
         List<Element<UploadEvidenceDocumentType>> finalAdditionalBundleDocs = additionalBundleDocs;
         getDocumentList(caseData).forEach(uploadEvidenceDocumentType -> {
-            Document documentToAdd = getDocument(uploadEvidenceDocumentType);
-            LocalDateTime documentCreatedDateTime = getDocumentDateTime(uploadEvidenceDocumentType);
+            Document documentToAdd = uploadDocumentRetriever.getDocument(uploadEvidenceDocumentType);
+            LocalDateTime documentCreatedDateTime = uploadDocumentRetriever.getDocumentDateTime(uploadEvidenceDocumentType);
             // If document was uploaded after the trial bundle was created, it is added to additional bundle documents
             // via applicant or respondent collections
             if (documentCreatedDateTime != null
@@ -225,10 +229,6 @@ public abstract class DocumentHandler<T> {
     }
 
     protected abstract List<Element<T>> getDocumentList(CaseData caseData);
-    
-    protected abstract Document getDocument(Element<T> element);
-
-    protected abstract LocalDateTime getDocumentDateTime(Element<T> element);
 
     protected abstract List<Element<UploadEvidenceDocumentType>> getDocsUploadedAfterBundle(CaseData caseData);
 

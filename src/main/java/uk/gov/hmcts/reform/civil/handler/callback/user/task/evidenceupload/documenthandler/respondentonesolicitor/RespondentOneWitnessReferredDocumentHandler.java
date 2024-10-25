@@ -2,15 +2,14 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.docu
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.DocumentTypeBuilder;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.RespondentSolicitorOneDocumentHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.retriever.UploadEvidenceDocumentRetriever;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_ONE_WITNESS_REFERRED;
@@ -21,24 +20,15 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploa
 public class RespondentOneWitnessReferredDocumentHandler extends
     RespondentSolicitorOneDocumentHandler<UploadEvidenceDocumentType> {
 
-    public RespondentOneWitnessReferredDocumentHandler(DocumentTypeBuilder<UploadEvidenceDocumentType> documentTypeBuilder) {
+    public RespondentOneWitnessReferredDocumentHandler(DocumentTypeBuilder<UploadEvidenceDocumentType> documentTypeBuilder,
+                                                       UploadEvidenceDocumentRetriever documentTypeRetriever) {
         super(RESPONDENT_ONE_WITNESS_REFERRED, RESPONDENT_TWO_WITNESS_REFERRED, EvidenceUploadType.WITNESS_REFERRED,
-            documentTypeBuilder);
+            documentTypeBuilder, documentTypeRetriever);
     }
 
     @Override
     protected List<Element<UploadEvidenceDocumentType>> getDocumentList(CaseData caseData) {
         return caseData.getDocumentReferredInStatementRes();
-    }
-
-    @Override
-    protected Document getDocument(Element<UploadEvidenceDocumentType> element) {
-        return element.getValue().getDocumentUpload();
-    }
-
-    @Override
-    protected LocalDateTime getDocumentDateTime(Element<UploadEvidenceDocumentType> element) {
-        return element.getValue().getCreatedDatetime();
     }
 
     @Override
