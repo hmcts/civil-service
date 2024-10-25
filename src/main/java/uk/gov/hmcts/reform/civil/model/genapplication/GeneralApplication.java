@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
@@ -24,6 +25,7 @@ public class GeneralApplication implements MappableObject {
 
     private final String generalApplicationState;
     private final GAApplicationType generalAppType;
+    private final GAApplicationTypeLR generalAppTypeLR;
     private final GARespondentOrderAgreement generalAppRespondentAgreement;
     private final BusinessProcess businessProcess;
     private final GAPbaDetails generalAppPBADetails;
@@ -67,10 +69,14 @@ public class GeneralApplication implements MappableObject {
     private final YesOrNo isGaRespondentOneLip;
     private final YesOrNo isGaRespondentTwoLip;
     private final HelpWithFees generalAppHelpWithFees;
+    private final CertOfSC certOfSC;
+    //caseName
+    private final String caseNameGaInternal;
 
     @JsonCreator
     GeneralApplication(@JsonProperty("generalApplicationState") String generalApplicationState,
                        @JsonProperty("generalAppType") GAApplicationType generalAppType,
+                       @JsonProperty("generalAppTypeLR") GAApplicationTypeLR generalAppTypeLR,
                        @JsonProperty("generalAppRespondentAgreement")
                            GARespondentOrderAgreement generalAppRespondentAgreement,
                        @JsonProperty("businessProcess") BusinessProcess businessProcess,
@@ -114,7 +120,9 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("isGaApplicantLip") YesOrNo isGaApplicantLip,
                        @JsonProperty("isGaRespondentOneLip") YesOrNo isGaRespondentOneLip,
                        @JsonProperty("isGaRespondentTwoLip") YesOrNo isGaRespondentTwoLip,
-                       @JsonProperty("generalAppHelpWithFees") HelpWithFees generalAppHelpWithFees) {
+                       @JsonProperty("generalAppHelpWithFees") HelpWithFees generalAppHelpWithFees,
+                       @JsonProperty("certOfSC") CertOfSC certOfSC,
+                       @JsonProperty("caseNameGaInternal") String caseNameGaInternal) {
 
         this.generalApplicationState = generalApplicationState;
         this.generalAppType = generalAppType;
@@ -160,5 +168,8 @@ public class GeneralApplication implements MappableObject {
         this.isGaRespondentOneLip = isGaRespondentOneLip;
         this.isGaRespondentTwoLip = isGaRespondentTwoLip;
         this.generalAppHelpWithFees = generalAppHelpWithFees;
+        this.certOfSC = certOfSC;
+        this.generalAppTypeLR = generalAppTypeLR;
+        this.caseNameGaInternal = caseNameGaInternal;
     }
 }

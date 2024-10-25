@@ -18,4 +18,5 @@ public class LipExtraDQ {
     private YesOrNo requestExtra4weeks;
     private YesOrNo considerClaimantDocuments;
     private String considerClaimantDocumentsDetails;
+    private LipExtraDQEvidenceConfirmDetails giveEvidenceConfirmDetails;
 }

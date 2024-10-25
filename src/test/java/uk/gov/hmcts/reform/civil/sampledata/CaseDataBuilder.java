@@ -141,6 +141,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationTypeLR;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
@@ -148,11 +149,13 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentAddress;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
@@ -362,6 +365,7 @@ public class CaseDataBuilder {
     protected String responseClaimTrack;
     protected CaseState ccdState;
     protected List<Element<CaseDocument>> systemGeneratedCaseDocuments;
+    protected List<Element<CaseDocument>> gaDraftDocument;
     protected PaymentDetails claimIssuedPaymentDetails;
     protected PaymentDetails paymentDetails;
     protected PaymentDetails hearingFeePaymentDetails;
@@ -546,6 +550,7 @@ public class CaseDataBuilder {
     private YesOrNo generalAppVaryJudgementType;
     private Document generalAppN245FormUpload;
     private GAApplicationType generalAppType;
+    private GAApplicationTypeLR generalAppTypeLR;
     private GAHearingDateGAspec generalAppHearingDate;
 
     private ChangeOfRepresentation changeOfRepresentation;
@@ -737,6 +742,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder generalAppType(GAApplicationType generalAppType) {
         this.generalAppType = generalAppType;
+        return this;
+    }
+
+    public CaseDataBuilder generalAppTypeLR(GAApplicationTypeLR generalAppTypeLR) {
+        this.generalAppTypeLR = generalAppTypeLR;
         return this;
     }
 
@@ -2518,6 +2528,59 @@ public class CaseDataBuilder {
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID("QWERTY R").build())
             .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
+            .build();
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .organisation(Organisation.builder().organisationID("QWERTY R2").build())
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
+            .build();
+        respondentSolicitor1EmailAddress = "respondentsolicitor@example.com";
+        respondentSolicitor2EmailAddress = "respondentsolicitor2@example.com";
+        applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
+        applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.defaults().build();
+        applicantSolicitor1CheckEmail = CorrectEmail.builder().email("hmcts.civil@gmail.com").correct(YES).build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDraftLip() {
+        solicitorReferences = SolicitorReferences.builder()
+            .applicantSolicitor1Reference("12345")
+            .respondentSolicitor1Reference("6789")
+            .build();
+        courtLocation = CourtLocation.builder()
+            .applicantPreferredCourt("214320")
+            .applicantPreferredCourtLocationList(
+                DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
+            .caseLocation(CaseLocationCivil.builder()
+                              .region("10")
+                              .baseLocation("214320")
+                              .build())
+            .build();
+        uploadParticularsOfClaim = NO;
+        claimValue = ClaimValue.builder()
+            .statementOfValueInPennies(BigDecimal.valueOf(10000000))
+            .build();
+        claimType = ClaimType.PERSONAL_INJURY;
+        claimTypeUnSpec = ClaimTypeUnspec.CLINICAL_NEGLIGENCE;
+        personalInjuryType = ROAD_ACCIDENT;
+        applicantSolicitor1PbaAccounts = DynamicList.builder()
+            .value(DynamicListElement.builder().label("PBA0077597").build())
+            .build();
+        claimFee = Fee.builder()
+            .version("1")
+            .code("CODE")
+            .calculatedAmountInPence(BigDecimal.valueOf(100))
+            .build();
+        applicant1 = PartyBuilder.builder().individual().build().toBuilder().partyID("app-1-party-id").build();
+        respondent1 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-1-party-id").build();
+        respondent1Represented = YES;
+        respondent1OrgRegistered = YES;
+        respondent2OrgRegistered = YES;
+        applicant1OrganisationPolicy = OrganisationPolicy.builder()
+            .organisation(Organisation.builder().organisationID("QWERTY A").build())
+            .build();
+        respondent1OrganisationPolicy = OrganisationPolicy.builder()
+            .organisation(Organisation.builder().organisationID("QWERTY R").build())
+            .orgPolicyCaseAssignedRole("[DEFENDANT]")
             .build();
         respondent2OrganisationPolicy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID("QWERTY R2").build())
@@ -6131,6 +6194,36 @@ public class CaseDataBuilder {
             .joIsRegisteredWithRTL(YES).build();
     }
 
+    public CaseData buildJudmentOnlineCaseDataWithPaymentImmediatelyWithOldAddress() {
+        return build().toBuilder()
+            .ccdState(All_FINAL_ORDERS_ISSUED)
+            .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
+            .joAmountOrdered("1200")
+            .joAmountCostOrdered("1100")
+            .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
+            .joOrderMadeDate(LocalDate.of(2022, 12, 12))
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .individualTitle("Mr.")
+                             .individualFirstName("Alex")
+                             .individualLastName(
+                                 "Richards Extra long name which exceeds 70 characters need to be trimmed down")
+                             .partyName(
+                                 "Mr. Alex Richards Extra long name which exceeds 70 characters need to be trimmed down")
+                             .partyEmail("respondent1@gmail.com")
+                             .primaryAddress(Address.builder()
+                                                 .addressLine1("Line 1 test again for more than 35 characters")
+                                                 .addressLine2("Line 1 test again for more than 35 characters")
+                                                 .addressLine3("Line 1 test again for more than 35 characters")
+                                                 .county("Line 1 test again for more than 35 characters")
+                                                 .postCode("Line 1 test again for more than 35 characters")
+                                                 .postTown("Line 1 test again for more than 35 characters")
+                                                 .build())
+                             .build())
+            .joIsRegisteredWithRTL(YES).build();
+    }
+
     public CaseData buildJudgmentOnlineCaseDataWithPaymentByDate() {
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
@@ -6176,6 +6269,8 @@ public class CaseDataBuilder {
                                       .build())
             .joIsRegisteredWithRTL(YES)
             .activeJudgment(JudgmentDetails.builder().issueDate(LocalDate.now()).build())
+            .locationName("Barnet Court")
+            .legacyCaseReference("000MC015")
             .build();
     }
 
@@ -6189,8 +6284,40 @@ public class CaseDataBuilder {
                                       .confirmFullPaymentMade(List.of("CONFIRMED"))
                                       .build())
             .joIsRegisteredWithRTL(YES)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                   .baseLocation("231596")
+                                   .region("2").build())
+            .legacyCaseReference("000MC015")
             .activeJudgment(JudgmentDetails.builder().issueDate(LocalDate.now()).build())
             .build();
+    }
+
+    public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31DaysForCosc() {
+
+        CaseData caseData = buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31Days();
+        JudgmentDetails activeJudgment = JudgmentDetails.builder()
+            .defendant1Name("Test name")
+            .defendant1Address(JudgmentAddress.builder().build())
+            .fullyPaymentMadeDate(LocalDate.now().plusDays(15))
+            .state(JudgmentState.CANCELLED)
+            .totalAmount("90000")
+            .issueDate(LocalDate.now())
+            .issueDate(LocalDate.now()).build();
+        caseData.setActiveJudgment(activeJudgment);
+        return caseData;
+    }
+
+    public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc() {
+        CaseData caseData =  buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
+        JudgmentDetails activeJudgment = JudgmentDetails.builder()
+            .defendant1Name("Test name")
+            .defendant1Address(JudgmentAddress.builder().build())
+            .fullyPaymentMadeDate(LocalDate.now().plusDays(15))
+            .state(JudgmentState.CANCELLED)
+            .totalAmount("90000")
+            .issueDate(LocalDate.now()).build();
+        caseData.setActiveJudgment(activeJudgment);
+        return caseData;
     }
 
     public CaseData getDefaultJudgment1v1Case() {
@@ -7460,6 +7587,7 @@ public class CaseDataBuilder {
             .helpWithFeesMoreInformationHearing(helpWithFeesMoreInformationHearing)
             .allocatedTrack(allocatedTrack)
             .generalAppType(generalAppType)
+            .generalAppTypeLR(generalAppTypeLR)
             .generalAppVaryJudgementType(generalAppVaryJudgementType)
             .generalAppN245FormUpload(generalAppN245FormUpload)
             .generalAppHearingDate(generalAppHearingDate)
@@ -7797,6 +7925,16 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder judgmentPaidInFull(JudgmentPaidInFull judgmentPaidInFull) {
         this.judgmentPaidInFull = judgmentPaidInFull;
+        return this;
+    }
+
+    public CaseDataBuilder gaDraftDocument(List<Element<CaseDocument>> singletonList) {
+        this.gaDraftDocument = singletonList;
+        return this;
+    }
+
+    public CaseDataBuilder ccdCaseReference(long ref) {
+        this.ccdCaseReference = ref;
         return this;
     }
 }

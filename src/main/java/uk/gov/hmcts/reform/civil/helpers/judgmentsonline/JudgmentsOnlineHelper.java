@@ -1,10 +1,15 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
+import camundajar.impl.scala.collection.mutable.StringBuilder;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentAddress;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
+import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddress;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -22,6 +27,8 @@ public class JudgmentsOnlineHelper {
     private static final String ERROR_MESSAGE_DATE_PAID_BY_MUST_BE_IN_FUTURE = "Date the judgment will be paid by must be in the future";
     private static final String ERROR_MESSAGE_DATE_FIRST_INSTALMENT_MUST_BE_IN_FUTURE = "Date of first instalment must be in the future";
     private static final String ERROR_MESSAGE_DATE_ORDER_MUST_BE_IN_PAST = "Date judge made the order must be in the past";
+
+    private static final String regex = "[ˆ`´¨]";
 
     private JudgmentsOnlineHelper() {
     }
@@ -173,4 +180,47 @@ public class JudgmentsOnlineHelper {
         return repaymentBreakdown.toString();
     }
 
+    public static JudgmentAddress getJudgmentAddress(Address address, RoboticsAddressMapper addressMapper) {
+
+        Address newAddress = Address.builder()
+            .addressLine1(removeWelshCharacters(address.getAddressLine1()))
+            .addressLine2(removeWelshCharacters(address.getAddressLine2()))
+            .addressLine3(removeWelshCharacters(address.getAddressLine3()))
+            .postCode(removeWelshCharacters(address.getPostCode()))
+            .postTown(removeWelshCharacters(address.getPostTown()))
+            .county(removeWelshCharacters(address.getCounty()))
+            .country(removeWelshCharacters(address.getCountry())).build();
+
+        RoboticsAddress roboticsAddress = addressMapper.toRoboticsAddress(newAddress);
+        return JudgmentAddress.builder()
+            .defendantAddressLine1(trimDownTo35(roboticsAddress.getAddressLine1()))
+            .defendantAddressLine2(trimDownTo35(roboticsAddress.getAddressLine2()))
+            .defendantAddressLine3(trimDownTo35(roboticsAddress.getAddressLine3()))
+            .defendantAddressLine4(trimDownTo35(roboticsAddress.getAddressLine4()))
+            .defendantAddressLine5(trimDownTo35(roboticsAddress.getAddressLine5()))
+            .defendantPostCode(roboticsAddress.getPostCode()).build();
+    }
+
+    public static String removeWelshCharacters(String input) {
+        return input != null ? input.replaceAll(regex, "") : input;
+    }
+
+    private static String trimDownTo35(String input) {
+        return input != null && input.length() > 35 ? input.substring(0, 35) : input;
+    }
+
+    public static  String formatAddress(JudgmentAddress address) {
+        String formattedLine = new StringBuilder()
+            .addAll(formatAddressLine(address.getDefendantAddressLine1()))
+            .addAll(formatAddressLine(address.getDefendantAddressLine2()))
+            .addAll(formatAddressLine(address.getDefendantAddressLine3()))
+            .addAll(formatAddressLine(address.getDefendantAddressLine4()))
+            .addAll(formatAddressLine(address.getDefendantAddressLine5()))
+            .result().trim();
+        return formattedLine.length() > 0 ? formattedLine.substring(0, formattedLine.length() - 1) : "";
+    }
+
+    private static String formatAddressLine(String line) {
+        return line != null ? line + ", " : "";
+    }
 }

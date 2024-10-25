@@ -141,6 +141,7 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private final HearingNotes hearingNotes;
     private final List<Element<UploadEvidenceDocumentType>> applicantDocsUploadedAfterBundle;
     private final List<Element<UploadEvidenceDocumentType>> respondentDocsUploadedAfterBundle;
+    private final List<Element<UploadEvidenceDocumentType>> bundleEvidence;
 
     /* Final Orders */
     private YesOrNo finalOrderMadeSelection;
@@ -173,6 +174,7 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private DynamicList finalOrderDownloadTemplateOptions;
     private CaseDocument finalOrderDownloadTemplateDocument;
     private Document uploadOrderDocumentFromTemplate;
+    private String finalOrderTrackToggle;
 
     // judge final freeform orders
     private final FinalOrderSelection finalOrderSelection;

@@ -6,6 +6,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.jsonwebtoken.lang.Collections;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -18,8 +20,6 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -46,9 +46,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static java.time.LocalDate.EPOCH;
 import static java.time.LocalDateTime.now;
 import static java.util.Collections.singletonList;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.GENERAL_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
@@ -62,7 +64,6 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.GENERAL_ORDER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @SuppressWarnings("unchecked")
@@ -684,6 +685,7 @@ public class GeneralApplicationDetailsBuilder {
                         .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
                         .orgPolicyReference(STRING_CONSTANT).build())
                 .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
+                .caseNameHmctsInternal("Internal caseName")
                 .build();
     }
 
@@ -1404,6 +1406,7 @@ public class GeneralApplicationDetailsBuilder {
                                             .baseLocation("34567")
                                             .region("4").build())
                 .isCcmccLocation(YES)
+                .caseLink(CaseLink.builder().caseReference("1234").build())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
                         .hasAgreed(NO)
                         .build())
@@ -1581,16 +1584,35 @@ public class GeneralApplicationDetailsBuilder {
             .build();
     }
 
-    public CaseData getTestCaseDataWithDraftApplicationPDFDocument(CaseData caseData) {
+    public CaseData getTestCaseDataWithDraftApplicationPDFDocumentLip(CaseData caseData) {
         String uid = "f000aa01-0451-4000-b000-000000000111";
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
+        List<Element<CaseDocument>> draftDocs = newArrayList();
+        draftDocs.add(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
+                          .value(pdfDocument).build());
+        draftDocs.add(Element.<CaseDocument>builder().id(UUID.fromString(uid))
+                          .value(pdfDocument).build());
         return caseData.toBuilder()
             .ccdCaseReference(1234L)
             .generalAppType(GAApplicationType.builder()
                                 .types(singletonList(EXTEND_TIME))
                                 .build())
-            .gaDraftDocument(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
-                                                    .value(pdfDocument).build()))
+            .gaDraftDocument(draftDocs)
+            .build();
+    }
+
+    public CaseData getTestCaseDataWithDraftApplicationPDFDocument(CaseData caseData) {
+        String uid = "f000aa01-0451-4000-b000-000000000111";
+        String uid1 = "f000aa01-0451-4000-b000-000000000000";
+        List<Element<CaseDocument>> draftDocs = newArrayList();
+        draftDocs.add(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
+                          .value(pdfDocument).build());
+        return caseData.toBuilder()
+            .ccdCaseReference(1234L)
+            .generalAppType(GAApplicationType.builder()
+                                .types(singletonList(EXTEND_TIME))
+                                .build())
+            .gaDraftDocument(draftDocs)
             .build();
     }
 
@@ -1610,6 +1632,9 @@ public class GeneralApplicationDetailsBuilder {
     public CaseData getTestCaseDataWithDirectionOrderStaffPDFDocument(CaseData caseData) {
         String uid = "f000aa01-0451-4000-b000-000000000111";
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
+        List<Element<CaseDocument>> directionOrderDocStaff = new ArrayList<>();
+        directionOrderDocStaff.add(Element.<CaseDocument>builder().id(UUID.fromString(uid1)).value(pdfDocument).build());
+
         return caseData.toBuilder()
                 .ccdCaseReference(1234L)
                 .generalAppType(GAApplicationType.builder()
@@ -1618,8 +1643,7 @@ public class GeneralApplicationDetailsBuilder {
                 .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
                 .generalOrderDocStaff(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid))
                         .value(pdfDocument).build()))
-                .directionOrderDocStaff(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
-                        .value(pdfDocument).build()))
+                .directionOrderDocStaff(directionOrderDocStaff)
                 .build();
     }
 

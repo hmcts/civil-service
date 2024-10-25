@@ -79,6 +79,12 @@ public enum DocmosisTemplates {
     FREE_FORM_ORDER_PDF("CV-UNS-DEC-ENG-01099.docx", "Order_%s.pdf"),
     ASSISTED_ORDER_PDF("CV-UNS-DEC-ENG-01283.docx", "Order_%s.pdf"),
 
+    // Judge order download order
+    BLANK_TEMPLATE_AFTER_HEARING_DOCX("CV-UNS-DEC-ENG-01286.docx", "%s_order.docx"),
+    BLANK_TEMPLATE_BEFORE_HEARING_DOCX("CV-UNS-DEC-ENG-01301.docx", "%s_Directions order.docx"),
+    FIX_DATE_CCMC_DOCX("CV-UNS-DEC-ENG-01287.docx", "%s_Directions order.docx"),
+    FIX_DATE_CMC_DOCX("CV-UNS-DEC-ENG-01302.docx", "%s_Directions order.docx"),
+
     //Court officer order
     COURT_OFFICER_ORDER_PDF("CV-UNS-DEC-ENG-01299.docx", "Order_%s.pdf"),
     SETTLEMENT_AGREEMENT_PDF("CV-SPC-CLM-ENG-00001-SETTLEMENT.docx", "%s-settlement-agreement.pdf"),
@@ -93,7 +99,8 @@ public enum DocmosisTemplates {
     JUDGMENT_BY_ADMISSION_DEFENDANT("CV-SPC-DEC-ENG-00915.docx", "Judgment_by_admission_defendant.pdf"),
     JUDGMENT_BY_DETERMINATION_CLAIMANT("CV-SPC-DEC-ENG-00982.docx", "Judgment_by_determination_claimant.pdf"),
     JUDGMENT_BY_DETERMINATION_DEFENDANT("CV-SPC-DEC-ENG-00981.docx", "Judgment_by_determination_defendant.pdf"),
-    NOTICE_OF_DISCONTINUANCE_PDF("CV-SPC-GNO-ENG-SD0001.docx", "notice_of_discontinuance_%s.pdf");
+    NOTICE_OF_DISCONTINUANCE_PDF("CV-SPC-GNO-ENG-SD0001.docx", "notice_of_discontinuance_%s.pdf"),
+    CERTIFICATE_OF_DEBT_PAYMENT("CV-SPC-STD-ENG-N441A.docx", "Certificate_of_debt_payment_%s.pdf");
 
     private final String template;
     private final String documentTitle;

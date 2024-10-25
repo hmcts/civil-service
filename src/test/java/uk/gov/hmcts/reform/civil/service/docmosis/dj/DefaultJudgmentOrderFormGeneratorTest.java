@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
@@ -52,7 +52,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SD
     DefaultJudgmentOrderFormGenerator.class,
     JacksonAutoConfiguration.class
 })
-public class DefaultJudgmentOrderFormGeneratorTest {
+class DefaultJudgmentOrderFormGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
@@ -68,7 +68,7 @@ public class DefaultJudgmentOrderFormGeneratorTest {
         .documentType(DEFAULT_JUDGMENT_SDO_ORDER)
         .build();
     @MockBean
-    private UnsecuredDocumentManagementService documentManagementService;
+    private SecuredDocumentManagementService documentManagementService;
 
     @MockBean
     private DocumentGeneratorService documentGeneratorService;

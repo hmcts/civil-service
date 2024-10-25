@@ -22,7 +22,6 @@ java:
     POLLING_EVENT_EMITTER_ENABLED: false
     LAUNCH_DARKLY_ENV: service-staging
     CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-aat.service.core-compute-aat.internal
-    DOCUMENT_MANAGEMENT_SECURED: true
     STITCHING_API_ENABLED: true
     RELEASE_REVISION: "{{ .Release.Revision }}"
     ACA_SERVICE_API_BASEURL: http://${SERVICE_NAME}-aac-manage-case-assignment
@@ -30,7 +29,6 @@ java:
     ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
     ROLE_INITIALISATION_ENABLED: true
     CASE_FLAGS_LOGGING_ENABLED: true
-    SIMPLE_STATE_FLOW_ENGINE_ENABLED: true
   postgresql:
     enabled: true
     image:
@@ -238,3 +236,6 @@ aac-manage-case-assignment:
             alias: IDAM_NOC_APPROVER_PASSWORD
           - name: notify-mca-api-key-secret
             alias: NOTIFY_MCA_API_KEY
+
+wiremock:
+  enabled: false

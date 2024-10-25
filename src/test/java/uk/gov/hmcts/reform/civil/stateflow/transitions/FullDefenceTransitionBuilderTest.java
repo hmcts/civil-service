@@ -596,7 +596,7 @@ public class FullDefenceTransitionBuilderTest {
             .respondent2(null)
             .applicant1Represented(NO)
             .respondent1Represented(NO)
-            .submittedDate(LocalDateTime.of(2024, 8, 1, 0, 0))
+            .submittedDate(LocalDateTime.of(2024, 11, 5, 0, 0))
             .build();
 
         assertTrue(isCarmApplicableLipCase.test(caseData));
@@ -639,7 +639,7 @@ public class FullDefenceTransitionBuilderTest {
     @Test
     void shouldReturnTrue_whenGetCarmEnabledForDate() {
         CaseData caseData = CaseData.builder()
-            .submittedDate(LocalDateTime.of(2024, 8, 1, 0, 0))
+            .submittedDate(LocalDateTime.of(2024, 11, 5, 0, 0))
             .build();
 
         assertTrue(FullDefenceTransitionBuilder.getCarmEnabledForDate(caseData));
