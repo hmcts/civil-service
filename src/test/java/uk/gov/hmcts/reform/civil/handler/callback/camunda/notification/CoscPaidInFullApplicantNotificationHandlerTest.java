@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
-import java.time.LocalDateTime;
 import java.util.Map;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
