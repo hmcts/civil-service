@@ -128,7 +128,13 @@ public class InitiateGeneralApplicationServiceHelper {
             .parentClaimantIsApplicant(isGAApplicantSameAsParentCaseClaimant
                                            ? YES
                                            : NO).build();
-        checkLipUrgency(isGaAppSameAsParentCaseClLip, applicationBuilder, caseData);
+        /*
+        * Don't consider hearing date if application is represented
+        * */
+        if (applicationBuilder.build().getIsGaApplicantLip().equals(YES)) {
+            checkLipUrgency(isGaAppSameAsParentCaseClLip, applicationBuilder, caseData);
+        }
+
         return applicationBuilder.build();
     }
 
