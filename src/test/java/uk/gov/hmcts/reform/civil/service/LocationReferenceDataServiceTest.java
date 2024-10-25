@@ -189,7 +189,6 @@ class LocationReferenceDataServiceTest {
             assertThat(courtLocations).isEmpty();
         }
 
-
         @Test
         void shouldReturnLocations_whenLRDReturnsNonScotlandLocations() {
             when(authTokenGenerator.generate()).thenReturn("service_token");
