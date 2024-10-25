@@ -184,7 +184,7 @@ tasks.withType(Test) {
 }
 
 test {
-  failFast = true
+  failFast = false
 }
 
 tasks.withType(Copy) {
