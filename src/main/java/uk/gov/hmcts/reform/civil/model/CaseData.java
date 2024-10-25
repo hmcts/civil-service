@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
 import uk.gov.hmcts.reform.civil.enums.ConfirmationToggle;
+import uk.gov.hmcts.reform.civil.enums.CoscApplicationStatus;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
@@ -51,6 +52,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -65,6 +67,7 @@ import uk.gov.hmcts.reform.civil.model.dq.RecurringIncomeLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationTypeLR;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
@@ -141,7 +144,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private final CaseState ccdState;
     private final CaseState previousCCDState;
+    private final String preStayState;
+    private final String manageStayOption;
     private final GAApplicationType generalAppType;
+    private final GAApplicationTypeLR generalAppTypeLR;
     private final GARespondentOrderAgreement generalAppRespondentAgreement;
     private final GAPbaDetails generalAppPBADetails;
     private final String generalAppDetailsOfOrder;
@@ -155,6 +161,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final SRPbaDetails hearingFeePBADetails;
     private final SRPbaDetails claimIssuedPBADetails;
     private final String applicantPartyName;
+    private final CertOfSC certOfSC;
 
     private final YesOrNo generalAppVaryJudgementType;
     private final YesOrNo generalAppParentClaimantIsApplicant;
@@ -590,6 +597,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> gaAddlDocRespondentSol;
     private final List<Element<CaseDocument>> gaAddlDocRespondentSolTwo;
     private final List<Element<CaseDocument>> gaAddlDocBundle;
+    private final List<Element<CaseDocument>> gaDraftDocument;
+    private final List<Element<CaseDocument>> gaDraftDocStaff;
+    private final List<Element<CaseDocument>> gaDraftDocClaimant;
+    private final List<Element<CaseDocument>> gaDraftDocRespondentSol;
+    private final List<Element<CaseDocument>> gaDraftDocRespondentSolTwo;
 
     private final List<Element<CaseDocument>> gaRespondDoc;
 
@@ -713,6 +725,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private CaseDocument noticeOfDiscontinueAllParitiesDoc;
     @JsonUnwrapped
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
+    private LocalDate coscSchedulerDeadline;
+    private CoscApplicationStatus coSCApplicationStatus;
+
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending

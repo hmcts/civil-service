@@ -43,7 +43,6 @@ public class UpdateCaseManagementDetailsService {
         final List<LocationRefData> availableLocations = fetchLocationData(callbackParams);
 
         updateApplicant1RequestedCourtDetails(caseData, builder, availableLocations);
-        updateRespondent1RequestedCourtDetails(caseData, builder, availableLocations);
 
         caseData = builder.build();
         if (caseData.getIsFlightDelayClaim() == YesOrNo.YES && caseData.isSmallClaim()) {
@@ -113,7 +112,7 @@ public class UpdateCaseManagementDetailsService {
                         .build())));
     }
 
-    private void updateRespondent1RequestedCourtDetails(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> availableLocations) {
+    public void updateRespondent1RequestedCourtDetails(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> availableLocations) {
         if (caseData.isRespondent1LiP()) {
             Optional.ofNullable(caseData.getRespondent1DQ())
                 .ifPresent(dq -> Optional.ofNullable(dq.getRespondent1DQRequestedCourt())
@@ -137,7 +136,7 @@ public class UpdateCaseManagementDetailsService {
             .build();
     }
 
-    private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
+    public List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }
