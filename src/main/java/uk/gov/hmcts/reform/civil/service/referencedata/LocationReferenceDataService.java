@@ -116,15 +116,7 @@ public class LocationReferenceDataService {
     }
 
     public List<LocationRefData> getCourtLocationsByEpimmsId(String authToken, String epimmsId) {
-        try {
-            return locationReferenceDataApiClient.getCourtVenueByEpimmsId(
-                authTokenGenerator.generate(),
-                authToken, epimmsId, CIVIL_COURT_TYPE_ID
-                );
-        } catch (Exception e) {
-            log.error(LOCATION_REFERENCE_DATA_LOOKUP_FAILED, e.getMessage(), e);
-        }
-        return new ArrayList<>();
+        return getCourtLocationsByEpimmsIdAndCourtType(authToken, epimmsId);
     }
 
     public List<LocationRefData> getCourtLocationsByEpimmsIdAndCourtType(String authToken, String epimmsId) {
@@ -194,7 +186,7 @@ public class LocationReferenceDataService {
             List<LocationRefData> responseEntity =
                 locationReferenceDataApiClient.getCourtVenueByLocationCode(
                     authTokenGenerator.generate(),
-                    authToken, "Y", "10", threeDigitCode, COURT_STATUS
+                    authToken, IS_CASE_MANAGEMENT_LOCATION, CIVIL_COURT_TYPE_ID, threeDigitCode, COURT_STATUS
                 );
             List<LocationRefData> locations = responseEntity;
             if (locations == null || locations.isEmpty()) {

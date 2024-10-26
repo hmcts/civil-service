@@ -139,8 +139,7 @@ public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
         List<LocationRefData> response = locationReferenceDataApiClient.getCourtVenueByEpimmsId(
             SERVICE_AUTH_TOKEN,
             AUTHORIZATION_TOKEN,
-            "epimmsId",
-            "courtTypeId"
+            "epimmsId"
         );
         assertThat(
             response.get(0).getRegion(),
@@ -255,7 +254,6 @@ public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
             .headers(SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN, AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
             .method(HttpMethod.GET.toString())
             .matchQuery("epimms_id", "epimmsId", "epimmsId")
-            .matchQuery("court_type_id", "courtTypeId", "courtTypeId")
             .willRespondWith()
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .body(buildLocationRefDataResponseBody())

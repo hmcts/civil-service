@@ -22,8 +22,7 @@ public interface LocationReferenceDataApiClient {
     List<LocationRefData> getCourtVenueByEpimmsId(
         @RequestHeader("ServiceAuthorization") String serviceAuthorisation,
         @RequestHeader("Authorization") final String authorisation,
-        @RequestParam("epimms_id") final String epimmsId,
-        @RequestParam("court_type_id") final String courtTypeId
+        @RequestParam("epimms_id") final String epimmsId
     );
 
     @GetMapping(value = "/refdata/location/court-venues")

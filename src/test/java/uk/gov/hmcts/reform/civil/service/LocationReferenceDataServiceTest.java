@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -207,7 +206,7 @@ class LocationReferenceDataServiceTest {
 
             DynamicList courtLocationString = getLocationsFromList(courtLocations);
 
-            assertThat(courtLocations.size()).isEqualTo(12);
+            assertThat(courtLocations).hasSize(12);
             assertThat(locationsFromDynamicList(courtLocationString)).containsOnly(
                 "site_name_01 - court address 1111 - AA0 0BB",
                 "site_name_02 - court address 2222 - AA0 0BB",
@@ -240,14 +239,14 @@ class LocationReferenceDataServiceTest {
             List<LocationRefData> courtLocations = refDataService
                 .getCourtLocationsForGeneralApplication("user_token");
 
-            assertThat(courtLocations.size()).isEqualTo(0);
+            assertThat(courtLocations).isEmpty();
         }
 
         private DynamicList getLocationsFromList(final List<LocationRefData> locations) {
             return fromList(locations.stream().map(location -> new StringBuilder().append(location.getSiteName())
                     .append(" - ").append(location.getCourtAddress())
                     .append(" - ").append(location.getPostcode()).toString())
-                                .collect(Collectors.toList()));
+                                .toList());
         }
 
         private List<String> locationsFromDynamicList(DynamicList dynamicList) {
@@ -469,7 +468,7 @@ class LocationReferenceDataServiceTest {
             List<LocationRefData> mockedResponse = List.of(ccmccLocation);
 
             when(authTokenGenerator.generate()).thenReturn("service_token");
-            when(locationReferenceDataApiClient.getCourtVenueByEpimmsId(
+            when(locationReferenceDataApiClient.getCourtVenueByEpimmsIdAndType(
                 anyString(),
                 anyString(),
                 anyString(),
@@ -517,7 +516,7 @@ class LocationReferenceDataServiceTest {
         @Test
         void shouldReturnEmptyList_whenEpimmsIdThrowsException() {
             when(authTokenGenerator.generate()).thenReturn("service_token");
-            when(locationReferenceDataApiClient.getCourtVenueByEpimmsId(
+            when(locationReferenceDataApiClient.getCourtVenueByEpimmsIdAndType(
                 anyString(),
                 anyString(),
                 anyString(),
@@ -526,8 +525,7 @@ class LocationReferenceDataServiceTest {
                 .thenThrow(new RestClientException("403"));
 
             List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsId("user_token", "192280");
-
-            assertThat(result.isEmpty());
+            assertThat(result).isEmpty();
         }
 
         @Test
@@ -545,8 +543,7 @@ class LocationReferenceDataServiceTest {
                 "user_token",
                 "192280"
             );
-
-            assertThat(result.isEmpty());
+            assertThat(result).isEmpty();
         }
     }
 
@@ -554,14 +551,14 @@ class LocationReferenceDataServiceTest {
     class LocationRefMatchingLabel {
 
         @Test
-        public void whenEmpty_empty() {
+        void whenEmpty_empty() {
             String bearer = "bearer";
             Assertions.assertTrue(refDataService.getLocationMatchingLabel(null, bearer).isEmpty());
             Assertions.assertTrue(refDataService.getLocationMatchingLabel("", bearer).isEmpty());
         }
 
         @Test
-        public void whenMatching_match() {
+        void whenMatching_match() {
             when(authTokenGenerator.generate()).thenReturn("service_token");
             LocationRefData el1 = LocationRefData.builder()
                 .siteName("site name")
