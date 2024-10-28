@@ -9,7 +9,6 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
@@ -21,6 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataContentFromStartEventResponse;
 
 @RequiredArgsConstructor
@@ -74,6 +74,6 @@ public class CoscApplicationAfterPaymentTaskHandler extends BaseExternalTaskHand
     }
 
     private boolean isClaimantLR(CaseData caseData) {
-        return YesOrNo.YES.equals(caseData.getApplicant1Represented());
+        return YES.equals(caseData.getApplicant1Represented());
     }
 }

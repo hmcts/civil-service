@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -118,6 +119,8 @@ public class CoscApplicationAfterPaymentTaskHandlerTest {
 
         handler.execute(mockExternalTask, externalTaskService);
 
+        variables.putValue(JUDGMENT_MARK_PAID_FULL, false);
+        variables.putValue(IS_CLAIMANT_LR, false);
         verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, CHECK_PAID_IN_FULL_SCHED_DEADLINE);
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
         verify(externalTaskService).complete(mockExternalTask, variables);
@@ -126,6 +129,7 @@ public class CoscApplicationAfterPaymentTaskHandlerTest {
     @Test
     void testStartTheEventWithActiveJudgment() {
         CaseData caseData = CaseData.builder()
+            .applicant1Represented(NO)
             .contactDetailsUpdatedEvent(
                 ContactDetailsUpdatedEvent.builder()
                     .description("Best description")
