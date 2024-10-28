@@ -139,21 +139,12 @@ public class FeatureToggleService {
             && featureToggleApi.isFeatureEnabledForDate("is-dashboard-enabled-for-case", epoch, false);
     }
 
-    public boolean isPartOfNationalRollout(String locationEpimms) {
-        return locationEpimms != null && featureToggleApi
-            .isFeatureEnabledForLocation("national-rollout-whitelist", locationEpimms, false);
-    }
-
     public boolean isCaseEventsEnabled() {
         return featureToggleApi.isFeatureEnabled("cui-case-events-enabled");
     }
 
     public boolean isAmendBundleEnabled() {
         return featureToggleApi.isFeatureEnabled("amend-bundle-enabled");
-    }
-
-    public boolean isGenAppsAllowedPreSdo() {
-        return featureToggleApi.isFeatureEnabled("ga-allowed-pre-sdo");
     }
 
     public boolean isCoSCEnabled() {
