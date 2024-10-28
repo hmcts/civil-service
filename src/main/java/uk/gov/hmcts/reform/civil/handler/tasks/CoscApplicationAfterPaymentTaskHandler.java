@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+
 import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -20,7 +21,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataContentFromStartEventResponse;
 
 @RequiredArgsConstructor
@@ -65,15 +65,10 @@ public class CoscApplicationAfterPaymentTaskHandler extends BaseExternalTaskHand
         variables.putValue(FLOW_STATE, stateFlow.getState().getName());
         variables.putValue(FLOW_FLAGS, stateFlow.getFlags());
         variables.putValue("isJudgmentMarkedPaidInFull", checkMarkPaidInFull(data));
-        variables.putValue("isClaimantLR", isClaimantLR(data));
         return variables;
     }
 
     private boolean checkMarkPaidInFull(CaseData data) {
         return (Objects.nonNull(data.getActiveJudgment()) && (data.getActiveJudgment().getFullyPaymentMadeDate() != null));
-    }
-
-    private boolean isClaimantLR(CaseData caseData) {
-        return YES.equals(caseData.getApplicant1Represented());
     }
 }

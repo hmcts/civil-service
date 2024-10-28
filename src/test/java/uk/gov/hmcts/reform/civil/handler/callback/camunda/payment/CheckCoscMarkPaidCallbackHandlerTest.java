@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.RuntimeService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -10,7 +11,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -21,6 +24,7 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHECK_PAID_IN_FULL_SCHED_DEADLINE;
@@ -42,12 +46,19 @@ class CheckCoscMarkPaidCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @MockBean
+    private RuntimeService runTimeService;
+
     private final LocalDateTime nowMock = LocalDateTime.of(2024, 10, 8, 0, 0, 0);
     private final LocalDate expectedlocalDate = LocalDate.of(2024, 10, 8).plusDays(30);
+    private static final String PROCESS_INSTANCE_ID = "process-instance-id";
 
     @Test
     void setCoscSchedulerDeadline_whenActiveJudgmentGetFullyPaymentDateIsNull() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
+            .applicant1Represented(YesOrNo.YES)
+            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
+            .build();
         when(time.now()).thenReturn(nowMock);
         caseData.setActiveJudgment(JudgmentDetails.builder()
                                        .totalAmount("123")
@@ -66,7 +77,10 @@ class CheckCoscMarkPaidCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void doNotSetCoscSchedulerDeadline_whenNoActiveJudgment() {
         when(time.now()).thenReturn(nowMock);
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
+            .applicant1Represented(YesOrNo.NO)
+            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
+            .build();
         caseData.setActiveJudgment(null);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -76,11 +90,14 @@ class CheckCoscMarkPaidCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getErrors()).isNull();
         assertNull(data.getCoscSchedulerDeadline());
         assertNull(data.getCoSCApplicationStatus());
+        verify(runTimeService).setVariable(PROCESS_INSTANCE_ID, "isClaimantLR", false);
     }
 
     @Test
     void doNotSetCoscSchedulerDeadline_whenActiveJudgementwithDate() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
+            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
+            .build();
         caseData.setActiveJudgment(JudgmentDetails.builder()
                                        .fullyPaymentMadeDate(LocalDate.of(2023, 1, 15))
                                              .build());
@@ -92,6 +109,7 @@ class CheckCoscMarkPaidCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getErrors()).isNull();
         assertNull(data.getCoscSchedulerDeadline());
         assertNull(data.getCoSCApplicationStatus());
+        verify(runTimeService).setVariable(PROCESS_INSTANCE_ID, "isClaimantLR", false);
     }
 
     @Test
