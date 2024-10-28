@@ -95,10 +95,27 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilder extends MidT
         };
     }
 
+    private static final Predicate<CaseData> respondentsRespondedInTime =
+        NotificationAcknowledgedTimeExtensionTransitionBuilder::getRespondentsRespondedInTime;
+
+    private static boolean getRespondentsRespondedInTime(CaseData caseData) {
+        MultiPartyScenario scenario = Objects.requireNonNull(getMultiPartyScenario(caseData));
+        List<LocalDateTime> respondentResponseDates = new ArrayList<>(List.of(caseData.getRespondent1ResponseDate()));
+
+        if (scenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
+            respondentResponseDates.add(caseData.getRespondent2ResponseDate());
+        }
+
+        boolean noNullResponses = respondentResponseDates.stream().allMatch(Objects::nonNull);
+
+        return noNullResponses && respondentResponseDates.stream()
+            .allMatch(responseDate -> responseDate.isBefore(caseData.getClaimDismissedDeadline()));
+    }
+
     public static final Predicate<CaseData> caseDismissedAfterClaimAcknowledgedExtension = caseData -> {
         LocalDateTime deadline = caseData.getClaimDismissedDeadline();
 
-        if (deadline.isBefore(LocalDateTime.now()) && getRespondentsRespondedInTime(caseData)) {
+        if (deadline.isBefore(LocalDateTime.now()) && respondentsRespondedInTime.negate().test(caseData)) {
             switch (getMultiPartyScenario(caseData)) {
                 case ONE_V_TWO_TWO_LEGAL_REP:
                     return caseData.getRespondent1AcknowledgeNotificationDate() != null
@@ -125,22 +142,5 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilder extends MidT
         return caseData.getReasonNotSuitableSDO() != null
             && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
             && caseData.getTakenOfflineDate() != null;
-    }
-
-    private static final Predicate<CaseData> respondentsRespondedInTime =
-        NotificationAcknowledgedTimeExtensionTransitionBuilder::getRespondentsRespondedInTime;
-
-    private static boolean getRespondentsRespondedInTime(CaseData caseData) {
-        MultiPartyScenario scenario = Objects.requireNonNull(getMultiPartyScenario(caseData));
-        List<LocalDateTime> respondentResponseDates = new ArrayList<>(List.of(caseData.getRespondent1ResponseDate()));
-
-        if (scenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
-            respondentResponseDates.add(caseData.getRespondent2ResponseDate());
-        }
-
-        boolean noNullResponses = respondentResponseDates.stream().allMatch(Objects::nonNull);
-
-        return noNullResponses && respondentResponseDates.stream()
-            .allMatch(responseDate -> responseDate.isBefore(caseData.getClaimDismissedDeadline()));
     }
 }
