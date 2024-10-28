@@ -5323,5 +5323,131 @@ class SimpleStateFlowEngineTest {
             );
         }
 
+        @Test
+        void shouldReturnAllResponsesReceived_whenDeadlinePassedButDefendantResponseWasInTime() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedRespondent1TimeExtension()
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .claimDismissedDate(LocalDateTime.now())
+                .respondent1ResponseDate(LocalDateTime.now().minusDays(20))
+                .build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
+
+            // When
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(ALL_RESPONSES_RECEIVED.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(10)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
+                    ALL_RESPONSES_RECEIVED.fullName()
+                );
+        }
+
+        @Test
+        void shouldReturnAllResponsesReceived_whenDeadlinePassedButDefendantResponseWasInTime_oneVersusTwoScenario() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedRespondent1TimeExtension()
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .claimDismissedDate(LocalDateTime.now())
+                .respondent1ResponseDate(LocalDateTime.now().minusDays(20))
+                .respondent2ResponseDate(LocalDateTime.now().minusDays(11))
+                .build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
+
+            // When
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(ALL_RESPONSES_RECEIVED.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(10)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
+                    ALL_RESPONSES_RECEIVED.fullName()
+                );
+        }
+
+        @Test
+        void shouldReturnClaimDismissed_whenDeadlinePassedAndResponseNotInTime_oneVersusTwoScenario() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedRespondent1TimeExtension()
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .claimDismissedDate(LocalDateTime.now())
+                .respondent1ResponseDate(LocalDateTime.now().minusDays(20))
+                .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
+                .respondent2(Party.builder().build())
+                .respondent2SameLegalRepresentative(NO)
+                .respondent2AcknowledgeNotificationDate(LocalDateTime.now().minusDays(30))
+                .build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
+
+            // When
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(11)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
+                    PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA.fullName(),
+                    CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()
+                );
+        }
+
     }
 }

@@ -100,7 +100,8 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilder extends MidT
 
     private static boolean getRespondentsRespondedInTime(CaseData caseData) {
         MultiPartyScenario scenario = Objects.requireNonNull(getMultiPartyScenario(caseData));
-        List<LocalDateTime> respondentResponseDates = new ArrayList<>(List.of(caseData.getRespondent1ResponseDate()));
+        List<LocalDateTime> respondentResponseDates = new ArrayList<>();
+        respondentResponseDates.add(caseData.getRespondent1ResponseDate());
 
         if (scenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
             respondentResponseDates.add(caseData.getRespondent2ResponseDate());
@@ -136,7 +137,6 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilder extends MidT
     public static final Predicate<CaseData> claimDismissalOutOfTime = caseData ->
         caseData.getClaimDismissedDeadline() != null
             && caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now());
-
 
     private static boolean isNotSuitableSDO(CaseData caseData) {
         return caseData.getReasonNotSuitableSDO() != null
