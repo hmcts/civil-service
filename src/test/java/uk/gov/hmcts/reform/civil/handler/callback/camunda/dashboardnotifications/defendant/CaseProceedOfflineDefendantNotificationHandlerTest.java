@@ -256,6 +256,11 @@ public class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCall
                 "DEFENDANT",
                 "BEARER_TOKEN"
             );
+            verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+                caseData.getCcdCaseReference().toString(),
+                "DEFENDANT",
+                "BEARER_TOKEN"
+            );
         }
 
         @Test

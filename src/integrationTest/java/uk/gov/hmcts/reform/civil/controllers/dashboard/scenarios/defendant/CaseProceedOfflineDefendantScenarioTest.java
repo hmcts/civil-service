@@ -62,7 +62,6 @@ public class CaseProceedOfflineDefendantScenarioTest extends DashboardBaseIntegr
             );
     }
 
-
     @Test
     void shouldUpdateCaseProceedOffLineTaskList() throws Exception {
 
