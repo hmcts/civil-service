@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -42,6 +43,7 @@ import static uk.gov.hmcts.reform.civil.utils.DocumentUtils.getDynamicListValueL
 import static uk.gov.hmcts.reform.civil.utils.DocumentUtils.getHearingTimeEstimateLabel;
 import static uk.gov.hmcts.reform.civil.utils.DocumentUtils.getDisposalHearingTimeEstimateDJ;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<DefaultJudgmentSDOOrderForm> {
@@ -162,9 +164,13 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     }
 
     private DefaultJudgmentSDOOrderForm getDefaultJudgmentFormTrial(CaseData caseData, String authorisation) {
+        log.info("getTrialHearingTimeDJ  == {}",
+                 caseData.getTrialHearingTimeDJ() != null
+                     && caseData.getTrialHearingTimeDJ().getDateToToggle() != null);
+        log.info("getHearingTimeEstimateLabel == {}",
+                 getHearingTimeEstimateLabel(caseData.getTrialHearingTimeDJ()));
         String trialHearingLocation = getDynamicListValueLabel(caseData.getTrialHearingMethodInPersonDJ());
         UserDetails userDetails = userService.getUserDetails(authorisation);
-
         boolean isJudge = false;
 
         if (userDetails.getRoles() != null) {
