@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
-import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 
 @ExtendWith(MockitoExtension.class)
 class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -161,8 +161,9 @@ class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHandlerTes
                 "company@email.com",
                 "template-id",
                 Map.of(
-                    CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                    CLAIM_LEGAL_ORG_NAME_SPEC, "Company 2"
+                    CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
+                    CLAIM_LEGAL_ORG_NAME_SPEC, "Company 2",
+                    PARTY_REFERENCES, "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided"
                 ),
                 "create-sdo-respondent-2-notification-000DC001"
             );
@@ -171,8 +172,9 @@ class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHandlerTes
         @NotNull
         private Map<String, String> getNotificationDataMap() {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name"
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
+                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided"
             );
         }
     }
