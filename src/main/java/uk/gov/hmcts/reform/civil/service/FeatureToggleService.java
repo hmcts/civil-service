@@ -143,4 +143,11 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("cui-case-events-enabled");
     }
 
+    public boolean isAmendBundleEnabled() {
+        return featureToggleApi.isFeatureEnabled("amend-bundle-enabled");
+    }
+
+    public boolean isCoSCEnabled() {
+        return featureToggleApi.isFeatureEnabled("isCoSCEnabled");
+    }
 }

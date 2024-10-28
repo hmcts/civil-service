@@ -77,7 +77,8 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
     private CallbackResponse buildConfirmation(CallbackParams callbackParams) {
         String newCourtLocationSiteName = courtLocationUtils.findPreferredLocationData(
             fetchLocationData(callbackParams),
-            callbackParams.getCaseData().getTransferCourtLocationList()).getSiteName();
+            callbackParams.getCaseData().getTransferCourtLocationList()
+        ).getSiteName();
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(CONFIRMATION_HEADER)
             .confirmationBody(getBody(newCourtLocationSiteName))
@@ -104,9 +105,9 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
 
     private String getBody(String siteName) {
         return "<h2 class=\"govuk-heading-m\">What happens next</h2>"
-                           + "The case has now been transferred to "
-                           + siteName
-                           + ". If the case has moved out of your region, you will no longer see it.<br><br>";
+            + "The case has now been transferred to "
+            + siteName
+            + ". If the case has moved out of your region, you will no longer see it.<br><br>";
     }
 
     private CallbackResponse saveTransferOnlineCase(CallbackParams callbackParams) {
@@ -114,7 +115,8 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         LocationRefData newCourtLocation = courtLocationUtils.findPreferredLocationData(
             fetchLocationData(callbackParams),
-            callbackParams.getCaseData().getTransferCourtLocationList());
+            callbackParams.getCaseData().getTransferCourtLocationList()
+        );
         if (nonNull(newCourtLocation)) {
             caseDataBuilder.caseManagementLocation(LocationHelper.buildCaseLocation(newCourtLocation));
             caseDataBuilder.locationName(newCourtLocation.getSiteName());
@@ -122,7 +124,10 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
 
         if (nonNull(newCourtLocation)) {
             caseDataBuilder.eaCourtLocation(YesOrNo.YES);
-            if (featureToggleService.isHmcEnabled()) {
+            if (featureToggleService.isHmcEnabled()
+                && !caseData.isApplicantLiP()
+                && !caseData.isRespondent1LiP()
+                && !caseData.isRespondent2LiP()) {
                 caseDataBuilder.hmcEaCourtLocation(
                     featureToggleService.isLocationWhiteListedForCaseProgression(newCourtLocation.getEpimmsId())
                         ? YesOrNo.YES : YesOrNo.NO);
@@ -141,7 +146,8 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
     private boolean ifSameCourtSelected(CallbackParams callbackParams) {
         LocationRefData newCourtLocation = courtLocationUtils.findPreferredLocationData(
             fetchLocationData(callbackParams),
-            callbackParams.getCaseData().getTransferCourtLocationList());
+            callbackParams.getCaseData().getTransferCourtLocationList()
+        );
         LocationRefData caseManagementLocation =
             getLocationRefData(callbackParams);
         return caseManagementLocation != null && newCourtLocation.getCourtLocationCode().equals(caseManagementLocation.getCourtLocationCode());
@@ -150,7 +156,7 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
     private LocationRefData getLocationRefData(CallbackParams callbackParams) {
         List<LocationRefData> locations = fetchLocationData(callbackParams);
         String baseLocation = callbackParams.getCaseData().getCaseManagementLocation() == null ? null : callbackParams.getCaseData().getCaseManagementLocation().getBaseLocation();
-        var matchedLocations =  locations.stream().filter(loc -> loc.getEpimmsId().equals(baseLocation)).toList();
+        var matchedLocations = locations.stream().filter(loc -> loc.getEpimmsId().equals(baseLocation)).toList();
         return !matchedLocations.isEmpty() ? matchedLocations.get(0) : null;
     }
 

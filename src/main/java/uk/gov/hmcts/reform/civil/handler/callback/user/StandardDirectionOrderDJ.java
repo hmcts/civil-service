@@ -770,10 +770,14 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         assignCategoryId.assignCategoryIdToCollection(caseData.getOrderSDODocumentDJCollection(),
                                                       document -> document.getValue().getDocumentLink(), "caseManagementOrders");
         caseDataBuilder.businessProcess(BusinessProcess.ready(STANDARD_DIRECTION_ORDER_DJ));
+
         caseDataBuilder.hearingNotes(getHearingNotes(caseData));
 
         caseDataBuilder.eaCourtLocation(YES);
-        if (featureToggleService.isHmcEnabled()) {
+        if (featureToggleService.isHmcEnabled()
+            && !caseData.isApplicantLiP()
+            && !caseData.isRespondent1LiP()
+            && !caseData.isRespondent2LiP()) {
             caseDataBuilder.hmcEaCourtLocation(featureToggleService.isLocationWhiteListedForCaseProgression(
                 caseData.getCaseManagementLocation().getBaseLocation()) ? YES : NO);
         }

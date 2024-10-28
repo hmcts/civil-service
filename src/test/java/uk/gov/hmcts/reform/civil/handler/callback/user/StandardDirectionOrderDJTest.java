@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.crd.model.Category;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -51,6 +52,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -933,7 +935,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getOrderSDODocumentDJCollection().get(0).getValue().getDocumentLink()
                            .getCategoryID()).isEqualTo("caseManagementOrders");
         }
-
     }
 
     @ParameterizedTest
@@ -963,6 +964,42 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
         assertThat(responseCaseData.getHmcEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
+    }
+
+    @Test
+    void shouldNotPopulateHmcEarlyAdoptersFlag_whenLiP() {
+        DynamicList options = DynamicList.builder()
+            .listItems(List.of(
+                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
+                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
+                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
+                       )
+            )
+            .value(DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build())
+            .build();
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
+            .toBuilder()
+            .disposalHearingMethodInPersonDJ(options)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(options.getValue().getCode()).build())
+            .build();
+        when(featureToggleService.isHmcEnabled()).thenReturn(true);
+
+        CallbackParams params = callbackParamsOf(caseData.toBuilder()
+                                                     .applicant1Represented(YesOrNo.NO)
+                                                     .build(), ABOUT_TO_SUBMIT);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+
+        assertThat(responseCaseData.getHmcEaCourtLocation()).isNull();
+
+        params = callbackParamsOf(caseData.toBuilder()
+                                                     .respondent1Represented(YesOrNo.NO)
+                                                     .build(), ABOUT_TO_SUBMIT);
+        response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+
+        assertThat(responseCaseData.getHmcEaCourtLocation()).isNull();
     }
 
     @Nested
