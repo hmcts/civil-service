@@ -17,4 +17,7 @@ values ('<a>Upload hearing documents</a>', 'Hearing' ,'<a>Llwytho dogfennau''r g
         'Gwrandawiad', 'Hearing.Arrangements.Add', 'Scenario.AAA6.Update.CaseProceedsInCaseman.Defendant.FastTrack', '{2, 2}', 'DEFENDANT', 11),
        ('<a>Confirm you''ve paid a judgment (CCJ) debt</a>', 'Judgments from the court',
         '<a>Cadarnhewch eich bod wedi talu dyled dyfarniad (CCJ)</a>', 'Dyfarniadau gan y llys',
+        'Judgment.Cosc', 'Scenario.AAA6.Update.CaseProceedsInCaseman.Defendant.FastTrack', '{2, 2}', 'DEFENDANT', 15),
+       ('<a>Confirm you''ve paid a judgment (CCJ) debt</a>', 'Judgments from the court',
+        '<a>Cadarnhewch eich bod wedi talu dyled dyfarniad (CCJ)</a>', 'Dyfarniadau gan y llys',
         'Judgment.Cosc', 'Scenario.AAA6.Update.CaseProceedsInCaseman.Defendant', '{2, 2}', 'DEFENDANT', 15);
