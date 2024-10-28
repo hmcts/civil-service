@@ -67,4 +67,13 @@ public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCal
             && caseMovedInCaseManStatesCaseProgression.contains(caseData.getPreviousCCDState())
             && isLipvLipOrLRvLip;
     }
+
+    @Override
+    protected void beforeRecordScenario(CaseData caseData, String authToken) {
+        dashboardApiClient.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "DEFENDANT",
+            authToken
+        );
+    }
 }
