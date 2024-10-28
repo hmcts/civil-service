@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -33,7 +34,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RES_SOLICITOR2
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -122,6 +123,11 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             }
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
+
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+        Map<String, String> notificationProperties = addProperties(caseData);
+        notificationProperties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent));
+
         if ((isRespondentSolicitor2Notification(callbackParams)
             && NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2()))
             || (!isRespondentSolicitor2Notification(callbackParams)
@@ -129,7 +135,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             notificationService.sendMail(
                 recipient,
                 notificationsProperties.getClaimantSolicitorConfirmsNotToProceed(),
-                addProperties(caseData),
+                notificationProperties,
                 String.format(NP_PROCEED_REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
             return AboutToStartOrSubmitCallbackResponse.builder().build();
@@ -144,14 +150,12 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             template = notificationsProperties.getClaimantSolicitorConfirmsToProceed();
         }
 
-        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-
         notificationService.sendMail(
             recipient,
             template,
             SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                 ? addPropertiesSpec(caseData, caseEvent)
-                : addProperties(caseData),
+                : notificationProperties,
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
         return AboutToStartOrSubmitCallbackResponse.builder().build();
@@ -203,25 +207,27 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            PARTY_REFERENCES, buildPartiesReferences(caseData)
-        );
+        return new HashMap<>(Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+        ));
     }
 
     public Map<String, String> addPropertiesSpec(CaseData caseData, CaseEvent caseEvent) {
         return Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
+            APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 
     public Map<String, String> addPropertiesLRvLip(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 
