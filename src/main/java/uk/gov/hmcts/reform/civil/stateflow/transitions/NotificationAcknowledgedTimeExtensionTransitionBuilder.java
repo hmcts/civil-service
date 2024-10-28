@@ -97,7 +97,8 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilder extends MidT
 
     public static final Predicate<CaseData> caseDismissedAfterClaimAcknowledgedExtension = caseData -> {
         LocalDateTime deadline = caseData.getClaimDismissedDeadline();
-        if (deadline.isBefore(LocalDateTime.now()) ) { // || deadline.isBefore(respondentResponseDate)
+
+        if (deadline.isBefore(LocalDateTime.now()) && getRespondentsRespondedInTime(caseData)) {
             switch (getMultiPartyScenario(caseData)) {
                 case ONE_V_TWO_TWO_LEGAL_REP:
                     return caseData.getRespondent1AcknowledgeNotificationDate() != null
@@ -127,9 +128,9 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilder extends MidT
     }
 
     private static final Predicate<CaseData> respondentsRespondedInTime =
-        NotificationAcknowledgedTimeExtensionTransitionBuilder::getRespondentsRespondedInTimePredicate;
+        NotificationAcknowledgedTimeExtensionTransitionBuilder::getRespondentsRespondedInTime;
 
-    private static boolean getRespondentsRespondedInTimePredicate(CaseData caseData) {
+    private static boolean getRespondentsRespondedInTime(CaseData caseData) {
         MultiPartyScenario scenario = Objects.requireNonNull(getMultiPartyScenario(caseData));
         List<LocalDateTime> respondentResponseDates = new ArrayList<>(List.of(caseData.getRespondent1ResponseDate()));
 
