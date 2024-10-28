@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.CoscApplicationStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -169,6 +170,24 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                     .extracting("previousCCDState").isNull();
+        }
+
+        @Test
+        void shouldAddCoScApplicationStatusValue_whenInvoked() {
+            CaseData caseData = CaseData.builder()
+                .respondent1Represented(YesOrNo.NO)
+                .coSCApplicationStatus(CoscApplicationStatus.ACTIVE)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("coSCApplicationStatus")
+                .isEqualTo(CoscApplicationStatus.INACTIVE.toString());
         }
     }
 }
