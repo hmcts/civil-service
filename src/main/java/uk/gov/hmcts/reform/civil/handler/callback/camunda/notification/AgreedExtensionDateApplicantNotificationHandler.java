@@ -13,9 +13,11 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +30,9 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.fetchDefendantName;
 
 @Service
@@ -45,6 +49,7 @@ public class AgreedExtensionDateApplicantNotificationHandler extends CallbackHan
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final OrganisationService organisationService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -65,11 +70,13 @@ public class AgreedExtensionDateApplicantNotificationHandler extends CallbackHan
 
     private CallbackResponse notifyApplicantSolicitorForAgreedExtensionDate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        Map<String, String> notificationProperties = addProperties(caseData);
+        notificationProperties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getSolicitorOrgName(callbackParams));
 
         notificationService.sendMail(
             getSolicitorEmailAddress(callbackParams),
             notificationsProperties.getClaimantSolicitorAgreedExtensionDate(),
-            addProperties(caseData),
+            notificationProperties,
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
         return AboutToStartOrSubmitCallbackResponse.builder().build();
@@ -99,12 +106,29 @@ public class AgreedExtensionDateApplicantNotificationHandler extends CallbackHan
             }
         }
 
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+        return new HashMap<>(Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             AGREED_EXTENSION_DATE, formatLocalDate(extensionDate.toLocalDate(), DATE),
-            PARTY_REFERENCES, buildPartiesReferences(caseData),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             DEFENDANT_NAME, fetchDefendantName(caseData)
-        );
+        ));
+    }
+
+    private String getSolicitorOrgName(CallbackParams callbackParams) {
+        String eventId = callbackParams.getRequest().getEventId();
+        CaseData caseData = callbackParams.getCaseData();
+
+        if (eventId.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE.name())) {
+            return getApplicantLegalOrganizationName(caseData, organisationService);
+        }
+        if (eventId.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC.name())) {
+            return getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService);
+        }
+        if (eventId.equals(NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE_CC.name())) {
+            return getRespondentLegalOrganizationName(caseData.getRespondent2OrganisationPolicy(), organisationService);
+        }
+
+        throw new CallbackException(String.format("Callback handler received unexpected event id: %s", eventId));
     }
 
     private String getSolicitorEmailAddress(CallbackParams callbackParams) {
