@@ -65,14 +65,7 @@ public class PaymentRequestUpdateCallbackService {
             PaymentDetails existingPaymentDetails = paymentProcessingHelper.retrievePaymentDetails(feeType, caseData);
 
             PaymentDetails updatedDetails = buildPaymentDetails(serviceRequestUpdateDto, existingPaymentDetails);
-            caseData = paymentProcessingHelper.updateCaseDataWithPaymentDetails(feeType, caseData, updatedDetails);
-
-            paymentProcessingHelper.createAndSubmitEvent(
-                caseData,
-                caseId,
-                feeType,
-                "PaymentRequestUpdate"
-            );
+            paymentProcessingHelper.updateCaseDataWithPaymentDetails(feeType, caseData, updatedDetails);
 
             CardPaymentStatusResponse cardPaymentStatusResponse = buildCardPaymentStatusResponse(serviceRequestUpdateDto);
             updatePaymentStatusService.updatePaymentStatus(
