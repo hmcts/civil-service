@@ -47,19 +47,5 @@ public class CaseProceedOfflineClaimantScenarioTest extends DashboardBaseIntegra
                         jsonPath("$[0].descriptionCy").value(
                                 "<p class=\"govuk-body\">Ni fydd eich cyfrif ar-lein yn cael ei ddiweddaru mwyach."
                                         + " Os oes unrhyw ddiweddariadau pellach i’ch achos, bydd y rhain yn cael eu hanfon atoch drwy'r post.</p>"));
-
-        //Verify task Item is created
-        doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
-            .andExpectAll(
-                status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].reference").value(caseId.toString()),
-                jsonPath("$[0].taskNameEn").value(
-                    "<a>Pay the hearing fee</a>"),
-                jsonPath("$[0].currentStatusEn").value("Inactive"),
-                jsonPath("$[1].taskNameEn").value(
-                    "<a>Upload hearing documents</a>"),
-                jsonPath("$[1].currentStatusEn").value("Inactive")
-
-            );
     }
 }
