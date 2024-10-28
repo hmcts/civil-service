@@ -4,10 +4,14 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
@@ -37,8 +41,11 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilder extends MidT
     @Override
     void setUpTransitions() {
         this.moveTo(ALL_RESPONSES_RECEIVED)
-            .onlyWhen(notificationAcknowledged.and(respondentTimeExtension).and(allResponsesReceived).and(claimDismissalOutOfTime.negate())
-                .and(takenOfflineByStaff.negate()))
+            .onlyWhen(notificationAcknowledged
+                          .and(respondentTimeExtension)
+                          .and(allResponsesReceived)
+                          .and(claimDismissalOutOfTime.negate().or(respondentsRespondedInTime))
+                          .and(takenOfflineByStaff.negate()))
             .moveTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
             .onlyWhen(notificationAcknowledged.and(respondentTimeExtension)
                 .and(awaitingResponsesFullDefenceReceived)
@@ -90,7 +97,7 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilder extends MidT
 
     public static final Predicate<CaseData> caseDismissedAfterClaimAcknowledgedExtension = caseData -> {
         LocalDateTime deadline = caseData.getClaimDismissedDeadline();
-        if (deadline.isBefore(LocalDateTime.now())) {
+        if (deadline.isBefore(LocalDateTime.now()) ) { // || deadline.isBefore(respondentResponseDate)
             switch (getMultiPartyScenario(caseData)) {
                 case ONE_V_TWO_TWO_LEGAL_REP:
                     return caseData.getRespondent1AcknowledgeNotificationDate() != null
@@ -112,9 +119,27 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilder extends MidT
         caseData.getClaimDismissedDeadline() != null
             && caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now());
 
+
     private static boolean isNotSuitableSDO(CaseData caseData) {
         return caseData.getReasonNotSuitableSDO() != null
             && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
             && caseData.getTakenOfflineDate() != null;
+    }
+
+    private static final Predicate<CaseData> respondentsRespondedInTime =
+        NotificationAcknowledgedTimeExtensionTransitionBuilder::getRespondentsRespondedInTimePredicate;
+
+    private static boolean getRespondentsRespondedInTimePredicate(CaseData caseData) {
+        MultiPartyScenario scenario = Objects.requireNonNull(getMultiPartyScenario(caseData));
+        List<LocalDateTime> respondentResponseDates = new ArrayList<>(List.of(caseData.getRespondent1ResponseDate()));
+
+        if (scenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
+            respondentResponseDates.add(caseData.getRespondent2ResponseDate());
+        }
+
+        boolean noNullResponses = respondentResponseDates.stream().allMatch(Objects::nonNull);
+
+        return noNullResponses && respondentResponseDates.stream()
+            .allMatch(responseDate -> responseDate.isBefore(caseData.getClaimDismissedDeadline()));
     }
 }
