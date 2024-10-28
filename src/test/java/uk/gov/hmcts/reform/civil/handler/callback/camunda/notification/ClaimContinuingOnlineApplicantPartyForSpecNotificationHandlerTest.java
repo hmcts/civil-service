@@ -34,14 +34,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.ISSUED_ON;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONSE_DEADLINE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.*;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -167,6 +164,7 @@ class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest extends 
             .respondent1ResponseDeadline(LocalDateTime.now())
             .addRespondent2(YesOrNo.NO)
             .claimantUserDetails(IdamUserDetails.builder().email(claimantUserEmail).build())
+            .ccdCaseReference(12345L)
             .build();
 
         return caseData;
@@ -177,10 +175,11 @@ class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest extends 
             RESPONDENT_NAME, "Mr. Sole Trader",
             CLAIMANT_NAME, "Mr. John Rambo",
             ISSUED_ON, formatLocalDate(LocalDate.now(), DATE),
-            CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONSE_DEADLINE, formatLocalDate(
                 caseData.getRespondent1ResponseDeadline()
-                    .toLocalDate(), DATE)
+                    .toLocalDate(), DATE),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 }

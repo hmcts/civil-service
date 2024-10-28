@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import org.apache.ibatis.annotations.Case;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -42,21 +43,10 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MORE_INFORMATION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.AMOUNT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HWF_MORE_INFO_DATE;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HWF_MORE_INFO_DOCUMENTS;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HWF_MORE_INFO_DOCUMENTS_WELSH;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HWF_REFERENCE_NUMBER;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PART_AMOUNT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASONS;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASONS_WELSH;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REMAINING_AMOUNT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.TYPE_OF_FEE;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.TYPE_OF_FEE_WELSH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.*;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -88,7 +78,6 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
         private static final String REFERENCE_NUMBER = "hwf-outcome-notification-000DC001";
         private static final String CLAIMANT = "Mr. John Rambo";
         private static final String HWF_REFERENCE = "000HWF001";
-        private static final String CLAIM_REFERENCE = "000DC001";
         private static final String CLAIM_FEE_AMOUNT = "1000.00";
         private static final String HEARING_FEE_AMOUNT = "2000.00";
         private static final String REMISSION_AMOUNT = "100000.00";
@@ -167,7 +156,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_NO_REMISSION,
-                getNotificationDataMapNoRemissionClaimIssued(),
+                getNotificationDataMapNoRemissionClaimIssued(caseData),
                 REFERENCE_NUMBER
             );
         }
@@ -192,7 +181,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_NO_REMISSION_TEMPLATE_HWF_BILINGUAL,
-                getNotificationDataMapNoRemissionClaimIssued(),
+                getNotificationDataMapNoRemissionClaimIssued(caseData),
                 REFERENCE_NUMBER
             );
         }
@@ -215,7 +204,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_NO_REMISSION,
-                getNotificationDataMapNoRemissionHearing(),
+                getNotificationDataMapNoRemissionHearing(caseData),
                 REFERENCE_NUMBER
             );
         }
@@ -241,7 +230,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_MORE_INFO_HWF,
-                getNotificationDataMapMoreInfoClaimIssued(),
+                getNotificationDataMapMoreInfoClaimIssued(caseData),
                 REFERENCE_NUMBER
             );
         }
@@ -267,7 +256,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_MORE_INFO_HWF,
-                getNotificationDataMapMoreInfoHearing(),
+                getNotificationDataMapMoreInfoHearing(caseData),
                 REFERENCE_NUMBER
             );
         }
@@ -289,7 +278,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_INVALID_HWF_REFERENCE,
-                getNotificationCommonDataMapForClaimIssued(),
+                getNotificationCommonDataMapForClaimIssued(caseData),
                 REFERENCE_NUMBER
             );
         }
@@ -312,7 +301,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_INVALID_HWF_REFERENCE,
-                getNotificationCommonDataMapForHearing(),
+                getNotificationCommonDataMapForHearing(caseData),
                 REFERENCE_NUMBER
             );
         }
@@ -337,7 +326,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION,
-                getNotificationDataMapPartialRemissionClaimIssued(),
+                getNotificationDataMapPartialRemissionClaimIssued(caseData),
                 REFERENCE_NUMBER
             );
         }
@@ -362,7 +351,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION,
-                getNotificationDataMapPartialRemissionHearing(),
+                getNotificationDataMapPartialRemissionHearing(caseData),
                 REFERENCE_NUMBER
             );
         }
@@ -384,7 +373,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_UPDATE_REF_NUMBER,
-                getNotificationCommonDataMapForClaimIssued(),
+                getNotificationCommonDataMapForClaimIssued(caseData),
                 REFERENCE_NUMBER
             );
         }
@@ -405,7 +394,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_UPDATE_REF_NUMBER,
-                getNotificationCommonDataMapForHearing(),
+                getNotificationCommonDataMapForHearing(caseData),
                 REFERENCE_NUMBER
             );
         }
@@ -432,7 +421,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_MORE_INFO_HWF_BILINGUAL,
-                getNotificationDataMapMoreInfoClaimIssued(),
+                getNotificationDataMapMoreInfoClaimIssued(caseData),
                 REFERENCE_NUMBER
             );
         }
@@ -457,7 +446,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_UPDATE_REF_NUMBER_BILINGUAL,
-                getNotificationCommonDataMapForClaimIssued(),
+                getNotificationCommonDataMapForClaimIssued(caseData),
                 REFERENCE_NUMBER
             );
         }
@@ -484,7 +473,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION_BILINGUAL,
-                getNotificationDataMapPartialRemissionClaimIssued(),
+                getNotificationDataMapPartialRemissionClaimIssued(caseData),
                 REFERENCE_NUMBER
             );
         }
@@ -509,104 +498,112 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_INVALID_HWF_REFERENCE_BILINGUAL,
-                getNotificationCommonDataMapForClaimIssued(),
+                getNotificationCommonDataMapForClaimIssued(caseData),
                 REFERENCE_NUMBER
             );
         }
 
-        private Map<String, String> getNotificationDataMapNoRemissionClaimIssued() {
+        private Map<String, String> getNotificationDataMapNoRemissionClaimIssued(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIMANT_NAME, CLAIMANT,
                 REASONS, NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET.getLabel(),
                 REASONS_WELSH, NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET.getLabelWelsh(),
                 TYPE_OF_FEE, FeeType.CLAIMISSUED.getLabel(),
                 TYPE_OF_FEE_WELSH, FeeType.CLAIMISSUED.getLabelInWelsh(),
                 HWF_REFERENCE_NUMBER, HWF_REFERENCE,
-                AMOUNT, CLAIM_FEE_AMOUNT
+                AMOUNT, CLAIM_FEE_AMOUNT,
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
 
-        private Map<String, String> getNotificationDataMapNoRemissionHearing() {
+        private Map<String, String> getNotificationDataMapNoRemissionHearing(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIMANT_NAME, CLAIMANT,
                 REASONS, NoRemissionDetailsSummary.INCORRECT_EVIDENCE.getLabel(),
                 REASONS_WELSH, NoRemissionDetailsSummary.INCORRECT_EVIDENCE.getLabelWelsh(),
                 TYPE_OF_FEE, FeeType.HEARING.getLabel(),
                 TYPE_OF_FEE_WELSH, FeeType.HEARING.getLabelInWelsh(),
                 HWF_REFERENCE_NUMBER, HWF_REFERENCE,
-                AMOUNT, HEARING_FEE_AMOUNT
+                AMOUNT, HEARING_FEE_AMOUNT,
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
 
-        private Map<String, String> getNotificationDataMapMoreInfoClaimIssued() {
+        private Map<String, String> getNotificationDataMapMoreInfoClaimIssued(CaseData caseData) {
             return Map.of(
                 HWF_MORE_INFO_DATE, formatLocalDate(NOW, DATE),
                 CLAIMANT_NAME, CLAIMANT,
-                CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 TYPE_OF_FEE, FeeType.CLAIMISSUED.getLabel(),
                 TYPE_OF_FEE_WELSH, FeeType.CLAIMISSUED.getLabelInWelsh(),
                 HWF_MORE_INFO_DOCUMENTS, getMoreInformationDocumentListString(),
                 HWF_MORE_INFO_DOCUMENTS_WELSH, getMoreInformationDocumentListStringWelsh(),
-                HWF_REFERENCE_NUMBER, HWF_REFERENCE
+                HWF_REFERENCE_NUMBER, HWF_REFERENCE,
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
 
-        private Map<String, String> getNotificationDataMapMoreInfoHearing() {
+        private Map<String, String> getNotificationDataMapMoreInfoHearing(CaseData caseData) {
             return Map.of(
                 HWF_MORE_INFO_DATE, formatLocalDate(NOW, DATE),
                 CLAIMANT_NAME, CLAIMANT,
-                CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 TYPE_OF_FEE, FeeType.HEARING.getLabel(),
                 TYPE_OF_FEE_WELSH, FeeType.HEARING.getLabelInWelsh(),
                 HWF_MORE_INFO_DOCUMENTS, getMoreInformationDocumentListString(),
                 HWF_MORE_INFO_DOCUMENTS_WELSH, getMoreInformationDocumentListStringWelsh(),
-                HWF_REFERENCE_NUMBER, HWF_REFERENCE
+                HWF_REFERENCE_NUMBER, HWF_REFERENCE,
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
 
-        private Map<String, String> getNotificationCommonDataMapForClaimIssued() {
+        private Map<String, String> getNotificationCommonDataMapForClaimIssued(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIMANT_NAME, CLAIMANT,
                 TYPE_OF_FEE, FeeType.CLAIMISSUED.getLabel(),
                 TYPE_OF_FEE_WELSH, FeeType.CLAIMISSUED.getLabelInWelsh(),
-                HWF_REFERENCE_NUMBER, HWF_REFERENCE
+                HWF_REFERENCE_NUMBER, HWF_REFERENCE,
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
 
-        private Map<String, String> getNotificationCommonDataMapForHearing() {
+        private Map<String, String> getNotificationCommonDataMapForHearing(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIMANT_NAME, CLAIMANT,
                 TYPE_OF_FEE, FeeType.HEARING.getLabel(),
                 TYPE_OF_FEE_WELSH, FeeType.HEARING.getLabelInWelsh(),
-                HWF_REFERENCE_NUMBER, HWF_REFERENCE
+                HWF_REFERENCE_NUMBER, HWF_REFERENCE,
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
 
-        private Map<String, String> getNotificationDataMapPartialRemissionClaimIssued() {
+        private Map<String, String> getNotificationDataMapPartialRemissionClaimIssued(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIMANT_NAME, CLAIMANT,
                 TYPE_OF_FEE, FeeType.CLAIMISSUED.getLabel(),
                 TYPE_OF_FEE_WELSH, FeeType.CLAIMISSUED.getLabelInWelsh(),
                 HWF_REFERENCE_NUMBER, HWF_REFERENCE,
                 PART_AMOUNT, "1000.00",
-                REMAINING_AMOUNT, OUTSTANDING_AMOUNT_IN_POUNDS
+                REMAINING_AMOUNT, OUTSTANDING_AMOUNT_IN_POUNDS,
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
 
-        private Map<String, String> getNotificationDataMapPartialRemissionHearing() {
+        private Map<String, String> getNotificationDataMapPartialRemissionHearing(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIMANT_NAME, CLAIMANT,
                 TYPE_OF_FEE, FeeType.HEARING.getLabel(),
                 TYPE_OF_FEE_WELSH, FeeType.HEARING.getLabelInWelsh(),
                 HWF_REFERENCE_NUMBER, HWF_REFERENCE,
                 PART_AMOUNT, "1000.00",
-                REMAINING_AMOUNT, OUTSTANDING_AMOUNT_IN_POUNDS
+                REMAINING_AMOUNT, OUTSTANDING_AMOUNT_IN_POUNDS,
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
 

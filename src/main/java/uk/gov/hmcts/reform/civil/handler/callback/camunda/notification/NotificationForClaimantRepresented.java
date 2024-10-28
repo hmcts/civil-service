@@ -26,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_LIP_AFTER_NOC_APPROVAL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_LIP_CLAIMANT_REPRESENTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_LIP_SOLICITOR;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service
 @RequiredArgsConstructor
@@ -97,18 +98,20 @@ public class NotificationForClaimantRepresented extends CallbackHandler implemen
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 
     public Map<String, String> addPropertiesApplicantSolicitor(CaseData caseData) {
         return Map.of(
-                CLAIM_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData),
                 LEGAL_ORG_APPLICANT1, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                         .getOrganisation().getOrganisationID()),
-                CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
+                CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 

@@ -200,6 +200,7 @@ class DefendantSignSettlementAgreementNotificationHandlerTest {
     private CaseData.CaseDataBuilder createCaseData() {
         return CaseData.builder()
             .legacyCaseReference("legacy ref")
+            .ccdCaseReference(11111L)
             .claimantBilingualLanguagePreference(Language.ENGLISH.toString())
             .applicant1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
@@ -231,9 +232,10 @@ class DefendantSignSettlementAgreementNotificationHandlerTest {
     private Map<String, String> createExpectedTemplateProperties() {
         return Map.of(
             "defendantName", "mr respondent lip",
-            "claimReferenceNumber", "legacy ref",
+            "claimReferenceNumber", "11111",
             "claimantName", "mr applicant1 lip",
-            "frontendBaseUrl", "dummy_cui_front_end_url"
+            "frontendBaseUrl", "dummy_cui_front_end_url",
+            "partyReferences", "Claimant reference: Not provided - Defendant reference: Not provided"
         );
     }
 }

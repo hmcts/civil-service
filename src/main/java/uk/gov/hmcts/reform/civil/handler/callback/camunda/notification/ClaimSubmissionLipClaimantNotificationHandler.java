@@ -17,6 +17,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_CLAIMANT_CLAIM_SUBMISSION;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service
 @RequiredArgsConstructor
@@ -70,7 +71,9 @@ public class ClaimSubmissionLipClaimantNotificationHandler extends CallbackHandl
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
-            CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
+            CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
         );
     }
 

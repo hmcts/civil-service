@@ -26,8 +26,8 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimSubmissionLipClaimantNotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest.AboutToSubmitCallback.LEGACY_CASE_REFERENCE;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.*;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
 class ClaimSubmissionLipClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -50,6 +50,7 @@ class ClaimSubmissionLipClaimantNotificationHandlerTest extends BaseCallbackHand
                          .type(Party.Type.INDIVIDUAL)
                          .build())
         .legacyCaseReference(LEGACY_CASE_REFERENCE)
+        .ccdCaseReference(12345L)
         .build();
 
     @Mock
@@ -75,7 +76,7 @@ class ClaimSubmissionLipClaimantNotificationHandlerTest extends BaseCallbackHand
         verify(notificationService).sendMail(
             CLAIMANT_EMAIL_ADDRESS,
             TEMPLATE_ID,
-            getNotificationDataMap(),
+            getNotificationDataMap(caseData),
             REFERENCE
         );
     }
@@ -99,7 +100,7 @@ class ClaimSubmissionLipClaimantNotificationHandlerTest extends BaseCallbackHand
         verify(notificationService, times(0)).sendMail(
             CLAIMANT_EMAIL_ADDRESS,
             TEMPLATE_ID,
-            getNotificationDataMap(),
+            getNotificationDataMap(caseData),
             REFERENCE
         );
     }
@@ -111,10 +112,12 @@ class ClaimSubmissionLipClaimantNotificationHandlerTest extends BaseCallbackHand
     }
 
     @NotNull
-    private Map<String, String> getNotificationDataMap() {
+    private Map<String, String> getNotificationDataMap(CaseData caseData) {
         return Map.of(
             RESPONDENT_NAME, "Mr. Defendant Guy",
-            CLAIMANT_NAME, "Mr. Claimant Guy"
+            CLAIMANT_NAME, "Mr. Claimant Guy",
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
         );
     }
 

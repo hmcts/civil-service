@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -188,11 +189,12 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
 
     private Map<String, String> getCommonProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             TYPE_OF_FEE, caseData.getHwfFeeType().getLabel(),
             TYPE_OF_FEE_WELSH, caseData.getHwfFeeType().getLabelInWelsh(),
-            HWF_REFERENCE_NUMBER, caseData.getHwFReferenceNumber()
+            HWF_REFERENCE_NUMBER, caseData.getHwFReferenceNumber(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
         );
     }
 
