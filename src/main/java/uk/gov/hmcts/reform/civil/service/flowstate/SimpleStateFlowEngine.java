@@ -23,16 +23,16 @@ public class SimpleStateFlowEngine implements IStateFlowEngine {
 
     protected final CaseDetailsConverter caseDetailsConverter;
     protected final FeatureToggleService featureToggleService;
-    protected final SimpleStateFlowBuilder stateFlowBuilder;
+    private final ObjectFactory<SimpleStateFlowBuilder> stateFlowBuilderObjectFactory;
+
 
     @Autowired
     public SimpleStateFlowEngine(CaseDetailsConverter caseDetailsConverter, FeatureToggleService featureToggleService,
-                                 SimpleStateFlowBuilder stateFlowBuilder) {
+                                 ObjectFactory<SimpleStateFlowBuilder> stateFlowBuilderObjectFactory) {
         this.caseDetailsConverter = caseDetailsConverter;
         this.featureToggleService = featureToggleService;
-        this.stateFlowBuilder = stateFlowBuilder;
+        this.stateFlowBuilderObjectFactory = stateFlowBuilderObjectFactory;
         log.info("SimpleStateFlowEngine created" + this);
-
     }
 
     public StateFlow evaluate(CaseDetails caseDetails) {
@@ -41,9 +41,9 @@ public class SimpleStateFlowEngine implements IStateFlowEngine {
 
     public StateFlow evaluate(CaseData caseData) {
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            return stateFlowBuilder.build(FlowState.Main.SPEC_DRAFT).evaluate(caseData);
+            return stateFlowBuilderObjectFactory.getObject().build(FlowState.Main.SPEC_DRAFT).evaluate(caseData);
         }
-        return stateFlowBuilder.build(FlowState.Main.DRAFT).evaluate(caseData);
+        return stateFlowBuilderObjectFactory.getObject().build(FlowState.Main.DRAFT).evaluate(caseData);
     }
 
     public StateFlow evaluateSpec(CaseDetails caseDetails) {
@@ -51,7 +51,7 @@ public class SimpleStateFlowEngine implements IStateFlowEngine {
     }
 
     public StateFlow evaluateSpec(CaseData caseData) {
-        return stateFlowBuilder.build(FlowState.Main.SPEC_DRAFT).evaluate(caseData);
+        return stateFlowBuilderObjectFactory.getObject().build(FlowState.Main.SPEC_DRAFT).evaluate(caseData);
     }
 
     public boolean hasTransitionedTo(CaseDetails caseDetails, FlowState.Main state) {
