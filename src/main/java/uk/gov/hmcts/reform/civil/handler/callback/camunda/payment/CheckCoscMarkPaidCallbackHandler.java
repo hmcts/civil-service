@@ -68,9 +68,11 @@ public class CheckCoscMarkPaidCallbackHandler extends CallbackHandler {
     private void updateCamundaVars(CaseData caseData) {
         log.info("<<<>>>");
         log.info(caseData.getApplicant1Represented() != null ? String.valueOf(caseData.getApplicant1Represented()) : "itisnull");
-        runTimeService.setVariable(
+        if (runTimeService != null) {
+            runTimeService.setVariable(
             caseData.getBusinessProcess().getProcessInstanceId(),
             "isClaimantLR", YES.equals(caseData.getApplicant1Represented()));
+        }
     }
 
 }

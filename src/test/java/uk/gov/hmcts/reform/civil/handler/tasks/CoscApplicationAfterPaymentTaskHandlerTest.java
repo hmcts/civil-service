@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -75,6 +76,7 @@ public class CoscApplicationAfterPaymentTaskHandlerTest {
     private CoscApplicationAfterPaymentTaskHandler handler;
 
     public static final String JUDGMENT_MARK_PAID_FULL = "isJudgmentMarkedPaidInFull";
+    public static final String IS_CLAIMANT_LR = "isClaimantLR";
     private final VariableMap variables = Variables.createVariables();
 
     @BeforeEach
@@ -82,6 +84,7 @@ public class CoscApplicationAfterPaymentTaskHandlerTest {
         variables.putValue(FLOW_STATE, "MAIN.DRAFT");
         variables.putValue(FLOW_FLAGS, Map.of());
         variables.putValue(JUDGMENT_MARK_PAID_FULL, false);
+        variables.putValue(IS_CLAIMANT_LR, false);
     }
 
     @Test
@@ -117,6 +120,7 @@ public class CoscApplicationAfterPaymentTaskHandlerTest {
         handler.execute(mockExternalTask, externalTaskService);
 
         variables.putValue(JUDGMENT_MARK_PAID_FULL, false);
+        variables.putValue(IS_CLAIMANT_LR, false);
         verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, CHECK_PAID_IN_FULL_SCHED_DEADLINE);
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
         verify(externalTaskService).complete(mockExternalTask, variables);
@@ -125,6 +129,7 @@ public class CoscApplicationAfterPaymentTaskHandlerTest {
     @Test
     void testStartTheEventWithActiveJudgment() {
         CaseData caseData = CaseData.builder()
+            .applicant1Represented(NO)
             .contactDetailsUpdatedEvent(
                 ContactDetailsUpdatedEvent.builder()
                     .description("Best description")
@@ -161,6 +166,53 @@ public class CoscApplicationAfterPaymentTaskHandlerTest {
 
         handler.execute(mockExternalTask, externalTaskService);
         variables.putValue(JUDGMENT_MARK_PAID_FULL, true);
+        variables.putValue(IS_CLAIMANT_LR, false);
+        verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, CHECK_PAID_IN_FULL_SCHED_DEADLINE);
+        verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
+        verify(externalTaskService).complete(mockExternalTask, variables);
+    }
+
+    @Test
+    void testStartTheEventWithActiveJudgmentClaimantLR() {
+        CaseData caseData = CaseData.builder()
+            .applicant1Represented(YES)
+            .contactDetailsUpdatedEvent(
+                ContactDetailsUpdatedEvent.builder()
+                    .description("Best description")
+                    .summary("Even better summary")
+                    .submittedByCaseworker(YES).build())
+            .businessProcess(
+                BusinessProcess.builder()
+                    .status(BusinessProcessStatus.READY)
+                    .processInstanceId("process-id").build())
+            .activeJudgment(JudgmentDetails.builder()
+                                .state(ISSUED)
+                                .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_BY_DATE).paymentDeadlineDate(
+                                    LocalDate.now()).build())
+                                .orderedAmount("150001")
+                                .fullyPaymentMadeDate(LocalDate.now())
+                                .build())
+            .build();
+
+        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+
+        when(mockExternalTask.getTopicName()).thenReturn("test");
+        when(mockExternalTask.getAllVariables())
+            .thenReturn(Map.of(
+                "caseId", GENERAL_APP_CASE_ID,
+                "caseEvent", CHECK_PAID_IN_FULL_SCHED_DEADLINE,
+                "generalAppParentCaseLink", CIVIL_CASE_ID
+            ));
+
+        when(coreCaseDataService.startUpdate(CIVIL_CASE_ID, CHECK_PAID_IN_FULL_SCHED_DEADLINE))
+            .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
+                            .eventId(CONTACT_INFORMATION_UPDATED.name()).build());
+        when(coreCaseDataService.submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class)))
+            .thenReturn(caseData);
+
+        handler.execute(mockExternalTask, externalTaskService);
+        variables.putValue(JUDGMENT_MARK_PAID_FULL, true);
+        variables.putValue(IS_CLAIMANT_LR, true);
         verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, CHECK_PAID_IN_FULL_SCHED_DEADLINE);
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
         verify(externalTaskService).complete(mockExternalTask, variables);
