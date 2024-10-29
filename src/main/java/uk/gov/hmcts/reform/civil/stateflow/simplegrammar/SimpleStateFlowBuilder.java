@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.stateflow.simplegrammar;
 
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.config.StateMachineBuilder;
 import org.springframework.statemachine.config.configurers.ExternalTransitionConfigurer;
@@ -21,6 +23,7 @@ import uk.gov.hmcts.reform.civil.stateflow.transitions.UnspecifiedDraftTransitio
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_CASE_KEY;
@@ -33,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STAT
  * - return the internal state engine for further processing
  */
 @Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @AllArgsConstructor
 public class SimpleStateFlowBuilder {
 
@@ -144,9 +148,10 @@ public class SimpleStateFlowBuilder {
         }
         allTransitionBuilders.forEach(transitionBuilder -> {
             List<Transition> transitions = transitionBuilder.buildTransitions();
-            transitions.forEach(transition -> {
-                stateFlowContext.addTransition(transition);
-            });
+            ListIterator<Transition> iterator = transitions.listIterator();
+            while (iterator.hasNext()) {
+                stateFlowContext.addTransition(iterator.next());
+            }
         });
     }
 
