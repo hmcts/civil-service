@@ -45,7 +45,6 @@ public class SimpleStateFlowBuilder {
     private final SpecDraftTransitionBuilder specDraftTransitionBuilder;
     private final List<MidTransitionBuilder> transitionBuilders;
 
-
     public static boolean isEmpty(String string) {
         return string == null || string.length() == 0;
     }

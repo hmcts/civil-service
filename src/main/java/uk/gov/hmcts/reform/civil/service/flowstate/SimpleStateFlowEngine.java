@@ -25,7 +25,6 @@ public class SimpleStateFlowEngine implements IStateFlowEngine {
     protected final FeatureToggleService featureToggleService;
     private final ObjectFactory<SimpleStateFlowBuilder> stateFlowBuilderObjectFactory;
 
-
     @Autowired
     public SimpleStateFlowEngine(CaseDetailsConverter caseDetailsConverter, FeatureToggleService featureToggleService,
                                  ObjectFactory<SimpleStateFlowBuilder> stateFlowBuilderObjectFactory) {
