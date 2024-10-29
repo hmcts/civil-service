@@ -97,6 +97,7 @@ import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
+import uk.gov.hmcts.reform.civil.model.sendAndReply.SendMessageContext;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.TransferCaseDetails;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -727,6 +728,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
     private LocalDate coscSchedulerDeadline;
     private CoscApplicationStatus coSCApplicationStatus;
+    private String sendMessageOption;
+    private SendMessageContext sendMessageContext;
+    private String sendMessageContent;
 
 
     /**

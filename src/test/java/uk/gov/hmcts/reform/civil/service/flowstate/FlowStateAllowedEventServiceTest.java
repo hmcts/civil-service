@@ -51,6 +51,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESET_PIN;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_AND_REPLY;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARK_PAID_FULL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM_CLAIMANT;
@@ -2525,6 +2526,15 @@ class FlowStateAllowedEventServiceTest {
             CaseDetailsBuilder.builder()
                 .atStateAwaitingCaseDetailsNotification().build();
         assertThat(flowStateAllowedEventService.isAllowed(caseDetails, UPDATE_NEXT_HEARING_DETAILS))
+            .isEqualTo(true);
+    }
+
+    @Test
+    void shouldReturnTrue_whenCaseEventIsSendAndReply() {
+        CaseDetails caseDetails =
+            CaseDetailsBuilder.builder()
+                .atStateAwaitingCaseDetailsNotification().build();
+        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, SEND_AND_REPLY))
             .isEqualTo(true);
     }
 }
