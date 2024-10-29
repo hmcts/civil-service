@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.stateflow.simplegrammar;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.statemachine.StateMachine;
@@ -37,7 +38,7 @@ import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STAT
  */
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-@AllArgsConstructor
+@Slf4j
 public class SimpleStateFlowBuilder {
 
     private static final String STATE = "state";
@@ -47,6 +48,14 @@ public class SimpleStateFlowBuilder {
     private final UnspecifiedDraftTransitionBuilder unspecifiedDraftTransitionBuilder;
     private final SpecDraftTransitionBuilder specDraftTransitionBuilder;
     private final List<MidTransitionBuilder> transitionBuilders;
+
+    public SimpleStateFlowBuilder(UnspecifiedDraftTransitionBuilder unspecifiedDraftTransitionBuilder,
+                                  SpecDraftTransitionBuilder specDraftTransitionBuilder, List<MidTransitionBuilder> transitionBuilders) {
+        this.unspecifiedDraftTransitionBuilder = unspecifiedDraftTransitionBuilder;
+        this.specDraftTransitionBuilder = specDraftTransitionBuilder;
+        this.transitionBuilders = transitionBuilders;
+        log.info("SimpleStateFlowBuilder created" + this);
+    }
 
     public static boolean isEmpty(String string) {
         return string == null || string.length() == 0;

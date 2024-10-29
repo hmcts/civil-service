@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -16,6 +18,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+@Slf4j
 public class SimpleStateFlowEngine implements IStateFlowEngine {
 
     protected final CaseDetailsConverter caseDetailsConverter;
@@ -28,6 +31,7 @@ public class SimpleStateFlowEngine implements IStateFlowEngine {
         this.caseDetailsConverter = caseDetailsConverter;
         this.featureToggleService = featureToggleService;
         this.stateFlowBuilder = stateFlowBuilder;
+        log.info("SimpleStateFlowEngine created" + this);
 
     }
 
