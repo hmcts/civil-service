@@ -72,11 +72,11 @@ public class TaskListService {
         }).orElseThrow(() -> new IllegalArgumentException("Invalid task item identifier " + taskItemIdentifier));
     }
 
-    public void makeProgressAbleTasksInactiveForCaseIdentifierAndRole(String caseIdentifier, String role, String eXcategory) {
+    public void makeProgressAbleTasksInactiveForCaseIdentifierAndRole(String caseIdentifier, String role, String excludedCategory) {
         List<TaskListEntity> tasks = new ArrayList<>();
-        if (Objects.nonNull(eXcategory)) {
-            List<TaskItemTemplateEntity> categories = taskItemTemplateRepository.findByCategoryEnAndRole(eXcategory, role);
-            if(Objects.nonNull(categories)) {
+        if (Objects.nonNull(excludedCategory)) {
+            List<TaskItemTemplateEntity> categories = taskItemTemplateRepository.findByCategoryEnAndRole(excludedCategory, role);
+            if (Objects.nonNull(categories)) {
                 List<Long> catIds = categories.stream().map(TaskItemTemplateEntity::getId).toList();
                 tasks = taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplate_IdNotIn(
                     caseIdentifier, role, List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue()), catIds
