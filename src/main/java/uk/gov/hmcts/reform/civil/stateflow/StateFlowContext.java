@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class StateFlowContext {
 
@@ -14,7 +15,7 @@ public class StateFlowContext {
 
     private final List<String> states = new ArrayList<>();
 
-    private final List<Transition> transitions = new ArrayList<>();
+    private final List<Transition> transitions = new CopyOnWriteArrayList<>();
 
     public Optional<String> getInitialState() {
         return states.isEmpty() ? Optional.empty() : Optional.of(states.get(0));
