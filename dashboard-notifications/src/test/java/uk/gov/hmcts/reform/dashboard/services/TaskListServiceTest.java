@@ -165,7 +165,7 @@ class TaskListServiceTest {
             .thenReturn(tasks);
 
         //when
-        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant");
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant", null);
 
         //then
         verify(taskListRepository).findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotIn(
