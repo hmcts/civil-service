@@ -18,9 +18,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_SET_ASIDE_JUDGMENT_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantEmail;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getDefendantNameBasedOnCaseType;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.*;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @Service
@@ -75,10 +73,11 @@ public class ClaimSetAsideJudgmentClaimantNotificationHandler extends CallbackHa
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             LEGAL_ORG_NAME, getApplicantLegalOrganizationName(caseData, organisationService),
             DEFENDANT_NAME_INTERIM,  getDefendantNameBasedOnCaseType(caseData),
-            REASON_FROM_CASEWORKER, caseData.getJoSetAsideJudgmentErrorText()
+            REASON_FROM_CASEWORKER, caseData.getJoSetAsideJudgmentErrorText(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
 
     }

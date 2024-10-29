@@ -37,6 +37,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.Cl
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @ExtendWith(MockitoExtension.class)
@@ -212,15 +214,17 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
         public Map<String, String> getNotificationDataMapSpec(CaseData caseData) {
             if (caseData.isRespondent1NotRepresented()) {
                 return Map.of(
-                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                    CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                     DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                    CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
+                    CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+                    PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
                 );
             } else {
                 return Map.of(
-                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                    CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                     CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData),
-                    CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
+                    CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+                    PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
                 );
             }
         }
@@ -230,7 +234,8 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData),
-                CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
+                CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
 
@@ -238,7 +243,8 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
         public Map<String, String> getNotificationDataMapRespondent2Carm(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-                CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData)
+                CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
 
