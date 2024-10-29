@@ -49,7 +49,6 @@ public class CaseDismissClaimantDashboardNotificationHandler extends AbstractCas
         dashboardApiClient.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseData.getCcdCaseReference().toString(),
             "CLAIMANT",
-            null,
             authToken
         );
     }
