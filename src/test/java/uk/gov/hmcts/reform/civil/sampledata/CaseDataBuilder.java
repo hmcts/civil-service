@@ -149,11 +149,13 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentAddress;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
@@ -687,6 +689,7 @@ public class CaseDataBuilder {
     private SdoR2FastTrackCreditHireDetails sdoR2FastTrackCreditHireDetails;
     private String claimantBilingualLanguagePreference;
     private JudgmentPaidInFull judgmentPaidInFull;
+    private YesOrNo anyRepresented;
 
     public CaseDataBuilder claimantBilingualLanguagePreference(String claimantBilingualLanguagePreference) {
         this.claimantBilingualLanguagePreference = claimantBilingualLanguagePreference;
@@ -6267,6 +6270,8 @@ public class CaseDataBuilder {
                                       .build())
             .joIsRegisteredWithRTL(YES)
             .activeJudgment(JudgmentDetails.builder().issueDate(LocalDate.now()).build())
+            .locationName("Barnet Court")
+            .legacyCaseReference("000MC015")
             .build();
     }
 
@@ -6280,8 +6285,40 @@ public class CaseDataBuilder {
                                       .confirmFullPaymentMade(List.of("CONFIRMED"))
                                       .build())
             .joIsRegisteredWithRTL(YES)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                   .baseLocation("231596")
+                                   .region("2").build())
+            .legacyCaseReference("000MC015")
             .activeJudgment(JudgmentDetails.builder().issueDate(LocalDate.now()).build())
             .build();
+    }
+
+    public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31DaysForCosc() {
+
+        CaseData caseData = buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31Days();
+        JudgmentDetails activeJudgment = JudgmentDetails.builder()
+            .defendant1Name("Test name")
+            .defendant1Address(JudgmentAddress.builder().build())
+            .fullyPaymentMadeDate(LocalDate.now().plusDays(15))
+            .state(JudgmentState.CANCELLED)
+            .totalAmount("90000")
+            .issueDate(LocalDate.now())
+            .issueDate(LocalDate.now()).build();
+        caseData.setActiveJudgment(activeJudgment);
+        return caseData;
+    }
+
+    public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc() {
+        CaseData caseData =  buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
+        JudgmentDetails activeJudgment = JudgmentDetails.builder()
+            .defendant1Name("Test name")
+            .defendant1Address(JudgmentAddress.builder().build())
+            .fullyPaymentMadeDate(LocalDate.now().plusDays(15))
+            .state(JudgmentState.CANCELLED)
+            .totalAmount("90000")
+            .issueDate(LocalDate.now()).build();
+        caseData.setActiveJudgment(activeJudgment);
+        return caseData;
     }
 
     public CaseData getDefaultJudgment1v1Case() {
@@ -7878,6 +7915,7 @@ public class CaseDataBuilder {
             .repaymentFrequency(repaymentFrequency)
             .repaymentDate(repaymentDate)
             .joJudgmentPaidInFull(judgmentPaidInFull)
+            .anyRepresented(anyRepresented)
             .build();
     }
 
@@ -7889,6 +7927,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder judgmentPaidInFull(JudgmentPaidInFull judgmentPaidInFull) {
         this.judgmentPaidInFull = judgmentPaidInFull;
+        return this;
+    }
+
+    public CaseDataBuilder anyRepresented(YesOrNo anyRepresented) {
+        this.anyRepresented = anyRepresented;
         return this;
     }
 
