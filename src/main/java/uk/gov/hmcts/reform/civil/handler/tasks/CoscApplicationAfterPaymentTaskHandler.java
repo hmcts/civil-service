@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -24,7 +23,6 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataContentFromStartEventResponse;
 
-@Slf4j
 @RequiredArgsConstructor
 @Component
 public class CoscApplicationAfterPaymentTaskHandler extends BaseExternalTaskHandler {
@@ -61,7 +59,6 @@ public class CoscApplicationAfterPaymentTaskHandler extends BaseExternalTaskHand
 
     @Override
     public VariableMap getVariableMap(ExternalTaskData externalTaskData) {
-        log.info("<<<1222>>>");
         var data = externalTaskData.caseData().orElseThrow();
         VariableMap variables = Variables.createVariables();
         var stateFlow = stateFlowEngine.evaluate(data);
@@ -77,8 +74,6 @@ public class CoscApplicationAfterPaymentTaskHandler extends BaseExternalTaskHand
     }
 
     private boolean isClaimantLR(CaseData caseData) {
-        log.info("<<<claimantlr>>>");
-        log.info(caseData.getApplicant1Represented() != null ? String.valueOf(caseData.getApplicant1Represented()) : "itisnull");
         return YES.equals(caseData.getApplicant1Represented());
     }
 }

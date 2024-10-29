@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.payment;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -22,7 +21,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHECK_PAID_IN_FULL_SCHED_DEADLINE;
 import static uk.gov.hmcts.reform.civil.enums.CoscApplicationStatus.ACTIVE;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Slf4j
 @Service
@@ -31,7 +29,6 @@ public class CheckCoscMarkPaidCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = singletonList(CHECK_PAID_IN_FULL_SCHED_DEADLINE);
     private final ObjectMapper objectMapper;
-    private final RuntimeService runTimeService;
     private final Time time;
 
     @Override
@@ -58,21 +55,8 @@ public class CheckCoscMarkPaidCallbackHandler extends CallbackHandler {
                 .coSCApplicationStatus(ACTIVE);
         }
 
-        updateCamundaVars(caseData);
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
     }
-
-    private void updateCamundaVars(CaseData caseData) {
-        log.info("<<<>>>");
-        log.info(caseData.getApplicant1Represented() != null ? String.valueOf(caseData.getApplicant1Represented()) : "itisnull");
-        if (runTimeService != null) {
-            runTimeService.setVariable(
-            caseData.getBusinessProcess().getProcessInstanceId(),
-            "isClaimantLR", YES.equals(caseData.getApplicant1Represented()));
-        }
-    }
-
 }

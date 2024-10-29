@@ -24,7 +24,6 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHECK_PAID_IN_FULL_SCHED_DEADLINE;
@@ -90,7 +89,6 @@ class CheckCoscMarkPaidCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getErrors()).isNull();
         assertNull(data.getCoscSchedulerDeadline());
         assertNull(data.getCoSCApplicationStatus());
-        verify(runTimeService).setVariable(PROCESS_INSTANCE_ID, "isClaimantLR", false);
     }
 
     @Test
@@ -109,7 +107,6 @@ class CheckCoscMarkPaidCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getErrors()).isNull();
         assertNull(data.getCoscSchedulerDeadline());
         assertNull(data.getCoSCApplicationStatus());
-        verify(runTimeService).setVariable(PROCESS_INSTANCE_ID, "isClaimantLR", false);
     }
 
     @Test
