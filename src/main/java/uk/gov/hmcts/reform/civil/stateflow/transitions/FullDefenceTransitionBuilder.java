@@ -45,9 +45,9 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
     @Override
     void setUpTransitions() {
         this.moveTo(IN_MEDIATION).onlyWhen((agreedToMediation.and(allAgreedToLrMediationSpec.negate()))
-                // for carm cases, fullDefenceProcced is tracked with lipFullDefenceProceed
-                // and move to in mediation if applicant does not settle
-                .or(lipFullDefenceProceed.and(isCarmApplicableLipCase).and(not(fullDefenceProceed))))
+                                               // for carm cases, fullDefenceProcced is tracked with lipFullDefenceProceed
+                                               // and move to in mediation if applicant does not settle
+                                               .or(isCarmApplicableLipCase.and(lipFullDefenceProceed.or(fullDefenceProceed))))
             .moveTo(FULL_DEFENCE_PROCEED)
             .onlyWhen(fullDefenceProceed.and(allAgreedToLrMediationSpec).and(agreedToMediation.negate()).and(declinedMediation.negate()))
             .set((c, flags) -> {
@@ -64,8 +64,8 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
                 flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
             })
             .moveTo(FULL_DEFENCE_PROCEED)
-            .onlyWhen(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
-                .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate()))
+            .onlyWhen(fullDefenceProceed.and(isCarmApplicableLipCase.negate()).and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
+                          .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate()))
             .set((c, flags) -> {
                 flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
                 flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
@@ -112,8 +112,8 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
     }
 
     public static boolean getCarmEnabledForDate(CaseData caseData) {
-        // Date of go live is 1st August, as we use "isAfter" we compare with 31st July
-        return caseData.getSubmittedDate().toLocalDate().isAfter(LocalDate.of(2024, 7, 31));
+        // Date of go live is  5th november , as we use "isAfter" we compare with 4th november
+        return caseData.getSubmittedDate().toLocalDate().isAfter(LocalDate.of(2024, 11, 4));
     }
 
     public static final Predicate<CaseData> takenOfflineByStaffAfterDefendantResponse =
