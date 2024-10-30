@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.enums.sendAndReply;
+package uk.gov.hmcts.reform.civil.enums.sendandreply;
 
 public enum RecipientOption {
     COURT_STAFF,
