@@ -7,12 +7,10 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
-import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 
 @Slf4j
 @Service
@@ -23,17 +21,16 @@ public class UpdatePaymentStatusService {
     private final CoreCaseDataService coreCaseDataService;
     private final PaymentServiceHelper paymentServiceHelper;
 
-    @Retryable(value = CaseDataUpdateException.class, backoff = @Backoff(delay = 500))
+    @Retryable(value = CaseDataUpdateException.class, maxAttempts = 3, backoff = @Backoff(delay = 500))
     public void updatePaymentStatus(FeeType feeType, String caseReference, CardPaymentStatusResponse cardPaymentStatusResponse) {
         try {
             CaseDetails caseDetails = coreCaseDataService.getCase(Long.valueOf(caseReference));
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
 
-            PaymentDetails paymentDetails = paymentServiceHelper.buildPaymentDetails(cardPaymentStatusResponse);
-            caseData = paymentServiceHelper.updateCaseDataByFeeType(caseData, feeType.name(), paymentDetails);
+            caseData = paymentServiceHelper.updateCaseDataByFeeType(caseData, feeType.name(),
+                                                                    paymentServiceHelper.buildPaymentDetails(cardPaymentStatusResponse));
 
-            boolean isFailedPayment = PaymentStatus.FAILED.name().equalsIgnoreCase(cardPaymentStatusResponse.getStatus());
-            paymentServiceHelper.createEvent(caseData, caseReference, feeType.name(), isFailedPayment);
+            paymentServiceHelper.createEvent(caseData, caseReference, feeType.name());
         } catch (Exception ex) {
             throw new CaseDataUpdateException();
         }

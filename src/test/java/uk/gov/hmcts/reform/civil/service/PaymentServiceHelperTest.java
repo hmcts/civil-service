@@ -40,7 +40,7 @@ class PaymentServiceHelperTest {
         StartEventResponse startEventResponse = StartEventResponse.builder().token("token").eventId("eventId").build();
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse);
 
-        paymentServiceHelper.createEvent(caseData, "123", FeeType.HEARING.name(), true);
+        paymentServiceHelper.createEvent(caseData, "123", FeeType.HEARING.name());
 
         verify(coreCaseDataService).startUpdate("123", CaseEvent.SERVICE_REQUEST_RECEIVED);
         verify(coreCaseDataService).submitUpdate(any(), any(CaseDataContent.class));
@@ -59,6 +59,7 @@ class PaymentServiceHelperTest {
     @Test
     void shouldBuildPaymentDetails() {
         CardPaymentStatusResponse response = CardPaymentStatusResponse.builder().status("SUCCESS").paymentReference("ref").build();
+        PaymentDetails existingDetails = PaymentDetails.builder().build();
 
         PaymentDetails paymentDetails = paymentServiceHelper.buildPaymentDetails(response);
 

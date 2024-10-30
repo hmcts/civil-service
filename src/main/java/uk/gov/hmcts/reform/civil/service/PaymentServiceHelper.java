@@ -25,8 +25,8 @@ public class PaymentServiceHelper {
     private final CoreCaseDataService coreCaseDataService;
     private final ObjectMapper objectMapper;
 
-    public void createEvent(CaseData caseData, String caseId, String feeType, boolean isFailedPayment) {
-        CaseEvent event = determineEventByFeeType(feeType, isFailedPayment);
+    public void createEvent(CaseData caseData, String caseId, String feeType) {
+        CaseEvent event = determineEventByFeeType(feeType);
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, event);
         CaseDataContent caseDataContent = buildCaseDataContent(startEventResponse, caseData);
         coreCaseDataService.submitUpdate(caseId, caseDataContent);
@@ -34,30 +34,27 @@ public class PaymentServiceHelper {
 
     public CaseData updateCaseDataByFeeType(CaseData caseData, String feeType, PaymentDetails paymentDetails) {
         return FeeType.HEARING.name().equals(feeType)
-            ? caseData.toBuilder().hearingFeePaymentDetails(paymentDetails).build()
-            : caseData.toBuilder().claimIssuedPaymentDetails(paymentDetails).build();
+                ? caseData.toBuilder().hearingFeePaymentDetails(paymentDetails).build()
+                : caseData.toBuilder().claimIssuedPaymentDetails(paymentDetails).build();
     }
 
     public PaymentDetails buildPaymentDetails(CardPaymentStatusResponse response) {
         return PaymentDetails.builder()
-            .status(PaymentStatus.valueOf(response.getStatus().toUpperCase()))
-            .reference(response.getPaymentReference())
-            .build();
+                .status(PaymentStatus.valueOf(response.getStatus().toUpperCase()))
+                .reference(response.getPaymentReference())
+                .build();
     }
 
     private CaseDataContent buildCaseDataContent(StartEventResponse startEventResponse, CaseData caseData) {
         Map<String, Object> updatedData = caseData.toMap(objectMapper);
         return CaseDataContent.builder()
-            .eventToken(startEventResponse.getToken())
-            .event(Event.builder().id(startEventResponse.getEventId()).build())
-            .data(updatedData)
-            .build();
+                .eventToken(startEventResponse.getToken())
+                .event(Event.builder().id(startEventResponse.getEventId()).build())
+                .data(updatedData)
+                .build();
     }
 
-    private CaseEvent determineEventByFeeType(String feeType, boolean isFailedPayment) {
-        if (isFailedPayment && FeeType.CLAIMISSUED.name().equals(feeType)) {
-            return CaseEvent.RESUBMIT_CLAIM;
-        }
+    private CaseEvent determineEventByFeeType(String feeType) {
         if (FeeType.HEARING.name().equals(feeType)) {
             return SERVICE_REQUEST_RECEIVED;
         }
