@@ -34,6 +34,7 @@ public class DefendantNocDashboardNotificationHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_NOC);
     public static final String TASK_ID = "CreateClaimantDashboardNotificationDefendantNoc";
+    private static final String CLAIMANT_ROLE = "CLAIMANT";
 
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper mapper;
@@ -57,6 +58,12 @@ public class DefendantNocDashboardNotificationHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         ScenarioRequestParams params = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
+
+        dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            CLAIMANT_ROLE,
+            authToken
+        );
 
         dashboardApiClient.recordScenario(
             caseData.getCcdCaseReference().toString(),
