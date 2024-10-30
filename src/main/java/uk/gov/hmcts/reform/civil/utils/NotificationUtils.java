@@ -155,12 +155,14 @@ public class NotificationUtils {
     }
 
     public static String getRespondentLegalOrganizationName(OrganisationPolicy organisationPolicy, OrganisationService organisationService) {
-        String id = organisationPolicy.getOrganisation().getOrganisationID();
-        Optional<Organisation> organisation = organisationService.findOrganisationById(id);
-
         String respondentLegalOrganizationName = null;
-        if (organisation.isPresent()) {
-            respondentLegalOrganizationName = organisation.get().getName();
+        if (organisationPolicy.getOrganisation() != null && organisationPolicy.getOrganisation().getOrganisationID() != null) {
+            String id = organisationPolicy.getOrganisation().getOrganisationID();
+            Optional<Organisation> organisation = organisationService.findOrganisationById(id);
+
+            if (organisation.isPresent()) {
+                respondentLegalOrganizationName = organisation.get().getName();
+            }
         }
         return respondentLegalOrganizationName;
     }
@@ -177,10 +179,37 @@ public class NotificationUtils {
     }
 
     public static String getApplicantLegalOrganizationName(CaseData caseData, OrganisationService organisationService) {
-        String id = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
-        Optional<Organisation> organisation = organisationService.findOrganisationById(id);
-        return organisation.isPresent() ? organisation.get().getName() :
-            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
+        if (caseData.getApplicant1OrganisationPolicy().getOrganisation() != null
+            && caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID() != null) {
+            String id = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
+            Optional<Organisation> organisation = organisationService.findOrganisationById(id);
+            return organisation.isPresent() ? organisation.get().getName() :
+                caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
+        }
+        return caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
+    }
+
+    public static String getLegalOrganizationNameForRespondent(CaseData caseData, boolean isRespondent1, OrganisationService organisationService) {
+        String legalOrganisationName = null;
+        String id = null;
+        if (isRespondent1) {
+            if (caseData.getRespondent1OrganisationPolicy().getOrganisation() != null
+                && caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID() != null) {
+                id = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
+            }
+        } else {
+            if (caseData.getRespondent2OrganisationPolicy().getOrganisation() != null
+                && caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID() != null) {
+                id = caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
+            }
+        }
+        if (id != null) {
+            Optional<Organisation> organisation = organisationService.findOrganisationById(id);
+            if (organisation.isPresent()) {
+                legalOrganisationName = organisation.get().getName();
+            }
+        }
+        return legalOrganisationName;
     }
 
     public static String getLegalOrganizationNameForRespondent(CaseData caseData, boolean isRespondent1, OrganisationService organisationService) {

@@ -268,6 +268,13 @@ public class DashboardNotificationsParamsMapper {
         // Ensures that notifications whose template specifies this will be prioritised when sorting
         params.put("priorityNotificationDeadline", LocalDateTime.now());
 
+        if (nonNull(caseData.getCertOfSC())) {
+            params.put("coscFullPaymentDateEn", DateUtils.formatDate(caseData.getCertOfSC().getDefendantFinalPaymentDate()));
+            params.put("coscFullPaymentDateCy", DateUtils.formatDateInWelsh(caseData.getCertOfSC().getDefendantFinalPaymentDate()));
+            params.put("coscNotificationDateEn", DateUtils.formatDate(LocalDate.now()));
+            params.put("coscNotificationDateCy", DateUtils.formatDateInWelsh(LocalDate.now()));
+        }
+
         return params;
     }
 

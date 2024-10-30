@@ -11,19 +11,20 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import static java.util.Objects.nonNull;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class JudgmentPaidInFullOnlineMapper extends JudgmentOnlineMapper {
 
-    @Override
-    public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
+    public JudgmentDetails addUpdateActiveJudgment(CaseData caseData, LocalDate paymentDate) {
 
         JudgmentDetails activeJudgment = caseData.getActiveJudgment();
-        JudgmentState state = getJudgmentState(caseData);
+        JudgmentState state = getJudgmentState(caseData, paymentDate);
         JudgmentDetails activeJudgmentDetails = activeJudgment.toBuilder()
             .state(state)
-            .fullyPaymentMadeDate(caseData.getJoJudgmentPaidInFull().getDateOfFullPaymentMade())
+            .fullyPaymentMadeDate(nonNull(paymentDate) ? paymentDate : caseData.getJoJudgmentPaidInFull().getDateOfFullPaymentMade())
             .lastUpdateTimeStamp(LocalDateTime.now())
             .rtlState(getJudgmentRTLStatus(state))
             .cancelledTimeStamp(JudgmentState.CANCELLED.equals(state) ? LocalDateTime.now() : null)
@@ -35,12 +36,21 @@ public class JudgmentPaidInFullOnlineMapper extends JudgmentOnlineMapper {
         return activeJudgmentDetails;
     }
 
-    protected JudgmentState getJudgmentState(CaseData caseData) {
+    @Override
+    public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
+        return addUpdateActiveJudgment(caseData, null);
+    }
+
+    protected JudgmentState getJudgmentState(CaseData caseData, LocalDate paymentDate) {
         boolean paidAfter31Days = JudgmentsOnlineHelper.checkIfDateDifferenceIsGreaterThan31Days(
             caseData.getActiveJudgment().getIssueDate(),
-            caseData.getJoJudgmentPaidInFull().getDateOfFullPaymentMade()
+            nonNull(paymentDate) ? paymentDate : caseData.getJoJudgmentPaidInFull().getDateOfFullPaymentMade()
         );
         return paidAfter31Days ? JudgmentState.SATISFIED : JudgmentState.CANCELLED;
+    }
+
+    protected JudgmentState getJudgmentState(CaseData caseData) {
+        return getJudgmentState(caseData, null);
     }
 
     protected String getJudgmentRTLStatus(JudgmentState state) {
