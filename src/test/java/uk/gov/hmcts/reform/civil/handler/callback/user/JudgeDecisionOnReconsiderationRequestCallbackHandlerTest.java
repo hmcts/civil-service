@@ -263,8 +263,9 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         @Test
         void whenSubmittedWithCreateGeneralOrder_thenIncludeHeader() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .build().toBuilder().systemGeneratedCaseDocuments(sdoDocList).upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
-                                                                      .reasonForReconsiderationTxtYes("Reason1").build()).decisionOnRequestReconsiderationOptions(
+                .build().toBuilder().systemGeneratedCaseDocuments(sdoDocList).upholdingPreviousOrderReason(
+                    UpholdingPreviousOrderReason.builder()
+                        .reasonForReconsiderationTxtYes("Reason1").build()).decisionOnRequestReconsiderationOptions(
                     DecisionOnRequestReconsiderationOptions.CREATE_GENERAL_ORDER).build();
             when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
             CallbackParams params = CallbackParams.builder()
@@ -280,8 +281,9 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         @Test
         void whenSubmittedWithCreateGeneralOrderCP_thenIncludeHeader() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .build().toBuilder().systemGeneratedCaseDocuments(sdoDocList).upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
-                                                                                                               .reasonForReconsiderationTxtYes("Reason1").build()).decisionOnRequestReconsiderationOptions(
+                .build().toBuilder().systemGeneratedCaseDocuments(sdoDocList).upholdingPreviousOrderReason(
+                    UpholdingPreviousOrderReason.builder()
+                        .reasonForReconsiderationTxtYes("Reason1").build()).decisionOnRequestReconsiderationOptions(
                     DecisionOnRequestReconsiderationOptions.CREATE_GENERAL_ORDER).build();
             when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
             CallbackParams params = CallbackParams.builder()
