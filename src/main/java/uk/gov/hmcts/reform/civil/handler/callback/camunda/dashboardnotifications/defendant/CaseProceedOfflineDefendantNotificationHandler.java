@@ -84,21 +84,20 @@ public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCal
             authToken
         );
 
-        if (caseData.getGeneralApplications() != null && !caseData.getGeneralApplications().isEmpty()) {
-            caseData.getGeneralApplications()
-                .forEach(application ->
-                         dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
-                             (application.getValue().getCaseLink().getCaseReference()).toString(),
-                             "APPLICANT",
-                             authToken
-                         ));
-        }
-
         dashboardApiClient.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseData.getCcdCaseReference().toString(),
             "DEFENDANT",
             authToken
         );
-    }
 
+        if (caseData.getGeneralApplications() != null && !caseData.getGeneralApplications().isEmpty()) {
+            caseData.getGeneralApplications()
+                .forEach(application ->
+                             dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
+                                 (application.getValue().getCaseLink().getCaseReference()).toString(),
+                                 "APPLICANT",
+                                 authToken
+                ));
+        }
+    }
 }
