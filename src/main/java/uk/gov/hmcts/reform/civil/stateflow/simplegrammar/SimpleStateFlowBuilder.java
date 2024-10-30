@@ -143,13 +143,14 @@ public class SimpleStateFlowBuilder {
             allTransitionBuilders.add(specDraftTransitionBuilder);
             allTransitionBuilders.addAll(transitionBuilders);
         }
+        List<Transition> transitions = new ArrayList<>();
         allTransitionBuilders.forEach(transitionBuilder -> {
-            List<Transition> transitions = transitionBuilder.buildTransitions();
-            ListIterator<Transition> iterator = transitions.listIterator();
-            while (iterator.hasNext()) {
-                stateFlowContext.addTransition(iterator.next());
-            }
+            transitions.addAll(transitionBuilder.buildTransitions());
         });
+        ListIterator<Transition> iterator = transitions.listIterator();
+        while (iterator.hasNext()) {
+            stateFlowContext.addTransition(iterator.next());
+        }
     }
 
     private void addState(FlowState.Main state, StateFlowContext stateFlowContext) {
