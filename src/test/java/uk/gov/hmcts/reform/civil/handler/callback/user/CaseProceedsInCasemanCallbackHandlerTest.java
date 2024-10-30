@@ -173,7 +173,7 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldAddCoScApplicationStatusValue_whenInvoked() {
+        void shouldUpdateCoScApplicationStatusValue_whenInvoked() {
             CaseData caseData = CaseData.builder()
                 .respondent1Represented(YesOrNo.NO)
                 .coSCApplicationStatus(CoscApplicationStatus.ACTIVE)
@@ -188,6 +188,22 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("coSCApplicationStatus")
                 .isEqualTo(CoscApplicationStatus.INACTIVE.toString());
+        }
+
+        @Test
+        void shouldNotUpdateCoScApplicationStatusValue_whenInvoked() {
+            CaseData caseData = CaseData.builder()
+                .respondent1Represented(YesOrNo.NO)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("coSCApplicationStatus").isNull();
         }
     }
 }
