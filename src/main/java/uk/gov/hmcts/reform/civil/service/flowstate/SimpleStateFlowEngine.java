@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -18,20 +16,19 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-@Slf4j
 public class SimpleStateFlowEngine implements IStateFlowEngine {
 
     protected final CaseDetailsConverter caseDetailsConverter;
     protected final FeatureToggleService featureToggleService;
-    private final ObjectFactory<SimpleStateFlowBuilder> stateFlowBuilderObjectFactory;
+    protected final SimpleStateFlowBuilder stateFlowBuilder;
 
     @Autowired
     public SimpleStateFlowEngine(CaseDetailsConverter caseDetailsConverter, FeatureToggleService featureToggleService,
-                                 ObjectFactory<SimpleStateFlowBuilder> stateFlowBuilderObjectFactory) {
+                                 SimpleStateFlowBuilder stateFlowBuilder) {
         this.caseDetailsConverter = caseDetailsConverter;
         this.featureToggleService = featureToggleService;
-        this.stateFlowBuilderObjectFactory = stateFlowBuilderObjectFactory;
-        log.info("SimpleStateFlowEngine created" + this);
+        this.stateFlowBuilder = stateFlowBuilder;
+
     }
 
     public StateFlow evaluate(CaseDetails caseDetails) {
@@ -40,9 +37,9 @@ public class SimpleStateFlowEngine implements IStateFlowEngine {
 
     public StateFlow evaluate(CaseData caseData) {
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            return stateFlowBuilderObjectFactory.getObject().build(FlowState.Main.SPEC_DRAFT).evaluate(caseData);
+            return stateFlowBuilder.build(FlowState.Main.SPEC_DRAFT).evaluate(caseData);
         }
-        return stateFlowBuilderObjectFactory.getObject().build(FlowState.Main.DRAFT).evaluate(caseData);
+        return stateFlowBuilder.build(FlowState.Main.DRAFT).evaluate(caseData);
     }
 
     public StateFlow evaluateSpec(CaseDetails caseDetails) {
@@ -50,7 +47,7 @@ public class SimpleStateFlowEngine implements IStateFlowEngine {
     }
 
     public StateFlow evaluateSpec(CaseData caseData) {
-        return stateFlowBuilderObjectFactory.getObject().build(FlowState.Main.SPEC_DRAFT).evaluate(caseData);
+        return stateFlowBuilder.build(FlowState.Main.SPEC_DRAFT).evaluate(caseData);
     }
 
     public boolean hasTransitionedTo(CaseDetails caseDetails, FlowState.Main state) {
