@@ -2,14 +2,14 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.SubmitClaimTask;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
@@ -83,8 +83,11 @@ class SubmitClaimTaskTest {
                                               organisationService, airlineEpimsService, locationRefDataService);
     }
 
-    @Test
-    void shouldSubmitClaimSuccessfully() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldSubmitClaimSuccessfully(boolean caseEventsEnabled) {
+        when(featureToggleService.isCaseEventsEnabled()).thenReturn(caseEventsEnabled);
+
         CaseData caseData = CaseData.builder()
             .totalClaimAmount(new BigDecimal("1000"))
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("test@gmail.com").build())
@@ -108,6 +111,11 @@ class SubmitClaimTaskTest {
         assertThat(response.getData()).isNotNull();
         assertThat(response.getErrors()).isEmpty();
         assertThat(response.getData()).containsEntry("interestClaimUntil", "UNTIL_SETTLED_OR_JUDGEMENT_MADE");
+        if (caseEventsEnabled) {
+            assertThat(response.getData().get("anyRepresented")).isEqualTo("Yes");
+        } else {
+            assertThat(response.getData().get("anyRepresented")).isNull();
+        }
     }
 }
 
