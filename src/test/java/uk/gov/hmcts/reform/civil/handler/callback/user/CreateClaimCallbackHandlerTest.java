@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -1524,6 +1525,21 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(objMapper.convertValue(caseData.getApplicant1(), HashMap.class));
             assertThat(response.getData()).extracting("respondent1")
                 .isEqualTo(objMapper.convertValue(caseData.getRespondent1(), HashMap.class));
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldAddAnyRepresentedAsYes_whenCaseEventsEnabledOnly(boolean caseEventsEnabled) {
+            when(featureToggleService.isCaseEventsEnabled()).thenReturn(caseEventsEnabled);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            if (caseEventsEnabled) {
+                assertThat(response.getData().get("anyRepresented"))
+                    .isEqualTo("Yes");
+            } else {
+                assertThat(response.getData().get("anyRepresented")).isNull();
+            }
         }
 
         @Test
