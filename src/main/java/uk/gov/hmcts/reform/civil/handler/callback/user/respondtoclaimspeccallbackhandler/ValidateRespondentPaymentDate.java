@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests;
+package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,10 +23,20 @@ public class ValidateRespondentPaymentDate implements CaseTask {
 
     public CallbackResponse execute(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        log.info("Executing payment date validation for case ID: {}", caseData.getCcdCaseReference());
 
         List<String> errors = paymentDateValidator
             .validate(Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
-                          .orElseGet(() -> RespondToClaimAdmitPartLRspec.builder().build()));
+                          .orElseGet(() -> {
+                              log.warn("RespondToClaimAdmitPartLRspec is null for case ID: {}", caseData.getCcdCaseReference());
+                              return RespondToClaimAdmitPartLRspec.builder().build();
+                          }));
+
+        if (errors.isEmpty()) {
+            log.info("Payment date validation passed for case ID: {}", caseData.getCcdCaseReference());
+        } else {
+            log.error("Payment date validation failed for case ID: {} with errors: {}", caseData.getCcdCaseReference(), errors);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)

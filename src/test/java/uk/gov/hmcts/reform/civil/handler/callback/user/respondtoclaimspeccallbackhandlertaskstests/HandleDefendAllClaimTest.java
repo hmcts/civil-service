@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandler.HandleDefendAllClaim;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
@@ -42,9 +43,6 @@ class HandleDefendAllClaimTest {
 
     @Mock
     private PaymentDateValidator paymentDateValidator;
-
-    @Mock
-    private RespondToClaimSpecUtils respondToClaimSpecUtilsDisputeDetails;
 
     @InjectMocks
     private HandleDefendAllClaim handleDefendAllClaim;
