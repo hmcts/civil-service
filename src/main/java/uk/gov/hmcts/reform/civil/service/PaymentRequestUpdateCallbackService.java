@@ -1,17 +1,27 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.Event;
+import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
-import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
-import java.util.Optional;
+import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 
@@ -20,124 +30,94 @@ import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 @RequiredArgsConstructor
 public class PaymentRequestUpdateCallbackService {
 
-    private static final String PAID = "Paid";
-    private final PaymentProcessingHelper paymentProcessingHelper;
+    public static final String PAID = "Paid";
+    private final CaseDetailsConverter caseDetailsConverter;
+    private final CoreCaseDataService coreCaseDataService;
+    private final ObjectMapper objectMapper;
     private final UpdatePaymentStatusService updatePaymentStatusService;
 
     public void processCallback(ServiceRequestUpdateDto serviceRequestUpdateDto, String feeType) {
-        String caseId = serviceRequestUpdateDto.getCcdCaseNumber();
-        log.info(
-            "Processing the callback for the caseId {} with status {}",
-            caseId,
-            serviceRequestUpdateDto.getServiceRequestStatus()
-        );
+        log.info("Processing callback for caseId {} with status {}",
+                 serviceRequestUpdateDto.getCcdCaseNumber(), serviceRequestUpdateDto.getServiceRequestStatus());
 
-        if (!isPaid(serviceRequestUpdateDto) || !isValidFeeType(feeType)) {
+        if (!PAID.equalsIgnoreCase(serviceRequestUpdateDto.getServiceRequestStatus())) {
             return;
         }
+        CaseDetails caseDetails = coreCaseDataService.getCase(Long.parseLong(serviceRequestUpdateDto.getCcdCaseNumber()));
+        CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
 
-        CaseData caseData = paymentProcessingHelper.getCaseData(caseId);
-
-        if (caseData.isLipvLipOneVOne()) {
-            processLiPCase(serviceRequestUpdateDto, feeType, caseId, caseData);
-        } else {
-            processNonLiPCase(serviceRequestUpdateDto, feeType, caseId, caseData);
+        if (isValidFeeType(feeType) && isEligibleForUpdate(feeType, caseData)) {
+            caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
+            if (caseData.isLipvLipOneVOne()) {
+                updatePaymentStatusService.updatePaymentStatus(FeeType.valueOf(feeType),
+                                                               serviceRequestUpdateDto.getCcdCaseNumber(), buildCardPaymentStatusResponse(serviceRequestUpdateDto));
+            } else {
+                createEvent(caseData, serviceRequestUpdateDto.getCcdCaseNumber(), feeType);
+            }
         }
-    }
-
-    private boolean isPaid(ServiceRequestUpdateDto serviceRequestUpdateDto) {
-        return PAID.equalsIgnoreCase(serviceRequestUpdateDto.getServiceRequestStatus());
     }
 
     private boolean isValidFeeType(String feeType) {
         return FeeType.HEARING.name().equals(feeType) || FeeType.CLAIMISSUED.name().equals(feeType);
     }
 
-    private void processLiPCase(
-        ServiceRequestUpdateDto serviceRequestUpdateDto,
-        String feeType,
-        String caseId,
-        CaseData caseData
-    ) {
-        if (paymentProcessingHelper.isValidPaymentUpdateHearing(feeType, caseData)
-            || paymentProcessingHelper.isValidUpdatePaymentClaimIssue(feeType, caseData)) {
-            log.info("Updating payment details for LiP case {}", caseId);
-            PaymentDetails existingPaymentDetails = paymentProcessingHelper.retrievePaymentDetails(feeType, caseData);
-
-            PaymentDetails updatedDetails = buildPaymentDetails(serviceRequestUpdateDto, existingPaymentDetails);
-            paymentProcessingHelper.updateCaseDataWithPaymentDetails(feeType, caseData, updatedDetails);
-
-            CardPaymentStatusResponse cardPaymentStatusResponse = buildCardPaymentStatusResponse(serviceRequestUpdateDto);
-            updatePaymentStatusService.updatePaymentStatus(
-                FeeType.valueOf(feeType),
-                caseId,
-                cardPaymentStatusResponse
-            );
-        }
+    private boolean isEligibleForUpdate(String feeType, CaseData caseData) {
+        return (FeeType.HEARING.name().equals(feeType) && isPaymentFailed(caseData.getHearingFeePaymentDetails()))
+            || (FeeType.CLAIMISSUED.name().equals(feeType) && isPaymentFailed(caseData.getClaimIssuedPaymentDetails()));
     }
 
-    private void processNonLiPCase(
-        ServiceRequestUpdateDto serviceRequestUpdateDto,
-        String feeType,
-        String caseId,
-        CaseData caseData
-    ) {
-        PaymentDetails existingPaymentDetails = paymentProcessingHelper.retrievePaymentDetails(feeType, caseData);
-        if (shouldUpdatePayment(existingPaymentDetails)) {
-            log.info("Updating payment details for Non-LiP case {}", caseId);
-            PaymentDetails updatedDetails = buildPaymentDetails(serviceRequestUpdateDto, existingPaymentDetails);
-            caseData = paymentProcessingHelper.updateCaseDataWithPaymentDetails(feeType, caseData, updatedDetails);
-
-            paymentProcessingHelper.createAndSubmitEvent(
-                caseData,
-                caseId,
-                feeType,
-                "PaymentRequestUpdate"
-            );
-
-            updatePaymentStatus(serviceRequestUpdateDto, feeType);
-        }
-    }
-
-    private boolean shouldUpdatePayment(PaymentDetails paymentDetails) {
+    private boolean isPaymentFailed(PaymentDetails paymentDetails) {
         return paymentDetails == null || FAILED.equals(paymentDetails.getStatus());
     }
 
-    private void updatePaymentStatus(ServiceRequestUpdateDto serviceRequestUpdateDto, String feeType) {
-        String caseId = serviceRequestUpdateDto.getCcdCaseNumber();
-        CardPaymentStatusResponse cardPaymentStatusResponse = buildCardPaymentStatusResponse(serviceRequestUpdateDto);
-        updatePaymentStatusService.updatePaymentStatus(
-            FeeType.valueOf(feeType),
-            caseId,
-            cardPaymentStatusResponse
-        );
-    }
-
-    private PaymentDetails buildPaymentDetails(
-        ServiceRequestUpdateDto serviceRequestUpdateDto,
-        PaymentDetails existingDetails
-    ) {
-        String customerReference = Optional.ofNullable(serviceRequestUpdateDto.getPayment())
-            .map(PaymentDto::getCustomerReference)
-            .orElse(Optional.ofNullable(existingDetails)
-                        .map(PaymentDetails::getCustomerReference)
-                        .orElse(null));
-
-        return PaymentDetails.builder()
-            .status(SUCCESS)
-            .customerReference(customerReference)
-            .reference(serviceRequestUpdateDto.getPayment().getPaymentReference())
-            .errorCode(null)
-            .errorMessage(null)
+    private CardPaymentStatusResponse buildCardPaymentStatusResponse(ServiceRequestUpdateDto serviceRequestUpdateDto) {
+        return CardPaymentStatusResponse.builder()
+            .paymentReference(serviceRequestUpdateDto.getPayment().getPaymentReference())
+            .status(SUCCESS.name())
             .build();
     }
 
-    private CardPaymentStatusResponse buildCardPaymentStatusResponse(
-        ServiceRequestUpdateDto serviceRequestUpdateDto
-    ) {
-        return CardPaymentStatusResponse.builder()
-            .paymentReference(serviceRequestUpdateDto.getPayment().getPaymentReference())
-            .status(SUCCESS.toString())
+    private void createEvent(CaseData caseData, String caseId, String feeType) {
+        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(
+            caseId,
+            getEventNameFromFeeType(caseData, feeType)
+        );
+
+        CaseDataContent caseDataContent = buildCaseDataContent(startEventResponse, caseData);
+        coreCaseDataService.submitUpdate(caseId, caseDataContent);
+    }
+
+    private CaseData updateCaseDataWithStateAndPaymentDetails(ServiceRequestUpdateDto serviceRequestUpdateDto, CaseData caseData, String feeType) {
+        PaymentDetails updatedPaymentDetails = PaymentDetails.builder()
+            .status(SUCCESS)
+            .customerReference(serviceRequestUpdateDto.getPayment().getCustomerReference())
+            .reference(serviceRequestUpdateDto.getPayment().getPaymentReference())
+            .build();
+
+        return getUpdatedCaseData(feeType, caseData, updatedPaymentDetails);
+    }
+
+    private CaseData getUpdatedCaseData(String feeType, CaseData caseData, PaymentDetails paymentDetails) {
+        return FeeType.HEARING.name().equals(feeType) ? caseData.toBuilder().hearingFeePaymentDetails(paymentDetails).build()
+            : caseData.toBuilder().claimIssuedPaymentDetails(paymentDetails).build();
+    }
+
+    private CaseEvent getEventNameFromFeeType(CaseData caseData, String feeType) {
+        if (FeeType.HEARING.name().equals(feeType)) {
+            return SERVICE_REQUEST_RECEIVED;
+        } else if (FeeType.CLAIMISSUED.name().equals(feeType) && SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return CREATE_CLAIM_SPEC_AFTER_PAYMENT;
+        } else {
+            return CREATE_CLAIM_AFTER_PAYMENT;
+        }
+    }
+
+    private CaseDataContent buildCaseDataContent(StartEventResponse startEventResponse, CaseData caseData) {
+        Map<String, Object> updatedData = caseData.toMap(objectMapper);
+        return CaseDataContent.builder()
+            .eventToken(startEventResponse.getToken())
+            .event(Event.builder().id(startEventResponse.getEventId()).build())
+            .data(updatedData)
             .build();
     }
 }

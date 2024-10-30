@@ -5,9 +5,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
@@ -24,42 +26,49 @@ class UpdatePaymentStatusServiceTest {
     private UpdatePaymentStatusService updatePaymentStatusService;
 
     @Mock
-    private PaymentProcessingHelper paymentProcessingHelper;
+    private CaseDetailsConverter caseDetailsConverter;
+
+    @Mock
+    private CoreCaseDataService coreCaseDataService;
+
+    @Mock
+    private PaymentServiceHelper paymentServiceHelper;
 
     @Test
     void shouldUpdatePaymentStatusAndSubmitEvent() {
-        CaseData caseData = CaseData.builder().build();
         String caseReference = "1234";
         FeeType feeType = FeeType.HEARING;
-        PaymentDetails existingPaymentDetails = PaymentDetails.builder()
-            .status(PaymentStatus.FAILED)
-            .reference("OLD REF")
+        CaseDetails caseDetails = CaseDetails.builder().build();
+        CaseData caseData = CaseData.builder()
+            .hearingFeePaymentDetails(PaymentDetails.builder()
+                                          .status(PaymentStatus.FAILED)
+                                          .reference("OLD REF")
+                                          .build())
             .build();
         CardPaymentStatusResponse cardPaymentStatusResponse = CardPaymentStatusResponse.builder()
             .paymentReference("NEW REF")
             .status(PaymentStatus.SUCCESS.name())
             .build();
-
-        when(paymentProcessingHelper.getCaseData(caseReference)).thenReturn(caseData);
-        when(paymentProcessingHelper.retrievePaymentDetails(feeType.name(), caseData)).thenReturn(existingPaymentDetails);
-
-        PaymentDetails updatedPaymentDetails = existingPaymentDetails.toBuilder()
+        PaymentDetails updatedPaymentDetails = PaymentDetails.builder()
             .status(PaymentStatus.SUCCESS)
-            .reference(cardPaymentStatusResponse.getPaymentReference())
-            .errorCode(cardPaymentStatusResponse.getErrorCode())
-            .errorMessage(cardPaymentStatusResponse.getErrorDescription())
+            .reference("NEW REF")
             .build();
 
-        when(paymentProcessingHelper.updateCaseDataWithPaymentDetails(feeType.name(), caseData, updatedPaymentDetails))
+        when(coreCaseDataService.getCase(Long.valueOf(caseReference))).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(paymentServiceHelper.buildPaymentDetails(cardPaymentStatusResponse))
+            .thenReturn(updatedPaymentDetails);
+        when(paymentServiceHelper.updateCaseDataByFeeType(caseData, feeType.name(), updatedPaymentDetails))
             .thenReturn(caseData);
 
         updatePaymentStatusService.updatePaymentStatus(feeType, caseReference, cardPaymentStatusResponse);
 
-        verify(paymentProcessingHelper).getCaseData(caseReference);
-        verify(paymentProcessingHelper).retrievePaymentDetails(feeType.name(), caseData);
-        verify(paymentProcessingHelper).updateCaseDataWithPaymentDetails(feeType.name(), caseData, updatedPaymentDetails);
-        verify(paymentProcessingHelper).createAndSubmitEvent(caseData, caseReference, feeType.name(), "UpdatePaymentStatus");
-        verifyNoMoreInteractions(paymentProcessingHelper);
+        verify(coreCaseDataService).getCase(Long.valueOf(caseReference));
+        verify(caseDetailsConverter).toCaseData(caseDetails);
+        verify(paymentServiceHelper).buildPaymentDetails(cardPaymentStatusResponse);
+        verify(paymentServiceHelper).updateCaseDataByFeeType(caseData, feeType.name(), updatedPaymentDetails);
+        verify(paymentServiceHelper).createEvent(caseData, caseReference, feeType.name());
+        verifyNoMoreInteractions(coreCaseDataService, caseDetailsConverter, paymentServiceHelper);
     }
 
     @Test
@@ -71,13 +80,13 @@ class UpdatePaymentStatusServiceTest {
             .status(PaymentStatus.SUCCESS.name())
             .build();
 
-        when(paymentProcessingHelper.getCaseData(caseReference)).thenThrow(new RuntimeException("Test exception"));
+        when(coreCaseDataService.getCase(Long.valueOf(caseReference))).thenThrow(new RuntimeException("Test exception"));
 
         assertThrows(CaseDataUpdateException.class, () ->
             updatePaymentStatusService.updatePaymentStatus(feeType, caseReference, cardPaymentStatusResponse)
         );
 
-        verify(paymentProcessingHelper).getCaseData(caseReference);
-        verifyNoMoreInteractions(paymentProcessingHelper);
+        verify(coreCaseDataService).getCase(Long.valueOf(caseReference));
+        verifyNoMoreInteractions(coreCaseDataService, caseDetailsConverter, paymentServiceHelper);
     }
 }
