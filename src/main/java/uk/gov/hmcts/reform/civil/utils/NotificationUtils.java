@@ -212,17 +212,6 @@ public class NotificationUtils {
         return legalOrganisationName;
     }
 
-    public static String getLegalOrganizationNameForRespondent(CaseData caseData, boolean isRespondent1, OrganisationService organisationService) {
-        String legalOrganisationName = null;
-        String id = isRespondent1 ? caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
-            : caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
-        Optional<Organisation> organisation = organisationService.findOrganisationById(id);
-        if (organisation.isPresent()) {
-            legalOrganisationName = organisation.get().getName();
-        }
-        return legalOrganisationName;
-    }
-
     public static String getApplicantEmail(CaseData caseData, boolean isApplicantLip) {
         if (isApplicantLip) {
             return caseData.getApplicant1().getPartyEmail() != null ? caseData.getApplicant1Email() : null;
