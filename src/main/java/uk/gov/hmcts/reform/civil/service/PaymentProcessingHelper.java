@@ -20,7 +20,9 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
+import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 
 @Slf4j
 @Component
@@ -71,11 +73,19 @@ public class PaymentProcessingHelper {
     private CaseEvent resolvePaymentRequestUpdateEvent(CaseData caseData, String feeType) {
         return switch (FeeType.valueOf(feeType)) {
             case HEARING -> SERVICE_REQUEST_RECEIVED;
-            case CLAIMISSUED -> CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-                ? CREATE_CLAIM_SPEC_AFTER_PAYMENT
-                : CREATE_CLAIM_AFTER_PAYMENT;
+            case CLAIMISSUED -> {
+                if (caseData.getClaimIssuedPaymentDetails() != null
+                    && caseData.getClaimIssuedPaymentDetails().getStatus() == FAILED) {
+                    yield RESUBMIT_CLAIM;
+                } else {
+                    yield CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                        ? CREATE_CLAIM_SPEC_AFTER_PAYMENT
+                        : CREATE_CLAIM_AFTER_PAYMENT;
+                }
+            }
         };
     }
+
 
     private CaseEvent resolveUpdatePaymentStatusEvent(String feeType) {
         return switch (FeeType.valueOf(feeType)) {
@@ -94,12 +104,12 @@ public class PaymentProcessingHelper {
     public boolean isValidPaymentUpdateHearing(String feeType, CaseData caseData) {
         return FeeType.HEARING.name().equals(feeType)
             && (caseData.getHearingFeePaymentDetails() == null
-            || caseData.getHearingFeePaymentDetails().getStatus() == PaymentStatus.FAILED);
+            || caseData.getHearingFeePaymentDetails().getStatus() == FAILED);
     }
 
     public boolean isValidUpdatePaymentClaimIssue(String feeType, CaseData caseData) {
         return FeeType.CLAIMISSUED.name().equals(feeType)
             && (caseData.getClaimIssuedPaymentDetails() == null
-            || caseData.getClaimIssuedPaymentDetails().getStatus() == PaymentStatus.FAILED);
+            || caseData.getClaimIssuedPaymentDetails().getStatus() == FAILED);
     }
 }
