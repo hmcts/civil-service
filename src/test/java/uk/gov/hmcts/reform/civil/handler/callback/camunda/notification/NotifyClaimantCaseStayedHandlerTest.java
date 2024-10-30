@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
 class NotifyClaimantCaseStayedHandlerTest {
@@ -83,7 +84,8 @@ class NotifyClaimantCaseStayedHandlerTest {
             Map.of(
                 "claimReferenceNumber", "1594901956117591",
                 "name", "John Doe",
-                "claimantvdefendant", "John Doe V Jack Jackson"
+                "claimantvdefendant", "John Doe V Jack Jackson",
+                "partyReferences", buildPartiesReferencesEmailSubject(caseData)
             ),
             "case-stayed-claimant-notification-1594901956117591"
         );

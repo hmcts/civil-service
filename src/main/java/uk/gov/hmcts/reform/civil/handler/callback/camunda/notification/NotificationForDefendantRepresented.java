@@ -106,8 +106,9 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
         return Map.of(
             DEFENDANT_NAME, caseData.getRespondent1().getPartyName(),
             CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString(),
-            LEGAL_REP_NAME, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID())
-            );
+            LEGAL_REP_NAME, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID()),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+        );
     }
 
     public Map<String, String> addPropertiesClaimant(CaseData caseData) {
