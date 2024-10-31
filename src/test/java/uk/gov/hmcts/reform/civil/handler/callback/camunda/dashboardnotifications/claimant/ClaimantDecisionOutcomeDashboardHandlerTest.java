@@ -67,7 +67,6 @@ public class ClaimantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHan
                 CallbackRequest.builder().eventId(UPDATE_DASHBOARD_TASK_LIST_CLAIMANT_DECISION_OUTCOME.name()).build()
             ).build();
 
-
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
