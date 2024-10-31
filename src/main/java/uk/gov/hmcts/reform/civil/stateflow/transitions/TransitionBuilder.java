@@ -59,7 +59,7 @@ public abstract class TransitionBuilder implements MoveToNext<FlowState.Main> {
     }
 
     Optional<Transition> getCurrentTransition() {
-        return transitions.isEmpty() ? Optional.empty() : Optional.of(transitions.get(transitions.size() - 1));
+        return transitions.isEmpty() || transitions.size() == 0 ? Optional.empty() : Optional.of(transitions.get(transitions.size() - 1));
     }
 
     private String fullyQualified(FlowState.Main state) {
