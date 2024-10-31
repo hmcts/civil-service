@@ -39,13 +39,16 @@ public class PaymentRequestUpdateCallbackService {
             PaymentDetails updatedPaymentDetails = paymentServiceHelper.buildPaymentDetails(
                 buildCardPaymentStatusResponse(serviceRequestUpdateDto)
             );
+
             caseData = paymentServiceHelper.updateCaseDataByFeeType(caseData, feeType, updatedPaymentDetails);
 
+            boolean isFailedPayment = isPaymentFailed(caseData.getClaimIssuedPaymentDetails())
+                || isPaymentFailed(caseData.getHearingFeePaymentDetails());
             if (caseData.isLipvLipOneVOne()) {
                 updatePaymentStatusService.updatePaymentStatus(FeeType.valueOf(feeType),
                                                                serviceRequestUpdateDto.getCcdCaseNumber(), buildCardPaymentStatusResponse(serviceRequestUpdateDto));
             } else {
-                paymentServiceHelper.createEvent(caseData, serviceRequestUpdateDto.getCcdCaseNumber(), feeType);
+                paymentServiceHelper.createEvent(caseData, serviceRequestUpdateDto.getCcdCaseNumber(), feeType, isFailedPayment);
             }
         }
     }

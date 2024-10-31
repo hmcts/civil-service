@@ -74,7 +74,7 @@ class PaymentRequestUpdateCallbackServiceTest {
         verify(caseDetailsConverter).toCaseData(any(CaseDetails.class));
         verify(paymentServiceHelper).buildPaymentDetails(any(CardPaymentStatusResponse.class));
         verify(paymentServiceHelper).updateCaseDataByFeeType(any(CaseData.class), anyString(), any(PaymentDetails.class));
-        verify(paymentServiceHelper).createEvent(any(CaseData.class), anyString(), anyString());
+        verify(paymentServiceHelper).createEvent(any(CaseData.class), anyString(), anyString(), true);
     }
 
     @Test

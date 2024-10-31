@@ -7,10 +7,12 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 
 @Slf4j
 @Service
@@ -27,10 +29,11 @@ public class UpdatePaymentStatusService {
             CaseDetails caseDetails = coreCaseDataService.getCase(Long.valueOf(caseReference));
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
 
-            caseData = paymentServiceHelper.updateCaseDataByFeeType(caseData, feeType.name(),
-                                                                    paymentServiceHelper.buildPaymentDetails(cardPaymentStatusResponse));
+            PaymentDetails paymentDetails = paymentServiceHelper.buildPaymentDetails(cardPaymentStatusResponse);
+            caseData = paymentServiceHelper.updateCaseDataByFeeType(caseData, feeType.name(), paymentDetails);
 
-            paymentServiceHelper.createEvent(caseData, caseReference, feeType.name());
+            boolean isFailedPayment = PaymentStatus.FAILED.name().equalsIgnoreCase(cardPaymentStatusResponse.getStatus());
+            paymentServiceHelper.createEvent(caseData, caseReference, feeType.name(), isFailedPayment);
         } catch (Exception ex) {
             throw new CaseDataUpdateException();
         }

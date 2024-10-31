@@ -67,7 +67,7 @@ class UpdatePaymentStatusServiceTest {
         verify(caseDetailsConverter).toCaseData(caseDetails);
         verify(paymentServiceHelper).buildPaymentDetails(cardPaymentStatusResponse);
         verify(paymentServiceHelper).updateCaseDataByFeeType(caseData, feeType.name(), updatedPaymentDetails);
-        verify(paymentServiceHelper).createEvent(caseData, caseReference, feeType.name());
+        verify(paymentServiceHelper).createEvent(caseData, caseReference, feeType.name(), false);
         verifyNoMoreInteractions(coreCaseDataService, caseDetailsConverter, paymentServiceHelper);
     }
 
