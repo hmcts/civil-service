@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.docmosis.CoverLetterAppendService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 
 import java.util.List;
@@ -32,7 +33,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 class SendHearingBulkPrintServiceTest {
 
     @Mock
-    private DocumentDownloadService documentDownloadService;
+    private CoverLetterAppendService coverLetterAppendService;
 
     @Mock
     private BulkPrintService bulkPrintService;
@@ -78,8 +79,8 @@ class SendHearingBulkPrintServiceTest {
         // given
         Party respondent1 = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = buildCaseData(respondent1, HEARING_FORM, true);
-        given(documentDownloadService.downloadDocument(any(), any()))
-            .willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
+        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any()))
+            .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         // when
         sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
@@ -93,8 +94,8 @@ class SendHearingBulkPrintServiceTest {
         // given
         Party claimant = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, HEARING_FORM, true);
-        given(documentDownloadService.downloadDocument(any(), any()))
-            .willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
+        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any()))
+            .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         // when
         sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
@@ -168,18 +169,5 @@ class SendHearingBulkPrintServiceTest {
 
         // then
         verifyNoInteractions(bulkPrintService);
-    }
-
-    @Test
-    void shouldReturnException_whenBulkPrintServiceReturnsIOException() {
-        // given
-        Party respondent1 = PartyBuilder.builder().soleTrader().build();
-        CaseData caseData = buildCaseData(respondent1, HEARING_FORM, true);
-        given(documentDownloadService.downloadDocument(any(), any()))
-            .willReturn(new DownloadedDocumentResponse(null, null, null));
-
-        // when // then
-        assertThrows(DocumentDownloadException.class, () ->
-            sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT));
     }
 }
