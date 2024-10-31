@@ -8,10 +8,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -39,9 +38,6 @@ class DecisionOutcomeCallbackHandlerTest extends BaseCallbackHandlerTest {
     private ObjectMapper objectMapper;
 
     @Mock
-    private DashboardApiClient dashboardApiClient;
-
-    @Mock
     private FeatureToggleService featureToggleService;
 
     @Test
@@ -66,6 +62,7 @@ class DecisionOutcomeCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
             .handle(params);
+
         assertThat(response.getErrors()).isNull();
     }
 
