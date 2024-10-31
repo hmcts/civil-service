@@ -33,8 +33,9 @@ public class NotifyDefendantStayUpdateRequestedHandler extends AbstractNotifyMan
     @Override
     protected String getNotificationTemplate(CaseData caseData) {
         if (isLiP(caseData)) {
-            // TODO: add lip template
-            return null;
+            return isBilingual(caseData)
+                ? notificationsProperties.getNotifyLipBilingualStayUpdateRequested()
+                : notificationsProperties.getNotifyLipStayUpdateRequested();
         } else {
             return notificationsProperties.getNotifyLRStayUpdateRequested();
         }
