@@ -986,7 +986,6 @@ class BundleRequestMapperTest {
 
     @Test
     void shouldFilterEvidenceForTrial() {
-        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
         List<Element<UploadEvidenceDocumentType>> list =
             bundleRequestMapper.filterDocumentaryEvidenceForTrialDocs(getDocumentEvidenceForTrial(),
                                                                       TypeOfDocDocumentaryEvidenceOfTrial.getAllDocsDisplayNames(), true);
@@ -995,7 +994,6 @@ class BundleRequestMapperTest {
 
     @Test
     void shouldFilterEvidenceForTrialAndCaseEventEnable() {
-        given(featureToggleService.isAmendBundleEnabled()).willReturn(true);
         List<Element<UploadEvidenceDocumentType>> list =
             bundleRequestMapper.filterDocumentaryEvidenceForTrialDocs(getDocumentEvidenceForTrial(),
                                                                       TypeOfDocDocumentaryEvidenceOfTrial.getAllDocsDisplayNames(), true);
