@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -74,7 +75,7 @@ class PaymentRequestUpdateCallbackServiceTest {
         verify(caseDetailsConverter).toCaseData(any(CaseDetails.class));
         verify(paymentServiceHelper).buildPaymentDetails(any(CardPaymentStatusResponse.class));
         verify(paymentServiceHelper).updateCaseDataByFeeType(any(CaseData.class), anyString(), any(PaymentDetails.class));
-        verify(paymentServiceHelper).createEvent(any(CaseData.class), anyString(), anyString(), true);
+        verify(paymentServiceHelper).createEvent(any(CaseData.class), anyString(), anyString(), eq(true));
     }
 
     @Test
