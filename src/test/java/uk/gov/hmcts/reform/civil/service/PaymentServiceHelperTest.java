@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
@@ -35,7 +36,7 @@ class PaymentServiceHelperTest {
     }
 
     @Test
-    void shouldCreateEvent() {
+    void shouldCreateEventForHearingFee() {
         CaseData caseData = CaseData.builder().build();
         StartEventResponse startEventResponse = StartEventResponse.builder().token("token").eventId("eventId").build();
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse);
@@ -43,6 +44,42 @@ class PaymentServiceHelperTest {
         paymentServiceHelper.createEvent(caseData, "123", FeeType.HEARING.name());
 
         verify(coreCaseDataService).startUpdate("123", CaseEvent.SERVICE_REQUEST_RECEIVED);
+        verify(coreCaseDataService).submitUpdate(any(), any(CaseDataContent.class));
+    }
+
+    @Test
+    void shouldCreateEventForClaimIssuedSpec() {
+        CaseData caseData = CaseData.builder().caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
+        StartEventResponse startEventResponse = StartEventResponse.builder().token("token").eventId("eventId").build();
+        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse);
+
+        paymentServiceHelper.createEvent(caseData, "123", FeeType.CLAIMISSUED.name());
+
+        verify(coreCaseDataService).startUpdate("123", CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT);
+        verify(coreCaseDataService).submitUpdate(any(), any(CaseDataContent.class));
+    }
+
+    @Test
+    void shouldCreateEventForClaimIssuedUnspec() {
+        CaseData caseData = CaseData.builder().caseAccessCategory(CaseCategory.UNSPEC_CLAIM).build();
+        StartEventResponse startEventResponse = StartEventResponse.builder().token("token").eventId("eventId").build();
+        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse);
+
+        paymentServiceHelper.createEvent(caseData, "123", FeeType.CLAIMISSUED.name());
+
+        verify(coreCaseDataService).startUpdate("123", CaseEvent.CREATE_CLAIM_AFTER_PAYMENT);
+        verify(coreCaseDataService).submitUpdate(any(), any(CaseDataContent.class));
+    }
+
+    @Test
+    void shouldCreateEventForOtherFeeType() {
+        CaseData caseData = CaseData.builder().build();
+        StartEventResponse startEventResponse = StartEventResponse.builder().token("token").eventId("eventId").build();
+        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse);
+
+        paymentServiceHelper.createEvent(caseData, "123", "OTHER_FEE_TYPE");
+
+        verify(coreCaseDataService).startUpdate("123", CaseEvent.RESUBMIT_CLAIM);
         verify(coreCaseDataService).submitUpdate(any(), any(CaseDataContent.class));
     }
 
@@ -59,7 +96,6 @@ class PaymentServiceHelperTest {
     @Test
     void shouldBuildPaymentDetails() {
         CardPaymentStatusResponse response = CardPaymentStatusResponse.builder().status("SUCCESS").paymentReference("ref").build();
-        PaymentDetails existingDetails = PaymentDetails.builder().build();
 
         PaymentDetails paymentDetails = paymentServiceHelper.buildPaymentDetails(response);
 
