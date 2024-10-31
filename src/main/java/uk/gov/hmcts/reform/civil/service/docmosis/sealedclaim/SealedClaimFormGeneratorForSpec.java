@@ -177,8 +177,8 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             .defendantResponseDeadlineDate(getResponseDeadline(caseData))
             .claimFixedCosts(caseData.getFixedCosts() != null ? caseData.getFixedCosts().getClaimFixedCosts() : null)
             .fixedCostAmount(caseData.getFixedCosts() != null && caseData.getFixedCosts().getFixedCostAmount() != null
-                                 ? MonetaryConversions.penniesToPounds(BigDecimal.valueOf
-                (Integer.parseInt(caseData.getFixedCosts().getFixedCostAmount()))).toString()
+                                 ? MonetaryConversions.penniesToPounds(BigDecimal.valueOf(
+                                     Integer.parseInt(caseData.getFixedCosts().getFixedCostAmount()))).toString()
                                  : (BigDecimal.valueOf(0)).toString())
             .build();
     }
