@@ -21,7 +21,7 @@ public class UpdatePaymentStatusService {
     private final CoreCaseDataService coreCaseDataService;
     private final PaymentServiceHelper paymentServiceHelper;
 
-    @Retryable(value = CaseDataUpdateException.class, maxAttempts = 3, backoff = @Backoff(delay = 500))
+    @Retryable(value = CaseDataUpdateException.class, backoff = @Backoff(delay = 500))
     public void updatePaymentStatus(FeeType feeType, String caseReference, CardPaymentStatusResponse cardPaymentStatusResponse) {
         try {
             CaseDetails caseDetails = coreCaseDataService.getCase(Long.valueOf(caseReference));
