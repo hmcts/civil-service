@@ -257,8 +257,9 @@ public class InitiateGeneralApplicationService {
         }
         if (featureToggleService.isCoSCEnabled()
             && caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID)) {
-            if (Objects.nonNull(caseData.getCertOfSC().getDebtPaymentEvidence()) &&
-                caseData.getCertOfSC().getDebtPaymentEvidence().getDebtPaymentOption().equals(DebtPaymentOptions.UNABLE_TO_PROVIDE_EVIDENCE_OF_FULL_PAYMENT)) {
+            if (Objects.nonNull(caseData.getCertOfSC().getDebtPaymentEvidence())
+                && caseData.getCertOfSC().getDebtPaymentEvidence().getDebtPaymentOption().equals(
+                    DebtPaymentOptions.UNABLE_TO_PROVIDE_EVIDENCE_OF_FULL_PAYMENT)) {
                 caseData.getCertOfSC().setProofOfDebtDoc(java.util.Collections.emptyList());
             }
             applicationBuilder.certOfSC(caseData.getCertOfSC());
