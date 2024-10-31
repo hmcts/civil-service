@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.docmosis.CoverLetterAppendService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 
 import java.time.LocalDate;
@@ -39,7 +40,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 class SendFinalOrderBulkPrintServiceTest {
 
     @Mock
-    private DocumentDownloadService documentDownloadService;
+    private CoverLetterAppendService coverLetterAppendService;
 
     @Mock
     private BulkPrintService bulkPrintService;
@@ -115,8 +116,8 @@ class SendFinalOrderBulkPrintServiceTest {
         // given
         Party respondent1 = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = buildCaseData(respondent1, JUDGE_FINAL_ORDER, true);
-        given(documentDownloadService.downloadDocument(any(), any()))
-            .willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
+        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any()))
+            .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         // when
         sendFinalOrderBulkPrintService.sendFinalOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
@@ -130,8 +131,8 @@ class SendFinalOrderBulkPrintServiceTest {
         // given
         Party claimant = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, JUDGE_FINAL_ORDER, true);
-        given(documentDownloadService.downloadDocument(any(), any()))
-            .willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
+        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any()))
+            .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         // when
         sendFinalOrderBulkPrintService.sendFinalOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
@@ -208,25 +209,12 @@ class SendFinalOrderBulkPrintServiceTest {
     }
 
     @Test
-    void shouldReturnException_whenBulkPrintServiceReturnsIOException() {
-        // given
-        Party respondent1 = PartyBuilder.builder().soleTrader().build();
-        CaseData caseData = buildCaseData(respondent1, JUDGE_FINAL_ORDER, true);
-        given(documentDownloadService.downloadDocument(any(), any()))
-            .willReturn(new DownloadedDocumentResponse(null, null, null));
-
-        // when // then
-        assertThrows(DocumentDownloadException.class, () ->
-            sendFinalOrderBulkPrintService.sendFinalOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT));
-    }
-
-    @Test
     void shouldDownloadDocumentAndPrintTranslatedLetterToClaimantLiPSuccessfully() {
         // given
         Party claimant = PartyBuilder.builder().individual().build();
         CaseData caseData = buildCaseDataForTranslatedOrder(claimant, DocumentType.ORDER_NOTICE_TRANSLATED_DOCUMENT);
-        given(documentDownloadService.downloadDocument(any(), any()))
-            .willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
+        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any()))
+            .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
         given(featureToggleService.isCaseProgressionEnabled()).willReturn(true);
 
         // when
@@ -241,8 +229,8 @@ class SendFinalOrderBulkPrintServiceTest {
         // given
         Party defendant = PartyBuilder.builder().individual().build();
         CaseData caseData = buildCaseDataForTranslatedOrder(defendant, DocumentType.ORDER_NOTICE_TRANSLATED_DOCUMENT);
-        given(documentDownloadService.downloadDocument(any(), any()))
-            .willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
+        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any()))
+            .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
         given(featureToggleService.isCaseProgressionEnabled()).willReturn(true);
 
         // when
