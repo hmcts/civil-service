@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
-import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
@@ -15,25 +14,12 @@ import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-
 @Component
 @RequiredArgsConstructor
 public class PaymentServiceHelper {
 
     private final CoreCaseDataService coreCaseDataService;
     private final ObjectMapper objectMapper;
-
-    public void createEvent(CaseData caseData, String caseId, String feeType) {
-        CaseEvent event = determineEventByFeeType(feeType, caseData);
-        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, event);
-        CaseDataContent caseDataContent = buildCaseDataContent(startEventResponse, caseData);
-        coreCaseDataService.submitUpdate(caseId, caseDataContent);
-    }
 
     public CaseData updateCaseDataByFeeType(CaseData caseData, String feeType, PaymentDetails paymentDetails) {
         return FeeType.HEARING.name().equals(feeType)
@@ -48,25 +34,12 @@ public class PaymentServiceHelper {
                 .build();
     }
 
-    private CaseDataContent buildCaseDataContent(StartEventResponse startEventResponse, CaseData caseData) {
+    public CaseDataContent buildCaseDataContent(StartEventResponse startEventResponse, CaseData caseData) {
         Map<String, Object> updatedData = caseData.toMap(objectMapper);
         return CaseDataContent.builder()
                 .eventToken(startEventResponse.getToken())
                 .event(Event.builder().id(startEventResponse.getEventId()).build())
                 .data(updatedData)
                 .build();
-    }
-
-    private CaseEvent determineEventByFeeType(String feeType, CaseData caseData) {
-        if (FeeType.HEARING.name().equals(feeType)) {
-            return SERVICE_REQUEST_RECEIVED;
-        } else if (FeeType.CLAIMISSUED.name().equals(feeType)) {
-            if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-                return CREATE_CLAIM_SPEC_AFTER_PAYMENT;
-            } else {
-                return CREATE_CLAIM_AFTER_PAYMENT;
-            }
-        }
-        return RESUBMIT_CLAIM;
     }
 }

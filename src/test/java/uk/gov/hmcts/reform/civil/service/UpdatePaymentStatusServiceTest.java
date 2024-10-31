@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
@@ -67,8 +68,9 @@ class UpdatePaymentStatusServiceTest {
         verify(caseDetailsConverter).toCaseData(caseDetails);
         verify(paymentServiceHelper).buildPaymentDetails(cardPaymentStatusResponse);
         verify(paymentServiceHelper).updateCaseDataByFeeType(caseData, feeType.name(), updatedPaymentDetails);
-        verify(paymentServiceHelper).createEvent(caseData, caseReference, feeType.name());
-        verifyNoMoreInteractions(coreCaseDataService, caseDetailsConverter, paymentServiceHelper);
+        verify(coreCaseDataService).startUpdate(caseReference, CaseEvent.CITIZEN_HEARING_FEE_PAYMENT);
+        verify(coreCaseDataService).submitUpdate(caseReference, paymentServiceHelper.buildCaseDataContent(null, caseData));
+        verifyNoMoreInteractions(coreCaseDataService, caseDetailsConverter);
     }
 
     @Test
