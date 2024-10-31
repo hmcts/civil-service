@@ -84,6 +84,7 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
         return PiPLetter
             .builder()
             .pin(caseData.getRespondent1PinToPostLRspec().getAccessCode())
+            .ccdCaseNumber(String.valueOf(caseData.getCcdCaseReference()))
             .claimReferenceNumber(caseData.getLegacyCaseReference())
             .claimantName(caseData.getApplicant1().getPartyName())
             .defendant(caseData.getRespondent1())
