@@ -32,12 +32,14 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.*;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.COVER_LETTER;
 
 @ExtendWith(MockitoExtension.class)
 public class CoverLetterAppendServiceTest {
@@ -101,7 +103,7 @@ public class CoverLetterAppendServiceTest {
         .documentSize(5L)
         .documentName("Cover letter.pdf")
         .createdBy("CIVIL")
-        .createdDatetime(LocalDateTime.of(2024, 1,2, 3, 4))
+        .createdDatetime(LocalDateTime.of(2024,  1, 2,  3,  4))
         .documentLink(Document.builder().documentFileName("Cover letter").documentBinaryUrl("Binary/url").documentUrl("url").build())
         .build();
 
@@ -110,7 +112,7 @@ public class CoverLetterAppendServiceTest {
         .documentSize(5L)
         .documentName("DocumentName.pdf")
         .createdBy("CIVIL")
-        .createdDatetime(LocalDateTime.of(2024, 1,2, 3, 4))
+        .createdDatetime(LocalDateTime.of(2024,  1, 2,  3,  4))
         .documentLink(Document.builder().documentFileName("DocumentName").documentBinaryUrl("Binary/url").documentUrl("url").build())
         .build();
     private static final byte[] STITCHED_DOC_BYTES = new byte[]{1, 2, 3, 4};
