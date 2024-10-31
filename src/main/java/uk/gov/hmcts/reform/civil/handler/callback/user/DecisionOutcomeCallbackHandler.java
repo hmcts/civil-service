@@ -56,5 +56,4 @@ public class DecisionOutcomeCallbackHandler extends CallbackHandler {
     public List<CaseEvent> handledEvents() {
         return EVENTS;
     }
-
 }
