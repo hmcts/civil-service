@@ -114,6 +114,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
@@ -1193,6 +1194,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .flatMap(docs -> docs.stream()
                 .filter(doc -> doc.getValue().getDocumentType().equals(DocumentType.SDO_ORDER))
                 .max(Comparator.comparing(doc -> doc.getValue().getCreatedDatetime())));
+    }
+
+    public Optional<List<CaseDocument>> getSDODocumentList() {
+        List<CaseDocument> sdoDocuments = systemGeneratedCaseDocuments.stream()
+            .map(Element::getValue)
+            .filter(doc -> doc.getDocumentType().equals(DocumentType.SDO_ORDER))
+            .collect(Collectors.toList());
+        return Optional.ofNullable(sdoDocuments.isEmpty() ? null : sdoDocuments);
     }
 
     @JsonIgnore
