@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -163,18 +164,8 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     }
 
     protected boolean isSDODoneAfterDecisionForReconsiderationMade() {
-        return getLatestEventTime(eventHistory, CaseEvent.CREATE_SDO)
-            .map(createdTime -> getLatestEventTime(eventHistory, CaseEvent.DECISION_ON_RECONSIDERATION_REQUEST)
-                .map(createdTime::isAfter)
-                .orElse(false))
-            .orElse(false);
-    }
-
-    private static Optional<LocalDateTime> getLatestEventTime(List<CaseEventDetail> eventHistory, CaseEvent eventType) {
-        return eventHistory.stream()
-            .filter(event -> event.getId().equals(eventType.name()))
-            .map(CaseEventDetail::getCreatedDate)
-            .max(LocalDateTime::compareTo);
+        return DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(caseData.getDecisionOnRequestReconsiderationOptions())
+            && caseData.getSDODocumentList().isPresent() && caseData.getSDODocumentList().get().size() == 2;
     }
 
     @Override
