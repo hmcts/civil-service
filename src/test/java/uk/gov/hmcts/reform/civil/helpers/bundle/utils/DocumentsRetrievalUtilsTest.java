@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.BundleFileNameList;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadFiles;
 import uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper;
+import uk.gov.hmcts.reform.civil.helpers.bundle.BundleRequestDocsOrganizer;
 import uk.gov.hmcts.reform.civil.helpers.bundle.BundleRequestMapper;
 import uk.gov.hmcts.reform.civil.helpers.bundle.ConversionToBundleRequestDocs;
 import uk.gov.hmcts.reform.civil.helpers.bundle.DocumentsRetrievalUtils;
@@ -42,11 +43,12 @@ import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getE
 @ExtendWith(MockitoExtension.class)
 class DocumentsRetrievalUtilsTest {
 
-    @Mock
-    private BundleRequestMapper bundleRequestMapper;
 
     @Mock
     private ConversionToBundleRequestDocs conversionToBundleRequestDocs;
+
+    @Mock
+    private BundleRequestDocsOrganizer bundleRequestDocsOrganizer;
 
     @InjectMocks
     private DocumentsRetrievalUtils documentsRetrievalUtils;
@@ -105,7 +107,6 @@ class DocumentsRetrievalUtilsTest {
             assertNotNull(result);
             assertEquals(1, result.size());
             assertEquals(expectedConvertedDocs, result);
-
         }
     }
 
@@ -144,7 +145,7 @@ class DocumentsRetrievalUtilsTest {
         Set<String> allExpertsNames = Set.of("Expert1");
         PartyType partyType = PartyType.CLAIMANT1;
 
-        when(bundleRequestMapper.groupExpertStatementsByName(anyList()))
+        when(bundleRequestDocsOrganizer.groupExpertStatementsByName(anyList()))
             .thenReturn(expectedGroupedDocuments);
 
         when(conversionToBundleRequestDocs.covertExpertEvidenceTypeToBundleRequestDocs(
@@ -188,7 +189,7 @@ class DocumentsRetrievalUtilsTest {
         BundleFileNameList bundleFileNameList = BundleFileNameList.CASE_SUMMARY_FILE_DISPLAY_NAME;
         Set<String> allExpertsNames = Set.of("Expert1", "Expert2");
 
-        when(bundleRequestMapper.groupExpertStatementsByName(anyList()))
+        when(bundleRequestDocsOrganizer.groupExpertStatementsByName(anyList()))
             .thenReturn(expectedGroupedDocuments);
 
         when(conversionToBundleRequestDocs.covertExpertEvidenceTypeToBundleRequestDocs(

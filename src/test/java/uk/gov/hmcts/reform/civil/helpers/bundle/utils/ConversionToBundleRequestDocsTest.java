@@ -5,7 +5,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadFiles;
+import uk.gov.hmcts.reform.civil.helpers.bundle.BundleRequestDocsOrganizer;
 import uk.gov.hmcts.reform.civil.helpers.bundle.BundleRequestMapper;
 import uk.gov.hmcts.reform.civil.helpers.bundle.ConversionToBundleRequestDocs;
 import uk.gov.hmcts.reform.civil.helpers.bundle.PartyType;
@@ -17,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,10 +34,10 @@ import static org.mockito.Mockito.verify;
 class ConversionToBundleRequestDocsTest {
 
     @Mock
-    private FeatureToggleService featureToggleService;
+    private BundleRequestDocsOrganizer requestDocsOrganizer;
 
     @Mock
-    private BundleRequestMapper bundleRequestMapper;
+    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private ConversionToBundleRequestDocs conversionToBundleRequestDocs;
@@ -48,8 +51,17 @@ class ConversionToBundleRequestDocsTest {
             .type(Party.Type.INDIVIDUAL)
             .build();
 
+
+        Document witnessDocument = Document.builder()
+            .documentUrl("http://example.com/document.pdf")
+            .documentBinaryUrl("http://example.com/documentBinary.pdf")
+            .documentFileName("document.pdf")
+            .categoryID("SomeCategoryID")
+            .build();
+
         UploadEvidenceWitness uploadEvidenceWitness = UploadEvidenceWitness.builder()
             .witnessOptionName("WitnessOptionName1")
+            .witnessOptionDocument(witnessDocument)
             .witnessOptionUploadDate(LocalDate.of(2023, 2, 5))
             .build();
         List<Element<UploadEvidenceWitness>> listOfUploadEvidenceWitness =
@@ -63,9 +75,6 @@ class ConversionToBundleRequestDocsTest {
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        verify(bundleRequestMapper).generateDocName(
-            eq(displayName), eq("WitnessOptionName1"), eq("1"), eq(LocalDate.of(2023, 2, 5))
-        );
     }
 
     @Test
@@ -75,10 +84,19 @@ class ConversionToBundleRequestDocsTest {
         boolean isWitnessSelf = true;
         PartyType partyType = PartyType.CLAIMANT1;
 
+        Document witnessDocument = Document.builder()
+            .documentUrl("http://example.com/document.pdf")
+            .documentBinaryUrl("http://example.com/documentBinary.pdf")
+            .documentFileName("document.pdf")
+            .categoryID("SomeCategoryID")
+            .build();
+
         UploadEvidenceWitness uploadEvidenceWitness = UploadEvidenceWitness.builder()
             .witnessOptionName("WitnessOptionName1")
+            .witnessOptionDocument(witnessDocument)
             .witnessOptionUploadDate(LocalDate.of(2023, 2, 5))
             .build();
+
         List<Element<UploadEvidenceWitness>> listOfUploadEvidenceWitness =
             List.of(Element.<UploadEvidenceWitness>builder().value(uploadEvidenceWitness).build());
 
@@ -87,12 +105,6 @@ class ConversionToBundleRequestDocsTest {
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        verify(bundleRequestMapper, times(0)).generateDocName(
-            eq(fileNamePrefix), eq("WitnessOptionName1"), eq(null), eq(LocalDate.of(2023, 2, 5))
-        );
-        verify(bundleRequestMapper, times(1)).generateDocName(
-            eq(fileNamePrefix), eq(partyType.getDisplayName()), eq(null), eq(LocalDate.of(2023, 2, 5))
-        );
     }
 
     @Test
@@ -101,13 +113,22 @@ class ConversionToBundleRequestDocsTest {
         String documentType = EvidenceUploadFiles.SKELETON_ARGUMENT.name();
         PartyType partyType = PartyType.CLAIMANT1;
 
+        Document document = Document.builder()
+            .documentUrl("http://example.com/document.pdf")
+            .documentBinaryUrl("http://example.com/documentBinary.pdf")
+            .documentFileName("document.pdf")
+            .categoryID("SomeCategoryID")
+            .build();
+
         UploadEvidenceDocumentType uploadEvidenceDocumentType1 = UploadEvidenceDocumentType.builder()
             .documentIssuedDate(LocalDate.of(2023, 4, 24))
             .bundleName("BundleName")
+            .documentUpload(document)
             .build();
 
         UploadEvidenceDocumentType uploadEvidenceDocumentType2 = UploadEvidenceDocumentType.builder()
             .documentIssuedDate(LocalDate.of(2024, 4, 24))
+            .documentUpload(document)
             .bundleName("BundleName")
             .build();
 
