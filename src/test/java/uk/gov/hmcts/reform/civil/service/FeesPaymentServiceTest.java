@@ -81,7 +81,7 @@ class FeesPaymentServiceTest {
     @MockBean
     private PinInPostConfiguration pinInPostConfiguration;
     @MockBean
-    private UpdatePaymentStatusService updatePaymentStatusService;
+    private PaymentRequestUpdateCallbackService paymentRequestUpdateCallbackService;
 
     @BeforeEach
     void before() {
@@ -238,7 +238,7 @@ class FeesPaymentServiceTest {
         );
 
         assertThat(govPaymentRequestStatus).isEqualTo(expectedResponse(status));
-        verify(updatePaymentStatusService, times(1)).updatePaymentStatus(any(), any(), any());
+        verify(paymentRequestUpdateCallbackService, times(1)).updatePaymentStatus(any(), any(), any());
     }
 
     @Test
