@@ -59,5 +59,4 @@ public class CheckCoscMarkPaidCallbackHandler extends CallbackHandler {
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
     }
-
 }
