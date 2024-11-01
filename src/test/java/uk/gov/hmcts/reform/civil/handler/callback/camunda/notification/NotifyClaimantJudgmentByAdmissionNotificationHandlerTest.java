@@ -31,7 +31,10 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGACY_CLAIM_REFERENCE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
@@ -71,6 +74,7 @@ class NotifyClaimantJudgmentByAdmissionNotificationHandlerTest extends BaseCallb
 
             CaseData caseData = CaseDataBuilder.builder()
                 .legacyCaseReference(REFERENCE_NUMBER)
+                .ccdCaseReference(12345L)
                 .atStateClaimDraft()
                 .applicant1Represented(YesOrNo.YES)
                 .buildJudmentOnlineCaseDataWithPaymentImmediately();
@@ -105,9 +109,11 @@ class NotifyClaimantJudgmentByAdmissionNotificationHandlerTest extends BaseCallb
                 .concat(getPartyNameBasedOnType(caseData.getRespondent2()));
         }
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             LEGAL_ORG_NAME, getApplicantLegalOrganizationName(caseData),
-            DEFENDANT_NAME,  defendantName
+            DEFENDANT_NAME,  defendantName,
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
         );
     }
 

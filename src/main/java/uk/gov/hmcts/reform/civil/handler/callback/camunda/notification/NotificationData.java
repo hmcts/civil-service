@@ -21,6 +21,7 @@ public interface NotificationData {
     String PARTY_REFERENCES = "partyReferences";
     String ALLOCATED_TRACK = "allocatedTrack";
     String RECIPIENT_PARTY_NAME = "recipientPartyName";
+    String LEGACY_CLAIM_REFERENCE = "legacyClaimReferenceNumber";
 
     String CLAIM_LEGAL_ORG_NAME_SPEC = "legalOrgName";
     String WHEN_WILL_BE_PAID_IMMEDIATELY = "payImmediately";
