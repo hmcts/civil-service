@@ -54,9 +54,9 @@ public class CoverLetterAppendService {
         List<DocumentMetaData> documentMetaDataList = appendCoverToDocument(coverLetterCaseDocument, caseDocuments);
         log.info("Bundle the following documents" + documentMetaDataList.get(0).toString()
                      + " and " + documentMetaDataList.get(1).toString());
-        log.info("Name" + Arrays.stream(caseDocuments).findFirst().get().getDocumentName().replace('/', '-'));
+        log.info("Name" + Arrays.stream(caseDocuments).findFirst().get().getDocumentName().replace('/', '-').replace(' ','-'));
         log.info("Authorisation:" + authorisation);
-        String bundleFileName = Arrays.stream(caseDocuments).findFirst().get().getDocumentName().replace('/', '-');
+        String bundleFileName = Arrays.stream(caseDocuments).findFirst().get().getDocumentName().replace('/', '-').replace(' ','-');
 
         CaseDocument mailableDocument = civilDocumentStitchingService.bundle(
             documentMetaDataList,
