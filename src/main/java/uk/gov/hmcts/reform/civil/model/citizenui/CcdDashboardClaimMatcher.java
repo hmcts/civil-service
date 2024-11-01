@@ -157,8 +157,24 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
             && !isSDOOrderInReviewOtherParty()
             && !isDecisionForReconsiderationMade()
             && sdoTime.isPresent()
+            && !isSDODoneAfterDecisionForReconsiderationMade()
             && (lastNonSdoOrderTime.isEmpty()
             || sdoTime.get().isAfter(lastNonSdoOrderTime.get()));
+    }
+
+    protected boolean isSDODoneAfterDecisionForReconsiderationMade() {
+        return getLatestEventTime(eventHistory, CaseEvent.CREATE_SDO)
+            .map(createdTime -> getLatestEventTime(eventHistory, CaseEvent.DECISION_ON_RECONSIDERATION_REQUEST)
+                .map(createdTime::isAfter)
+                .orElse(false))
+            .orElse(false);
+    }
+
+    private static Optional<LocalDateTime> getLatestEventTime(List<CaseEventDetail> eventHistory, CaseEvent eventType) {
+        return eventHistory.stream()
+            .filter(event -> event.getId().equals(eventType.name()))
+            .map(CaseEventDetail::getCreatedDate)
+            .max(LocalDateTime::compareTo);
     }
 
     @Override
