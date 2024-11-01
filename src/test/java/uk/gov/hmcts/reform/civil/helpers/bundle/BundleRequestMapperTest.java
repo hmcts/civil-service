@@ -46,20 +46,24 @@ class BundleRequestMapperTest {
     @InjectMocks
     private BundleRequestMapper bundleRequestMapper;
 
-    private ConversionToBundleRequestDocs conversionToBundleRequestDocs;
-    private DocumentsRetrievalUtils documentsRetrievalUtils;
-
     private static final String TEST_URL = "url";
     private static final String TEST_FILE_TYPE = "Email";
     private static final String TEST_FILE_NAME = "testFileName.pdf";
 
     @BeforeEach
     void setUp() {
-        conversionToBundleRequestDocs = new ConversionToBundleRequestDocs(featureToggleService, bundleRequestMapper);
-        documentsRetrievalUtils = new DocumentsRetrievalUtils(bundleRequestMapper, conversionToBundleRequestDocs);
-        bundleRequestMapper = new BundleRequestMapper(documentsRetrievalUtils,
-                                                      conversionToBundleRequestDocs,
-                                                      featureToggleService);
+        ConversionToBundleRequestDocs conversionToBundleRequestDocs = new ConversionToBundleRequestDocs(
+            featureToggleService,
+            bundleRequestMapper
+        );
+        DocumentsRetrievalUtils documentsRetrievalUtils = new DocumentsRetrievalUtils(
+            bundleRequestMapper,
+            conversionToBundleRequestDocs
+        );
+        bundleRequestMapper = new BundleRequestMapper(
+            documentsRetrievalUtils,
+            conversionToBundleRequestDocs,
+            featureToggleService);
     }
 
     @ParameterizedTest
@@ -986,7 +990,6 @@ class BundleRequestMapperTest {
 
     @Test
     void shouldFilterEvidenceForTrial() {
-        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
         List<Element<UploadEvidenceDocumentType>> list =
             bundleRequestMapper.filterDocumentaryEvidenceForTrialDocs(getDocumentEvidenceForTrial(),
                                                                       TypeOfDocDocumentaryEvidenceOfTrial.getAllDocsDisplayNames(), true);
@@ -995,7 +998,6 @@ class BundleRequestMapperTest {
 
     @Test
     void shouldFilterEvidenceForTrialAndCaseEventEnable() {
-        given(featureToggleService.isAmendBundleEnabled()).willReturn(true);
         List<Element<UploadEvidenceDocumentType>> list =
             bundleRequestMapper.filterDocumentaryEvidenceForTrialDocs(getDocumentEvidenceForTrial(),
                                                                       TypeOfDocDocumentaryEvidenceOfTrial.getAllDocsDisplayNames(), true);
