@@ -41,8 +41,8 @@ import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getE
 @RequiredArgsConstructor
 public class DocumentsRetrievalUtils {
 
-    private final BundleRequestMapper bundleRequestMapper;
     private final ConversionToBundleRequestDocs conversionToBundleRequestDocs;
+    private final BundleRequestDocsOrganizer bundleRequestDocsOrganizer;
     private static final String DATE_FORMAT = "dd/MM/yyyy";
 
     public String getParticularsOfClaimName(CaseData caseData) {
@@ -129,7 +129,7 @@ public class DocumentsRetrievalUtils {
                     getPartyByPartyType(partyType, caseData)
                 )).collect(Collectors.toList());
             if (!tempList.isEmpty()) {
-                Map<String, List<Element<UploadEvidenceExpert>>> expertReportMap = bundleRequestMapper.groupExpertStatementsByName(
+                Map<String, List<Element<UploadEvidenceExpert>>> expertReportMap = bundleRequestDocsOrganizer.groupExpertStatementsByName(
                     tempList);
                 expertReportMap.forEach((expertName, expertEvidenceList) -> bundlingRequestDocuments.addAll(
                     conversionToBundleRequestDocs.covertExpertEvidenceTypeToBundleRequestDocs(
@@ -147,7 +147,7 @@ public class DocumentsRetrievalUtils {
                                                                       BundleFileNameList bundleFileNameList, Set<String> allExpertsNames, Set<String> allJointExpertsNames) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         Map<String, List<Element<UploadEvidenceExpert>>> expertReportMap =
-            bundleRequestMapper.groupExpertStatementsByName(getExpertDocsByPartyAndDocType(
+            bundleRequestDocsOrganizer.groupExpertStatementsByName(getExpertDocsByPartyAndDocType(
                 partyType,
                 evidenceUploadFiles,
                 caseData
@@ -187,7 +187,7 @@ public class DocumentsRetrievalUtils {
                                                              Set<String> allExpertsNames) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         Map<String, List<Element<UploadEvidenceExpert>>> expertReportMap =
-            bundleRequestMapper.groupExpertStatementsByName(getExpertDocsByPartyAndDocType(
+            bundleRequestDocsOrganizer.groupExpertStatementsByName(getExpertDocsByPartyAndDocType(
                 partyType,
                 evidenceUploadFiles,
                 caseData
@@ -233,7 +233,7 @@ public class DocumentsRetrievalUtils {
         List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrial, List<String> displayNames, boolean doesNotMatchType) {
         if (documentEvidenceForTrial != null) {
             return
-                bundleRequestMapper.filterDocumentaryEvidenceForTrialDocs(
+                bundleRequestDocsOrganizer.filterDocumentaryEvidenceForTrialDocs(
                     documentEvidenceForTrial,
                     displayNames,
                     doesNotMatchType
@@ -292,18 +292,18 @@ public class DocumentsRetrievalUtils {
         }).toList();
     }
 
-    public List<BundlingRequestDocument> getDqWithNoCategoryId(CaseData caseData) {
-        List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
-        bundlingRequestDocuments.addAll(bundleRequestMapper.mapSystemGeneratedCaseDocument(
-            caseData.getSystemGeneratedCaseDocuments().stream()
-                .filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
-                    .equals(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                    && caseDocumentElement.getValue().getDocumentLink().getCategoryID() == null)
-                .collect(Collectors.toList()),
-            BundleFileNameList.DIRECTIONS_QUESTIONNAIRE_NO_CATEGORY_ID.getDisplayName()
-        ));
-        return bundlingRequestDocuments;
-    }
+    // public List<BundlingRequestDocument> getDqWithNoCategoryId(CaseData caseData) {
+    //     List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
+    //     bundlingRequestDocuments.addAll(bundleRequestMapper.mapSystemGeneratedCaseDocument(
+    //         caseData.getSystemGeneratedCaseDocuments().stream()
+    //             .filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
+    //                 .equals(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+    //                 && caseDocumentElement.getValue().getDocumentLink().getCategoryID() == null)
+    //             .collect(Collectors.toList()),
+    //         BundleFileNameList.DIRECTIONS_QUESTIONNAIRE_NO_CATEGORY_ID.getDisplayName()
+    //     ));
+    //     return bundlingRequestDocuments;
+    // }
 
     private boolean matchType(String name, Collection<String> displayNames, boolean doesNotMatchType) {
 

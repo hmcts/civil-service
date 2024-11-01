@@ -456,7 +456,7 @@ public class BundleRequestMapper {
             PartyType.DEFENDANT2
         ));
 
-        bundlingRequestDocuments.addAll(documentsRetrievalUtils.getDqWithNoCategoryId(caseData));
+        bundlingRequestDocuments.addAll(getDqWithNoCategoryId(caseData));
         return ElementUtils.wrapElements(bundlingRequestDocuments);
     }
 
@@ -598,14 +598,27 @@ public class BundleRequestMapper {
         return ElementUtils.wrapElements(bundlingRequestDocuments);
     }
 
-    public List<Element<UploadEvidenceDocumentType>> filterDocumentaryEvidenceForTrialDocs(
-        List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrial, List<String> displayNames,
-        boolean doesNotMatchType) {
-        sortEvidenceUploadByDate(documentEvidenceForTrial, false);
-        return documentEvidenceForTrial.stream().filter(uploadEvidenceDocumentTypeElement -> matchType(
-            uploadEvidenceDocumentTypeElement.getValue().getTypeOfDocument(),
-            displayNames, doesNotMatchType
-        )).collect(Collectors.toList());
+    // public List<Element<UploadEvidenceDocumentType>> filterDocumentaryEvidenceForTrialDocs(
+    //     List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrial, List<String> displayNames,
+    //     boolean doesNotMatchType) {
+    //     sortEvidenceUploadByDate(documentEvidenceForTrial, false);
+    //     return documentEvidenceForTrial.stream().filter(uploadEvidenceDocumentTypeElement -> matchType(
+    //         uploadEvidenceDocumentTypeElement.getValue().getTypeOfDocument(),
+    //         displayNames, doesNotMatchType
+    //     )).collect(Collectors.toList());
+    // }
+
+    public List<BundlingRequestDocument> getDqWithNoCategoryId(CaseData caseData) {
+        List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
+        bundlingRequestDocuments.addAll(mapSystemGeneratedCaseDocument(
+            caseData.getSystemGeneratedCaseDocuments().stream()
+                .filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
+                    .equals(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                    && caseDocumentElement.getValue().getDocumentLink().getCategoryID() == null)
+                .collect(Collectors.toList()),
+            BundleFileNameList.DIRECTIONS_QUESTIONNAIRE_NO_CATEGORY_ID.getDisplayName()
+        ));
+        return bundlingRequestDocuments;
     }
 
     private boolean matchType(String name, Collection<String> displayNames, boolean doesNotMatchType) {
