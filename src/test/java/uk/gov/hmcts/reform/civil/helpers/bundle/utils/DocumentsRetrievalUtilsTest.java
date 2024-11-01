@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.enums.caseprogression.BundleFileNameList;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadFiles;
 import uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper;
 import uk.gov.hmcts.reform.civil.helpers.bundle.BundleRequestDocsOrganizer;
-import uk.gov.hmcts.reform.civil.helpers.bundle.BundleRequestMapper;
 import uk.gov.hmcts.reform.civil.helpers.bundle.ConversionToBundleRequestDocs;
 import uk.gov.hmcts.reform.civil.helpers.bundle.DocumentsRetrievalUtils;
 import uk.gov.hmcts.reform.civil.helpers.bundle.PartyType;
@@ -42,7 +41,6 @@ import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getE
 
 @ExtendWith(MockitoExtension.class)
 class DocumentsRetrievalUtilsTest {
-
 
     @Mock
     private ConversionToBundleRequestDocs conversionToBundleRequestDocs;

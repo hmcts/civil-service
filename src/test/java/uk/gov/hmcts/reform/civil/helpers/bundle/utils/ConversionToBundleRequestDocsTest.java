@@ -8,7 +8,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadFiles;
 import uk.gov.hmcts.reform.civil.helpers.bundle.BundleRequestDocsOrganizer;
-import uk.gov.hmcts.reform.civil.helpers.bundle.BundleRequestMapper;
 import uk.gov.hmcts.reform.civil.helpers.bundle.ConversionToBundleRequestDocs;
 import uk.gov.hmcts.reform.civil.helpers.bundle.PartyType;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -19,16 +18,12 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class ConversionToBundleRequestDocsTest {
@@ -50,7 +45,6 @@ class ConversionToBundleRequestDocsTest {
             .partyName("PartyName")
             .type(Party.Type.INDIVIDUAL)
             .build();
-
 
         Document witnessDocument = Document.builder()
             .documentUrl("http://example.com/document.pdf")
