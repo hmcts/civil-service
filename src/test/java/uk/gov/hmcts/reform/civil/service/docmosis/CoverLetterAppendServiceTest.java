@@ -104,7 +104,7 @@ public class CoverLetterAppendServiceTest {
         .documentName("Cover letter.pdf")
         .createdBy("CIVIL")
         .createdDatetime(LocalDateTime.of(2024,  1, 2,  3,  4))
-        .documentLink(Document.builder().documentFileName("Cover letter").documentBinaryUrl("Binary/url").documentUrl("url").build())
+        .documentLink(Document.builder().documentFileName("Cover letter.pdf").documentBinaryUrl("Binary/url").documentUrl("url").build())
         .build();
 
     private static final CaseDocument caseDocument = CaseDocument.builder()
@@ -113,7 +113,7 @@ public class CoverLetterAppendServiceTest {
         .documentName("DocumentName.pdf")
         .createdBy("CIVIL")
         .createdDatetime(LocalDateTime.of(2024,  1, 2,  3,  4))
-        .documentLink(Document.builder().documentFileName("DocumentName").documentBinaryUrl("Binary/url").documentUrl("url").build())
+        .documentLink(Document.builder().documentFileName("DocumentName.pdf").documentBinaryUrl("Binary/url").documentUrl("url").build())
         .build();
     private static final byte[] STITCHED_DOC_BYTES = new byte[]{1, 2, 3, 4};
 
