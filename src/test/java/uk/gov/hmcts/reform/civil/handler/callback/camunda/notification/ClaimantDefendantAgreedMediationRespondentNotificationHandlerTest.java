@@ -218,14 +218,16 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
                     CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                     DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                     CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-                    PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+                    PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                    LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
                 );
             } else {
                 return Map.of(
                     CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                     CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData),
                     CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-                    PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+                    PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                    LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
                 );
             }
         }
@@ -236,7 +238,8 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData),
                 CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
             );
         }
 

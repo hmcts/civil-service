@@ -85,7 +85,8 @@ class NotifyClaimantCaseStayedHandlerTest {
                 "claimReferenceNumber", "1594901956117591",
                 "name", "John Doe",
                 "claimantvdefendant", "John Doe V Jack Jackson",
-                "partyReferences", buildPartiesReferencesEmailSubject(caseData)
+                "partyReferences", buildPartiesReferencesEmailSubject(caseData),
+                "legacyClaimReferenceNumber", caseData.getLegacyCaseReference()
             ),
             "case-stayed-claimant-notification-1594901956117591"
         );

@@ -36,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT2_FO
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGACY_CLAIM_REFERENCE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
@@ -169,7 +170,8 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 LEGAL_ORG_NAME, ORG_NAME_RESPONDENT1,
                 DEFENDANT_NAME, NotificationUtils.getDefendantNameBasedOnCaseType(caseData),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
             );
         }
 
@@ -179,7 +181,8 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 LEGAL_ORG_NAME, ORG_NAME_RESPONDENT2,
                 DEFENDANT_NAME, NotificationUtils.getDefendantNameBasedOnCaseType(caseData),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
             );
         }
 
