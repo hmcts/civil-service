@@ -9,6 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
@@ -64,6 +65,7 @@ public class MediationJsonServiceTest {
     private static final String MEDIATION_ALT_CONTACT_NUMBER = "07222222222";
 
     private static final String LIP_MEDIATION_CONTACT_NAME = "Lip contact person";
+    private static final String LIP_DEFENDANT_REGISTERED_EMAIL = "registered@email.com";
 
     @MockBean
     private OrganisationService organisationService;
@@ -555,7 +557,10 @@ public class MediationJsonServiceTest {
                 .respondent1Represented(NO)
                 .addLiPRespondent1MediationInfo(false)
                 .addLiPApplicant1MediationInfo(false)
-                .build();
+                .build().toBuilder()
+                .defendantUserDetails(IdamUserDetails.builder()
+                                          .email(LIP_DEFENDANT_REGISTERED_EMAIL)
+                                          .build()).build();
 
             List<MediationLitigant> expected = new ArrayList<>();
             expected.add(addMediationInfoLip(buildClaimant1(NO),
@@ -579,7 +584,10 @@ public class MediationJsonServiceTest {
                 .respondent1Represented(NO)
                 .addLiPRespondent1MediationInfo(false)
                 .addLiPApplicant1MediationInfo(false)
-                .build();
+                .build().toBuilder()
+                .defendantUserDetails(IdamUserDetails.builder()
+                                          .email(LIP_DEFENDANT_REGISTERED_EMAIL)
+                                          .build()).build();
 
             List<MediationLitigant> expected = new ArrayList<>();
             expected.add(addMediationInfoLip(buildUnrepresentedClaimant1Company(),
@@ -603,7 +611,10 @@ public class MediationJsonServiceTest {
                 .respondent1Represented(NO)
                 .addLiPRespondent1MediationInfo(true)
                 .addLiPApplicant1MediationInfo(true)
-                .build();
+                .build().toBuilder()
+                .defendantUserDetails(IdamUserDetails.builder()
+                                          .email(LIP_DEFENDANT_REGISTERED_EMAIL)
+                                          .build()).build();
 
             List<MediationLitigant> expected = new ArrayList<>();
             expected.add(addAltMediationInfoLip(buildClaimant1(NO)));
@@ -910,7 +921,7 @@ public class MediationJsonServiceTest {
                 .represented(false)
                 .solicitorOrgName(null)
                 .litigantTelephone("0123456789")
-                .litigantEmail("sole.trader@email.com")
+                .litigantEmail(LIP_DEFENDANT_REGISTERED_EMAIL)
                 .mediationContactName(null)
                 .mediationContactNumber(null)
                 .mediationContactEmail(null)

@@ -176,7 +176,8 @@ public class MediationJsonService {
             return buildUnrepresentedLitigant(caseData.getApplicant1(),
                                               caseData.getCaseDataLiP().getApplicant1AdditionalLipPartyDetails() != null
                                                   ? caseData.getCaseDataLiP().getApplicant1AdditionalLipPartyDetails().getContactPerson() : null,
-                                              caseData.getCaseDataLiP().getApplicant1LiPResponseCarm());
+                                              caseData.getCaseDataLiP().getApplicant1LiPResponseCarm(),
+                                              false, caseData);
         } else {
             return buildRepresentedLitigant(caseData.getApplicant1(),
                                             caseData.getApp1MediationContactInfo(),
@@ -207,7 +208,8 @@ public class MediationJsonService {
             return buildUnrepresentedLitigant(caseData.getRespondent1(),
                                               caseData.getCaseDataLiP().getRespondent1LiPResponse() != null
                                                   ? caseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1LiPContactPerson() : null,
-                                              caseData.getCaseDataLiP().getRespondent1MediationLiPResponseCarm());
+                                              caseData.getCaseDataLiP().getRespondent1MediationLiPResponseCarm(),
+                                              true, caseData);
         }
     }
 
@@ -225,7 +227,8 @@ public class MediationJsonService {
     }
 
     private MediationLitigant buildUnrepresentedLitigant(Party party, String originalMediationContactPerson,
-                                                         MediationLiPCarm mediationLiPCarm) {
+                                                         MediationLiPCarm mediationLiPCarm, boolean isRespondent1,
+                                                         CaseData caseData) {
         List<MediationUnavailability> dateRangeToAvoid = getDateRangeToAvoid(mediationLiPCarm);
 
         String mediationContactName = getUnrepresentedLitigantMediationContactName(
@@ -237,6 +240,11 @@ public class MediationJsonService {
         String mediationPhone = YES.equals(mediationLiPCarm.getIsMediationPhoneCorrect())
             ? party.getPartyPhone() : mediationLiPCarm.getAlternativeMediationTelephone();
 
+        String litigantEmail = party.getPartyEmail();
+        if (isRespondent1 && caseData.getDefendantUserDetails() != null) {
+            litigantEmail = caseData.getDefendantUserDetails().getEmail();
+        }
+
         String partyRole = party.getFlags() != null ? party.getFlags().getRoleOnCase() : null;
         return MediationLitigant.builder()
             .partyID(party.getPartyID())
@@ -246,7 +254,7 @@ public class MediationJsonService {
             .paperResponse(PAPER_RESPONSE)
             .represented(false)
             .solicitorOrgName(null)
-            .litigantEmail(party.getPartyEmail())
+            .litigantEmail(litigantEmail)
             .litigantTelephone(party.getPartyPhone())
             .mediationContactName(mediationContactName)
             .mediationContactNumber(mediationPhone)
