@@ -645,4 +645,7 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String notifyLipBilingualStayUpdateRequested;
+
+    @NotEmpty
+    private String notifyClaimantLRCoscApplied;
 }
