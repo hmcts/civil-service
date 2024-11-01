@@ -203,9 +203,11 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_JUDGEMENTS_ONLINE_ISSUED_CCJ_CLAIMANT("Scenario.AAA6.JudgmentsOnline.IssuedCCJ.Claimant"),
     SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_PROCESSED_DEFENDANT("Scenario.AAA6.ProofofDebtPayment.ApplicationProcessed.Defendant"),
     SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_CLAIMANT("Scenario.AAA6.ProofofDebtPayment.Application.Claimant"),
+    SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_DEFENDANT("Scenario.AAA6.ProofofDebtPayment.Application.Defendant"),
+    SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT("Scenario.AAA6.CP.Stay.Lifted.Claimant"),
+    SCENARIO_AAA6_CP_STAY_LIFTED_DEFENDANT("Scenario.AAA6.CP.Stay.Lifted.Defendant"),
     SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT("Scenario.AAA6.Update.CaseProceedsInCaseman.Defendant"),
-    SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK("Scenario.AAA6.Update.CaseProceedsInCaseman.Defendant.FastTrack"),
-    SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_DEFENDANT("Scenario.AAA6.ProofofDebtPayment.Application.Defendant");
+    SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK("Scenario.AAA6.Update.CaseProceedsInCaseman.Defendant.FastTrack");
 
     private final String scenario;
 
