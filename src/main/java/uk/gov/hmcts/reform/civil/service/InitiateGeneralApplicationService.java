@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.DebtPaymentOptions;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -258,10 +257,12 @@ public class InitiateGeneralApplicationService {
         if (featureToggleService.isCoSCEnabled()
             && caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID)) {
             if (Objects.nonNull(caseData.getCertOfSC().getDebtPaymentEvidence())
-                && Objects.nonNull(caseData.getCertOfSC().getDebtPaymentEvidence().getDebtPaymentOption())
-                && caseData.getCertOfSC().getDebtPaymentEvidence().getDebtPaymentOption().equals(
-                    DebtPaymentOptions.UNABLE_TO_PROVIDE_EVIDENCE_OF_FULL_PAYMENT)) {
-                caseData.getCertOfSC().setProofOfDebtDoc(java.util.Collections.emptyList());
+                && Objects.nonNull(caseData.getCertOfSC().getDebtPaymentEvidence().getDebtPaymentOption())) {
+                switch (caseData.getCertOfSC().getDebtPaymentEvidence().getDebtPaymentOption()) {
+                    case UPLOAD_EVIDENCE_DEBT_PAID_IN_FULL, MADE_FULL_PAYMENT_TO_COURT ->
+                        caseData.getCertOfSC().setProofOfDebtDoc(caseData.getGeneralAppEvidenceDocument());
+                    default -> caseData.getCertOfSC().setProofOfDebtDoc(java.util.Collections.emptyList());
+                }
             }
             applicationBuilder.certOfSC(caseData.getCertOfSC());
         }
