@@ -41,10 +41,15 @@ public class PaymentProcessingHelper {
         Map<String, Object> updatedData = caseData.toMap(objectMapper);
         return CaseDataContent.builder()
             .eventToken(startEventResponse.getToken())
-            .event(Event.builder().id(startEventResponse.getEventId()).build())
+            .event(Event.builder()
+                       .id(startEventResponse.getEventId())
+                       .summary(null)
+                       .description(null)
+                       .build())
             .data(updatedData)
             .build();
     }
+
 
     public PaymentDetails retrievePaymentDetails(String feeType, CaseData caseData) {
         return switch (FeeType.valueOf(feeType)) {
