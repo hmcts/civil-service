@@ -50,7 +50,6 @@ public class PaymentProcessingHelper {
             .build();
     }
 
-
     public PaymentDetails retrievePaymentDetails(String feeType, CaseData caseData) {
         return switch (FeeType.valueOf(feeType)) {
             case HEARING -> caseData.getHearingFeePaymentDetails();
