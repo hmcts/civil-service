@@ -99,7 +99,8 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
                 caseData.getCcdCaseReference().toString(),
                 CLAIM_LEGAL_ORG_NAME_SPEC,
                 getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
             );
         }
         return Map.of(

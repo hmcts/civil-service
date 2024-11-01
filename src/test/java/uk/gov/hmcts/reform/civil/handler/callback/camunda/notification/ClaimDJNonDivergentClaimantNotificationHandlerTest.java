@@ -34,6 +34,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME_INTERIM;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGACY_CLAIM_REFERENCE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
@@ -152,7 +153,8 @@ public class ClaimDJNonDivergentClaimantNotificationHandlerTest extends BaseCall
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             LEGAL_ORG_NAME, "Test Org Name",
             DEFENDANT_NAME_INTERIM, "Mr. Sole Trader",
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
         );
     }
 
@@ -162,7 +164,8 @@ public class ClaimDJNonDivergentClaimantNotificationHandlerTest extends BaseCall
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             LEGAL_ORG_NAME, "Test Org Name",
             DEFENDANT_NAME_INTERIM, "Mr. Sole Trader and Mr. John Rambo",
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
         );
     }
 

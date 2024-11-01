@@ -79,7 +79,8 @@ public class NotifyClaimantJudgmentVariedDeterminationOfMeansNotificationHandler
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 LEGAL_ORG_NAME, getApplicantLegalOrganizationName(caseData, organisationService),
                 DEFENDANT_NAME,  getDefendantNameBasedOnCaseType(caseData),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
             );
     }
 

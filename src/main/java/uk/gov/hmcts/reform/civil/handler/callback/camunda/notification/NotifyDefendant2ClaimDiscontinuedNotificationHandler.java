@@ -84,7 +84,8 @@ public class NotifyDefendant2ClaimDiscontinuedNotificationHandler extends Callba
             caseData.getCcdCaseReference().toString(),
             LEGAL_ORG_NAME,
             getRespondentLegalOrganizationName(caseData.getRespondent2OrganisationPolicy(), organisationService),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
         );
     }
 }

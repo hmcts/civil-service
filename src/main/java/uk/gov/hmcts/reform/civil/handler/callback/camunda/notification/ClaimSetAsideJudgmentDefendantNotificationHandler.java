@@ -75,7 +75,8 @@ public class ClaimSetAsideJudgmentDefendantNotificationHandler extends CallbackH
             LEGAL_ORG_NAME, getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService),
             DEFENDANT_NAME_INTERIM, getDefendantNameBasedOnCaseType(caseData),
             REASON_FROM_CASEWORKER, caseData.getJoSetAsideJudgmentErrorText(),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
         );
     }
 
@@ -131,7 +132,8 @@ public class ClaimSetAsideJudgmentDefendantNotificationHandler extends CallbackH
             LEGAL_ORG_NAME, getRespondentLegalOrganizationName(caseData.getRespondent2OrganisationPolicy(), organisationService),
             REASON_FROM_CASEWORKER, caseData.getJoSetAsideJudgmentErrorText(),
             DEFENDANT_NAME_INTERIM, getDefendantNameBasedOnCaseType(caseData),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
         );
     }
 

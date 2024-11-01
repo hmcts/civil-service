@@ -110,7 +110,8 @@ public class NotificationForClaimantRepresented extends CallbackHandler implemen
                 LEGAL_ORG_APPLICANT1, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                         .getOrganisation().getOrganisationID()),
                 CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
         );
     }
 

@@ -45,6 +45,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGACY_CLAIM_REFERENCE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
@@ -508,7 +509,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME,
                 DEFENDANT_NAME, DEFENDANT_PARTY_NAME,
                 CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString(),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
             );
         }
 
@@ -518,7 +520,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME,
                 PARTY_NAME, CLAIMANT_TEXT + DEFENDANT_PARTY_NAME,
                 CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString(),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
             );
         }
 
@@ -528,7 +531,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME,
                 PARTY_NAME, CLAIMANT_TEXT + DEFENDANT_PARTY_NAME + " and " + DEFENDANT_2_PARTY_NAME,
                 CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString(),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
             );
         }
 
@@ -537,7 +541,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
             return Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME,
                 CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString(),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
             );
         }
     }

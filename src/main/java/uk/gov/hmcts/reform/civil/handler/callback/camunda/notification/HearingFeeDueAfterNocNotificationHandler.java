@@ -81,7 +81,8 @@ public class HearingFeeDueAfterNocNotificationHandler extends CallbackHandler
             HEARING_TIME, caseData.getHearingTimeHourMinute(),
             HEARING_FEE, String.valueOf(caseData.getHearingFee().formData()),
             HEARING_DUE_DATE, formatLocalDate(caseData.getHearingDueDate(), DATE),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
         );
     }
 

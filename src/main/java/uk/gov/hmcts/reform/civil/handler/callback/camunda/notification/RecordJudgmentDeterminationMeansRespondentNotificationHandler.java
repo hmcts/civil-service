@@ -101,7 +101,8 @@ public class RecordJudgmentDeterminationMeansRespondentNotificationHandler exten
                 caseData.getRespondent1OrganisationPolicy(),
                 organisationService),
             DEFENDANT_NAME, NotificationUtils.getDefendantNameBasedOnCaseType(caseData),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
         );
     }
 
@@ -112,7 +113,8 @@ public class RecordJudgmentDeterminationMeansRespondentNotificationHandler exten
                 caseData.getRespondent2OrganisationPolicy(),
                 organisationService),
             DEFENDANT_NAME, NotificationUtils.getDefendantNameBasedOnCaseType(caseData),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
         );
     }
 

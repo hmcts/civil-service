@@ -98,7 +98,8 @@ public class ClaimantDefendantAgreedMediationRespondentNotificationHandler exten
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
             );
         } else {
             return Map.of(
@@ -106,7 +107,8 @@ public class ClaimantDefendantAgreedMediationRespondentNotificationHandler exten
                 CLAIM_LEGAL_ORG_NAME_SPEC,
                 getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService),
                 CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
             );
         }
     }
@@ -117,7 +119,8 @@ public class ClaimantDefendantAgreedMediationRespondentNotificationHandler exten
             CLAIM_LEGAL_ORG_NAME_SPEC,
             getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService),
             CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
         );
     }
 
@@ -126,7 +129,8 @@ public class ClaimantDefendantAgreedMediationRespondentNotificationHandler exten
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIM_LEGAL_ORG_NAME_SPEC,
             getRespondentLegalOrganizationName(caseData.getRespondent2OrganisationPolicy(), organisationService),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
         );
     }
 

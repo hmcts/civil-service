@@ -80,7 +80,8 @@ public class ClaimSetAsideJudgmentClaimantNotificationHandler extends CallbackHa
             LEGAL_ORG_NAME, getApplicantLegalOrganizationName(caseData, organisationService),
             DEFENDANT_NAME_INTERIM,  getDefendantNameBasedOnCaseType(caseData),
             REASON_FROM_CASEWORKER, caseData.getJoSetAsideJudgmentErrorText(),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
         );
 
     }

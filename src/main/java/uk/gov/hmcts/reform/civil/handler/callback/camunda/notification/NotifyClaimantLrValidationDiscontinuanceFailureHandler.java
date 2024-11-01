@@ -73,7 +73,8 @@ public class NotifyClaimantLrValidationDiscontinuanceFailureHandler extends Call
         return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 LEGAL_ORG_NAME, getApplicantLegalOrganizationName(caseData, organisationService),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
             );
     }
 

@@ -56,7 +56,8 @@ public abstract class AbstractNotifyCaseStayedHandler extends CallbackHandler im
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_NAME, getPartyName(caseData),
             CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            LEGACY_CLAIM_REFERENCE, caseData.getLegacyCaseReference()
         );
     }
 
