@@ -43,6 +43,7 @@ class BundleRequestMapperTest {
     private BundleRequestMapper bundleRequestMapper;
     @Mock
     private FeatureToggleService featureToggleService;
+
     private static final String TEST_URL = "url";
     private static final String TEST_FILE_TYPE = "Email";
     private static final String TEST_FILE_NAME = "testFileName.pdf";
