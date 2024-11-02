@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,11 +8,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -21,17 +21,18 @@ import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_UPLOAD_HEARING_DOCUMENTS_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_STAY_LIFTED_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
-class UploadHearingDocumentsDefendantHandlerTest extends BaseCallbackHandlerTest {
+public class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
-    private UploadHearingDocumentsDefendantHandler handler;
+    private StayLiftedClaimantNotificationHandler handler;
 
     @Mock
     private DashboardApiClient dashboardApiClient;
@@ -42,13 +43,11 @@ class UploadHearingDocumentsDefendantHandlerTest extends BaseCallbackHandlerTest
     @Mock
     private FeatureToggleService featureToggleService;
 
-    public static final String TASK_ID = "CreateUploadHearingDocumentNotificationForDefendant";
-
-    HashMap<String, Object> params = new HashMap<>();
+    public static final String TASK_ID = "DashboardNotificationStayLiftedClaimant";
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
-        assertThat(handler.handledEvents()).contains(CREATE_DASHBOARD_NOTIFICATION_UPLOAD_HEARING_DOCUMENTS_DEFENDANT);
+        assertThat(handler.handledEvents()).contains(CREATE_DASHBOARD_NOTIFICATION_STAY_LIFTED_CLAIMANT);
     }
 
     @Test
@@ -56,25 +55,22 @@ class UploadHearingDocumentsDefendantHandlerTest extends BaseCallbackHandlerTest
         assertThat(handler.camundaActivityId(
             CallbackParamsBuilder.builder()
                 .request(CallbackRequest.builder()
-                             .eventId(CREATE_DASHBOARD_NOTIFICATION_UPLOAD_HEARING_DOCUMENTS_DEFENDANT.name())
+                             .eventId(CREATE_DASHBOARD_NOTIFICATION_STAY_LIFTED_CLAIMANT.name())
                              .build())
                 .build()))
             .isEqualTo(TASK_ID);
     }
 
     @Test
-    void createDashboardNotifications() {
+    void shouldConfigureDashboardNotificationsStayCase() {
 
-        params.put("ccdCaseReference", "1239988");
+        HashMap<String, Object> params = new HashMap<>();
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .respondent1Represented(YesOrNo.NO)
-            .ccdCaseReference(12349988L)
-            .ccdState(CaseState.CASE_PROGRESSION)
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
+            .toBuilder().applicant1Represented(YesOrNo.NO)
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -82,9 +78,10 @@ class UploadHearingDocumentsDefendantHandlerTest extends BaseCallbackHandlerTest
             .build();
 
         handler.handle(callbackParams);
-        verify(dashboardApiClient).recordScenario(
+
+        verify(dashboardApiClient, times(1)).recordScenario(
             caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_DEFENDANT.getScenario(),
+            SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT.getScenario(),
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );
