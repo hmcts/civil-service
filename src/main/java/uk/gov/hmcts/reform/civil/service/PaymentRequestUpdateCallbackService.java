@@ -164,13 +164,23 @@ public class PaymentRequestUpdateCallbackService {
 
     private CaseEvent determineEvent(CaseData caseData, FeeType feeType, boolean isCallback) {
         return switch (feeType) {
-            case HEARING -> isCallback ? SERVICE_REQUEST_RECEIVED : CITIZEN_HEARING_FEE_PAYMENT;
-            case CLAIMISSUED -> isCallback
-                ? (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM
-                ? CREATE_CLAIM_SPEC_AFTER_PAYMENT
-                : CREATE_CLAIM_AFTER_PAYMENT)
-                : CITIZEN_CLAIM_ISSUE_PAYMENT;
+            case HEARING -> getHearingEvent(isCallback);
+            case CLAIMISSUED -> getClaimIssuedEvent(caseData, isCallback);
         };
+    }
+
+    private CaseEvent getHearingEvent(boolean isCallback) {
+        return isCallback ? SERVICE_REQUEST_RECEIVED : CITIZEN_HEARING_FEE_PAYMENT;
+    }
+
+    private CaseEvent getClaimIssuedEvent(CaseData caseData, boolean isCallback) {
+        if (isCallback) {
+            return caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM
+                ? CREATE_CLAIM_SPEC_AFTER_PAYMENT
+                : CREATE_CLAIM_AFTER_PAYMENT;
+        } else {
+            return CITIZEN_CLAIM_ISSUE_PAYMENT;
+        }
     }
 
     private CaseData updateCaseDataWithPaymentDetails(ServiceRequestUpdateDto dto, CaseData caseData, FeeType feeType) {
