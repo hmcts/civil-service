@@ -10,8 +10,10 @@ import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
+import java.util.HashMap;
 import java.util.Map;
 
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
@@ -35,6 +37,10 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
         return null;
     }
 
+    protected Map<String, Boolean> getScenarios(CaseData caseData) {
+        return null;
+    }
+
     /**
      * Depending on the case data, the scenario may or may not be applicable.
      *
@@ -52,7 +58,7 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
     /**
      * Called just before a scenario is recorded, when the scenario is known and should record is true.
      *
-     * @param caseData case info
+     * @param caseData  case info
      * @param authToken auth token
      */
     protected void beforeRecordScenario(CaseData caseData, String authToken) {
@@ -86,6 +92,15 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
                 scenarioParams
             );
         }
+
+        ofNullable(getScenarios(caseData)).orElse(new HashMap<>())
+            .entrySet().stream()
+            .filter(scenarioEntry -> !Strings.isNullOrEmpty(scenarioEntry.getKey()) && scenarioEntry.getValue())
+            .forEach(scenarioEntry -> dashboardApiClient.recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                scenarioEntry.getKey(),
+                authToken,
+                scenarioParams));
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }

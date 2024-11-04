@@ -125,6 +125,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
+import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
@@ -1592,5 +1593,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isLipCase() {
         return this.isApplicant1NotRepresented() || this.isRespondent1LiP();
+    }
+
+    @JsonIgnore
+    public boolean isHearingFeePaid() {
+        return nonNull(this.getHearingFeePaymentDetails())
+            && SUCCESS.equals(this.getHearingFeePaymentDetails().getStatus()) || this.hearingFeePaymentDoneWithHWF();
     }
 }
