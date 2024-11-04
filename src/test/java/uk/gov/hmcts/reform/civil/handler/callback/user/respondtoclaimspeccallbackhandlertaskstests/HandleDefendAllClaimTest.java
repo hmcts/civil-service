@@ -44,7 +44,7 @@ class HandleDefendAllClaimTest {
     private PaymentDateValidator paymentDateValidator;
 
     @Mock
-    private RespondToClaimSpecUtils respondToClaimSpecUtilsDisputeDetails;
+    private RespondToClaimSpecUtils respondToClaimSpecUtils;
 
     @InjectMocks
     private HandleDefendAllClaim handleDefendAllClaim;
@@ -55,7 +55,8 @@ class HandleDefendAllClaimTest {
         handleDefendAllClaim = new HandleDefendAllClaim(
             objectMapper,
             toggleService,
-            paymentDateValidator
+            paymentDateValidator,
+            respondToClaimSpecUtils
         );
     }
 
