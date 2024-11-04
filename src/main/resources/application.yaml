@@ -460,6 +460,7 @@ notifications:
   notifyLRStayUpdateRequested: "2bf8e191-d0aa-4cc3-9c54-42245c1d56a2"
   notifyLipStayUpdateRequested: "a08532c7-67f5-4c4f-a30d-81c4c0508ffc"
   notifyLipBilingualStayUpdateRequested: "95e2509e-7e8a-4c59-a756-605286b88847"
+  notifyClaimantLRCoscApplied: "a2f38927-7e54-4066-bbce-ff6ffda821ac"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
