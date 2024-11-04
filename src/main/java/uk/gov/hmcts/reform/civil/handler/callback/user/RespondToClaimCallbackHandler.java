@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.SetApplicantResponseDeadline;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -538,14 +539,13 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         // casefileview changes need to assign documents into specific folders, this is help determine
         // which user is "creating" the document and therefore which folder to move the documents
         // into, when directions order is generated in GenerateDirectionsQuestionnaireCallbackHandler
-        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        updatedCaseDataBuilder.respondent2DocumentGeneration(null);
-        if (!coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
-                                                     .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
-            && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
-                                                       .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
-            updatedCaseDataBuilder.respondent2DocumentGeneration("userRespondent2");
-        }
+        SetApplicantResponseDeadline.getUserInfo(
+            callbackParams,
+            updatedCaseDataBuilder,
+            caseData,
+            userService,
+            coreCaseUserService
+        );
 
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
             && isAwaitingAnotherDefendantResponse(caseData)) {
