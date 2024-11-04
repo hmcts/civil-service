@@ -32,8 +32,17 @@ public class DetermineLoggedInSolicitor implements CaseTask {
 
     public CallbackResponse execute(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-
         var updatedCaseData = caseData.toBuilder();
+
+        updateSolicitorRoles(callbackParams, updatedCaseData);
+        updateCompanyOrOrganisationStatus(caseData, updatedCaseData);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedCaseData.build().toMap(objectMapper))
+            .build();
+    }
+
+    private void updateSolicitorRoles(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
         if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORONE)) {
             updatedCaseData.isRespondent1(YES);
             updatedCaseData.isRespondent2(NO);
@@ -47,30 +56,34 @@ public class DetermineLoggedInSolicitor implements CaseTask {
             updatedCaseData.isRespondent2(NO);
             updatedCaseData.isApplicant1(YES);
         }
+    }
 
+    private void updateCompanyOrOrganisationStatus(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
         if (YES.equals(caseData.getIsRespondent2())) {
-            if (caseData.getRespondent2DetailsForClaimDetailsTab() != null
-                && ("Company".equals(caseData.getRespondent2DetailsForClaimDetailsTab().getPartyTypeDisplayValue())
-                || "Organisation".equals(
-                caseData.getRespondent2DetailsForClaimDetailsTab().getPartyTypeDisplayValue()))) {
-                updatedCaseData.neitherCompanyNorOrganisation(NO);
-            } else {
-                updatedCaseData.neitherCompanyNorOrganisation(YES);
-            }
+            updateCompanyOrOrganisationStatusForRespondent2(caseData, updatedCaseData);
         } else {
-            if ((caseData.getRespondent1DetailsForClaimDetailsTab() != null
-                && ("Company".equals(caseData.getRespondent1DetailsForClaimDetailsTab().getPartyTypeDisplayValue())
-                || "Organisation".equals(
-                caseData.getRespondent1DetailsForClaimDetailsTab().getPartyTypeDisplayValue())))) {
-                updatedCaseData.neitherCompanyNorOrganisation(NO);
-            } else {
-                updatedCaseData.neitherCompanyNorOrganisation(YES);
-            }
+            updateCompanyOrOrganisationStatusForRespondent1(caseData, updatedCaseData);
         }
+    }
 
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.build().toMap(objectMapper))
-            .build();
+    private void updateCompanyOrOrganisationStatusForRespondent2(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+        if (caseData.getRespondent2DetailsForClaimDetailsTab() != null
+            && ("Company".equals(caseData.getRespondent2DetailsForClaimDetailsTab().getPartyTypeDisplayValue())
+            || "Organisation".equals(caseData.getRespondent2DetailsForClaimDetailsTab().getPartyTypeDisplayValue()))) {
+            updatedCaseData.neitherCompanyNorOrganisation(NO);
+        } else {
+            updatedCaseData.neitherCompanyNorOrganisation(YES);
+        }
+    }
+
+    private void updateCompanyOrOrganisationStatusForRespondent1(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+        if (caseData.getRespondent1DetailsForClaimDetailsTab() != null
+            && ("Company".equals(caseData.getRespondent1DetailsForClaimDetailsTab().getPartyTypeDisplayValue())
+            || "Organisation".equals(caseData.getRespondent1DetailsForClaimDetailsTab().getPartyTypeDisplayValue()))) {
+            updatedCaseData.neitherCompanyNorOrganisation(NO);
+        } else {
+            updatedCaseData.neitherCompanyNorOrganisation(YES);
+        }
     }
 
     private boolean solicitorHasCaseRole(CallbackParams callbackParams, CaseRole caseRole) {
