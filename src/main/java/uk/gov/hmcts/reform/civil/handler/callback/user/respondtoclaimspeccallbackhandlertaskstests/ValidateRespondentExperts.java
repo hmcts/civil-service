@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.CaseTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -24,19 +25,42 @@ public class ValidateRespondentExperts implements CaseTask, ExpertsValidator {
 
     public CallbackResponse execute(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (!ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
-            if (respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
-                return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
-            } else if (respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
-                return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
-            } else if (respondToClaimSpecUtils.isRespondent2HasSameLegalRep(caseData)
-                && caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO
-                && caseData.getRespondent2DQ() != null
-                && caseData.getRespondent2DQ().getRespondent2DQExperts() != null) {
-                return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
-            }
+        MultiPartyScenario scenario = MultiPartyScenario.getMultiPartyScenario(caseData);
+
+        if (!ONE_V_ONE.equals(scenario)) {
+            return handleMultiPartyScenario(callbackParams, caseData);
         }
-        return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
+        return validateExperts(caseData.getRespondent1DQ());
     }
 
+    private CallbackResponse handleMultiPartyScenario(CallbackParams callbackParams, CaseData caseData) {
+        if (isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
+            return validateExperts(caseData.getRespondent1DQ());
+        } else if (isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
+            return validateExperts(caseData.getRespondent2DQ());
+        } else if (isRespondent2WithDifferentLegalRep(caseData)) {
+            return validateExperts(caseData.getRespondent2DQ());
+        }
+        return validateExperts(caseData.getRespondent1DQ());
+    }
+
+    private boolean isSolicitorRepresentsOnlyOneOfRespondents(CallbackParams callbackParams, CaseRole caseRole) {
+        return respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, caseRole);
+    }
+
+    private boolean isRespondent2WithDifferentLegalRep(CaseData caseData) {
+        return hasSameLegalRep(caseData) && isResponseDifferent(caseData) && hasRespondent2DQExperts(caseData);
+    }
+
+    private boolean hasSameLegalRep(CaseData caseData) {
+        return respondToClaimSpecUtils.isRespondent2HasSameLegalRep(caseData);
+    }
+
+    private boolean isResponseDifferent(CaseData caseData) {
+        return caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO;
+    }
+
+    private boolean hasRespondent2DQExperts(CaseData caseData) {
+        return caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getRespondent2DQExperts() != null;
+    }
 }

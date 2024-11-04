@@ -19,6 +19,14 @@ public class ValidateLengthOfUnemployment implements CaseTask {
 
     public CallbackResponse execute(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        List<String> errors = validateLengthOfUnemployment(caseData);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
+    private List<String> validateLengthOfUnemployment(CaseData caseData) {
         List<String> errors = new ArrayList<>();
 
         if (caseData.getRespondToClaimAdmitPartUnemployedLRspec() != null) {
@@ -31,8 +39,6 @@ public class ValidateLengthOfUnemployment implements CaseTask {
             }
         }
 
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
+        return errors;
     }
 }

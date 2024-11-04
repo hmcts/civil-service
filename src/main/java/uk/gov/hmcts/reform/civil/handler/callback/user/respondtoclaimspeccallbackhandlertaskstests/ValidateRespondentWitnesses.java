@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.CaseTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -29,18 +30,33 @@ public class ValidateRespondentWitnesses implements CaseTask, WitnessesValidator
 
     public CallbackResponse execute(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (!ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
-            if (respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
-                return validateR1Witnesses(caseData);
-            } else if (respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
-                return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
-            } else if (respondent2HasSameLegalRep(caseData)
-                && caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO
-                && caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getRespondent2DQWitnesses() != null) {
-                return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
-            }
+        MultiPartyScenario scenario = MultiPartyScenario.getMultiPartyScenario(caseData);
+
+        if (!ONE_V_ONE.equals(scenario)) {
+            return handleMultiPartyScenario(callbackParams, caseData);
         }
         return validateR1Witnesses(caseData);
+    }
+
+    private CallbackResponse handleMultiPartyScenario(CallbackParams callbackParams, CaseData caseData) {
+        if (isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
+            return validateR1Witnesses(caseData);
+        } else if (isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
+            return validateWitnesses(caseData.getRespondent2DQ());
+        } else if (isRespondent2HasDifferentResponse(caseData)) {
+            return validateWitnesses(caseData.getRespondent2DQ());
+        }
+        return validateR1Witnesses(caseData);
+    }
+
+    private boolean isSolicitorRepresentsOnlyOneOfRespondents(CallbackParams callbackParams, CaseRole caseRole) {
+        return respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, caseRole);
+    }
+
+    private boolean isRespondent2HasDifferentResponse(CaseData caseData) {
+        return respondent2HasSameLegalRep(caseData)
+            && caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO
+            && caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getRespondent2DQWitnesses() != null;
     }
 
     private CallbackResponse validateR1Witnesses(CaseData caseData) {

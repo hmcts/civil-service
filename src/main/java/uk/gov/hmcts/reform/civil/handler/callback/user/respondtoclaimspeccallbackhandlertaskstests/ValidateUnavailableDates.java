@@ -27,13 +27,10 @@ public class ValidateUnavailableDates implements CaseTask {
     public CallbackResponse execute(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors;
-        if (SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
-            SmallClaimHearing smallClaimHearing = caseData.getRespondent1DQ().getRespondent1DQHearingSmallClaim();
-            if (YES.equals(caseData.getIsRespondent2())) {
-                smallClaimHearing = caseData.getRespondent2DQ().getRespondent2DQHearingSmallClaim();
-            }
-            errors = unavailableDateValidator.validateSmallClaimsHearing(smallClaimHearing);
 
+        if (isSmallClaim(caseData)) {
+            SmallClaimHearing smallClaimHearing = getSmallClaimHearing(caseData);
+            errors = unavailableDateValidator.validateSmallClaimsHearing(smallClaimHearing);
         } else {
             Hearing hearingLRspec = caseData.getRespondent1DQ().getRespondent1DQHearingFastClaim();
             errors = unavailableDateValidator.validateFastClaimHearing(hearingLRspec);
@@ -42,5 +39,16 @@ public class ValidateUnavailableDates implements CaseTask {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
+    }
+
+    private boolean isSmallClaim(CaseData caseData) {
+        return SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack());
+    }
+
+    private SmallClaimHearing getSmallClaimHearing(CaseData caseData) {
+        if (YES.equals(caseData.getIsRespondent2())) {
+            return caseData.getRespondent2DQ().getRespondent2DQHearingSmallClaim();
+        }
+        return caseData.getRespondent1DQ().getRespondent1DQHearingSmallClaim();
     }
 }

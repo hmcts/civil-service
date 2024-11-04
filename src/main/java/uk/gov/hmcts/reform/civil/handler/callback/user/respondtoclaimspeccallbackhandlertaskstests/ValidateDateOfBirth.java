@@ -38,32 +38,14 @@ public class ValidateDateOfBirth implements CaseTask {
     private final RespondToClaimSpecUtils respondToClaimSpecUtils;
 
     public CallbackResponse execute(CallbackParams callbackParams) {
-        Party respondent = callbackParams.getCaseData().getRespondent1();
-        if (respondent == null && callbackParams.getCaseData().getRespondent2() != null) {
-            respondent = callbackParams.getCaseData().getRespondent2();
-        }
+        Party respondent = getRespondent(callbackParams);
         List<String> errors = dateOfBirthValidator.validate(respondent);
 
         CaseData caseData = callbackParams.getCaseData();
         errors.addAll(correspondenceAddressCorrect(caseData));
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
-        if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))
-            && YES.equals(caseData.getAddRespondent2())) {
-            if (respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
-                && respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
-                updatedData.sameSolicitorSameResponse(YES).build();
-            } else {
-                updatedData.sameSolicitorSameResponse(NO).build();
-            }
-        } else if (ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
-            && YES.equals(caseData.getAddRespondent2())) {
-            if (NO.equals(caseData.getRespondentResponseIsSame())) {
-                updatedData.sameSolicitorSameResponse(NO).build();
-            } else {
-                updatedData.sameSolicitorSameResponse(YES).build();
-            }
 
-        }
+        updateSolicitorResponse(callbackParams, caseData, updatedData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
@@ -71,22 +53,49 @@ public class ValidateDateOfBirth implements CaseTask {
             .build();
     }
 
+    private Party getRespondent(CallbackParams callbackParams) {
+        Party respondent = callbackParams.getCaseData().getRespondent1();
+        if (respondent == null && callbackParams.getCaseData().getRespondent2() != null) {
+            respondent = callbackParams.getCaseData().getRespondent2();
+        }
+        return respondent;
+    }
+
+    private void updateSolicitorResponse(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+        if (isTwoLegalRepsScenario(caseData) && YES.equals(caseData.getAddRespondent2())) {
+            updatedData.sameSolicitorSameResponse(
+                respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
+                    && respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE) ? YES : NO
+            ).build();
+        } else if (isOneLegalRepScenario(caseData) && YES.equals(caseData.getAddRespondent2())) {
+            updatedData.sameSolicitorSameResponse(
+                NO.equals(caseData.getRespondentResponseIsSame()) ? NO : YES
+            ).build();
+        }
+    }
+
+    private boolean isTwoLegalRepsScenario(CaseData caseData) {
+        return ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData));
+    }
+
+    private boolean isOneLegalRepScenario(CaseData caseData) {
+        return ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData));
+    }
+
     private List<String> correspondenceAddressCorrect(CaseData caseData) {
-        if (caseData.getIsRespondent1() == YesOrNo.YES
-            && caseData.getSpecAoSRespondentCorrespondenceAddressRequired() == YesOrNo.NO) {
-            return postcodeValidator.validate(
-                Optional.ofNullable(caseData.getSpecAoSRespondentCorrespondenceAddressdetails())
-                    .map(Address::getPostCode)
-                    .orElse(null)
-            );
-        } else if (caseData.getIsRespondent2() == YesOrNo.YES
-            && caseData.getSpecAoSRespondent2CorrespondenceAddressRequired() == YesOrNo.NO) {
-            return postcodeValidator.validate(
-                Optional.ofNullable(caseData.getSpecAoSRespondent2CorrespondenceAddressdetails())
-                    .map(Address::getPostCode)
-                    .orElse(null)
-            );
+        if (isCorrespondenceAddressRequired(caseData.getIsRespondent1(), caseData.getSpecAoSRespondentCorrespondenceAddressRequired())) {
+            return validatePostcode(caseData.getSpecAoSRespondentCorrespondenceAddressdetails());
+        } else if (isCorrespondenceAddressRequired(caseData.getIsRespondent2(), caseData.getSpecAoSRespondent2CorrespondenceAddressRequired())) {
+            return validatePostcode(caseData.getSpecAoSRespondent2CorrespondenceAddressdetails());
         }
         return Collections.emptyList();
+    }
+
+    private boolean isCorrespondenceAddressRequired(YesOrNo isRespondent, YesOrNo isAddressRequired) {
+        return isRespondent == YesOrNo.YES && isAddressRequired == YesOrNo.NO;
+    }
+
+    private List<String> validatePostcode(Address address) {
+        return postcodeValidator.validate(Optional.ofNullable(address).map(Address::getPostCode).orElse(null));
     }
 }
