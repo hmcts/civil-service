@@ -9,14 +9,12 @@ import uk.gov.hmcts.reform.civil.config.ManageCaseBaseUrlConfiguration;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
 import uk.gov.hmcts.reform.civil.exceptions.MissingFieldsUpdatedException;
-import uk.gov.hmcts.reform.civil.exceptions.NotEarlyAdopterCourtException;
 import uk.gov.hmcts.reform.civil.exceptions.IncludesLitigantInPersonException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.EarlyAdoptersService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
@@ -79,13 +77,11 @@ public class HearingValuesService {
     private final OrganisationService organisationService;
     private final ObjectMapper mapper;
     private final CaseFlagsInitialiser caseFlagInitialiser;
-    private final EarlyAdoptersService earlyAdoptersService;
     private final FeatureToggleService featuretoggleService;
 
     public ServiceHearingValuesModel getValues(Long caseId, String authToken) throws Exception {
         CaseData caseData = retrieveCaseData(caseId);
         populateMissingFields(caseId, caseData);
-        isEarlyAdopter(caseData);
         isLrVLr(caseData);
 
         String baseUrl = manageCaseBaseUrlConfiguration.getManageCaseBaseUrl();
@@ -133,12 +129,6 @@ public class HearingValuesService {
         } catch (Exception ex) {
             log.error(String.format("No case found for %d", caseId));
             throw new CaseNotFoundException();
-        }
-    }
-
-    private void isEarlyAdopter(CaseData caseData) throws NotEarlyAdopterCourtException {
-        if (!earlyAdoptersService.isPartOfHmcEarlyAdoptersRollout(caseData)) {
-            throw new NotEarlyAdopterCourtException();
         }
     }
 
