@@ -552,7 +552,7 @@ public class CaseDataTest {
         Optional<Element<CaseDocument>> caseDocument = caseData.getSDODocument();
         //Then
         assertEquals(SDO_ORDER, caseDocument.get().getValue().getDocumentType());
-        assertEquals(caseDocument.get().getValue().getDocumentName(), "Doc2");
+        assertEquals("Doc2", caseDocument.get().getValue().getDocumentName());
     }
 
     @Test

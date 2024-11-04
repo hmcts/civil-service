@@ -164,8 +164,8 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     }
 
     protected boolean isSDODoneAfterDecisionForReconsiderationMade() {
-        return DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(caseData.getDecisionOnRequestReconsiderationOptions())
-            && caseData.getSDODocumentList().isPresent() && caseData.getSDODocumentList().get().size() == 2;
+        return caseData.getDecisionOnRequestReconsiderationOptions() == DecisionOnRequestReconsiderationOptions.CREATE_SDO
+            && caseData.getSDODocumentList().map(List::size).orElse(0) == 2;
     }
 
     @Override
