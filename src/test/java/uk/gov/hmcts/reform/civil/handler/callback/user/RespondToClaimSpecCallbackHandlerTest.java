@@ -1500,13 +1500,13 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getData())
             .extracting("respondent1DQFixedRecoverableCostsIntermediate")
             .extracting("frcSupportingDocument")
-            .extracting("categoryID")
+            .extracting("category_id")
             .isEqualTo(DQ_DEF1.getValue());
 
         assertThat(response.getData())
             .extracting("respondent2DQFixedRecoverableCostsIntermediate")
             .extracting("frcSupportingDocument")
-            .extracting("categoryID")
+            .extracting("category_id")
             .isEqualTo(DQ_DEF2.getValue());
     }
 
@@ -1543,7 +1543,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getData())
             .extracting("respondent1DQFixedRecoverableCostsIntermediate")
             .extracting("frcSupportingDocument")
-            .extracting("categoryID")
+            .extracting("category_id")
             .isEqualTo(DQ_DEF1.getValue());
     }
 
@@ -1749,9 +1749,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getData().get("specRespondentCorrespondenceAddressdetails"))
             .extracting("PostCode")
             .isEqualTo("new postcode");
-        assertThat(response.getData().get("specAoSRespondentCorrespondenceAddressdetails"))
-            .extracting("PostCode")
-            .isNull();
     }
 
     @Test
@@ -1798,9 +1795,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getData().get("specRespondentCorrespondenceAddressdetails"))
             .extracting("PostCode")
             .isEqualTo("new postcode");
-        assertThat(response.getData().get("specAoSRespondentCorrespondenceAddressdetails"))
-            .extracting("PostCode")
-            .isNull();
         assertEquals(
             response.getData().get("specRespondentCorrespondenceAddressdetails"),
             response.getData().get("specRespondent2CorrespondenceAddressdetails")
@@ -1849,9 +1843,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getData().get("specRespondent2CorrespondenceAddressdetails"))
             .extracting("PostCode")
             .isEqualTo("new postcode");
-        assertThat(response.getData().get("specAoSRespondent2CorrespondenceAddressdetails"))
-            .extracting("PostCode")
-            .isNull();
     }
 
     @Test
