@@ -58,7 +58,7 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
     /**
      * Called just before a scenario is recorded, when the scenario is known and should record is true.
      *
-     * @param caseData  case info
+     * @param caseData case info
      * @param authToken auth token
      */
     protected void beforeRecordScenario(CaseData caseData, String authToken) {
