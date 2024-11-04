@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.helpers.bundle.utils;
+package uk.gov.hmcts.reform.civil.helpers.bundle;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -7,9 +7,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadFiles;
-import uk.gov.hmcts.reform.civil.helpers.bundle.BundleRequestDocsOrganizer;
-import uk.gov.hmcts.reform.civil.helpers.bundle.ConversionToBundleRequestDocs;
-import uk.gov.hmcts.reform.civil.helpers.bundle.PartyType;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.bundle.BundlingRequestDocument;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
@@ -24,6 +21,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class ConversionToBundleRequestDocsTest {

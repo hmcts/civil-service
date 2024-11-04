@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.helpers.bundle.utils;
+package uk.gov.hmcts.reform.civil.helpers.bundle;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,11 +10,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.BundleFileNameList;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadFiles;
-import uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper;
-import uk.gov.hmcts.reform.civil.helpers.bundle.BundleRequestDocsOrganizer;
-import uk.gov.hmcts.reform.civil.helpers.bundle.ConversionToBundleRequestDocs;
-import uk.gov.hmcts.reform.civil.helpers.bundle.DocumentsRetrieval;
-import uk.gov.hmcts.reform.civil.helpers.bundle.PartyType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.bundle.BundlingRequestDocument;
@@ -40,7 +35,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getExpertDocsByPartyAndDocType;
 
 @ExtendWith(MockitoExtension.class)
-class DocumentsRetrievalTest {
+class BundleDocumentsRetrievalTest {
 
     @Mock
     private ConversionToBundleRequestDocs conversionToBundleRequestDocs;
@@ -49,7 +44,7 @@ class DocumentsRetrievalTest {
     private BundleRequestDocsOrganizer bundleRequestDocsOrganizer;
 
     @InjectMocks
-    private DocumentsRetrieval documentsRetrieval;
+    private BundleDocumentsRetrieval bundleDocumentsRetrieval;
 
     @Test
     void shouldReturnCorrectParticularsOfClaimName_forSpecClaim() {
@@ -58,7 +53,7 @@ class DocumentsRetrievalTest {
             .issueDate(LocalDate.of(2023, 12, 4))
             .build();
 
-        String result = documentsRetrieval.getParticularsOfClaimName(caseData);
+        String result = bundleDocumentsRetrieval.getParticularsOfClaimName(caseData);
 
         assertEquals("Particulars Of Claim 04/12/2023", result);
     }
@@ -100,7 +95,7 @@ class DocumentsRetrievalTest {
             )).thenReturn(expectedConvertedDocs);
 
             List<BundlingRequestDocument> result =
-                documentsRetrieval.getAllRemainingExpertQuestions(partyType, evidenceUploadFiles, caseData);
+                bundleDocumentsRetrieval.getAllRemainingExpertQuestions(partyType, evidenceUploadFiles, caseData);
 
             assertNotNull(result);
             assertEquals(1, result.size());
@@ -151,7 +146,7 @@ class DocumentsRetrievalTest {
             .thenReturn(expectedBundlingRequestDocs);
 
         List<BundlingRequestDocument> result =
-            documentsRetrieval.getAllOtherPartyQuestions(partyType, caseData, allExpertsNames);
+            bundleDocumentsRetrieval.getAllOtherPartyQuestions(partyType, caseData, allExpertsNames);
 
         assertNotNull(result);
         assertFalse(result.isEmpty());
@@ -160,7 +155,6 @@ class DocumentsRetrievalTest {
 
     @Test
     void shouldGetAllExpertReports() {
-        // Arrange
 
         Document documentTest1 = new Document("testUrl1", "binUrl1", "Name1", "hash1", null, "14 Apr 2024 00:00:00");
 
@@ -194,7 +188,7 @@ class DocumentsRetrievalTest {
             any(), anyString(), anyString()))
             .thenReturn(expectedBundlingRequestDocs);
 
-        List<BundlingRequestDocument> result = documentsRetrieval.getAllExpertReports(
+        List<BundlingRequestDocument> result = bundleDocumentsRetrieval.getAllExpertReports(
             partyType, evidenceUploadFiles, caseData, bundleFileNameList, allExpertsNames);
 
         assertNotNull(result);

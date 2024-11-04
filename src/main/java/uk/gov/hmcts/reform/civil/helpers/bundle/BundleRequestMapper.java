@@ -45,7 +45,7 @@ public class BundleRequestMapper {
     private static final String DOC_FILE_NAME_WITH_DATE = "DOC_FILE_NAME %s";
     private static final String DATE_FORMAT = "dd/MM/yyyy";
 
-    private final DocumentsRetrieval documentsRetrieval;
+    private final BundleDocumentsRetrieval bundleDocumentsRetrieval;
     private final ConversionToBundleRequestDocs conversionToBundleRequestDocs;
     private final FeatureToggleService featureToggleService;
     private final BundleRequestDocsOrganizer bundleRequestDocsOrganizer;
@@ -109,7 +109,7 @@ public class BundleRequestMapper {
             caseData.getServedDocumentFiles()
                 .getParticularsOfClaimDocument()
                 .forEach(poc -> bundlingRequestDocuments.add(
-                    buildBundlingRequestDoc(documentsRetrieval.getParticularsOfClaimName(caseData),
+                    buildBundlingRequestDoc(bundleDocumentsRetrieval.getParticularsOfClaimName(caseData),
                                             poc.getValue(), ""
                     )));
         }
@@ -119,22 +119,22 @@ public class BundleRequestMapper {
     private List<Element<BundlingRequestDocument>> mapJointStatementOfExperts(CaseData caseData) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         Arrays.stream(PartyType.values()).toList().forEach(partyType -> {
-            Set<String> allJointExpertsNames = documentsRetrieval.getAllExpertsNames(
+            Set<String> allJointExpertsNames = bundleDocumentsRetrieval.getAllExpertsNames(
                 partyType,
                 EvidenceUploadFiles.JOINT_STATEMENT,
                 caseData
             );
-            bundlingRequestDocuments.addAll(documentsRetrieval.getAllExpertReports(
+            bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getAllExpertReports(
                 partyType,
                 EvidenceUploadFiles.JOINT_STATEMENT,
                 caseData,
                 BundleFileNameList.JOINT_STATEMENTS_OF_EXPERTS,
                 allJointExpertsNames
             ));
-            bundlingRequestDocuments.addAll(documentsRetrieval.getAllOtherPartyQuestions(partyType, caseData,
-                                                                                         allJointExpertsNames
+            bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getAllOtherPartyQuestions(partyType, caseData,
+                                                                                               allJointExpertsNames
             ));
-            bundlingRequestDocuments.addAll(documentsRetrieval.getAllExpertReports(
+            bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getAllExpertReports(
                 partyType,
                 EvidenceUploadFiles.ANSWERS_FOR_EXPERTS,
                 caseData,
@@ -185,7 +185,7 @@ public class BundleRequestMapper {
 
         if (documentEvidenceForTrialList != null) {
             bundlingRequestDocuments.addAll(conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(
-                documentsRetrieval.getDocumentaryEvidenceByType(
+                bundleDocumentsRetrieval.getDocumentaryEvidenceByType(
                     documentEvidenceForTrialList,
                     TypeOfDocDocumentaryEvidenceOfTrial.getAllDocsDisplayNames(),
                     true
@@ -200,39 +200,39 @@ public class BundleRequestMapper {
 
     private List<Element<BundlingRequestDocument>> mapExpertEvidenceDocs(CaseData caseData, PartyType partyType) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
-        Set<String> allExpertsNames = documentsRetrieval.getAllExpertsNames(
+        Set<String> allExpertsNames = bundleDocumentsRetrieval.getAllExpertsNames(
             partyType,
             EvidenceUploadFiles.EXPERT_REPORT,
             caseData
         );
-        Set<String> allJointExpertsNames = documentsRetrieval.getAllExpertsNames(
+        Set<String> allJointExpertsNames = bundleDocumentsRetrieval.getAllExpertsNames(
             partyType,
             EvidenceUploadFiles.JOINT_STATEMENT,
             caseData
         );
-        bundlingRequestDocuments.addAll(documentsRetrieval.getAllExpertReports(
+        bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getAllExpertReports(
             partyType,
             EvidenceUploadFiles.EXPERT_REPORT,
             caseData,
             BundleFileNameList.EXPERT_EVIDENCE,
             allExpertsNames
         ));
-        bundlingRequestDocuments.addAll(documentsRetrieval.getAllOtherPartyQuestions(partyType,
-                                                                                     caseData, allExpertsNames
+        bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getAllOtherPartyQuestions(partyType,
+                                                                                           caseData, allExpertsNames
         ));
-        bundlingRequestDocuments.addAll(documentsRetrieval.getAllExpertReports(
+        bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getAllExpertReports(
             partyType,
             EvidenceUploadFiles.ANSWERS_FOR_EXPERTS,
             caseData,
             BundleFileNameList.REPLIES_FROM,
             allExpertsNames
         ));
-        bundlingRequestDocuments.addAll(documentsRetrieval.getAllRemainingExpertQuestions(
+        bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getAllRemainingExpertQuestions(
             partyType,
             EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS,
             caseData
         ));
-        bundlingRequestDocuments.addAll(documentsRetrieval.getAllRemainingExpertReports(
+        bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getAllRemainingExpertReports(
             partyType,
             EvidenceUploadFiles.ANSWERS_FOR_EXPERTS,
             caseData,
@@ -245,14 +245,14 @@ public class BundleRequestMapper {
 
     private List<Element<BundlingRequestDocument>> mapWitnessStatements(CaseData caseData, PartyType partyType) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
-        Party party = documentsRetrieval.getPartyByPartyType(partyType, caseData);
+        Party party = bundleDocumentsRetrieval.getPartyByPartyType(partyType, caseData);
         Map<String, List<Element<UploadEvidenceWitness>>> witnessStatmentsMap =
             bundleRequestDocsOrganizer.groupWitnessStatementsByName(getWitnessDocsByPartyAndDocType(
                 partyType,
                 EvidenceUploadFiles.WITNESS_STATEMENT,
                 caseData
             ));
-        List<Element<UploadEvidenceWitness>> witnessStatementSelf = documentsRetrieval.getSelfStatement(
+        List<Element<UploadEvidenceWitness>> witnessStatementSelf = bundleDocumentsRetrieval.getSelfStatement(
             witnessStatmentsMap,
             party
         );
@@ -301,7 +301,7 @@ public class BundleRequestMapper {
         );
         if (documentEvidenceForTrial != null) {
             bundlingRequestDocuments.addAll(conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(
-                documentsRetrieval.getDocumentaryEvidenceByType(
+                bundleDocumentsRetrieval.getDocumentaryEvidenceByType(
                     documentEvidenceForTrial,
                     TypeOfDocDocumentaryEvidenceOfTrial.NOTICE_TO_ADMIT_FACTS.getDisplayNames(),
                     false
@@ -352,31 +352,31 @@ public class BundleRequestMapper {
 
     private List<Element<BundlingRequestDocument>> mapDq(CaseData caseData) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
-        bundlingRequestDocuments.addAll(documentsRetrieval.getDqByCategoryId(
+        bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getDqByCategoryId(
             caseData,
             DocCategory.APP1_DQ.getValue(),
             PartyType.CLAIMANT1
         ));
         if (featureToggleService.isCaseProgressionEnabled()) {
-            bundlingRequestDocuments.addAll(documentsRetrieval.getDqByCategoryId(
+            bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getDqByCategoryId(
                 caseData,
                 DocCategory.DQ_APP1.getValue(),
                 PartyType.CLAIMANT1
             ));
         }
-        bundlingRequestDocuments.addAll(documentsRetrieval.getDqByCategoryId(
+        bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getDqByCategoryId(
             caseData,
             DocCategory.DEF1_DEFENSE_DQ.getValue(),
             PartyType.DEFENDANT1
         ));
         if (featureToggleService.isCaseProgressionEnabled()) {
-            bundlingRequestDocuments.addAll(documentsRetrieval.getDqByCategoryId(
+            bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getDqByCategoryId(
                 caseData,
                 DocCategory.DQ_DEF1.getValue(),
                 PartyType.DEFENDANT1
             ));
         }
-        bundlingRequestDocuments.addAll(documentsRetrieval.getDqByCategoryId(
+        bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getDqByCategoryId(
             caseData,
             DocCategory.DEF2_DEFENSE_DQ.getValue(),
             PartyType.DEFENDANT2
@@ -401,7 +401,7 @@ public class BundleRequestMapper {
         List<Element<CaseDocument>> clAndDfDocList = caseData.getDefendantResponseDocuments();
         clAndDfDocList.addAll(caseData.getClaimantResponseDocuments());
         List<Element<CaseDocument>> sortedDefendantDefenceAndClaimantReply =
-            documentsRetrieval.getSortedDefendantDefenceAndClaimantReply(clAndDfDocList);
+            bundleDocumentsRetrieval.getSortedDefendantDefenceAndClaimantReply(clAndDfDocList);
         sortedDefendantDefenceAndClaimantReply.forEach(caseDocumentElement -> {
             String docType = caseDocumentElement.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)
                 ? BundleFileNameList.DEFENCE.getDisplayName() : BundleFileNameList.CL_REPLY.getDisplayName();
@@ -425,7 +425,7 @@ public class BundleRequestMapper {
         Arrays.stream(PartyType.values()).toList().forEach(partyType ->
                                                                bundlingRequestDocuments.addAll(
                                                                    conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(
-                                                                       documentsRetrieval.getDocumentaryEvidenceByType(
+                                                                       bundleDocumentsRetrieval.getDocumentaryEvidenceByType(
                                                                            getEvidenceUploadDocsByPartyAndDocType(
                                                                                partyType,
                                                                                EvidenceUploadFiles.DOCUMENTARY,
@@ -442,7 +442,7 @@ public class BundleRequestMapper {
         Arrays.stream(PartyType.values()).toList().forEach(partyType ->
                                                                bundlingRequestDocuments.addAll(
                                                                    conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(
-                                                                       documentsRetrieval.getDocumentaryEvidenceByType(
+                                                                       bundleDocumentsRetrieval.getDocumentaryEvidenceByType(
                                                                            getEvidenceUploadDocsByPartyAndDocType(
                                                                                partyType,
                                                                                EvidenceUploadFiles.DOCUMENTARY,
@@ -477,7 +477,7 @@ public class BundleRequestMapper {
         Arrays.stream(PartyType.values()).toList().forEach(partyType ->
                                                                bundlingRequestDocuments.addAll(
                                                                    conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(
-                                                                       documentsRetrieval.getDocumentaryEvidenceByType(
+                                                                       bundleDocumentsRetrieval.getDocumentaryEvidenceByType(
                                                                            getEvidenceUploadDocsByPartyAndDocType(
                                                                                partyType,
                                                                                EvidenceUploadFiles.DOCUMENTARY,
@@ -494,7 +494,7 @@ public class BundleRequestMapper {
         Arrays.stream(PartyType.values()).toList().forEach(partyType ->
                                                                bundlingRequestDocuments.addAll(
                                                                    conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(
-                                                                       documentsRetrieval.getDocumentaryEvidenceByType(
+                                                                       bundleDocumentsRetrieval.getDocumentaryEvidenceByType(
                                                                            getEvidenceUploadDocsByPartyAndDocType(
                                                                                partyType,
                                                                                EvidenceUploadFiles.DOCUMENTARY,

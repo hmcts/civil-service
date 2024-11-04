@@ -36,7 +36,7 @@ import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleUtils.generateDocNa
 
 @Component
 @RequiredArgsConstructor
-public class DocumentsRetrieval {
+public class BundleDocumentsRetrieval {
 
     private final ConversionToBundleRequestDocs conversionToBundleRequestDocs;
     private final BundleRequestDocsOrganizer bundleRequestDocsOrganizer;

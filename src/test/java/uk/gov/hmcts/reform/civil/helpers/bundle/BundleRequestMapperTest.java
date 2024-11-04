@@ -55,12 +55,12 @@ class BundleRequestMapperTest {
         BundleRequestDocsOrganizer bundleRequestDocsOrganizer = new BundleRequestDocsOrganizer();
         ConversionToBundleRequestDocs conversionToBundleRequestDocs = new ConversionToBundleRequestDocs(
             featureToggleService, bundleRequestDocsOrganizer);
-        DocumentsRetrieval documentsRetrieval = new DocumentsRetrieval(
+        BundleDocumentsRetrieval bundleDocumentsRetrieval = new BundleDocumentsRetrieval(
             conversionToBundleRequestDocs,
             bundleRequestDocsOrganizer
         );
         bundleRequestMapper = new BundleRequestMapper(
-            documentsRetrieval,
+            bundleDocumentsRetrieval,
             conversionToBundleRequestDocs,
             featureToggleService,
             bundleRequestDocsOrganizer
@@ -988,20 +988,4 @@ class BundleRequestMapperTest {
         assertEquals(false, bundleCreateRequest.getCaseDetails().getCaseData().isHasApplicant2());
         assertEquals(false, bundleCreateRequest.getCaseDetails().getCaseData().isHasRespondant2());
     }
-
-    // @Test
-    // void shouldFilterEvidenceForTrial() {
-    //     List<Element<UploadEvidenceDocumentType>> list =
-    //         bundleRequestMapper.filterDocumentaryEvidenceForTrialDocs(getDocumentEvidenceForTrial(),
-    //                                                                   TypeOfDocDocumentaryEvidenceOfTrial.getAllDocsDisplayNames(), true);
-    //     assertEquals(1, list.size());
-    // }
-    //
-    // @Test
-    // void shouldFilterEvidenceForTrialAndCaseEventEnable() {
-    //     List<Element<UploadEvidenceDocumentType>> list =
-    //         bundleRequestMapper.filterDocumentaryEvidenceForTrialDocs(getDocumentEvidenceForTrial(),
-    //                                                                   TypeOfDocDocumentaryEvidenceOfTrial.getAllDocsDisplayNames(), true);
-    //     assertEquals(1, list.size());
-    // }
 }
