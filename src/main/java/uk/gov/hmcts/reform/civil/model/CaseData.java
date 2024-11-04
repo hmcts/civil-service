@@ -1196,6 +1196,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
                 .max(Comparator.comparing(doc -> doc.getValue().getCreatedDatetime())));
     }
 
+    @JsonIgnore
     public Optional<List<CaseDocument>> getSDODocumentList() {
         if (systemGeneratedCaseDocuments == null) {
             return Optional.empty();
