@@ -190,8 +190,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
-    StateFlowEngine.class,
-
     SimpleStateFlowEngine.class,
     SimpleStateFlowBuilder.class,
     TransitionsTestConfiguration.class,
@@ -943,7 +941,9 @@ class FlowStateAllowedEventServiceTest {
                         SETTLE_CLAIM_MARK_PAID_FULL,
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        AMEND_RESTITCH_BUNDLE,
+                        asyncStitchingComplete
                     }
                 ),
                 of(
@@ -1713,7 +1713,9 @@ class FlowStateAllowedEventServiceTest {
                     new CaseEvent[] {
                         DISMISS_CLAIM,
                         migrateCase,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        AMEND_RESTITCH_BUNDLE,
+                        asyncStitchingComplete
                     }
                 ),
                 of(
@@ -1912,7 +1914,8 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
@@ -2144,10 +2147,10 @@ class FlowStateAllowedEventServiceTest {
         @ArgumentsSource(GetAllowedCaseEventForFlowStateArgumentsSpec.class)
         void shouldReturnTrue_whenEventIsAllowedAtGivenState(FlowState.Main flowState, CaseEvent... caseEvents) {
             Arrays.stream(caseEvents).forEach(caseEvent ->
-                                                  assertTrue(flowStateAllowedEventService.isAllowedOnStateForSpec(
-                                                      flowState.fullName(),
-                                                      caseEvent
-                                                  ))
+                assertTrue(flowStateAllowedEventService.isAllowedOnStateForSpec(
+                    flowState.fullName(),
+                    caseEvent
+                ))
             );
         }
     }
@@ -2268,7 +2271,8 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     AMEND_RESTITCH_BUNDLE,
                     new String[] {
-                        IN_HEARING_READINESS.fullName()
+                        IN_HEARING_READINESS.fullName(),
+                        PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA.fullName()
                     }
                 ),
                 of(
