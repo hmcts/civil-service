@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.RespondToClaimSpecUtils;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.SetApplicantResponseDeadline;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -625,19 +626,12 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private void assembleResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
         List<Element<CaseDocument>> defendantUploads = new ArrayList<>();
         ResponseDocument respondent1ClaimResponseDocument = caseData.getRespondent1ClaimResponseDocument();
-        if (respondent1ClaimResponseDocument != null) {
-            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1ClaimDocument = respondent1ClaimResponseDocument.getFile();
-            if (respondent1ClaimDocument != null) {
-                Element<CaseDocument> documentElement =
-                        buildElemCaseDocument(respondent1ClaimDocument, "Defendant",
-                        updatedCaseData.build().getRespondent1ResponseDate(),
-                        DocumentType.DEFENDANT_DEFENCE
-                );
-                assignCategoryId.assignCategoryIdToDocument(respondent1ClaimDocument,
-                        DocCategory.DEF1_DEFENSE_DQ.getValue());
-                defendantUploads.add(documentElement);
-            }
-        }
+        RespondToClaimSpecUtils.addRespondentDocuments(
+            updatedCaseData,
+            defendantUploads,
+            respondent1ClaimResponseDocument,
+            assignCategoryId
+        );
 
         Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
         if (respondent1DQ != null) {

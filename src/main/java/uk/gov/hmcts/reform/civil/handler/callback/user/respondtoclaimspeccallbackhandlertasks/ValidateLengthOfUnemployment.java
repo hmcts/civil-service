@@ -31,11 +31,10 @@ public class ValidateLengthOfUnemployment implements CaseTask {
 
         if (caseData.getRespondToClaimAdmitPartUnemployedLRspec() != null) {
             var lengthOfUnemployment = caseData.getRespondToClaimAdmitPartUnemployedLRspec().getLengthOfUnemployment();
-            if (lengthOfUnemployment != null) {
-                if (lengthOfUnemployment.getNumberOfYearsInUnemployment().contains(".")
-                    || lengthOfUnemployment.getNumberOfMonthsInUnemployment().contains(".")) {
-                    errors.add("Length of time unemployed must be a whole number, for example, 10.");
-                }
+            if (lengthOfUnemployment != null
+                && (lengthOfUnemployment.getNumberOfYearsInUnemployment().contains(".")
+                    || lengthOfUnemployment.getNumberOfMonthsInUnemployment().contains("."))) {
+                errors.add("Length of time unemployed must be a whole number, for example, 10.");
             }
         }
 

@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantRespon
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -90,47 +89,62 @@ public class RespondToClaimSpecUtils {
     public Set<DefendantResponseShowTag> whoDisputesBcoPartAdmission(CaseData caseData) {
         Set<DefendantResponseShowTag> tags = EnumSet.noneOf(DefendantResponseShowTag.class);
         MultiPartyScenario mpScenario = getMultiPartyScenario(caseData);
+
         switch (mpScenario) {
             case ONE_V_ONE:
-                if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-                    tags.add(ONLY_RESPONDENT_1_DISPUTES);
-                }
+                handleOneVOneScenario(caseData, tags);
                 break;
             case TWO_V_ONE:
-                if ((caseData.getDefendantSingleResponseToBothClaimants() == YES
-                    && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION)
-                    || caseData.getClaimant1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
-                    || caseData.getClaimant2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-                    tags.add(ONLY_RESPONDENT_1_DISPUTES);
-                }
+                handleTwoVOneScenario(caseData, tags);
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
-                if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-                    if (caseData.getRespondentResponseIsSame() == YES
-                        || caseData.getRespondent2ClaimResponseTypeForSpec()
-                        == RespondentResponseTypeSpec.PART_ADMISSION) {
-                        tags.add(DefendantResponseShowTag.BOTH_RESPONDENTS_DISPUTE);
-                    } else {
-                        tags.add(ONLY_RESPONDENT_1_DISPUTES);
-                    }
-                } else if (caseData.getRespondent2ClaimResponseTypeForSpec()
-                    == RespondentResponseTypeSpec.PART_ADMISSION) {
-                    tags.add(DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES);
-                }
+                handleOneVTwoOneLegalRepScenario(caseData, tags);
                 break;
             case ONE_V_TWO_TWO_LEGAL_REP:
-                if (caseData.getShowConditionFlags().contains(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1)
-                    && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-                    tags.add(ONLY_RESPONDENT_1_DISPUTES);
-                } else if (caseData.getShowConditionFlags().contains(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2)
-                    && caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-                    tags.add(DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES);
-                }
+                handleOneVTwoTwoLegalRepScenario(caseData, tags);
                 break;
             default:
                 throw new UnsupportedOperationException(UNKNOWN_MP_SCENARIO);
         }
         return tags;
+    }
+
+    private void handleOneVOneScenario(CaseData caseData, Set<DefendantResponseShowTag> tags) {
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
+            tags.add(ONLY_RESPONDENT_1_DISPUTES);
+        }
+    }
+
+    private void handleTwoVOneScenario(CaseData caseData, Set<DefendantResponseShowTag> tags) {
+        if ((caseData.getDefendantSingleResponseToBothClaimants() == YES
+            && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION)
+            || caseData.getClaimant1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+            || caseData.getClaimant2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
+            tags.add(ONLY_RESPONDENT_1_DISPUTES);
+        }
+    }
+
+    private void handleOneVTwoOneLegalRepScenario(CaseData caseData, Set<DefendantResponseShowTag> tags) {
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
+            if (caseData.getRespondentResponseIsSame() == YES
+                || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
+                tags.add(DefendantResponseShowTag.BOTH_RESPONDENTS_DISPUTE);
+            } else {
+                tags.add(ONLY_RESPONDENT_1_DISPUTES);
+            }
+        } else if (caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
+            tags.add(DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES);
+        }
+    }
+
+    private void handleOneVTwoTwoLegalRepScenario(CaseData caseData, Set<DefendantResponseShowTag> tags) {
+        if (caseData.getShowConditionFlags().contains(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1)
+            && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
+            tags.add(ONLY_RESPONDENT_1_DISPUTES);
+        } else if (caseData.getShowConditionFlags().contains(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2)
+            && caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
+            tags.add(DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES);
+        }
     }
 
     public void removeWhoDisputesAndWhoPaidLess(Set<DefendantResponseShowTag> tags) {
@@ -155,10 +169,40 @@ public class RespondToClaimSpecUtils {
     }
 
     public void assembleResponseDocumentsSpec(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+        List<Element<CaseDocument>> defendantUploads = getDefendantUploads(caseData, updatedCaseData);
+        List<Element<CaseDocument>> additionalDocuments = dqResponseDocumentUtils.buildDefendantResponseDocuments(updatedCaseData.build());
+        defendantUploads.addAll(additionalDocuments);
+
+        if (!defendantUploads.isEmpty()) {
+            updatedCaseData.defendantResponseDocuments(defendantUploads);
+        }
+
+        frcDocumentsUtils.assembleDefendantsFRCDocuments(caseData);
+        clearTempDocuments(updatedCaseData);
+    }
+
+    private List<Element<CaseDocument>> getDefendantUploads(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
         List<Element<CaseDocument>> defendantUploads = nonNull(caseData.getDefendantResponseDocuments())
             ? caseData.getDefendantResponseDocuments() : new ArrayList<>();
 
+        addRespondent1Documents(caseData, updatedCaseData, defendantUploads);
+        addRespondent2Documents(caseData, updatedCaseData, defendantUploads);
+
+        return defendantUploads;
+    }
+
+    private void addRespondent1Documents(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData, List<Element<CaseDocument>> defendantUploads) {
         ResponseDocument respondent1SpecDefenceResponseDocument = caseData.getRespondent1SpecDefenceResponseDocument();
+        addRespondentDocuments(
+            updatedCaseData,
+            defendantUploads,
+            respondent1SpecDefenceResponseDocument,
+            assignCategoryId
+        );
+    }
+
+    public static void addRespondentDocuments(CaseData.CaseDataBuilder<?, ?> updatedCaseData, List<Element<CaseDocument>> defendantUploads,
+                                              ResponseDocument respondent1SpecDefenceResponseDocument, AssignCategoryId assignCategoryId) {
         if (respondent1SpecDefenceResponseDocument != null) {
             uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1ClaimDocument = respondent1SpecDefenceResponseDocument.getFile();
             if (respondent1ClaimDocument != null) {
@@ -174,57 +218,33 @@ public class RespondToClaimSpecUtils {
                 defendantUploads.add(documentElement);
             }
         }
-        Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
-        if (respondent1DQ != null) {
-            ResponseDocument respondent2SpecDefenceResponseDocument = caseData.getRespondent2SpecDefenceResponseDocument();
-            if (respondent2SpecDefenceResponseDocument != null) {
-                uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2ClaimDocument = respondent2SpecDefenceResponseDocument.getFile();
-                if (respondent2ClaimDocument != null) {
-                    Element<CaseDocument> documentElement = buildElemCaseDocument(
-                        respondent2ClaimDocument, DEF2,
-                        updatedCaseData.build().getRespondent2ResponseDate(),
-                        DocumentType.DEFENDANT_DEFENCE
-                    );
-                    assignCategoryId.assignCategoryIdToDocument(
-                        respondent2ClaimDocument,
-                        DocCategory.DEF2_DEFENSE_DQ.getValue()
-                    );
-                    defendantUploads.add(documentElement);
-                }
-            }
-        } else {
-            ResponseDocument respondent2SpecDefenceResponseDocument = caseData.getRespondent2SpecDefenceResponseDocument();
-            if (respondent2SpecDefenceResponseDocument != null) {
-                uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2ClaimDocument = respondent2SpecDefenceResponseDocument.getFile();
-                if (respondent2ClaimDocument != null) {
-                    Element<CaseDocument> documentElement = buildElemCaseDocument(
-                        respondent2ClaimDocument, DEF2,
-                        updatedCaseData.build().getRespondent2ResponseDate(),
-                        DocumentType.DEFENDANT_DEFENCE
-                    );
-                    assignCategoryId.assignCategoryIdToDocument(
-                        respondent2ClaimDocument,
-                        DocCategory.DEF2_DEFENSE_DQ.getValue()
-                    );
-                    CaseDocument copy = assignCategoryId
-                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF2.getValue());
-                    defendantUploads.add(documentElement);
-                    if (Objects.nonNull(copy)) {
-                        defendantUploads.add(ElementUtils.element(copy));
-                    }
-                }
+    }
+
+    private void addRespondent2Documents(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData, List<Element<CaseDocument>> defendantUploads) {
+        ResponseDocument respondent2SpecDefenceResponseDocument = caseData.getRespondent2SpecDefenceResponseDocument();
+        if (respondent2SpecDefenceResponseDocument != null) {
+            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2ClaimDocument = respondent2SpecDefenceResponseDocument.getFile();
+            if (respondent2ClaimDocument != null) {
+                Element<CaseDocument> documentElement = buildElemCaseDocument(
+                    respondent2ClaimDocument, DEF2,
+                    updatedCaseData.build().getRespondent2ResponseDate(),
+                    DocumentType.DEFENDANT_DEFENCE
+                );
+                assignCategoryId.assignCategoryIdToDocument(
+                    respondent2ClaimDocument,
+                    DocCategory.DEF2_DEFENSE_DQ.getValue()
+                );
+                defendantUploads.add(documentElement);
+                addCopyIfNonNull(defendantUploads, documentElement);
             }
         }
+    }
 
-        List<Element<CaseDocument>> additionalDocuments = dqResponseDocumentUtils.buildDefendantResponseDocuments(updatedCaseData.build());
-        defendantUploads.addAll(additionalDocuments);
-
-        if (!defendantUploads.isEmpty()) {
-            updatedCaseData.defendantResponseDocuments(defendantUploads);
+    private void addCopyIfNonNull(List<Element<CaseDocument>> defendantUploads, Element<CaseDocument> documentElement) {
+        CaseDocument copy = assignCategoryId.copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF2.getValue());
+        if (Objects.nonNull(copy)) {
+            defendantUploads.add(ElementUtils.element(copy));
         }
-
-        frcDocumentsUtils.assembleDefendantsFRCDocuments(caseData);
-        clearTempDocuments(updatedCaseData);
     }
 
     private void clearTempDocuments(CaseData.CaseDataBuilder<?, ?> builder) {
