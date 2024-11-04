@@ -2147,10 +2147,10 @@ class FlowStateAllowedEventServiceTest {
         @ArgumentsSource(GetAllowedCaseEventForFlowStateArgumentsSpec.class)
         void shouldReturnTrue_whenEventIsAllowedAtGivenState(FlowState.Main flowState, CaseEvent... caseEvents) {
             Arrays.stream(caseEvents).forEach(caseEvent ->
-                                                  assertTrue(flowStateAllowedEventService.isAllowedOnStateForSpec(
-                                                      flowState.fullName(),
-                                                      caseEvent
-                                                  ))
+                assertTrue(flowStateAllowedEventService.isAllowedOnStateForSpec(
+                    flowState.fullName(),
+                    caseEvent
+                ))
             );
         }
     }
