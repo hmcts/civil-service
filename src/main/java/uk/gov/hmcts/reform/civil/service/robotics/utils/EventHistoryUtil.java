@@ -5,16 +5,28 @@ import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
+import uk.gov.hmcts.reform.civil.model.dq.DQ;
+import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
+import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
+import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static java.lang.String.format;
 import static java.math.BigDecimal.ZERO;
+import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 
 public class EventHistoryUtil {
 
@@ -26,6 +38,19 @@ public class EventHistoryUtil {
     public static final String RPA_IN_MEDIATION = "IN MEDIATION";
     public static final String ENTER = "Enter";
     public static final String LIFTED = "Lifted";
+
+    public static final String PROCEED = "proceed";
+    public static final String NOT_PROCEED = "not proceed";
+
+    public static final String CLAIMANT_PROCEEDS = "Claimant proceeds.";
+    public static final String CLAIMANTS_PROCEED = "Claimants proceed.";
+
+    public static final String MISC_TEXT_REQUESTED_IJ = "RPA Reason: Summary judgment requested and referred to judge.";
+    public static final String MISC_TEXT_GRANTED_IJ = "RPA Reason: Summary judgment granted and referred to judge.";
+    public static final String MISC_TEXT_REQUESTED_DJ = "RPA Reason: Default Judgment requested and claim moved offline.";
+    public static final String MISC_TEXT_GRANTED_DJ = "RPA Reason: Default Judgment granted and claim moved offline.";
+
+    public static final String RPA_REASON_ONLY_ONE_OF_THE_RESPONDENT_IS_NOTIFIED = "RPA Reason: Only one of the respondent is notified.";
 
     private EventHistoryUtil() {
     }
@@ -113,5 +138,55 @@ public class EventHistoryUtil {
             ? repaymentPlan.map(RepaymentPlanLRspec::getFirstRepaymentDate)
             .orElse(null)
             : null;
+    }
+
+    public static LocalDateTime setApplicant1ResponseDate(CaseData caseData) {
+        LocalDateTime applicant1ResponseDate = caseData.getApplicant1ResponseDate();
+        if (applicant1ResponseDate == null || applicant1ResponseDate.isBefore(LocalDateTime.now())) {
+            applicant1ResponseDate = LocalDateTime.now();
+        }
+        return applicant1ResponseDate;
+    }
+
+    public static String getPreferredCourtCode(DQ dq) {
+        return ofNullable(dq.getRequestedCourt())
+            .map(RequestedCourt::getResponseCourtCode)
+            .orElse("");
+    }
+
+    public static boolean isStayClaim(DQ dq) {
+        return ofNullable(dq.getFileDirectionQuestionnaire())
+            .map(FileDirectionsQuestionnaire::getOneMonthStayRequested)
+            .orElse(NO) == YES;
+    }
+
+    public static String prepareEventDetailsText(DQ dq, String preferredCourtCode) {
+        return format(
+            "preferredCourtCode: %s; stayClaim: %s",
+            preferredCourtCode,
+            isStayClaim(dq)
+        );
+    }
+
+    public static void buildRespondentResponseText(EventHistory.EventHistoryBuilder builder, CaseData caseData, String miscText, LocalDateTime respondentResponseDate) {
+        if (!SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            builder.miscellaneous(Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .eventCode(MISCELLANEOUS.getCode())
+                .dateReceived(respondentResponseDate)
+                .eventDetailsText(miscText)
+                .eventDetails(EventDetails.builder()
+                    .miscText(miscText)
+                    .build())
+                .build());
+        }
+    }
+
+    public static State getPreviousState(List<State> stateHistory) {
+        if (stateHistory.size() > 1) {
+            return stateHistory.get(stateHistory.size() - 2);
+        } else {
+            throw new IllegalStateException("Flow state history should have at least two items: " + stateHistory);
+        }
     }
 }

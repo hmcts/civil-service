@@ -11,6 +11,15 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 public class PredicateUtils {
 
+    public static final Predicate<CaseData> grantedFlagDefendantPredicate = (CaseData cd) -> cd.getRespondent2() != null
+        && cd.getDefendantDetails() != null
+        && !cd.getDefendantDetails().getValue()
+        .getLabel().startsWith("Both");
+    public static final Predicate<CaseData> grantedFlagDefendantSpecPredicate = (CaseData cd) -> cd.getRespondent2() != null
+        && cd.getDefendantDetailsSpec() != null
+        && !cd.getDefendantDetailsSpec().getValue()
+        .getLabel().startsWith("Both");
+
     private PredicateUtils() {
         //NO-OP
     }
