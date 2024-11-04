@@ -1197,6 +1197,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     public Optional<List<CaseDocument>> getSDODocumentList() {
+        if (systemGeneratedCaseDocuments == null) {
+            return Optional.empty();
+        }
         List<CaseDocument> sdoDocuments = systemGeneratedCaseDocuments.stream()
             .map(Element::getValue)
             .filter(doc -> doc.getDocumentType().equals(DocumentType.SDO_ORDER))
