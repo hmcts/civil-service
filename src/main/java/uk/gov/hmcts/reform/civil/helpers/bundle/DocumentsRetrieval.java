@@ -1,19 +1,15 @@
 package uk.gov.hmcts.reform.civil.helpers.bundle;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.BundleFileNameList;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadFiles;
-import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.bundle.BundlingRequestDocument;
-import uk.gov.hmcts.reform.civil.model.bundle.DocumentLink;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
@@ -29,21 +25,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getExpertDocsByPartyAndDocType;
+import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleUtils.buildBundlingRequestDoc;
+import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleUtils.generateDocName;
 
 @Component
 @RequiredArgsConstructor
-public class DocumentsRetrievalUtils {
+public class DocumentsRetrieval {
 
     private final ConversionToBundleRequestDocs conversionToBundleRequestDocs;
     private final BundleRequestDocsOrganizer bundleRequestDocsOrganizer;
-    private static final String DATE_FORMAT = "dd/MM/yyyy";
 
     public String getParticularsOfClaimName(CaseData caseData) {
         LocalDate pocDate;
@@ -292,19 +288,6 @@ public class DocumentsRetrievalUtils {
         }).toList();
     }
 
-    // public List<BundlingRequestDocument> getDqWithNoCategoryId(CaseData caseData) {
-    //     List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
-    //     bundlingRequestDocuments.addAll(bundleRequestMapper.mapSystemGeneratedCaseDocument(
-    //         caseData.getSystemGeneratedCaseDocuments().stream()
-    //             .filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
-    //                 .equals(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-    //                 && caseDocumentElement.getValue().getDocumentLink().getCategoryID() == null)
-    //             .collect(Collectors.toList()),
-    //         BundleFileNameList.DIRECTIONS_QUESTIONNAIRE_NO_CATEGORY_ID.getDisplayName()
-    //     ));
-    //     return bundlingRequestDocuments;
-    // }
-
     private boolean matchType(String name, Collection<String> displayNames, boolean doesNotMatchType) {
 
         if (doesNotMatchType) {
@@ -312,27 +295,6 @@ public class DocumentsRetrievalUtils {
         } else {
             return displayNames.stream().anyMatch(s -> s.equalsIgnoreCase(name.trim()));
         }
-    }
-
-    private String generateDocName(String fileName, String strParam, String strParam2, LocalDate date) {
-        if (StringUtils.isBlank(strParam)) {
-            return String.format(fileName, DateFormatHelper.formatLocalDate(date, DATE_FORMAT));
-        } else if (StringUtils.isBlank(strParam2)) {
-            return String.format(fileName, strParam, DateFormatHelper.formatLocalDate(date, DATE_FORMAT));
-        } else {
-            return String.format(fileName, strParam, strParam2, DateFormatHelper.formatLocalDate(date, DATE_FORMAT));
-        }
-    }
-
-    private BundlingRequestDocument buildBundlingRequestDoc(String docName, Document document, String docType) {
-        return BundlingRequestDocument.builder()
-            .documentFileName(docName)
-            .documentType(docType)
-            .documentLink(DocumentLink.builder()
-                              .documentUrl(document.getDocumentUrl())
-                              .documentBinaryUrl(document.getDocumentBinaryUrl())
-                              .documentFilename(document.getDocumentFileName()).build())
-            .build();
     }
 
     private Set<String> getAllExpertFromOtherParty(PartyType partyType, EvidenceUploadFiles expertReport,
@@ -369,16 +331,5 @@ public class DocumentsRetrievalUtils {
             list.addAll(getExpertDocsByPartyAndDocType(PartyType.CLAIMANT2, evidenceUploadFileType, caseData));
         }
         return list;
-    }
-
-    public Map<String, List<Element<UploadEvidenceExpert>>> groupExpertStatementsByName(
-        List<Element<UploadEvidenceExpert>> documentExpertReport) {
-        Map<String, List<Element<UploadEvidenceExpert>>> expertStatementMap = new TreeMap<>();
-        if (documentExpertReport != null) {
-            expertStatementMap = documentExpertReport.stream().collect(Collectors
-                                                                           .groupingBy(uploadEvidenceExpertElement -> uploadEvidenceExpertElement
-                                                                               .getValue().getExpertOptionName().trim().toLowerCase()));
-        }
-        return expertStatementMap;
     }
 }

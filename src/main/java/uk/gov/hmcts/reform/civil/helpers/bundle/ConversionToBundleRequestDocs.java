@@ -2,27 +2,25 @@ package uk.gov.hmcts.reform.civil.helpers.bundle;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.BundleFileNameList;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadFiles;
-import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.bundle.BundlingRequestDocument;
-import uk.gov.hmcts.reform.civil.model.bundle.DocumentLink;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleUtils.buildBundlingRequestDoc;
+import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleUtils.generateDocName;
 
 @Component
 @RequiredArgsConstructor
@@ -191,27 +189,6 @@ public class ConversionToBundleRequestDocs {
             });
         }
         return bundlingRequestDocuments;
-    }
-
-    public BundlingRequestDocument buildBundlingRequestDoc(String docName, Document document, String docType) {
-        return BundlingRequestDocument.builder()
-            .documentFileName(docName)
-            .documentType(docType)
-            .documentLink(DocumentLink.builder()
-                              .documentUrl(document.getDocumentUrl())
-                              .documentBinaryUrl(document.getDocumentBinaryUrl())
-                              .documentFilename(document.getDocumentFileName()).build())
-            .build();
-    }
-
-    public String generateDocName(String fileName, String strParam, String strParam2, LocalDate date) {
-        if (StringUtils.isBlank(strParam)) {
-            return String.format(fileName, DateFormatHelper.formatLocalDate(date, DATE_FORMAT));
-        } else if (StringUtils.isBlank(strParam2)) {
-            return String.format(fileName, strParam, DateFormatHelper.formatLocalDate(date, DATE_FORMAT));
-        } else {
-            return String.format(fileName, strParam, strParam2, DateFormatHelper.formatLocalDate(date, DATE_FORMAT));
-        }
     }
 
     public String getFileNameBaseOnType(String fileNamePrefix, Element<UploadEvidenceDocumentType> uploadEvidence,

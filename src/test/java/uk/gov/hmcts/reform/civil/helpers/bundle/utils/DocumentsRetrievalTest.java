@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadFiles;
 import uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper;
 import uk.gov.hmcts.reform.civil.helpers.bundle.BundleRequestDocsOrganizer;
 import uk.gov.hmcts.reform.civil.helpers.bundle.ConversionToBundleRequestDocs;
-import uk.gov.hmcts.reform.civil.helpers.bundle.DocumentsRetrievalUtils;
+import uk.gov.hmcts.reform.civil.helpers.bundle.DocumentsRetrieval;
 import uk.gov.hmcts.reform.civil.helpers.bundle.PartyType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getExpertDocsByPartyAndDocType;
 
 @ExtendWith(MockitoExtension.class)
-class DocumentsRetrievalUtilsTest {
+class DocumentsRetrievalTest {
 
     @Mock
     private ConversionToBundleRequestDocs conversionToBundleRequestDocs;
@@ -49,7 +49,7 @@ class DocumentsRetrievalUtilsTest {
     private BundleRequestDocsOrganizer bundleRequestDocsOrganizer;
 
     @InjectMocks
-    private DocumentsRetrievalUtils documentsRetrievalUtils;
+    private DocumentsRetrieval documentsRetrieval;
 
     @Test
     void shouldReturnCorrectParticularsOfClaimName_forSpecClaim() {
@@ -58,7 +58,7 @@ class DocumentsRetrievalUtilsTest {
             .issueDate(LocalDate.of(2023, 12, 4))
             .build();
 
-        String result = documentsRetrievalUtils.getParticularsOfClaimName(caseData);
+        String result = documentsRetrieval.getParticularsOfClaimName(caseData);
 
         assertEquals("Particulars Of Claim 04/12/2023", result);
     }
@@ -100,7 +100,7 @@ class DocumentsRetrievalUtilsTest {
             )).thenReturn(expectedConvertedDocs);
 
             List<BundlingRequestDocument> result =
-                documentsRetrievalUtils.getAllRemainingExpertQuestions(partyType, evidenceUploadFiles, caseData);
+                documentsRetrieval.getAllRemainingExpertQuestions(partyType, evidenceUploadFiles, caseData);
 
             assertNotNull(result);
             assertEquals(1, result.size());
@@ -151,7 +151,7 @@ class DocumentsRetrievalUtilsTest {
             .thenReturn(expectedBundlingRequestDocs);
 
         List<BundlingRequestDocument> result =
-            documentsRetrievalUtils.getAllOtherPartyQuestions(partyType, caseData, allExpertsNames);
+            documentsRetrieval.getAllOtherPartyQuestions(partyType, caseData, allExpertsNames);
 
         assertNotNull(result);
         assertFalse(result.isEmpty());
@@ -194,7 +194,7 @@ class DocumentsRetrievalUtilsTest {
             any(), anyString(), anyString()))
             .thenReturn(expectedBundlingRequestDocs);
 
-        List<BundlingRequestDocument> result = documentsRetrievalUtils.getAllExpertReports(
+        List<BundlingRequestDocument> result = documentsRetrieval.getAllExpertReports(
             partyType, evidenceUploadFiles, caseData, bundleFileNameList, allExpertsNames);
 
         assertNotNull(result);

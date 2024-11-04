@@ -55,14 +55,16 @@ class BundleRequestMapperTest {
         BundleRequestDocsOrganizer bundleRequestDocsOrganizer = new BundleRequestDocsOrganizer();
         ConversionToBundleRequestDocs conversionToBundleRequestDocs = new ConversionToBundleRequestDocs(
             featureToggleService, bundleRequestDocsOrganizer);
-        DocumentsRetrievalUtils documentsRetrievalUtils = new DocumentsRetrievalUtils(
+        DocumentsRetrieval documentsRetrieval = new DocumentsRetrieval(
             conversionToBundleRequestDocs,
             bundleRequestDocsOrganizer
         );
         bundleRequestMapper = new BundleRequestMapper(
-            documentsRetrievalUtils,
+            documentsRetrieval,
             conversionToBundleRequestDocs,
-            featureToggleService);
+            featureToggleService,
+            bundleRequestDocsOrganizer
+            );
     }
 
     @ParameterizedTest
