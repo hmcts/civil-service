@@ -12,8 +12,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandler.RespondToClaimSpecUtils;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandler.ValidateDateOfBirth;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;

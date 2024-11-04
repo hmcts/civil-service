@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandler;
+package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -22,18 +22,10 @@ public class HandleRespondentResponseTypeForSpec implements CaseTask {
 
     public CallbackResponse execute(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        Long caseId = caseData.getCcdCaseReference();
-
-        log.info("Executing HandleRespondentResponseTypeForSpec for caseId: {}", caseId);
-
         if (caseData.getRespondent1ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION
             || caseData.getRespondent2ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION) {
-            log.info("Setting specDefenceFullAdmittedRequired to NO for caseId: {}", caseId);
             caseData = caseData.toBuilder().specDefenceFullAdmittedRequired(NO).build();
         }
-
-        log.info("Completed HandleRespondentResponseTypeForSpec for caseId: {}", caseId);
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();

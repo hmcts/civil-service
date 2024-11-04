@@ -12,8 +12,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandler.RespondToClaimSpecUtils;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandler.SetGenericResponseTypeFlag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
@@ -65,6 +63,7 @@ class SetGenericResponseTypeFlagTest {
     void setUp() {
         ObjectMapper objectMapper = new ObjectMapper();
         setGenericResponseTypeFlag = new SetGenericResponseTypeFlag(objectMapper, userService, coreCaseUserService, respondToClaimSpecUtilsDisputeDetails);
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
     }
 
     @Test
@@ -108,8 +107,6 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetGenericResponseTypeFlagForOneVTwoTwoLegalRepScenario() {
-        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-
         CaseData caseData = CaseData.builder()
             .isRespondent1(YES)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
@@ -405,8 +402,6 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetGenericResponseTypeFlagWhenBothRespondentsHavePartAdmissionInOneVTwoTwoLegalRepScenario() {
-        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-
         CaseData caseData = CaseData.builder()
             .isRespondent1(YES)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
@@ -422,8 +417,6 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetGenericResponseTypeFlagWhenUserHasRespondentSolicitorTwoRoleInOneVTwoTwoLegalRepScenario() {
-        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-
         CaseData caseData = CaseData.builder()
             .isRespondent1(YES)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
@@ -440,10 +433,8 @@ class SetGenericResponseTypeFlagTest {
         assertEquals("COUNTER_ADMIT_OR_ADMIT_PART", response.getData().get(MULTI_PARTY_RESPONSE_TYPE_FLAGS));
     }
 
-    /*@Test
+    @Test
     void shouldSetGenericResponseTypeFlagWhenRespondent2HasPartAdmissionInOneVTwoTwoLegalRepScenario() {
-        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-
         CaseData caseData = CaseData.builder()
             .isRespondent2(YES)
             .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
@@ -454,12 +445,10 @@ class SetGenericResponseTypeFlagTest {
 
         assertEquals("PART_ADMISSION", response.getData().get(RESPONDENT_CLAIM_RESPONSE_TYPE_GENERIC));
         assertEquals("COUNTER_ADMIT_OR_ADMIT_PART", response.getData().get(MULTI_PARTY_RESPONSE_TYPE_FLAGS));
-    }*/
+    }
 
-    /*@Test
+    @Test
     void shouldSetGenericResponseTypeFlagWhenRespondent1HasFullAdmissionAndRespondent2HasPartAdmissionInOneVTwoTwoLegalRepScenario() {
-        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-
         CaseData caseData = CaseData.builder()
             .isRespondent1(YES)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
@@ -472,7 +461,7 @@ class SetGenericResponseTypeFlagTest {
 
         assertEquals("PART_ADMISSION", response.getData().get(RESPONDENT_CLAIM_RESPONSE_TYPE_GENERIC));
         assertEquals("COUNTER_ADMIT_OR_ADMIT_PART", response.getData().get(MULTI_PARTY_RESPONSE_TYPE_FLAGS));
-    }*/
+    }
 
     @Test
     void shouldNotSetCounterAdmitOrAdmitPartFlagWhenClaimant1HasFullDefence() {
@@ -490,8 +479,6 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetGenericResponseTypeFlagWhenBothRespondentsHaveFullDefenceInOneVTwoTwoLegalRepScenario() {
-        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-
         CaseData caseData = CaseData.builder()
             .isRespondent1(YES)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
@@ -507,8 +494,6 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetGenericResponseTypeFlagWhenRespondent1HasFullDefenceAndRespondent2HasFullAdmissionInOneVTwoTwoLegalRepScenario() {
-        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-
         CaseData caseData = CaseData.builder()
             .isRespondent1(YES)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
@@ -524,8 +509,6 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetGenericResponseTypeFlagWhenRespondent1HasFullDefenceAndImmediatePaymentRouteInOneVTwoTwoLegalRepScenario() {
-        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-
         CaseData caseData = CaseData.builder()
             .isRespondent1(YES)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
@@ -543,8 +526,6 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetGenericResponseTypeFlagWhenRespondent2HasFullAdmissionAndImmediatePaymentRouteInOneVTwoTwoLegalRepScenario() {
-        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-
         CaseData caseData = CaseData.builder()
             .isRespondent2(YES)
             .defenceAdmitPartPaymentTimeRouteRequired2(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
@@ -560,10 +541,8 @@ class SetGenericResponseTypeFlagTest {
         assertEquals("IMMEDIATELY", response.getData().get(DEFENCE_ADMIT_PART_PAYMENT_TIME_ROUTE_GENERIC));
     }
 
-    /*@Test
+    @Test
     void shouldSetGenericResponseTypeFlagWhenRespondent1HasFullAdmissionAndSameResponseInOneVTwoOneLegalRepScenario() {
-        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-
         CaseData caseData = CaseData.builder()
             .showConditionFlags(EnumSet.of(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
@@ -574,7 +553,7 @@ class SetGenericResponseTypeFlagTest {
 
         assertEquals("FULL_ADMISSION", response.getData().get(RESPONDENT_CLAIM_RESPONSE_TYPE_GENERIC));
         assertEquals("NOT_FULL_DEFENCE", response.getData().get(MULTI_PARTY_RESPONSE_TYPE_FLAGS));
-    }*/
+    }
 
     @Test
     void shouldSetGenericResponseTypeFlagWhenRespondent1HasDifferentResponseInOneVTwoOneLegalRepScenario() {
@@ -646,8 +625,6 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetGenericResponseTypeFlagForOneVTwoTwoLegalRepScenarioWithRespondent2NotResponding() {
-        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-
         CaseData caseData = CaseData.builder()
             .isRespondent1(YES)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)

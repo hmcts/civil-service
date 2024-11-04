@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandler;
+package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertaskstests;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
