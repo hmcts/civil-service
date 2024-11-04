@@ -21,7 +21,6 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
 @ExtendWith(MockitoExtension.class)
 class BundleRequestDocsOrganizerTest {
 
@@ -31,30 +30,27 @@ class BundleRequestDocsOrganizerTest {
     private static final String TEST_URL = "url";
     private static final String TEST_FILE_NAME = "testFileName.pdf";
 
-
     @Test
     void shouldGroupWitnessStatementsByName() {
 
-        List<Element<UploadEvidenceWitness>> witnessEvidenceList;
+        List<Element<UploadEvidenceWitness>> witnessEvidenceList = new ArrayList<>();
 
         UploadEvidenceWitness witness1 = UploadEvidenceWitness.builder()
             .witnessOptionName("WitnessA")
             .witnessOptionUploadDate(LocalDate.of(2023, 2, 5))
             .build();
+        witnessEvidenceList.add(Element.<UploadEvidenceWitness>builder().value(witness1).build());
 
         UploadEvidenceWitness witness2 = UploadEvidenceWitness.builder()
             .witnessOptionName("WitnessA")
             .witnessOptionUploadDate(LocalDate.of(2023, 3, 10))
             .build();
+        witnessEvidenceList.add(Element.<UploadEvidenceWitness>builder().value(witness2).build());
 
         UploadEvidenceWitness witness3 = UploadEvidenceWitness.builder()
             .witnessOptionName("WitnessB")
             .witnessOptionUploadDate(LocalDate.of(2023, 4, 15))
             .build();
-
-        witnessEvidenceList = new ArrayList<>();
-        witnessEvidenceList.add(Element.<UploadEvidenceWitness>builder().value(witness1).build());
-        witnessEvidenceList.add(Element.<UploadEvidenceWitness>builder().value(witness2).build());
         witnessEvidenceList.add(Element.<UploadEvidenceWitness>builder().value(witness3).build());
 
         Map<String, List<Element<UploadEvidenceWitness>>> result =
@@ -173,7 +169,6 @@ class BundleRequestDocsOrganizerTest {
                                                                       TypeOfDocDocumentaryEvidenceOfTrial.getAllDocsDisplayNames(), true);
         assertEquals(1, list.size());
     }
-
 
     private List<Element<UploadEvidenceDocumentType>> getDocumentEvidenceForTrial() {
         List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = new ArrayList<>();

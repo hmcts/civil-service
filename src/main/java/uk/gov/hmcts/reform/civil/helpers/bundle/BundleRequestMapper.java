@@ -43,7 +43,6 @@ public class BundleRequestMapper {
 
     private static final String DOC_FILE_NAME = "DOC_FILE_NAME";
     private static final String DOC_FILE_NAME_WITH_DATE = "DOC_FILE_NAME %s";
-    private static final String DATE_FORMAT = "dd/MM/yyyy";
 
     private final BundleDocumentsRetrieval bundleDocumentsRetrieval;
     private final ConversionToBundleRequestDocs conversionToBundleRequestDocs;
@@ -53,6 +52,7 @@ public class BundleRequestMapper {
     public BundleCreateRequest mapCaseDataToBundleCreateRequest(CaseData caseData,
                                                                 String bundleConfigFileName, String jurisdiction,
                                                                 String caseTypeId) {
+        log.info("Mapping case data to BundleCreateRequest for case ID: {}", caseData.getCcdCaseReference());
         String fileNameIdentifier = generateFileName(caseData);
         return BundleCreateRequest.builder()
             .caseDetails(BundlingCaseDetails.builder()
@@ -147,6 +147,7 @@ public class BundleRequestMapper {
     }
 
     private String generateFileName(CaseData caseData) {
+        log.debug("Generating file name for case ID: {}", caseData.getCcdCaseReference());
         String applicantName = caseData.getApplicant1().isIndividual()
             ? caseData.getApplicant1().getIndividualLastName() : caseData.getApplicant1().getPartyName();
         String respondentName = caseData.getRespondent1().isIndividual()

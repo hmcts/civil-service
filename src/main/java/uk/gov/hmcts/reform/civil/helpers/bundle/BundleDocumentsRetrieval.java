@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.helpers.bundle;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -36,12 +37,15 @@ import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleUtils.generateDocNa
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class BundleDocumentsRetrieval {
 
     private final ConversionToBundleRequestDocs conversionToBundleRequestDocs;
     private final BundleRequestDocsOrganizer bundleRequestDocsOrganizer;
 
     public String getParticularsOfClaimName(CaseData caseData) {
+
+        log.info("Getting details of claim for case ID: {}", caseData.getCcdCaseReference());
         LocalDate pocDate;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             pocDate = caseData.getIssueDate();

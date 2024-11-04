@@ -38,6 +38,7 @@ public class ConversionToBundleRequestDocs {
     public List<BundlingRequestDocument> covertOtherWitnessEvidenceToBundleRequestDocs(
         Map<String, List<Element<UploadEvidenceWitness>>> witnessStatmentsMap, String displayName, String documentType,
         Party party) {
+        log.debug("Converting other witness evidence to bundle request docs for party {}", party);
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         if (party != null) {
             if (party.getPartyName() != null) {
@@ -90,6 +91,7 @@ public class ConversionToBundleRequestDocs {
                                                                                   String documentType,
                                                                                   PartyType party,
                                                                                   boolean isWitnessSelf) {
+        log.debug("Converting witness evidence to bundle request docs for file name prefix: {} and party: {}", fileNamePrefix, party);
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         if (witnessEvidence != null) {
             if (featureToggleService.isAmendBundleEnabled()) {
@@ -123,6 +125,7 @@ public class ConversionToBundleRequestDocs {
     public List<BundlingRequestDocument> covertEvidenceUploadTypeToBundleRequestDocs(List<Element<UploadEvidenceDocumentType>> evidenceUploadDocList,
                                                                                      String fileNamePrefix, String documentType,
                                                                                      PartyType party) {
+        log.debug("Converting evidence upload type to bundle request docs for file name prefix: {} and party: {}", fileNamePrefix, party);
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         if (evidenceUploadDocList != null) {
             if (featureToggleService.isAmendBundleEnabled()) {
@@ -157,6 +160,8 @@ public class ConversionToBundleRequestDocs {
 
     public List<BundlingRequestDocument> covertExpertEvidenceTypeToBundleRequestDocs(List<Element<UploadEvidenceExpert>> evidenceUploadExpert,
                                                                                      String fileNamePrefix, String documentType) {
+
+        log.debug("Converting expert evidence type to bundle request docs for file name prefix: {}", fileNamePrefix);
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
 
         if (evidenceUploadExpert != null) {
@@ -191,7 +196,7 @@ public class ConversionToBundleRequestDocs {
         return bundlingRequestDocuments;
     }
 
-    public String getFileNameBaseOnType(String fileNamePrefix, Element<UploadEvidenceDocumentType> uploadEvidence,
+    private String getFileNameBaseOnType(String fileNamePrefix, Element<UploadEvidenceDocumentType> uploadEvidence,
                                         String documentType, PartyType party) {
         if (fileNamePrefix.equals(DOC_FILE_NAME)) {
             return uploadEvidence.getValue().getDocumentUpload().getDocumentFileName()
