@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.is1v1Or2v1Case;
 
@@ -13,8 +14,9 @@ public class CaseHandledOfflineApplicantSolicitorUnspecNotifier extends CaseHand
     private final NotificationsProperties notificationsProperties;
 
     public CaseHandledOfflineApplicantSolicitorUnspecNotifier(NotificationService notificationService,
-                                                              NotificationsProperties notificationsProperties) {
-        super(notificationService);
+                                                              NotificationsProperties notificationsProperties,
+                                                              OrganisationService organisationService) {
+        super(notificationService, organisationService);
         this.notificationsProperties = notificationsProperties;
     }
 
