@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /*
@@ -26,4 +27,19 @@ public class CamundaRuntimeClient {
         variablesResponse.entrySet().stream().forEach(entry -> parsedResponse.put(entry.getKey(), entry.getValue().getValue()));
         return parsedResponse;
     }
+
+    public Map<String, Object> getEvaluatedDmnCourtLocations(String courtId) {
+        Map<String, Object> requestBody = Map.of("variables", Map.of(
+            "caseManagementLocation", Map.of("value", courtId, "type", "string")
+        ));
+        try {
+            List<Map<String, Object>> responseList = camundaRestEngineApi.evaluateDecision("civil-default-case-processing-locations", "civil", requestBody);
+            Map<String, Object> responseMap = responseList.get(0);
+            return responseMap;
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println(e.getMessage() + "NO COURT IN DMN");
+        }
+        return null;
+    }
 }
+

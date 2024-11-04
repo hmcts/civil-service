@@ -37,13 +37,14 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderReasons;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderAppeal;
-import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrdersComplexityBand;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRecitalsRecorded;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRepresentation;
+import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrdersComplexityBand;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetailsOrderWithoutNotice;
+import uk.gov.hmcts.reform.civil.model.finalorders.SecondaryWaCaseLocationCivil;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -224,6 +225,12 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private HearingOtherComments respondent2HearingOtherComments;
     @Builder.Default
     private final List<Element<CaseDocument>> trialReadyDocuments = new ArrayList<>();
+
+    //secondary WA locations
+    private SecondaryWaCaseLocationCivil cmcListingLocation;
+    private SecondaryWaCaseLocationCivil ccmcListingLocation;
+    private SecondaryWaCaseLocationCivil preTrialListingLocation;
+    private SecondaryWaCaseLocationCivil trialListingLocation;
 
     /**
      * Claimant has requested a reconsideration of the SDO.
