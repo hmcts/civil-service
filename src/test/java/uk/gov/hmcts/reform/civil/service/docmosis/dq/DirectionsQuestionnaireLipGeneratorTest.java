@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.DQExtraDetailsLip;
+import uk.gov.hmcts.reform.civil.model.citizenui.EvidenceConfirmDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.ExpertLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ExpertReportLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.HearingSupportLip;
@@ -25,8 +26,11 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.builders.DQGeneratorFormBuilder;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers.GetRespondentsForDQGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers.RespondentTemplateForDQGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers.SetApplicantsForDQGenerator;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
@@ -45,10 +49,13 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     DirectionsQuestionnaireGenerator.class,
     DirectionsQuestionnaireLipGenerator.class,
     JacksonAutoConfiguration.class,
-    StateFlowEngine.class,
     SimpleStateFlowEngine.class,
     SimpleStateFlowBuilder.class,
     TransitionsTestConfiguration.class,
+    DQGeneratorFormBuilder.class,
+    GetRespondentsForDQGenerator.class,
+    RespondentTemplateForDQGenerator.class,
+    SetApplicantsForDQGenerator.class,
     CaseDetailsConverter.class
 })
 class DirectionsQuestionnaireLipGeneratorTest {
@@ -195,6 +202,36 @@ class DirectionsQuestionnaireLipGeneratorTest {
         DirectionsQuestionnaireForm form = generator.getTemplateData(caseData, BEARER_TOKEN);
         //Then
         assertNotNull(form.getLipExtraDQ());
+    }
+
+    @Test
+    void shouldGenerateLipGiveEvidenceYourselfConfirmDetails_whenTheyExist() {
+        //Given
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+            .caseDataLiP(CaseDataLiP
+                             .builder()
+                             .respondent1LiPResponse(
+                                 RespondentLiPResponse
+                                     .builder()
+                                     .respondent1DQExtraDetails(
+                                         DQExtraDetailsLip.builder()
+                                             .giveEvidenceYourSelf(YesOrNo.YES)
+                                             .build())
+                                     .respondent1DQEvidenceConfirmDetails(EvidenceConfirmDetails
+                                                                              .builder()
+                                                                              .firstName("Sam")
+                                                                              .lastName("Wise")
+                                                                              .phone("07788994455")
+                                                                              .email("sam@wise.come")
+                                                                              .jobTitle("wise man")
+                                                                              .build())
+                                     .build())
+                             .build())
+            .build();
+        //When
+        DirectionsQuestionnaireForm form = generator.getTemplateData(caseData, BEARER_TOKEN);
+        //Then
+        assertNotNull(form.getLipExtraDQ().getGiveEvidenceConfirmDetails());
     }
 
     @Test

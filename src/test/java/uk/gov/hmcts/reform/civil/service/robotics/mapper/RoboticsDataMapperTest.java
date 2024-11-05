@@ -33,10 +33,8 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
-import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.builders.EventBuildersConfiguration;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
@@ -55,20 +53,18 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @SpringBootTest(classes = {
-    AddressLinesMapper.class,
-    CaseDetailsConverter.class,
-    EventBuildersConfiguration.class,
-    EventHistoryMapper.class,
-    EventHistorySequencer.class,
     JacksonAutoConfiguration.class,
-    JsonSchemaValidationService.class,
-    OrganisationService.class,
-    RoboticsAddressMapper.class,
-    RoboticsDataMapper.class,
-    SimpleStateFlowBuilder.class,
+    CaseDetailsConverter.class,
     SimpleStateFlowEngine.class,
-    StateFlowEngine.class,
+    SimpleStateFlowBuilder.class,
     TransitionsTestConfiguration.class,
+    EventHistorySequencer.class,
+    EventHistoryMapper.class,
+    EventBuildersConfiguration.class,
+    RoboticsDataMapper.class,
+    RoboticsAddressMapper.class,
+    AddressLinesMapper.class,
+    OrganisationService.class
 })
 @ExtendWith(SpringExtension.class)
 class RoboticsDataMapperTest {

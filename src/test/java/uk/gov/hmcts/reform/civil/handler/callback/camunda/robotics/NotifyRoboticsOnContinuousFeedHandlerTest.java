@@ -21,13 +21,10 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
-import uk.gov.hmcts.reform.civil.service.notification.robotics.DefaultJudgmentRoboticsNotifier;
 import uk.gov.hmcts.reform.civil.service.notification.robotics.RoboticsNotifier;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
-import uk.gov.hmcts.reform.civil.service.robotics.builders.DivergentResponseBuilder;
 import uk.gov.hmcts.reform.civil.service.robotics.builders.EventBuildersConfiguration;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
@@ -52,25 +49,22 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
 @SpringBootTest(classes = {
-    AddressLinesMapper.class,
-    CaseDetailsConverter.class,
-    DefaultJudgmentRoboticsNotifier.class,
-    DivergentResponseBuilder.class,
-    EventBuildersConfiguration.class,
-    EventHistoryMapper.class,
-    EventHistorySequencer.class,
-    JacksonAutoConfiguration.class,
-    JsonSchemaValidationService.class,
     NotifyRoboticsOnContinuousFeedHandler.class,
-    OrganisationService.class,
-    RoboticsAddressMapper.class,
+    RoboticsNotifier.class,
+    JsonSchemaValidationService.class,
     RoboticsDataMapper.class,
     RoboticsDataMapperForSpec.class,
-    RoboticsNotifier.class,
-    SimpleStateFlowBuilder.class,
+    RoboticsAddressMapper.class,
+    AddressLinesMapper.class,
+    EventHistorySequencer.class,
+    EventHistoryMapper.class,
+    EventBuildersConfiguration.class,
+    JacksonAutoConfiguration.class,
+    CaseDetailsConverter.class,
     SimpleStateFlowEngine.class,
-    StateFlowEngine.class,
-    TransitionsTestConfiguration.class
+    SimpleStateFlowBuilder.class,
+    TransitionsTestConfiguration.class,
+    OrganisationService.class
 })
 @ExtendWith(SpringExtension.class)
 class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest {

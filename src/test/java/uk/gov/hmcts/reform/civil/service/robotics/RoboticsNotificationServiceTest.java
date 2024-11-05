@@ -36,13 +36,11 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
-import uk.gov.hmcts.reform.civil.service.robotics.builders.EventBuildersConfiguration;
-import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
@@ -67,21 +65,19 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
     classes = {
-        AddressLinesMapper.class,
-        CaseDetailsConverter.class,
-        EventBuildersConfiguration.class,
-        EventHistoryMapper.class,
-        EventHistorySequencer.class,
-        JacksonAutoConfiguration.class,
-        OrganisationService.class,
-        RoboticsAddressMapper.class,
-        RoboticsDataMapper.class,
         RoboticsEmailConfiguration.class,
         RoboticsNotificationService.class,
-        SimpleStateFlowBuilder.class,
+        JacksonAutoConfiguration.class,
+        CaseDetailsConverter.class,
         SimpleStateFlowEngine.class,
-        StateFlowEngine.class,
-        TransitionsTestConfiguration.class
+        SimpleStateFlowBuilder.class,
+        TransitionsTestConfiguration.class,
+        EventHistorySequencer.class,
+        EventHistoryMapper.class,
+        RoboticsDataMapper.class,
+        RoboticsAddressMapper.class,
+        AddressLinesMapper.class,
+        OrganisationService.class
     },
     properties = {
         "sendgrid.api-key:some-key",

@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
 import uk.gov.hmcts.reform.civil.service.notification.robotics.RoboticsNotifier;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
@@ -51,22 +50,21 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
 
 @SpringBootTest(classes = {
-    AddressLinesMapper.class,
-    CaseDetailsConverter.class,
-    EventBuildersConfiguration.class,
-    EventHistoryMapper.class,
-    EventHistorySequencer.class,
-    JacksonAutoConfiguration.class,
-    JsonSchemaValidationService.class,
     NotifyRoboticsOnCaseHandedOfflineHandler.class,
-    OrganisationService.class,
-    RoboticsAddressMapper.class,
-    RoboticsDataMapper.class,
     RoboticsNotifier.class,
-    SimpleStateFlowBuilder.class,
+    JsonSchemaValidationService.class,
     SimpleStateFlowEngine.class,
-    StateFlowEngine.class,
-    TransitionsTestConfiguration.class
+    SimpleStateFlowBuilder.class,
+    RoboticsDataMapper.class,
+    RoboticsAddressMapper.class,
+    AddressLinesMapper.class,
+    EventHistorySequencer.class,
+    EventHistoryMapper.class,
+    EventBuildersConfiguration.class,
+    JacksonAutoConfiguration.class,
+    CaseDetailsConverter.class,
+    TransitionsTestConfiguration.class,
+    OrganisationService.class
 })
 @ExtendWith(SpringExtension.class)
 class NotifyRoboticsOnCaseHandedOfflineHandlerTest extends BaseCallbackHandlerTest {

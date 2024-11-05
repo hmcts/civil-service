@@ -20,7 +20,7 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ClaimDismissedPastNotificationDeadlineBuilder implements EventBuilder {
+public class ClaimDismissedPastNotificationDeadlineBuilder extends BaseEventBuilder {
 
     private final IStateFlowEngine stateFlowEngine;
 

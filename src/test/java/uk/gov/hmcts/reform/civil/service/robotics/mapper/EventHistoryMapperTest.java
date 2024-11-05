@@ -49,7 +49,8 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
 import uk.gov.hmcts.reform.civil.service.robotics.builders.CounterClaimBuilder;
 import uk.gov.hmcts.reform.civil.service.robotics.builders.DivergentResponseBuilder;
 import uk.gov.hmcts.reform.civil.service.robotics.builders.EventBuildersConfiguration;
@@ -61,6 +62,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.builders.NotificationAcknowled
 import uk.gov.hmcts.reform.civil.service.robotics.builders.PartAdmissionBuilder;
 import uk.gov.hmcts.reform.civil.service.robotics.builders.PastClaimDismissedDeadlineBuilder;
 import uk.gov.hmcts.reform.civil.service.robotics.builders.TakenOfflineByStaffBuilder;
+import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
@@ -115,7 +117,9 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.
     EventHistoryMapper.class,
     EventHistorySequencer.class,
     JacksonAutoConfiguration.class,
-    StateFlowEngine.class,
+    SimpleStateFlowBuilder.class,
+    SimpleStateFlowEngine.class,
+    TransitionsTestConfiguration.class
 })
 class EventHistoryMapperTest {
 
