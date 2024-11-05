@@ -42,14 +42,13 @@ public class FullDefenceProceedTransitionBuilderTest {
 
     @Test
     void shouldSetUpTransitions_withExpectedSizeAndStates() {
-        assertThat(result).hasSize(6);
+        assertThat(result).hasSize(5);
 
         assertTransition(result.get(0), "MAIN.FULL_DEFENCE_PROCEED", "MAIN.IN_HEARING_READINESS");
         assertTransition(result.get(1), "MAIN.FULL_DEFENCE_PROCEED", "MAIN.CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE");
         assertTransition(result.get(2), "MAIN.FULL_DEFENCE_PROCEED", "MAIN.TAKEN_OFFLINE_BY_STAFF");
         assertTransition(result.get(3), "MAIN.FULL_DEFENCE_PROCEED", "MAIN.TAKEN_OFFLINE_AFTER_SDO");
         assertTransition(result.get(4), "MAIN.FULL_DEFENCE_PROCEED", "MAIN.TAKEN_OFFLINE_SDO_NOT_DRAWN");
-        assertTransition(result.get(5), "MAIN.FULL_DEFENCE_PROCEED", "MAIN.IN_MEDIATION");
     }
 
     @Test

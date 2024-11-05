@@ -112,11 +112,14 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
 
     public static boolean getCarmEnabledForLipCase(CaseData caseData) {
         return caseData.getCaseDataLiP() != null
-            && caseData.getCaseDataLiP().getApplicant1LiPResponseCarm() != null;
+            && (caseData.getCaseDataLiP().getApplicant1LiPResponseCarm() != null
+            || caseData.getCaseDataLiP().getRespondent1MediationLiPResponseCarm() != null);
     }
 
     public static boolean getCarmEnabledForCase(CaseData caseData) {
-        return caseData.getApp1MediationContactInfo() != null;
+        return caseData.getApp1MediationContactInfo() != null
+            || caseData.getResp1MediationContactInfo() != null
+            || caseData.getResp2MediationContactInfo() != null;
     }
 
     public static final Predicate<CaseData> takenOfflineByStaffAfterDefendantResponse =
