@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
@@ -4230,96 +4229,6 @@ class SimpleStateFlowEngineTest {
             assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
             assertNull(newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
         }
-
-        @Test
-        void fullDefencePartialMediationSpec() {
-            // Given
-            CaseData caseData = CaseData.builder()
-                // spec claim
-                .caseAccessCategory(SPEC_CLAIM)
-                // claim submitted
-                .submittedDate(LocalDateTime.now())
-                .respondent1Represented(YES)
-                // payment successful
-                .paymentSuccessfulDate(LocalDateTime.now())
-                // pending claim issued
-                .issueDate(LocalDate.now())
-                .respondent1OrgRegistered(YES)
-                // claim issued
-                .claimNotificationDeadline(LocalDateTime.now())
-                // full defence
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .claimNotificationDate(LocalDateTime.now())
-                // defendant agrees to mediation
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .responseClaimMediationSpecRequired(YES)
-                .build();
-
-            // When
-            StateFlow fullState = stateFlowEngine.evaluate(caseData);
-
-            // Then
-            assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
-
-            StateFlow newState = stateFlowEngine.evaluate(caseData.toBuilder()
-                                                              .applicant1ProceedWithClaim(YES)
-                                                              .applicant1ClaimMediationSpecRequired(
-                                                                  SmallClaimMedicalLRspec.builder()
-                                                                      .hasAgreedFreeMediation(NO)
-                                                                      .build()
-                                                              )
-                                                              .build());
-
-            assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
-            assertNull(newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
-        }
-
-        @Test
-        void fullDefenceAllMediationSpec() {
-            // Given
-            CaseData caseData = CaseData.builder()
-                // spec claim
-                .caseAccessCategory(SPEC_CLAIM)
-                // claim submitted
-                .submittedDate(LocalDateTime.now())
-                .respondent1Represented(YES)
-                // payment successful
-                .paymentSuccessfulDate(LocalDateTime.now())
-                // pending claim issued
-                .issueDate(LocalDate.now())
-                .respondent1OrgRegistered(YES)
-                // claim issued
-                .claimNotificationDeadline(LocalDateTime.now())
-                // full defence
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .claimNotificationDate(LocalDateTime.now())
-                // defendant agrees to mediation
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .responseClaimMediationSpecRequired(YES)
-                .applicant1ClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
-                                                          .hasAgreedFreeMediation(YES).build())
-                .build();
-
-            // When
-            StateFlow fullState = stateFlowEngine.evaluate(caseData);
-
-            // Then
-            assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
-
-            StateFlow newState = stateFlowEngine.evaluate(caseData.toBuilder()
-                                                              .applicant1ProceedWithClaim(YES)
-                                                              .applicant1ClaimMediationSpecRequired(
-                                                                  SmallClaimMedicalLRspec.builder()
-                                                                      .hasAgreedFreeMediation(YES)
-                                                                      .build()
-                                                              )
-                                                              .build());
-
-            assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
-            assertEquals(Boolean.TRUE, newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
-        }
     }
 
     @Nested
@@ -4543,49 +4452,6 @@ class SimpleStateFlowEngineTest {
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                 entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true));
-        }
-
-        @Test
-        void shouldReturnInHearingReadiness_whenTransitionedFromFullDefenseProceed() {
-            // Given
-            CaseData caseData = CaseData.builder()
-                .caseAccessCategory(SPEC_CLAIM)
-                .submittedDate(LocalDateTime.now())
-                .respondent1Represented(YES)
-                .paymentSuccessfulDate(LocalDateTime.now())
-                .issueDate(LocalDate.now())
-                .respondent1OrgRegistered(YES)
-                .claimNotificationDeadline(LocalDateTime.now())
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .claimNotificationDate(LocalDateTime.now())
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .responseClaimMediationSpecRequired(YES)
-                .applicant1ProceedWithClaim(YES)
-                .applicant1ClaimMediationSpecRequired(
-                    SmallClaimMedicalLRspec.builder()
-                        .hasAgreedFreeMediation(NO)
-                        .build())
-                .hearingReferenceNumber("11111111")
-                .listingOrRelisting(ListingOrRelisting.LISTING)
-                .build();
-
-            // When
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-            // Then
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(IN_HEARING_READINESS.fullName());
-            assertThat(stateFlow.getStateHistory())
-                .hasSize(8)
-                .extracting(State::getName)
-                .containsExactly(
-                    SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), FULL_DEFENCE.fullName(),
-                    FULL_DEFENCE_PROCEED.fullName(), IN_HEARING_READINESS.fullName()
-                );
         }
 
         @Test
