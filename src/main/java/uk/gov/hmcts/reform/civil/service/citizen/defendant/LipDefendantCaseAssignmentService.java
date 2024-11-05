@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
@@ -54,13 +55,18 @@ public class LipDefendantCaseAssignmentService {
                 .build();
         Map<String, Object> data = new HashMap<>();
         data.put("defendantUserDetails", defendantUserDetails);
-        if (caseFlagsLoggingEnabled && caseDetails.isPresent()) {
+        if (caseDetails.isPresent()) {
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails.get());
-            log.info(
-                "case id: {}, respondent flags start of event submission: {}",
-                caseId,
-                caseData.getRespondent1().getFlags()
-            );
+            Party respondent1 = caseData.getRespondent1();
+            respondent1 = respondent1.toBuilder().partyEmail(defendantIdamUserDetails.getEmail()).build();
+            data.put("respondent1", respondent1);
+            if (caseFlagsLoggingEnabled) {
+                log.info(
+                    "case id: {}, respondent flags start of event submission: {}",
+                    caseId,
+                    respondent1.getFlags()
+                );
+            }
         }
         if (caseRole.isPresent() && caseRole.get() == CaseRole.DEFENDANT && caseDetails.isPresent()) {
             Map<String, Object> pinPostData = defendantPinToPostLRspecService.removePinInPostData(caseDetails.get());
