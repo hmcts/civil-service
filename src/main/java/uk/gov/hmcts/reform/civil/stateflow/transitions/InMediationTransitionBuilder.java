@@ -30,9 +30,9 @@ public class InMediationTransitionBuilder extends MidTransitionBuilder {
     }
 
     public static final Predicate<CaseData> casemanMarksMediationUnsuccessful = caseData ->
-        Objects.nonNull(caseData.getMediation().getUnsuccessfulMediationReason())
-            || (Objects.nonNull(caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect())
-            && !caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect().isEmpty());
+        Objects.nonNull(caseData.getMediation())
+            && (Objects.nonNull(caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect()))
+            && !caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect().isEmpty();
 
     public static final Predicate<CaseData> takenOfflineByStaffBeforeMediationUnsuccessful = caseData ->
         caseData.getTakenOfflineByStaffDate() != null
