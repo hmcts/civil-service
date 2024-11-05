@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.civil.model.caseprogression.RevisedHearingRequirement
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
+import uk.gov.hmcts.reform.civil.model.caseprogression.WorkAllocationTaskLocationModel;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -44,7 +45,6 @@ import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrdersComplexityBand;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetailsOrderWithoutNotice;
-import uk.gov.hmcts.reform.civil.model.finalorders.SecondaryWaCaseLocationCivil;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -227,10 +227,7 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private final List<Element<CaseDocument>> trialReadyDocuments = new ArrayList<>();
 
     //secondary WA locations
-    private SecondaryWaCaseLocationCivil cmcListingLocation;
-    private SecondaryWaCaseLocationCivil ccmcListingLocation;
-    private SecondaryWaCaseLocationCivil preTrialListingLocation;
-    private SecondaryWaCaseLocationCivil trialListingLocation;
+    private List<Element<WorkAllocationTaskLocationModel>> taskManagementLocations;
 
     /**
      * Claimant has requested a reconsideration of the SDO.
