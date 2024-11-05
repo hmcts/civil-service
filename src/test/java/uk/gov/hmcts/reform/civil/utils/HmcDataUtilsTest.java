@@ -1469,6 +1469,12 @@ class HmcDataUtilsTest {
                 .build();
     }
 
+    private HearingGetResponse buildHearing(String hearingType) {
+        return HearingGetResponse.builder()
+            .hearingDetails(HearingDetails.builder().hearingType(hearingType).build())
+            .build();
+    }
+
     private HearingGetResponse buildHearingWithOrganisation(List<HearingIndividual> testIndividuals,
                                                             PartyDetailsModel org) {
         List<PartyDetailsModel> partyDetails = new ArrayList<>(testIndividuals.stream()
@@ -1482,12 +1488,6 @@ class HmcDataUtilsTest {
                 HearingDaySchedule.builder()
                     .attendees(testIndividuals.stream().map(HearingIndividual::buildAttendee).toList())
                     .build())).build())
-            .build();
-    }
-
-    private HearingGetResponse buildHearing(String hearingType) {
-        return HearingGetResponse.builder()
-            .hearingDetails(HearingDetails.builder().hearingType(hearingType).build())
             .build();
     }
 
