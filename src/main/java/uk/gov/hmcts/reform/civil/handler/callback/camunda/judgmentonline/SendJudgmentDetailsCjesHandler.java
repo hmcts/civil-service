@@ -51,7 +51,7 @@ public class SendJudgmentDetailsCjesHandler extends CallbackHandler {
 
         if (SEND_JUDGMENT_DETAILS_CJES.equals(caseEvent)) {
             updateCamundaVars(caseData);
-            if (Boolean.TRUE.equals(isActiveJudgmentRegisteredWithRTL(caseData))) {
+            if (caseData.isActiveJudgmentRegisteredWithRTL()) {
                 cjesService.sendJudgment(caseData, true);
             }
         } else if (SEND_JUDGMENT_DETAILS_CJES_SA.equals(caseEvent)) {
@@ -64,10 +64,6 @@ public class SendJudgmentDetailsCjesHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
-    }
-
-    private Boolean isActiveJudgmentRegisteredWithRTL(CaseData caseData) {
-        return YES.equals(caseData.getActiveJudgment().getIsRegisterWithRTL());
     }
 
     private Boolean isLatestHistoricJudgmentRegisteredWithRTL(CaseData caseData) {

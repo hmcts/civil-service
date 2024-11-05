@@ -8,23 +8,25 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentPaidInFullOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.judgments.paidinfull.JudgmentPaidInFullProcessor;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_PAID_IN_FULL;
@@ -34,13 +36,15 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private JudgmentPaidInFullCallbackHandler handler;
 
+    @Mock
+    private JudgmentPaidInFullProcessor judgmentPaidInFullProcessor;
+
     @BeforeEach
     void setup() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        JudgmentPaidInFullOnlineMapper paidInFullJudgmentOnlineMapper = new JudgmentPaidInFullOnlineMapper();
-        handler = new JudgmentPaidInFullCallbackHandler(objectMapper, paidInFullJudgmentOnlineMapper);
+        handler = new JudgmentPaidInFullCallbackHandler(objectMapper, judgmentPaidInFullProcessor);
     }
 
     @Test
@@ -55,96 +59,19 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
             caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now())
-                                           .paymentPlan(JudgmentPaymentPlan.builder()
-                                                            .type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
-                                           .orderedAmount("100")
-                                           .costs("50")
-                                           .totalAmount("150")
-                                           .build());
+                .paymentPlan(JudgmentPaymentPlan.builder()
+                    .type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
+                .orderedAmount("100")
+                .costs("50")
+                .totalAmount("150")
+                .build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            when(judgmentPaidInFullProcessor.process(caseData)).thenReturn(caseData);
+            handler.handle(params);
             //Then: judgmentOnline fields should be set correctly
-
-            assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("dateOfFullPaymentMade").isEqualTo(LocalDate.now().plusDays(35).toString());
-            assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("confirmFullPaymentMade").isEqualTo(List.of("CONFIRMED"));
-
-            assertThat(response.getData().get("activeJudgment")).isNotNull();
-            assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("SATISFIED");
-            assertThat(response.getData().get("activeJudgment")).extracting("fullyPaymentMadeDate").isEqualTo(LocalDate.now().plusDays(35).toString());
-        }
-
-        @Test
-        void shouldPopulateJudgementStatusAsSatisfied() {
-            //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
-            caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now())
-                                           .paymentPlan(JudgmentPaymentPlan.builder()
-                                                            .type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
-                                           .orderedAmount("100")
-                                           .costs("50")
-                                           .totalAmount("150")
-                                           .build());
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            //When: handler is called with ABOUT_TO_SUBMIT event
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            //Then: judgmentOnline fields should be set correctly
-
-            assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("dateOfFullPaymentMade").isEqualTo(LocalDate.now().plusDays(35).toString());
-            assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("confirmFullPaymentMade").isEqualTo(List.of("CONFIRMED"));
-            assertThat(response.getData().get("joIsLiveJudgmentExists")).isEqualTo("Yes");
-
-        }
-
-        @Test
-        void shouldPopulateJudgementStatusAsCancelled() {
-            //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31Days();
-            caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now())
-                                           .paymentPlan(JudgmentPaymentPlan.builder()
-                                                            .type(PaymentPlanSelection.PAY_IMMEDIATELY)
-                                                            .build())
-                                           .orderedAmount("100")
-                                           .costs("50")
-                                           .totalAmount("150")
-                                           .build());
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            //When: handler is called with ABOUT_TO_SUBMIT event
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            //Then: judgmentOnline fields should be set correctly
-
-            assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("dateOfFullPaymentMade").isEqualTo(LocalDate.now().plusDays(15).toString());
-            assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("confirmFullPaymentMade").isEqualTo(List.of("CONFIRMED"));
-            assertThat(response.getData().get("joIsLiveJudgmentExists")).isEqualTo("Yes");
-
-            assertThat(response.getData().get("activeJudgment")).isNotNull();
-            assertThat(response.getData().get("historicJudgment")).isNull();
-        }
-
-        @Test
-        void shouldPopulateJudgementStatusAsCancelledForDefaultJudgment() {
-            //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
-            CaseData caseData = CaseDataBuilder.builder()
-                .getDefaultJudgment1v1CaseJudgmentPaid();
-            caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now())
-                                           .paymentPlan(JudgmentPaymentPlan.builder()
-                                                            .type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
-                                           .orderedAmount("100")
-                                           .costs("50")
-                                           .totalAmount("150")
-                                           .build());
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            //When: handler is called with ABOUT_TO_SUBMIT event
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            //Then: judgmentOnline fields should be set correctly
-            assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("confirmFullPaymentMade").isEqualTo(List.of("CONFIRMED"));
-            assertThat(response.getData().get("joIsLiveJudgmentExists")).isEqualTo("Yes");
-            assertThat(response.getData().get("activeJudgment")).isNotNull();
-            assertThat(response.getData().get("historicJudgment")).isNull();
+            verify(judgmentPaidInFullProcessor).process(caseData);
         }
     }
 

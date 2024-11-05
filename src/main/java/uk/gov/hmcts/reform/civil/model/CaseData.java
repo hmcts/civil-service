@@ -1593,4 +1593,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isLipCase() {
         return this.isApplicant1NotRepresented() || this.isRespondent1LiP();
     }
+
+    @JsonIgnore
+    public Boolean isActiveJudgmentRegisteredWithRTL() {
+        return YES.equals(this.getActiveJudgment().getIsRegisterWithRTL());
+    }
 }
