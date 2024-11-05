@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.service.camunda.UpdateSecondaryWALocationsService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,6 +50,7 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
     private static final String ERROR_SELECT_DIFF_LOCATION = "Select a different hearing court location to transfer!";
     private static final String CONFIRMATION_HEADER = "# Case transferred to new location";
     private final FeatureToggleService featureToggleService;
+    private final UpdateSecondaryWALocationsService updateSecondaryWALocations;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -133,11 +135,11 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
                         featureToggleService.isLocationWhiteListedForCaseProgression(newCourtLocation.getEpimmsId())
                             ? YesOrNo.YES : YesOrNo.NO);
                 }
+                updateSecondaryWALocations.updateSecondaryWALocations(newCourtLocation.getEpimmsId(), callbackParams.getParams().get(BEARER_TOKEN).toString(), caseDataBuilder);
             } else {
                 caseDataBuilder.eaCourtLocation(YesOrNo.NO);
             }
         }
-
         DynamicList tempLocationList = caseData.getTransferCourtLocationList();
         tempLocationList.setListItems(null);
         caseDataBuilder.transferCourtLocationList(tempLocationList);

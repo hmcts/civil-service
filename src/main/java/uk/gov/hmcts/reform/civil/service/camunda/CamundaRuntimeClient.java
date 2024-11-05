@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.camunda;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.community.rest.client.model.VariableValueDto;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -15,6 +16,7 @@ import java.util.Map;
  * */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class CamundaRuntimeClient {
 
     private final AuthTokenGenerator authTokenGenerator;
@@ -34,10 +36,9 @@ public class CamundaRuntimeClient {
         ));
         try {
             List<Map<String, Object>> responseList = camundaRestEngineApi.evaluateDecision("civil-default-case-processing-locations", "civil", requestBody);
-            Map<String, Object> responseMap = responseList.get(0);
-            return responseMap;
+            return responseList.get(0);
         } catch (IndexOutOfBoundsException e) {
-            System.out.println(e.getMessage() + "NO COURT IN DMN");
+            log.info("Court epimmId missing from DMN");
         }
         return null;
     }

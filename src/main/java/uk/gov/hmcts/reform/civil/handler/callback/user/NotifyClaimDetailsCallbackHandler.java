@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.ServiceOfDateValidationMessageUtils;
-import uk.gov.hmcts.reform.civil.utils.UpdateSecondaryWALocationsUtils;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ParticularsOfClaimValidator;
 
 import java.time.LocalDate;
@@ -43,7 +42,6 @@ import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -100,7 +98,6 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     private final ServiceOfDateValidationMessageUtils serviceOfDateValidationMessageUtils;
     private final FeatureToggleService featureToggleService;
     private final AssignCategoryId assignCategoryId;
-    private final UpdateSecondaryWALocationsUtils updateSecondaryWALocations;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -332,10 +329,6 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     private CallbackResponse prepareDefendantSolicitorOptions(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-
-
-
-
         List<String> dynamicListOptions = new ArrayList<>();
         dynamicListOptions.add("Both");
         dynamicListOptions.add("Defendant One: " + caseData.getRespondent1().getPartyName());
@@ -346,8 +339,6 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.defendantSolicitorNotifyClaimDetailsOptions(DynamicList.fromList(dynamicListOptions));
-
-        updateSecondaryWALocations.updateSecondaryWALocations("000000", caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), caseDataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseDataBuilder.build().toMap(objectMapper))

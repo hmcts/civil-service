@@ -12,6 +12,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SecondaryLocationModel  {
+
     private String type;
     private String value;
     private Map<String, Object> valueInfo;

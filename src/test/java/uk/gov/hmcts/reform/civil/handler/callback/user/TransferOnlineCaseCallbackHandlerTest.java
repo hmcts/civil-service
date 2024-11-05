@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.camunda.UpdateSecondaryWALocationsService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 
@@ -52,12 +53,14 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
     protected CourtLocationUtils courtLocationUtils;
     @Mock
     protected FeatureToggleService featureToggleService;
+    @Mock
+    protected UpdateSecondaryWALocationsService updateSecondaryWALocationsService;
 
     @BeforeEach
     void setup() {
         objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
         handler = new TransferOnlineCaseCallbackHandler(objectMapper, locationRefDataService, courtLocationUtils,
-                                                        featureToggleService);
+                                                        featureToggleService, updateSecondaryWALocationsService);
     }
 
     @Nested
