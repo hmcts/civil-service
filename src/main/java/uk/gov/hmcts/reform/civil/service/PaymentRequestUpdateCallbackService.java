@@ -73,12 +73,12 @@ public class PaymentRequestUpdateCallbackService {
 
     private void processPaymentUpdate(ServiceRequestUpdateDto dto, CaseData caseData, FeeType feeType, Long caseId) {
         if (!caseData.isLipvLipOneVOne()) {
-            handlePaymentUpdate(dto, caseData, feeType, caseId, false);
+            handlePaymentUpdate(dto, caseData, feeType, caseId);
             return;
         }
 
         if (isPaymentUpdateValid(feeType, caseData)) {
-            handlePaymentUpdate(dto, caseData, feeType, caseId, true);
+            handlePaymentUpdate(dto, caseData, feeType, caseId);
         } else {
             log.info("Payment update is not valid for case {} and feeType {}", caseId, feeType);
         }
@@ -101,16 +101,16 @@ public class PaymentRequestUpdateCallbackService {
     }
 
     private boolean isPaymentUpdateValid(FeeType feeType, CaseData caseData) {
-        return (feeType == FeeType.HEARING && isHearingPaymentFailed(caseData))
-            || (feeType == FeeType.CLAIMISSUED && isClaimIssuePaymentFailed(caseData));
+        return (feeType == FeeType.HEARING && isHearingPaymentUnpaidOrFailed(caseData))
+            || (feeType == FeeType.CLAIMISSUED && isClaimIssuePaymentUnpaidOrFailed(caseData));
     }
 
-    private boolean isHearingPaymentFailed(CaseData caseData) {
+    private boolean isHearingPaymentUnpaidOrFailed(CaseData caseData) {
         PaymentDetails hearingPayment = caseData.getHearingFeePaymentDetails();
         return hearingPayment == null || hearingPayment.getStatus() == PaymentStatus.FAILED;
     }
 
-    private boolean isClaimIssuePaymentFailed(CaseData caseData) {
+    private boolean isClaimIssuePaymentUnpaidOrFailed(CaseData caseData) {
         PaymentDetails claimIssuePayment = caseData.getClaimIssuedPaymentDetails();
         return claimIssuePayment == null || claimIssuePayment.getStatus() == PaymentStatus.FAILED;
     }
@@ -123,20 +123,22 @@ public class PaymentRequestUpdateCallbackService {
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
             caseData = updateCaseDataWithPaymentDetails(paymentStatusResponse, caseData, feeType);
 
-            createAndSubmitEvent(caseData, caseId, feeType, false);
+            submitUpdatePaymentStatusEvent(caseData, caseId, feeType);
         } catch (Exception ex) {
             log.error("Error updating payment status for case {}: {}", caseReference, ex.getMessage());
             throw new CaseDataUpdateException();
         }
     }
 
-    private void handlePaymentUpdate(ServiceRequestUpdateDto dto, CaseData caseData, FeeType feeType, Long caseId, boolean isValidPayment) {
+    private void handlePaymentUpdate(ServiceRequestUpdateDto dto, CaseData caseData, FeeType feeType, Long caseId) {
         caseData = updateCaseDataWithPaymentDetails(dto, caseData, feeType);
-        if (isValidPayment) {
+
+        if (caseData.isLipvLipOneVOne() && isPaymentUpdateValid(feeType, caseData)) {
             CardPaymentStatusResponse paymentStatusResponse = buildPaymentStatusResponse(dto);
             updatePaymentStatus(feeType, dto.getCcdCaseNumber(), paymentStatusResponse);
         }
-        createAndSubmitEvent(caseData, caseId, feeType, true);
+
+        submitProcessCallbackEvent(caseData, caseId, feeType);
     }
 
     private CardPaymentStatusResponse buildPaymentStatusResponse(ServiceRequestUpdateDto dto) {
@@ -146,8 +148,17 @@ public class PaymentRequestUpdateCallbackService {
             .build();
     }
 
-    private void createAndSubmitEvent(CaseData caseData, Long caseId, FeeType feeType, boolean isCallback) {
-        CaseEvent event = determineEvent(caseData, feeType, isCallback);
+    private void submitProcessCallbackEvent(CaseData caseData, Long caseId, FeeType feeType) {
+        CaseEvent event = determineProcessCallbackEventFromFeeType(caseData, feeType);
+        submitEvent(caseData, caseId, event);
+    }
+
+    private void submitUpdatePaymentStatusEvent(CaseData caseData, Long caseId, FeeType feeType) {
+        CaseEvent event = determineUpdatePaymentStatusEventFromFeeType(feeType);
+        submitEvent(caseData, caseId, event);
+    }
+
+    private void submitEvent(CaseData caseData, Long caseId, CaseEvent event) {
         StartEventResponse startEvent = coreCaseDataService.startUpdate(
             String.valueOf(caseId),
             event
@@ -162,25 +173,20 @@ public class PaymentRequestUpdateCallbackService {
         coreCaseDataService.submitUpdate(String.valueOf(caseId), caseDataContent);
     }
 
-    private CaseEvent determineEvent(CaseData caseData, FeeType feeType, boolean isCallback) {
+    private CaseEvent determineProcessCallbackEventFromFeeType(CaseData caseData, FeeType feeType) {
         return switch (feeType) {
-            case HEARING -> getHearingEvent(isCallback);
-            case CLAIMISSUED -> getClaimIssuedEvent(caseData, isCallback);
+            case HEARING -> SERVICE_REQUEST_RECEIVED;
+            case CLAIMISSUED -> caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM
+                ? CREATE_CLAIM_SPEC_AFTER_PAYMENT
+                : CREATE_CLAIM_AFTER_PAYMENT;
         };
     }
 
-    private CaseEvent getHearingEvent(boolean isCallback) {
-        return isCallback ? SERVICE_REQUEST_RECEIVED : CITIZEN_HEARING_FEE_PAYMENT;
-    }
-
-    private CaseEvent getClaimIssuedEvent(CaseData caseData, boolean isCallback) {
-        if (isCallback) {
-            return caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM
-                ? CREATE_CLAIM_SPEC_AFTER_PAYMENT
-                : CREATE_CLAIM_AFTER_PAYMENT;
-        } else {
-            return CITIZEN_CLAIM_ISSUE_PAYMENT;
-        }
+    private CaseEvent determineUpdatePaymentStatusEventFromFeeType(FeeType feeType) {
+        return switch (feeType) {
+            case HEARING -> CITIZEN_HEARING_FEE_PAYMENT;
+            case CLAIMISSUED -> CITIZEN_CLAIM_ISSUE_PAYMENT;
+        };
     }
 
     private CaseData updateCaseDataWithPaymentDetails(ServiceRequestUpdateDto dto, CaseData caseData, FeeType feeType) {
