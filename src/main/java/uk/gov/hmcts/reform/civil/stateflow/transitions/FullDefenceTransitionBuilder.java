@@ -47,6 +47,9 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
                                                // for carm cases, fullDefenceProcced is tracked with lipFullDefenceProceed
                                                // and move to in mediation if applicant does not settle
                                                .or(isCarmApplicableLipCase.and(lipFullDefenceProceed.or(fullDefenceProceed))))
+            .moveTo(IN_MEDIATION)
+            // for carm LR cases
+            .onlyWhen(isCarmApplicableCase.and(fullDefenceProceed))
             .moveTo(FULL_DEFENCE_PROCEED)
             .onlyWhen(fullDefenceProceed.and(allAgreedToLrMediationSpec).and(agreedToMediation.negate()).and(declinedMediation.negate()))
             .set((c, flags) -> {
@@ -96,6 +99,13 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
         }
         return predicate;
     }
+
+    public static final Predicate<CaseData> isCarmApplicableCase = caseData ->
+        Optional.ofNullable(caseData)
+            .filter(FullDefenceTransitionBuilder::getCarmEnabledForCase)
+            .filter(FullDefenceTransitionBuilder::isSpecSmallClaim)
+            .filter(data -> YES.equals(data.getRespondent1Represented()) && !NO.equals(data.getApplicant1Represented()))
+            .isPresent();
 
     public static final Predicate<CaseData> isCarmApplicableLipCase = caseData ->
         Optional.ofNullable(caseData)
