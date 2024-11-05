@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
+import uk.gov.hmcts.reform.civil.model.citizenui.MediationLiPCarm;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
@@ -637,21 +638,27 @@ public class FullDefenceTransitionBuilderTest {
     }
 
     @Test
-    void shouldReturnTrue_whenGetCarmEnabledForDate() {
+    void shouldReturnTrue_whenGetCarmEnabledForLipCase() {
         CaseData caseData = CaseData.builder()
-            .submittedDate(LocalDateTime.of(2024, 11, 5, 0, 0))
+            .caseDataLiP(CaseDataLiP.builder()
+                             .applicant1LiPResponseCarm(MediationLiPCarm.builder()
+                                                            .isMediationContactNameCorrect(YES)
+                                                            .build())
+                             .build())
             .build();
 
-        assertTrue(FullDefenceTransitionBuilder.getCarmEnabledForDate(caseData));
+        assertTrue(FullDefenceTransitionBuilder.getCarmEnabledForLipCase(caseData));
     }
 
     @Test
-    void shouldReturnFalse_whenGetCarmEnabledForDate() {
+    void shouldReturnFalse_whenGetCarmEnabledForLipCase() {
         CaseData caseData = CaseData.builder()
-            .submittedDate(LocalDateTime.of(2024, 7, 31, 0, 0))
+            .caseDataLiP(CaseDataLiP.builder()
+                             .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().build())
+                             .build())
             .build();
 
-        assertFalse(FullDefenceTransitionBuilder.getCarmEnabledForDate(caseData));
+        assertFalse(FullDefenceTransitionBuilder.getCarmEnabledForLipCase(caseData));
     }
 
     @Test

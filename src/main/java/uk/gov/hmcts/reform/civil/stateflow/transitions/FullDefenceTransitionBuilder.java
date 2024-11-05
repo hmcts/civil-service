@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
 
-import java.time.LocalDate;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -64,7 +63,7 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
                 flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
             })
             .moveTo(FULL_DEFENCE_PROCEED)
-            .onlyWhen(fullDefenceProceed.and(isCarmApplicableLipCase.negate()).and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
+            .onlyWhen(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
                           .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate()))
             .set((c, flags) -> {
                 flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
@@ -72,7 +71,7 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
             })
             .moveTo(FULL_DEFENCE_PROCEED)
             .onlyWhen((fullDefenceProceed.or(isClaimantNotSettleFullDefenceClaim).or(isDefendantNotPaidFullDefenceClaim))
-                .and(not(agreedToMediation)).and(isCarmApplicableLipCase.negate()).and(isLipCase))
+                .and(not(agreedToMediation)).and(isLipCase))
             .set((c, flags) -> {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
                 flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), false);
@@ -100,7 +99,7 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
 
     public static final Predicate<CaseData> isCarmApplicableLipCase = caseData ->
         Optional.ofNullable(caseData)
-            .filter(FullDefenceTransitionBuilder::getCarmEnabledForDate)
+            .filter(FullDefenceTransitionBuilder::getCarmEnabledForLipCase)
             .filter(FullDefenceTransitionBuilder::isSpecSmallClaim)
             .filter(data -> data.getRespondent2() == null)
             .filter(data -> NO.equals(data.getApplicant1Represented()) || NO.equals(data.getRespondent1Represented()))
@@ -111,9 +110,13 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
             && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack());
     }
 
-    public static boolean getCarmEnabledForDate(CaseData caseData) {
-        // Date of go live is  5th november , as we use "isAfter" we compare with 4th november
-        return caseData.getSubmittedDate().toLocalDate().isAfter(LocalDate.of(2024, 11, 4));
+    public static boolean getCarmEnabledForLipCase(CaseData caseData) {
+        return caseData.getCaseDataLiP() != null
+            && caseData.getCaseDataLiP().getApplicant1LiPResponseCarm() != null;
+    }
+
+    public static boolean getCarmEnabledForCase(CaseData caseData) {
+        return caseData.getApp1MediationContactInfo() != null;
     }
 
     public static final Predicate<CaseData> takenOfflineByStaffAfterDefendantResponse =
