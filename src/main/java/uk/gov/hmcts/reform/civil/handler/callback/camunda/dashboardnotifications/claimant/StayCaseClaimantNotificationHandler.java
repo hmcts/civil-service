@@ -42,4 +42,12 @@ public class StayCaseClaimantNotificationHandler extends CaseEventsDashboardCall
         return SCENARIO_AAA6_CP_CASE_STAYED_CLAIMANT.getScenario();
     }
 
+    @Override
+    protected void beforeRecordScenario(CaseData caseData, String authToken) {
+        dashboardApiClient.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "CLAIMANT",
+            authToken
+        );
+    }
 }
