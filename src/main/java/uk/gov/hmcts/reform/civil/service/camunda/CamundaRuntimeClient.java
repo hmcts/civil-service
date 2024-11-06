@@ -30,11 +30,13 @@ public class CamundaRuntimeClient {
         return parsedResponse;
     }
 
-    public Map<String, Object> getEvaluatedDmnCourtLocations(String courtId) {
+    public Map<String, Object> getEvaluatedDmnCourtLocations(String courtId, String caseTrackValue) {
         Map<String, Object> requestBody = Map.of("variables", Map.of(
-            "caseManagementLocation", Map.of("value", courtId, "type", "string")
+            "caseManagementLocation", Map.of("value", courtId, "type", "string"),
+            "claimTrack", Map.of("value", caseTrackValue, "type", "string")
         ));
         try {
+            log.info("Evaluating court location dmn with CML: {}, and claim track: {}", courtId, caseTrackValue);
             List<Map<String, Object>> responseList = camundaRestEngineApi.evaluateDecision("civil-default-case-processing-locations", "civil", requestBody);
             return responseList.get(0);
         } catch (IndexOutOfBoundsException e) {

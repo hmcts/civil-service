@@ -135,7 +135,8 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
                         featureToggleService.isLocationWhiteListedForCaseProgression(newCourtLocation.getEpimmsId())
                             ? YesOrNo.YES : YesOrNo.NO);
                 }
-                updateSecondaryWALocations.updateSecondaryWALocations(newCourtLocation.getEpimmsId(), callbackParams.getParams().get(BEARER_TOKEN).toString(), caseDataBuilder);
+                updateSecondaryWALocations.updateSecondaryWALocations(newCourtLocation.getEpimmsId(), caseData,
+                                                                      callbackParams.getParams().get(BEARER_TOKEN).toString(), caseDataBuilder);
             } else {
                 caseDataBuilder.eaCourtLocation(YesOrNo.NO);
             }

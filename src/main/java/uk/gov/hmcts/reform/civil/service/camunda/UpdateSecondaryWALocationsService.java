@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @RequiredArgsConstructor
@@ -31,9 +33,9 @@ public class UpdateSecondaryWALocationsService {
     private static final String PRE_TRIAL_REVIEW_LOCATION = "pre trial review location";
     private static final String TRIAL_LOCATION = "trial location";
 
-    public void updateSecondaryWALocations(String courtId, String authorisation, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
-        Map<String, Object> secondaryCourtMap = camundaRuntimeClient.getEvaluatedDmnCourtLocations(courtId);
+    public void updateSecondaryWALocations(String courtId, CaseData caseData, String authorisation, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
 
+        Map<String, Object> secondaryCourtMap = camundaRuntimeClient.getEvaluatedDmnCourtLocations(courtId, getClaimTrack(caseData));
         SecondaryListingLocations secondaryLocations = objectMapper.convertValue(secondaryCourtMap, SecondaryListingLocations.class);
         List<LocationRefData> locationRefDataList = locationRefDataService.getHearingCourtLocations(authorisation);
         log.info("hearing court list size {} with entries {}", locationRefDataList.size(), locationRefDataList);
@@ -96,5 +98,14 @@ public class UpdateSecondaryWALocationsService {
             throw new IllegalArgumentException("Court Location not found, in location data for court type " + courtType);
         }
         return courtTypeLocationDetails;
+    }
+
+    private String getClaimTrack(CaseData caseData) {
+        if (caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
+            return caseData.getAllocatedTrack().name();
+        } else if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
+            return caseData.getResponseClaimTrack();
+        }
+        return null;
     }
 }

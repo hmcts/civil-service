@@ -12,16 +12,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SecondaryListingLocations  {
 
-    @JsonProperty("PrelistingAdminLocation")
-    private SecondaryLocationModel prelistingAdminLocation;
     @JsonProperty("CMCListingLocation")
     private SecondaryLocationModel cmcListingLocation;
-    @JsonProperty("TrialListingLocation")
-    private SecondaryLocationModel trialListingLocation;
-    @JsonProperty("PTRListingLocation")
-    private SecondaryLocationModel ptrListingLocation;
     @JsonProperty("CCMCListingLocation")
     private SecondaryLocationModel ccmcListingLocation;
-    @JsonProperty("PostlistingAdminLocation")
-    private SecondaryLocationModel postlistingAdminLocation;
+    @JsonProperty("PTRListingLocation")
+    private SecondaryLocationModel ptrListingLocation;
+    @JsonProperty("TrialListingLocation")
+    private SecondaryLocationModel trialListingLocation;
 }
