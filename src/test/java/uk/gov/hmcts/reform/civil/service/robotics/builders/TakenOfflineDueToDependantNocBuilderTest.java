@@ -12,11 +12,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.dto.EventHistoryDTO;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 @SpringBootTest(classes = {TakenOfflineDueToDependantNocBuilder.class})
@@ -35,7 +31,7 @@ class TakenOfflineDueToDependantNocBuilderTest {
             .respondent1Represented(NO)
             .build();
 
-        Event expectedEvent = Event.builder()
+        final Event expectedEvent = Event.builder()
             .eventSequence(1)
             .eventCode("999")
             .dateReceived(caseData.getTakenOfflineDate())

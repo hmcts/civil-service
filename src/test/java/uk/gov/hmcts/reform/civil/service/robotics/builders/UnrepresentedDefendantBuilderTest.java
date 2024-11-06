@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.robotics.builders;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,7 +37,7 @@ class UnrepresentedDefendantBuilderTest {
             .respondent1Represented(NO)
             .respondent2(null).build();
 
-        Event expectedEvent = Event.builder()
+        final Event expectedEvent = Event.builder()
             .eventSequence(1)
             .eventCode("999")
             .dateReceived(caseData.getSubmittedDate())
@@ -54,7 +55,7 @@ class UnrepresentedDefendantBuilderTest {
         assertThat(builder.build()).isNotNull();
         assertThat(builder.build())
             .extracting("miscellaneous")
-            .asList()
+            .asInstanceOf(InstanceOfAssertFactories.list(Event.class))
             .containsExactly(expectedEvent);
     }
 }
