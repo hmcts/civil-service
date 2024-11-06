@@ -9,8 +9,10 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
@@ -49,28 +51,32 @@ public class ClaimIssuedTransitionBuilder extends MidTransitionBuilder {
     }
 
     @Override
-    void setUpTransitions() {
-        this.moveTo(CLAIM_NOTIFIED).onlyWhen(claimNotified)
-            .moveTo(TAKEN_OFFLINE_BY_STAFF).onlyWhen(takenOfflineByStaffAfterClaimIssue)
-            .moveTo(TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED).onlyWhen(takenOfflineAfterClaimNotified)
-            .moveTo(PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA).onlyWhen(pastClaimNotificationDeadline)
-            .moveTo(CONTACT_DETAILS_CHANGE).onlyWhen(contactDetailsChange)
-            .set(flags -> flags.put(FlowFlag.CONTACT_DETAILS_CHANGE.name(), true))
-            .moveTo(RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL).onlyWhen(isRespondentResponseLangIsBilingual.and(not(contactDetailsChange)))
-            .set(flags -> flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true))
-            .moveTo(FULL_DEFENCE).onlyWhen(fullDefenceSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual))
-                                               .and(not(pastClaimNotificationDeadline)))
-            .moveTo(PART_ADMISSION).onlyWhen(partAdmissionSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual)))
-            .moveTo(FULL_ADMISSION).onlyWhen(fullAdmissionSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual)))
-            .moveTo(COUNTER_CLAIM).onlyWhen(counterClaimSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual)))
-            .moveTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
-            .onlyWhen(awaitingResponsesFullDefenceReceivedSpec.and(specClaim))
-            .moveTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED)
-            .onlyWhen(awaitingResponsesNonFullDefenceReceivedSpec.and(specClaim))
-            .moveTo(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE)
-            .onlyWhen(divergentRespondWithDQAndGoOfflineSpec.and(specClaim))
-            .moveTo(DIVERGENT_RESPOND_GO_OFFLINE)
-            .onlyWhen(divergentRespondGoOfflineSpec.and(specClaim));
+    void setUpTransitions(List<Transition> transitions) {
+        this.moveTo(CLAIM_NOTIFIED, transitions).onlyWhen(claimNotified, transitions)
+            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaffAfterClaimIssue, transitions)
+            .moveTo(TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED, transitions).onlyWhen(takenOfflineAfterClaimNotified, transitions)
+            .moveTo(PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA, transitions).onlyWhen(pastClaimNotificationDeadline, transitions)
+            .moveTo(CONTACT_DETAILS_CHANGE, transitions).onlyWhen(contactDetailsChange, transitions)
+            .set(flags -> flags.put(FlowFlag.CONTACT_DETAILS_CHANGE.name(), true), transitions)
+            .moveTo(RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL, transitions)
+            .onlyWhen(isRespondentResponseLangIsBilingual.and(not(contactDetailsChange)), transitions)
+            .set(flags -> flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true), transitions)
+            .moveTo(FULL_DEFENCE, transitions).onlyWhen(fullDefenceSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual))
+                .and(not(pastClaimNotificationDeadline)), transitions)
+            .moveTo(PART_ADMISSION, transitions)
+            .onlyWhen(partAdmissionSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual)), transitions)
+            .moveTo(FULL_ADMISSION, transitions)
+            .onlyWhen(fullAdmissionSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual)), transitions)
+            .moveTo(COUNTER_CLAIM, transitions)
+            .onlyWhen(counterClaimSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual)), transitions)
+            .moveTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED, transitions)
+            .onlyWhen(awaitingResponsesFullDefenceReceivedSpec.and(specClaim), transitions)
+            .moveTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED, transitions)
+            .onlyWhen(awaitingResponsesNonFullDefenceReceivedSpec.and(specClaim), transitions)
+            .moveTo(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE, transitions)
+            .onlyWhen(divergentRespondWithDQAndGoOfflineSpec.and(specClaim), transitions)
+            .moveTo(DIVERGENT_RESPOND_GO_OFFLINE, transitions)
+            .onlyWhen(divergentRespondGoOfflineSpec.and(specClaim), transitions);
     }
 
     public static final Predicate<CaseData> claimNotified = caseData ->
