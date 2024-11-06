@@ -1206,13 +1206,17 @@ public class CaseDataTest {
 
     @ParameterizedTest
     @MethodSource("provideDocumentListTestData")
-    void shouldReturnExpectedDocumentList(DocumentType documentType, List<Element<CaseDocument>> systemGeneratedCaseDocuments, Optional<List<CaseDocument>> expected) {
+    void shouldReturnExpectedDocumentList(DocumentType documentType, List<Element<CaseDocument>> documentCollection, Optional<List<CaseDocument>> expected) {
         CaseData caseData = CaseData.builder()
-            .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments)
+            .systemGeneratedCaseDocuments(documentCollection)
+            .finalOrderDocumentCollection(documentCollection)
             .build();
 
-        Optional<List<CaseDocument>> result = caseData.getDocumentListByType(documentType);
+        List<Element<CaseDocument>> documents = DocumentType.SDO_ORDER.equals(documentType)
+            ? caseData.getSystemGeneratedCaseDocuments()
+            : caseData.getFinalOrderDocumentCollection();
 
+        Optional<List<CaseDocument>> result = caseData.getDocumentListByType(documents, documentType);
         assertThat(result).isEqualTo(expected);
     }
 

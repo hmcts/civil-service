@@ -167,12 +167,12 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
 
     protected boolean isSDODoneAfterDecisionForReconsiderationMade() {
         return caseData.getDecisionOnRequestReconsiderationOptions() == DecisionOnRequestReconsiderationOptions.CREATE_SDO
-            && caseData.getDocumentListByType(DocumentType.SDO_ORDER).map(List::size).orElse(0) == 2;
+            && caseData.getDocumentListByType(caseData.getSystemGeneratedCaseDocuments(), DocumentType.SDO_ORDER).map(List::size).orElse(0) == 2;
     }
 
     protected boolean isGeneralOrderAfterDecisionForReconsiderationMade() {
         return caseData.getDecisionOnRequestReconsiderationOptions() == DecisionOnRequestReconsiderationOptions.CREATE_GENERAL_ORDER
-            && caseData.getDocumentListByType(DocumentType.JUDGE_FINAL_ORDER).isPresent();
+            && caseData.getDocumentListByType(caseData.getFinalOrderDocumentCollection(), DocumentType.JUDGE_FINAL_ORDER).isPresent();
     }
 
     @Override
