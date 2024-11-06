@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -157,8 +158,14 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
             && !isSDOOrderInReviewOtherParty()
             && !isDecisionForReconsiderationMade()
             && sdoTime.isPresent()
+            && !isSDODoneAfterDecisionForReconsiderationMade()
             && (lastNonSdoOrderTime.isEmpty()
             || sdoTime.get().isAfter(lastNonSdoOrderTime.get()));
+    }
+
+    protected boolean isSDODoneAfterDecisionForReconsiderationMade() {
+        return caseData.getDecisionOnRequestReconsiderationOptions() == DecisionOnRequestReconsiderationOptions.CREATE_SDO
+            && caseData.getSDODocumentList().map(List::size).orElse(0) == 2;
     }
 
     @Override
