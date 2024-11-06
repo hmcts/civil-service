@@ -277,7 +277,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
             && nonNull(caseData.getOrderRequestedForReviewDefendant())
             && caseData.getOrderRequestedForReviewDefendant().equals(YES)
             && !isDecisionForReconsiderationMade()
-            && isSDODoneAfterDecisionForReconsiderationMade();
+            && !isSDODoneAfterDecisionForReconsiderationMade();
     }
 
     @Override
