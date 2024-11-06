@@ -137,7 +137,8 @@ public class SetGenericResponseTypeFlag implements CaseTask {
         }
     }
 
-    private void handleOneVTwoTwoLegalRepScenario(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData, MultiPartyScenario multiPartyScenario) {
+    private void handleOneVTwoTwoLegalRepScenario(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData,
+                                                  MultiPartyScenario multiPartyScenario) {
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         if (ONE_V_TWO_TWO_LEGAL_REP.equals(multiPartyScenario)) {
             if (coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
