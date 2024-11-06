@@ -38,11 +38,6 @@ public class CaseProceedOfflineClaimantNotificationHandler extends DashboardCall
     }
 
     @Override
-    public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
-    }
-
-    @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
     }
@@ -53,6 +48,11 @@ public class CaseProceedOfflineClaimantNotificationHandler extends DashboardCall
             return SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_WITHOUT_TASK_CHANGES.getScenario();
         }
         return SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT.getScenario();
+    }
+
+    @Override
+    public String camundaActivityId(CallbackParams callbackParams) {
+        return TASK_ID;
     }
 
     @Override

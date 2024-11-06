@@ -43,16 +43,16 @@ public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCal
     }
 
     @Override
-    public List<CaseEvent> handledEvents() {
-        return EVENTS;
-    }
-
-    @Override
     public String getScenario(CaseData caseData) {
         if (featureToggleService.isCaseProgressionEnabled()) {
             return SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_WITHOUT_TASK_CHANGES.getScenario();
         }
         return SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario();
+    }
+
+    @Override
+    public List<CaseEvent> handledEvents() {
+        return EVENTS;
     }
 
     @Override
