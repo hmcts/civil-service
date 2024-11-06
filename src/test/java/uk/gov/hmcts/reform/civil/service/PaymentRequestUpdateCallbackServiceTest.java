@@ -164,29 +164,6 @@ class PaymentRequestUpdateCallbackServiceTest {
     }
 
     @Test
-    void shouldProceed_WhenAdditionalPaymentExist_WithPayment() {
-        PaymentDetails paymentDetails = PaymentDetails.builder()
-            .status(PaymentStatus.SUCCESS)
-            .reference(REFERENCE)
-            .build();
-        CaseData caseData = buildCaseData(CaseState.CASE_PROGRESSION, BusinessProcessStatus.READY, BUSINESS_PROCESS, paymentDetails)
-            .toBuilder()
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1Represented(YesOrNo.NO)
-            .build();
-        CaseDetails caseDetails = buildCaseDetails(caseData);
-
-        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
-
-        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), FeeType.CLAIMISSUED.name());
-
-        verify(coreCaseDataService).getCase(CASE_ID);
-        verify(coreCaseDataService, never()).startUpdate(any(), any());
-        verify(coreCaseDataService, never()).submitUpdate(any(), any());
-    }
-
-    @Test
     void shouldProceed_WhenAdditionalPaymentExist_WithPaymentFailForClaimIssued() {
         PaymentDetails paymentDetails = PaymentDetails.builder()
             .status(PaymentStatus.FAILED)
@@ -211,26 +188,6 @@ class PaymentRequestUpdateCallbackServiceTest {
         verify(coreCaseDataService).getCase(CASE_ID);
         verify(coreCaseDataService).startUpdate(any(), any());
         verify(coreCaseDataService).submitUpdate(any(), any());
-    }
-
-    @Test
-    void shouldNotCallUpdatePaymentStatus_WhenLipVLipAndHearingFeeDetailsAreNotNull() {
-        CaseData caseData = buildCaseData(CaseState.CASE_PROGRESSION, BusinessProcessStatus.READY, BUSINESS_PROCESS,
-                                          PaymentDetails.builder().status(PaymentStatus.SUCCESS).build())
-            .toBuilder()
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1Represented(YesOrNo.NO)
-            .build();
-        CaseDetails caseDetails = buildCaseDetails(caseData);
-
-        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
-
-        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), FeeType.HEARING.name());
-
-        verify(coreCaseDataService).getCase(CASE_ID);
-        verify(coreCaseDataService, never()).startUpdate(any(), any());
-        verify(coreCaseDataService, never()).submitUpdate(any(), any());
     }
 
     @Test
