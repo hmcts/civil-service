@@ -77,7 +77,7 @@ public class EventBuilderFactory {
             Map.entry(FlowState.Main.PART_ADMIT_REJECT_REPAYMENT, admitRejectPaymentBuilder),
             Map.entry(FlowState.Main.FULL_ADMIT_REJECT_REPAYMENT, admitRejectPaymentBuilder),
             Map.entry(FlowState.Main.IN_MEDIATION, inMediationBuilder),
-            Map.entry(FlowState.Main.TAKEN_OFFLINE_SPEC_DEFENDANT_NOC, admitRejectPaymentBuilder)
+            Map.entry(FlowState.Main.TAKEN_OFFLINE_SPEC_DEFENDANT_NOC, takenOfflineDueToDependantNocBuilder)
         );
     }
 

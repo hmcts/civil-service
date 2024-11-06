@@ -2,8 +2,9 @@ package uk.gov.hmcts.reform.civil.service.robotics.builders;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
@@ -13,18 +14,14 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.dto.EventHistoryDTO;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
-@SpringBootTest(classes = {UnrepresentedDefendantBuilder.class})
+@ExtendWith(MockitoExtension.class)
 class UnrepresentedDefendantBuilderTest {
 
-    @Autowired
+    @InjectMocks
     private UnrepresentedDefendantBuilder unrepresentedDefendantBuilder;
 
     @MockBean
@@ -49,7 +46,6 @@ class UnrepresentedDefendantBuilderTest {
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         EventHistoryDTO eventHistoryDTO = EventHistoryDTO.builder().builder(builder).caseData(caseData).build();
-        when(time.now()).thenReturn(ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDateTime());
         unrepresentedDefendantBuilder.buildEvent(eventHistoryDTO);
 
         assertThat(builder.build()).isNotNull();

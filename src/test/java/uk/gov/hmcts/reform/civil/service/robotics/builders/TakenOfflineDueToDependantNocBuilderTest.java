@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.civil.service.robotics.builders;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
@@ -15,10 +17,10 @@ import uk.gov.hmcts.reform.civil.service.robotics.dto.EventHistoryDTO;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
-@SpringBootTest(classes = {TakenOfflineDueToDependantNocBuilder.class})
+@ExtendWith(MockitoExtension.class)
 class TakenOfflineDueToDependantNocBuilderTest {
 
-    @Autowired
+    @InjectMocks
     private TakenOfflineDueToDependantNocBuilder takenOfflineDueToDependantNocBuilder;
 
     @MockBean
