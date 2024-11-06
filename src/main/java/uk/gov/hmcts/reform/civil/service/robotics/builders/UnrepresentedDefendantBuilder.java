@@ -23,7 +23,6 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.
 @RequiredArgsConstructor
 public class UnrepresentedDefendantBuilder extends BaseEventBuilder {
 
-
     public void buildEvent(EventHistoryDTO eventHistoryDTO) {
         EventHistory.EventHistoryBuilder builder = eventHistoryDTO.getBuilder();
         CaseData caseData = eventHistoryDTO.getCaseData();
