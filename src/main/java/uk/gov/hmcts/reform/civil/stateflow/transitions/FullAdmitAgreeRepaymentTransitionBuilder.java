@@ -5,6 +5,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
+
+import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isRespondentSignSettlementAgreement;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SIGN_SETTLEMENT_AGREEMENT;
@@ -18,7 +21,7 @@ public class FullAdmitAgreeRepaymentTransitionBuilder extends MidTransitionBuild
     }
 
     @Override
-    void setUpTransitions() {
-        this.moveTo(SIGN_SETTLEMENT_AGREEMENT).onlyWhen(isRespondentSignSettlementAgreement);
+    void setUpTransitions(List<Transition> transitions) {
+        this.moveTo(SIGN_SETTLEMENT_AGREEMENT, transitions).onlyWhen(isRespondentSignSettlementAgreement, transitions);
     }
 }
