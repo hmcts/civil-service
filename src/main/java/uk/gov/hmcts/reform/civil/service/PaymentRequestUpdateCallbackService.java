@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
-import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
 import java.util.Optional;
 
@@ -68,20 +67,7 @@ public class PaymentRequestUpdateCallbackService {
         CaseDetails caseDetails = coreCaseDataService.getCase(caseId);
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
 
-        processPaymentUpdate(dto, caseData, feeType, caseId);
-    }
-
-    private void processPaymentUpdate(ServiceRequestUpdateDto dto, CaseData caseData, FeeType feeType, Long caseId) {
-        if (!caseData.isLipvLipOneVOne()) {
-            handlePaymentUpdate(dto, caseData, feeType, caseId);
-            return;
-        }
-
-        if (isPaymentUpdateValid(feeType, caseData)) {
-            handlePaymentUpdate(dto, caseData, feeType, caseId);
-        } else {
-            log.info("Payment update is not valid for case {} and feeType {}", caseId, feeType);
-        }
+        handlePaymentUpdate(dto, caseData, feeType, caseId);
     }
 
     private boolean isPaid(ServiceRequestUpdateDto dto) {
@@ -131,14 +117,14 @@ public class PaymentRequestUpdateCallbackService {
     }
 
     private void handlePaymentUpdate(ServiceRequestUpdateDto dto, CaseData caseData, FeeType feeType, Long caseId) {
-        caseData = updateCaseDataWithPaymentDetails(dto, caseData, feeType);
+        CardPaymentStatusResponse paymentStatusResponse = buildPaymentStatusResponse(dto);
+        caseData = updateCaseDataWithPaymentDetails(paymentStatusResponse, caseData, feeType);
 
         if (caseData.isLipvLipOneVOne() && isPaymentUpdateValid(feeType, caseData)) {
-            CardPaymentStatusResponse paymentStatusResponse = buildPaymentStatusResponse(dto);
             updatePaymentStatus(feeType, dto.getCcdCaseNumber(), paymentStatusResponse);
+        } else {
+            submitProcessCallbackEvent(caseData, caseId, feeType);
         }
-
-        submitProcessCallbackEvent(caseData, caseId, feeType);
     }
 
     private CardPaymentStatusResponse buildPaymentStatusResponse(ServiceRequestUpdateDto dto) {
@@ -189,26 +175,7 @@ public class PaymentRequestUpdateCallbackService {
         };
     }
 
-    private CaseData updateCaseDataWithPaymentDetails(ServiceRequestUpdateDto dto, CaseData caseData, FeeType feeType) {
-        PaymentDetails existingPayment = getPaymentDetails(feeType, caseData);
-        String customerReference = Optional.ofNullable(dto.getPayment())
-            .map(PaymentDto::getCustomerReference)
-            .orElseGet(() -> Optional.ofNullable(existingPayment).map(PaymentDetails::getCustomerReference).orElse(null));
-
-        PaymentDetails updatedPayment = PaymentDetails.builder()
-            .status(PaymentStatus.SUCCESS)
-            .customerReference(customerReference)
-            .reference(dto.getPayment().getPaymentReference())
-            .errorCode(null)
-            .errorMessage(null)
-            .build();
-
-        return applyPaymentDetails(caseData, feeType, updatedPayment);
-    }
-
     private CaseData updateCaseDataWithPaymentDetails(CardPaymentStatusResponse response, CaseData caseData, FeeType feeType) {
-        PaymentDetails existingPayment = getPaymentDetails(feeType, caseData);
-
         PaymentDetails updatedPayment = PaymentDetails.builder()
             .status(PaymentStatus.valueOf(response.getStatus()))
             .reference(response.getPaymentReference())
@@ -216,16 +183,16 @@ public class PaymentRequestUpdateCallbackService {
             .errorMessage(response.getErrorDescription())
             .build();
 
-        if (existingPayment != null) {
-            updatedPayment = existingPayment.toBuilder()
+        PaymentDetails mergedPayment = Optional.ofNullable(getPaymentDetails(feeType, caseData))
+            .map(existingPayment -> existingPayment.toBuilder()
                 .status(updatedPayment.getStatus())
                 .reference(updatedPayment.getReference())
                 .errorCode(updatedPayment.getErrorCode())
                 .errorMessage(updatedPayment.getErrorMessage())
-                .build();
-        }
+                .build())
+            .orElse(updatedPayment);
 
-        return applyPaymentDetails(caseData, feeType, updatedPayment);
+        return applyPaymentDetails(caseData, feeType, mergedPayment);
     }
 
     private PaymentDetails getPaymentDetails(FeeType feeType, CaseData caseData) {
