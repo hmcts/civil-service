@@ -1196,8 +1196,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public Optional<List<CaseDocument>> getDocumentListByType(DocumentType documentType) {
-        List<CaseDocument> documents = systemGeneratedCaseDocuments.stream()
+    public Optional<List<CaseDocument>> getDocumentListByType(List<Element<CaseDocument>> documentCollection, DocumentType documentType) {
+        List<CaseDocument> documents = documentCollection.stream()
             .map(Element::getValue)
             .filter(doc -> doc.getDocumentType().equals(documentType))
             .toList();
