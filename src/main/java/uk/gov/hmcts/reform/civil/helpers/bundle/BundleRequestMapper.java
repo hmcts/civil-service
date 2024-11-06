@@ -568,10 +568,6 @@ public class BundleRequestMapper {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         bundlingRequestDocuments.addAll(getDqByCategoryId(caseData,
                                                           DocCategory.APP1_DQ.getValue(), PartyType.CLAIMANT1));
-        if (featureToggleService.isCaseProgressionEnabled()) {
-            bundlingRequestDocuments.addAll(getDqByCategoryId(caseData,
-                                                              DocCategory.DQ_APP1.getValue(), PartyType.CLAIMANT1));
-        }
         bundlingRequestDocuments.addAll(getDqByCategoryId(caseData,
                                                           DocCategory.DEF1_DEFENSE_DQ.getValue(), PartyType.DEFENDANT1));
         if (featureToggleService.isCaseProgressionEnabled()) {
