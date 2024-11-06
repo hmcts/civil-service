@@ -188,17 +188,16 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
             CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
                 .applicant1Represented(YesOrNo.NO)
                 .build();
-
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT.name())
                     .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
 
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
-
             handler.handle(params);
 
+            // Then
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            verifyDeleteNotificationsAndTaskListUpdates(caseData);
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA6.Update.Claimant.TaskList.UploadDocuments.FinalOrders",
@@ -434,16 +433,16 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
                 .drawDirectionsOrderRequired(YesOrNo.NO)
                 .build();
 
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT.name())
                     .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
 
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
-
             handler.handle(params);
 
+            // Then
+            verifyDeleteNotificationsAndTaskListUpdates(caseData);
+            HashMap<String, Object> scenarioParams = new HashMap<>();
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA6.Update.TaskList.TrialReady.FinalOrders.Claimant",
@@ -461,8 +460,6 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
                 .trialReadyApplicant(YesOrNo.YES)
                 .build();
 
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT.name())
                     .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
@@ -471,6 +468,7 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
 
             handler.handle(params);
 
+            HashMap<String, Object> scenarioParams = new HashMap<>();
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA6.Update.Claimant.TaskList.UploadDocuments.FinalOrders",
@@ -478,5 +476,18 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
+    }
+
+    private void verifyDeleteNotificationsAndTaskListUpdates(CaseData caseData) {
+        verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "CLAIMANT",
+            "BEARER_TOKEN"
+        );
+        verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "CLAIMANT",
+            "BEARER_TOKEN"
+        );
     }
 }
