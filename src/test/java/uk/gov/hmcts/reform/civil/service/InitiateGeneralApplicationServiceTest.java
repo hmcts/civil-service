@@ -1356,7 +1356,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(getSampleCourLocationsRefObjectPostSdo());
         when(featureToggleService.isCoSCEnabled()).thenReturn(true);
         CaseData result = service.buildCaseData(data.toBuilder(), data, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
 
         assertThat(result.getGeneralApplications()).hasSize(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
