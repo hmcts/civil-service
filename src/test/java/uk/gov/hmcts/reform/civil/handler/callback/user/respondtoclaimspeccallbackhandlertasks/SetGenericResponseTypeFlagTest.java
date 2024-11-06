@@ -237,6 +237,8 @@ class SetGenericResponseTypeFlagTest {
             (AboutToStartOrSubmitCallbackResponse) setGenericResponseTypeFlag.execute(callbackParams);
 
         assertEquals("FULL_DEFENCE", response.getData().get(MULTI_PARTY_RESPONSE_TYPE_FLAGS));
+        assertEquals("FULL_DEFENCE", response.getData().get(RESPONDENT_CLAIM_RESPONSE_TYPE_GENERIC));
+        assertNotNull(response.getData().get(MULTI_PARTY_RESPONSE_TYPE_FLAGS));
     }
 
     @Test

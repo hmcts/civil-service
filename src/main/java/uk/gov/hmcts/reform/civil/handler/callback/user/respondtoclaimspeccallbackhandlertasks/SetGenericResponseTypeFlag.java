@@ -91,14 +91,19 @@ public class SetGenericResponseTypeFlag implements CaseTask {
     private void handleOneVOneScenario(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData, MultiPartyScenario multiPartyScenario) {
         if (ONE_V_ONE.equals(multiPartyScenario)) {
             updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
-            if (caseData.getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE) {
-                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
-            } else if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.COUNTER_CLAIM) {
-                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
-            } else if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION
-                || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION) {
-                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_ADMISSION);
-            }
+            updateMultiPartyResponseTypeFlags(caseData, updatedData);
+        }
+    }
+
+    private void updateMultiPartyResponseTypeFlags(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+        RespondentResponseTypeSpec responseType = caseData.getRespondent1ClaimResponseTypeForSpec();
+        if (responseType == FULL_DEFENCE) {
+            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
+        } else if (responseType == RespondentResponseTypeSpec.COUNTER_CLAIM) {
+            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
+        } else if (responseType == RespondentResponseTypeSpec.FULL_ADMISSION
+            || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION) {
+            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_ADMISSION);
         }
     }
 
@@ -114,23 +119,32 @@ public class SetGenericResponseTypeFlag implements CaseTask {
     }
 
     private void handleOneVTwoOneLegalRepScenario(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData, MultiPartyScenario multiPartyScenario) {
-        if (ONE_V_TWO_ONE_LEGAL_REP.equals(multiPartyScenario)
-            && Objects.equals(caseData.getRespondent1ClaimResponseTypeForSpec(), caseData.getRespondent2ClaimResponseTypeForSpec())) {
-            updatedData.respondentResponseIsSame(YES);
-            caseData = caseData.toBuilder().respondentResponseIsSame(YES).build();
+        if (ONE_V_TWO_ONE_LEGAL_REP.equals(multiPartyScenario)) {
+            if (Objects.equals(caseData.getRespondent1ClaimResponseTypeForSpec(), caseData.getRespondent2ClaimResponseTypeForSpec())) {
+                handleSameResponseForOneVTwoOneLegalRep(caseData, updatedData);
+            } else {
+                handleDifferentResponseForOneVTwoOneLegalRep(caseData, updatedData);
+            }
         }
-        if (ONE_V_TWO_ONE_LEGAL_REP.equals(multiPartyScenario) && caseData.getRespondentResponseIsSame().equals(NO)) {
+    }
+
+    private void handleSameResponseForOneVTwoOneLegalRep(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+        updatedData.respondentResponseIsSame(YES);
+        caseData = caseData.toBuilder().respondentResponseIsSame(YES).build();
+        updatedData.sameSolicitorSameResponse(YES);
+        updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
+        if (FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
+        }
+    }
+
+    private void handleDifferentResponseForOneVTwoOneLegalRep(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+        if (NO.equals(caseData.getRespondentResponseIsSame())) {
             updatedData.sameSolicitorSameResponse(NO);
             if (FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
                 || FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
                 updatedData.respondentClaimResponseTypeForSpecGeneric(FULL_DEFENCE);
-            }
-        } else if (ONE_V_TWO_ONE_LEGAL_REP.equals(multiPartyScenario) && caseData.getRespondentResponseIsSame().equals(YES)) {
-            updatedData.sameSolicitorSameResponse(YES);
-            updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
-            if (FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-                || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
-                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
             }
         } else {
             updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
@@ -141,86 +155,124 @@ public class SetGenericResponseTypeFlag implements CaseTask {
                                                   MultiPartyScenario multiPartyScenario) {
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         if (ONE_V_TWO_TWO_LEGAL_REP.equals(multiPartyScenario)) {
-            if (coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
-                updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent2ClaimResponseTypeForSpec());
-            } else {
-                updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
-            }
+            setRespondentClaimResponseTypeForSpec(caseData, updatedData, userInfo);
+            setMultiPartyResponseTypeFlagsForOneVTwoTwoLegalRep(caseData, updatedData);
         }
+    }
 
-        if (ONE_V_TWO_TWO_LEGAL_REP.equals(multiPartyScenario)
-            && ((YES.equals(caseData.getIsRespondent1())
+    private void setRespondentClaimResponseTypeForSpec(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData, UserInfo userInfo) {
+        if (coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
+            updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent2ClaimResponseTypeForSpec());
+        } else {
+            updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
+        }
+    }
+
+    private void setMultiPartyResponseTypeFlagsForOneVTwoTwoLegalRep(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+        if ((YES.equals(caseData.getIsRespondent1())
             && RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
             || (YES.equals(caseData.getIsRespondent2())
-            && RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())))) {
+            && RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))) {
             updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.PART_ADMISSION);
         }
     }
 
     private void handleRespondentResponseTypeForSpec(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+        setRespondentClaimResponseTypeForSpecGeneric(caseData, updatedData);
+        setMultiPartyResponseTypeFlags(caseData, updatedData);
+        setSpecFullAdmissionOrPartAdmission(caseData, updatedData);
+        setSpecFullDefenceOrPartAdmission(caseData, updatedData);
+        setSpecDefenceFullAdmittedRequired(caseData, updatedData);
+        setShowHowToAddTimeLinePage(caseData, updatedData);
+        setPartAdmittedByEitherRespondents(caseData, updatedData);
+        setFullAdmissionAndFullAmountPaid(caseData, updatedData);
+    }
+
+    private void setRespondentClaimResponseTypeForSpecGeneric(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
         if (YES.equals(caseData.getIsRespondent2())) {
             updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent2ClaimResponseTypeForSpec());
         }
+    }
 
-        if (caseData.getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE
-            || caseData.getRespondent2ClaimResponseTypeForSpec() == FULL_DEFENCE
-            || caseData.getClaimant1ClaimResponseTypeForSpec() == FULL_DEFENCE
-            || caseData.getClaimant2ClaimResponseTypeForSpec() == FULL_DEFENCE) {
+    private void setMultiPartyResponseTypeFlags(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+        if (isAnyRespondentOrClaimantFullDefence(caseData)) {
             updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
         }
 
-        if ((YES.equals(caseData.getIsRespondent1())
-            && (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
-            || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION))
-            || (YES.equals(caseData.getIsRespondent2())
-            && (caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
-            || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION))) {
-            updatedData.specFullAdmissionOrPartAdmission(YES);
-        }
-        if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
-            || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
-            || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
+        if (isRespondent2AdmitOrCounterClaim(caseData)) {
             updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
         }
-        if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
-            || caseData.getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE) {
+    }
+
+    private boolean isAnyRespondentOrClaimantFullDefence(CaseData caseData) {
+        return caseData.getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE
+            || caseData.getRespondent2ClaimResponseTypeForSpec() == FULL_DEFENCE
+            || caseData.getClaimant1ClaimResponseTypeForSpec() == FULL_DEFENCE
+            || caseData.getClaimant2ClaimResponseTypeForSpec() == FULL_DEFENCE;
+    }
+
+    private boolean isRespondent2AdmitOrCounterClaim(CaseData caseData) {
+        return RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent2ClaimResponseTypeForSpec());
+    }
+
+    private void setSpecFullAdmissionOrPartAdmission(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+        if (isRespondent1Admitting(caseData) || isRespondent2Admitting(caseData)) {
+            updatedData.specFullAdmissionOrPartAdmission(YES);
+        }
+    }
+
+    private boolean isRespondent1Admitting(CaseData caseData) {
+        return YES.equals(caseData.getIsRespondent1())
+            && (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+            || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION);
+    }
+
+    private boolean isRespondent2Admitting(CaseData caseData) {
+        return YES.equals(caseData.getIsRespondent2())
+            && (caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+            || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION);
+    }
+
+    private void setSpecFullDefenceOrPartAdmission(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+        if (isRespondent1DefendingOrAdmitting(caseData)) {
             updatedData.specFullDefenceOrPartAdmission1V1(YES);
         }
-        if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
-            || caseData.getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE
-            || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
-            || caseData.getRespondent2ClaimResponseTypeForSpec() == FULL_DEFENCE) {
+        if (isAnyRespondentDefendingOrAdmitting(caseData)) {
             updatedData.specFullDefenceOrPartAdmission(YES);
         } else {
             updatedData.specFullDefenceOrPartAdmission(NO);
         }
+    }
+
+    private boolean isRespondent1DefendingOrAdmitting(CaseData caseData) {
+        return caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+            || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE;
+    }
+
+    private boolean isAnyRespondentDefendingOrAdmitting(CaseData caseData) {
+        return isRespondent1DefendingOrAdmitting(caseData)
+            || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+            || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE;
+    }
+
+    private void setSpecDefenceFullAdmittedRequired(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
         if (caseData.getRespondent1ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION
             || caseData.getRespondent2ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION) {
             updatedData.specDefenceFullAdmittedRequired(NO);
         }
+    }
 
+    private void setShowHowToAddTimeLinePage(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
         if (YES.equals(caseData.getSpecPaidLessAmountOrDisputesOrPartAdmission())
             && !MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART.equals(caseData.getMultiPartyResponseTypeFlags())
             && (!RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT.equals(caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()))) {
             updatedData.showHowToAddTimeLinePage(YES);
         }
+    }
 
-        if (YES.equals(caseData.getIsRespondent1())) {
-            if (RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
-                updatedData.showHowToAddTimeLinePage(NO);
-                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
-            } else if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
-                updatedData.showHowToAddTimeLinePage(NO);
-            }
-        } else if (YES.equals(caseData.getIsRespondent2())) {
-            if (RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
-                updatedData.showHowToAddTimeLinePage(NO);
-                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
-            } else if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
-                updatedData.showHowToAddTimeLinePage(NO);
-            }
-        }
-
+    private void setPartAdmittedByEitherRespondents(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
         if (YES.equals(caseData.getIsRespondent2()) && YES.equals(caseData.getSpecDefenceAdmittedRequired())) {
             updatedData.partAdmittedByEitherRespondents(YES);
         } else if (YES.equals(caseData.getIsRespondent1()) && YES.equals(caseData.getSpecDefenceAdmitted2Required())) {
@@ -228,7 +280,9 @@ public class SetGenericResponseTypeFlag implements CaseTask {
         } else {
             updatedData.partAdmittedByEitherRespondents(NO);
         }
+    }
 
+    private void setFullAdmissionAndFullAmountPaid(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
         if (YES.equals(caseData.getIsRespondent2()) && YES.equals(caseData.getSpecDefenceFullAdmitted2Required())) {
             updatedData.fullAdmissionAndFullAmountPaid(YES);
         } else if (YES.equals(caseData.getIsRespondent1()) && YES.equals(caseData.getSpecDefenceFullAdmittedRequired())) {
@@ -249,6 +303,13 @@ public class SetGenericResponseTypeFlag implements CaseTask {
     }
 
     private void updateShowConditions(CaseData caseData, Set<DefendantResponseShowTag> updatedShowConditions) {
+        addRespondent1AdmitsPartOrFull(caseData, updatedShowConditions);
+        addRespondent2AdmitsPartOrFull(caseData, updatedShowConditions);
+        addSomeoneDisputes(caseData, updatedShowConditions);
+        addCurrentAdmitsPartOrFull(caseData, updatedShowConditions);
+    }
+
+    private void addRespondent1AdmitsPartOrFull(CaseData caseData, Set<DefendantResponseShowTag> updatedShowConditions) {
         EnumSet<RespondentResponseTypeSpec> anyAdmission = EnumSet.of(
             RespondentResponseTypeSpec.PART_ADMISSION,
             RespondentResponseTypeSpec.FULL_ADMISSION
@@ -260,13 +321,30 @@ public class SetGenericResponseTypeFlag implements CaseTask {
                 updatedShowConditions.add(RESPONDENT_2_ADMITS_PART_OR_FULL);
             }
         }
+    }
+
+    private void addRespondent2AdmitsPartOrFull(CaseData caseData, Set<DefendantResponseShowTag> updatedShowConditions) {
+        EnumSet<RespondentResponseTypeSpec> anyAdmission = EnumSet.of(
+            RespondentResponseTypeSpec.PART_ADMISSION,
+            RespondentResponseTypeSpec.FULL_ADMISSION
+        );
         if (caseData.getShowConditionFlags().contains(CAN_ANSWER_RESPONDENT_2)
             && anyAdmission.contains(caseData.getRespondent2ClaimResponseTypeForSpec())) {
             updatedShowConditions.add(RESPONDENT_2_ADMITS_PART_OR_FULL);
         }
+    }
+
+    private void addSomeoneDisputes(CaseData caseData, Set<DefendantResponseShowTag> updatedShowConditions) {
         if (someoneDisputes(caseData)) {
             updatedShowConditions.add(SOMEONE_DISPUTES);
         }
+    }
+
+    private void addCurrentAdmitsPartOrFull(CaseData caseData, Set<DefendantResponseShowTag> updatedShowConditions) {
+        EnumSet<RespondentResponseTypeSpec> anyAdmission = EnumSet.of(
+            RespondentResponseTypeSpec.PART_ADMISSION,
+            RespondentResponseTypeSpec.FULL_ADMISSION
+        );
         if ((anyAdmission.contains(caseData.getRespondent1ClaimResponseTypeForSpec())
             && YES.equals(caseData.getIsRespondent1()))
             || (anyAdmission.contains(caseData.getRespondent2ClaimResponseTypeForSpec())
@@ -284,25 +362,33 @@ public class SetGenericResponseTypeFlag implements CaseTask {
     }
 
     private boolean someoneDisputes(CaseData caseData) {
-        if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
-            return ((caseData.getClaimant1ClaimResponseTypeForSpec() == FULL_DEFENCE
-                || caseData.getClaimant2ClaimResponseTypeForSpec() == FULL_DEFENCE)
-                || caseData.getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE
-                || caseData.getRespondent1ClaimResponseTypeForSpec() == PART_ADMISSION);
+        if (isTwoVOneScenario(caseData)) {
+            return isClaimantOrRespondentDisputing(caseData);
         } else {
-            return someoneDisputes(caseData, CAN_ANSWER_RESPONDENT_1,
-                                   caseData.getRespondent1ClaimResponseTypeForSpec()
-            )
-                || someoneDisputes(caseData, CAN_ANSWER_RESPONDENT_2,
-                                   caseData.getRespondent2ClaimResponseTypeForSpec()
-            );
+            return isRespondentDisputing(caseData, CAN_ANSWER_RESPONDENT_1, caseData.getRespondent1ClaimResponseTypeForSpec())
+                || isRespondentDisputing(caseData, CAN_ANSWER_RESPONDENT_2, caseData.getRespondent2ClaimResponseTypeForSpec());
         }
     }
 
-    private boolean someoneDisputes(CaseData caseData, DefendantResponseShowTag respondent,
-                                    RespondentResponseTypeSpec response) {
+    private boolean isTwoVOneScenario(CaseData caseData) {
+        return TWO_V_ONE.equals(getMultiPartyScenario(caseData));
+    }
+
+    private boolean isClaimantOrRespondentDisputing(CaseData caseData) {
+        return isClaimantDisputing(caseData) || isRespondentDisputing(caseData.getRespondent1ClaimResponseTypeForSpec());
+    }
+
+    private boolean isClaimantDisputing(CaseData caseData) {
+        return caseData.getClaimant1ClaimResponseTypeForSpec() == FULL_DEFENCE
+            || caseData.getClaimant2ClaimResponseTypeForSpec() == FULL_DEFENCE;
+    }
+
+    private boolean isRespondentDisputing(RespondentResponseTypeSpec responseType) {
+        return responseType == FULL_DEFENCE || responseType == PART_ADMISSION;
+    }
+
+    private boolean isRespondentDisputing(CaseData caseData, DefendantResponseShowTag respondent, RespondentResponseTypeSpec response) {
         return caseData.getShowConditionFlags().contains(respondent)
-            && (response == FULL_DEFENCE
-            || (response == PART_ADMISSION && !NO.equals(caseData.getRespondentResponseIsSame())));
+            && (response == FULL_DEFENCE || (response == PART_ADMISSION && !NO.equals(caseData.getRespondentResponseIsSame())));
     }
 }
