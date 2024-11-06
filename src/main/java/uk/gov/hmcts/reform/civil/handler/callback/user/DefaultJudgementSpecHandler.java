@@ -193,7 +193,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(errors.isEmpty()
-                ? caseDataBuilder.build().toMap(objectMapper) : null)
+                      ? caseDataBuilder.build().toMap(objectMapper) : null)
             .build();
     }
 
@@ -245,7 +245,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         var acceptanceSpec = callbackParams.getRequest().getCaseDetails().getData().get("CPRAcceptance");
         if (Objects.isNull(acceptanceSpec) && Objects.isNull(acceptance2DefSpec)) {
             listErrors.add("To apply for default judgment, all of the statements must apply to the defendant "
-                + "- if they do not apply, close this page and apply for default judgment when they do");
+                               + "- if they do not apply, close this page and apply for default judgment when they do");
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(listErrors)
@@ -253,17 +253,20 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private CallbackResponse partialPayment(CallbackParams callbackParams) {
-
         var caseData = callbackParams.getCaseData();
 
-        var totalIncludeInterest = caseData.getTotalClaimAmount().doubleValue()
-            + Optional.ofNullable(caseData.getTotalInterest()).orElse(BigDecimal.ZERO).doubleValue();
+        BigDecimal claimFeeAmount = MonetaryConversions.penniesToPounds(caseData.getCalculatedClaimFeeInPence());
+
+        BigDecimal totalIncludeInterestAndFee = caseData.getTotalClaimAmount()
+            .add(Optional.ofNullable(caseData.getTotalInterest()).orElse(BigDecimal.ZERO))
+            .add(claimFeeAmount);
+
         List<String> errors = new ArrayList<>();
 
         if (caseData.getPartialPayment() == YesOrNo.YES) {
-            var partialPaymentPennies = new BigDecimal(caseData.getPartialPaymentAmount());
-            var partialPaymentPounds = MonetaryConversions.penniesToPounds(partialPaymentPennies).doubleValue();
-            if (partialPaymentPounds >= totalIncludeInterest) {
+            BigDecimal partialPaymentPounds = MonetaryConversions.penniesToPounds(new BigDecimal(caseData.getPartialPaymentAmount()));
+
+            if (partialPaymentPounds.compareTo(totalIncludeInterestAndFee) > 0) {
                 errors.add("The amount already paid exceeds the full claim amount");
             }
         }
@@ -271,7 +274,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
-
     }
 
     private CallbackResponse validatePaymentDateDeadline(CallbackParams callbackParams) {
@@ -311,6 +313,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             fixedCost,
             callbackParams
         );
+
         caseDataBuilder.repaymentSummaryObject(repaymentBreakdown.toString());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
