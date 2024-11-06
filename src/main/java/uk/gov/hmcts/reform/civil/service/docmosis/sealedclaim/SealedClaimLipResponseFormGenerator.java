@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -20,6 +21,7 @@ import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_LIP_SPEC;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerator<SealedClaimLipResponseForm> {
@@ -30,7 +32,9 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
 
     @Override
     public SealedClaimLipResponseForm getTemplateData(CaseData caseData) {
+        log.info("Generating sealed claim lip response form for caseId {}", caseData.getCcdCaseReference());
         if (featureToggleService.isCarmEnabledForCase(caseData)) {
+            log.info("If Generating sealed claim lip response form for caseId {}", caseData.getCcdCaseReference());
             SealedClaimLipResponseForm.toTemplate(caseData);
             SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder responseFormBuilder =
                 SealedClaimLipResponseForm.toTemplate(caseData).toBuilder()
@@ -43,6 +47,7 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
             return responseFormBuilder.build();
 
         } else {
+            log.info("Else Generating sealed claim lip response form for caseId {}", caseData.getCcdCaseReference());
             return  SealedClaimLipResponseForm.toTemplate(caseData);
         }
     }
@@ -108,6 +113,7 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
     }
 
     public CaseDocument generate(final CaseData caseData, final String authorization) {
+        log.info("generate document for case {}", caseData.getCcdCaseReference());
         SealedClaimLipResponseForm templateData = getTemplateData(caseData);
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             templateData,
@@ -117,7 +123,7 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
             DEFENDANT_RESPONSE_LIP_SPEC.getDocumentTitle(),
             caseData.getLegacyCaseReference()
         );
-
+        log.info("docmosisDocument {} generated file name {} ", docmosisDocument.getDocumentTitle(), fileName);
         return documentManagementService.uploadDocument(
             authorization,
             new PDF(fileName, docmosisDocument.getBytes(), DocumentType.DEFENDANT_DEFENCE)
