@@ -3,24 +3,25 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotification
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.callback.CaseProgressionDashboardCallbackHandler;
+import uk.gov.hmcts.reform.civil.callback.CaseEventsDashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
-import java.util.Collections;
 import java.util.List;
 
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_STAY_LIFTED_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT;
+
 @Service
-public class UploadHearingDocumentsClaimantHandler extends CaseProgressionDashboardCallbackHandler {
+public class StayLiftedClaimantNotificationHandler extends CaseEventsDashboardCallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(CaseEvent.CREATE_DASHBOARD_NOTIFICATION_UPLOAD_HEARING_DOCUMENTS_CLAIMANT);
-    private static final String TASK_ID = "CreateUploadHearingDocumentNotificationForClaimant";
+    private static final List<CaseEvent> EVENTS =
+        List.of(CREATE_DASHBOARD_NOTIFICATION_STAY_LIFTED_CLAIMANT);
+    public static final String TASK_ID = "DashboardNotificationStayLiftedClaimant";
 
-    public UploadHearingDocumentsClaimantHandler(DashboardApiClient dashboardApiClient,
+    public StayLiftedClaimantNotificationHandler(DashboardApiClient dashboardApiClient,
                                                  DashboardNotificationsParamsMapper mapper,
                                                  FeatureToggleService featureToggleService) {
         super(dashboardApiClient, mapper, featureToggleService);
@@ -37,14 +38,12 @@ public class UploadHearingDocumentsClaimantHandler extends CaseProgressionDashbo
     }
 
     @Override
-    protected String getScenario(CaseData caseData) {
-        return DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT.getScenario();
+    public String getScenario(CaseData caseData) {
+        return SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT.getScenario();
     }
 
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
-        return caseData.isApplicantNotRepresented()
-            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
-            && featureToggleService.isCaseProgressionEnabled();
+        return caseData.isApplicant1NotRepresented();
     }
 }
