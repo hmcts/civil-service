@@ -276,7 +276,8 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         return featureToggleService.isCaseProgressionEnabled() && isSDOMadeByLegalAdviser()
             && nonNull(caseData.getOrderRequestedForReviewClaimant())
             && caseData.getOrderRequestedForReviewClaimant().equals(YES) && !isDecisionForReconsiderationMade()
-            && !isSDODoneAfterDecisionForReconsiderationMade();
+            && !isSDODoneAfterDecisionForReconsiderationMade()
+            && !isGeneralOrderAfterDecisionForReconsiderationMade();
     }
 
     @Override
@@ -285,13 +286,15 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
             && nonNull(caseData.getOrderRequestedForReviewDefendant())
             && caseData.getOrderRequestedForReviewDefendant().equals(YES)
             && !isSDOOrderInReview() && !isDecisionForReconsiderationMade()
-            && !isSDODoneAfterDecisionForReconsiderationMade();
+            && !isSDODoneAfterDecisionForReconsiderationMade()
+            && !isGeneralOrderAfterDecisionForReconsiderationMade();
     }
 
     @Override
     public boolean isDecisionForReconsiderationMade() {
         return caseData.getHearingDate() == null && caseData.getDecisionOnReconsiderationDocumentFromList().isPresent()
-            && !isSDODoneAfterDecisionForReconsiderationMade();
+            && !isSDODoneAfterDecisionForReconsiderationMade()
+            && !isGeneralOrderAfterDecisionForReconsiderationMade();
     }
 
     @Override
