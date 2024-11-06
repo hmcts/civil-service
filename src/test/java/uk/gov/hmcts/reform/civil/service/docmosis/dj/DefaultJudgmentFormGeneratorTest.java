@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
+import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentForm;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -364,5 +365,30 @@ class DefaultJudgmentFormGeneratorTest {
             .assignCategoryIdToCaseDocument(CASE_DOCUMENT, "judgments");
         verify(organisationService, times(5)).findOrganisationById(any());
         assertThat(caseDocuments).hasSize(2);
+    }
+
+    @Test
+    void shouldGenerateDefaultJudgmentFormWithPartialPaymentAllocatedToCostsWhenTotalClaimAmountExceeded() {
+
+        when(interestCalculator.calculateInterest(any(CaseData.class)))
+            .thenReturn(new BigDecimal(10));
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v2Respondent2LiP()
+            .respondent2(PartyBuilder.builder().company().build())
+            .totalClaimAmount(new BigDecimal(2000))
+            .partialPaymentAmount("201500")
+            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(1000)).build())
+            .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
+            .repaymentFrequency(RepaymentFrequencyDJ.ONCE_TWO_WEEKS)
+            .repaymentDate(LocalDate.now().plusMonths(4))
+            .repaymentSuggestion("200")
+            .build();
+
+        DefaultJudgmentForm djForm =
+            generator.getDefaultJudgmentForm(caseData, caseData.getRespondent1(), GENERATE_DJ_FORM_SPEC.name(), false);
+
+        assertThat(djForm.getCosts()).isNotNull();
+        assertThat(djForm.getCosts()).isEqualTo("5.00");
+        assertThat(djForm.getDebt()).isEqualTo("0");
     }
 }

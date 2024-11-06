@@ -117,14 +117,20 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
 
     }
 
-    private DefaultJudgmentForm getDefaultJudgmentForm(CaseData caseData,
-                                                       uk.gov.hmcts.reform.civil.model.Party respondent,
-                                                       String event,
-                                                       boolean addReferenceOfSecondRes) {
+    protected DefaultJudgmentForm getDefaultJudgmentForm(CaseData caseData,
+                                                         uk.gov.hmcts.reform.civil.model.Party respondent,
+                                                         String event,
+                                                         boolean addReferenceOfSecondRes) {
         BigDecimal debtAmount = event.equals(GENERATE_DJ_FORM_SPEC.name())
-            ? JudgmentsOnlineHelper.getDebtAmount(caseData, interestCalculator).setScale(2) : new BigDecimal(0);
+            ? JudgmentsOnlineHelper.getDebtAmount(caseData, interestCalculator).setScale(2) : BigDecimal.ZERO;
         BigDecimal cost = event.equals(GENERATE_DJ_FORM_SPEC.name())
-            ? getClaimFee(caseData) : new BigDecimal(0);
+            ? getClaimFee(caseData) : BigDecimal.ZERO;
+        ;
+
+        if (debtAmount.signum() < 1) {
+            cost = cost.add(debtAmount);
+            debtAmount = BigDecimal.ZERO;
+        }
 
         String respReference = addReferenceOfSecondRes ? caseData.getSolicitorReferences()
             .getRespondentSolicitor1Reference() : null;
