@@ -6,7 +6,9 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
@@ -25,11 +27,11 @@ public class PendingClaimIssuedUnrepresentedDefendantOneVOneSpecTransitionBuilde
     }
 
     @Override
-    void setUpTransitions() {
-        this.moveTo(CLAIM_ISSUED)
-            .onlyWhen(claimIssued.and(pinInPostEnabledAndLiP))
-            .moveTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT)
-            .onlyWhen(takenOfflineBySystem.and(not(pinInPostEnabledAndLiP)));
+    void setUpTransitions(List<Transition> transitions) {
+        this.moveTo(CLAIM_ISSUED, transitions)
+            .onlyWhen(claimIssued.and(pinInPostEnabledAndLiP), transitions)
+            .moveTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT, transitions)
+            .onlyWhen(takenOfflineBySystem.and(not(pinInPostEnabledAndLiP)), transitions);
     }
 
     public static final Predicate<CaseData> pinInPostEnabledAndLiP = caseData ->
