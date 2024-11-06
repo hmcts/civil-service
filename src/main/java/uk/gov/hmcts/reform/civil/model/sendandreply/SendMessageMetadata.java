@@ -12,9 +12,9 @@ import uk.gov.hmcts.reform.civil.enums.sendandreply.SubjectOption;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class SendMessageContext {
+public class SendMessageMetadata {
 
-    private RecipientOption recipient;
+    private RecipientOption recipientRoleType;
     private YesOrNo isUrgent;
     private SubjectOption subject;
     private String otherSubjectName;
