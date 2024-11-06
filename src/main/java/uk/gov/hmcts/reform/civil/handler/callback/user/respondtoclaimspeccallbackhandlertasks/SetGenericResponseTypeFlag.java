@@ -91,19 +91,14 @@ public class SetGenericResponseTypeFlag implements CaseTask {
     private void handleOneVOneScenario(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData, MultiPartyScenario multiPartyScenario) {
         if (ONE_V_ONE.equals(multiPartyScenario)) {
             updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
-            updateMultiPartyResponseTypeFlags(caseData, updatedData);
-        }
-    }
-
-    private void updateMultiPartyResponseTypeFlags(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
-        RespondentResponseTypeSpec responseType = caseData.getRespondent1ClaimResponseTypeForSpec();
-        if (responseType == FULL_DEFENCE) {
-            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
-        } else if (responseType == RespondentResponseTypeSpec.COUNTER_CLAIM) {
-            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
-        } else if (responseType == RespondentResponseTypeSpec.FULL_ADMISSION
-            || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION) {
-            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_ADMISSION);
+            if (caseData.getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
+            } else if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.COUNTER_CLAIM) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
+            } else if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION
+                    || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_ADMISSION);
+            }
         }
     }
 
@@ -119,32 +114,23 @@ public class SetGenericResponseTypeFlag implements CaseTask {
     }
 
     private void handleOneVTwoOneLegalRepScenario(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData, MultiPartyScenario multiPartyScenario) {
-        if (ONE_V_TWO_ONE_LEGAL_REP.equals(multiPartyScenario)) {
-            if (Objects.equals(caseData.getRespondent1ClaimResponseTypeForSpec(), caseData.getRespondent2ClaimResponseTypeForSpec())) {
-                handleSameResponseForOneVTwoOneLegalRep(caseData, updatedData);
-            } else {
-                handleDifferentResponseForOneVTwoOneLegalRep(caseData, updatedData);
-            }
+        if (ONE_V_TWO_ONE_LEGAL_REP.equals(multiPartyScenario)
+                && Objects.equals(caseData.getRespondent1ClaimResponseTypeForSpec(), caseData.getRespondent2ClaimResponseTypeForSpec())) {
+            updatedData.respondentResponseIsSame(YES);
+            caseData = caseData.toBuilder().respondentResponseIsSame(YES).build();
         }
-    }
-
-    private void handleSameResponseForOneVTwoOneLegalRep(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
-        updatedData.respondentResponseIsSame(YES);
-        caseData = caseData.toBuilder().respondentResponseIsSame(YES).build();
-        updatedData.sameSolicitorSameResponse(YES);
-        updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
-        if (FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
-            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
-        }
-    }
-
-    private void handleDifferentResponseForOneVTwoOneLegalRep(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
-        if (NO.equals(caseData.getRespondentResponseIsSame())) {
+        if (ONE_V_TWO_ONE_LEGAL_REP.equals(multiPartyScenario) && caseData.getRespondentResponseIsSame().equals(NO)) {
             updatedData.sameSolicitorSameResponse(NO);
             if (FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-                || FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
+                    || FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
                 updatedData.respondentClaimResponseTypeForSpecGeneric(FULL_DEFENCE);
+            }
+        } else if (ONE_V_TWO_ONE_LEGAL_REP.equals(multiPartyScenario) && caseData.getRespondentResponseIsSame().equals(YES)) {
+            updatedData.sameSolicitorSameResponse(YES);
+            updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
+            if (FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                    || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
             }
         } else {
             updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
@@ -155,24 +141,18 @@ public class SetGenericResponseTypeFlag implements CaseTask {
                                                   MultiPartyScenario multiPartyScenario) {
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         if (ONE_V_TWO_TWO_LEGAL_REP.equals(multiPartyScenario)) {
-            setRespondentClaimResponseTypeForSpec(caseData, updatedData, userInfo);
-            setMultiPartyResponseTypeFlagsForOneVTwoTwoLegalRep(caseData, updatedData);
+            if (coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
+                updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent2ClaimResponseTypeForSpec());
+            } else {
+                updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
+            }
         }
-    }
 
-    private void setRespondentClaimResponseTypeForSpec(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData, UserInfo userInfo) {
-        if (coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
-            updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent2ClaimResponseTypeForSpec());
-        } else {
-            updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
-        }
-    }
-
-    private void setMultiPartyResponseTypeFlagsForOneVTwoTwoLegalRep(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
-        if ((YES.equals(caseData.getIsRespondent1())
-            && RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
-            || (YES.equals(caseData.getIsRespondent2())
-            && RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))) {
+        if (ONE_V_TWO_TWO_LEGAL_REP.equals(multiPartyScenario)
+                && ((YES.equals(caseData.getIsRespondent1())
+                && RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
+                || (YES.equals(caseData.getIsRespondent2())
+                && RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())))) {
             updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.PART_ADMISSION);
         }
     }
