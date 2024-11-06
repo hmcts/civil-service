@@ -16,7 +16,10 @@ import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
+import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.util.Comparator;
 import java.util.List;
@@ -77,7 +80,15 @@ public class StitchingCompleteCallbackHandler extends CallbackHandler {
             String bundleEvent = caseData.getBundleEvent();
             if (hasBundleErrors == null && bundleEvent != null && (BUNDLE_CREATED_NOTIFICATION_EVENT.equals(bundleEvent) || AMEND_RESTITCH_BUNDLE_EVENT.equals(bundleEvent))) {
                 CaseEvent processEvent = BUNDLE_CREATED_NOTIFICATION_EVENT.equals(bundleEvent) ? BUNDLE_CREATION_NOTIFICATION : AMEND_RESTITCH_BUNDLE;
-                caseData = caseData.toBuilder().businessProcess(BusinessProcess.ready(processEvent)).build();
+
+                List<Element<UploadEvidenceDocumentType>> evidenceUploadedAfterBundle = List.of(
+                    ElementUtils.element(UploadEvidenceDocumentType.builder().build())
+                );
+
+                caseData = caseData.toBuilder()
+                    .applicantDocsUploadedAfterBundle(evidenceUploadedAfterBundle)
+                    .respondentDocsUploadedAfterBundle(evidenceUploadedAfterBundle)
+                    .businessProcess(BusinessProcess.ready(processEvent)).build();
             }
         }
 
