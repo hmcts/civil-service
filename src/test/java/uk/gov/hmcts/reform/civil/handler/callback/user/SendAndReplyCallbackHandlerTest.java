@@ -125,7 +125,6 @@ public class SendAndReplyCallbackHandlerTest {
         verifyNoInteractions(messageService);
     }
 
-
     @Nested
     class Submitted {
 
