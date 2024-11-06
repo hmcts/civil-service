@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.EvidenceConfirmDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.ExpertLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.HearingSupportLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
@@ -12,47 +13,47 @@ import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.ExpertReportTemplate;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.LipExperts;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.LipExtraDQ;
+import uk.gov.hmcts.reform.civil.model.docmosis.dq.LipExtraDQEvidenceConfirmDetails;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
-import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.builders.DQGeneratorFormBuilder;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers.RespondentTemplateForDQGenerator;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.model.docmosis.dq.HearingLipSupportRequirements.toHearingSupportRequirements;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_LR_V_LIP_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.model.docmosis.dq.HearingLipSupportRequirements.toHearingSupportRequirements;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_LR_V_LIP_RESPONSE;
 
 @Service
 public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaireGenerator {
 
     public DirectionsQuestionnaireLipGenerator(DocumentManagementService documentManagementService,
                                                DocumentGeneratorService documentGeneratorService,
-                                               IStateFlowEngine stateFlowEngine,
-                                               RepresentativeService representativeService,
                                                FeatureToggleService featureToggleService,
-                                               LocationReferenceDataService locationRefDataService) {
+                                               DQGeneratorFormBuilder dqGeneratorFormBuilder,
+                                               RespondentTemplateForDQGenerator respondentTemplateForDQGenerator
+    ) {
+
         super(
             documentManagementService,
             documentGeneratorService,
-            stateFlowEngine,
-            representativeService,
             featureToggleService,
-            locationRefDataService
+            dqGeneratorFormBuilder,
+            respondentTemplateForDQGenerator
         );
     }
 
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData, String authorisation) {
-        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = getDirectionsQuestionnaireFormBuilder(
+        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = dqGeneratorFormBuilder.getDirectionsQuestionnaireFormBuilder(
             caseData,
             authorisation
         );
@@ -82,6 +83,7 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
                     .giveEvidenceYourSelf(respondent1DQExtraDetails.getGiveEvidenceYourSelf())
                     .whyPhoneOrVideoHearing(respondent1DQExtraDetails.getWhyPhoneOrVideoHearing())
                     .wantPhoneOrVideoHearing(respondent1DQExtraDetails.getWantPhoneOrVideoHearing())
+                    .giveEvidenceConfirmDetails(getDetails(caseData.getCaseDataLiP().getRespondent1LiPResponse()))
                     .build())
                 .lipExperts(LipExperts.builder()
                     .details(respondent1DQExtraDetails
@@ -106,13 +108,12 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
 
     @Override
     protected DocmosisTemplates getTemplateId(CaseData caseData) {
-        if (caseData.isRespondent1NotRepresented() && getFeatureToggleService().isPinInPostEnabled()) {
+        if (caseData.isRespondent1NotRepresented() && featureToggleService.isPinInPostEnabled()) {
             return DQ_LR_V_LIP_RESPONSE;
         }
         return super.getTemplateId(caseData);
     }
 
-    @Override
     protected List<Party> getRespondents(CaseData caseData, String defendantIdentifier) {
         return List.of(Party.builder()
             .name(caseData.getRespondent1().getPartyName())
@@ -122,7 +123,6 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
             .build());
     }
 
-    @Override
     protected RequestedCourt getRequestedCourt(DQ dq, String authorisation) {
         RequestedCourt rc = dq.getRequestedCourt();
         if (rc != null && null != rc.getCaseLocation()) {
@@ -136,5 +136,19 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
                 .requestHearingAtSpecificCourt(NO)
                 .build();
         }
+    }
+
+    private LipExtraDQEvidenceConfirmDetails getDetails(RespondentLiPResponse respondentLiPResponse) {
+        EvidenceConfirmDetails confirmDetails = respondentLiPResponse.getRespondent1DQEvidenceConfirmDetails();
+        if (confirmDetails != null) {
+            return LipExtraDQEvidenceConfirmDetails.builder()
+                .firstName(confirmDetails.getFirstName())
+                .lastName(confirmDetails.getLastName())
+                .email(confirmDetails.getEmail())
+                .phone(confirmDetails.getPhone())
+                .jobTitle(confirmDetails.getJobTitle())
+                .build();
+        }
+        return null;
     }
 }

@@ -15,11 +15,14 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
 import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
+import uk.gov.hmcts.reform.civil.model.citizenui.DebtPaymentEvidence;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
@@ -31,6 +34,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -47,6 +51,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -68,6 +73,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements.OTHER_SUPPORT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
@@ -140,6 +146,9 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     private UserRoleCaching userRoleCaching;
 
     @MockBean
+    private WorkingDayIndicator workingDayIndicator;
+
+    @MockBean
     private CrossAccessUserConfiguration crossAccessUserConfiguration;
 
     @MockBean
@@ -166,6 +175,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             anyInt()
         ))
             .thenReturn(weekdayDate);
+
+        when(workingDayIndicator.isWorkingDay(any())).thenReturn(true);
 
         when(organisationApi.findUserOrganisation(any(), any()))
             .thenReturn(uk.gov.hmcts.reform.civil.prd.model.Organisation
@@ -1294,6 +1305,28 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .isNotNull();
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
             .isEqualTo(SUBMITTED_DATE);
+    }
+
+    @Test
+    void shouldPopulateCoScGeneralAppSubmittedDateForLipDefendant() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithEmptyCollectionOfApps(CaseData.builder().build());
+        CertOfSC certOfSC = CertOfSC.builder().defendantFinalPaymentDate(LocalDate.now())
+            .debtPaymentEvidence(DebtPaymentEvidence.builder().build()).build();
+        CaseData data = caseData.toBuilder().certOfSC(certOfSC)
+            .generalAppType(GAApplicationType.builder()
+            .types(singletonList(CONFIRM_CCJ_DEBT_PAID))
+            .build()).build();
+        data.getGeneralAppHearingDetails().getHearingPreferredLocation().setValue(null);
+        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(getSampleCourLocationsRefObjectPostSdo());
+        when(featureToggleService.isCoSCEnabled()).thenReturn(true);
+        CaseData result = service.buildCaseData(data.toBuilder(), data, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+
+        assertThat(result.getGeneralApplications()).hasSize(1);
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
+            .isNotNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getCertOfSC()).isNotNull();
     }
 
     private void assertCaseDateEntries(CaseData caseData) {

@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.RequestForReconsiderationNotificationDeadlineEvent;
+import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.search.RequestForReconsiderationNotificationDeadlineSearchService;
 
 import java.util.List;
@@ -14,18 +15,19 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class RequestForReconsiderationNotificationDeadlineHandler implements BaseExternalTaskHandler {
+public class RequestForReconsiderationNotificationDeadlineHandler extends BaseExternalTaskHandler {
 
     private final RequestForReconsiderationNotificationDeadlineSearchService caseSearchService;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
-    public void handleTask(ExternalTask externalTask) {
+    public ExternalTaskData handleTask(ExternalTask externalTask) {
         List<CaseDetails> cases = caseSearchService.getCases();
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
         cases.forEach(caseDetails -> {
             applicationEventPublisher.publishEvent(new RequestForReconsiderationNotificationDeadlineEvent(caseDetails.getId()));
         });
+        return ExternalTaskData.builder().build();
     }
 }

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -13,10 +14,10 @@ import java.util.List;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.SendSDOToLiPDefendantCallbackHandler.TASK_ID_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SendSDOBulkPrintService {
 
     private final BulkPrintService bulkPrintService;

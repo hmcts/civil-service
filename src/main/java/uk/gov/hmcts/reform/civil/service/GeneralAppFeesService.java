@@ -120,7 +120,7 @@ public class GeneralAppFeesService {
                 result = setAsideFeeForGA;
             }
         }
-        if (shouldUpdateGATypeSize(typeSize, types)) {
+        if (isUpdateCoScGATypeSize(typeSize, types)) {
             typeSize--;
             Fee certOfSatisfactionOrCancel = getFeeForGA(feesConfiguration.getCertificateOfSatisfaction(), "miscellaneous", "other");
             result = getCoScFeeResult(result, certOfSatisfactionOrCancel);
@@ -239,7 +239,7 @@ public class GeneralAppFeesService {
             .orElse(null);
     }
 
-    private boolean shouldUpdateGATypeSize(int typeSize, List<GeneralApplicationTypes> types) {
+    private boolean isUpdateCoScGATypeSize(int typeSize, List<GeneralApplicationTypes> types) {
         return typeSize > 0 && CollectionUtils.containsAny(types, CONFIRM_YOU_PAID_CCJ_DEBT);
     }
 
