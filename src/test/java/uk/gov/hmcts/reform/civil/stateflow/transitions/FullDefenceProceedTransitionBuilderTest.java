@@ -11,18 +11,15 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterSDO;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineSDONotDrawn;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceProceedTransitionBuilder.specSmallClaimCarm;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceProceedTransitionBuilder.takenOfflineAfterNotSuitableForSdo;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceProceedTransitionBuilder.takenOfflineByStaffAfterClaimantResponseBeforeSDO;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceProceedTransitionBuilder.takenOfflineByStaffAfterSDO;
@@ -45,40 +42,13 @@ public class FullDefenceProceedTransitionBuilderTest {
 
     @Test
     void shouldSetUpTransitions_withExpectedSizeAndStates() {
-        assertThat(result).hasSize(6);
+        assertThat(result).hasSize(5);
 
         assertTransition(result.get(0), "MAIN.FULL_DEFENCE_PROCEED", "MAIN.IN_HEARING_READINESS");
         assertTransition(result.get(1), "MAIN.FULL_DEFENCE_PROCEED", "MAIN.CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE");
         assertTransition(result.get(2), "MAIN.FULL_DEFENCE_PROCEED", "MAIN.TAKEN_OFFLINE_BY_STAFF");
         assertTransition(result.get(3), "MAIN.FULL_DEFENCE_PROCEED", "MAIN.TAKEN_OFFLINE_AFTER_SDO");
         assertTransition(result.get(4), "MAIN.FULL_DEFENCE_PROCEED", "MAIN.TAKEN_OFFLINE_SDO_NOT_DRAWN");
-        assertTransition(result.get(5), "MAIN.FULL_DEFENCE_PROCEED", "MAIN.IN_MEDIATION");
-    }
-
-    @Test
-    void shouldReturnTrue_whenApplicantProceedsSpecSmallClaimCarmEnabled() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateApplicantRespondToDefenceAndProceed()
-            .setClaimTypeToSpecClaim()
-            .applicant1ProceedWithClaim(YES)
-            .responseClaimTrack(SMALL_CLAIM.name())
-            .build().toBuilder()
-            .submittedDate(LocalDateTime.of(2024, 12, 1, 1, 0))
-            .build();
-        assertTrue(specSmallClaimCarm.test(caseData));
-    }
-
-    @Test
-    void shouldReturnFalse_whenApplicantProceedsSpecSmallClaimCarmNotEnabled() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateApplicantRespondToDefenceAndProceed()
-            .setClaimTypeToSpecClaim()
-            .applicant1ProceedWithClaim(YES)
-            .responseClaimTrack(SMALL_CLAIM.name())
-            .build().toBuilder()
-            .submittedDate(LocalDateTime.of(2024, 7, 31, 23, 0))
-            .build();
-        assertFalse(specSmallClaimCarm.test(caseData));
     }
 
     @Test
