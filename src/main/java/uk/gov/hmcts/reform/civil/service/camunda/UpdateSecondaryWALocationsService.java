@@ -46,7 +46,6 @@ public class UpdateSecondaryWALocationsService {
             LocationRefData preTrialListing = courtLocationDetails(locationRefDataList, secondaryLocations.getPtrListingLocation().getValue(), "Pre trial Listing");
             LocationRefData trialListing = courtLocationDetails(locationRefDataList, secondaryLocations.getTrialListingLocation().getValue(), "Trial Listing");
 
-
             List<Element<WorkAllocationTaskLocationModel>> waTaskLocationList = new ArrayList<>();
 
             waTaskLocationList.add(element(WorkAllocationTaskLocationModel.builder()
