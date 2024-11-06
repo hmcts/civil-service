@@ -330,8 +330,8 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             caseData = newCaseData;
         }
 
-        if (caseData.getGeneralAppHearingDetails().getHearingPreferredLocation() != null
-             && Objects.nonNull(caseData.getGeneralAppHearingDetails().getHearingPreferredLocation().getValue())) {
+        if (Objects.nonNull(caseData.getGeneralAppHearingDetails().getHearingPreferredLocation())
+            && Objects.nonNull(caseData.getGeneralAppHearingDetails().getHearingPreferredLocation().getValue())) {
             List<String> applicationLocationList = List.of(caseData.getGeneralAppHearingDetails()
                                                                .getHearingPreferredLocation()
                                                                .getValue().getLabel());
@@ -365,7 +365,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
         Map<String, Object> data = initiateGeneralApplicationService
                 .buildCaseData(dataBuilder, caseData, userDetails, callbackParams.getParams().get(BEARER_TOKEN)
-                        .toString()).toMap(objectMapper);
+                        .toString(), feesService).toMap(objectMapper);
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(data).build();
     }
