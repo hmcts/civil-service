@@ -11,9 +11,10 @@ import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
 
-import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -43,49 +44,56 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
     }
 
     @Override
-    void setUpTransitions() {
-        this.moveTo(IN_MEDIATION).onlyWhen((agreedToMediation.and(allAgreedToLrMediationSpec.negate()))
+    void setUpTransitions(List<Transition> transitions) {
+        this.moveTo(IN_MEDIATION, transitions).onlyWhen((agreedToMediation.and(allAgreedToLrMediationSpec.negate()))
                 // for carm cases, fullDefenceProcced is tracked with lipFullDefenceProceed
                 // and move to in mediation if applicant does not settle
-                .or(lipFullDefenceProceed.and(isCarmApplicableLipCase).and(not(fullDefenceProceed))))
-            .moveTo(FULL_DEFENCE_PROCEED)
-            .onlyWhen(fullDefenceProceed.and(allAgreedToLrMediationSpec).and(agreedToMediation.negate()).and(declinedMediation.negate()))
+                .or(isCarmApplicableLipCase.and(lipFullDefenceProceed.or(fullDefenceProceed))), transitions)
+            .moveTo(IN_MEDIATION, transitions)
+            // for carm LR cases
+            .onlyWhen(isCarmApplicableCase.and(fullDefenceProceed), transitions)
+            .moveTo(FULL_DEFENCE_PROCEED, transitions)
+            .onlyWhen(fullDefenceProceed.and(allAgreedToLrMediationSpec).and(agreedToMediation.negate()).and(declinedMediation.negate()), transitions)
             .set((c, flags) -> {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
                 flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
-                flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
-            })
-            .moveTo(FULL_DEFENCE_PROCEED)
+                flags.put(FlowFlag.SDO_ENABLED.name(),
+                    JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
+            }, transitions)
+            .moveTo(FULL_DEFENCE_PROCEED, transitions)
             .onlyWhen(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
-                .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim))
+                .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim), transitions)
             .set((c, flags) -> {
                 flags.put(FlowFlag.IS_MULTI_TRACK.name(), true);
                 flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
-                flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
-            })
-            .moveTo(FULL_DEFENCE_PROCEED)
-            .onlyWhen(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
-                .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate()))
+                flags.put(FlowFlag.SDO_ENABLED.name(),
+                    JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
+            }, transitions)
+            .moveTo(FULL_DEFENCE_PROCEED, transitions)
+            .onlyWhen(fullDefenceProceed.and(isCarmApplicableLipCase.negate()).and(isCarmApplicableCase.negate())
+                .and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
+                .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate()), transitions)
             .set((c, flags) -> {
-                flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
+                flags.put(FlowFlag.SDO_ENABLED.name(),
+                    JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
                 flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
-            })
-            .moveTo(FULL_DEFENCE_PROCEED)
+            }, transitions)
+            .moveTo(FULL_DEFENCE_PROCEED, transitions)
             .onlyWhen((fullDefenceProceed.or(isClaimantNotSettleFullDefenceClaim).or(isDefendantNotPaidFullDefenceClaim))
-                .and(not(agreedToMediation)).and(isCarmApplicableLipCase.negate()).and(isLipCase))
+                .and(not(agreedToMediation)).and(isCarmApplicableLipCase.negate()).and(isLipCase), transitions)
             .set((c, flags) -> {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
                 flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), false);
-            })
-            .moveTo(FULL_DEFENCE_PROCEED).onlyWhen(isClaimantSettleTheClaim.and(not(agreedToMediation)))
+            }, transitions)
+            .moveTo(FULL_DEFENCE_PROCEED, transitions).onlyWhen(isClaimantSettleTheClaim.and(not(agreedToMediation)), transitions)
             .set((c, flags) -> {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
                 flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), true);
-            })
-            .moveTo(FULL_DEFENCE_NOT_PROCEED).onlyWhen(fullDefenceNotProceed)
-            .moveTo(TAKEN_OFFLINE_BY_STAFF).onlyWhen(takenOfflineByStaffAfterDefendantResponse)
-            .moveTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
-            .onlyWhen(applicantOutOfTime);
+            }, transitions)
+            .moveTo(FULL_DEFENCE_NOT_PROCEED, transitions).onlyWhen(fullDefenceNotProceed, transitions)
+            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaffAfterDefendantResponse, transitions)
+            .moveTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA, transitions)
+            .onlyWhen(applicantOutOfTime, transitions);
     }
 
     public static final Predicate<CaseData> lipFullDefenceProceed = FullDefenceTransitionBuilder::getPredicateForLipClaimantIntentionProceed;
@@ -98,9 +106,16 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
         return predicate;
     }
 
+    public static final Predicate<CaseData> isCarmApplicableCase = caseData ->
+        Optional.ofNullable(caseData)
+            .filter(FullDefenceTransitionBuilder::getCarmEnabledForCase)
+            .filter(FullDefenceTransitionBuilder::isSpecSmallClaim)
+            .filter(data -> YES.equals(data.getRespondent1Represented()) && !NO.equals(data.getApplicant1Represented()))
+            .isPresent();
+
     public static final Predicate<CaseData> isCarmApplicableLipCase = caseData ->
         Optional.ofNullable(caseData)
-            .filter(FullDefenceTransitionBuilder::getCarmEnabledForDate)
+            .filter(FullDefenceTransitionBuilder::getCarmEnabledForLipCase)
             .filter(FullDefenceTransitionBuilder::isSpecSmallClaim)
             .filter(data -> data.getRespondent2() == null)
             .filter(data -> NO.equals(data.getApplicant1Represented()) || NO.equals(data.getRespondent1Represented()))
@@ -111,9 +126,16 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
             && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack());
     }
 
-    public static boolean getCarmEnabledForDate(CaseData caseData) {
-        // Date of go live is 1st August, as we use "isAfter" we compare with 31st July
-        return caseData.getSubmittedDate().toLocalDate().isAfter(LocalDate.of(2024, 7, 31));
+    public static boolean getCarmEnabledForLipCase(CaseData caseData) {
+        return caseData.getCaseDataLiP() != null
+            && (caseData.getCaseDataLiP().getApplicant1LiPResponseCarm() != null
+            || caseData.getCaseDataLiP().getRespondent1MediationLiPResponseCarm() != null);
+    }
+
+    public static boolean getCarmEnabledForCase(CaseData caseData) {
+        return caseData.getApp1MediationContactInfo() != null
+            || caseData.getResp1MediationContactInfo() != null
+            || caseData.getResp2MediationContactInfo() != null;
     }
 
     public static final Predicate<CaseData> takenOfflineByStaffAfterDefendantResponse =

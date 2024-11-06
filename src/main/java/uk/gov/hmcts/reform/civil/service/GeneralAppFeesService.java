@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.FeeLookupResponseDto;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -84,6 +85,15 @@ public class GeneralAppFeesService {
         );
     }
 
+    public Fee getFeeForGA(GeneralApplication generalApplication, LocalDate hearingScheduledDate) {
+        return getFeeForGA(
+            generalApplication.getGeneralAppType().getTypes(),
+            getRespondentAgreed(generalApplication),
+            getInformOtherParty(generalApplication),
+            hearingScheduledDate
+        );
+    }
+
     private Fee getFeeForGA(List<GeneralApplicationTypes> types, Boolean respondentAgreed, Boolean informOtherParty, LocalDate hearingScheduledDate) {
         Fee result = Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(Integer.MAX_VALUE)).build();
         int typeSize = types.size();
@@ -110,7 +120,7 @@ public class GeneralAppFeesService {
                 result = setAsideFeeForGA;
             }
         }
-        if (shouldUpdateGATypeSize(typeSize, types)) {
+        if (isUpdateCoScGATypeSize(typeSize, types)) {
             typeSize--;
             Fee certOfSatisfactionOrCancel = getFeeForGA(feesConfiguration.getCertificateOfSatisfaction(), "miscellaneous", "other");
             result = getCoScFeeResult(result, certOfSatisfactionOrCancel);
@@ -202,8 +212,22 @@ public class GeneralAppFeesService {
             .orElse(null);
     }
 
+    protected Boolean getRespondentAgreed(GeneralApplication generalApplication) {
+        return Optional.ofNullable(generalApplication.getGeneralAppRespondentAgreement())
+            .map(GARespondentOrderAgreement::getHasAgreed)
+            .map(hasAgreed -> hasAgreed == YES)
+            .orElse(null);
+    }
+
     protected Boolean getInformOtherParty(CaseData caseData) {
         return Optional.ofNullable(caseData.getGeneralAppInformOtherParty())
+            .map(GAInformOtherParty::getIsWithNotice)
+            .map(isWithNotice -> isWithNotice == YES)
+            .orElse(null);
+    }
+
+    protected Boolean getInformOtherParty(GeneralApplication generalApplication) {
+        return Optional.ofNullable(generalApplication.getGeneralAppInformOtherParty())
             .map(GAInformOtherParty::getIsWithNotice)
             .map(isWithNotice -> isWithNotice == YES)
             .orElse(null);
@@ -215,7 +239,7 @@ public class GeneralAppFeesService {
             .orElse(null);
     }
 
-    private boolean shouldUpdateGATypeSize(int typeSize, List<GeneralApplicationTypes> types) {
+    private boolean isUpdateCoScGATypeSize(int typeSize, List<GeneralApplicationTypes> types) {
         return typeSize > 0 && CollectionUtils.containsAny(types, CONFIRM_YOU_PAID_CCJ_DEBT);
     }
 
