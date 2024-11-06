@@ -6,7 +6,9 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
@@ -20,9 +22,9 @@ public class PastApplicantResponseDeadlineAwaitingCamundaTransitionBuilder exten
     }
 
     @Override
-    void setUpTransitions() {
-        this.moveTo(TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE)
-            .onlyWhen(applicantOutOfTimeProcessedByCamunda);
+    void setUpTransitions(List<Transition> transitions) {
+        this.moveTo(TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE, transitions)
+            .onlyWhen(applicantOutOfTimeProcessedByCamunda, transitions);
     }
 
     public static final Predicate<CaseData> applicantOutOfTimeProcessedByCamunda = caseData ->
