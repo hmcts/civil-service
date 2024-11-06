@@ -708,23 +708,23 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             String test = "The judgment will order " + caseData.getDefendantDetailsSpec().getValue().getLabel()
-                + " to pay £1222.00, including the claim fee and"
+                + " to pay £1212.00, including the claim fee and"
                 + " interest, if applicable, as shown:\n"
                 + "### Claim amount \n"
                 + " £1010.00\n"
                 + " ### Claim interest amount \n"
                 + "£100.00\n"
                 + " ### Fixed cost amount \n"
-                + "£112.00\n"
+                + "£102.00\n"
                 + "### Claim fee amount \n"
                 + " £1.00\n"
                 + " ## Subtotal \n"
-                + " £1223.00\n"
+                + " £1213.00\n"
                 + "\n"
                 + " ### Amount already paid \n"
                 + "£1.00\n"
                 + " ## Total still owed \n"
-                + " £1222.00";
+                + " £1212.00";
 
             assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
 
@@ -758,23 +758,23 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             String test = "The judgment will order " + caseData.getDefendantDetailsSpec().getValue().getLabel()
-                + " to pay £681.00, including the claim fee and"
+                + " to pay £671.00, including the claim fee and"
                 + " interest, if applicable, as shown:\n"
                 + "### Claim amount \n"
                 + " £499.00\n"
                 + " ### Claim interest amount \n"
                 + "£100.00\n"
                 + " ### Fixed cost amount \n"
-                + "£82.00\n"
+                + "£72.00\n"
                 + "### Claim fee amount \n"
                 + " £1.00\n"
                 + " ## Subtotal \n"
-                + " £682.00\n"
+                + " £672.00\n"
                 + "\n"
                 + " ### Amount already paid \n"
                 + "£1.00\n"
                 + " ## Total still owed \n"
-                + " £681.00";
+                + " £671.00";
             assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
         }
 
@@ -805,23 +805,23 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             String test = "The judgment will order " + caseData.getDefendantDetailsSpec().getValue().getLabel()
-                + " to pay £1201.00, including the claim fee and"
+                + " to pay £1191.00, including the claim fee and"
                 + " interest, if applicable, as shown:\n"
                 + "### Claim amount \n"
                 + " £999.00\n"
                 + " ### Claim interest amount \n"
                 + "£100.00\n"
                 + " ### Fixed cost amount \n"
-                + "£102.00\n"
+                + "£92.00\n"
                 + "### Claim fee amount \n"
                 + " £1.00\n"
                 + " ## Subtotal \n"
-                + " £1202.00\n"
+                + " £1192.00\n"
                 + "\n"
                 + " ### Amount already paid \n"
                 + "£1.00\n"
                 + " ## Total still owed \n"
-                + " £1201.00";
+                + " £1191.00";
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
         }
@@ -952,16 +952,16 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                     + " ### Claim interest amount \n"
                     + "£100.00\n"
                     + " ### Fixed cost amount \n"
-                    + "£112.00\n"
+                    + "£102.00\n"
                     + "### Claim fee amount \n"
                     + " £1.00\n"
                     + " ## Subtotal \n"
-                    + " £1223.00\n"
+                    + " £1213.00\n"
                     + "\n"
                     + " ### Amount already paid \n"
                     + "£1.00\n"
                     + " ## Total still owed \n"
-                    + " £1222.00";
+                    + " £1212.00";
 
             assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
 
@@ -1008,16 +1008,16 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                     + " ### Claim interest amount \n"
                     + "£100.00\n"
                     + " ### Fixed cost amount \n"
-                    + "£112.00\n"
+                    + "£102.00\n"
                     + "### Claim fee amount \n"
                     + " £0.00\n"
                     + " ## Subtotal \n"
-                    + " £1222.00\n"
+                    + " £1212.00\n"
                     + "\n"
                     + " ### Amount already paid \n"
                     + "£1.00\n"
                     + " ## Total still owed \n"
-                    + " £1221.00";
+                    + " £1211.00";
 
             assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
         }
