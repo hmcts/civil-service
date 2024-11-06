@@ -13,15 +13,11 @@ import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
-import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentForm;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.FeesService;
-import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
@@ -130,7 +126,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
         BigDecimal cost = event.equals(GENERATE_DJ_FORM_SPEC.name())
             ? getClaimFee(caseData) : new BigDecimal(0);
 
-        String respReference = addReferenceOfSecondRes ?  caseData.getSolicitorReferences()
+        String respReference = addReferenceOfSecondRes ? caseData.getSolicitorReferences()
             .getRespondentSolicitor1Reference() : null;
 
         return DefaultJudgmentForm.builder()
