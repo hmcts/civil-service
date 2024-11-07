@@ -21,7 +21,7 @@ public class Message {
     private String senderName;
     private String recipientRoleType;
     private YesOrNo isUrgent;
-    private String subject;
+    private String headerSubject;
     private String contentSubject;
     private String messageContent;
 
@@ -31,7 +31,7 @@ public class Message {
         return Message.builder()
             .recipientRoleType(messageContext.getRecipientRoleType().getLabel())
             .isUrgent(messageContext.getIsUrgent())
-            .subject(subject)
+            .headerSubject(subject)
             .contentSubject(subject)
             .build();
     }
