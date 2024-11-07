@@ -353,11 +353,7 @@ public class BundleRequestMapper {
 
     private List<Element<BundlingRequestDocument>> mapDq(CaseData caseData) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
-        bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getDqByCategoryId(
-            caseData,
-            DocCategory.APP1_DQ.getValue(),
-            PartyType.CLAIMANT1
-        ));
+
         if (featureToggleService.isCaseProgressionEnabled()) {
             bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getDqByCategoryId(
                 caseData,
@@ -365,11 +361,10 @@ public class BundleRequestMapper {
                 PartyType.CLAIMANT1
             ));
         }
-        bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getDqByCategoryId(
-            caseData,
-            DocCategory.DEF1_DEFENSE_DQ.getValue(),
-            PartyType.DEFENDANT1
-        ));
+        bundlingRequestDocuments.addAll(getDqByCategoryId(caseData,
+                                                          DocCategory.APP1_DQ.getValue(), PartyType.CLAIMANT1));
+        bundlingRequestDocuments.addAll(getDqByCategoryId(caseData,
+                                                          DocCategory.DEF1_DEFENSE_DQ.getValue(), PartyType.DEFENDANT1));
         if (featureToggleService.isCaseProgressionEnabled()) {
             bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getDqByCategoryId(
                 caseData,
