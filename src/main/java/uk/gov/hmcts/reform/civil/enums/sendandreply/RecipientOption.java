@@ -7,8 +7,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum RecipientOption {
     COURT_STAFF("Court staff"),
-    DISTRICT_JUDGE("District judge"),
-    CIRCUIT_JUDGE("Circuit judge"),
+    DISTRICT_JUDGE("Judge"),
+    CIRCUIT_JUDGE("Judge"),
     LEGAL_ADVISOR("Legal advisor");
 
     private final String label;
