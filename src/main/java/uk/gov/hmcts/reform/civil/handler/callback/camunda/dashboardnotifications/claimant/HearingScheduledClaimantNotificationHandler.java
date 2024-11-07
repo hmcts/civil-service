@@ -9,12 +9,15 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
@@ -54,9 +57,11 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
     private final LocationReferenceDataService locationRefDataService;
     private final HearingNoticeCamundaService camundaService;
     private final HearingFeesService hearingFeesService;
+    private final UserService userService;
+    private final SystemUpdateUserConfiguration userConfig;
 
     @Override
-    protected Map<String, Callback> callbacks() { 
+    protected Map<String, Callback> callbacks() {
         return toggleService.isCaseProgressionEnabled()
             ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForHearingScheduled)
             : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
@@ -77,10 +82,12 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
     }
 
     private CallbackResponse configureScenarioForHearingScheduled(CallbackParams callbackParams) {
+        UserAuthContent systemUpdateUser = getSystemUpdateUser();
         CaseData caseData = callbackParams.getCaseData();
+        String systemAuthToken = systemUpdateUser.getUserToken();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<LocationRefData> locations = (locationRefDataService
-            .getCourtLocationsForDefaultJudgments(authToken));
+            .getCourtLocationsForDefaultJudgments(systemAuthToken));
         LocationRefData locationRefData = fillPreferredLocationData(locations, caseData.getHearingLocation());
         if (nonNull(locationRefData)) {
             caseData = caseData.toBuilder().hearingLocationCourtName(locationRefData.getSiteName()).build();
@@ -132,5 +139,11 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
                     locationLabel
                 )).findFirst();
         return preferredLocation.orElse(null);
+    }
+
+    private UserAuthContent getSystemUpdateUser() {
+        String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+        String userId = userService.getUserInfo(userToken).getUid();
+        return UserAuthContent.builder().userToken(userToken).userId(userId).build();
     }
 }

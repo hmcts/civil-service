@@ -9,10 +9,13 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
@@ -37,6 +40,8 @@ public class HearingScheduledDefendantNotificationHandler extends CallbackHandle
     private final DashboardNotificationsParamsMapper mapper;
     private final FeatureToggleService toggleService;
     private final LocationReferenceDataService locationRefDataService;
+    private final UserService userService;
+    private final SystemUpdateUserConfiguration userConfig;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -56,10 +61,12 @@ public class HearingScheduledDefendantNotificationHandler extends CallbackHandle
     }
 
     private CallbackResponse configureScenarioForHearingScheduled(CallbackParams callbackParams) {
+        UserAuthContent systemUpdateUser = getSystemUpdateUser();
         CaseData caseData = callbackParams.getCaseData();
+        String systemAuthToken = systemUpdateUser.getUserToken();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<LocationRefData> locations = (locationRefDataService
-            .getCourtLocationsForDefaultJudgments(authToken));
+            .getCourtLocationsForDefaultJudgments(systemAuthToken));
         LocationRefData locationRefData = fillPreferredLocationData(locations, caseData.getHearingLocation());
         if (nonNull(locationRefData)) {
             caseData = caseData.toBuilder().hearingLocationCourtName(locationRefData.getSiteName()).build();
@@ -73,5 +80,11 @@ public class HearingScheduledDefendantNotificationHandler extends CallbackHandle
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private UserAuthContent getSystemUpdateUser() {
+        String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+        String userId = userService.getUserInfo(userToken).getUid();
+        return UserAuthContent.builder().userToken(userToken).userId(userId).build();
     }
 }
