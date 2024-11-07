@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -21,13 +22,13 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 @Slf4j
 public class SendAndReplyMessageService {
 
-    private static final Map<String, String> IDAM_ROLE_LABEL_MAP = Map.of(
-            "caseworker-civil-admin", "Court Staff",
-            "judge", "Judge",
-            "legal-advisor", "Legal Advisor"
+    private static final Map<String, String> ROLE_CATEGORY_LABEL_MAP = Map.of(
+            "ADMIN", "Court Staff",
+            "JUDICIAL", "Judge",
+            "LEGAL_OPERATIONS", "Legal Advisor"
     );
 
-    // Order is important here. As we only use the first matching role when mapping against a users role assignments.
+    // Order is important here as we only use the first matching role when mapping against a users role assignments.
     // Senior roles should always be before their non-senior counterpart.
     private static final List<String> SUPPORTED_ROLES = List.of(
         "ctsc-team-leader",
@@ -53,15 +54,16 @@ public class SendAndReplyMessageService {
         String messageContent, String userAuth) {
 
         UserDetails details = userService.getUserDetails(userAuth);
-        String senderIdamRoleLabel = getIdamRoleLabel(details.getRoles());
-        String senderAssignedRole = getAssignedRoleTypeLabel(userAuth, details.getId());
+        RoleAssignmentResponse role = getFirstSupportedRole(userAuth, details.getId());
+        String senderRoleCategory = ROLE_CATEGORY_LABEL_MAP.getOrDefault(role.getRoleCategory(), "");
+        String senderAssignedRole = role.getRoleLabel();
         String senderName = String.format("%s, %s", details.getFullName(), senderAssignedRole);
 
         List<Element<Message>> messageList = ofNullable(messages).orElse(new ArrayList<>());
         messageList.add(element(
             Message.from(messageMetaData)
                 .toBuilder()
-                .senderRoleType(senderIdamRoleLabel)
+                .senderRoleType(senderRoleCategory)
                 .senderName(senderName)
                 .sentTime(time.now())
                 .updatedTime(time.now())
@@ -71,21 +73,11 @@ public class SendAndReplyMessageService {
         return messageList;
     }
 
-    private String getAssignedRoleTypeLabel(String auth, String userId) {
+    private RoleAssignmentResponse getFirstSupportedRole(String auth, String userId) {
         var roleAssignments = roleAssignmentsService.getRoleAssignmentsWithLabels(userId, auth);
-        return SUPPORTED_ROLES.stream()
-            .flatMap(supportedRole -> roleAssignments.getRoleAssignmentResponse().stream()
-                .filter(userRole -> supportedRole.equals(userRole.getRoleName()))
-                .map(RoleAssignmentResponse::getRoleLabel))
-            .findFirst()
-            .orElse("");
-    }
-
-    private String getIdamRoleLabel(List<String> roles) {
-        return roles.stream()
-            .filter(IDAM_ROLE_LABEL_MAP::containsKey)
-            .map(IDAM_ROLE_LABEL_MAP::get)
-            .findFirst()
-            .orElse("");
+        return roleAssignments.getRoleAssignmentResponse().stream()
+            .filter(userRole -> SUPPORTED_ROLES.contains(userRole.getRoleName()))
+            .min(Comparator.comparingInt(userRole -> SUPPORTED_ROLES.indexOf(userRole.getRoleName())))
+            .orElse(RoleAssignmentResponse.builder().roleLabel("").roleCategory("").build());
     }
 }
