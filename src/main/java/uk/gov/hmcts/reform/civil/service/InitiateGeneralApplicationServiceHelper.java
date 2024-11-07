@@ -8,11 +8,15 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CaseAssignmentApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRole;
 import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAParties;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
@@ -21,6 +25,7 @@ import uk.gov.hmcts.reform.civil.utils.UserRoleUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -44,15 +49,18 @@ public class InitiateGeneralApplicationServiceHelper {
     private final AuthTokenGenerator authTokenGenerator;
     private final UserService userService;
     private final CrossAccessUserConfiguration crossAccessUserConfiguration;
+    private final WorkingDayIndicator workingDayIndicator;
+
     public static final String APPLICANT_ID = "001";
     public static final String RESPONDENT_ID = "002";
     public static final String RESPONDENT2_ID = "003";
     public static final String APPLICANT2_ID = "004";
-    private static final int LIP_URGENT_DAYS = 11;
+    private static final int LIP_URGENT_DAYS = 10;
     private static final String LIP_URGENT_REASON = "There is a hearing on the main case within 10 days";
 
     public GeneralApplication setRespondentDetailsIfPresent(GeneralApplication generalApplication,
-                                                            CaseData caseData, UserDetails userDetails) {
+                                                            CaseData caseData, UserDetails userDetails,
+                                                            GeneralAppFeesService feesService) {
         if (caseData.getApplicant1OrganisationPolicy() == null
             || caseData.getRespondent1OrganisationPolicy() == null
             || (YES.equals(caseData.getAddRespondent2()) && caseData.getRespondent2OrganisationPolicy() == null)) {
@@ -124,16 +132,37 @@ public class InitiateGeneralApplicationServiceHelper {
             .parentClaimantIsApplicant(isGAApplicantSameAsParentCaseClaimant
                                            ? YES
                                            : NO).build();
-        checkLipUrgency(isGaAppSameAsParentCaseClLip, applicationBuilder, caseData);
+
+        /*
+        * Don't consider hearing date if application is represented
+        * */
+        if (Objects.nonNull(applicationBuilder.build().getIsGaApplicantLip())
+            && applicationBuilder.build().getIsGaApplicantLip().equals(YES)) {
+            checkLipUrgency(isGaAppSameAsParentCaseClLip, applicationBuilder, generalApplication, caseData, feesService);
+        }
+
         return applicationBuilder.build();
     }
 
     private void checkLipUrgency(Boolean isGaAppSameAsParentCaseClLip,
                                  GeneralApplication.GeneralApplicationBuilder applicationBuilder,
-                                 CaseData caseData) {
+                                 GeneralApplication generalApplication,
+                                 CaseData caseData,
+                                 GeneralAppFeesService feesService) {
+
+        LocalDate startDate = LocalDateTime.now().getHour() >= 16
+            ? LocalDate.now().plusDays(1)
+            : LocalDate.now();
+
+        LocalDate lipUrgentEndDate = LocalDate.now().plusDays(LIP_URGENT_DAYS);
+
+        long noOfHoliday = startDate.datesUntil(lipUrgentEndDate)
+            .filter(date -> !workingDayIndicator.isWorkingDay(date)).count();
+
         if (Objects.nonNull(isGaAppSameAsParentCaseClLip)
-                && Objects.nonNull(caseData.getHearingDate())
-                && LocalDate.now().plusDays(LIP_URGENT_DAYS).isAfter(caseData.getHearingDate())) {
+            && Objects.nonNull(caseData.getHearingDate())
+            && caseData.getHearingDate().isBefore(lipUrgentEndDate.plusDays(noOfHoliday))) {
+
             applicationBuilder.generalAppUrgencyRequirement(
                     GAUrgencyRequirement
                             .builder()
@@ -148,6 +177,14 @@ public class InitiateGeneralApplicationServiceHelper {
                     .urgentAppConsiderationDate(caseData.getHearingDate())
                     .build());
         }
+        //set main case hearing date as ga hearing date
+        if (Objects.nonNull(isGaAppSameAsParentCaseClLip) && Objects.nonNull(caseData.getHearingDate())) {
+            applicationBuilder
+                .generalAppHearingDate(GAHearingDateGAspec.builder().hearingScheduledDate(caseData.getHearingDate()).build());
+            Fee feeForGA = feesService.getFeeForGA(generalApplication, caseData.getHearingDate());
+            GAPbaDetails generalAppPBADetails = GAPbaDetails.builder().fee(feeForGA).build();
+            applicationBuilder.generalAppPBADetails(generalAppPBADetails);
+        }
     }
 
     private Boolean setSingleGaApplicant(List<CaseAssignmentUserRole> applicantSolicitor,
@@ -161,6 +198,7 @@ public class InitiateGeneralApplicationServiceHelper {
         if (applnSol.getCaseRole() != null) {
             if (applnSol.getCaseRole().equals(CaseRole.CLAIMANT.getFormattedName())
                     || applnSol.getCaseRole().equals(CaseRole.DEFENDANT.getFormattedName())) {
+
                 applicationBuilder.isGaApplicantLip(YES);
                 if (applnSol.getCaseRole().equals(CaseRole.DEFENDANT.getFormattedName())) {
                     isGaAppSameAsParentCaseClLip = false;

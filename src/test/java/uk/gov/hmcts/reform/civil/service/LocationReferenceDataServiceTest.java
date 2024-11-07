@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -173,6 +173,22 @@ class LocationReferenceDataServiceTest {
         }
 
         @Test
+        void shouldReturnLocations_whenLRDReturnsAllLocationsForGaIfErrorThenError() {
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+            when(locationReferenceDataApiClient.getCourtVenue(
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString()
+            )).thenThrow(new RuntimeException());
+
+            List<LocationRefData> courtLocations = refDataService.getCourtLocationsForGeneralApplication("user_token");
+            assertThat(courtLocations).isEmpty();
+        }
+
+        @Test
         void shouldReturnLocations_whenLRDReturnsNonScotlandLocations() {
             when(authTokenGenerator.generate()).thenReturn("service_token");
             when(locationReferenceDataApiClient.getCourtVenue(
@@ -190,7 +206,7 @@ class LocationReferenceDataServiceTest {
 
             DynamicList courtLocationString = getLocationsFromList(courtLocations);
 
-            assertThat(courtLocations.size()).isEqualTo(12);
+            assertThat(courtLocations).hasSize(12);
             assertThat(locationsFromDynamicList(courtLocationString)).containsOnly(
                 "site_name_01 - court address 1111 - AA0 0BB",
                 "site_name_02 - court address 2222 - AA0 0BB",
@@ -223,14 +239,14 @@ class LocationReferenceDataServiceTest {
             List<LocationRefData> courtLocations = refDataService
                 .getCourtLocationsForGeneralApplication("user_token");
 
-            assertThat(courtLocations.size()).isEqualTo(0);
+            assertThat(courtLocations).isEmpty();
         }
 
         private DynamicList getLocationsFromList(final List<LocationRefData> locations) {
             return fromList(locations.stream().map(location -> new StringBuilder().append(location.getSiteName())
                     .append(" - ").append(location.getCourtAddress())
                     .append(" - ").append(location.getPostcode()).toString())
-                                .collect(Collectors.toList()));
+                                .toList());
         }
 
         private List<String> locationsFromDynamicList(DynamicList dynamicList) {
@@ -260,6 +276,22 @@ class LocationReferenceDataServiceTest {
 
             assertThat(courtLocations).isNotNull();
         }
+
+        @Test
+        void shouldReturnLocations_whenLRDReturnsAllLocationsForDefaultJudgmentsIfErrorThenError() {
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+            when(locationReferenceDataApiClient.getCourtVenue(
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString()
+            )).thenThrow(new RuntimeException());
+
+            List<LocationRefData> courtLocations = refDataService.getCourtLocationsForDefaultJudgments("user_token");
+            assertThat(courtLocations).isEmpty();
+        }
     }
 
     @Nested
@@ -284,6 +316,89 @@ class LocationReferenceDataServiceTest {
 
             assertThat(result.getEpimmsId()).isEqualTo("192280");
             assertThat(result.getRegionId()).isEqualTo("4");
+        }
+
+        @Test
+        void shouldReturnLocations_whenLRDReturnsOnCnbcLocationsMoreThanError() {
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+            when(locationReferenceDataApiClient.getCourtVenueByName(
+                anyString(),
+                anyString(),
+                anyString()
+            )).thenThrow(new RuntimeException());
+
+            LocationRefData result = refDataService.getCnbcLocation("user_token");
+            assertThat(result).isEqualTo(LocationRefData.builder().build());
+        }
+
+        @Test
+        void shouldReturnLocations_whenLRDReturnsOnCnbcLocationsMoreThan2() {
+            LocationRefData ccmccLocation = LocationRefData.builder().courtVenueId("9263").epimmsId("192282")
+                .siteName("site_name").regionId("4").region("North West").courtType("County Court")
+                .courtTypeId("10").locationType("COURT").courtName("COUNTY COURT MONEY CLAIMS CENTRE")
+                .venueName("CNBC").build();
+            LocationRefData ccmccLocation2 = LocationRefData.builder().courtVenueId("9263").epimmsId("192281")
+                .siteName("site_name").regionId("4").region("North West").courtType("County Court")
+                .courtTypeId("10").locationType("COURT").courtName("NATIONAL BUSINESS CENTER")
+                .venueName("CNBC").build();
+            List<LocationRefData> mockedResponse = List.of(ccmccLocation, ccmccLocation2);
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+            when(locationReferenceDataApiClient.getCourtVenueByName(
+                anyString(),
+                anyString(),
+                anyString()
+            ))
+                .thenReturn(mockedResponse);
+
+            LocationRefData result = refDataService.getCnbcLocation("user_token");
+
+            assertThat(result.getEpimmsId()).isEqualTo("192282");
+            assertThat(result.getRegionId()).isEqualTo("4");
+        }
+
+        @Test
+        void shouldReturnLocations_whenLRDReturnsOnCnbcLocations() {
+            LocationRefData ccmccLocation = LocationRefData.builder().courtVenueId("9263").epimmsId("192280")
+                .siteName("site_name").regionId("4").region("North West").courtType("County Court")
+                .courtTypeId("10").locationType("COURT").courtName("COUNTY COURT MONEY CLAIMS CENTRE")
+                .venueName("CNBC").build();
+            List<LocationRefData> mockedResponse = List.of(ccmccLocation);
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+            when(locationReferenceDataApiClient.getCourtVenueByName(
+                anyString(),
+                anyString(),
+                anyString()
+            ))
+                .thenReturn(mockedResponse);
+
+            LocationRefData result = refDataService.getCnbcLocation("user_token");
+
+            assertThat(result.getEpimmsId()).isEqualTo("192280");
+            assertThat(result.getRegionId()).isEqualTo("4");
+
+            when(locationReferenceDataApiClient.getCourtVenueByName(
+                anyString(),
+                anyString(),
+                anyString()
+            ))
+                .thenReturn(null);
+
+            result = refDataService.getCnbcLocation("user_token");
+
+            assertThat(result.getEpimmsId()).isNull();
+            assertThat(result.getRegionId()).isNull();
+
+            when(locationReferenceDataApiClient.getCourtVenueByName(
+                anyString(),
+                anyString(),
+                anyString()
+            ))
+                .thenReturn(List.of());
+
+            result = refDataService.getCnbcLocation("user_token");
+
+            assertThat(result.getEpimmsId()).isNull();
+            assertThat(result.getRegionId()).isNull();
         }
 
         @Test
@@ -353,7 +468,8 @@ class LocationReferenceDataServiceTest {
             List<LocationRefData> mockedResponse = List.of(ccmccLocation);
 
             when(authTokenGenerator.generate()).thenReturn("service_token");
-            when(locationReferenceDataApiClient.getCourtVenueByEpimmsId(
+            when(locationReferenceDataApiClient.getCourtVenueByEpimmsIdAndType(
+                anyString(),
                 anyString(),
                 anyString(),
                 anyString()
@@ -400,7 +516,8 @@ class LocationReferenceDataServiceTest {
         @Test
         void shouldReturnEmptyList_whenEpimmsIdThrowsException() {
             when(authTokenGenerator.generate()).thenReturn("service_token");
-            when(locationReferenceDataApiClient.getCourtVenueByEpimmsId(
+            when(locationReferenceDataApiClient.getCourtVenueByEpimmsIdAndType(
+                anyString(),
                 anyString(),
                 anyString(),
                 anyString()
@@ -408,8 +525,7 @@ class LocationReferenceDataServiceTest {
                 .thenThrow(new RestClientException("403"));
 
             List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsId("user_token", "192280");
-
-            assertThat(result.isEmpty());
+            assertThat(result).isEmpty();
         }
 
         @Test
@@ -427,8 +543,7 @@ class LocationReferenceDataServiceTest {
                 "user_token",
                 "192280"
             );
-
-            assertThat(result.isEmpty());
+            assertThat(result).isEmpty();
         }
     }
 
@@ -436,14 +551,14 @@ class LocationReferenceDataServiceTest {
     class LocationRefMatchingLabel {
 
         @Test
-        public void whenEmpty_empty() {
+        void whenEmpty_empty() {
             String bearer = "bearer";
             Assertions.assertTrue(refDataService.getLocationMatchingLabel(null, bearer).isEmpty());
             Assertions.assertTrue(refDataService.getLocationMatchingLabel("", bearer).isEmpty());
         }
 
         @Test
-        public void whenMatching_match() {
+        void whenMatching_match() {
             when(authTokenGenerator.generate()).thenReturn("service_token");
             LocationRefData el1 = LocationRefData.builder()
                 .siteName("site name")
@@ -465,9 +580,9 @@ class LocationReferenceDataServiceTest {
                 bearer
             );
             Assertions.assertTrue(opt.isPresent());
-            Assertions.assertEquals(el1.getSiteName(), opt.get().getSiteName());
-            Assertions.assertEquals(el1.getCourtAddress(), opt.get().getCourtAddress());
-            Assertions.assertEquals(el1.getPostcode(), opt.get().getPostcode());
+            assertEquals(el1.getSiteName(), opt.get().getSiteName());
+            assertEquals(el1.getCourtAddress(), opt.get().getCourtAddress());
+            assertEquals(el1.getPostcode(), opt.get().getPostcode());
         }
     }
 
