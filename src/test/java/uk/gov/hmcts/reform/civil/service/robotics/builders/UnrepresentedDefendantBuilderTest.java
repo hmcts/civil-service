@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.dto.EventHistoryDTO;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 @ExtendWith(MockitoExtension.class)

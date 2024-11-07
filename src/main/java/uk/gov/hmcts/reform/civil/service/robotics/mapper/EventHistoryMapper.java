@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.builders.BreathingSpaceEventBuilder;
 import uk.gov.hmcts.reform.civil.service.robotics.builders.CaseNotesEventBuilder;
 import uk.gov.hmcts.reform.civil.service.robotics.builders.CcjEventBuilder;
-import uk.gov.hmcts.reform.civil.service.robotics.builders.ConsentExtensionFilingDefenceEventBuilder;
+import uk.gov.hmcts.reform.civil.service.robotics.builders.InformAgreedExtensionDateSpecBuilder;
 import uk.gov.hmcts.reform.civil.service.robotics.builders.DefaultJudgmentBuilder;
 import uk.gov.hmcts.reform.civil.service.robotics.builders.EventBuilder;
 import uk.gov.hmcts.reform.civil.service.robotics.builders.EventBuilderFactory;
@@ -33,7 +33,7 @@ public class EventHistoryMapper {
     private final BreathingSpaceEventBuilder breathingSpaceEventBuilder;
     private final CaseNotesEventBuilder caseNotesEventBuilder;
     private final CcjEventBuilder ccjEventBuilder;
-    private final ConsentExtensionFilingDefenceEventBuilder consentExtensionFilingDefenceEventBuilder;
+    private final InformAgreedExtensionDateSpecBuilder informAgreedExtensionDateSpecBuilder;
     private final DefaultJudgmentBuilder defaultJudgementBuilder;
     private final EventBuilderFactory eventBuilderFactory;
     private final EventHistorySequencer eventHistorySequencer;
@@ -78,7 +78,7 @@ public class EventHistoryMapper {
             EventHistoryUtil.MISC_TEXT_GRANTED_DJ,
             caseData.getDefendantDetailsSpec()
         );
-        consentExtensionFilingDefenceEventBuilder.buildInformAgreedExtensionDateForSpec(builder, caseData);
+        informAgreedExtensionDateSpecBuilder.buildEvent(EventHistoryDTO.builder().builder(builder).caseData(caseData).build());
         takenOfflineAfterSdoBuilder.buildClaimTakenOfflineAfterDJ(builder, caseData);
         ccjEventBuilder.buildCcjEvent(builder, caseData);
         return eventHistorySequencer.sortEvents(builder.build());

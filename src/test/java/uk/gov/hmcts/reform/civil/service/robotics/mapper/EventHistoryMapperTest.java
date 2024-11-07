@@ -51,6 +51,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
+import uk.gov.hmcts.reform.civil.service.robotics.builders.ClaimDismissedPastDeadlineBuilder;
 import uk.gov.hmcts.reform.civil.service.robotics.builders.CounterClaimBuilder;
 import uk.gov.hmcts.reform.civil.service.robotics.builders.DivergentResponseBuilder;
 import uk.gov.hmcts.reform.civil.service.robotics.builders.EventBuildersConfiguration;
@@ -60,7 +61,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.builders.FullDefenceNotProceed
 import uk.gov.hmcts.reform.civil.service.robotics.builders.FullDefenceProceedBuilder;
 import uk.gov.hmcts.reform.civil.service.robotics.builders.NotificationAcknowledgedBuilder;
 import uk.gov.hmcts.reform.civil.service.robotics.builders.PartAdmissionBuilder;
-import uk.gov.hmcts.reform.civil.service.robotics.builders.PastClaimDismissedDeadlineBuilder;
 import uk.gov.hmcts.reform.civil.service.robotics.builders.TakenOfflineByStaffBuilder;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
@@ -151,7 +151,7 @@ class EventHistoryMapperTest {
     @Autowired
     NotificationAcknowledgedBuilder notificationAcknowledgedBuilder;
     @Autowired
-    PastClaimDismissedDeadlineBuilder pastClaimDismissedDeadlineBuilder;
+    ClaimDismissedPastDeadlineBuilder claimDismissedPastDeadlineBuilder;
     @MockBean
     private Time time;
 
@@ -6454,9 +6454,9 @@ class EventHistoryMapperTest {
                     .eventSequence(5)
                     .eventCode("999")
                     .dateReceived(caseData.getClaimDismissedDate())
-                    .eventDetailsText(pastClaimDismissedDeadlineBuilder.prepareClaimDismissedDetails(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION))
+                    .eventDetailsText(claimDismissedPastDeadlineBuilder.prepareClaimDismissedDetails(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION))
                     .eventDetails(EventDetails.builder()
-                        .miscText(pastClaimDismissedDeadlineBuilder.prepareClaimDismissedDetails(
+                        .miscText(claimDismissedPastDeadlineBuilder.prepareClaimDismissedDetails(
                                           CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION))
                                       .build())
                     .build()
@@ -6537,9 +6537,9 @@ class EventHistoryMapperTest {
                     .eventSequence(5)
                     .eventCode("999")
                     .dateReceived(caseData.getClaimDismissedDate())
-                    .eventDetailsText(pastClaimDismissedDeadlineBuilder.prepareClaimDismissedDetails(NOTIFICATION_ACKNOWLEDGED))
+                    .eventDetailsText(claimDismissedPastDeadlineBuilder.prepareClaimDismissedDetails(NOTIFICATION_ACKNOWLEDGED))
                     .eventDetails(EventDetails.builder()
-                        .miscText(pastClaimDismissedDeadlineBuilder.prepareClaimDismissedDetails(
+                        .miscText(claimDismissedPastDeadlineBuilder.prepareClaimDismissedDetails(
                                           NOTIFICATION_ACKNOWLEDGED))
                                       .build())
                     .build()
@@ -6620,9 +6620,9 @@ class EventHistoryMapperTest {
                     .eventSequence(6)
                     .eventCode("999")
                     .dateReceived(caseData.getClaimDismissedDate())
-                    .eventDetailsText(pastClaimDismissedDeadlineBuilder.prepareClaimDismissedDetails(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION))
+                    .eventDetailsText(claimDismissedPastDeadlineBuilder.prepareClaimDismissedDetails(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION))
                     .eventDetails(EventDetails.builder()
-                        .miscText(pastClaimDismissedDeadlineBuilder.prepareClaimDismissedDetails(
+                        .miscText(claimDismissedPastDeadlineBuilder.prepareClaimDismissedDetails(
                                           NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION))
                                       .build())
                     .build()

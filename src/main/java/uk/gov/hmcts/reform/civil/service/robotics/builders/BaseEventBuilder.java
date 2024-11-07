@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimantResponseDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.PartyData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
@@ -17,18 +18,22 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
 import static java.lang.String.format;
+import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.CONSENT_EXTENSION_FILING_DEFENCE;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DIRECTIONS_QUESTIONNAIRE_FILED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
@@ -40,6 +45,7 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.prepareEventSequence;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseTypeForRespondent;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseTypeForRespondentSpec;
@@ -363,5 +369,34 @@ public abstract class BaseEventBuilder implements EventBuilder {
                         .build())
                     .build())
             .toList();
+    }
+
+    protected Event buildConsentExtensionFilingDefenceEvent(
+        PartyData party, MultiPartyScenario scenario, int eventNumber) {
+        return Event.builder()
+            .eventSequence(eventNumber)
+            .eventCode(CONSENT_EXTENSION_FILING_DEFENCE.getCode())
+            .dateReceived(party.getTimeExtensionDate())
+            .litigiousPartyID(party.getRole().equals(RESPONDENT_ONE) ? RESPONDENT_ID : RESPONDENT2_ID)
+            .eventDetailsText(getExtensionEventText(scenario, party))
+            .eventDetails(EventDetails.builder()
+                .agreedExtensionDate(party.getSolicitorAgreedDeadlineExtension().format(ISO_DATE))
+                .build())
+            .build();
+    }
+
+    protected String getExtensionEventText(MultiPartyScenario scenario, PartyData party) {
+        String extensionDate = party.getSolicitorAgreedDeadlineExtension()
+            .format(DateTimeFormatter.ofPattern("dd MM yyyy"));
+        switch (scenario) {
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                return format("Defendant(s) have agreed extension: %s", extensionDate);
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                return format("Defendant: %s has agreed extension: %s", party.getDetails().getPartyName(),
+                    extensionDate
+                );
+            default:
+                return format("agreed extension date: %s", extensionDate);
+        }
     }
 }
