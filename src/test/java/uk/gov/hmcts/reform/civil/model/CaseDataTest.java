@@ -1205,40 +1205,47 @@ public class CaseDataTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideSDODocumentListTestData")
-    void shouldReturnExpectedSDODocumentList(List<Element<CaseDocument>> systemGeneratedCaseDocuments, Optional<List<CaseDocument>> expected) {
+    @MethodSource("provideDocumentListTestData")
+    void shouldReturnExpectedDocumentList(DocumentType documentType, List<Element<CaseDocument>> documentCollection, Optional<List<CaseDocument>> expected) {
         CaseData caseData = CaseData.builder()
-            .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments)
+            .systemGeneratedCaseDocuments(documentCollection)
+            .finalOrderDocumentCollection(documentCollection)
             .build();
 
-        Optional<List<CaseDocument>> result = caseData.getSDODocumentList();
+        List<Element<CaseDocument>> documents = DocumentType.SDO_ORDER.equals(documentType)
+            ? caseData.getSystemGeneratedCaseDocuments()
+            : caseData.getFinalOrderDocumentCollection();
 
+        Optional<List<CaseDocument>> result = caseData.getDocumentListByType(documents, documentType);
         assertThat(result).isEqualTo(expected);
     }
 
-    private static Stream<Arguments> provideSDODocumentListTestData() {
+    private static Stream<Arguments> provideDocumentListTestData() {
         return Stream.of(
-            Arguments.of(new ArrayList<>(), Optional.empty()),
-            Arguments.of(
-                List.of(ElementUtils.element(CaseDocument.builder().documentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT).build())),
-                Optional.empty()
+            Arguments.of(DocumentType.SDO_ORDER, new ArrayList<>(), Optional.empty()),
+            Arguments.of(DocumentType.SDO_ORDER,
+                         List.of(ElementUtils.element(CaseDocument.builder().documentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT).build())),
+                         Optional.empty()
             ),
-            Arguments.of(
-                List.of(
-                    ElementUtils.element(CaseDocument.builder().documentType(SDO_ORDER).build()),
-                    ElementUtils.element(CaseDocument.builder().documentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT).build())
-                ),
-                Optional.of(List.of(CaseDocument.builder().documentType(SDO_ORDER).build()))
+            Arguments.of(DocumentType.SDO_ORDER,
+                         List.of(
+                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.SDO_ORDER).build()),
+                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT).build())
+                         ),
+                         Optional.of(List.of(CaseDocument.builder().documentType(DocumentType.SDO_ORDER).build()))
             ),
-            Arguments.of(
-                List.of(
-                    ElementUtils.element(CaseDocument.builder().documentType(SDO_ORDER).build()),
-                    ElementUtils.element(CaseDocument.builder().documentType(SDO_ORDER).build())
-                ),
-                Optional.of(List.of(
-                    CaseDocument.builder().documentType(SDO_ORDER).build(),
-                    CaseDocument.builder().documentType(SDO_ORDER).build()
-                ))
+            Arguments.of(DocumentType.JUDGE_FINAL_ORDER,
+                         List.of(
+                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build())
+                         ),
+                         Optional.of(List.of(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build()))
+            ),
+            Arguments.of(DocumentType.JUDGE_FINAL_ORDER,
+                         List.of(
+                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build()),
+                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT).build())
+                         ),
+                         Optional.of(List.of(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build()))
             )
         );
     }
