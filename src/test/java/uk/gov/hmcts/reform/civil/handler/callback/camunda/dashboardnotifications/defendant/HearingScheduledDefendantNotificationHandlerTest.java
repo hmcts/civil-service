@@ -75,6 +75,7 @@ public class HearingScheduledDefendantNotificationHandlerTest extends BaseCallba
     void init() {
         clearInvocations(userService);
     }
+
     @Nested
     class CaseProgression {
 
