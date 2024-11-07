@@ -51,6 +51,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
@@ -144,6 +146,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 }
             }
         }
+
+        setClaimTrackForTaskName(caseData, caseDataBuilder);
+
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         caseDataBuilder
                 .generalAppHearingDetails(
@@ -363,6 +368,8 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             caseData = updatedCaseData;
         }
 
+        log.info("TASK NAME FOR GA {}", caseData.getGaWaTrackLabel());
+
         Map<String, Object> data = initiateGeneralApplicationService
                 .buildCaseData(dataBuilder, caseData, userDetails, callbackParams.getParams().get(BEARER_TOKEN)
                         .toString(), feesService).toMap(objectMapper);
@@ -388,13 +395,35 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 && caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {
             caseData = caseData.toBuilder()
                     .generalAppInformOtherParty(
-                            GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build()).build();
+                            GAInformOtherParty.builder().isWithNotice(YES).build()).build();
         }
         return caseData;
     }
 
     private boolean inStateAfterJudicialReferral(CaseState state) {
         return !stateAfterJudicialReferral.contains(state);
+    }
+
+    private void setClaimTrackForTaskName(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+        String taskTrackName = "";
+        log.info("UPDATING TASK NAME FOR GA");
+        if (caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
+            taskTrackName =  caseData.getAllocatedTrack().name();
+        } else if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
+            taskTrackName =  caseData.getResponseClaimTrack();
+        }
+        log.info("TASK NAME TO APPEND {}", taskTrackName);
+
+        switch (taskTrackName) {
+            case "MULTI_CLAIM":
+                caseDataBuilder.gaWaTrackLabel("track: Multi claim");
+            case "INTERMEDIATE_CLAIM":
+                caseDataBuilder.gaWaTrackLabel("track: Intermediate claim");
+            case "SMALL_CLAIM":
+                caseDataBuilder.gaWaTrackLabel("track: Small claim");
+            case "FAST_CLAIM":
+                caseDataBuilder.gaWaTrackLabel("track: Fast claim");
+        }
     }
 
 }
