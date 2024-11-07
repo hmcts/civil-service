@@ -424,6 +424,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 break;
             case "SMALL_CLAIM":
                 caseDataBuilder.gaWaTrackLabel("track: Small claim");
+                break;
             case "FAST_CLAIM":
                 caseDataBuilder.gaWaTrackLabel("track: Fast claim");
                 break;
