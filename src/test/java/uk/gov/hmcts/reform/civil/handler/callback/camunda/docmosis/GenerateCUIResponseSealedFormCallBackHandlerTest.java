@@ -164,4 +164,31 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
 
         verify(formGenerator).generate(caseData, BEARER_TOKEN);
     }
+
+    @Test
+    void shouldGenerateForm_whenIsLipVLipEnabledStitchingEnabledButRespondent1ClaimResponseTypeForSpecIsFullAdmissionSoNoDqWillGenerate() {
+        //Given
+        List<Element<CaseDocument>> documents = List.of(
+            element(CaseDocument.builder().documentName("responseForm.pdf").build()));
+        given(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(any(CaseDocument.class), any(CaseData.class))).willReturn(documents);
+        given(formGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
+        List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments).build();
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        ReflectionTestUtils.setField(handler, "stitchEnabled", true);
+
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse)handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+        //Then
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().stream()
+                       .filter(caseDocumentElement -> caseDocumentElement.getValue()
+                           .getDocumentName().equals("responseForm.pdf")).count()).isEqualTo(1);
+
+        verify(formGenerator).generate(caseData, BEARER_TOKEN);
+    }
 }
