@@ -49,6 +49,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.CreateSDOCallbackHandlerUtils;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.disposalhearing.DisclosureOfDocumentsFieldBuilder;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.disposalhearing.DisposalHearingPopulator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.FastTrackPopulator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.GenerateSdoOrder;
@@ -58,6 +59,16 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.SmallClaimsPopulator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.SubmitSDO;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.ValidateFieldsNihl;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.disposalhearing.FinalDisposalHearingFieldBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.disposalhearing.HearingBundleFieldBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.disposalhearing.HearingNotesFieldBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.disposalhearing.HearingTimeFieldBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.disposalhearing.JudgesRecitalFieldBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.disposalhearing.MedicalEvidenceFieldBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.disposalhearing.OrderWithoutHearingFieldBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.disposalhearing.QuestionsToExpertsFieldBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.disposalhearing.SchedulesOfLossFieldBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.disposalhearing.WitnessOfFactFieldBuilder;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
@@ -213,7 +224,18 @@ import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.FEEDBACK_LINK;
     FastTrackPopulator.class,
     DisposalHearingPopulator.class,
     ValidateFieldsNihl.class,
-    PrePopulateSdoR2AndNihlFields.class},
+    PrePopulateSdoR2AndNihlFields.class,
+    JudgesRecitalFieldBuilder.class,
+    DisclosureOfDocumentsFieldBuilder.class,
+    WitnessOfFactFieldBuilder.class,
+    MedicalEvidenceFieldBuilder.class,
+    QuestionsToExpertsFieldBuilder.class,
+    SchedulesOfLossFieldBuilder.class,
+    FinalDisposalHearingFieldBuilder.class,
+    HearingTimeFieldBuilder.class,
+    OrderWithoutHearingFieldBuilder.class,
+    HearingBundleFieldBuilder.class,
+    HearingNotesFieldBuilder.class},
     properties = {"reference.database.enabled=false"})
 public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 

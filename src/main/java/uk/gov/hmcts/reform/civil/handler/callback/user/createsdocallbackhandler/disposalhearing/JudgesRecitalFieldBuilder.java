@@ -12,11 +12,10 @@ import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.UPON_CONSIDERING
 @Component
 public class JudgesRecitalFieldBuilder implements SdoCaseFieldBuilder {
 
-     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
+    public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
         log.info("Setting judges recital");
         updatedData.disposalHearingJudgesRecital(DisposalHearingJudgesRecital.builder()
-            .input(UPON_CONSIDERING)
-            .build());
+                                                     .input(UPON_CONSIDERING)
+                                                     .build());
     }
-
 }
