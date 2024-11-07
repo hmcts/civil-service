@@ -49,9 +49,6 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.CreateSDOCallbackHandlerUtils;
-import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.disposalhearing.DisclosureOfDocumentsFieldBuilder;
-import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.disposalhearing.DisposalHearingPopulator;
-import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.FastTrackPopulator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.GenerateSdoOrder;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.PrePopulateOrderDetailsPages;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.PrePopulateSdoR2AndNihlFields;
@@ -59,6 +56,8 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.SmallClaimsPopulator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.SubmitSDO;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.ValidateFieldsNihl;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.disposalhearing.DisclosureOfDocumentsFieldBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.disposalhearing.DisposalHearingPopulator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.disposalhearing.FinalDisposalHearingFieldBuilder;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.disposalhearing.HearingBundleFieldBuilder;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.disposalhearing.HearingNotesFieldBuilder;
@@ -69,6 +68,21 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.disposalhearing.QuestionsToExpertsFieldBuilder;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.disposalhearing.SchedulesOfLossFieldBuilder;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.disposalhearing.WitnessOfFactFieldBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.fasttrack.FastTrackBuildingDisputeFieldBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.fasttrack.FastTrackClinicalNegligenceFieldBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.fasttrack.FastTrackCreditHireFieldBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.fasttrack.FastTrackDisclosureOfDocumentsFieldBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.fasttrack.FastTrackHearingTimeFieldBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.fasttrack.FastTrackHousingDisrepairFieldBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.fasttrack.FastTrackJudgesRecitalFieldBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.fasttrack.FastTrackNotesFieldBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.fasttrack.FastTrackOrderWithoutJudgementFieldBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.fasttrack.FastTrackPersonalInjuryFieldBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.fasttrack.FastTrackPopulator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.fasttrack.FastTrackRoadTrafficAccidentFieldBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.fasttrack.FastTrackSchedulesOfLossFieldBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.fasttrack.FastTrackTrialFieldBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.fasttrack.FastTrackWitnessOfFactFieldBuilder;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
@@ -148,6 +162,12 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_HEADER_SDO;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_1_V_1;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_1_V_2;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_2_V_1;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.FEEDBACK_LINK;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.ADDENDUM_REPORT;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.APPLICATION_TO_RELY_DETAILS;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.CLAIMANT_PERMISSION_TO_RELY;
@@ -197,12 +217,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate.FIVE_HOURS;
 import static uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions.OPEN_DATE;
-import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_1_V_1;
-import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_1_V_2;
-import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_2_V_1;
-import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE;
-import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO;
-import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.FEEDBACK_LINK;
 
 @SpringBootTest(classes = {
     CreateSDOCallbackHandler.class,
@@ -235,7 +249,21 @@ import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.FEEDBACK_LINK;
     HearingTimeFieldBuilder.class,
     OrderWithoutHearingFieldBuilder.class,
     HearingBundleFieldBuilder.class,
-    HearingNotesFieldBuilder.class},
+    HearingNotesFieldBuilder.class,
+    FastTrackJudgesRecitalFieldBuilder.class,
+    FastTrackDisclosureOfDocumentsFieldBuilder.class,
+    FastTrackSchedulesOfLossFieldBuilder.class,
+    FastTrackWitnessOfFactFieldBuilder.class,
+    FastTrackTrialFieldBuilder.class,
+    FastTrackHearingTimeFieldBuilder.class,
+    FastTrackNotesFieldBuilder.class,
+    FastTrackOrderWithoutJudgementFieldBuilder.class,
+    FastTrackBuildingDisputeFieldBuilder.class,
+    FastTrackClinicalNegligenceFieldBuilder.class,
+    FastTrackCreditHireFieldBuilder.class,
+    FastTrackHousingDisrepairFieldBuilder.class,
+    FastTrackPersonalInjuryFieldBuilder.class,
+    FastTrackRoadTrafficAccidentFieldBuilder.class},
     properties = {"reference.database.enabled=false"})
 public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
