@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -19,6 +20,12 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 @RequiredArgsConstructor
 @Slf4j
 public class SendAndReplyMessageService {
+
+    private static final Map<String, String> IDAM_ROLE_LABEL_MAP = Map.of(
+            "caseworker-civil-admin", "Court Staff",
+            "judge", "Judge",
+            "legal-advisor", "Legal Advisor"
+    );
 
     // Order is important here. As we only use the first matching role when mapping against a users role assignments.
     // Senior roles should always be before their non-senior counterpart.
@@ -46,14 +53,16 @@ public class SendAndReplyMessageService {
         String messageContent, String userAuth) {
 
         UserDetails details = userService.getUserDetails(userAuth);
-        String senderRoleType = getRoleTypeLabel(userAuth, details.getId());
-        String senderName = String.format("%s, %s", details.getFullName(), senderRoleType);
+        String senderIdamRoleLabel = getIdamRoleLabel(details.getRoles());
+        String senderAssignedRole = getAssignedRoleTypeLabel(userAuth, details.getId());
+        String senderName = String.format("%s, %s", details.getFullName(), senderAssignedRole);
 
         List<Element<Message>> messageList = ofNullable(messages).orElse(new ArrayList<>());
         messageList.add(element(
             Message.from(messageMetaData)
                 .toBuilder()
-                .senderRoleType(senderRoleType).senderName(senderName)
+                .senderRoleType(senderIdamRoleLabel)
+                .senderName(senderName)
                 .sentTime(time.now())
                 .updatedTime(time.now())
                 .messageContent(messageContent)
@@ -62,12 +71,20 @@ public class SendAndReplyMessageService {
         return messageList;
     }
 
-    private String getRoleTypeLabel(String auth, String userId) {
+    private String getAssignedRoleTypeLabel(String auth, String userId) {
         var roleAssignments = roleAssignmentsService.getRoleAssignmentsWithLabels(userId, auth);
         return SUPPORTED_ROLES.stream()
             .flatMap(supportedRole -> roleAssignments.getRoleAssignmentResponse().stream()
                 .filter(userRole -> supportedRole.equals(userRole.getRoleName()))
                 .map(RoleAssignmentResponse::getRoleLabel))
+            .findFirst()
+            .orElse("");
+    }
+
+    private String getIdamRoleLabel(List<String> roles) {
+        return roles.stream()
+            .filter(IDAM_ROLE_LABEL_MAP::containsKey)
+            .map(IDAM_ROLE_LABEL_MAP::get)
             .findFirst()
             .orElse("");
     }

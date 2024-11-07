@@ -32,6 +32,10 @@ class SendAndReplyMessageServiceTest {
 
     private static String USER_AUTH = "auth";
     private static String USER_NAME = "Test User";
+    private static final String COURT_STAFF_ROLE = "caseworker-civil-admin";
+    private static final String JUDGE_ROLE = "judge";
+    private static final String LEGAL_ADVISOR_ROLE = "legal-advisor";
+    private static final String OTHER_ROLE = "other";
     private static SendMessageMetadata MESSAGE_METADATA = SendMessageMetadata.builder()
         .subject(HEARING)
         .recipientRoleType(CIRCUIT_JUDGE)
@@ -39,11 +43,6 @@ class SendAndReplyMessageServiceTest {
         .build();
     private static String MESSAGE_CONTENT = "Message Content";
     private static LocalDateTime NOW = LocalDateTime.of(2014, 11, 1, 0, 0, 0);
-    public static final UserDetails USER_DETAILS = UserDetails.builder()
-        .id("uid")
-        .forename("Test")
-        .surname("User")
-        .build();
 
     private static final Message EXISTING_MESSAGE =
         Message.builder()
@@ -70,15 +69,18 @@ class SendAndReplyMessageServiceTest {
     @BeforeEach
     public void setupTest() {
         when(time.now()).thenReturn(NOW);
-        when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
     }
 
     @Nested
     class AddMessage {
         @Test
         public void should_returnExpectedMessage_whenExistingMessagesAreNull() {
+            UserDetails userDetails = buildUserDetails(List.of(COURT_STAFF_ROLE));
+            when(userService.getUserDetails(USER_AUTH)).thenReturn(userDetails);
+
+            String expectedIdamRoleLabel = "Court Staff";
             String expectedUserRoleLabel = "Hearing Centre Administrator";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(userDetails.getId(), USER_AUTH)).thenReturn(
                 buildRoleAssignmentsResponse(Map.of(
                     "hearing-centre-admin", expectedUserRoleLabel,
                     "some-other-role", "Some Other Role"
@@ -92,13 +94,17 @@ class SendAndReplyMessageServiceTest {
                 USER_AUTH
             );
 
-            assertEquals(List.of(buildExpectedMessage(expectedUserRoleLabel)), unwrapElements(actual));
+            assertEquals(List.of(buildExpectedMessage(expectedIdamRoleLabel, expectedUserRoleLabel)), unwrapElements(actual));
         }
 
         @Test
         public void should_returnExpectedMessage_forHearingCentreAdmin() {
+            UserDetails userDetails = buildUserDetails(List.of(OTHER_ROLE, COURT_STAFF_ROLE));
+            when(userService.getUserDetails(USER_AUTH)).thenReturn(userDetails);
+
+            String expectedIdamRoleLabel = "Court Staff";
             String expectedUserRoleLabel = "Hearing Centre Administrator";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(userDetails.getId(), USER_AUTH)).thenReturn(
                 buildRoleAssignmentsResponse(Map.of(
                     "hearing-centre-admin", expectedUserRoleLabel,
                     "some-other-role", "Some Other Role"
@@ -117,14 +123,18 @@ class SendAndReplyMessageServiceTest {
 
             assertEquals(List.of(
                 EXISTING_MESSAGE,
-                buildExpectedMessage(expectedUserRoleLabel)
+                buildExpectedMessage(expectedIdamRoleLabel, expectedUserRoleLabel)
             ), unwrapElements(actual));
         }
 
         @Test
         public void should_returnExpectedMessage_forHearingCentreTeamLeader() {
+            UserDetails userDetails = buildUserDetails(List.of(OTHER_ROLE, COURT_STAFF_ROLE));
+            when(userService.getUserDetails(USER_AUTH)).thenReturn(userDetails);
+
+            String expectedIdamRoleLabel = "Court Staff";
             String expectedUserRoleLabel = "Hearing Centre Team Leader";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(userDetails.getId(), USER_AUTH)).thenReturn(
                 buildRoleAssignmentsResponse(Map.of(
                     "hearing-centre-admin", "Hearing Centre Administrator",
                     "hearing-centre-team-leader", expectedUserRoleLabel,
@@ -144,14 +154,18 @@ class SendAndReplyMessageServiceTest {
 
             assertEquals(List.of(
                 EXISTING_MESSAGE,
-                buildExpectedMessage(expectedUserRoleLabel)
+                buildExpectedMessage(expectedIdamRoleLabel, expectedUserRoleLabel)
             ), unwrapElements(actual));
         }
 
         @Test
         public void should_returnExpectedMessage_forCtsc() {
+            UserDetails userDetails = buildUserDetails(List.of(OTHER_ROLE, COURT_STAFF_ROLE));
+            when(userService.getUserDetails(USER_AUTH)).thenReturn(userDetails);
+
             String expectedUserRoleLabel = "CTSC";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            String expectedIdamRoleLabel = "Court Staff";
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(userDetails.getId(), USER_AUTH)).thenReturn(
                 buildRoleAssignmentsResponse(Map.of(
                     "ctsc", expectedUserRoleLabel,
                     "some-other-role", "Some Other Role"
@@ -170,14 +184,18 @@ class SendAndReplyMessageServiceTest {
 
             assertEquals(List.of(
                 EXISTING_MESSAGE,
-                buildExpectedMessage(expectedUserRoleLabel)
+                buildExpectedMessage(expectedIdamRoleLabel, expectedUserRoleLabel)
             ), unwrapElements(actual));
         }
 
         @Test
         public void should_returnExpectedMessage_forCtscTeamLeader() {
+            UserDetails userDetails = buildUserDetails(List.of(OTHER_ROLE, COURT_STAFF_ROLE));
+            when(userService.getUserDetails(USER_AUTH)).thenReturn(userDetails);
+
+            String expectedIdamRoleLabel = "Court Staff";
             String expectedUserRoleLabel = "CTSC Team Leader";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(userDetails.getId(), USER_AUTH)).thenReturn(
                 buildRoleAssignmentsResponse(Map.of(
                     "ctsc", "CTSC",
                     "ctsc-team-leader", expectedUserRoleLabel,
@@ -197,14 +215,18 @@ class SendAndReplyMessageServiceTest {
 
             assertEquals(List.of(
                 EXISTING_MESSAGE,
-                buildExpectedMessage(expectedUserRoleLabel)
+                buildExpectedMessage(expectedIdamRoleLabel, expectedUserRoleLabel)
             ), unwrapElements(actual));
         }
 
         @Test
         public void should_returnExpectedMessage_forTribunalCaseworker() {
+            UserDetails userDetails = buildUserDetails(List.of(OTHER_ROLE, LEGAL_ADVISOR_ROLE));
+            when(userService.getUserDetails(USER_AUTH)).thenReturn(userDetails);
+
+            String expectedIdamRoleLabel = "Legal Advisor";
             String expectedUserRoleLabel = "Tribunal Caseworker";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(userDetails.getId(), USER_AUTH)).thenReturn(
                 buildRoleAssignmentsResponse(Map.of(
                     "tribunal-caseworker", expectedUserRoleLabel,
                     "some-other-role", "Some Other Role"
@@ -223,14 +245,18 @@ class SendAndReplyMessageServiceTest {
 
             assertEquals(List.of(
                 EXISTING_MESSAGE,
-                buildExpectedMessage(expectedUserRoleLabel)
+                buildExpectedMessage(expectedIdamRoleLabel, expectedUserRoleLabel)
             ), unwrapElements(actual));
         }
 
         @Test
         public void should_returnExpectedMessage_forSeniorTribunalCaseworker() {
+            UserDetails userDetails = buildUserDetails(List.of(OTHER_ROLE, LEGAL_ADVISOR_ROLE));
+            when(userService.getUserDetails(USER_AUTH)).thenReturn(userDetails);
+
+            String expectedIdamRoleLabel = "Legal Advisor";
             String expectedUserRoleLabel = "Senior Tribunal Caseworker";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(userDetails.getId(), USER_AUTH)).thenReturn(
                 buildRoleAssignmentsResponse(Map.of(
                     "tribunal-caseworker", "Tribunal Caseworker",
                     "senior-tribunal-caseworker", expectedUserRoleLabel,
@@ -250,14 +276,18 @@ class SendAndReplyMessageServiceTest {
 
             assertEquals(List.of(
                 EXISTING_MESSAGE,
-                buildExpectedMessage(expectedUserRoleLabel)
+                buildExpectedMessage(expectedIdamRoleLabel, expectedUserRoleLabel)
             ), unwrapElements(actual));
         }
 
         @Test
         public void should_returnExpectedMessage_forNationalBusinessCentre() {
+            UserDetails userDetails = buildUserDetails(List.of(OTHER_ROLE, COURT_STAFF_ROLE));
+            when(userService.getUserDetails(USER_AUTH)).thenReturn(userDetails);
+
+            String expectedIdamRoleLabel = "Court Staff";
             String expectedUserRoleLabel = "National Business Centre";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(userDetails.getId(), USER_AUTH)).thenReturn(
                 buildRoleAssignmentsResponse(Map.of(
                     "national-business-centre", expectedUserRoleLabel,
                     "some-other-role", "Some Other Role"
@@ -276,14 +306,18 @@ class SendAndReplyMessageServiceTest {
 
             assertEquals(List.of(
                 EXISTING_MESSAGE,
-                buildExpectedMessage(expectedUserRoleLabel)
+                buildExpectedMessage(expectedIdamRoleLabel, expectedUserRoleLabel)
             ), unwrapElements(actual));
         }
 
         @Test
         public void should_returnExpectedMessage_forNationalBusinessCentreTeamLeader() {
+            UserDetails userDetails = buildUserDetails(List.of(OTHER_ROLE, COURT_STAFF_ROLE));
+            when(userService.getUserDetails(USER_AUTH)).thenReturn(userDetails);
+
+            String expectedIdamRoleLabel = "Court Staff";
             String expectedUserRoleLabel = "NBC Team Leader";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(userDetails.getId(), USER_AUTH)).thenReturn(
                 buildRoleAssignmentsResponse(Map.of(
                     "national-business-centre", "National Business Centre",
                     "nbc-team-leader", expectedUserRoleLabel,
@@ -303,14 +337,18 @@ class SendAndReplyMessageServiceTest {
 
             assertEquals(List.of(
                 EXISTING_MESSAGE,
-                buildExpectedMessage(expectedUserRoleLabel)
+                buildExpectedMessage(expectedIdamRoleLabel, expectedUserRoleLabel)
             ), unwrapElements(actual));
         }
 
         @Test
         public void should_returnExpectedMessage_forDistrictJudge() {
+            UserDetails userDetails = buildUserDetails(List.of(OTHER_ROLE, JUDGE_ROLE));
+            when(userService.getUserDetails(USER_AUTH)).thenReturn(userDetails);
+
+            String expectedIdamRoleLabel = "Judge";
             String expectedUserRoleLabel = "District Judge";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(userDetails.getId(), USER_AUTH)).thenReturn(
                 buildRoleAssignmentsResponse(Map.of(
                     "judge", "Judge",
                     "district-judge", expectedUserRoleLabel,
@@ -330,14 +368,18 @@ class SendAndReplyMessageServiceTest {
 
             assertEquals(List.of(
                 EXISTING_MESSAGE,
-                buildExpectedMessage(expectedUserRoleLabel)
+                buildExpectedMessage(expectedIdamRoleLabel, expectedUserRoleLabel)
             ), unwrapElements(actual));
         }
 
         @Test
         public void should_returnExpectedMessage_forCircuitJudge() {
+            UserDetails userDetails = buildUserDetails(List.of(OTHER_ROLE, JUDGE_ROLE));
+            when(userService.getUserDetails(USER_AUTH)).thenReturn(userDetails);
+
+            String expectedIdamRoleLabel = "Judge";
             String expectedUserRoleLabel = "Circuit Judge";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(userDetails.getId(), USER_AUTH)).thenReturn(
                 buildRoleAssignmentsResponse(Map.of(
                     "judge", "Judge",
                     "circuit-judge", expectedUserRoleLabel,
@@ -357,14 +399,18 @@ class SendAndReplyMessageServiceTest {
 
             assertEquals(List.of(
                 EXISTING_MESSAGE,
-                buildExpectedMessage(expectedUserRoleLabel)
+                buildExpectedMessage(expectedIdamRoleLabel, expectedUserRoleLabel)
             ), unwrapElements(actual));
         }
 
         @Test
         public void should_returnExpectedMessage_forJudge() {
+            UserDetails userDetails = buildUserDetails(List.of(OTHER_ROLE, JUDGE_ROLE));
+            when(userService.getUserDetails(USER_AUTH)).thenReturn(userDetails);
+
+            String expectedIdamRoleLabel = "Judge";
             String expectedUserRoleLabel = "Judge";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(userDetails.getId(), USER_AUTH)).thenReturn(
                 buildRoleAssignmentsResponse(Map.of(
                     "judge", "Judge",
                     "some-other-role", "Some Other Role"
@@ -383,8 +429,17 @@ class SendAndReplyMessageServiceTest {
 
             assertEquals(List.of(
                 EXISTING_MESSAGE,
-                buildExpectedMessage(expectedUserRoleLabel)
+                buildExpectedMessage(expectedIdamRoleLabel, expectedUserRoleLabel)
             ), unwrapElements(actual));
+        }
+
+        private UserDetails buildUserDetails(List<String> roles) {
+            return UserDetails.builder()
+                .id("uid")
+                .forename("Test")
+                .surname("User")
+                .roles(roles)
+                .build();
         }
 
         private RoleAssignmentServiceResponse buildRoleAssignmentsResponse(Map<String, String> roleToLabelMap) {
@@ -397,7 +452,7 @@ class SendAndReplyMessageServiceTest {
                 .build();
         }
 
-        private Message buildExpectedMessage(String expectedUserRoleLabel) {
+        private Message buildExpectedMessage(String expectedUserIdemRoleLabel, String expectedUserRoleLabel) {
             return Message.builder()
                 .messageContent(MESSAGE_CONTENT)
                 .sentTime(NOW)
@@ -407,7 +462,7 @@ class SendAndReplyMessageServiceTest {
                 .isUrgent(MESSAGE_METADATA.getIsUrgent())
                 .recipientRoleType(MESSAGE_METADATA.getRecipientRoleType().getLabel())
                 .senderName(String.format("%s, %s", USER_NAME, expectedUserRoleLabel))
-                .senderRoleType(expectedUserRoleLabel)
+                .senderRoleType(expectedUserIdemRoleLabel)
                 .build();
         }
     }
