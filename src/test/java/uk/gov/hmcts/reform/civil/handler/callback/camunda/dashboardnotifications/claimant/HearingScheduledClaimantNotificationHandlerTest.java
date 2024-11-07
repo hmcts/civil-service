@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -8,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -22,11 +25,13 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -37,6 +42,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -74,172 +80,156 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
     @Mock
     private HearingFeesService hearingFeesService;
 
+    @Mock
+    private UserService userService;
+
+    @Mock
+    private SystemUpdateUserConfiguration userConfig;
+
     public static final String TASK_ID = "GenerateDashboardNotificationHearingScheduledClaimant";
+
+    private static final String USER_AUTH_TOKEN = "Bearer user-xyz";
 
     HashMap<String, Object> params = new HashMap<>();
 
-    @Test
-    void handleEventsReturnsTheExpectedCallbackEvent() {
-        assertThat(handler.handledEvents()).contains(CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT,
-                                                     CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC);
+    @BeforeEach
+    void init() {
+        clearInvocations(userService);
     }
+    @Nested
+    class CaseProgression {
 
-    @Test
-    void shouldNotCallRecordScenario_whenCaseProgressionIsDisabled() {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
+        private static final String USER_ID = "User1";
 
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, CaseData.builder().build())
-            .build();
+        @Test
+        void handleEventsReturnsTheExpectedCallbackEvent() {
+            assertThat(handler.handledEvents()).contains(
+                CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT,
+                CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC
+            );
+        }
 
-        handler.handle(callbackParams);
-        verify(dashboardApiClient, never())
-            .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
-    }
+        @Test
+        void shouldNotCallRecordScenario_whenCaseProgressionIsDisabled() {
+            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
 
-    @Test
-    void shouldReturnCorrectCamundaActivityId_whenInvoked() {
-        assertThat(handler.camundaActivityId(
-            CallbackParamsBuilder.builder()
-                .request(CallbackRequest.builder()
-                             .eventId(CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT.name())
-                             .build())
-                .build()))
-            .isEqualTo(TASK_ID);
-    }
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, CaseData.builder().build())
+                .build();
 
-    @Test
-    void createDashboardNotifications() {
-        List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("Name").courtAddress("Loc").postcode("1").build());
-        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+            handler.handle(callbackParams);
+            verify(dashboardApiClient, never())
+                .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
+        }
 
-        DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();
-        DynamicList list = DynamicList.builder().value(location).listItems(List.of(location)).build();
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .applicant1Represented(YesOrNo.NO)
-            .build().toBuilder().hearingLocation(list).build();
+        @Test
+        void shouldReturnCorrectCamundaActivityId_whenInvoked() {
+            assertThat(handler.camundaActivityId(
+                CallbackParamsBuilder.builder()
+                    .request(CallbackRequest.builder()
+                                 .eventId(CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT.name())
+                                 .build())
+                    .build()))
+                .isEqualTo(TASK_ID);
+        }
 
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, caseData)
-            .request(CallbackRequest.builder().eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT").build())
-            .build();
+        @Test
+        void createDashboardNotifications() {
+            List<LocationRefData> locations = new ArrayList<>();
+            locations.add(LocationRefData.builder().siteName("Name").courtAddress("Loc").postcode("1").build());
+            when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+            when(userService.getUserInfo(USER_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
+            when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword())).thenReturn(USER_AUTH_TOKEN);
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
 
-        handler.handle(callbackParams);
-        verify(dashboardApiClient).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario(),
-            "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(params).build()
-        );
-        verifyNoMoreInteractions(dashboardApiClient);
-    }
+            DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();
+            DynamicList list = DynamicList.builder().value(location).listItems(List.of(location)).build();
+            CaseData caseData = CaseData.builder()
+                .legacyCaseReference("reference")
+                .ccdCaseReference(1234L)
+                .applicant1Represented(YesOrNo.NO)
+                .build().toBuilder().hearingLocation(list).build();
 
-    @Test
-    void shouldCreateDashboardNotificationsForHearingFeeIfCaseInHRAndListing() {
-        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT").build())
+                .build();
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .ccdState(HEARING_READINESS)
-            .listingOrRelisting(LISTING)
-            .applicant1Represented(YesOrNo.NO)
-            .build();
+            handler.handle(callbackParams);
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(params).build()
+            );
+            verifyNoMoreInteractions(dashboardApiClient);
+        }
 
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, caseData)
-            .request(CallbackRequest.builder().eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT").build())
-            .build();
+        @Test
+        void shouldCreateDashboardNotificationsForHearingFeeIfCaseInHRAndListing() {
+            when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+            when(userService.getUserInfo(USER_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
+            when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword())).thenReturn(USER_AUTH_TOKEN);
 
-        handler.handle(callbackParams);
-        verify(dashboardApiClient).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario(),
-            "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(params).build()
-        );
-        verify(dashboardApiClient).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT.getScenario(),
-            "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(params).build()
-        );
-    }
+            CaseData caseData = CaseData.builder()
+                .legacyCaseReference("reference")
+                .ccdCaseReference(1234L)
+                .ccdState(HEARING_READINESS)
+                .listingOrRelisting(LISTING)
+                .applicant1Represented(YesOrNo.NO)
+                .build();
 
-    @Test
-    void shouldCreateDashboardNotificationsForHearingFeeIfFeePaymentFailure_HMC() {
-        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        when(hearingNoticeCamundaService.getProcessVariables(any()))
-            .thenReturn(HearingNoticeVariables.builder()
-                            .hearingId("HER1234")
-                            .hearingType("AAA7-TRI")
-                            .build());
-        when(hearingFeesService.getFeeForHearingSmallClaims(any()))
-            .thenReturn(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build());
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT").build())
+                .build();
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .totalClaimAmount(new BigDecimal(100))
-            .responseClaimTrack("SMALL_CLAIM")
-            .applicant1Represented(YesOrNo.NO)
-            .hearingFeePaymentDetails(PaymentDetails.builder().status(PaymentStatus.FAILED).build())
-            .businessProcess(BusinessProcess.builder().processInstanceId("").build())
-            .build();
+            handler.handle(callbackParams);
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(params).build()
+            );
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(params).build()
+            );
+        }
 
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, caseData)
-            .request(CallbackRequest.builder().eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC").build())
-            .build();
+        @Test
+        void shouldCreateDashboardNotificationsForHearingFeeIfFeePaymentFailure_HMC() {
+            when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+            when(userService.getUserInfo(USER_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
+            when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword())).thenReturn(USER_AUTH_TOKEN);
+            when(hearingNoticeCamundaService.getProcessVariables(any()))
+                .thenReturn(HearingNoticeVariables.builder()
+                                .hearingId("HER1234")
+                                .hearingType("AAA7-TRI")
+                                .build());
+            when(hearingFeesService.getFeeForHearingSmallClaims(any()))
+                .thenReturn(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build());
 
-        handler.handle(callbackParams);
-        verify(dashboardApiClient).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario(),
-            "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(params).build()
-        );
-        verify(dashboardApiClient).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT.getScenario(),
-            "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(params).build()
-        );
-        verify(hearingFeesService).getFeeForHearingSmallClaims(new BigDecimal(100).setScale(2, RoundingMode.UNNECESSARY));
-    }
+            CaseData caseData = CaseData.builder()
+                .legacyCaseReference("reference")
+                .ccdCaseReference(1234L)
+                .totalClaimAmount(new BigDecimal(100))
+                .responseClaimTrack("SMALL_CLAIM")
+                .applicant1Represented(YesOrNo.NO)
+                .hearingFeePaymentDetails(PaymentDetails.builder().status(PaymentStatus.FAILED).build())
+                .businessProcess(BusinessProcess.builder().processInstanceId("").build())
+                .build();
 
-    @Test
-    void shouldCreateDashboardNotificationsForHearingFeeIfFeeNeverPaid_HMC() {
-        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        when(hearingNoticeCamundaService.getProcessVariables(any()))
-            .thenReturn(HearingNoticeVariables.builder()
-                            .hearingId("HER1234")
-                            .hearingType("AAA7-TRI")
-                            .build());
-        when(hearingFeesService.getFeeForHearingSmallClaims(any()))
-            .thenReturn(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build());
-
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .totalClaimAmount(new BigDecimal(100))
-            .responseClaimTrack("SMALL_CLAIM")
-            .applicant1Represented(YesOrNo.NO)
-            .businessProcess(BusinessProcess.builder().processInstanceId("").build())
-            .build();
-
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, caseData)
-            .request(CallbackRequest.builder().eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC").build())
-            .build();
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId(
+                    "CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC").build())
+                .build();
 
         handler.handle(callbackParams);
         verify(dashboardApiClient).recordScenario(
@@ -261,6 +251,8 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
     void shouldNotCreateDashboardNotificationsForHearingFeeIfFeePaymentSuccess_HMC() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        when(userService.getUserInfo(USER_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
+        when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword())).thenReturn(USER_AUTH_TOKEN);
         when(hearingNoticeCamundaService.getProcessVariables(any()))
             .thenReturn(HearingNoticeVariables.builder()
                             .hearingId("HER1234")
@@ -295,6 +287,8 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
     void shouldNotCreateDashboardNotificationsForHearingFeeIfHearingTypeDisposal_HMC() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        when(userService.getUserInfo(USER_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
+        when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword())).thenReturn(USER_AUTH_TOKEN);
         when(hearingNoticeCamundaService.getProcessVariables(any()))
             .thenReturn(HearingNoticeVariables.builder()
                             .hearingId("HER1234")
@@ -328,6 +322,8 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
     void shouldNotCreateDashboardNotificationsForHearingFeeIfPaidWithHwF_HMC() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        when(userService.getUserInfo(USER_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
+        when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword())).thenReturn(USER_AUTH_TOKEN);
         when(hearingNoticeCamundaService.getProcessVariables(any()))
             .thenReturn(HearingNoticeVariables.builder()
                             .hearingId("HER1234")
@@ -364,6 +360,8 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
     void shouldCreateDashboardNotificationsForHearingFeeIfNotPaidWithHwF_HMC() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        when(userService.getUserInfo(USER_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
+        when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword())).thenReturn(USER_AUTH_TOKEN);
         when(hearingNoticeCamundaService.getProcessVariables(any()))
             .thenReturn(HearingNoticeVariables.builder()
                             .hearingId("HER1234")
@@ -402,24 +400,27 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
         verify(hearingFeesService).getFeeForHearingSmallClaims(new BigDecimal(100).setScale(2, RoundingMode.UNNECESSARY));
     }
 
-    @Test
-    void shouldNotCreateDashboardNotificationsForHearingFeeIfCaseInHRAndListing_butApplicantLR() {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        @Test
+        void shouldNotCreateDashboardNotificationsForHearingFeeIfCaseInHRAndListing_butApplicantLR() {
+            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+            when(userService.getUserInfo(USER_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
+            when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword())).thenReturn(USER_AUTH_TOKEN);
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .ccdState(HEARING_READINESS)
-            .listingOrRelisting(LISTING)
-            .applicant1Represented(YesOrNo.YES)
-            .build();
+            CaseData caseData = CaseData.builder()
+                .legacyCaseReference("reference")
+                .ccdCaseReference(1234L)
+                .ccdState(HEARING_READINESS)
+                .listingOrRelisting(LISTING)
+                .applicant1Represented(YesOrNo.YES)
+                .build();
 
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, caseData)
-            .request(CallbackRequest.builder().eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT").build())
-            .build();
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT").build())
+                .build();
 
-        handler.handle(callbackParams);
-        verifyNoInteractions(dashboardApiClient);
+            handler.handle(callbackParams);
+            verifyNoInteractions(dashboardApiClient);
+        }
     }
 }
