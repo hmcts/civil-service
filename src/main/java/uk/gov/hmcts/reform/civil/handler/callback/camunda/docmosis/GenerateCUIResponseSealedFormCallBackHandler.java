@@ -97,18 +97,18 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                 assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.DEF1_DEFENSE_DQ.getValue());
             } else {
                 log.info("Inner Else sealedForm {} condition for case {}", sealedForm, caseData.getCcdCaseReference());
-                addToSystemGeneratedDocments(caseDataBuilder, sealedForm, caseData);
+                addToSystemGeneratedDocuments(caseDataBuilder, sealedForm, caseData);
             }
         } else {
             log.info("Else sealedForm {} condition for case {}", sealedForm, caseData.getCcdCaseReference());
-            addToSystemGeneratedDocments(caseDataBuilder, sealedForm, caseData);
+            addToSystemGeneratedDocuments(caseDataBuilder, sealedForm, caseData);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
-    private void addToSystemGeneratedDocments(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseDocument sealedForm, CaseData caseData) {
+    private void addToSystemGeneratedDocuments(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseDocument sealedForm, CaseData caseData) {
         caseDataBuilder.respondent1ClaimResponseDocumentSpec(sealedForm)
             .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
                 sealedForm,
