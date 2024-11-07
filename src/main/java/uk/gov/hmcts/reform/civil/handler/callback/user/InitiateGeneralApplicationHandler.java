@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -176,7 +177,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
         List<GeneralApplicationTypes> generalAppTypes = getGeneralApplicationTypes(callbackParams, caseData);
 
-        var consent = Objects.nonNull(caseData.getGeneralAppRespondentAgreement())
+        var consent = nonNull(caseData.getGeneralAppRespondentAgreement())
                                 && YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed());
         List<String> errors = new ArrayList<>();
         if (generalAppTypes.size() == 1
@@ -335,8 +336,8 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             caseData = newCaseData;
         }
 
-        if (Objects.nonNull(caseData.getGeneralAppHearingDetails().getHearingPreferredLocation())
-            && Objects.nonNull(caseData.getGeneralAppHearingDetails().getHearingPreferredLocation().getValue())) {
+        if (nonNull(caseData.getGeneralAppHearingDetails().getHearingPreferredLocation())
+            && nonNull(caseData.getGeneralAppHearingDetails().getHearingPreferredLocation().getValue())) {
             List<String> applicationLocationList = List.of(caseData.getGeneralAppHearingDetails()
                                                                .getHearingPreferredLocation()
                                                                .getValue().getLabel());
@@ -390,7 +391,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     }
 
     private CaseData setWithNoticeByType(CaseData caseData) {
-        if (Objects.nonNull(caseData.getGeneralAppType())
+        if (nonNull(caseData.getGeneralAppType())
                 && caseData.getGeneralAppType().getTypes().size() == 1
                 && caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {
             caseData = caseData.toBuilder()
@@ -407,9 +408,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private void setClaimTrackForTaskName(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         String taskTrackName = "";
         log.info("UPDATING TASK NAME FOR GA");
-        if (caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
+        if (caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM) && nonNull(caseData.getAllocatedTrack())) {
             taskTrackName =  caseData.getAllocatedTrack().name();
-        } else if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
+        } else if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM) && nonNull(caseData.getResponseClaimTrack())) {
             taskTrackName =  caseData.getResponseClaimTrack();
         }
         log.info("TASK NAME TO APPEND {}", taskTrackName);
@@ -417,12 +418,16 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         switch (taskTrackName) {
             case "MULTI_CLAIM":
                 caseDataBuilder.gaWaTrackLabel("track: Multi claim");
+                break;
             case "INTERMEDIATE_CLAIM":
                 caseDataBuilder.gaWaTrackLabel("track: Intermediate claim");
+                break;
             case "SMALL_CLAIM":
                 caseDataBuilder.gaWaTrackLabel("track: Small claim");
             case "FAST_CLAIM":
                 caseDataBuilder.gaWaTrackLabel("track: Fast claim");
+                break;
+            default: caseDataBuilder.gaWaTrackLabel(null);
         }
     }
 
