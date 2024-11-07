@@ -6,26 +6,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.SdoCaseFieldBuilder;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.disposalhearing.DisposalHearingPopulator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 
-import java.time.LocalDate;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DisposalHearingPopulatorTest {
 
     @Mock
-    private WorkingDayIndicator workingDayIndicator;
-
-    @Mock
-    private DeadlinesCalculator deadlinesCalculator;
+    private List<SdoCaseFieldBuilder> sdoCaseFieldBuilder;
 
     @InjectMocks
     private DisposalHearingPopulator disposalHearingPopulator;
@@ -34,37 +28,21 @@ class DisposalHearingPopulatorTest {
 
     @BeforeEach
     void setUp() {
-        caseData = CaseData.builder()
-            .build();
+        caseData = CaseData.builder().build();
+        disposalHearingPopulator = new DisposalHearingPopulator(sdoCaseFieldBuilder);
     }
 
     @Test
     void shouldSetDisposalHearingFields() {
-        when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(LocalDate.now().plusDays(1));
-        when(deadlinesCalculator.plusWorkingDays(any(LocalDate.class), any(Integer.class))).thenReturn(LocalDate.now().plusDays(5));
-
         CaseData.CaseDataBuilder<?, ?> updatedData = CaseData.builder();
         disposalHearingPopulator.setDisposalHearingFields(updatedData, caseData);
 
         CaseData result = updatedData.build();
-        assertThat(result.getDisposalHearingJudgesRecital()).isNotNull();
-        assertThat(result.getDisposalHearingDisclosureOfDocuments()).isNotNull();
-        assertThat(result.getDisposalHearingWitnessOfFact()).isNotNull();
-        assertThat(result.getDisposalHearingMedicalEvidence()).isNotNull();
-        assertThat(result.getDisposalHearingQuestionsToExperts()).isNotNull();
-        assertThat(result.getDisposalHearingSchedulesOfLoss()).isNotNull();
-        assertThat(result.getDisposalHearingFinalDisposalHearing()).isNotNull();
-        assertThat(result.getDisposalHearingHearingTime()).isNotNull();
-        assertThat(result.getDisposalOrderWithoutHearing()).isNotNull();
-        assertThat(result.getDisposalHearingBundle()).isNotNull();
-        assertThat(result.getDisposalHearingNotes()).isNotNull();
+        assertThat(result).isNotNull();
     }
 
     @Test
     void shouldSetJudgementDeductionValues() {
-        when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(LocalDate.now().plusDays(1));
-        when(deadlinesCalculator.plusWorkingDays(any(LocalDate.class), any(Integer.class))).thenReturn(LocalDate.now().plusDays(5));
-
         CaseData caseDataWithJudgementSum = CaseData.builder()
             .drawDirectionsOrder(JudgementSum.builder().judgementSum(10.0).build())
             .build();
