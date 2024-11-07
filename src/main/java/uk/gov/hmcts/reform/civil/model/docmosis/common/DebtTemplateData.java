@@ -50,8 +50,10 @@ public class DebtTemplateData {
                                          .setScale(2, RoundingMode.CEILING));
                 break;
             default:
-                builder.paidPerMonth((MonetaryConversions.penniesToPounds(debtLRspec.getPaymentAmount()))
-                                         .setScale(2, RoundingMode.CEILING));
+                builder.paidPerMonth(debtLRspec.getPaymentAmount() != null
+                                         ? (MonetaryConversions.penniesToPounds(debtLRspec.getPaymentAmount()))
+                                         .setScale(2, RoundingMode.CEILING) : new BigDecimal(0)
+                    .setScale(2, RoundingMode.CEILING));
                 break;
         }
         return builder.build();
