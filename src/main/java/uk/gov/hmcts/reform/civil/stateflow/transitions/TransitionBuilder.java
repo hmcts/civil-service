@@ -27,39 +27,32 @@ public abstract class TransitionBuilder implements MoveToNext<FlowState.Main> {
     protected final FeatureToggleService featureToggleService;
     public static final String FLOW_NAME = "MAIN";
 
-    private List<Transition> transitions;
-
     @Override
-    public MoveToNext<FlowState.Main> moveTo(FlowState.Main toState) {
-        this.addTransition(new Transition(fullyQualified(fromState), fullyQualified(toState)));
+    public MoveToNext<FlowState.Main> moveTo(FlowState.Main toState, List<Transition> transitions) {
+        transitions.add(new Transition(fullyQualified(fromState), fullyQualified(toState)));
         return this;
     }
 
     @Override
-    public OnlyWhenNext<FlowState.Main> onlyWhen(Predicate<CaseData> condition) {
-        this.getCurrentTransition().ifPresent(t -> t.setCondition(condition));
+    public OnlyWhenNext<FlowState.Main> onlyWhen(Predicate<CaseData> condition, List<Transition> transitions) {
+        this.getCurrentTransition(transitions).ifPresent(t -> t.setCondition(condition));
         return this;
     }
 
     @Override
-    public SetNext<FlowState.Main> set(Consumer<Map<String, Boolean>> flags) {
-        this.getCurrentTransition().ifPresent(t -> t.setFlags(flags));
+    public SetNext<FlowState.Main> set(Consumer<Map<String, Boolean>> flags, List<Transition> transitions) {
+        this.getCurrentTransition(transitions).ifPresent(t -> t.setFlags(flags));
         return this;
     }
 
     @Override
-    public SetNext<FlowState.Main> set(BiConsumer<CaseData, Map<String, Boolean>> flags) {
-        this.getCurrentTransition().ifPresent(t -> t.setDynamicFlags(flags));
+    public SetNext<FlowState.Main> set(BiConsumer<CaseData, Map<String, Boolean>> flags, List<Transition> transitions) {
+        this.getCurrentTransition(transitions).ifPresent(t -> t.setDynamicFlags(flags));
         return this;
     }
 
-    public List<Transition> addTransition(Transition transition) {
-        this.transitions.add(transition);
-        return this.transitions;
-    }
-
-    Optional<Transition> getCurrentTransition() {
-        return transitions.isEmpty() ? Optional.empty() : Optional.of(transitions.get(transitions.size() - 1));
+    Optional<Transition> getCurrentTransition(List<Transition> transitions) {
+        return transitions.isEmpty() || transitions.size() == 0 ? Optional.empty() : Optional.of(transitions.get(transitions.size() - 1));
     }
 
     private String fullyQualified(FlowState.Main state) {
@@ -68,10 +61,10 @@ public abstract class TransitionBuilder implements MoveToNext<FlowState.Main> {
 
     @Override
     public List<Transition> buildTransitions() {
-        this.transitions = new ArrayList<>();
-        setUpTransitions();
-        return this.transitions;
+        List<Transition> transitions = new ArrayList<>();
+        setUpTransitions(transitions);
+        return transitions;
     }
 
-    abstract void setUpTransitions();
+    abstract void setUpTransitions(List<Transition> transitions);
 }
