@@ -1,16 +1,16 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler;
+package uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.disposalhearing;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.SdoCaseFieldBuilder;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgementDeductionValue;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingMedicalEvidence;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
@@ -24,10 +24,9 @@ import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-
-import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.UPON_CONSIDERING;
 
 @Slf4j
 @Component
@@ -36,6 +35,7 @@ public class DisposalHearingPopulator {
 
     private final WorkingDayIndicator workingDayIndicator;
     private final DeadlinesCalculator deadlinesCalculator;
+    private final List<SdoCaseFieldBuilder> disposalHearingBuilders;
 
     private void updateDeductionValue(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
         Optional.ofNullable(caseData.getDrawDirectionsOrder())
@@ -68,7 +68,7 @@ public class DisposalHearingPopulator {
 
     public void setDisposalHearingFields(CaseData.CaseDataBuilder<?, ?> updatedData, CaseData caseData) {
         log.info("Setting disposal hearing fields for case data");
-        setJudgesRecital(updatedData);
+        disposalHearingBuilders.forEach(disposalHearingBuilder -> disposalHearingBuilder.build(updatedData));
         updateDeductionValue(caseData, updatedData);
         setDisclosureOfDocuments(updatedData);
         setWitnessOfFact(updatedData);
@@ -80,13 +80,6 @@ public class DisposalHearingPopulator {
         setOrderWithoutHearing(updatedData);
         setHearingBundle(updatedData);
         setHearingNotes(updatedData);
-    }
-
-    private void setJudgesRecital(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        log.info("Setting judges recital");
-        updatedData.disposalHearingJudgesRecital(DisposalHearingJudgesRecital.builder()
-                                                     .input(UPON_CONSIDERING)
-                                                     .build());
     }
 
     private void setDisclosureOfDocuments(CaseData.CaseDataBuilder<?, ?> updatedData) {
