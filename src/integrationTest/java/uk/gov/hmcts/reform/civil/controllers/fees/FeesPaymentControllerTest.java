@@ -100,7 +100,7 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
         PaymentDto response = buildGovPayCardPaymentStatusResponse(status);
         when(paymentsClient.getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN))
             .thenReturn(response);
-        doThrow(new CaseDataUpdateException()).when(paymentRequestUpdateCallbackService).updatePaymentStatus(any(), any(), any());
+        doThrow(new CaseDataUpdateException()).when(paymentRequestUpdateCallbackService).updatePaymentStatus(any(), any(), any(CardPaymentStatusResponse.class));
         doGet(BEARER_TOKEN, FEES_PAYMENT_STATUS_URL, HEARING.name(), "123", "RC-1701-0909-0602-0418")
             .andExpect(content().json(toJson(expectedResponse(status))))
             .andExpect(status().isOk());

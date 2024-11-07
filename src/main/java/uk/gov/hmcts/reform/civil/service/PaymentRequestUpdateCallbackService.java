@@ -45,18 +45,13 @@ public class PaymentRequestUpdateCallbackService {
                  dto.getServiceRequestStatus());
 
         if (!isPaid(dto)) {
-            log.info("Service request status is not 'Paid'. No action required.");
+            log.info("Service request status is not 'Paid'. No action required for case {}", dto.getCcdCaseNumber());
             return;
         }
 
         FeeType feeType = getFeeType(feeTypeStr);
-        if (feeType == null) {
-            log.error("Invalid feeType: {}", feeTypeStr);
-            return;
-        }
-
-        if (!isHandledFeeType(feeType)) {
-            log.info("FeeType {} is not handled. No action required.", feeType);
+        if (!isHandledFeeType(feeType) || feeType == null) {
+            log.info("FeeType {} is not handled or invalid. No action required for case {}", feeType, dto.getCcdCaseNumber());
             return;
         }
 
@@ -67,7 +62,15 @@ public class PaymentRequestUpdateCallbackService {
         CaseDetails caseDetails = coreCaseDataService.getCase(caseId);
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
 
-        handlePaymentUpdate(dto, caseData, feeType, caseId);
+        if ((caseData.isLipvLipOneVOne() && isPaymentUpdateValid(feeType, caseData)) || !caseData.isLipvLipOneVOne()) {
+            handlePaymentUpdate(dto, caseData, feeType);
+        }
+    }
+
+    private void handlePaymentUpdate(ServiceRequestUpdateDto dto, CaseData caseData, FeeType feeType) {
+        CardPaymentStatusResponse paymentStatusResponse = buildPaymentStatusResponse(dto);
+        caseData = updateCaseDataWithPaymentDetails(paymentStatusResponse, caseData, feeType);
+        updatePaymentStatus(feeType, dto.getCcdCaseNumber(), caseData);
     }
 
     private boolean isPaid(ServiceRequestUpdateDto dto) {
@@ -102,6 +105,17 @@ public class PaymentRequestUpdateCallbackService {
     }
 
     @Retryable(value = CaseDataUpdateException.class, backoff = @Backoff(delay = 500))
+    public void updatePaymentStatus(FeeType feeType, String caseReference, CaseData caseData) {
+        try {
+            Long caseId = Long.valueOf(caseReference);
+            submitUpdatePaymentEvent(caseData, caseId, feeType);
+        } catch (Exception ex) {
+            log.error("Error updating payment status for case {}: {}", caseReference, ex.getMessage());
+            throw new CaseDataUpdateException();
+        }
+    }
+
+    @Retryable(value = CaseDataUpdateException.class, backoff = @Backoff(delay = 500))
     public void updatePaymentStatus(FeeType feeType, String caseReference, CardPaymentStatusResponse paymentStatusResponse) {
         try {
             Long caseId = Long.valueOf(caseReference);
@@ -109,21 +123,10 @@ public class PaymentRequestUpdateCallbackService {
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
             caseData = updateCaseDataWithPaymentDetails(paymentStatusResponse, caseData, feeType);
 
-            submitUpdatePaymentStatusEvent(caseData, caseId, feeType);
+            submitUpdatePaymentEvent(caseData, caseId, feeType);
         } catch (Exception ex) {
             log.error("Error updating payment status for case {}: {}", caseReference, ex.getMessage());
             throw new CaseDataUpdateException();
-        }
-    }
-
-    private void handlePaymentUpdate(ServiceRequestUpdateDto dto, CaseData caseData, FeeType feeType, Long caseId) {
-        CardPaymentStatusResponse paymentStatusResponse = buildPaymentStatusResponse(dto);
-        caseData = updateCaseDataWithPaymentDetails(paymentStatusResponse, caseData, feeType);
-
-        if (caseData.isLipvLipOneVOne() && isPaymentUpdateValid(feeType, caseData)) {
-            updatePaymentStatus(feeType, dto.getCcdCaseNumber(), paymentStatusResponse);
-        } else {
-            submitProcessCallbackEvent(caseData, caseId, feeType);
         }
     }
 
@@ -134,13 +137,8 @@ public class PaymentRequestUpdateCallbackService {
             .build();
     }
 
-    private void submitProcessCallbackEvent(CaseData caseData, Long caseId, FeeType feeType) {
-        CaseEvent event = determineProcessCallbackEventFromFeeType(caseData, feeType);
-        submitEvent(caseData, caseId, event);
-    }
-
-    private void submitUpdatePaymentStatusEvent(CaseData caseData, Long caseId, FeeType feeType) {
-        CaseEvent event = determineUpdatePaymentStatusEventFromFeeType(feeType);
+    private void submitUpdatePaymentEvent(CaseData caseData, Long caseId, FeeType feeType) {
+        CaseEvent event = determineEventFromFeeType(caseData, feeType);
         submitEvent(caseData, caseId, event);
     }
 
@@ -159,20 +157,20 @@ public class PaymentRequestUpdateCallbackService {
         coreCaseDataService.submitUpdate(String.valueOf(caseId), caseDataContent);
     }
 
-    private CaseEvent determineProcessCallbackEventFromFeeType(CaseData caseData, FeeType feeType) {
-        return switch (feeType) {
-            case HEARING -> SERVICE_REQUEST_RECEIVED;
-            case CLAIMISSUED -> caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM
-                ? CREATE_CLAIM_SPEC_AFTER_PAYMENT
-                : CREATE_CLAIM_AFTER_PAYMENT;
-        };
-    }
-
-    private CaseEvent determineUpdatePaymentStatusEventFromFeeType(FeeType feeType) {
-        return switch (feeType) {
-            case HEARING -> CITIZEN_HEARING_FEE_PAYMENT;
-            case CLAIMISSUED -> CITIZEN_CLAIM_ISSUE_PAYMENT;
-        };
+    private CaseEvent determineEventFromFeeType(CaseData caseData, FeeType feeType) {
+        if (caseData.isLipvLipOneVOne()) {
+            return switch (feeType) {
+                case HEARING -> CITIZEN_HEARING_FEE_PAYMENT;
+                case CLAIMISSUED -> CITIZEN_CLAIM_ISSUE_PAYMENT;
+            };
+        } else {
+            return switch (feeType) {
+                case HEARING -> SERVICE_REQUEST_RECEIVED;
+                case CLAIMISSUED -> caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM
+                    ? CREATE_CLAIM_SPEC_AFTER_PAYMENT
+                    : CREATE_CLAIM_AFTER_PAYMENT;
+            };
+        }
     }
 
     private CaseData updateCaseDataWithPaymentDetails(CardPaymentStatusResponse response, CaseData caseData, FeeType feeType) {

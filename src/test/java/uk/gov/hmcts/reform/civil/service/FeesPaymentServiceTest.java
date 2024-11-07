@@ -238,7 +238,7 @@ class FeesPaymentServiceTest {
         );
 
         assertThat(govPaymentRequestStatus).isEqualTo(expectedResponse(status));
-        verify(paymentRequestUpdateCallbackService, times(1)).updatePaymentStatus(any(), any(), any());
+        verify(paymentRequestUpdateCallbackService, times(1)).updatePaymentStatus(any(), any(), any(CardPaymentStatusResponse.class));
     }
 
     @Test
