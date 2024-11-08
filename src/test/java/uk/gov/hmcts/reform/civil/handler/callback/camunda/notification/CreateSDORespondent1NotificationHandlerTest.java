@@ -132,7 +132,7 @@ class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldNotifyRespondentLiP_whenInvoked() {
-            when(notificationsProperties.getSdoOrderedSpec()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
@@ -159,8 +159,7 @@ class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldNotifyRespondentLiP_whenInvokedEA() {
-            when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-            when(notificationsProperties.getSdoOrderedSpecEA()).thenReturn(TEMPLATE_ID_EA);
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID_EA);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
@@ -187,7 +186,7 @@ class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldNotifyRespondentLiPWithBilingual_whenDefendantResponseIsBilingual() {
-            when(notificationsProperties.getSdoOrderedSpecBilingual()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(TEMPLATE_ID);
 
             Party party = PartyBuilder.builder()
                 .individual(DEFENDANT_NAME)

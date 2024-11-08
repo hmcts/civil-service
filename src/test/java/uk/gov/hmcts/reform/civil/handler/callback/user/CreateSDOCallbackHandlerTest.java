@@ -1494,7 +1494,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertEquals(expectedEaCourtLocation, responseCaseData.getEaCourtLocation());
     }
 
-
     @Test
     void shouldNotPopulateHmcEarlyAdoptersFlag_whenLiP() {
         DynamicList options = DynamicList.builder()
