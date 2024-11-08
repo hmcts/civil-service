@@ -881,12 +881,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
     @Nested
     class AboutToSubmitCallback {
-
-        @BeforeEach
-        void setup() {
-            given(featureToggleService.isEarlyAdoptersEnabled()).willReturn(true);
-        }
-
         @Test
         void shouldFinishBusinessProcess() {
             List<String> items = List.of("label 1", "label 2", "label 3");
@@ -1017,7 +1011,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation()))
             .thenReturn(isLocationWhiteListed);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
         when(featureToggleService.isLocationWhiteListedForCaseProgression(eq(options.getValue().getCode()))).thenReturn(
             isLocationWhiteListed);
 
