@@ -165,7 +165,7 @@ class TaskListServiceTest {
 
         when(taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotIn(
             "123", "Claimant",
-            List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue())
+            List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(), TaskStatus.NOT_AVAILABLE_YET.getPlaceValue())
         ))
             .thenReturn(tasks);
 
@@ -175,10 +175,10 @@ class TaskListServiceTest {
         //then
         verify(taskListRepository).findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotIn(
             "123", "Claimant",
-            List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue())
+            List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(), TaskStatus.NOT_AVAILABLE_YET.getPlaceValue())
         );
 
-        verify(taskListRepository, atLeast(5)).save(ArgumentMatchers.argThat(
+        verify(taskListRepository, atLeast(4)).save(ArgumentMatchers.argThat(
             a -> {
                 Assertions.assertEquals(
                     a.getCurrentStatus(),
