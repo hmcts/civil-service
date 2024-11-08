@@ -20,12 +20,16 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
+import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -134,30 +138,46 @@ public class StitchingCompleteCallbackHandlerTest extends BaseCallbackHandlerTes
         assertThat(updatedData.getBundleError()).isEqualTo(expectedBundleError);
         if (expectedBusinessProcessEvent != null) {
             assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(expectedBusinessProcessEvent);
+            assertThat(updatedData.getApplicantDocsUploadedAfterBundle().size()).isEqualTo(1);
+            assertThat(updatedData.getRespondentDocsUploadedAfterBundle().size()).isEqualTo(1);
         } else {
             assertThat(updatedData.getBusinessProcess()).isNull();
+            assertThat(updatedData.getApplicantDocsUploadedAfterBundle().size()).isEqualTo(caseData.getApplicantDocsUploadedAfterBundle().size());
+            assertThat(updatedData.getRespondentDocsUploadedAfterBundle().size()).isEqualTo(caseData.getRespondentDocsUploadedAfterBundle().size());
         }
     }
 
     private static Stream<Arguments> provideCaseDataForTriggerUpdateBundleCategoryIdTest() {
         Bundle bundleSuccess = Bundle.builder().id("1").stitchStatus(Optional.of("SUCCESS")).build();
         Bundle bundleFailed = Bundle.builder().id("2").stitchStatus(Optional.of("FAILED")).build();
+        List<Element<UploadEvidenceDocumentType>> docsUploadedAfterBundle = Stream.generate(() ->
+                                                                                                ElementUtils.element(
+                                                                                                    UploadEvidenceDocumentType.builder().build())
+        ).limit(3).collect(Collectors.toList());
 
         return Stream.of(
             Arguments.of(
-                CaseData.builder().caseBundles(List.of(new IdValue<>("1", bundleSuccess))).build(),
+                CaseData.builder().applicantDocsUploadedAfterBundle(docsUploadedAfterBundle)
+                    .respondentDocsUploadedAfterBundle(docsUploadedAfterBundle)
+                    .caseBundles(List.of(new IdValue<>("1", bundleSuccess))).build(),
                 null,
                 null
             ),
             Arguments.of(
-                CaseData.builder().caseBundles(List.of(new IdValue<>("1", bundleFailed))).build(),
+                CaseData.builder().applicantDocsUploadedAfterBundle(docsUploadedAfterBundle)
+                    .respondentDocsUploadedAfterBundle(docsUploadedAfterBundle)
+                    .caseBundles(List.of(new IdValue<>("1", bundleFailed))).build(),
                 YesOrNo.YES,
                 null
             ),
-            Arguments.of(CaseData.builder().caseBundles(List.of(new IdValue<>("1", bundleSuccess))).bundleEvent(
-                "BUNDLE_CREATED_NOTIFICATION").build(), null, "BUNDLE_CREATION_NOTIFICATION"),
-            Arguments.of(CaseData.builder().caseBundles(List.of(new IdValue<>("1", bundleSuccess))).bundleEvent(
-                "AMEND_RESTITCH_BUNDLE").build(), null, "AMEND_RESTITCH_BUNDLE")
+            Arguments.of(CaseData.builder().applicantDocsUploadedAfterBundle(docsUploadedAfterBundle)
+                             .respondentDocsUploadedAfterBundle(docsUploadedAfterBundle)
+                             .caseBundles(List.of(new IdValue<>("1", bundleSuccess))).bundleEvent(
+                    "BUNDLE_CREATED_NOTIFICATION").build(), null, "BUNDLE_CREATION_NOTIFICATION"),
+            Arguments.of(CaseData.builder().applicantDocsUploadedAfterBundle(docsUploadedAfterBundle)
+                             .respondentDocsUploadedAfterBundle(docsUploadedAfterBundle)
+                             .caseBundles(List.of(new IdValue<>("1", bundleSuccess))).bundleEvent(
+                    "AMEND_RESTITCH_BUNDLE").build(), null, "AMEND_RESTITCH_BUNDLE")
         );
     }
 }
