@@ -237,7 +237,8 @@ class TaskListServiceTest {
 
         when(taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplate_IdNotIn(
             "123", "Claimant",
-            List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue()),
+            List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(),
+                    TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()),
             List.of(Long.valueOf(123))
         ))
             .thenReturn(tasks);
@@ -265,7 +266,8 @@ class TaskListServiceTest {
             "CategoryEn", "Claimant");
         verify(taskListRepository).findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplate_IdNotIn(
             "123", "Claimant",
-            List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue()),
+            List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(),
+                    TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()),
             List.of(Long.valueOf(123))
         );
 
