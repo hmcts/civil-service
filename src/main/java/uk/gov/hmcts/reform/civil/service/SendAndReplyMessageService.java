@@ -23,9 +23,9 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 public class SendAndReplyMessageService {
 
     private static final Map<String, String> ROLE_CATEGORY_LABEL_MAP = Map.of(
-            "ADMIN", "Court Staff",
+            "ADMIN", "Court staff",
             "JUDICIAL", "Judge",
-            "LEGAL_OPERATIONS", "Legal Advisor"
+            "LEGAL_OPERATIONS", "Legal advisor"
     );
 
     // Order is important here as we only use the first matching role when mapping against a users role assignments.

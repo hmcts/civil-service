@@ -79,7 +79,7 @@ class SendAndReplyMessageServiceTest {
         public void should_returnExpectedMessage_whenExistingMessagesAreNull() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
-            String expectedRoleCategoryLabel = "Court Staff";
+            String expectedRoleCategoryLabel = "Court staff";
             String expectedUserRoleLabel = "Hearing Centre Administrator";
             when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
@@ -101,7 +101,7 @@ class SendAndReplyMessageServiceTest {
         public void should_returnExpectedMessage_forHearingCentreAdmin() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
-            String expectedRoleCategoryLabel = "Court Staff";
+            String expectedRoleCategoryLabel = "Court staff";
             String expectedUserRoleLabel = "Hearing Centre Administrator";
             when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
@@ -130,7 +130,7 @@ class SendAndReplyMessageServiceTest {
         public void should_returnExpectedMessage_forHearingCentreTeamLeader() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
-            String expectedRoleCategoryLabel = "Court Staff";
+            String expectedRoleCategoryLabel = "Court staff";
             String expectedUserRoleLabel = "Hearing Centre Team Leader";
             when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
@@ -161,7 +161,7 @@ class SendAndReplyMessageServiceTest {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
             String expectedUserRoleLabel = "CTSC";
-            String expectedRoleCategoryLabel = "Court Staff";
+            String expectedRoleCategoryLabel = "Court staff";
             when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
@@ -188,7 +188,7 @@ class SendAndReplyMessageServiceTest {
         public void should_returnExpectedMessage_forCtscTeamLeader() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
-            String expectedRoleCategoryLabel = "Court Staff";
+            String expectedRoleCategoryLabel = "Court staff";
             String expectedUserRoleLabel = "CTSC Team Leader";
             when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
@@ -218,7 +218,7 @@ class SendAndReplyMessageServiceTest {
         public void should_returnExpectedMessage_forTribunalCaseworker() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
-            String expectedRoleCategoryLabel = "Legal Advisor";
+            String expectedRoleCategoryLabel = "Legal advisor";
             String expectedUserRoleLabel = "Tribunal Caseworker";
             when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
@@ -247,7 +247,7 @@ class SendAndReplyMessageServiceTest {
         public void should_returnExpectedMessage_forSeniorTribunalCaseworker() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
-            String expectedRoleCategoryLabel = "Legal Advisor";
+            String expectedRoleCategoryLabel = "Legal advisor";
             String expectedUserRoleLabel = "Senior Tribunal Caseworker";
             when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
@@ -277,7 +277,7 @@ class SendAndReplyMessageServiceTest {
         public void should_returnExpectedMessage_forNationalBusinessCentre() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
-            String expectedRoleCategoryLabel = "Court Staff";
+            String expectedRoleCategoryLabel = "Court staff";
             String expectedUserRoleLabel = "National Business Centre";
             when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
@@ -306,7 +306,7 @@ class SendAndReplyMessageServiceTest {
         public void should_returnExpectedMessage_forNationalBusinessCentreTeamLeader() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
-            String expectedRoleCategoryLabel = "Court Staff";
+            String expectedRoleCategoryLabel = "Court staff";
             String expectedUserRoleLabel = "NBC Team Leader";
             when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
