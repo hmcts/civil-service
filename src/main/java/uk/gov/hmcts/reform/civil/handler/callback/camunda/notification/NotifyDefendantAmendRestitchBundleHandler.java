@@ -22,6 +22,7 @@ import java.util.Map;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_AMEND_RESTITCH_BUNDLE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_TWO_AMEND_RESTITCH_BUNDLE;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +32,7 @@ public class NotifyDefendantAmendRestitchBundleHandler extends CallbackHandler i
     private static final String REFERENCE_TEMPLATE = "amend-restitch-bundle-defendant-notification-%s";
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_DEFENDANT_AMEND_RESTITCH_BUNDLE);
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_DEFENDANT_AMEND_RESTITCH_BUNDLE, NOTIFY_DEFENDANT_TWO_AMEND_RESTITCH_BUNDLE);
     private static final String DATE_FORMAT = "dd-MM-yyyy";
 
     @Override
@@ -52,10 +53,12 @@ public class NotifyDefendantAmendRestitchBundleHandler extends CallbackHandler i
     public CallbackResponse sendNotification(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
+        boolean isDefendant1 = isForRespondent1(callbackParams);
+
         notificationService.sendMail(
-            getRecipient(caseData),
+            getRecipient(caseData, isDefendant1),
             getNotificationTemplate(caseData),
-            addProperties(caseData),
+            addProperties(caseData, isDefendant1),
             String.format(REFERENCE_TEMPLATE, caseData.getCcdCaseReference())
         );
         return AboutToStartOrSubmitCallbackResponse.builder().build();
@@ -71,21 +74,30 @@ public class NotifyDefendantAmendRestitchBundleHandler extends CallbackHandler i
         }
     }
 
-    @Override
-    public Map<String, String> addProperties(CaseData caseData) {
+    public Map<String, String> addProperties(CaseData caseData, boolean isDefendant1) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            PARTY_NAME, caseData.getRespondent1().getPartyName(),
+            PARTY_NAME, isDefendant1 ? caseData.getRespondent1().getPartyName() : caseData.getRespondent2().getPartyName(),
             CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData),
             BUNDLE_RESTITCH_DATE, LocalDate.now().format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK))
         );
     }
 
-    private String getRecipient(CaseData caseData) {
+    @Override
+    public Map<String, String> addProperties(CaseData caseData) {
+        return null;
+    }
+
+    private String getRecipient(CaseData caseData, boolean isDefendant1) {
         if (caseData.isRespondent1LiP() && nonNull(caseData.getRespondent1().getPartyEmail())) {
             return caseData.getRespondent1().getPartyEmail();
         } else {
-            return caseData.getRespondentSolicitor1EmailAddress();
+            return isDefendant1 ? caseData.getRespondentSolicitor1EmailAddress() : caseData.getRespondentSolicitor2EmailAddress();
         }
+    }
+
+    private boolean isForRespondent1(CallbackParams callbackParams) {
+        return callbackParams.getRequest().getEventId()
+            .equals(NOTIFY_DEFENDANT_AMEND_RESTITCH_BUNDLE.name());
     }
 }
