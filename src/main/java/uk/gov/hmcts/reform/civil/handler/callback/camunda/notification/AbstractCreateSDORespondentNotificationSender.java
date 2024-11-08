@@ -58,20 +58,19 @@ public abstract class AbstractCreateSDORespondentNotificationSender implements N
                 : notificationsProperties.getNotifyLipUpdateTemplate();
         }
 
-        return getSdoTemplateForCaseCategory(caseData);
+        if (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM) {
+            if (caseData.isRespondentResponseBilingual()) {
+                return notificationsProperties.getSdoOrderedSpecBilingual();
+            }
+            return notificationsProperties.getSdoOrderedSpec();
+        }
+        return notificationsProperties.getSdoOrdered();
+
     }
 
     private boolean isLipCase(CaseEvent caseEvent, CaseData caseData) {
         return (CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_SDO_TRIGGERED.equals(caseEvent) && caseData.isRespondent1LiP())
             || (CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_SDO_TRIGGERED.equals(caseEvent) && caseData.isRespondent2LiP());
-    }
-
-    private String getSdoTemplateForCaseCategory(CaseData caseData) {
-        boolean isSpecClaim = caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM;
-        if (featureToggleService.isEarlyAdoptersEnabled()) {
-            return isSpecClaim ? notificationsProperties.getSdoOrderedSpecEA() : notificationsProperties.getSdoOrderedEA();
-        }
-        return isSpecClaim ? notificationsProperties.getSdoOrderedSpec() : notificationsProperties.getSdoOrdered();
     }
 
     /**

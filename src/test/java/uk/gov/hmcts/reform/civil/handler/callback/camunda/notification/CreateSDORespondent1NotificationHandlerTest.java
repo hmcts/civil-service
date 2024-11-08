@@ -73,7 +73,6 @@ class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHandlerTes
     private static final String LEGACY_REFERENCE = "create-sdo-respondent-1-notification-000DC001";
     private static final String DEFENDANT_NAME = "respondent";
     private static final String TEMPLATE_ID = "template-id";
-    private static final String TEMPLATE_ID_EA = "template-id-EA";
     private static final String ORG_NAME = "Signer Name";
 
     @Nested
@@ -99,32 +98,6 @@ class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHandlerTes
             verify(notificationService).sendMail(
                 caseData.getRespondentSolicitor1EmailAddress(),
                 TEMPLATE_ID,
-                getNotificationDataMap(),
-                LEGACY_REFERENCE
-            );
-        }
-
-        @Test
-        void shouldNotifyRespondentSolicitor_whenInvokedEA() {
-            when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-            when(notificationsProperties.getSdoOrderedEA()).thenReturn(TEMPLATE_ID_EA);
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
-
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-            CallbackParams params = CallbackParams.builder()
-                .caseData(caseData)
-                .type(ABOUT_TO_SUBMIT)
-                .request(CallbackRequest.builder()
-                             .eventId(CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_SDO_TRIGGERED.name())
-                             .build())
-                .build();
-
-            handler.handle(params);
-
-            verify(notificationService).sendMail(
-                caseData.getRespondentSolicitor1EmailAddress(),
-                TEMPLATE_ID_EA,
                 getNotificationDataMap(),
                 LEGACY_REFERENCE
             );
@@ -159,7 +132,7 @@ class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldNotifyRespondentLiP_whenInvokedEA() {
-            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID_EA);
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
@@ -178,7 +151,7 @@ class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHandlerTes
 
             verify(notificationService).sendMail(
                 caseData.getRespondent1().getPartyEmail(),
-                TEMPLATE_ID_EA,
+                TEMPLATE_ID,
                 getNotificationDataLipMap1(caseData),
                 LEGACY_REFERENCE
             );
