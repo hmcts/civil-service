@@ -162,10 +162,11 @@ class SendAndReplyMessageServiceTest {
 
             String expectedUserRoleLabel = "CTSC";
             String expectedRoleCategoryLabel = "Court Staff";
-            buildRoleAssignmentsResponse(List.of(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+                buildRoleAssignmentsResponse(List.of(
                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                 RoleAssignmentResponse.builder().roleName("ctsc").roleLabel("CTSC").roleCategory("ADMIN").build())
-            );
+            ));
 
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(element(EXISTING_MESSAGE));
