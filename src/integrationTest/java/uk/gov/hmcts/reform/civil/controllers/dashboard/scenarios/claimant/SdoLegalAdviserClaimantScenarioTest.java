@@ -42,6 +42,10 @@ public class SdoLegalAdviserClaimantScenarioTest extends CaseProgressionDashboar
         DynamicListElement selectedCourt = DynamicListElement.builder()
             .code("00002").label("court 2 - 2 address - Y02 7RB").build();
 
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
+
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
             .toBuilder()
             .responseClaimTrack("SMALL_CLAIM")
@@ -53,9 +57,7 @@ public class SdoLegalAdviserClaimantScenarioTest extends CaseProgressionDashboar
             .finalOrderDocumentCollection(List.of(ElementUtils.element(
                 CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
             .build();
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
+
         handler.handle(callbackParamsTestSDO(caseData));
 
         String requestForReconsiderationDeadlineEn = DateUtils.formatDate(LocalDate.now().plusDays(7));
