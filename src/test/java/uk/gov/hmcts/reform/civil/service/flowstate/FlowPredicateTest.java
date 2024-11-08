@@ -27,7 +27,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.acceptRepaymentPlan;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allResponsesReceived;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTime;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeNotBeingTakenOffline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeProcessedByCamunda;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesFullDefenceReceived;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesNonFullDefenceReceived;
@@ -856,13 +856,13 @@ class FlowPredicateTest {
             @Test
             void shouldReturnTrue_whenCaseDataIsAtStatePastApplicantResponseDeadline() {
                 CaseData caseData = CaseDataBuilder.builder().atStatePastApplicantResponseDeadline().build();
-                assertTrue(applicantOutOfTime.test(caseData));
+                assertTrue(applicantOutOfTimeNotBeingTakenOffline.test(caseData));
             }
 
             @Test
             void shouldReturnFalse_whenCaseDataIsAtStateApplicantRespondToDefenceAndProceed() {
                 CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
-                assertFalse(applicantOutOfTime.test(caseData));
+                assertFalse(applicantOutOfTimeNotBeingTakenOffline.test(caseData));
             }
 
             @Test
@@ -870,7 +870,7 @@ class FlowPredicateTest {
                 CaseData caseData = CaseDataBuilder.builder().atStatePastApplicantResponseDeadline()
                     .applicant1ResponseDate(LocalDateTime.now().minusDays(1))
                     .build();
-                assertFalse(applicantOutOfTime.test(caseData));
+                assertFalse(applicantOutOfTimeNotBeingTakenOffline.test(caseData));
             }
         }
 
