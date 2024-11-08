@@ -236,7 +236,9 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             .applicantRepresentativeOrganisationName(representativeService.getApplicantRepresentative(caseData).getOrganisationName())
             .claimFixedCosts(caseData.getFixedCosts() != null ? caseData.getFixedCosts().getClaimFixedCosts() : null)
             .fixedCostAmount(caseData.getFixedCosts() != null && caseData.getFixedCosts().getFixedCostAmount() != null
-                                 ? caseData.getFixedCosts().getFixedCostAmount() : null)
+                                 ? MonetaryConversions.penniesToPounds(BigDecimal.valueOf(
+                Integer.parseInt(caseData.getFixedCosts().getFixedCostAmount()))).toString()
+                                 : (BigDecimal.valueOf(0)).toString())
             .build();
     }
 
