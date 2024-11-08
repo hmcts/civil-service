@@ -8,7 +8,9 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.CaseProceedOfflineDefendantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -20,7 +22,7 @@ public class CaseProceedOfflineDefendantScenarioTest extends DashboardBaseIntegr
     private CaseProceedOfflineDefendantNotificationHandler handler;
 
     @Test
-    void should_create_case_proceed_offline__claimant_scenario() throws Exception {
+    void should_create_case_proceed_offline_defendant_scenario() throws Exception {
 
         String caseId = "72016577145";
 
@@ -64,7 +66,7 @@ public class CaseProceedOfflineDefendantScenarioTest extends DashboardBaseIntegr
     void should_create_case_proceed_offline__claimant_scenario_without_tasks() throws Exception {
 
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        String caseId = "72016577145";
+        String caseId = "72016577183";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
             .toBuilder()
@@ -95,6 +97,42 @@ public class CaseProceedOfflineDefendantScenarioTest extends DashboardBaseIntegr
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0]").doesNotExist()
+            );
+    }
+  
+   @Test
+    void shouldUpdateCaseProceedOffLineTaskList() throws Exception {
+        
+        when(featureToggleService.isCoSCEnabled()).thenReturn(true);
+        String caseId = "72016577333";
+
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
+            .toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(Long.valueOf(caseId))
+            .respondent1Represented(YesOrNo.NO)
+            .activeJudgment(JudgmentDetails.builder().build())
+            .previousCCDState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .build();
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        when(featureToggleService.isCoSCEnabled()).thenReturn(true);
+
+        handler.handle(callbackParams(caseData));
+
+        //Verify task Item is created
+        doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "DEFENDANT")
+            .andExpectAll(
+                status().is(HttpStatus.OK.value()),
+                jsonPath("$[0].reference").value(caseId.toString()),
+                jsonPath("$[0].taskNameEn").value("<a>Upload hearing documents</a>"),
+                jsonPath("$[0].currentStatusEn").value(TaskStatus.INACTIVE.getName()),
+                jsonPath("$[0].taskNameCy").value("<a>Llwytho dogfennau'r gwrandawiad</a>"),
+                jsonPath("$[0].currentStatusCy").value(TaskStatus.INACTIVE.getWelshName()),
+                jsonPath("$[1].reference").value(caseId.toString()),
+                jsonPath("$[1].taskNameEn").value("<a>Confirm you've paid a judgment (CCJ) debt</a>"),
+                jsonPath("$[1].currentStatusEn").value(TaskStatus.INACTIVE.getName()),
+                jsonPath("$[1].taskNameCy").value("<a>Cadarnhewch eich bod wedi talu dyled dyfarniad (CCJ)</a>"),
+                jsonPath("$[1].currentStatusCy").value(TaskStatus.INACTIVE.getWelshName())
             );
     }
 }
