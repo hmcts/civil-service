@@ -133,6 +133,8 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
                         featureToggleService.isLocationWhiteListedForCaseProgression(newCourtLocation.getEpimmsId())
                             ? YesOrNo.YES : YesOrNo.NO);
                 }
+            } else if (isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData)) {
+                caseDataBuilder.eaCourtLocation(YesOrNo.YES);
             } else {
                 caseDataBuilder.eaCourtLocation(YesOrNo.NO);
             }
@@ -145,6 +147,11 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private boolean isLipCaseWithProgressionEnabledAndCourtWhiteListed(CaseData caseData) {
+        return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne())
+            && featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation());
     }
 
     private boolean ifSameCourtSelected(CallbackParams callbackParams) {

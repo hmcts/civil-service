@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle;
@@ -785,6 +786,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                 caseDataBuilder.hmcEaCourtLocation(featureToggleService.isLocationWhiteListedForCaseProgression(
                     caseData.getCaseManagementLocation().getBaseLocation()) ? YES : NO);
             }
+        } else if (isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData)) {
+            caseDataBuilder.eaCourtLocation(YesOrNo.YES);
         } else {
             log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
             caseDataBuilder.eaCourtLocation(NO);
@@ -794,6 +797,11 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(state)
             .build();
+    }
+
+    private boolean isLipCaseWithProgressionEnabledAndCourtWhiteListed(CaseData caseData) {
+        return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne())
+            && featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation());
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {

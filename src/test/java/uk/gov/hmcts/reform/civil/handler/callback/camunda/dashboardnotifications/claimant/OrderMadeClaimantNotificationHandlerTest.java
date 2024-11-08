@@ -385,7 +385,7 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
 
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
+            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .responseClaimTrack("SMALL_CLAIM")
@@ -442,7 +442,7 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
 
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
+            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
                 .responseClaimTrack("SMALL_CLAIM")

@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -29,12 +31,13 @@ public abstract class AbstractCreateSDORespondentNotificationSender implements N
 
     protected abstract String getRecipientEmail(CaseData caseData);
 
-    void notifyRespondentPartySDOTriggered(CaseData caseData) {
+    void notifyRespondentPartySDOTriggered(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
         String email = getRecipientEmail(caseData);
         if (StringUtils.isNotBlank(email)) {
             notificationService.sendMail(
                 email,
-                getSDOTemplate(caseData),
+                getSDOTemplate(callbackParams),
                 addProperties(caseData),
                 getDocReference(caseData)
             );
@@ -45,16 +48,30 @@ public abstract class AbstractCreateSDORespondentNotificationSender implements N
         }
     }
 
-    private String getSDOTemplate(CaseData caseData) {
-        if (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM) {
-            if (caseData.isRespondentResponseBilingual()) {
-                return notificationsProperties.getSdoOrderedSpecBilingual();
-            }
-            return featureToggleService.isEarlyAdoptersEnabled()
-                ? notificationsProperties.getSdoOrderedSpecEA() : notificationsProperties.getSdoOrderedSpec();
+    private String getSDOTemplate(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+
+        if (isLipCase(caseEvent, caseData)) {
+            return caseData.isRespondentResponseBilingual()
+                ? notificationsProperties.getNotifyLipUpdateTemplateBilingual()
+                : notificationsProperties.getNotifyLipUpdateTemplate();
         }
-        return featureToggleService.isEarlyAdoptersEnabled()
-            ? notificationsProperties.getSdoOrderedEA() : notificationsProperties.getSdoOrdered();
+
+        return getSdoTemplateForCaseCategory(caseData);
+    }
+
+    private boolean isLipCase(CaseEvent caseEvent, CaseData caseData) {
+        return (CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_SDO_TRIGGERED.equals(caseEvent) && caseData.isRespondent1LiP())
+            || (CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_SDO_TRIGGERED.equals(caseEvent) && caseData.isRespondent2LiP());
+    }
+
+    private String getSdoTemplateForCaseCategory(CaseData caseData) {
+        boolean isSpecClaim = caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM;
+        if (featureToggleService.isEarlyAdoptersEnabled()) {
+            return isSpecClaim ? notificationsProperties.getSdoOrderedSpecEA() : notificationsProperties.getSdoOrderedEA();
+        }
+        return isSpecClaim ? notificationsProperties.getSdoOrderedSpec() : notificationsProperties.getSdoOrdered();
     }
 
     /**
