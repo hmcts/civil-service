@@ -99,10 +99,10 @@ public class CaseProceedOfflineDefendantScenarioTest extends DashboardBaseIntegr
                 jsonPath("$[0]").doesNotExist()
             );
     }
-  
-   @Test
+
+    @Test
     void shouldUpdateCaseProceedOffLineTaskList() throws Exception {
-        
+
         when(featureToggleService.isCoSCEnabled()).thenReturn(true);
         String caseId = "72016577333";
 
