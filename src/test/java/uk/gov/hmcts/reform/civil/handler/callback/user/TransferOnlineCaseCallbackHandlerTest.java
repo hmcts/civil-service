@@ -319,7 +319,10 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
             "false, NO, NO, NO",
             "true, YES, NO, YES"
         })
-        void shouldSetEaCourtLocationBasedOnConditions(boolean isLocationWhiteListed, YesOrNo applicant1Represented, YesOrNo respondent1Represented, YesOrNo expectedEaCourtLocation) {
+        void shouldSetEaCourtLocationBasedOnConditions(boolean isLocationWhiteListed,
+                                                       YesOrNo applicant1Represented,
+                                                       YesOrNo respondent1Represented,
+                                                       YesOrNo expectedEaCourtLocation) {
             DynamicListElement selectedCourt = DynamicListElement.builder()
                 .code("00002").label("court 2 - 2 address - Y02 7RB").build();
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
