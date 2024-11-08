@@ -102,7 +102,7 @@ class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldNotifyRespondentLiP_whenInvoked() {
-            when(notificationsProperties.getSdoOrdered()).thenReturn("template-id");
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id");
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
