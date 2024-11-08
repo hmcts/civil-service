@@ -26,6 +26,7 @@ java:
     ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
     ROLE_INITIALISATION_ENABLED: true
     CASE_FLAGS_LOGGING_ENABLED: true
+    DOCMOSIS_TORNADO_URL: https://docmosis.preview.platform.hmcts.net
   keyVaults:
     civil:
       resourceGroup: civil
