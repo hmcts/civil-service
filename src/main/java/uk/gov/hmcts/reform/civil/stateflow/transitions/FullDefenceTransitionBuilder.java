@@ -26,7 +26,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.agreedToMediation;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLipCase;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTime;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeNotBeingTakenOffline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceNotProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_NOT_PROCEED;
@@ -63,7 +63,7 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
             .moveTo(FULL_DEFENCE_PROCEED, transitions)
             .onlyWhen(fullDefenceProceed
                           .and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()).or(declinedMediation))
-                          .and(applicantOutOfTime.negate()).and(demageMultiClaim), transitions)
+                          .and(applicantOutOfTimeNotBeingTakenOffline.negate()).and(demageMultiClaim), transitions)
             .set((c, flags) -> {
                 flags.put(FlowFlag.IS_MULTI_TRACK.name(), true);
                 flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
@@ -74,7 +74,7 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
             .onlyWhen(fullDefenceProceed
                           .and(isCarmApplicableLipCase.negate()).and(isCarmApplicableCase.negate())
                 .and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()).or(declinedMediation))
-                          .and(applicantOutOfTime.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate()), transitions)
+                          .and(applicantOutOfTimeNotBeingTakenOffline.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate()), transitions)
             .set((c, flags) -> {
                 flags.put(FlowFlag.SDO_ENABLED.name(),
                     JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
@@ -95,7 +95,7 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
             .moveTo(FULL_DEFENCE_NOT_PROCEED, transitions).onlyWhen(fullDefenceNotProceed, transitions)
             .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaffAfterDefendantResponse, transitions)
             .moveTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA, transitions)
-            .onlyWhen(applicantOutOfTime, transitions);
+            .onlyWhen(applicantOutOfTimeNotBeingTakenOffline, transitions);
     }
 
     public static final Predicate<CaseData> lipFullDefenceProceed = FullDefenceTransitionBuilder::getPredicateForLipClaimantIntentionProceed;
