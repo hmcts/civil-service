@@ -483,6 +483,7 @@ public class GeneralApplicationDetailsBuilder {
         CaseLocationCivil caseManagementLoc = CaseLocationCivil.builder().region("1").baseLocation("22222").build();
         return caseData.toBuilder()
             .ccdCaseReference(1234L)
+            .caseAccessCategory(SPEC_CLAIM)
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
                                                .organisation(Organisation.builder()
                                                                  .organisationID(STRING_CONSTANT).build())
@@ -1778,6 +1779,7 @@ public class GeneralApplicationDetailsBuilder {
         return CaseData
                 .builder()
                 .ccdCaseReference(1L)
+                .caseAccessCategory(SPEC_CLAIM)
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant1").build())
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent1").build())
                 .addRespondent2(NO)

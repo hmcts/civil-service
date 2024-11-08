@@ -604,7 +604,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     @Test
     void shoulAddUnSpecClaimType() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataSPEC(null);
+            .getTestCaseDataSPEC(UNSPEC_CLAIM);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(getSampleCourLocationsRefObjectPostSdo());
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
