@@ -37,8 +37,9 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
         return null;
     }
 
+    @SuppressWarnings("unused")
     protected Map<String, Boolean> getScenarios(CaseData caseData) {
-        return null;
+        return new HashMap<>();
     }
 
     /**

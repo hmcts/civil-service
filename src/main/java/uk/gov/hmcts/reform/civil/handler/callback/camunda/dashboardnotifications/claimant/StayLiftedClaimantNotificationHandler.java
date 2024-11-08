@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -58,7 +59,7 @@ public class StayLiftedClaimantNotificationHandler extends CaseEventsDashboardCa
             );
         }
 
-        return null;
+        return new HashMap<>();
     }
 
     private boolean hadHearingScheduled(CaseData caseData) {
