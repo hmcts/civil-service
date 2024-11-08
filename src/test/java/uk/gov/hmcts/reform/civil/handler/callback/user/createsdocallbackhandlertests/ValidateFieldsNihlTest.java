@@ -30,5 +30,4 @@ class ValidateFieldsNihlTest {
 
         nihlFieldValidators.forEach(builder -> verify(builder, times(1)).validate(caseData, errors));
     }
-
 }

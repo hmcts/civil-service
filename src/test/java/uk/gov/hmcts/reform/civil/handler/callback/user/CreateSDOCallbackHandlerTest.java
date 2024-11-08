@@ -54,7 +54,13 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.PrePopulateSdoR2AndNihlFields;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.SetOrderDetailsFlags;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.SmallClaimsPopulator;
-import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.SubmitSDO;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.submitsdo.ClaimsTrackBasedOnJudgeSelectionFieldUpdater;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.submitsdo.CourtLocationFieldUpdater;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.submitsdo.GeneratedDocumentsFieldUpdater;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.submitsdo.HearingMethodsFieldUpdater;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.submitsdo.SdoR2SmallClaimsHearingFieldUpdater;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.submitsdo.SdoR2TrialFieldUpdater;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.submitsdo.SubmitSDO;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.fieldsnihl.AddendumReportDateNihlFieldValidator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.fieldsnihl.ApplicationToRelyDetailsDateNihlFieldValidator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.fieldsnihl.ClaimantShallUndergoDateNihlFieldValidator;
@@ -109,6 +115,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.fieldsnihl.WitnessDefendantCountNihlFieldValidator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.fieldsnihl.WrittenQuestionsDateNihlFieldValidator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.fieldsnihl.WrittenQuestionsDateToEntExpertNihlFieldValidator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.submitsdo.SubmitSdoUtils;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
@@ -315,7 +322,14 @@ import static uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions.OPEN_DATE;
     TrialWindowDateToNihlFieldValidator.class,
     ImportantNotesDateNihlFieldValidator.class,
     WitnessClaimantCountNihlFieldValidator.class,
-    WitnessDefendantCountNihlFieldValidator.class},
+    WitnessDefendantCountNihlFieldValidator.class,
+    GeneratedDocumentsFieldUpdater.class,
+    CourtLocationFieldUpdater.class,
+    HearingMethodsFieldUpdater.class,
+    SubmitSdoUtils.class,
+    SdoR2SmallClaimsHearingFieldUpdater.class,
+    SdoR2TrialFieldUpdater.class,
+    ClaimsTrackBasedOnJudgeSelectionFieldUpdater.class},
     properties = {"reference.database.enabled=false"})
 public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
