@@ -203,7 +203,7 @@ class DashboardControllerTest {
 
         //then
         assertEquals(OK, responseEntity.getStatusCode());
-        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant");
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant", null);
     }
 
     @Test
@@ -211,7 +211,7 @@ class DashboardControllerTest {
 
         //given
         doThrow(new RuntimeException()).when(taskListService)
-            .makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant");
+            .makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant", null);
 
         //then
         assertThrows(RuntimeException.class, () -> dashboardController
