@@ -309,11 +309,11 @@ class FeatureToggleServiceTest {
     void shouldReturnCorrectValueBasedOnLocationAndFeatureToggle(String location, boolean isFeatureEnabled, boolean expected) {
 
         if (isFeatureEnabled && location != null) {
-        when(featureToggleApi.isFeatureEnabledForLocation(
-            "case-progression-location-whitelist",
-            location,
-            true
-        )).thenReturn(isFeatureEnabled);
+            when(featureToggleApi.isFeatureEnabledForLocation(
+                "case-progression-location-whitelist",
+                location,
+                true
+            )).thenReturn(isFeatureEnabled);
             when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isFeatureEnabled);
         }
 
