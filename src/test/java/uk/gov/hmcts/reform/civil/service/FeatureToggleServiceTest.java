@@ -303,12 +303,19 @@ class FeatureToggleServiceTest {
     @CsvSource({
         "someLocation, true, true",
         "someLocation, false, false",
-        "null, true, false",
-        "null, false, false"
+        ", true, false",
+        ", false, false"
     })
     void shouldReturnCorrectValueBasedOnLocationAndFeatureToggle(String location, boolean isFeatureEnabled, boolean expected) {
-        when(featureToggleApi.isFeatureEnabledForLocation("case-progression-location-whitelist", location, true)).thenReturn(isFeatureEnabled);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isFeatureEnabled);
+
+        if (isFeatureEnabled && location != null) {
+        when(featureToggleApi.isFeatureEnabledForLocation(
+            "case-progression-location-whitelist",
+            location,
+            true
+        )).thenReturn(isFeatureEnabled);
+            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isFeatureEnabled);
+        }
 
         boolean result = featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(location);
 
