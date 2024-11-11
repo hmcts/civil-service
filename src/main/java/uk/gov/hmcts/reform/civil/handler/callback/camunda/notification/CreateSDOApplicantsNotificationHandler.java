@@ -23,6 +23,7 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANTS_SOLICITOR_SDO_TRIGGERED;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service
 @RequiredArgsConstructor
@@ -71,7 +72,8 @@ public class CreateSDOApplicantsNotificationHandler extends CallbackHandler impl
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantsLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                  .getOrganisation().getOrganisationID(), caseData)
         );
@@ -92,13 +94,6 @@ public class CreateSDOApplicantsNotificationHandler extends CallbackHandler impl
     }
 
     private String getNotificationTemplate(CaseData caseData) {
-
-        String unspecTemplate = featureToggleService.isEarlyAdoptersEnabled()
-            ? notificationsProperties.getSdoOrderedEA() : notificationsProperties.getSdoOrdered();
-
-        String specTemplate = featureToggleService.isEarlyAdoptersEnabled()
-            ? notificationsProperties.getSdoOrderedSpecEA() : notificationsProperties.getSdoOrderedSpec();
-
         if (caseData.isApplicantLiP()) {
             if (caseData.isClaimantBilingual()) {
                 return notificationsProperties.getNotifyLipUpdateTemplateBilingual();
@@ -107,9 +102,9 @@ public class CreateSDOApplicantsNotificationHandler extends CallbackHandler impl
             }
         } else {
             if (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM) {
-                return specTemplate;
+                return notificationsProperties.getSdoOrderedSpec();
             } else {
-                return unspecTemplate;
+                return notificationsProperties.getSdoOrdered();
             }
         }
     }

@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
-import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 
 @ExtendWith(MockitoExtension.class)
 class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -101,40 +101,6 @@ class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHandlerTes
         }
 
         @Test
-        void shouldNotifyRespondentSolicitor_whenInvokedEA() {
-            when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-            when(notificationsProperties.getSdoOrderedEA()).thenReturn("template-id-ea");
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
-
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-                .toBuilder()
-                .respondent2(Party.builder()
-                                 .type(Party.Type.COMPANY)
-                                 .companyName("Company 1")
-                                 .partyEmail("company@email.com")
-                                 .build())
-                .respondent2Represented(YesOrNo.YES)
-                .build();
-            CallbackParams params = CallbackParams.builder()
-                .caseData(caseData)
-                .type(ABOUT_TO_SUBMIT)
-                .request(CallbackRequest.builder()
-                             .eventId(CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_SDO_TRIGGERED.name())
-                             .build())
-                .build();
-
-            handler.handle(params);
-
-            verify(notificationService).sendMail(
-                "respondentsolicitor2@example.com",
-                "template-id-ea",
-                getNotificationDataMap(),
-                "create-sdo-respondent-2-notification-000DC001"
-            );
-        }
-
-        @Test
         void shouldNotifyRespondentLiP_whenInvoked() {
             when(notificationsProperties.getSdoOrdered()).thenReturn("template-id");
 
@@ -161,8 +127,9 @@ class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHandlerTes
                 "company@email.com",
                 "template-id",
                 Map.of(
-                    CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                    CLAIM_LEGAL_ORG_NAME_SPEC, "Company 2"
+                    CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
+                    CLAIM_LEGAL_ORG_NAME_SPEC, "Company 2",
+                    PARTY_REFERENCES, "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided"
                 ),
                 "create-sdo-respondent-2-notification-000DC001"
             );
@@ -171,8 +138,9 @@ class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHandlerTes
         @NotNull
         private Map<String, String> getNotificationDataMap() {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name"
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
+                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided"
             );
         }
     }
