@@ -82,6 +82,7 @@ public class StayCaseDefendantNotificationHandlerTest extends BaseCallbackHandle
         verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseData.getCcdCaseReference().toString(),
             "DEFENDANT",
+            "Applications",
             "BEARER_TOKEN"
         );
 
