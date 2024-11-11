@@ -350,6 +350,7 @@ public class InitiateGeneralApplicationService {
     public boolean respondentAssigned(CaseData caseData) {
         String caseId = caseData.getCcdCaseReference().toString();
         CaseAssignmentUserRolesResource userRoles = getUserRolesOnCase(caseId);
+        log.info("USER ROLES ON CASE : {}", userRoles);
         List<String> respondentCaseRoles = getRespondentCaseRoles(caseData);
 
         if (featureToggleService.isGaForLipsEnabled() && (caseData.isRespondent1LiP() || caseData.isRespondent2LiP()
