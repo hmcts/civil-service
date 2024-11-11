@@ -476,6 +476,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .partialPaymentAmount("3000000")
                 .build();
 
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(interestAmount);
+
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors().get(0)).isEqualTo("The amount already paid exceeds the full claim amount");
@@ -493,6 +495,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .totalInterest(interestAmount)
                 .partialPaymentAmount("3000")
                 .build();
+
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(interestAmount);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -513,6 +517,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .partialPayment(YesOrNo.YES)
                 .partialPaymentAmount(partialPaymentAmount.multiply(new BigDecimal(100)).toString())
                 .build();
+
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(interestAmount);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -535,6 +541,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .partialPaymentAmount(partialPaymentAmount.multiply(new BigDecimal(100)).toString())
                 .build();
 
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(interestAmount);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -555,6 +562,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .partialPayment(YesOrNo.YES)
                 .partialPaymentAmount(partialPaymentAmount.multiply(new BigDecimal(100)).toString())
                 .build();
+
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(interestAmount);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

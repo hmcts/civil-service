@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -193,7 +192,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(errors.isEmpty()
-                      ? caseDataBuilder.build().toMap(objectMapper) : null)
+                ? caseDataBuilder.build().toMap(objectMapper) : null)
             .build();
     }
 
@@ -245,7 +244,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         var acceptanceSpec = callbackParams.getRequest().getCaseDetails().getData().get("CPRAcceptance");
         if (Objects.isNull(acceptanceSpec) && Objects.isNull(acceptance2DefSpec)) {
             listErrors.add("To apply for default judgment, all of the statements must apply to the defendant "
-                               + "- if they do not apply, close this page and apply for default judgment when they do");
+                + "- if they do not apply, close this page and apply for default judgment when they do");
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(listErrors)
@@ -258,7 +257,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         BigDecimal claimFeeAmount = MonetaryConversions.penniesToPounds(caseData.getCalculatedClaimFeeInPence());
 
         BigDecimal totalIncludeInterestAndFee = caseData.getTotalClaimAmount()
-            .add(Optional.ofNullable(caseData.getTotalInterest()).orElse(BigDecimal.ZERO))
+            .add(interestCalculator.calculateInterest(caseData))
             .add(claimFeeAmount);
 
         List<String> errors = new ArrayList<>();

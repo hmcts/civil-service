@@ -268,4 +268,21 @@ class InterestCalculatorTest {
         assertThat(interestCalculator.getInterestPerDayBreakdown(caseData))
             .isEqualTo("31 December 2024");
     }
+
+    @Test
+    void shouldReturnCorrectAmountWhenUntilClaimSubmittedIsSelected() {
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+            .claimInterest(YesOrNo.YES)
+            .caseReference(123456789L)
+            .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
+            .sameRateInterestSelection(SameRateInterestSelection.builder()
+                .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
+            .interestClaimFrom(InterestClaimFromType.FROM_A_SPECIFIC_DATE)
+            .interestFromSpecificDate(LocalDate.of(2023, 11, 07))
+            .interestClaimUntil(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE)
+            .totalClaimAmount(BigDecimal.valueOf(999.78))
+            .build();
+        caseData = caseData.toBuilder().submittedDate(LocalDateTime.of(2024, 10, 28, 15, 59)).build();
+        assertThat(interestCalculator.calculateInterest(caseData)).isEqualTo(BigDecimal.valueOf(78.32).setScale(2, RoundingMode.UNNECESSARY));
+    }
 }
