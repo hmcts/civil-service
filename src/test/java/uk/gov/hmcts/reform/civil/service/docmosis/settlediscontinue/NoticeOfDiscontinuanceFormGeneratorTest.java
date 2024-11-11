@@ -46,7 +46,7 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
     private NoticeOfDiscontinuanceFormGenerator formGenerator;
 
     @Test
-    void shouldGenerateNoticeOfDiscontinuanceDoc_whenValidDataIsProvided() {
+    void shouldGenerateRespondent1NoticeOfDiscontinuanceDoc_whenValidDataIsProvided() {
         String fileName = String.format(
                 NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), REFERENCE_NUMBER);
 
@@ -64,7 +64,59 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
 
         CaseData caseData = getCaseData();
 
-        CaseDocument caseDoc = formGenerator.generateDocs(caseData, BEARER_TOKEN);
+        CaseDocument caseDoc = formGenerator.generateDocs(caseData, caseData.getRespondent1() ,BEARER_TOKEN);
+        assertThat(caseDoc).isNotNull();
+
+        verify(documentManagementService)
+                .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, NOTICE_OF_DISCONTINUANCE));
+    }
+
+    @Test
+    void shouldGenerateApplicant1NoticeOfDiscontinuanceDoc_whenValidDataIsProvided() {
+        String fileName = String.format(
+                NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), REFERENCE_NUMBER);
+
+        CaseDocument caseDocument = CaseDocumentBuilder.builder()
+                .documentName(fileName)
+                .documentType(NOTICE_OF_DISCONTINUANCE)
+                .build();
+
+        when(documentGeneratorService.generateDocmosisDocument(any(NoticeOfDiscontinuanceForm.class), eq(NOTICE_OF_DISCONTINUANCE_PDF)))
+                .thenReturn(new DocmosisDocument(NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), bytes));
+
+        when(documentManagementService
+                .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, NOTICE_OF_DISCONTINUANCE)))
+                .thenReturn(caseDocument);
+
+        CaseData caseData = getCaseData();
+
+        CaseDocument caseDoc = formGenerator.generateDocs(caseData, caseData.getApplicant1() ,BEARER_TOKEN);
+        assertThat(caseDoc).isNotNull();
+
+        verify(documentManagementService)
+                .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, NOTICE_OF_DISCONTINUANCE));
+    }
+
+    @Test
+    void shouldGenerateRespondent2NoticeOfDiscontinuanceDoc_whenValidDataIsProvided() {
+        String fileName = String.format(
+                NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), REFERENCE_NUMBER);
+
+        CaseDocument caseDocument = CaseDocumentBuilder.builder()
+                .documentName(fileName)
+                .documentType(NOTICE_OF_DISCONTINUANCE)
+                .build();
+
+        when(documentGeneratorService.generateDocmosisDocument(any(NoticeOfDiscontinuanceForm.class), eq(NOTICE_OF_DISCONTINUANCE_PDF)))
+                .thenReturn(new DocmosisDocument(NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), bytes));
+
+        when(documentManagementService
+                .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, NOTICE_OF_DISCONTINUANCE)))
+                .thenReturn(caseDocument);
+
+        CaseData caseData = getCaseData();
+
+        CaseDocument caseDoc = formGenerator.generateDocs(caseData, caseData.getRespondent2() ,BEARER_TOKEN);
         assertThat(caseDoc).isNotNull();
 
         verify(documentManagementService)
@@ -75,6 +127,7 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
         return CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
                 .legacyCaseReference(REFERENCE_NUMBER)
                 .respondent1(PartyBuilder.builder().individual().build().toBuilder().individualFirstName("John").individualLastName("Doe").build())
+                .respondent2(PartyBuilder.builder().individual().build().toBuilder().individualFirstName("Lily").individualLastName("Potter").build())
                 .applicant1(PartyBuilder.builder().individual().build().toBuilder().individualFirstName("James").individualLastName("White").build())
                 .applicant2(PartyBuilder.builder().individual().build().toBuilder().individualFirstName("Jan").individualLastName("Black").build())
                 .claimantWhoIsDiscontinuing(DynamicList.builder()
