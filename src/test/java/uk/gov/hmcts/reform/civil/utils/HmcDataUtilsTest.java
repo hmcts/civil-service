@@ -19,6 +19,8 @@ import uk.gov.hmcts.reform.hmc.model.hearing.HearingDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingRequestDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingResponse;
+import uk.gov.hmcts.reform.hmc.model.hearing.OrganisationDetailsModel;
+import uk.gov.hmcts.reform.hmc.model.hearing.PartyDetailsModel;
 import uk.gov.hmcts.reform.hmc.model.hearings.CaseHearing;
 import uk.gov.hmcts.reform.hmc.model.hearings.HearingsResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.HearingDay;
@@ -1346,6 +1348,27 @@ class HmcDataUtilsTest {
             assertNull(actual);
         }
 
+        @Test
+        void shouldNotThrowNpeWhenAttendeesContainsOrgNotIndividualFromListAssistMisuse() {
+            HearingGetResponse hearing = buildHearingWithOrganisation(
+                List.of(HearingIndividual.attendingHearingInPerson("Jason", "Wells"),
+                        HearingIndividual.attendingHearingByPhone("Chloe", "Landale"),
+                        HearingIndividual.attendingHearingInPerson("Michael", "Carver"),
+                        HearingIndividual.attendingHearingByVideo("Jenny", "Harper"),
+                        HearingIndividual.attendingHearingInPerson("Jack", "Crawley")
+                ),
+                PartyDetailsModel.builder().hearingSubChannel(INTER.name()).partyID("PARTYID")
+                    .organisationDetails(OrganisationDetailsModel.builder()
+                                             .cftOrganisationID("ID")
+                                             .name("Misplaced Org")
+                                             .build()).build()
+                );
+
+            String actual = HmcDataUtils.getInPersonAttendeeNames(hearing);
+
+            assertEquals("Jason Wells\nMichael Carver\nJack Crawley", actual);
+        }
+
     }
 
     @Nested
@@ -1449,6 +1472,22 @@ class HmcDataUtilsTest {
     private HearingGetResponse buildHearing(String hearingType) {
         return HearingGetResponse.builder()
             .hearingDetails(HearingDetails.builder().hearingType(hearingType).build())
+            .build();
+    }
+
+    private HearingGetResponse buildHearingWithOrganisation(List<HearingIndividual> testIndividuals,
+                                                            PartyDetailsModel org) {
+        List<PartyDetailsModel> partyDetails = new ArrayList<>(testIndividuals.stream()
+                                                                   .map(HearingIndividual::buildPartyDetails).toList());
+
+        partyDetails.add(org);
+
+        return HearingGetResponse.builder()
+            .partyDetails(partyDetails)
+            .hearingResponse(HearingResponse.builder().hearingDaySchedule(List.of(
+                HearingDaySchedule.builder()
+                    .attendees(testIndividuals.stream().map(HearingIndividual::buildAttendee).toList())
+                    .build())).build())
             .build();
     }
 

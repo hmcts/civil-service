@@ -4,7 +4,9 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -25,9 +27,9 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
     }
 
     @Override
-    void setUpTransitions() {
-        this.moveTo(CLAIM_SUBMITTED)
-            .onlyWhen(claimSubmittedOneRespondentRepresentative.or(claimSubmitted1v1RespondentOneUnregistered))
+    void setUpTransitions(List<Transition> transitions) {
+        this.moveTo(CLAIM_SUBMITTED, transitions)
+            .onlyWhen(claimSubmittedOneRespondentRepresentative.or(claimSubmitted1v1RespondentOneUnregistered), transitions)
             .set((c, flags) -> flags.putAll(
                 // Do not set UNREPRESENTED_DEFENDANT_ONE or UNREPRESENTED_DEFENDANT_TWO to false here unless
                 // camunda diagram for TAKE_CASE_OFFLINE is changed
@@ -38,11 +40,11 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
                     JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()
-                )))
-            .moveTo(CLAIM_SUBMITTED)
+                )), transitions)
+            .moveTo(CLAIM_SUBMITTED, transitions)
             .onlyWhen(claimSubmittedTwoRegisteredRespondentRepresentatives
                 .or(claimSubmittedTwoRespondentRepresentativesOneUnregistered)
-                .or(claimSubmittedBothUnregisteredSolicitors))
+                .or(claimSubmittedBothUnregisteredSolicitors), transitions)
             .set((c, flags) -> flags.putAll(
                 // Do not set UNREPRESENTED_DEFENDANT_ONE or UNREPRESENTED_DEFENDANT_TWO to false here unless
                 // camunda diagram for TAKE_CASE_OFFLINE is changed
@@ -54,10 +56,10 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
                     JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()
-                )))
+                )), transitions)
             // Only one unrepresented defendant
-            .moveTo(CLAIM_SUBMITTED)
-            .onlyWhen(claimSubmittedOneUnrepresentedDefendantOnly)
+            .moveTo(CLAIM_SUBMITTED, transitions)
+            .onlyWhen(claimSubmittedOneUnrepresentedDefendantOnly, transitions)
             .set((c, flags) -> flags.putAll(
                 Map.of(
                     FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
@@ -66,12 +68,12 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
                     JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()
-                )))
+                )), transitions)
             // Unrepresented defendant 1
-            .moveTo(CLAIM_SUBMITTED)
+            .moveTo(CLAIM_SUBMITTED, transitions)
             .onlyWhen(claimSubmittedRespondent1Unrepresented
                 .and(claimSubmittedOneUnrepresentedDefendantOnly.negate())
-                .and(claimSubmittedRespondent2Unrepresented.negate()))
+                .and(claimSubmittedRespondent2Unrepresented.negate()), transitions)
             .set((c, flags) -> flags.putAll(
                 Map.of(
                     FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
@@ -81,11 +83,11 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
                     JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()
-                )))
+                )), transitions)
             // Unrepresented defendant 2
-            .moveTo(CLAIM_SUBMITTED)
+            .moveTo(CLAIM_SUBMITTED, transitions)
             .onlyWhen(claimSubmittedRespondent2Unrepresented
-                .and(claimSubmittedRespondent1Unrepresented.negate()))
+                .and(claimSubmittedRespondent1Unrepresented.negate()), transitions)
             .set((c, flags) -> flags.putAll(
                 Map.of(
                     FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false,
@@ -95,11 +97,11 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
                     JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()
-                )))
+                )), transitions)
             // Unrepresented defendants
-            .moveTo(CLAIM_SUBMITTED)
+            .moveTo(CLAIM_SUBMITTED, transitions)
             .onlyWhen(claimSubmittedRespondent1Unrepresented.and(
-                claimSubmittedRespondent2Unrepresented))
+                claimSubmittedRespondent2Unrepresented), transitions)
             .set((c, flags) -> flags.putAll(
                 Map.of(
                     FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
@@ -109,7 +111,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
                     JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()
-                )));
+                )), transitions);
     }
 
     public static final Predicate<CaseData> claimSubmittedOneRespondentRepresentative = caseData ->
