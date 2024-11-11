@@ -61,8 +61,9 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
                     JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
             }, transitions)
             .moveTo(FULL_DEFENCE_PROCEED, transitions)
-            .onlyWhen(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
-                .or(declinedMediation).and(applicantOutOfTimeNotBeingTakenOffline.negate()).and(demageMultiClaim), transitions)
+            .onlyWhen(fullDefenceProceed
+                          .and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()).or(declinedMediation))
+                          .and(applicantOutOfTimeNotBeingTakenOffline.negate()).and(demageMultiClaim), transitions)
             .set((c, flags) -> {
                 flags.put(FlowFlag.IS_MULTI_TRACK.name(), true);
                 flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
@@ -70,9 +71,10 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
                     JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
             }, transitions)
             .moveTo(FULL_DEFENCE_PROCEED, transitions)
-            .onlyWhen(fullDefenceProceed.and(isCarmApplicableLipCase.negate()).and(isCarmApplicableCase.negate())
-                .and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
-                .or(declinedMediation).and(applicantOutOfTimeNotBeingTakenOffline.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate()), transitions)
+            .onlyWhen(fullDefenceProceed
+                          .and(isCarmApplicableLipCase.negate()).and(isCarmApplicableCase.negate())
+                .and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()).or(declinedMediation))
+                          .and(applicantOutOfTimeNotBeingTakenOffline.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate()), transitions)
             .set((c, flags) -> {
                 flags.put(FlowFlag.SDO_ENABLED.name(),
                     JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
