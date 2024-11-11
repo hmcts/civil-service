@@ -880,12 +880,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
     @Nested
     class AboutToSubmitCallback {
-
-        @BeforeEach
-        void setup() {
-            given(featureToggleService.isEarlyAdoptersEnabled()).willReturn(true);
-        }
-
         @Test
         void shouldFinishBusinessProcess() {
             List<String> items = List.of("label 1", "label 2", "label 3");
