@@ -155,4 +155,8 @@ public class FeatureToggleService {
     public boolean isCoSCEnabled() {
         return featureToggleApi.isFeatureEnabled("isCoSCEnabled");
     }
+
+    public boolean isHmcNroEnabled() {
+        return featureToggleApi.isFeatureEnabled("hmc-nro");
+    }
 }
