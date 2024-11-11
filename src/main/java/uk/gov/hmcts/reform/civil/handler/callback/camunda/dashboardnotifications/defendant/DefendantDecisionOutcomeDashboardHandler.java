@@ -21,6 +21,7 @@ public class DefendantDecisionOutcomeDashboardHandler extends CaseProgressionDas
 
     private static final List<CaseEvent> EVENTS = List.of(UPDATE_DASHBOARD_TASK_LIST_DEFENDANT_DECISION_OUTCOME);
     public static final String TASK_ID = "GenerateDashboardDefendantDecisionOutcome";
+    private static final String DEFENDANT_ROLE = "DEFENDANT";
 
     public DefendantDecisionOutcomeDashboardHandler(DashboardApiClient dashboardApiClient,
                                                     DashboardNotificationsParamsMapper mapper,
@@ -41,6 +42,21 @@ public class DefendantDecisionOutcomeDashboardHandler extends CaseProgressionDas
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
         return caseData.isRespondent1NotRepresented();
+    }
+
+    @Override
+    protected void beforeRecordScenario(CaseData caseData, String authToken) {
+        dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            DEFENDANT_ROLE,
+            authToken
+        );
+
+        dashboardApiClient.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            DEFENDANT_ROLE,
+            authToken
+        );
     }
 
     @Override
