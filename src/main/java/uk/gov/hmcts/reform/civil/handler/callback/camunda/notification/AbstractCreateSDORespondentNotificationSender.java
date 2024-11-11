@@ -60,13 +60,15 @@ public abstract class AbstractCreateSDORespondentNotificationSender implements N
                 : notificationsProperties.getNotifyLipUpdateTemplate();
         }
 
-        return caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM
-            ? (caseData.isRespondentResponseBilingual()
-            ? notificationsProperties.getSdoOrderedSpecBilingual()
-            : featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
-            ? notificationsProperties.getSdoOrderedSpecEa()
-            : notificationsProperties.getSdoOrderedSpec())
-            : notificationsProperties.getSdoOrdered();
+        if (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM) {
+            if (caseData.isRespondentResponseBilingual()) {
+                return notificationsProperties.getSdoOrderedSpecBilingual();
+            }
+
+            return featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
+                ? notificationsProperties.getSdoOrderedSpecEa() : notificationsProperties.getSdoOrderedSpec();
+        }
+        return notificationsProperties.getSdoOrdered();
 
     }
 
