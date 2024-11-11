@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.util.Map;
 
@@ -33,12 +34,13 @@ public abstract class AbstractCreateSDORespondentNotificationSender implements N
 
     void notifyRespondentPartySDOTriggered(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         String email = getRecipientEmail(caseData);
         if (StringUtils.isNotBlank(email)) {
             notificationService.sendMail(
                 email,
                 getSDOTemplate(callbackParams),
-                addProperties(caseData),
+                isLipCase(caseEvent, caseData) ? addPropertiesLip(caseData) : addProperties(caseData),
                 getDocReference(caseData)
             );
         } else {
@@ -93,6 +95,14 @@ public abstract class AbstractCreateSDORespondentNotificationSender implements N
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalName(caseData),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+        );
+    }
+
+    public Map<String, String> addPropertiesLip(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            PARTY_NAME, caseData.getRespondent1().getPartyName(),
+            CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
         );
     }
 }
