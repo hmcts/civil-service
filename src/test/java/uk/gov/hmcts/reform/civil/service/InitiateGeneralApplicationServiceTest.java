@@ -18,11 +18,14 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.DebtPaymentOptions;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
 import uk.gov.hmcts.reform.civil.model.citizenui.DebtPaymentEvidence;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
@@ -88,6 +91,7 @@ import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServic
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.URGENCY_DATE_SHOULD_NOT_BE_PROVIDED;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @SpringBootTest(classes = {
     InitiateGeneralApplicationService.class,
@@ -1308,15 +1312,46 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     @Test
-    void shouldPopulateCoScGeneralAppSubmittedDateForLipDefendant() {
+    void shouldPopulateCoScGeneralAppSubmittedForLipDefendant() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataWithEmptyCollectionOfApps(CaseData.builder().build());
+        List<Element<Document>> documentList = new ArrayList<>();
+        documentList.add(element(Document.builder()
+                                     .documentUrl("fake-url")
+                                     .documentFileName("file-name")
+                                     .documentBinaryUrl("binary-url")
+                                     .build()));
         CertOfSC certOfSC = CertOfSC.builder().defendantFinalPaymentDate(LocalDate.now())
-            .debtPaymentEvidence(DebtPaymentEvidence.builder().build()).build();
+            .debtPaymentEvidence(DebtPaymentEvidence.builder().debtPaymentOption(
+                DebtPaymentOptions.MADE_FULL_PAYMENT_TO_COURT).build()).build();
         CaseData data = caseData.toBuilder().certOfSC(certOfSC)
+            .generalAppEvidenceDocument(documentList)
             .generalAppType(GAApplicationType.builder()
             .types(singletonList(CONFIRM_CCJ_DEBT_PAID))
             .build()).build();
+        data.getGeneralAppHearingDetails().getHearingPreferredLocation().setValue(null);
+        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(getSampleCourLocationsRefObjectPostSdo());
+        when(featureToggleService.isCoSCEnabled()).thenReturn(true);
+        CaseData result = service.buildCaseData(data.toBuilder(), data, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+
+        assertThat(result.getGeneralApplications()).hasSize(1);
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
+            .isNotNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getCertOfSC()).isNotNull();
+    }
+
+    @Test
+    void shouldPopulateCoScGeneralAppDataForLipDefendant() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithEmptyCollectionOfApps(CaseData.builder().build());
+        CertOfSC certOfSC = CertOfSC.builder().defendantFinalPaymentDate(LocalDate.now())
+            .debtPaymentEvidence(DebtPaymentEvidence.builder().debtPaymentOption(
+                DebtPaymentOptions.UNABLE_TO_PROVIDE_EVIDENCE_OF_FULL_PAYMENT).build()).build();
+        CaseData data = caseData.toBuilder().certOfSC(certOfSC)
+            .generalAppType(GAApplicationType.builder()
+                                .types(singletonList(CONFIRM_CCJ_DEBT_PAID))
+                                .build()).build();
         data.getGeneralAppHearingDetails().getHearingPreferredLocation().setValue(null);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(getSampleCourLocationsRefObjectPostSdo());
         when(featureToggleService.isCoSCEnabled()).thenReturn(true);

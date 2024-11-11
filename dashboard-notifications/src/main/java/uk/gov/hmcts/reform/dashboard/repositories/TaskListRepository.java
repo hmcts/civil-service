@@ -21,4 +21,7 @@ public interface TaskListRepository extends CrudRepository<TaskListEntity, UUID>
 
     List<TaskListEntity> findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotIn(
         String reference, String role, Collection<Integer> currentStatus);
+
+    List<TaskListEntity> findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplate_IdNotIn(
+        String reference, String role, Collection<Integer> currentStatus, Collection<Long> templates);
 }
