@@ -18,8 +18,7 @@ public class CourtLocationFieldUpdater implements SdoCaseDataFieldUpdater {
 
     @Override
     public void update(CaseData caseData, CaseData.CaseDataBuilder<?, ?> dataBuilder) {
-        if (!sdoSubmittedPreCPForLiPCase(caseData)
-                && featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
+        if (!sdoSubmittedPreCPForLiPCase(caseData)) {
             log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
             dataBuilder.eaCourtLocation(YES);
 
