@@ -82,37 +82,19 @@ public class FeesRangeGroupApiConsumerTest extends BaseContractTest {
     private DslPart buildRangeGroupFeesResponseBody() {
         return newJsonArray(response -> response
             .object(feeDto -> feeDto
-                .object("applicantType", applicantType ->
+                .object("applicant_type", applicantType ->
                     applicantType
-                        .stringMatcher("creationTime",
-                                       "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
-                                       "2020-10-06T18:54:48.785000")
-                        .stringMatcher("lastUpdated",
-                                       "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
-                                       "2020-10-06T18:54:48.785000")
                         .stringType("name", "name"))
-                .object("channelType", channelTypeDto ->
+                .object("channel_type", channelTypeDto ->
                     channelTypeDto
-                        .stringMatcher("creationTime",
-                                       "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
-                                       "2020-10-06T18:54:48.785000")
-                        .stringMatcher("lastUpdated",
-                                       "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
-                                       "2020-10-06T18:54:48.785000")
                         .stringType("name", "name"))
                 .stringType("code", "code")
-                .object("currentVersion", feeVersionDto ->
+                .object("current_version", feeVersionDto ->
                     getFeeVersionDto(feeVersionDto))
-                .object("eventType", eventType -> eventType
-                    .stringMatcher("creationTime",
-                                   "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
-                                   "2020-10-06T18:54:48.785000")
-                    .stringMatcher("lastUpdated",
-                                   "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
-                                   "2020-10-06T18:54:48.785000")
+                .object("event_type", eventType -> eventType
                     .stringType("name", "name"))
-                .stringType("feeType", "FEETYPE")
-                .minArrayLike("feeVersions", 1, feeVersions -> getFeeVersionDto(feeVersions))
+                .stringType("fee_type", "FEETYPE")
+                .minArrayLike("fee_versions", 1, feeVersions -> getFeeVersionDto(feeVersions))
                 .object("jurisdiction1", jurisdiction1 ->
                     jurisdiction1
                         .stringType("name", "name"))
@@ -120,20 +102,14 @@ public class FeesRangeGroupApiConsumerTest extends BaseContractTest {
                     jurisdiction2
                         .stringType("name", "name"))
                 .stringType("keyword", "keyword")
-                .object("matchingVersion", feeVersionDto ->
+                .object("matching_version", feeVersionDto ->
                     getFeeVersionDto(feeVersionDto))
-                .numberType("maxRange", "maxRange")
-                .numberType("minRange", "minRange")
-                .stringType("rangeUnit", "rangeUnit")
-                .object("serviceType", serviceType -> serviceType
-                    .stringMatcher("creationTime",
-                                   "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
-                                   "2020-10-06T18:54:48.785000")
-                    .stringMatcher("lastUpdated",
-                                   "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
-                                   "2020-10-06T18:54:48.785000")
+                .numberType("max_range", "maxRange")
+                .numberType("min_range", "minRange")
+                .stringType("range_unit", "rangeUnit")
+                .object("service_type", serviceType -> serviceType
                     .stringType("name", "name"))
-                .booleanType("unspecifiedClaimAmount")
+                .booleanType("unspecified_claim_amount")
             )).build();
     }
 
@@ -143,24 +119,22 @@ public class FeesRangeGroupApiConsumerTest extends BaseContractTest {
             .stringType("author", "author")
             .stringType("description", "description")
             .stringType("direction", "direction")
-            .object("flatAmount", flatAmount ->
+            .object("flat_amount", flatAmount ->
                 flatAmount
                     .numberType("amount"))
-            .stringType("memoLine", "memoLine")
-            .stringType("naturalAccountCode", "naturalAccountCode")
-            .object("percentageAmount", percentageAmount -> percentageAmount
+            .stringType("memo_line", "memoLine")
+            .stringType("natural_account_code", "naturalAccountCode")
+            .object("percentage_amount", percentageAmount -> percentageAmount
                 .numberType("percentage"))
-            .stringType("siRefId", "siRefId")
+            .stringType("si_ref_id", "siRefId")
             .stringType("status", "status")
-            .stringType("statutoryInstrument", "statutoryInstrument")
-            .stringMatcher("validFrom",
-                           "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
-                           "2020-10-06T18:54:48.785000")
-            .stringMatcher("validTo",
-                           "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
-                           "2020-10-06T18:54:48.785000")
-            .numberType("version")
-            .object("volumeAmount", volumeAmount -> volumeAmount
-                .numberType("amount"));
+            .stringType("statutory_instrument", "statutoryInstrument")
+            .stringMatcher("valid_from",
+                "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{1,6}\\+\\d{2}:\\d{2})$",
+                "2015-03-09T00:00:00.000+00:00")
+            .stringMatcher("valid_to",
+                "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{1,6}\\+\\d{2}:\\d{2})$",
+                "2022-03-09T00:00:00.000+00:00")
+            .numberType("version");
     }
 }
