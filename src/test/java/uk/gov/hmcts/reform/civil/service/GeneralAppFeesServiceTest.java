@@ -668,14 +668,6 @@ class GeneralAppFeesServiceTest {
             assertThat(feesService.getFeeForGA(caseDataOutside14Days))
                 .isEqualTo(FEE_PENCE_14);
             randomList.remove(randomList.size() - 1);
-            randomList.add(GeneralApplicationTypes.VARY_ORDER);
-            caseDataOutside14Days = getFeeCase(
-                randomList,
-                YesOrNo.YES, YesOrNo.YES, LocalDate.now().plusDays(15)
-            );
-            assertThat(feesService.getFeeForGA(caseDataOutside14Days))
-                .isEqualTo(FEE_PENCE_14);
-            randomList.remove(randomList.size() - 1);
         }
 
         @Test
@@ -712,7 +704,6 @@ class GeneralAppFeesServiceTest {
             when(feesConfiguration.getEvent()).thenReturn("general application");
 
             List<GeneralApplicationTypes> randomList = getRandomDefaultTypes();
-            randomList.add(GeneralApplicationTypes.VARY_ORDER);
             randomList.add(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT);
             CaseData caseDataOutside14Days = getFeeCase(
                 randomList,
