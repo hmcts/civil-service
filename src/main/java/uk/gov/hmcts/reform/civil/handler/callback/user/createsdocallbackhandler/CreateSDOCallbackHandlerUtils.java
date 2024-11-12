@@ -52,17 +52,17 @@ public class CreateSDOCallbackHandlerUtils {
             return Optional.empty();
         }
         Optional<LocationRefData> matchingLocation = Optional.ofNullable(preferredCourt)
-            .flatMap(requestedCourt -> locationHelper.getMatching(locations, preferredCourt));
+                .flatMap(requestedCourt -> locationHelper.getMatching(locations, preferredCourt));
         logger.debug("Matching location found: {}", matchingLocation.orElse(null));
         return matchingLocation;
     }
 
     private DynamicList createDynamicList(List<LocationRefData> locations, Optional<LocationRefData> matchingLocation) {
         DynamicList dynamicList = DynamicList.fromList(locations,
-                                                       this::getLocationEpimms,
-                                                       LocationReferenceDataService::getDisplayEntry,
-                                                       matchingLocation.orElse(null),
-                                                       true);
+                this::getLocationEpimms,
+                LocationReferenceDataService::getDisplayEntry,
+                matchingLocation.orElse(null),
+                true);
         logger.debug("Dynamic list created with matching location: {}", matchingLocation.orElse(null));
         return dynamicList;
     }
@@ -71,24 +71,24 @@ public class CreateSDOCallbackHandlerUtils {
         logger.info("Getting dynamic hearing method list for caseData: {}", caseData);
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         String serviceId = caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
-            ? SPEC_SERVICE_ID : UNSPEC_SERVICE_ID;
+                ? SPEC_SERVICE_ID : UNSPEC_SERVICE_ID;
         Optional<CategorySearchResult> categorySearchResult = categoryService.findCategoryByCategoryIdAndServiceId(
-            authToken, HEARING_CHANNEL_SDO, serviceId
+                authToken, HEARING_CHANNEL_SDO, serviceId
         );
         DynamicList hearingMethodList = HearingMethodUtils.getHearingMethodList(categorySearchResult.orElse(null));
         List<DynamicListElement> hearingMethodListWithoutNotInAttendance = hearingMethodList
-            .getListItems()
-            .stream()
-            .filter(elem -> !elem.getLabel().equals(HearingMethod.NOT_IN_ATTENDANCE.getLabel()))
-            .toList();
+                .getListItems()
+                .stream()
+                .filter(elem -> !elem.getLabel().equals(HearingMethod.NOT_IN_ATTENDANCE.getLabel()))
+                .toList();
         hearingMethodList.setListItems(hearingMethodListWithoutNotInAttendance);
         logger.info("Dynamic hearing method list created with {} items", hearingMethodList.getListItems().size());
         return hearingMethodList;
     }
 
     public void setCheckList(
-        CaseData.CaseDataBuilder<?, ?> updatedData,
-        List<OrderDetailsPagesSectionsToggle> checkList
+            CaseData.CaseDataBuilder<?, ?> updatedData,
+            List<OrderDetailsPagesSectionsToggle> checkList
     ) {
         logger.info("Setting checklist for caseData: {}", updatedData.build());
         updatedData.fastTrackAltDisputeResolutionToggle(checkList);

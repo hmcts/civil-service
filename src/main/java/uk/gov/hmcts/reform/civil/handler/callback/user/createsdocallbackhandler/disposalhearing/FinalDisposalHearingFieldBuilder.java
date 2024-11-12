@@ -16,10 +16,10 @@ public class FinalDisposalHearingFieldBuilder implements SdoCaseFieldBuilder {
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
         log.info("Setting final disposal hearing");
         updatedData.disposalHearingFinalDisposalHearing(
-            DisposalHearingFinalDisposalHearing.builder()
-                .input("This claim will be listed for final disposal before a judge on the first "
-                           + "available date after")
-                .date(LocalDate.now().plusWeeks(16))
-                .build());
+                DisposalHearingFinalDisposalHearing.builder()
+                        .input("This claim will be listed for final disposal before a judge on the first "
+                                + "available date after")
+                        .date(LocalDate.now().plusWeeks(16))
+                        .build());
     }
 }
