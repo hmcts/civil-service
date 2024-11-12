@@ -595,7 +595,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData().get("showOldDJFixedCostsScreen")).isNull();
-            assertThat(response.getData().get("showDJFixedCostsScreen")).isNull();
+            assertThat(response.getData().get("showDJFixedCostsScreen")).isEqualTo("No");
             assertThat(response.getData().get("repaymentSummaryObject")).isNotNull();
         }
 
@@ -772,7 +772,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .partialPayment(YES)
                 .paymentSetDate(LocalDate.now().minusDays(15))
                 .partialPaymentAmount("100")
-                .totalClaimAmount(BigDecimal.valueOf(5001))
+                .totalClaimAmount(BigDecimal.valueOf(5002))
                 .fixedCosts(FixedCosts.builder()
                                 .claimFixedCosts(YES)
                                 .fixedCostAmount("10000")
@@ -787,21 +787,21 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             String test = "The judgment will order " + caseData.getDefendantDetailsSpec().getValue().getLabel()
-                + " to pay £5131.00, including the claim fee and"
+                + " to pay £5132.00, including the claim fee and"
                 + " interest, if applicable, as shown:\n"
                 + "### Claim amount \n"
-                + " £5001.00\n"
+                + " £5002.00\n"
                 + " ### Fixed cost amount \n"
                 + "£130.00\n"
                 + "### Claim fee amount \n"
                 + " £1.00\n"
                 + " ## Subtotal \n"
-                + " £5132.00\n"
+                + " £5133.00\n"
                 + "\n"
                 + " ### Amount already paid \n"
                 + "£1.00\n"
                 + " ## Total still owed \n"
-                + " £5131.00";
+                + " £5132.00";
             assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
         }
 

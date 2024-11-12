@@ -287,9 +287,12 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             if (YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
                 if (judgmentAmount.compareTo(BigDecimal.valueOf(25)) > 0) {
                     caseDataBuilder.showDJFixedCostsScreen(YesOrNo.YES);
+                } else {
+                    caseDataBuilder.showDJFixedCostsScreen(YesOrNo.NO);
                 }
             }
-            if (caseDataBuilder.build().getShowDJFixedCostsScreen() == null) {
+            if (caseDataBuilder.build().getShowDJFixedCostsScreen() == null
+                || YesOrNo.NO.equals(caseDataBuilder.build().getShowDJFixedCostsScreen())) {
                 // calculate repayment breakdown
                 StringBuilder repaymentBreakdown = buildRepaymentBreakdown(
                     caseData,
@@ -506,26 +509,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     private BigDecimal calculateJudgmentAmountForFixedCosts(CaseData caseData) {
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
-        BigDecimal totalInterest = caseData.getTotalInterest() != null ? caseData.getTotalInterest() : BigDecimal.ZERO;
-        var claimWithInterest = caseData.getTotalClaimAmount().add(totalInterest);
-        var claimfee = feesService.getFeeDataByTotalClaimAmount(claimWithInterest);
-        BigDecimal claimFeePounds;
-        if (caseData.getOutstandingFeeInPounds() != null) {
-            claimFeePounds = caseData.getOutstandingFeeInPounds();
-        } else {
-            claimFeePounds = MonetaryConversions.penniesToPounds(claimfee.getCalculatedAmountInPence());
-        }
-        BigDecimal fixedCost = BigDecimal.valueOf(0);
-        if (caseData.getFixedCosts() == null) {
-            fixedCost = calculateFixedCosts(caseData);
-        } else {
-            if (caseData.getFixedCosts() != null && caseData.getFixedCosts().getFixedCostAmount() != null) {
-                fixedCost = MonetaryConversions.penniesToPounds(BigDecimal.valueOf(
-                    Integer.parseInt(caseData.getFixedCosts().getFixedCostAmount())));
-            }
-        }
 
-        BigDecimal subTotal = getSubTotal(caseData, interest, claimFeePounds, fixedCost);
+        BigDecimal subTotal = caseData.getTotalClaimAmount().add(interest);
         BigDecimal partialPaymentPounds = getPartialPayment(caseData);
         return calculateOverallTotal(partialPaymentPounds, subTotal);
     }
