@@ -127,7 +127,7 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
                     .caseDetails(CaseDetails.builder().state(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString()).build()).build()).build();
 
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
+            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
             handler.handle(params);
 
@@ -155,7 +155,7 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
                     .caseDetails(CaseDetails.builder().state(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString()).build()).build()).build();
 
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
+            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
             handler.handle(params);
 
@@ -183,7 +183,7 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
                     .caseDetails(CaseDetails.builder().state(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString()).build()).build()).build();
 
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
+            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
             handler.handle(params);
 
@@ -399,7 +399,7 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
             ).build();
 
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(false);
+            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
 
             handler.handle(params);
 
@@ -413,7 +413,7 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldRecordScenarioInSdoLegalAdviser_whenInvoked() {
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
+            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .orderSDODocumentDJCollection(List.of(
@@ -532,7 +532,7 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name())
                     .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
 
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
+            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
 
             handler.handle(params);
@@ -560,7 +560,7 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name())
                     .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
 
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
+            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
 
             handler.handle(params);
@@ -589,7 +589,7 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name())
                     .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
 
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
+            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
 
             handler.handle(params);

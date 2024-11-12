@@ -137,8 +137,8 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
     }
 
     private boolean isSDODrawnPreCPRelease(CaseData caseData) {
-        return !getFeatureToggleService().
-            isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation());
+        return !getFeatureToggleService()
+            .isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation());
     }
 
     private boolean isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(CaseData caseData) {

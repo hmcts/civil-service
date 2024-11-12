@@ -122,7 +122,7 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
                     .caseDetails(CaseDetails.builder().state(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString()).build()).build()).build();
 
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
+            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
             handler.handle(params);
 
@@ -150,7 +150,7 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
                     .caseDetails(CaseDetails.builder().state(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString()).build()).build()).build();
 
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
+            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
             handler.handle(params);
 
@@ -177,7 +177,7 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name())
                     .caseDetails(CaseDetails.builder().state(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString()).build()).build()).build();
 
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
+            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
 
             handler.handle(params);
@@ -199,7 +199,7 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT.name())
                     .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
 
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
+            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
             handler.handle(params);
 
             // Then
@@ -366,7 +366,7 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name()).build()
             ).build();
 
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(false);
+            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
 
             handler.handle(params);
@@ -492,7 +492,7 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT.name())
                     .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
 
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
+            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
             handler.handle(params);
 
             // Then
@@ -519,7 +519,7 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT.name())
                     .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
 
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
+            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
             handler.handle(params);
 
