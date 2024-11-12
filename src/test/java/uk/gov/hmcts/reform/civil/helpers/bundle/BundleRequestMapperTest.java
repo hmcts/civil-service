@@ -1,10 +1,13 @@
 package uk.gov.hmcts.reform.civil.helpers.bundle;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
@@ -34,22 +37,44 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.BDDMockito.given;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class BundleRequestMapperTest {
+
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private BundleRequestMapper bundleRequestMapper;
-    @Mock
-    private FeatureToggleService featureToggleService;
+
     private static final String TEST_URL = "url";
     private static final String TEST_FILE_TYPE = "Email";
     private static final String TEST_FILE_NAME = "testFileName.pdf";
 
-    @Test
-    void testBundleRequestMapperWithAllDocs() {
+    @BeforeEach
+    void setUp() {
+        BundleRequestDocsOrganizer bundleRequestDocsOrganizer = new BundleRequestDocsOrganizer();
+        ConversionToBundleRequestDocs conversionToBundleRequestDocs = new ConversionToBundleRequestDocs(
+            featureToggleService, bundleRequestDocsOrganizer);
+        BundleDocumentsRetrieval bundleDocumentsRetrieval = new BundleDocumentsRetrieval(
+            conversionToBundleRequestDocs,
+            bundleRequestDocsOrganizer
+        );
+        bundleRequestMapper = new BundleRequestMapper(
+            bundleDocumentsRetrieval,
+            conversionToBundleRequestDocs,
+            featureToggleService,
+            bundleRequestDocsOrganizer
+            );
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void testBundleRequestMapperWithAllDocs(boolean caseProgressionCuiEnabled) {
         // Given
         //Add all type of documents and other request details in case data
         CaseData caseData = getCaseData();
+
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(caseProgressionCuiEnabled);
         given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
 
         // When
@@ -102,15 +127,19 @@ class BundleRequestMapperTest {
         assertEquals("CL 1 Directions Questionnaire 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(0).getValue().getDocumentFileName());
         assertEquals("DF 1 Directions Questionnaire 10/02/2023",
-                bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(1).getValue().getDocumentFileName());
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(1).getValue().getDocumentFileName());
+        if (featureToggleService.isCaseProgressionEnabled()) {
+            assertEquals("DF 1 Directions Questionnaire 12/03/2023",
+                         bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(2).getValue().getDocumentFileName());
+        }
         assertEquals("DF 2 Directions Questionnaire 10/02/2023",
-                bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(2).getValue().getDocumentFileName());
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(caseProgressionCuiEnabled ? 3 : 2).getValue().getDocumentFileName());
         assertEquals("DF 2 Directions Questionnaire 11/02/2023",
-                bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(3).getValue().getDocumentFileName());
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(caseProgressionCuiEnabled ? 4 : 3).getValue().getDocumentFileName());
         assertEquals("DF 2 Directions Questionnaire 10/03/2023",
-                bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(4).getValue().getDocumentFileName());
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(caseProgressionCuiEnabled ? 5 : 4).getValue().getDocumentFileName());
         assertEquals("Directions Questionnaire 10/02/2023",
-                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(5).getValue().getDocumentFileName());
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(caseProgressionCuiEnabled ? 6 : 5).getValue().getDocumentFileName());
         assertEquals("Directions Order 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getOrdersDocuments().get(0).getValue().getDocumentFileName());
         assertEquals("Order 10/02/2023",
@@ -172,11 +201,14 @@ class BundleRequestMapperTest {
 
     }
 
-    @Test
-    void testBundleRequestMapperWithAllDocsAndCaseEvenEnable() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void testBundleRequestMapperWithAllDocsAndCaseEvenEnable(boolean caseProgressionCuiEnabled) {
         // Given
         //Add all type of documents and other request details in case data
         CaseData caseData = getCaseDataNoCategoryId();
+
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(caseProgressionCuiEnabled);
         given(featureToggleService.isAmendBundleEnabled()).willReturn(true);
 
         // When
@@ -230,14 +262,18 @@ class BundleRequestMapperTest {
                      bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(0).getValue().getDocumentFileName());
         assertEquals("DF 1 Directions Questionnaire 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(1).getValue().getDocumentFileName());
+        if (featureToggleService.isCaseProgressionEnabled()) {
+            assertEquals("DF 1 Directions Questionnaire 12/03/2023",
+                         bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(2).getValue().getDocumentFileName());
+        }
         assertEquals("DF 2 Directions Questionnaire 10/02/2023",
-                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(2).getValue().getDocumentFileName());
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(caseProgressionCuiEnabled ? 3 : 2).getValue().getDocumentFileName());
         assertEquals("DF 2 Directions Questionnaire 11/02/2023",
-                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(3).getValue().getDocumentFileName());
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(caseProgressionCuiEnabled ? 4 : 3).getValue().getDocumentFileName());
         assertEquals("DF 2 Directions Questionnaire 10/03/2023",
-                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(4).getValue().getDocumentFileName());
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(caseProgressionCuiEnabled ? 5 : 4).getValue().getDocumentFileName());
         assertEquals("Directions Questionnaire 10/02/2023",
-                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(5).getValue().getDocumentFileName());
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(caseProgressionCuiEnabled ? 6 : 5).getValue().getDocumentFileName());
         assertEquals("Directions Order 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getOrdersDocuments().get(0).getValue().getDocumentFileName());
         assertEquals("Order 10/02/2023",
@@ -521,20 +557,25 @@ class BundleRequestMapperTest {
     }
 
     private List<Element<UploadEvidenceExpert>> getExpertOtherPartyQuestionDocs(String partyName) {
-        String expertName = "";
-        String otherParty = "";
-        if (partyName.equals("cl1Fname")) {
-            expertName = "expert3";
-            otherParty = "df1Fname";
-        } else if (partyName.equals("cl2Fname")) {
-            expertName = "expert4";
-            otherParty = "df2Fname";
-        } else if (partyName.equals("df1Fname")) {
-            expertName = "expert1";
-            otherParty = "cl1Fname";
-        } else {
-            expertName = "expert2";
-            otherParty = "cl2Fname";
+        String expertName;
+        String otherParty;
+        switch (partyName) {
+            case "cl1Fname" -> {
+                expertName = "expert3";
+                otherParty = "df1Fname";
+            }
+            case "cl2Fname" -> {
+                expertName = "expert4";
+                otherParty = "df2Fname";
+            }
+            case "df1Fname" -> {
+                expertName = "expert1";
+                otherParty = "cl1Fname";
+            }
+            default -> {
+                expertName = "expert2";
+                otherParty = "cl2Fname";
+            }
         }
         List<Element<UploadEvidenceExpert>> expertEvidenceDocs = new ArrayList<>();
         expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
@@ -822,12 +863,28 @@ class BundleRequestMapperTest {
                                   .documentFileName("DQ_NO_CATEGORY_ID").build())
                 .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
                                                   2, 2)).build();
+        CaseDocument caseDocumentDQApp1LiP =
+            CaseDocument.builder()
+                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .documentLink(Document.builder().documentUrl(TEST_URL).categoryID(DocCategory.DQ_APP1.getValue())
+                                  .documentFileName(TEST_FILE_NAME).build())
+                .createdDatetime(LocalDateTime.of(2023, 3, 11, 2,
+                                                  2, 2)).build();
+        CaseDocument caseDocumentDQDef1LiP =
+            CaseDocument.builder()
+                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .documentLink(Document.builder().documentUrl(TEST_URL).categoryID(DocCategory.DQ_DEF1.getValue())
+                                  .documentFileName(TEST_FILE_NAME).build())
+                .createdDatetime(LocalDateTime.of(2023, 3, 12, 2,
+                                                  2, 2)).build();
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef1));
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQApp1));
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef22));
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef21));
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef23));
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQNoId));
+        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQApp1LiP));
+        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef1LiP));
         CaseDocument caseDocumentDJ =
             CaseDocument.builder()
                 .documentType(DocumentType.DEFAULT_JUDGMENT_SDO_ORDER)
@@ -922,23 +979,5 @@ class BundleRequestMapperTest {
         // Then: hasApplicant2 and hasRespondant2 should return false
         assertEquals(false, bundleCreateRequest.getCaseDetails().getCaseData().isHasApplicant2());
         assertEquals(false, bundleCreateRequest.getCaseDetails().getCaseData().isHasRespondant2());
-    }
-
-    @Test
-    void shouldFilterEvidenceForTrial() {
-        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
-        List<Element<UploadEvidenceDocumentType>> list =
-            bundleRequestMapper.filterDocumentaryEvidenceForTrialDocs(getDocumentEvidenceForTrial(),
-                                                                      TypeOfDocDocumentaryEvidenceOfTrial.getAllDocsDisplayNames(), true);
-        assertEquals(1, list.size());
-    }
-
-    @Test
-    void shouldFilterEvidenceForTrialAndCaseEventEnable() {
-        given(featureToggleService.isAmendBundleEnabled()).willReturn(true);
-        List<Element<UploadEvidenceDocumentType>> list =
-            bundleRequestMapper.filterDocumentaryEvidenceForTrialDocs(getDocumentEvidenceForTrial(),
-                                                                      TypeOfDocDocumentaryEvidenceOfTrial.getAllDocsDisplayNames(), true);
-        assertEquals(1, list.size());
     }
 }

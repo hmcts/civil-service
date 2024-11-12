@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.DebtPaymentOptions;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -104,9 +105,9 @@ public class InitiateGeneralApplicationService {
             AWAITING_APPLICANT_INTENTION);
 
     public CaseData buildCaseData(CaseData.CaseDataBuilder dataBuilder, CaseData caseData, UserDetails userDetails,
-                                  String authToken) {
+                                  String authToken, GeneralAppFeesService feesService) {
         List<Element<GeneralApplication>> applications =
-            addApplication(buildApplication(caseData, userDetails, authToken), caseData.getGeneralApplications());
+            addApplication(buildApplication(caseData, userDetails, authToken, feesService), caseData.getGeneralApplications());
 
         return dataBuilder
             .generalApplications(applications)
@@ -128,7 +129,7 @@ public class InitiateGeneralApplicationService {
             .build();
     }
 
-    private GeneralApplication buildApplication(CaseData caseData, UserDetails userDetails, String authToken) {
+    private GeneralApplication buildApplication(CaseData caseData, UserDetails userDetails, String authToken, GeneralAppFeesService feesService) {
 
         GeneralApplication.GeneralApplicationBuilder applicationBuilder = GeneralApplication.builder();
         if (caseData.getGeneralAppEvidenceDocument() != null) {
@@ -254,8 +255,22 @@ public class InitiateGeneralApplicationService {
                 applicationBuilder.generalAppSubmittedDateGAspec(time.now());
             }
         }
+        if (featureToggleService.isCoSCEnabled()
+            && caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID)) {
+            if (Objects.nonNull(caseData.getCertOfSC().getDebtPaymentEvidence())
+                && Objects.nonNull(caseData.getCertOfSC().getDebtPaymentEvidence().getDebtPaymentOption())) {
+                DebtPaymentOptions deptPaymentOption = caseData.getCertOfSC().getDebtPaymentEvidence().getDebtPaymentOption();
+                if (DebtPaymentOptions.MADE_FULL_PAYMENT_TO_COURT.equals(deptPaymentOption)
+                    || DebtPaymentOptions.UPLOAD_EVIDENCE_DEBT_PAID_IN_FULL.equals(deptPaymentOption)) {
+                    caseData.getCertOfSC().setProofOfDebtDoc(caseData.getGeneralAppEvidenceDocument());
+                } else {
+                    caseData.getCertOfSC().setProofOfDebtDoc(java.util.Collections.emptyList());
+                }
+            }
+            applicationBuilder.certOfSC(caseData.getCertOfSC());
+        }
         applicationBuilder.caseNameGaInternal(caseData.getCaseNameHmctsInternal());
-        return helper.setRespondentDetailsIfPresent(applicationBuilder.build(), caseData, userDetails);
+        return helper.setRespondentDetailsIfPresent(applicationBuilder.build(), caseData, userDetails, feesService);
     }
 
     private List<Element<GeneralApplication>> addApplication(GeneralApplication application,

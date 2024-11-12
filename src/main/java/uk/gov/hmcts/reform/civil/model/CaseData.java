@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
 import uk.gov.hmcts.reform.civil.enums.ConfirmationToggle;
+import uk.gov.hmcts.reform.civil.enums.CoscApplicationStatus;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
@@ -45,6 +46,7 @@ import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrN
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
@@ -65,6 +67,7 @@ import uk.gov.hmcts.reform.civil.model.dq.RecurringIncomeLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationTypeLR;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
@@ -105,6 +108,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
@@ -144,6 +148,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String preStayState;
     private final String manageStayOption;
     private final GAApplicationType generalAppType;
+    private final GAApplicationTypeLR generalAppTypeLR;
     private final GARespondentOrderAgreement generalAppRespondentAgreement;
     private final GAPbaDetails generalAppPBADetails;
     private final String generalAppDetailsOfOrder;
@@ -157,6 +162,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final SRPbaDetails hearingFeePBADetails;
     private final SRPbaDetails claimIssuedPBADetails;
     private final String applicantPartyName;
+    private final CertOfSC certOfSC;
 
     private final YesOrNo generalAppVaryJudgementType;
     private final YesOrNo generalAppParentClaimantIsApplicant;
@@ -592,6 +598,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> gaAddlDocRespondentSol;
     private final List<Element<CaseDocument>> gaAddlDocRespondentSolTwo;
     private final List<Element<CaseDocument>> gaAddlDocBundle;
+    private final List<Element<CaseDocument>> gaDraftDocument;
+    private final List<Element<CaseDocument>> gaDraftDocStaff;
+    private final List<Element<CaseDocument>> gaDraftDocClaimant;
+    private final List<Element<CaseDocument>> gaDraftDocRespondentSol;
+    private final List<Element<CaseDocument>> gaDraftDocRespondentSolTwo;
 
     private final List<Element<CaseDocument>> gaRespondDoc;
 
@@ -715,6 +726,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private CaseDocument noticeOfDiscontinueAllParitiesDoc;
     @JsonUnwrapped
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
+    private LocalDate coscSchedulerDeadline;
+    private CoscApplicationStatus coSCApplicationStatus;
+
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
@@ -1175,12 +1189,19 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public Optional<Element<CaseDocument>> getSDODocument() {
-        if (getSystemGeneratedCaseDocuments() != null) {
-            return getSystemGeneratedCaseDocuments().stream()
-                .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
-                    .getDocumentType().equals(DocumentType.SDO_ORDER)).findAny();
-        }
-        return Optional.empty();
+        return Optional.ofNullable(systemGeneratedCaseDocuments)
+            .flatMap(docs -> docs.stream()
+                .filter(doc -> doc.getValue().getDocumentType().equals(DocumentType.SDO_ORDER))
+                .max(Comparator.comparing(doc -> doc.getValue().getCreatedDatetime())));
+    }
+
+    @JsonIgnore
+    public Optional<List<CaseDocument>> getDocumentListByType(List<Element<CaseDocument>> documentCollection, DocumentType documentType) {
+        List<CaseDocument> documents = documentCollection.stream()
+            .map(Element::getValue)
+            .filter(doc -> doc.getDocumentType().equals(documentType))
+            .toList();
+        return Optional.ofNullable(documents.isEmpty() ? null : documents);
     }
 
     @JsonIgnore

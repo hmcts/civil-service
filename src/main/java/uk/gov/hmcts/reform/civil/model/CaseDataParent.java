@@ -294,6 +294,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
 
     private final String respondent1EmailAddress;
     private final YesOrNo applicant1Represented;
+    private final YesOrNo anyRepresented;
 
     /**
      * Adding for LR ITP Update.
@@ -440,12 +441,6 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private final List<Element<Document>> gaRespDocRespondentSol;
     private final List<Element<Document>> gaRespDocRespondentSolTwo;
 
-    private final List<Element<CaseDocument>> gaDraftDocument;
-    private final List<Element<CaseDocument>> gaDraftDocStaff;
-    private final List<Element<CaseDocument>> gaDraftDocClaimant;
-    private final List<Element<CaseDocument>> gaDraftDocRespondentSol;
-    private final List<Element<CaseDocument>> gaDraftDocRespondentSolTwo;
-
     private final Address specRespondent2CorrespondenceAddressdetails;
     private final YesOrNo specRespondent2CorrespondenceAddressRequired;
 
@@ -485,6 +480,8 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private List<Element<MediationDocumentsReferredInStatement>> res2MediationDocumentsReferred;
 
     private SmallClaimsMediation smallClaimsMediationSectionStatement;
+
+    private FixedCosts fixedCosts;
 
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {

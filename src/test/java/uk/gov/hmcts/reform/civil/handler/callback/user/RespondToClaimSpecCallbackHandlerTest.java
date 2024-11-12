@@ -84,9 +84,10 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
@@ -155,7 +156,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     CaseDetailsConverter.class,
     LocationReferenceDataService.class,
     CourtLocationUtils.class,
-    StateFlowEngine.class,
+    SimpleStateFlowEngine.class,
+    SimpleStateFlowBuilder.class,
     AssignCategoryId.class,
     FrcDocumentsUtils.class
 })
@@ -186,7 +188,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private StateFlow mockedStateFlow;
     @MockBean
-    private StateFlowEngine stateFlowEngine;
+    private SimpleStateFlowEngine stateFlowEngine;
+
+    @MockBean
+    private SimpleStateFlowBuilder simpleStateFlowBuilder;
+
     @Mock
     private DateOfBirthValidator dateOfBirthValidator;
     @MockBean
@@ -1436,8 +1442,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         when(time.now()).thenReturn(responseDate);
         when(deadlinesCalculator.calculateApplicantResponseDeadline(
-            any(LocalDateTime.class),
-            any(AllocatedTrack.class)
+            any(LocalDateTime.class)
         )).thenReturn(deadline);
 
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -1483,8 +1488,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         when(time.now()).thenReturn(responseDate);
         when(deadlinesCalculator.calculateApplicantResponseDeadline(
-            any(LocalDateTime.class),
-            any(AllocatedTrack.class)
+            any(LocalDateTime.class)
         )).thenReturn(deadline);
 
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -1521,8 +1525,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         when(time.now()).thenReturn(responseDate);
         when(deadlinesCalculator.calculateApplicantResponseDeadline(
-            any(LocalDateTime.class),
-            any(AllocatedTrack.class)
+            any(LocalDateTime.class)
         )).thenReturn(deadline);
 
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -1597,8 +1600,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         when(time.now()).thenReturn(responseDate);
         when(deadlinesCalculator.calculateApplicantResponseDeadline(
-            any(LocalDateTime.class),
-            any(AllocatedTrack.class)
+            any(LocalDateTime.class)
         )).thenReturn(deadline);
 
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());

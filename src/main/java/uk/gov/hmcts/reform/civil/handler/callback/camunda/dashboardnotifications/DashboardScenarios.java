@@ -146,8 +146,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_DEFENDANT_RESPONSE_BILINGUAL_CLAIMANT("Scenario.AAA6.DefResponse.BilingualFlagSet.Claimant"),
     SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT("Scenario.AAA6.CaseProceedsInCaseman.Claimant"),
     SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT("Scenario.AAA6.CaseProceedsInCaseman.Defendant"),
-    SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_FAST_TRACK("Scenario.AAA6.CaseProceedsInCaseman.Claimant.FastTrack"),
-    SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK("Scenario.AAA6.CaseProceedsInCaseman.Defendant.FastTrack"),
+    SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_WITHOUT_TASK_CHANGES("Scenario.AAA6.CaseProceedsInCaseman.Claimant.FastTrack"),
+    SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_WITHOUT_TASK_CHANGES("Scenario.AAA6.CaseProceedsInCaseman.Defendant.FastTrack"),
     SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOADED_CLAIMANT("Scenario.AAA6.CP.HearingDocuments.Uploaded.Claimant"),
     SCENARIO_AAA6_CP_HEARING_DOCUMENTS_NOT_UPLOADED_CLAIMANT("Scenario.AAA6.CP.HearingDocuments.NotUploaded.Claimant"),
     SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOADED_DEFENDANT("Scenario.AAA6.CP.HearingDocuments.Uploaded.Defendant"),
@@ -196,9 +196,18 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_DISMISS_CASE_DEFENDANT("Scenario.AAA6.CP.Case.Dismissed.Defendant"),
     SCENARIO_AAA6_CP_CASE_STAYED_CLAIMANT("Scenario.AAA6.CP.Case.Stayed.Claimant"),
     SCENARIO_AAA6_CP_CASE_STAYED_DEFENDANT("Scenario.AAA6.CP.Case.Stayed.Defendant"),
+    SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_APPLICANT("Scenario.AAA6.GeneralApps.ApplicationProceedsOffline.Applicant"),
+    SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_RESPONDENT("Scenario.AAA6.GeneralApps.ApplicationProceedsOffline.Respondent"),
     SCENARIO_AAA6_UPDATE_TASK_LIST_TRIAL_READY_FINALS_ORDERS_DEFENDANT("Scenario.AAA6.Update.TaskList.TrialReady.FinalOrders.Defendant"),
     SCENARIO_AAA6_UPDATE_TASK_LIST_TRIAL_READY_FINALS_ORDERS_CLAIMANT("Scenario.AAA6.Update.TaskList.TrialReady.FinalOrders.Claimant"),
-    SCENARIO_AAA6_JUDGEMENTS_ONLINE_ISSUED_CCJ_CLAIMANT("Scenario.AAA6.JudgmentsOnline.IssuedCCJ.Claimant");
+    SCENARIO_AAA6_JUDGEMENTS_ONLINE_ISSUED_CCJ_CLAIMANT("Scenario.AAA6.JudgmentsOnline.IssuedCCJ.Claimant"),
+    SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_PROCESSED_DEFENDANT("Scenario.AAA6.ProofofDebtPayment.ApplicationProcessed.Defendant"),
+    SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_CLAIMANT("Scenario.AAA6.ProofofDebtPayment.Application.Claimant"),
+    SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_DEFENDANT("Scenario.AAA6.ProofofDebtPayment.Application.Defendant"),
+    SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT("Scenario.AAA6.CP.Stay.Lifted.Claimant"),
+    SCENARIO_AAA6_CP_STAY_LIFTED_DEFENDANT("Scenario.AAA6.CP.Stay.Lifted.Defendant"),
+    SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT("Scenario.AAA6.Update.CaseProceedsInCaseman.Defendant"),
+    SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK("Scenario.AAA6.Update.CaseProceedsInCaseman.Defendant.FastTrack");
 
     private final String scenario;
 

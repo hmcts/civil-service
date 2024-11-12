@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
@@ -8,15 +10,17 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType.DEFAULT_JUDGMENT;
@@ -24,13 +28,13 @@ import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType.DEFAUL
 @Slf4j
 public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher implements Claim {
 
-    public CcdDashboardDefendantClaimMatcher(CaseData caseData, FeatureToggleService featureToggleService) {
-        super(caseData);
-        this.featureToggleService = featureToggleService;
-    }
-
     private static final LocalTime FOUR_PM = LocalTime.of(16, 1, 0);
-    private FeatureToggleService featureToggleService;
+
+    public CcdDashboardDefendantClaimMatcher(CaseData caseData,
+                                             FeatureToggleService featureToggleService,
+                                             List<CaseEventDetail> eventHistory) {
+        super(caseData, featureToggleService, eventHistory);
+    }
 
     @Override
     public boolean hasResponsePending() {
@@ -65,7 +69,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
             return false;
         }
         return hasResponseFullAdmit()
-                && isPayImmediately();
+            && isPayImmediately();
     }
 
     @Override
@@ -198,41 +202,8 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     }
 
     @Override
-    public boolean isHearingFormGenerated() {
-        return !caseData.getHearingDocuments().isEmpty() && !isPaperResponse();
-    }
-
-    @Override
     public boolean hasSdoBeenDrawn() {
         return caseData.getSDODocument().isPresent();
-    }
-
-    @Override
-    public boolean isBeforeHearing() {
-        return isBeforeSmallClaimHearing() || (isBeforeFastTrackHearing() || noHearingScheduled());
-    }
-
-    private boolean noHearingScheduled() {
-        return caseData.getSmallClaimsHearing() == null && caseData.getFastTrackHearingTime() == null;
-    }
-
-    private boolean isBeforeSmallClaimHearing() {
-        return Optional.ofNullable(caseData.getSmallClaimsHearing())
-            .map(SmallClaimsHearing::getDateFrom)
-            .map(hearingFromDate -> hearingFromDate.isAfter(LocalDate.now()))
-            .orElse(false);
-    }
-
-    private boolean isBeforeFastTrackHearing() {
-        return Optional.ofNullable(caseData.getFastTrackHearingTime())
-            .map(FastTrackHearingTime::getDateFrom)
-            .map(hearingFromDate -> hearingFromDate.isAfter(LocalDate.now()))
-            .orElse(false);
-    }
-
-    @Override
-    public boolean isMoreDetailsRequired() {
-        return hasSdoBeenDrawn() && isBeforeHearing() && featureToggleService.isCaseProgressionEnabled();
     }
 
     @Override
@@ -300,32 +271,14 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     }
 
     @Override
-    public boolean isSDOOrderCreated() {
-        return caseData.getHearingDate() == null
-            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
-            && !isSDOOrderLegalAdviserCreated()
-            && !isSDOOrderInReview()
-            && !isSDOOrderInReviewOtherParty()
-            && !isDecisionForReconsiderationMade();
-    }
-
-    @Override
-    public boolean isSDOOrderLegalAdviserCreated() {
-        return featureToggleService.isCaseProgressionEnabled()
-            && caseData.getHearingDate() == null
-            && isSDOMadeByLegalAdviser()
-            && !isSDOOrderInReview()
-            && !isSDOOrderInReviewOtherParty()
-            && !isDecisionForReconsiderationMade();
-    }
-
-    @Override
     public boolean isSDOOrderInReview() {
         return featureToggleService.isCaseProgressionEnabled()
             && isSDOMadeByLegalAdviser()
             && nonNull(caseData.getOrderRequestedForReviewDefendant())
             && caseData.getOrderRequestedForReviewDefendant().equals(YES)
-            && !isDecisionForReconsiderationMade();
+            && !isDecisionForReconsiderationMade()
+            && !isSDODoneAfterDecisionForReconsiderationMade()
+            && !isGeneralOrderAfterDecisionForReconsiderationMade();
     }
 
     @Override
@@ -335,13 +288,17 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
             && nonNull(caseData.getOrderRequestedForReviewClaimant())
             && caseData.getOrderRequestedForReviewClaimant().equals(YES)
             && !isSDOOrderInReview()
-            && !isDecisionForReconsiderationMade();
+            && !isDecisionForReconsiderationMade()
+            && !isSDODoneAfterDecisionForReconsiderationMade()
+            && !isGeneralOrderAfterDecisionForReconsiderationMade();
     }
 
     @Override
     public boolean isDecisionForReconsiderationMade() {
         return caseData.getHearingDate() == null
-            && caseData.getDecisionOnReconsiderationDocumentFromList().isPresent();
+            && caseData.getDecisionOnReconsiderationDocumentFromList().isPresent()
+            && !isSDODoneAfterDecisionForReconsiderationMade()
+            && !isGeneralOrderAfterDecisionForReconsiderationMade();
     }
 
     @Override
@@ -449,7 +406,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isCaseDismissed() {
-        return caseData.getCcdState() == CaseState.CASE_DISMISSED;
+        return caseData.getCcdState() == CaseState.CASE_DISMISSED && isNull(caseData.getCaseDismissedHearingFeeDueDate());
     }
 
     @Override
@@ -457,4 +414,22 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         return caseData.getCcdState() == CaseState.CASE_STAYED;
     }
 
+    @Override
+    public boolean isAwaitingJudgment() {
+        return caseData.getCcdState() == CaseState.DECISION_OUTCOME;
+    }
+
+    @Override
+    public boolean trialArrangementsSubmitted() {
+        Optional<LocalDateTime> eventTime = getTimeOfMostRecentEventOfType(
+            EnumSet.of(CaseEvent.GENERATE_TRIAL_READY_FORM_RESPONDENT1));
+        Optional<LocalDateTime> orderTime = getTimeOfLastNonSDOOrder();
+        return caseData.isFastTrackClaim()
+            && caseData.getTrialReadyRespondent1() != null
+            && (CaseState.HEARING_READINESS.equals(caseData.getCcdState()) || CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.equals(caseData.getCcdState()))
+            && !isBundleCreatedStatusActive()
+            && isHearingLessThanDaysAway(DAY_LIMIT)
+            && (eventTime.isPresent())
+            && (orderTime.isEmpty() || eventTime.get().isAfter(orderTime.get()));
+    }
 }

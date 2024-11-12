@@ -375,7 +375,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
         LocalDateTime responseDate = time.now();
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
-        LocalDateTime applicant1Deadline = getApplicant1ResponseDeadline(responseDate, allocatedTrack);
+        LocalDateTime applicant1Deadline = getApplicant1ResponseDeadline(responseDate);
 
         updatedCaseDataBuilder
             .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
@@ -702,8 +702,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             && caseData.getRespondent2SameLegalRepresentative() == YES;
     }
 
-    private LocalDateTime getApplicant1ResponseDeadline(LocalDateTime responseDate, AllocatedTrack allocatedTrack) {
-        return deadlinesCalculator.calculateApplicantResponseDeadline(responseDate, allocatedTrack);
+    private LocalDateTime getApplicant1ResponseDeadline(LocalDateTime responseDate) {
+        return deadlinesCalculator.calculateApplicantResponseDeadline(responseDate);
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {

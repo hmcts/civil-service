@@ -9,13 +9,14 @@ import uk.gov.hmcts.reform.civil.model.CaseDataParent;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLiPvLRCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLipCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.nocSubmittedForLiPDefendant;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.nocSubmittedForLiPDefendantBeforeOffline;
@@ -36,11 +37,11 @@ public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
     }
 
     @Override
-    void setUpTransitions() {
-        this.moveTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyWhen(paymentSuccessful)
-            .moveTo(TAKEN_OFFLINE_BY_STAFF).onlyWhen(takenOfflineByStaffBeforeClaimIssued)
-            .moveTo(CLAIM_ISSUED_PAYMENT_FAILED).onlyWhen(paymentFailed)
-            .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyWhen(isLipCase)
+    void setUpTransitions(List<Transition> transitions) {
+        this.moveTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL, transitions).onlyWhen(paymentSuccessful, transitions)
+            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaffBeforeClaimIssued, transitions)
+            .moveTo(CLAIM_ISSUED_PAYMENT_FAILED, transitions).onlyWhen(paymentFailed, transitions)
+            .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, transitions).onlyWhen(isLipCase, transitions)
             .set((c, flags) -> {
                 if (featureToggleService.isPinInPostEnabled()) {
                     flags.put(FlowFlag.PIP_ENABLED.name(), true);
@@ -53,26 +54,27 @@ public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
                 }
                 flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
                 flags.put(FlowFlag.LIP_CASE.name(), true);
-            })
-            .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyWhen(nocSubmittedForLiPApplicant)
+            }, transitions)
+            .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, transitions).onlyWhen(nocSubmittedForLiPApplicant, transitions)
             .set(flags -> flags.putAll(
                 Map.of(
                     FlowFlag.LIP_CASE.name(), false,
                     FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true
-                )))
-            .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyWhen(isLiPvLRCase.and(not(nocSubmittedForLiPDefendant))
-                .and(not(nocSubmittedForLiPDefendantBeforeOffline)))
+                )), transitions)
+            .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, transitions)
+            .onlyWhen(isLiPvLRCase.and(not(nocSubmittedForLiPDefendant))
+                .and(not(nocSubmittedForLiPDefendantBeforeOffline)), transitions)
             .set(flags -> flags.putAll(
                 Map.of(
                     FlowFlag.LIP_CASE.name(), true,
                     FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
-                )))
-            .moveTo(SPEC_DEFENDANT_NOC).onlyWhen(nocSubmittedForLiPDefendantBeforeOffline)
+                )), transitions)
+            .moveTo(SPEC_DEFENDANT_NOC, transitions).onlyWhen(nocSubmittedForLiPDefendantBeforeOffline, transitions)
             .set(flags -> flags.putAll(
                 Map.of(
                     FlowFlag.LIP_CASE.name(), true,
                     FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
-                )));
+                )), transitions);
     }
 
     public static final Predicate<CaseData> paymentFailed = caseData ->
@@ -84,7 +86,8 @@ public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
 
     public static final Predicate<CaseData> claimIssueHwF = CaseData::isHelpWithFees;
 
-    public static final Predicate<CaseData> takenOfflineByStaffBeforeClaimIssued = ClaimSubmittedTransitionBuilder::getPredicateTakenOfflineByStaffBeforeClaimIssue;
+    public static final Predicate<CaseData> takenOfflineByStaffBeforeClaimIssued =
+        ClaimSubmittedTransitionBuilder::getPredicateTakenOfflineByStaffBeforeClaimIssue;
 
     public static boolean getPredicateTakenOfflineByStaffBeforeClaimIssue(CaseData caseData) {
         // In case of SPEC and UNSPEC claim ClaimNotificationDeadline will be set when the case is issued
