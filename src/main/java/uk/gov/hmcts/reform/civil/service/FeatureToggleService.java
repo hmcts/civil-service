@@ -82,10 +82,6 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("cui-case-progression");
     }
 
-    public boolean isEarlyAdoptersEnabled() {
-        return featureToggleApi.isFeatureEnabled("early-adopters");
-    }
-
     public boolean isSdoR2Enabled() {
         return featureToggleApi.isFeatureEnabled("isSdoR2Enabled");
     }
@@ -158,5 +154,9 @@ public class FeatureToggleService {
 
     public boolean isCoSCEnabled() {
         return featureToggleApi.isFeatureEnabled("isCoSCEnabled");
+    }
+
+    public boolean isHmcNroEnabled() {
+        return featureToggleApi.isFeatureEnabled("hmc-nro");
     }
 }

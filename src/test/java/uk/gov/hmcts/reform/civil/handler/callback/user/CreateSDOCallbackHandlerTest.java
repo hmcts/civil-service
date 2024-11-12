@@ -904,8 +904,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(time.now()).willReturn(submittedDate);
 
             given(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).willReturn(true);
-
-            given(featureToggleService.isEarlyAdoptersEnabled()).willReturn(true);
         }
 
         @Test
@@ -993,7 +991,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
         when(featureToggleService.isLocationWhiteListedForCaseProgression(selectedCourt.getCode())).thenReturn(
             isLocationWhiteListed);
         when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())).thenReturn(
@@ -1040,7 +1037,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
         when(featureToggleService.isLocationWhiteListedForCaseProgression(selectedCourt.getCode()))
             .thenReturn(isLocationWhiteListed);
         when(locationRefDataService.getLocationMatchingLabel(selectedCourt.getCode(), params.getParams().get(
@@ -1083,7 +1079,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .drawDirectionsOrderRequired(NO)
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
         when(featureToggleService.isLocationWhiteListedForCaseProgression(selectedCourt.getCode()))
             .thenReturn(isLocationWhiteListed);
         when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation()))
@@ -1129,7 +1124,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .drawDirectionsOrderRequired(NO)
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
         when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation()))
             .thenReturn(isLocationWhiteListed);
         when(featureToggleService.isLocationWhiteListedForCaseProgression((selectedCourt.getCode()))).thenReturn(
@@ -1175,7 +1169,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .sdoR2Trial(SdoR2Trial.builder().hearingCourtLocationList(localOptions.toBuilder().value(selectedCourt).build()).build())
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())).thenReturn(
             isLocationWhiteListed);
@@ -1222,7 +1215,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .sdoR2Trial(SdoR2Trial.builder().altHearingCourtLocationList(localOptions.toBuilder().value(selectedCourt).build()).build())
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         when(featureToggleService.isLocationWhiteListedForCaseProgression(selectedCourt.getCode()))
             .thenReturn(isLocationWhiteListed);
@@ -1269,7 +1261,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 selectedCourt).build()).build())
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())).thenReturn(
             isLocationWhiteListed);
@@ -1315,7 +1306,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .drawDirectionsOrderRequired(NO)
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())).thenReturn(
             isLocationWhiteListed);
@@ -1363,7 +1353,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 selectedCourt).build()).build())
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         when(featureToggleService.isLocationWhiteListedForCaseProgression((selectedCourt.getCode()))).thenReturn(
             isLocationWhiteListed);
@@ -1678,7 +1667,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     void whenClaimUnspecAndJudgeSelects_changeTrackOrMaintainAllocatedTrack(CaseData caseData, AllocatedTrack expectedAllocatedTrack) {
         // When judge selects a different track to which the claim is currently on, update allocatedTrack to match selection
         // or maintain allocatedTrack if selection already corresponds with selection made.
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -1767,7 +1755,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     void whenClaimSpecAndJudgeSelects_changeTrackOrMaintainClaimResponseTrack(CaseData caseData, String expectedClaimResponseTrack) {
         // When judge selects a different track to which the claim is currently on, update ClaimResponseTrack to match selection
         // or maintain ClaimResponseTrack if selection already corresponds with selection made.
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
