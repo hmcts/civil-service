@@ -775,17 +775,15 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         var state = "CASE_PROGRESSION";
         caseDataBuilder.hearingNotes(getHearingNotes(caseData));
 
-        if (featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
+        boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
+        boolean isNationalRollout = featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation());
+        boolean isHmcEnabled = featureToggleService.isHmcEnabled();
+        boolean isLocationWhiteListed = featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation());
+
+        if (isNationalRollout && !isLipCase) {
             log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
             caseDataBuilder.eaCourtLocation(YES);
-
-            if (featureToggleService.isHmcEnabled()
-                && !caseData.isApplicantLiP()
-                && !caseData.isRespondent1LiP()
-                && !caseData.isRespondent2LiP()) {
-                caseDataBuilder.hmcEaCourtLocation(featureToggleService.isLocationWhiteListedForCaseProgression(
-                    caseData.getCaseManagementLocation().getBaseLocation()) ? YES : NO);
-            }
+            caseDataBuilder.hmcEaCourtLocation(isHmcEnabled && !isLipCase && isLocationWhiteListed ? YES : NO);
         } else if (isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData)) {
             caseDataBuilder.eaCourtLocation(YesOrNo.YES);
         } else {

@@ -110,7 +110,7 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
             }
 
         }
-        if (isSDODrawnPreCPRelease()) {
+        if (isSDODrawnPreCPRelease(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_SDO_DRAWN_PRE_CASE_PROGRESSION.getScenario();
         }
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
@@ -136,8 +136,9 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
         return caseData.isApplicant1NotRepresented();
     }
 
-    private boolean isSDODrawnPreCPRelease() {
-        return !getFeatureToggleService().isCaseProgressionEnabled();
+    private boolean isSDODrawnPreCPRelease(CaseData caseData) {
+        return !getFeatureToggleService().
+            isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation());
     }
 
     private boolean isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(CaseData caseData) {
