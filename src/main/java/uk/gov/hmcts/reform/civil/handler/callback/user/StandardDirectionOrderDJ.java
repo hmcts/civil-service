@@ -772,15 +772,13 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                       document -> document.getValue().getDocumentLink(), "caseManagementOrders");
         caseDataBuilder.businessProcess(BusinessProcess.ready(STANDARD_DIRECTION_ORDER_DJ));
 
-        var state = "CASE_PROGRESSION";
         caseDataBuilder.hearingNotes(getHearingNotes(caseData));
 
         boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
-        boolean isNationalRollout = featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation());
         boolean isHmcEnabled = featureToggleService.isHmcEnabled();
         boolean isLocationWhiteListed = featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation());
 
-        if (isNationalRollout && !isLipCase) {
+        if (!isLipCase) {
             log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
             caseDataBuilder.eaCourtLocation(YES);
             caseDataBuilder.hmcEaCourtLocation(isHmcEnabled && !isLipCase && isLocationWhiteListed ? YES : NO);
@@ -791,6 +789,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             caseDataBuilder.eaCourtLocation(NO);
         }
 
+        var state = "CASE_PROGRESSION";
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(state)
