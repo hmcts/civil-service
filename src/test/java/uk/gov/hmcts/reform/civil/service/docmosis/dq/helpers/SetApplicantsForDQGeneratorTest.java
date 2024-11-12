@@ -89,8 +89,8 @@ class SetApplicantsForDQGeneratorTest {
 
         DirectionsQuestionnaireForm form = builder.build();
 
-        assertEquals(form.getApplicant().getPrimaryAddress(),addr1);
-        assertEquals(form.getApplicant2().getPrimaryAddress(),addr2);
+        assertEquals(form.getApplicant().getPrimaryAddress(), addr1);
+        assertEquals(form.getApplicant2().getPrimaryAddress(), addr2);
         verify(representativeService, times(2)).getApplicantRepresentative(caseData);
     }
 }
