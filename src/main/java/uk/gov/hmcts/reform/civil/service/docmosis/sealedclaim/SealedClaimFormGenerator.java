@@ -84,6 +84,8 @@ public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<S
                                               .map(SolicitorReferences::getRespondentSolicitor1Reference)
                                               .orElse(""))
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
+            .applicantRepresentativeOrganisationName(representativeService.getApplicantRepresentative(caseData)
+                                                         .getOrganisationName())
             .courtFee(caseData.getClaimFee().formData());
 
         if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
