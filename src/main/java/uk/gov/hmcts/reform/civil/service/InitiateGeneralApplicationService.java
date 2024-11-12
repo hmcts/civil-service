@@ -128,6 +128,7 @@ public class InitiateGeneralApplicationService {
             .generalAppHearingDetails(GAHearingDetails.builder().build())
             .generalAppEvidenceDocument(java.util.Collections.emptyList())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().build())
+            .gaWaTrackLabel(null)
             .build();
     }
 
