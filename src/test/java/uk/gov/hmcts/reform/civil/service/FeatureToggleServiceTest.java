@@ -285,4 +285,13 @@ class FeatureToggleServiceTest {
 
         assertThat(featureToggleService.isCoSCEnabled()).isEqualTo(toggleStat);
     }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsHmcNroCEnabled(Boolean toggleStat) {
+        var isCoSCEnabledKey = "hmc-nro";
+        givenToggle(isCoSCEnabledKey, toggleStat);
+
+        assertThat(featureToggleService.isHmcNroEnabled()).isEqualTo(toggleStat);
+    }
 }
