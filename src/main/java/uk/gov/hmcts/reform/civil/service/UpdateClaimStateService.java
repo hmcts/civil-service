@@ -24,12 +24,11 @@ public class UpdateClaimStateService {
 
     public String setUpCaseState(CaseData updatedData) {
         if (shouldMoveToInMediationState(updatedData,
-                                         featureToggleService.isCarmEnabledForCase(updatedData))) {
+                                         featureToggleService.isCarmEnabledForCase(updatedData))
+            || (updatedData.hasDefendantAgreedToFreeMediation() && updatedData.hasClaimantAgreedToFreeMediation())) {
             return CaseState.IN_MEDIATION.name();
         } else if (isJudicialReferralAllowed(updatedData)) {
             return CaseState.JUDICIAL_REFERRAL.name();
-        } else if (updatedData.hasDefendantAgreedToFreeMediation() && updatedData.hasClaimantAgreedToFreeMediation()) {
-            return CaseState.IN_MEDIATION.name();
         } else if (isCaseSettledAllowed(updatedData)) {
             return CaseState.CASE_SETTLED.name();
         } else if (updatedData.hasApplicantNotProceededWithClaim()) {
