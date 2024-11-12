@@ -86,6 +86,7 @@ public class UpdateVisibilityNoticeOfDiscontinuanceHandler extends CallbackHandl
             .respondent1NoticeOfDiscontinueCWViewDoc(null)
             .respondent2NoticeOfDiscontinueCWViewDoc(null);
     }
+
     private void assignCategoryIdForAllParties(CaseData caseData) {
         assignCategoryId.assignCategoryIdToCaseDocument(caseData.getApplicant1NoticeOfDiscontinueAllPartyViewDoc(), DocCategory.NOTICE_OF_DISCONTINUE.getValue());
         assignCategoryId.assignCategoryIdToCaseDocument(caseData.getRespondent1NoticeOfDiscontinueAllPartyViewDoc(), DocCategory.NOTICE_OF_DISCONTINUE.getValue());

@@ -64,7 +64,7 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
 
         CaseData caseData = getCaseData();
 
-        CaseDocument caseDoc = formGenerator.generateDocs(caseData, caseData.getRespondent1() ,BEARER_TOKEN);
+        CaseDocument caseDoc = formGenerator.generateDocs(caseData, caseData.getRespondent1(), BEARER_TOKEN);
         assertThat(caseDoc).isNotNull();
 
         verify(documentManagementService)
@@ -90,7 +90,7 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
 
         CaseData caseData = getCaseData();
 
-        CaseDocument caseDoc = formGenerator.generateDocs(caseData, caseData.getApplicant1() ,BEARER_TOKEN);
+        CaseDocument caseDoc = formGenerator.generateDocs(caseData, caseData.getApplicant1(), BEARER_TOKEN);
         assertThat(caseDoc).isNotNull();
 
         verify(documentManagementService)
@@ -116,7 +116,7 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
 
         CaseData caseData = getCaseData();
 
-        CaseDocument caseDoc = formGenerator.generateDocs(caseData, caseData.getRespondent2() ,BEARER_TOKEN);
+        CaseDocument caseDoc = formGenerator.generateDocs(caseData, caseData.getRespondent2(), BEARER_TOKEN);
         assertThat(caseDoc).isNotNull();
 
         verify(documentManagementService)
