@@ -49,8 +49,8 @@ public class SetOrderDetailsFlags implements CaseTask {
         updateFlagsBasedOnTrack(caseData, updatedData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedData.build().toMap(objectMapper))
-                .build();
+            .data(updatedData.build().toMap(objectMapper))
+            .build();
     }
 
     private void resetFlags(CaseData.CaseDataBuilder<?, ?> updatedData) {
@@ -79,29 +79,29 @@ public class SetOrderDetailsFlags implements CaseTask {
 
     private void updateDeductionValue(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
         Optional.ofNullable(caseData.getDrawDirectionsOrder())
-                .map(JudgementSum::getJudgementSum)
-                .map(d -> d + "%")
-                .ifPresent(deductionPercentage -> {
-                    log.debug("Updating DisposalHearingJudgementDeductionValue with value: {}", deductionPercentage);
-                    DisposalHearingJudgementDeductionValue tempDisposalHearingJudgementDeductionValue =
-                            DisposalHearingJudgementDeductionValue.builder()
-                                    .value(deductionPercentage)
-                                    .build();
-                    updatedData.disposalHearingJudgementDeductionValue(tempDisposalHearingJudgementDeductionValue);
+            .map(JudgementSum::getJudgementSum)
+            .map(d -> d + "%")
+            .ifPresent(deductionPercentage -> {
+                log.debug("Updating DisposalHearingJudgementDeductionValue with value: {}", deductionPercentage);
+                DisposalHearingJudgementDeductionValue tempDisposalHearingJudgementDeductionValue =
+                    DisposalHearingJudgementDeductionValue.builder()
+                        .value(deductionPercentage)
+                        .build();
+                updatedData.disposalHearingJudgementDeductionValue(tempDisposalHearingJudgementDeductionValue);
 
-                    log.debug("Updating FastTrackJudgementDeductionValue with value: {}", deductionPercentage);
-                    FastTrackJudgementDeductionValue tempFastTrackJudgementDeductionValue =
-                            FastTrackJudgementDeductionValue.builder()
-                                    .value(deductionPercentage)
-                                    .build();
-                    updatedData.fastTrackJudgementDeductionValue(tempFastTrackJudgementDeductionValue).build();
+                log.debug("Updating FastTrackJudgementDeductionValue with value: {}", deductionPercentage);
+                FastTrackJudgementDeductionValue tempFastTrackJudgementDeductionValue =
+                    FastTrackJudgementDeductionValue.builder()
+                        .value(deductionPercentage)
+                        .build();
+                updatedData.fastTrackJudgementDeductionValue(tempFastTrackJudgementDeductionValue).build();
 
-                    log.debug("Updating SmallClaimsJudgementDeductionValue with value: {}", deductionPercentage);
-                    SmallClaimsJudgementDeductionValue tempSmallClaimsJudgementDeductionValue =
-                            SmallClaimsJudgementDeductionValue.builder()
-                                    .value(deductionPercentage)
-                                    .build();
-                    updatedData.smallClaimsJudgementDeductionValue(tempSmallClaimsJudgementDeductionValue).build();
-                });
+                log.debug("Updating SmallClaimsJudgementDeductionValue with value: {}", deductionPercentage);
+                SmallClaimsJudgementDeductionValue tempSmallClaimsJudgementDeductionValue =
+                    SmallClaimsJudgementDeductionValue.builder()
+                        .value(deductionPercentage)
+                        .build();
+                updatedData.smallClaimsJudgementDeductionValue(tempSmallClaimsJudgementDeductionValue).build();
+            });
     }
 }

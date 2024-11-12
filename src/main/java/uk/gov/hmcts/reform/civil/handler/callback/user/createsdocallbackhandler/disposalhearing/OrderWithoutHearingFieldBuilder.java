@@ -23,16 +23,16 @@ public class OrderWithoutHearingFieldBuilder implements SdoCaseFieldBuilder {
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
         log.info("Setting order without hearing");
         updatedData.disposalOrderWithoutHearing(DisposalOrderWithoutHearing.builder()
-                .input(String.format(
-                        "This order has been made without hearing. Each party has the right "
-                                + "to apply to have this Order set aside or varied. Any such application must be "
-                                + "received by the Court (together with the appropriate fee) by 4pm on %s.",
-                        deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
-                                .format(DateTimeFormatter.ofPattern(
-                                        "dd MMMM yyyy",
-                                        Locale.ENGLISH
-                                ))
-                ))
-                .build());
+                                                    .input(String.format(
+                                                        "This order has been made without hearing. Each party has the right "
+                                                            + "to apply to have this Order set aside or varied. Any such application must be "
+                                                            + "received by the Court (together with the appropriate fee) by 4pm on %s.",
+                                                        deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
+                                                            .format(DateTimeFormatter.ofPattern(
+                                                                "dd MMMM yyyy",
+                                                                Locale.ENGLISH
+                                                            ))
+                                                    ))
+                                                    .build());
     }
 }

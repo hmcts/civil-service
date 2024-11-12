@@ -21,13 +21,13 @@ public class MedicalEvidenceFieldBuilder implements SdoCaseFieldBuilder {
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
         log.info("Setting medical evidence");
         updatedData.disposalHearingMedicalEvidence(DisposalHearingMedicalEvidence.builder()
-                .input(
-                        "The claimant has permission to rely upon the written expert evidence already "
-                                + "uploaded to the Digital Portal with the particulars of claim and in addition has "
-                                + "permission to rely upon any associated correspondence or updating report which "
-                                + "is uploaded to the Digital Portal by 4pm on")
-                .date(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(
-                        4)))
-                .build());
+                                                       .input(
+                                                           "The claimant has permission to rely upon the written expert evidence already "
+                                                               + "uploaded to the Digital Portal with the particulars of claim and in addition has "
+                                                               + "permission to rely upon any associated correspondence or updating report which "
+                                                               + "is uploaded to the Digital Portal by 4pm on")
+                                                       .date(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(
+                                                           4)))
+                                                       .build());
     }
 }
