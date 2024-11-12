@@ -167,18 +167,17 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             .claimFee(MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
                 .toString())
             // Claim amount + interest + claim fees
-            .totalAmountOfClaim(interest != null ? caseData.getTotalClaimAmount()
-                .add(interest)
-                .add(MonetaryConversions.penniesToPounds(caseData.getClaimFee()
-                    .getCalculatedAmountInPence())).toString()
-                : caseData.getTotalClaimAmount()
-                .add(MonetaryConversions.penniesToPounds(caseData.getClaimFee()
-                    .getCalculatedAmountInPence())).toString())
+            .totalAmountOfClaim(getTotalAmountOfClaim(caseData, interest))
             .statementOfTruth(caseData.getApplicantSolicitor1ClaimStatementOfTruth())
             .descriptionOfClaim(caseData.getDetailsOfClaim())
             .applicantRepresentativeOrganisationName(representativeService.getApplicantRepresentative(caseData)
                 .getOrganisationName())
             .defendantResponseDeadlineDate(getResponseDeadline(caseData))
+            .claimFixedCosts(caseData.getFixedCosts() != null ? caseData.getFixedCosts().getClaimFixedCosts() : null)
+            .fixedCostAmount(caseData.getFixedCosts() != null && caseData.getFixedCosts().getFixedCostAmount() != null
+                                 ? MonetaryConversions.penniesToPounds(BigDecimal.valueOf(
+                                     Integer.parseInt(caseData.getFixedCosts().getFixedCostAmount()))).toString()
+                                 : (BigDecimal.valueOf(0)).toString())
             .build();
     }
 
@@ -188,6 +187,26 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
         }
         return caseData.getInterestClaimFrom().equals(InterestClaimFromType.FROM_A_SPECIFIC_DATE)
             ? caseData.getInterestFromSpecificDate() : caseData.getSubmittedDate().toLocalDate();
+    }
+
+    private String getTotalAmountOfClaim(CaseData caseData, BigDecimal interest) {
+        BigDecimal fixedCostAmount = caseData.getFixedCosts() != null
+            && caseData.getFixedCosts().getFixedCostAmount() != null
+            ? BigDecimal.valueOf(Integer.parseInt(caseData.getFixedCosts().getFixedCostAmount())) : null;
+
+        BigDecimal totalClaimAmount = caseData.getTotalClaimAmount()
+            .add(MonetaryConversions.penniesToPounds(caseData.getClaimFee()
+                                                         .getCalculatedAmountInPence()));
+
+        if (interest != null) {
+            totalClaimAmount = totalClaimAmount.add(interest);
+        }
+
+        if (fixedCostAmount != null) {
+            totalClaimAmount = totalClaimAmount.add(MonetaryConversions.penniesToPounds(fixedCostAmount));
+        }
+
+        return totalClaimAmount.toString();
     }
 
     public SealedClaimFormForSpec getTemplateDataBulkClaim(CaseData caseData) {
@@ -218,14 +237,15 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             .claimAmount(getClaimAmountBulk(caseData))
             .claimFee(MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence()).toString())
             // Claim amount + interest + claim fees
-            .totalAmountOfClaim(interest != null ? caseData.getTotalClaimAmount()
-                .add(interest)
-                .add(MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())).toString() :
-                caseData.getTotalClaimAmount()
-                    .add(MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())).toString())
+            .totalAmountOfClaim(getTotalAmountOfClaim(caseData, interest))
             .statementOfTruth(caseData.getApplicantSolicitor1ClaimStatementOfTruth())
             .descriptionOfClaim(caseData.getDetailsOfClaim())
             .applicantRepresentativeOrganisationName(representativeService.getApplicantRepresentative(caseData).getOrganisationName())
+            .claimFixedCosts(caseData.getFixedCosts() != null ? caseData.getFixedCosts().getClaimFixedCosts() : null)
+            .fixedCostAmount(caseData.getFixedCosts() != null && caseData.getFixedCosts().getFixedCostAmount() != null
+                                 ? MonetaryConversions.penniesToPounds(BigDecimal.valueOf(
+                Integer.parseInt(caseData.getFixedCosts().getFixedCostAmount()))).toString()
+                                 : (BigDecimal.valueOf(0)).toString())
             .build();
     }
 
