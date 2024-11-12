@@ -16,10 +16,10 @@ public class HearingTimeFieldBuilder implements SdoCaseFieldBuilder {
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
         log.info("Setting hearing time");
         updatedData.disposalHearingHearingTime(DisposalHearingHearingTime.builder()
-                                                   .input(
-                                                       "This claim will be listed for final disposal before a judge on the first "
-                                                           + "available date after")
-                                                   .dateTo(LocalDate.now().plusWeeks(16))
-                                                   .build());
+                .input(
+                        "This claim will be listed for final disposal before a judge on the first "
+                                + "available date after")
+                .dateTo(LocalDate.now().plusWeeks(16))
+                .build());
     }
 }

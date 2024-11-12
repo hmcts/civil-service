@@ -7,7 +7,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.CreateSDOCallbackHandlerUtils;
-import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.PrePopulateSdoR2AndNihlFields;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.sdor2andnihlfields.PrePopulateSdoR2AndNihlFields;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.sdor2andnihlfields.SdoR2AndNihlFieldsCaseFieldBuilder;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -32,6 +33,9 @@ class PrePopulateSdoR2AndNihlFieldsTest {
 
     @Mock
     private CreateSDOCallbackHandlerUtils createSDOCallbackHandlerUtils;
+
+    @Mock
+    private List<SdoR2AndNihlFieldsCaseFieldBuilder> sdoR2AndNihlFieldsBuilders;
 
     @InjectMocks
     private PrePopulateSdoR2AndNihlFields prePopulateSdoR2AndNihlFields;

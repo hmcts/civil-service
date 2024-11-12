@@ -47,8 +47,8 @@ public class GenerateSdoOrder implements CaseTask {
     public CallbackResponse execute(CallbackParams callbackParams) {
         log.info("Executing GenerateSdoOrder with callback version: {}", callbackParams.getVersion());
         CaseData caseData = V_1.equals(callbackParams.getVersion())
-            ? mapHearingMethodFields(callbackParams.getCaseData())
-            : callbackParams.getCaseData();
+                ? mapHearingMethodFields(callbackParams.getCaseData())
+                : callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 
         log.debug("Handling witness statements");
@@ -65,25 +65,25 @@ public class GenerateSdoOrder implements CaseTask {
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .data(updatedData.build().toMap(objectMapper))
-            .build();
+                .errors(errors)
+                .data(updatedData.build().toMap(objectMapper))
+                .build();
     }
 
     private void handleWitnessStatements(CaseData caseData, List<String> errors) {
         if (nonNull(caseData.getSmallClaimsWitnessStatement())) {
             log.debug("Validating Small Claims Witness Statement");
             validateAndAddWitnessErrors(
-                caseData.getSmallClaimsWitnessStatement().getInput2(),
-                caseData.getSmallClaimsWitnessStatement().getInput3(),
-                errors
+                    caseData.getSmallClaimsWitnessStatement().getInput2(),
+                    caseData.getSmallClaimsWitnessStatement().getInput3(),
+                    errors
             );
         } else if (nonNull(caseData.getFastTrackWitnessOfFact())) {
             log.debug("Validating Fast Track Witness of Fact");
             validateAndAddWitnessErrors(
-                caseData.getFastTrackWitnessOfFact().getInput2(),
-                caseData.getFastTrackWitnessOfFact().getInput3(),
-                errors
+                    caseData.getFastTrackWitnessOfFact().getInput2(),
+                    caseData.getFastTrackWitnessOfFact().getInput3(),
+                    errors
             );
         } else if (isSdoR2EnabledForDRHSmallClaim(caseData)) {
             log.debug("Validating DRH Fields for SdoR2 Small Claim");
@@ -127,8 +127,8 @@ public class GenerateSdoOrder implements CaseTask {
                                           CaseData.CaseDataBuilder<?, ?> updatedData) {
         log.info("Generating SDO document");
         CaseDocument document = sdoGeneratorService.generate(
-            caseData,
-            callbackParams.getParams().get(BEARER_TOKEN).toString()
+                caseData,
+                callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
 
         if (document != null) {
@@ -154,7 +154,7 @@ public class GenerateSdoOrder implements CaseTask {
 
     private void handleDisposalHearingMethod(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
         if (caseData.getHearingMethodValuesDisposalHearing() != null
-            && caseData.getHearingMethodValuesDisposalHearing().getValue() != null) {
+                && caseData.getHearingMethodValuesDisposalHearing().getValue() != null) {
 
             String disposalHearingMethodLabel = caseData.getHearingMethodValuesDisposalHearing().getValue().getLabel();
             log.debug("Handling Disposal Hearing Method: {}", disposalHearingMethodLabel);
@@ -170,7 +170,7 @@ public class GenerateSdoOrder implements CaseTask {
 
     private void handleFastTrackHearingMethod(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
         if (caseData.getHearingMethodValuesFastTrack() != null
-            && caseData.getHearingMethodValuesFastTrack().getValue() != null) {
+                && caseData.getHearingMethodValuesFastTrack().getValue() != null) {
 
             String fastTrackHearingMethodLabel = caseData.getHearingMethodValuesFastTrack().getValue().getLabel();
             log.debug("Handling Fast Track Hearing Method: {}", fastTrackHearingMethodLabel);
@@ -186,7 +186,7 @@ public class GenerateSdoOrder implements CaseTask {
 
     private void handleSmallClaimsHearingMethod(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
         if (caseData.getHearingMethodValuesSmallClaims() != null
-            && caseData.getHearingMethodValuesSmallClaims().getValue() != null) {
+                && caseData.getHearingMethodValuesSmallClaims().getValue() != null) {
 
             String smallClaimsHearingMethodLabel = caseData.getHearingMethodValuesSmallClaims().getValue().getLabel();
             log.debug("Handling Small Claims Hearing Method: {}", smallClaimsHearingMethodLabel);
@@ -245,8 +245,8 @@ public class GenerateSdoOrder implements CaseTask {
 
     private void validateNoOfWitnessClaimant(CaseData caseData, List<String> errors) {
         if (Objects.nonNull(caseData.getSdoR2SmallClaimsWitnessStatements())
-            && caseData.getSdoR2SmallClaimsWitnessStatements().getIsRestrictWitness() == YES
-            && nonNull(caseData.getSdoR2SmallClaimsWitnessStatements().getSdoR2SmallClaimsRestrictWitness().getNoOfWitnessClaimant())) {
+                && caseData.getSdoR2SmallClaimsWitnessStatements().getIsRestrictWitness() == YES
+                && nonNull(caseData.getSdoR2SmallClaimsWitnessStatements().getSdoR2SmallClaimsRestrictWitness().getNoOfWitnessClaimant())) {
             log.debug("Validating number of claimant witnesses");
             validateGreaterThanZero(caseData.getSdoR2SmallClaimsWitnessStatements().getSdoR2SmallClaimsRestrictWitness().getNoOfWitnessClaimant()).ifPresent(errors::add);
         }
@@ -254,8 +254,8 @@ public class GenerateSdoOrder implements CaseTask {
 
     private void validateNoOfWitnessDefendant(CaseData caseData, List<String> errors) {
         if (Objects.nonNull(caseData.getSdoR2SmallClaimsWitnessStatements())
-            && caseData.getSdoR2SmallClaimsWitnessStatements().getIsRestrictWitness() == YES
-            && nonNull(caseData.getSdoR2SmallClaimsWitnessStatements().getSdoR2SmallClaimsRestrictWitness().getNoOfWitnessDefendant())) {
+                && caseData.getSdoR2SmallClaimsWitnessStatements().getIsRestrictWitness() == YES
+                && nonNull(caseData.getSdoR2SmallClaimsWitnessStatements().getSdoR2SmallClaimsRestrictWitness().getNoOfWitnessDefendant())) {
             log.debug("Validating number of defendant witnesses");
             validateGreaterThanZero(caseData.getSdoR2SmallClaimsWitnessStatements().getSdoR2SmallClaimsRestrictWitness().getNoOfWitnessDefendant()).ifPresent(errors::add);
         }
@@ -263,33 +263,33 @@ public class GenerateSdoOrder implements CaseTask {
 
     private void validateTrialOnOptionsOpenDate(CaseData caseData, LocalDate today, List<String> errors) {
         if (Objects.nonNull(caseData.getSdoR2SmallClaimsHearing())
-            && caseData.getSdoR2SmallClaimsHearing().getTrialOnOptions() == HearingOnRadioOptions.OPEN_DATE) {
+                && caseData.getSdoR2SmallClaimsHearing().getTrialOnOptions() == HearingOnRadioOptions.OPEN_DATE) {
             log.debug("Validating Trial On Options Open Date");
             validateFutureDate(
-                caseData.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsHearingFirstOpenDateAfter().getListFrom(),
-                today
+                    caseData.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsHearingFirstOpenDateAfter().getListFrom(),
+                    today
             ).ifPresent(errors::add);
         }
     }
 
     private void validateTrialOnOptionsHearingWindowDateTo(CaseData caseData, LocalDate today, List<String> errors) {
         if (Objects.nonNull(caseData.getSdoR2SmallClaimsHearing())
-            && caseData.getSdoR2SmallClaimsHearing().getTrialOnOptions() == HearingOnRadioOptions.HEARING_WINDOW) {
+                && caseData.getSdoR2SmallClaimsHearing().getTrialOnOptions() == HearingOnRadioOptions.HEARING_WINDOW) {
             log.debug("Validating Trial On Options Hearing Window Date To");
             validateFutureDate(
-                caseData.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsHearingWindow().getDateTo(),
-                today
+                    caseData.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsHearingWindow().getDateTo(),
+                    today
             ).ifPresent(errors::add);
         }
     }
 
     private void validateTrialOnOptionsHearingWindowListFrom(CaseData caseData, LocalDate today, List<String> errors) {
         if (Objects.nonNull(caseData.getSdoR2SmallClaimsHearing())
-            && caseData.getSdoR2SmallClaimsHearing().getTrialOnOptions() == HearingOnRadioOptions.HEARING_WINDOW) {
+                && caseData.getSdoR2SmallClaimsHearing().getTrialOnOptions() == HearingOnRadioOptions.HEARING_WINDOW) {
             log.debug("Validating Trial On Options Hearing Window List From");
             validateFutureDate(
-                caseData.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsHearingWindow().getListFrom(),
-                today
+                    caseData.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsHearingWindow().getListFrom(),
+                    today
             ).ifPresent(errors::add);
         }
     }

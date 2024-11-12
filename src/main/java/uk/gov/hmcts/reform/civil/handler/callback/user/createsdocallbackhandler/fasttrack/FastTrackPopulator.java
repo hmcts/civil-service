@@ -16,6 +16,6 @@ public class FastTrackPopulator {
     private final List<SdoCaseFieldBuilder> fastTrackBuilders;
 
     public void setFastTrackFields(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        fastTrackBuilders.forEach(disposalHearingBuilder -> disposalHearingBuilder.build(updatedData));
+        fastTrackBuilders.forEach(builder -> builder.build(updatedData));
     }
 }

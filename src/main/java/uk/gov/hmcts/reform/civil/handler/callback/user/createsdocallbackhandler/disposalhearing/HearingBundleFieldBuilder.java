@@ -14,8 +14,8 @@ public class HearingBundleFieldBuilder implements SdoCaseFieldBuilder {
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
         log.info("Setting hearing bundle");
         updatedData.disposalHearingBundle(DisposalHearingBundle.builder()
-                                              .input(
-                                                  "At least 7 days before the disposal hearing, the claimant must file and serve")
-                                              .build());
+                .input(
+                        "At least 7 days before the disposal hearing, the claimant must file and serve")
+                .build());
     }
 }

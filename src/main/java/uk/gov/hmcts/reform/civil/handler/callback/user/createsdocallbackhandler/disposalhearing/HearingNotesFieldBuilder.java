@@ -21,11 +21,11 @@ public class HearingNotesFieldBuilder implements SdoCaseFieldBuilder {
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
         log.info("Setting hearing notes");
         updatedData.disposalHearingNotes(DisposalHearingNotes.builder()
-                                             .input(
-                                                 "This Order has been made without a hearing. Each party has the right to apply to "
-                                                     + "have this Order set aside or varied. Any such application must be uploaded to the "
-                                                     + "Digital Portal together with the appropriate fee, by 4pm on")
-                                             .date(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(1)))
-                                             .build());
+                .input(
+                        "This Order has been made without a hearing. Each party has the right to apply to "
+                                + "have this Order set aside or varied. Any such application must be uploaded to the "
+                                + "Digital Portal together with the appropriate fee, by 4pm on")
+                .date(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(1)))
+                .build());
     }
 }
