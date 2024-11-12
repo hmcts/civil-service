@@ -21,8 +21,8 @@ public class QuestionsToExpertsFieldBuilder implements SdoCaseFieldBuilder {
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
         log.info("Setting questions to experts");
         updatedData.disposalHearingQuestionsToExperts(
-            DisposalHearingQuestionsToExperts.builder()
-                .date(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
-                .build());
+                DisposalHearingQuestionsToExperts.builder()
+                        .date(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
+                        .build());
     }
 }

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandlertests;
+package uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandlertests.disposalhearingtests;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

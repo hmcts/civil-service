@@ -97,9 +97,9 @@ public class PrePopulateOrderDetailsPages implements CaseTask {
         try {
             logger.debug("Setting initial order methods and CARM fields");
             updatedData
-                .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
-                .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson)
-                .showCarmFields(featureToggleService.isCarmEnabledForCase(caseData) ? YES : NO);
+                    .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
+                    .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson)
+                    .showCarmFields(featureToggleService.isCarmEnabledForCase(caseData) ? YES : NO);
 
             logger.debug("Updating case management location if Legal Advisor SDO");
             Optional<RequestedCourt> preferredCourt = updateCaseManagementLocationIfLegalAdvisorSdo(updatedData, caseData);
@@ -109,7 +109,7 @@ public class PrePopulateOrderDetailsPages implements CaseTask {
 
             logger.debug("Creating dynamic locations list");
             DynamicList locationsList = createSDOCallbackHandlerUtils.getLocationList(
-                preferredCourt.orElse(null), false, locationRefDataList);
+                    preferredCourt.orElse(null), false, locationRefDataList);
             setMethodInPerson(updatedData, locationsList);
 
             logger.debug("Creating dynamic hearing method list");
@@ -132,13 +132,13 @@ public class PrePopulateOrderDetailsPages implements CaseTask {
             handleSdoR2FeaturesIfNeeded(caseData, updatedData, callbackParams, preferredCourt, hearingMethodList, locationRefDataList);
 
             return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedData.build().toMap(objectMapper))
-                .build();
+                    .data(updatedData.build().toMap(objectMapper))
+                    .build();
         } catch (Exception e) {
             return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(List.of("An unexpected error occurred while pre-populating order details."))
-                .data(updatedData.build().toMap(objectMapper))
-                .build();
+                    .errors(List.of("An unexpected error occurred while pre-populating order details."))
+                    .data(updatedData.build().toMap(objectMapper))
+                    .build();
         }
     }
 
@@ -152,9 +152,9 @@ public class PrePopulateOrderDetailsPages implements CaseTask {
     private void handleSdoR2FeaturesIfNeeded(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData, CallbackParams callbackParams,
                                              Optional<RequestedCourt> preferredCourt, DynamicList hearingMethodList, List<LocationRefData> locationRefDataList) {
         if (featureToggleService.isSdoR2Enabled()
-            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
-            && DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(
-            caseData.getDecisionOnRequestReconsiderationOptions())) {
+                && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+                && DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(
+                caseData.getDecisionOnRequestReconsiderationOptions())) {
             logger.debug("Resetting fields for reconsideration");
             resetFieldsForReconsideration(updatedData);
         }
@@ -184,9 +184,9 @@ public class PrePopulateOrderDetailsPages implements CaseTask {
                                         DynamicList hearingMethodList) {
         logger.debug("Setting hearing method values to IN_PERSON");
         DynamicListElement hearingMethodInPerson = hearingMethodList.getListItems().stream()
-            .filter(elem -> elem.getLabel().equals(HearingMethod.IN_PERSON.getLabel()))
-            .findFirst()
-            .orElse(null);
+                .filter(elem -> elem.getLabel().equals(HearingMethod.IN_PERSON.getLabel()))
+                .findFirst()
+                .orElse(null);
         hearingMethodList.setValue(hearingMethodInPerson);
         updatedData.hearingMethodValuesFastTrack(hearingMethodList);
         updatedData.hearingMethodValuesDisposalHearing(hearingMethodList);
@@ -233,35 +233,35 @@ public class PrePopulateOrderDetailsPages implements CaseTask {
     private void setWelshLanguageUsage(CaseData.CaseDataBuilder<?, ?> updatedData) {
         logger.debug("Setting Welsh language usage descriptions");
         updatedData.sdoR2FastTrackUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder()
-                                                         .description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION)
-                                                         .build());
+                .description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION)
+                .build());
         updatedData.sdoR2SmallClaimsUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder()
-                                                           .description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION)
-                                                           .build());
+                .description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION)
+                .build());
         updatedData.sdoR2DisposalHearingUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder()
-                                                               .description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION)
-                                                               .build());
+                .description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION)
+                .build());
     }
 
     private List<LocationRefData> getAllLocationFromRefData(CallbackParams callbackParams) {
         logger.debug("Fetching hearing court locations from reference data service");
         return locationRefDataService.getHearingCourtLocations(
-            callbackParams.getParams().get(BEARER_TOKEN).toString());
+                callbackParams.getParams().get(BEARER_TOKEN).toString());
     }
 
     private void updateExpertEvidenceFields(CaseData.CaseDataBuilder<?, ?> updatedData) {
         logger.debug("Updating expert evidence fields with calculated dates");
         FastTrackPersonalInjury tempFastTrackPersonalInjury = FastTrackPersonalInjury.builder()
-            .input1("The Claimant has permission to rely upon the written expert evidence already uploaded to the"
+                .input1("The Claimant has permission to rely upon the written expert evidence already uploaded to the"
                         + " Digital Portal with the particulars of claim")
-            .input2("The Defendant(s) may ask questions of the Claimant's expert which must be sent to the expert " +
+                .input2("The Defendant(s) may ask questions of the Claimant's expert which must be sent to the expert " +
                         "directly and uploaded to the Digital Portal by 4pm on")
-            .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(14)))
-            .input3("The answers to the questions shall be answered by the Expert by")
-            .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(42)))
-            .input4("and uploaded to the Digital Portal by the party who has asked the question by")
-            .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(49)))
-            .build();
+                .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(14)))
+                .input3("The answers to the questions shall be answered by the Expert by")
+                .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(42)))
+                .input4("and uploaded to the Digital Portal by the party who has asked the question by")
+                .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(49)))
+                .build();
 
         updatedData.fastTrackPersonalInjury(tempFastTrackPersonalInjury).build();
         logger.debug("Expert evidence fields updated successfully");
@@ -270,31 +270,31 @@ public class PrePopulateOrderDetailsPages implements CaseTask {
     private void updateDisclosureOfDocumentFields(CaseData.CaseDataBuilder<?, ?> updatedData) {
         logger.debug("Updating disclosure of document fields with calculated dates");
         FastTrackDisclosureOfDocuments tempFastTrackDisclosureOfDocuments = FastTrackDisclosureOfDocuments.builder()
-            .input1("Standard disclosure shall be provided by the parties by uploading to the Digital Portal their "
+                .input1("Standard disclosure shall be provided by the parties by uploading to the Digital Portal their "
                         + "list of documents by 4pm on")
-            .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
-            .input2("Any request to inspect a document, or for a copy of a document, shall be made directly to "
+                .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
+                .input2("Any request to inspect a document, or for a copy of a document, shall be made directly to "
                         + "the other party by 4pm on")
-            .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(5)))
-            .input3("Requests will be complied with within 7 days of the receipt of the request.")
-            .input4("Each party must upload to the Digital Portal copies of those documents on which they wish to"
+                .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(5)))
+                .input3("Requests will be complied with within 7 days of the receipt of the request.")
+                .input4("Each party must upload to the Digital Portal copies of those documents on which they wish to"
                         + " rely at trial by 4pm on")
-            .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-            .build();
+                .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
+                .build();
 
         updatedData.fastTrackDisclosureOfDocuments(tempFastTrackDisclosureOfDocuments).build();
         logger.debug("Disclosure of document fields updated successfully");
     }
 
     private void setCheckListNihl(
-        CaseData.CaseDataBuilder<?, ?> updatedData,
-        List<IncludeInOrderToggle> includeInOrderToggle
+            CaseData.CaseDataBuilder<?, ?> updatedData,
+            List<IncludeInOrderToggle> includeInOrderToggle
     ) {
         logger.debug("Setting checklist toggles for NIHL inclusion");
         updatedData.sdoAltDisputeResolution(SdoR2FastTrackAltDisputeResolution.builder().includeInOrderToggle(
-            includeInOrderToggle).build());
+                includeInOrderToggle).build());
         updatedData.sdoVariationOfDirections(SdoR2VariationOfDirections.builder().includeInOrderToggle(
-            includeInOrderToggle).build());
+                includeInOrderToggle).build());
         updatedData.sdoR2Settlement(SdoR2Settlement.builder().includeInOrderToggle(includeInOrderToggle).build());
         updatedData.sdoR2DisclosureOfDocumentsToggle(includeInOrderToggle).build();
         updatedData.sdoR2SeparatorWitnessesOfFactToggle(includeInOrderToggle).build();
@@ -321,10 +321,10 @@ public class PrePopulateOrderDetailsPages implements CaseTask {
             logger.debug("Case qualifies for Legal Advisor SDO, fetching preferred court");
             preferredCourt = locationHelper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData, true);
             preferredCourt.map(RequestedCourt::getCaseLocation)
-                .ifPresent(location -> {
-                    updatedData.caseManagementLocation(location);
-                    logger.debug("Case management location set to: {}", location);
-                });
+                    .ifPresent(location -> {
+                        updatedData.caseManagementLocation(location);
+                        logger.debug("Case management location set to: {}", location);
+                    });
             return preferredCourt;
         } else {
             logger.debug("Case does not qualify for Legal Advisor SDO, fetching standard case management location");
@@ -334,8 +334,8 @@ public class PrePopulateOrderDetailsPages implements CaseTask {
 
     public Predicate<CaseData> isSpecClaim1000OrLessAndCcmcc(BigDecimal ccmccAmount) {
         return caseData ->
-            caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
-                && ccmccAmount.compareTo(caseData.getTotalClaimAmount()) >= 0
-                && caseData.getCaseManagementLocation().getBaseLocation().equals(ccmccEpimsId);
+                caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
+                        && ccmccAmount.compareTo(caseData.getTotalClaimAmount()) >= 0
+                        && caseData.getCaseManagementLocation().getBaseLocation().equals(ccmccEpimsId);
     }
 }

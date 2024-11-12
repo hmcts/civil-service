@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.GenerateSdoOrder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.generatesdoorder.GenerateSdoOrder;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.PrePopulateOrderDetailsPages;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.SetOrderDetailsFlags;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.submitsdo.SubmitSDO;

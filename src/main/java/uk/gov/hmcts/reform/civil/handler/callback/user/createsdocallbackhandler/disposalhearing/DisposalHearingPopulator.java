@@ -28,30 +28,30 @@ public class DisposalHearingPopulator {
 
     private void updateDeductionValue(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
         Optional.ofNullable(caseData.getDrawDirectionsOrder())
-            .map(JudgementSum::getJudgementSum)
-            .map(d -> d + "%")
-            .ifPresent(deductionPercentage -> {
-                log.info("Updating deduction value to {}", deductionPercentage);
-                DisposalHearingJudgementDeductionValue tempDisposalHearingJudgementDeductionValue =
-                    DisposalHearingJudgementDeductionValue.builder()
-                        .value(deductionPercentage)
-                        .build();
+                .map(JudgementSum::getJudgementSum)
+                .map(d -> d + "%")
+                .ifPresent(deductionPercentage -> {
+                    log.info("Updating deduction value to {}", deductionPercentage);
+                    DisposalHearingJudgementDeductionValue tempDisposalHearingJudgementDeductionValue =
+                            DisposalHearingJudgementDeductionValue.builder()
+                                    .value(deductionPercentage)
+                                    .build();
 
-                updatedData.disposalHearingJudgementDeductionValue(tempDisposalHearingJudgementDeductionValue);
+                    updatedData.disposalHearingJudgementDeductionValue(tempDisposalHearingJudgementDeductionValue);
 
-                FastTrackJudgementDeductionValue tempFastTrackJudgementDeductionValue =
-                    FastTrackJudgementDeductionValue.builder()
-                        .value(deductionPercentage)
-                        .build();
+                    FastTrackJudgementDeductionValue tempFastTrackJudgementDeductionValue =
+                            FastTrackJudgementDeductionValue.builder()
+                                    .value(deductionPercentage)
+                                    .build();
 
-                updatedData.fastTrackJudgementDeductionValue(tempFastTrackJudgementDeductionValue).build();
+                    updatedData.fastTrackJudgementDeductionValue(tempFastTrackJudgementDeductionValue).build();
 
-                SmallClaimsJudgementDeductionValue tempSmallClaimsJudgementDeductionValue =
-                    SmallClaimsJudgementDeductionValue.builder()
-                        .value(deductionPercentage)
-                        .build();
+                    SmallClaimsJudgementDeductionValue tempSmallClaimsJudgementDeductionValue =
+                            SmallClaimsJudgementDeductionValue.builder()
+                                    .value(deductionPercentage)
+                                    .build();
 
-                updatedData.smallClaimsJudgementDeductionValue(tempSmallClaimsJudgementDeductionValue).build();
-            });
+                    updatedData.smallClaimsJudgementDeductionValue(tempSmallClaimsJudgementDeductionValue).build();
+                });
     }
 }
