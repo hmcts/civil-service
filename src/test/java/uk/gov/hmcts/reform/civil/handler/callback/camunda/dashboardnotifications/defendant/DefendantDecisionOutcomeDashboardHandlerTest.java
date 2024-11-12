@@ -67,13 +67,13 @@ public class DefendantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHa
                 CallbackRequest.builder().eventId(UPDATE_DASHBOARD_TASK_LIST_DEFENDANT_DECISION_OUTCOME.name()).build()
             ).build();
 
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-
-            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
-
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             handler.handle(params);
 
+            // Then
+            verifyDeleteNotificationsAndTaskListUpdates(caseData);
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_DEFENDANT_TRIAL_READY_DECISION_OUTCOME.getScenario(),
@@ -93,13 +93,13 @@ public class DefendantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHa
                 CallbackRequest.builder().eventId(UPDATE_DASHBOARD_TASK_LIST_DEFENDANT_DECISION_OUTCOME.name()).build()
             ).build();
 
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-
-            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
-
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             handler.handle(params);
 
+            // Then
+            verifyDeleteNotificationsAndTaskListUpdates(caseData);
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_DEFENDANT_DECISION_OUTCOME.getScenario(),
@@ -127,6 +127,8 @@ public class DefendantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHa
 
             handler.handle(params);
 
+            // Then
+            verifyDeleteNotificationsAndTaskListUpdates(caseData);
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_DEFENDANT_TRIAL_READY_DECISION_OUTCOME.getScenario(),
@@ -134,5 +136,18 @@ public class DefendantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHa
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
+    }
+
+    private void verifyDeleteNotificationsAndTaskListUpdates(CaseData caseData) {
+        verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "DEFENDANT",
+            "BEARER_TOKEN"
+        );
+        verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "DEFENDANT",
+            "BEARER_TOKEN"
+        );
     }
 }
