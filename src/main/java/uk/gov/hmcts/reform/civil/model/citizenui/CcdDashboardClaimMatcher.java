@@ -127,16 +127,24 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isSDOOrderCreatedPreCP() {
+        String baseLocation = Optional.ofNullable(caseData.getCaseManagementLocation())
+            .map(location -> location.getBaseLocation())
+            .orElse(null);
         return CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
-            && !featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation());
+            && baseLocation != null
+            && !featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(baseLocation);
     }
 
     @Override
     public boolean isSDOOrderCreatedCP() {
+        String baseLocation = Optional.ofNullable(caseData.getCaseManagementLocation())
+            .map(location -> location.getBaseLocation())
+            .orElse(null);
         Optional<LocalDateTime> lastNonSdoOrderTime = getTimeOfLastNonSDOOrder();
         Optional<LocalDateTime> sdoTime = getSDOTime();
         return CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
+            && baseLocation != null
             && !isSDOOrderLegalAdviserCreated()
             && !isSDOOrderInReview()
             && !isSDOOrderInReviewOtherParty()
