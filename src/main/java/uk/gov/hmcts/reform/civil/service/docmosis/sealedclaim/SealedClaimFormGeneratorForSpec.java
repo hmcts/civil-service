@@ -181,7 +181,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             .build();
     }
 
-    private static LocalDate getInterestFromDate(CaseData caseData) {
+    private LocalDate getInterestFromDate(CaseData caseData) {
         if (caseData.getInterestClaimFrom() == null) {
             return null;
         }
