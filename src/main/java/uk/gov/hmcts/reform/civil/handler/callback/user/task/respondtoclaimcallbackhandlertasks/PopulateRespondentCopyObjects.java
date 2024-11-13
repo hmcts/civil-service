@@ -118,7 +118,6 @@ public class PopulateRespondentCopyObjects implements CaseTask {
 
     private CaseData.CaseDataBuilder<?, ?> updateCaseData(CaseData caseData, YesOrNo isRespondent1, RequestedCourt requestedCourt1) {
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder()
-            .respondent1Copy(caseData.getRespondent1())
             .isRespondent1(isRespondent1)
             .respondent1DQ(Respondent1DQ.builder()
                                .respondent1DQRequestedCourt(
@@ -136,7 +135,6 @@ public class PopulateRespondentCopyObjects implements CaseTask {
 
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             updatedCaseData
-                .respondent2Copy(caseData.getRespondent2())
                 .respondent2DetailsForClaimDetailsTab(updatedCaseData.build().getRespondent2()
                                                           .toBuilder().flags(null).build());
         }

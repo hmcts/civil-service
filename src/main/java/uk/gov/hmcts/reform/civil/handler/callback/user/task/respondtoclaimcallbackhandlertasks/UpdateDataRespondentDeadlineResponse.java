@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallb
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.PersistDataUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,12 +33,14 @@ public class UpdateDataRespondentDeadlineResponse {
 
     private final LocationReferenceDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
+    private final CaseDetailsConverter caseDetailsConverter;
 
     public UpdateDataRespondentDeadlineResponse(LocationReferenceDataService locationRefDataService,
-                                                CourtLocationUtils courtLocationUtils) {
+                                                CourtLocationUtils courtLocationUtils, CaseDetailsConverter caseDetailsConverter) {
 
         this.locationRefDataService = locationRefDataService;
         this.courtLocationUtils = courtLocationUtils;
+        this.caseDetailsConverter = caseDetailsConverter;
     }
 
     void updateBothRespondentsResponseSameLegalRep(CallbackParams callbackParams,
@@ -77,7 +81,7 @@ public class UpdateDataRespondentDeadlineResponse {
             .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
 
         setApplicantDeadlineIfRequired(caseData, updatedData, applicant1Deadline);
-        updateRespondent2AdressesAndSetDeadline(caseData, updatedData);
+        updateRespondent2AdressesAndSetDeadline(callbackParams, updatedData);
         updateRespondent2Date(caseData, updatedData, responseDate);
         updateRespondent1StatementOfTruth(callbackParams, caseData, updatedData);
     }
@@ -121,17 +125,11 @@ public class UpdateDataRespondentDeadlineResponse {
         return caseData.getAddApplicant2() != null && caseData.getAddApplicant2() == YES;
     }
 
-    private void updateRespondent2AdressesAndSetDeadline(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
-        if (ofNullable(caseData.getRespondent2()).isPresent()
-            && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
-            var updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
-                .build();
-
-            updatedData
-                .respondent2(updatedRespondent2)
-                .respondent2Copy(null)
-                .respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
+    private void updateRespondent2AdressesAndSetDeadline(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> updatedData) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
+        if (ofNullable(caseData.getRespondent2()).isPresent()) {
+            PersistDataUtils.persistPartyAddress(oldCaseData, caseData);
 
             if (caseData.getRespondent2ResponseDate() == null) {
                 updatedData.nextDeadline(caseData.getRespondent2ResponseDeadline().toLocalDate());

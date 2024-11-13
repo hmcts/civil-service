@@ -8,8 +8,8 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.CaseTask;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
+import uk.gov.hmcts.reform.civil.utils.PersistDataUtils;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -56,6 +57,8 @@ public class SetApplicantResponseDeadline implements CaseTask {
     private final UpdateDataRespondentDeadlineResponse updateDataRespondentDeadlineResponse;
     private final AssembleDocumentsForDeadlineResponse assembleDocumentsForDeadlineResponse;
 
+    private final CaseDetailsConverter caseDetailsConverter;
+
     public SetApplicantResponseDeadline(Time time,
                                         DeadlinesCalculator deadlinesCalculator,
                                         FrcDocumentsUtils frcDocumentsUtils,
@@ -66,7 +69,7 @@ public class SetApplicantResponseDeadline implements CaseTask {
                                         CoreCaseUserService coreCaseUserService,
                                         UserService userService,
                                         UpdateDataRespondentDeadlineResponse updateDataRespondentDeadlineResponse,
-                                        AssembleDocumentsForDeadlineResponse assembleDocumentsForDeadlineResponse) {
+                                        AssembleDocumentsForDeadlineResponse assembleDocumentsForDeadlineResponse, CaseDetailsConverter caseDetailsConverter) {
         this.time = time;
         this.deadlinesCalculator = deadlinesCalculator;
         this.frcDocumentsUtils = frcDocumentsUtils;
@@ -78,12 +81,13 @@ public class SetApplicantResponseDeadline implements CaseTask {
         this.userService = userService;
         this.updateDataRespondentDeadlineResponse = updateDataRespondentDeadlineResponse;
         this.assembleDocumentsForDeadlineResponse = assembleDocumentsForDeadlineResponse;
+        this.caseDetailsConverter = caseDetailsConverter;
     }
 
     public CallbackResponse execute(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        CaseData.CaseDataBuilder<?, ?> updatedData = updateRespondentAddresses(caseData);
+        CaseData.CaseDataBuilder<?, ?> updatedData = updateRespondentAddresses(callbackParams);
 
         LocalDateTime responseDate = time.now();
         LocalDateTime applicant1Deadline = getApplicant1ResponseDeadline(responseDate);
@@ -198,27 +202,22 @@ public class SetApplicantResponseDeadline implements CaseTask {
         }
     }
 
-    private CaseData.CaseDataBuilder<?, ?> updateRespondentAddresses(CaseData caseData) {
-
-        Party updatedRespondent1 = caseData.getRespondent1().toBuilder()
-            .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
-            .flags(caseData.getRespondent1Copy().getFlags())
-            .build();
-
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
-            .respondent1(updatedRespondent1)
-            .respondent1Copy(null);
-
-        if (ofNullable(caseData.getRespondent2()).isPresent()
-            && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
-            Party updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
-                .flags(caseData.getRespondent2Copy().getFlags())
-                .build();
-
-            updatedData.respondent2(updatedRespondent2).respondent2Copy(null);
+    private CaseData.CaseDataBuilder<?, ?> updateRespondentAddresses(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        if (ofNullable(caseData.getRespondent1()).isPresent()
+            && (caseData.getRespondent1().getPrimaryAddress() == null)) {
+            throw new IllegalArgumentException("Primary Address cannot be empty");
         }
-        return updatedData;
+        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
+
+        PersistDataUtils.persistPartyAddress(oldCaseData, caseData);
+
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
+        PersistDataUtils.persistFlagsForParties(oldCaseData, caseData, caseDataBuilder);
+
+        CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder = caseData.toBuilder();
+        return updatedCaseDataBuilder;
     }
 
     private LocalDateTime getApplicant1ResponseDeadline(LocalDateTime responseDate) {

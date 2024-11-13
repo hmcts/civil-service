@@ -14,9 +14,10 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.AssembleDocumentsForDeadlineResponse;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.SetApplicantResponseDeadline;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.UpdateDataRespondentDeadlineResponse;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -97,6 +98,8 @@ class SetApplicantResponseDeadlineTest {
 
     @Mock
     private  CourtLocationUtils courtLocationUtils;
+    @Mock
+    private CaseDetailsConverter caseDetailsConverter;
 
     @BeforeEach
     void setUp() {
@@ -123,9 +126,12 @@ class SetApplicantResponseDeadlineTest {
             .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
             .respondentResponseIsSame(YES)
             .respondent2SameLegalRepresentative(YES)
-            .respondent1Copy(PartyBuilder.builder().individual().build())
-            .respondent2Copy(PartyBuilder.builder().individual().build())
             .build();
+        CaseData oldCaseData = CaseDataBuilder.builder()
+            .applicant1(Party.builder().build())
+            .respondent1(Party.builder().build())
+            .build();
+        when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
 
         CallbackParams callbackParams = CallbackParams.builder()
             .caseData(caseData)
@@ -168,9 +174,12 @@ class SetApplicantResponseDeadlineTest {
             .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
             .respondentResponseIsSame(NO)
             .respondent2SameLegalRepresentative(NO)
-            .respondent1Copy(PartyBuilder.builder().individual().build())
-            .respondent2Copy(PartyBuilder.builder().individual().build())
             .build();
+        CaseData oldCaseData = CaseDataBuilder.builder()
+            .applicant1(Party.builder().build())
+            .respondent1(Party.builder().build())
+            .build();
+        when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
 
         CallbackParams callbackParams = CallbackParams.builder()
             .caseData(caseData)
@@ -209,9 +218,12 @@ class SetApplicantResponseDeadlineTest {
             .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
             .respondentResponseIsSame(NO)
             .respondent2SameLegalRepresentative(NO)
-            .respondent1Copy(PartyBuilder.builder().individual().build())
-            .respondent2Copy(PartyBuilder.builder().individual().build())
             .build();
+        CaseData oldCaseData = CaseDataBuilder.builder()
+            .applicant1(Party.builder().build())
+            .respondent1(Party.builder().build())
+            .build();
+        when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
 
         CallbackParams callbackParams = CallbackParams.builder()
             .caseData(caseData)
