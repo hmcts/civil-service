@@ -118,11 +118,13 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     private CaseData getUpdatedCaseData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         final BigDecimal respondToAdmittedClaimOwingAmount = caseData.getRespondToAdmittedClaimOwingAmount();
-        log.info(
-            "case id: {}, respondToAdmittedClaimOwingAmount: {}",
-            callbackParams.getRequest().getCaseDetails().getId(),
-            respondToAdmittedClaimOwingAmount == null ? "" : respondToAdmittedClaimOwingAmount.toString()
-        );
+        if (respondToAdmittedClaimOwingAmount != null) {
+            log.info(
+                "case id: {}, respondToAdmittedClaimOwingAmount: {}",
+                callbackParams.getRequest().getCaseDetails().getId(),
+                 respondToAdmittedClaimOwingAmount
+            );
+        }
         CaseDocument dummyDocument = new CaseDocument(null, null, null, 0, null, null, null);
         LocalDateTime responseDate = time.now();
         return caseData.toBuilder()
@@ -134,6 +136,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             .applicant1ResponseDeadline(deadlinesCalculator.calculateApplicantResponseDeadline(
                 responseDate
             ))
+
             .build();
     }
 }
