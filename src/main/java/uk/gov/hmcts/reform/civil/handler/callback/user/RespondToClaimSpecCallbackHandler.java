@@ -1381,6 +1381,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
             CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
             PersistDataUtils.persistFlagsForParties(oldCaseData, caseData, caseDataBuilder);
+            var updatedRespondent2 = caseData.getRespondent2().toBuilder()
+                .build();
+            updatedData.respondent2(updatedRespondent2);
+            updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
         }
 
         if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
@@ -1433,6 +1437,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     updatedRespondent2 = caseData.getRespondent2().toBuilder().build();
                     PersistDataUtils.persistPartyAddress(oldCaseData, caseData);
                 }
+                CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+                PersistDataUtils.persistFlagsForParties(oldCaseData, caseData, caseDataBuilder);
                 updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
             }
 
