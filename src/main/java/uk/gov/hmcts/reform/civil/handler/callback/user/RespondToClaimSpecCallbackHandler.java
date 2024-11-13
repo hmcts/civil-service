@@ -1430,9 +1430,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     updatedRespondent2 = caseData.getRespondent2().toBuilder()
                         .primaryAddress(caseData.getSpecAoSRespondent2HomeAddressDetails()).build();
                 } else {
-                    CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-                    PersistDataUtils.persistFlagsForParties(caseData, oldCaseData, caseDataBuilder);
+                    updatedRespondent2 = caseData.getRespondent2().toBuilder().build();
+                    PersistDataUtils.persistPartyAddress(oldCaseData, caseData);
                 }
+                updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
             }
 
             // moving statement of truth value to correct field, this was not possible in mid event.

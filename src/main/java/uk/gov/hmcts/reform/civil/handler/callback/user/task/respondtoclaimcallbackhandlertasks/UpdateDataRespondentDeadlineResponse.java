@@ -130,6 +130,12 @@ public class UpdateDataRespondentDeadlineResponse {
         CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             PersistDataUtils.persistPartyAddress(oldCaseData, caseData);
+            var updatedRespondent2 = caseData.getRespondent2().toBuilder()
+                .build();
+
+            updatedData
+                .respondent2(updatedRespondent2)
+                .respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
 
             if (caseData.getRespondent2ResponseDate() == null) {
                 updatedData.nextDeadline(caseData.getRespondent2ResponseDeadline().toLocalDate());
