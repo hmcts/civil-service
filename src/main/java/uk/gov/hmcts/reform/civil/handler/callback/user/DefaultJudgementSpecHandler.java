@@ -278,10 +278,14 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
+        // show old fixed costs screen if claim was created before new fixed
+        // costs screen at claim issue was released
         if (caseData.getFixedCosts() == null) {
             caseDataBuilder.showOldDJFixedCostsScreen(YesOrNo.YES);
         }
 
+        // otherwise show new dj fixed costs screen if judgment amount is more
+        // than 25. judgment amount = claim amount + interest - partial amount
         if (caseData.getFixedCosts() != null) {
             BigDecimal judgmentAmount = calculateJudgmentAmountForFixedCosts(caseData);
             if (YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
@@ -291,6 +295,9 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
                     caseDataBuilder.showDJFixedCostsScreen(YesOrNo.NO);
                 }
             }
+            // if case is applicable to new fixed costs but new screen will not
+            // be shown due to the above conditions, then skip straight to
+            // repayment breakdown screen
             if (caseDataBuilder.build().getShowDJFixedCostsScreen() == null
                 || YesOrNo.NO.equals(caseDataBuilder.build().getShowDJFixedCostsScreen())) {
                 // calculate repayment breakdown
