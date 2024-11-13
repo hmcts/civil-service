@@ -133,6 +133,7 @@ public class HearingValuesServiceTest {
         ReflectionTestUtils.setField(hearingValuesService, "mapper", mapper);
         when(earlyAdoptersService.isPartOfHmcEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
         when(featuretoggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
+        when(featuretoggleService.isHmcNroEnabled()).thenReturn(false);
     }
 
     @Test
@@ -595,6 +596,34 @@ public class HearingValuesServiceTest {
             CaseDetails caseDetails = CaseDetails.builder()
                 .data(caseData.toMap(mapper))
                 .id(caseId).build();
+            when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
+            when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
+
+            when(earlyAdoptersService.isPartOfHmcEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
+            assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "auth"));
+        }
+
+        @Test
+        void shouldNotThrowErrorIfHmcNroToggleIsOn() {
+            Long caseId = 1L;
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .caseAccessCategory(UNSPEC_CLAIM)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
+                                            .region(WELSH_REGION_ID).build())
+                .applicant1DQ(applicant1DQ)
+                .respondent1DQ(respondent1DQ)
+                .build();
+            caseData = caseData.toBuilder()
+                .applicant1(caseData.getApplicant1().toBuilder()
+                                .flags(Flags.builder().partyName("party name").build())
+                                .build()).build();
+
+            CaseDetails caseDetails = CaseDetails.builder()
+                .data(caseData.toMap(mapper))
+                .id(caseId).build();
+            when(earlyAdoptersService.isPartOfHmcEarlyAdoptersRollout(any(CaseData.class))).thenReturn(false);
+            when(featuretoggleService.isHmcNroEnabled()).thenReturn(true);
             when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
             when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
 
