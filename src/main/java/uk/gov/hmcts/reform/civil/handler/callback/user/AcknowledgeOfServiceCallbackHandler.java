@@ -137,6 +137,12 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
             .respondentSolicitor1ServiceAddressRequired(caseData.getSpecAoSRespondentCorrespondenceAddressRequired())
             .respondentSolicitor1ServiceAddress(caseData.getSpecAoSRespondentCorrespondenceAddressdetails());
 
+        if (ofNullable(caseData.getRespondent2()).isPresent()) {
+            var updatedRespondent2 = caseData.getRespondent2().toBuilder()
+                .build();
+            caseDataBuilder.respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
