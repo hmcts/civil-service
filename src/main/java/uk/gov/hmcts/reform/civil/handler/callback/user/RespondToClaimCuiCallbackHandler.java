@@ -136,7 +136,6 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             .applicant1ResponseDeadline(deadlinesCalculator.calculateApplicantResponseDeadline(
                 responseDate
             ))
-
             .build();
     }
 }
