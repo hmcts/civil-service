@@ -19,7 +19,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_TWO_
 @Service
 public class NotifyDefendantCaseStayedHandler extends AbstractNotifyCaseStayedHandler {
 
-    private static final String TASK_ID = "NotifyDefendantStayCase";
+    private static final String TASK_ID_DEF_ONE = "NotifyDefendantStayCase";
+    private static final String TASK_ID_DEF_TWO = "NotifyDefendant2StayCase";
     private static final String REFERENCE_TEMPLATE = "case-stayed-defendant-notification-%s";
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_DEFENDANT_STAY_CASE, NOTIFY_DEFENDANT_TWO_STAY_CASE);
 
@@ -69,7 +70,8 @@ public class NotifyDefendantCaseStayedHandler extends AbstractNotifyCaseStayedHa
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+        return callbackParams.getRequest().getEventId().equals(NOTIFY_DEFENDANT_STAY_CASE)
+            ? TASK_ID_DEF_ONE : TASK_ID_DEF_TWO;
     }
 
     @Override

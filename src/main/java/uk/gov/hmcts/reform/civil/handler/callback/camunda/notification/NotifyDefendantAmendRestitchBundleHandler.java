@@ -28,7 +28,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_TWO_
 @RequiredArgsConstructor
 public class NotifyDefendantAmendRestitchBundleHandler extends CallbackHandler implements NotificationData {
 
-    private static final String TASK_ID = "NotifyDefendantAmendRestitchBundle";
+    private static final String TASK_ID_DEF_ONE = "NotifyDefendantAmendRestitchBundle";
+    private static final String TASK_ID_DEF_TWO = "NotifyDefendant2AmendRestitchBundle";
     private static final String REFERENCE_TEMPLATE = "amend-restitch-bundle-defendant-notification-%s";
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -42,7 +43,8 @@ public class NotifyDefendantAmendRestitchBundleHandler extends CallbackHandler i
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+        return callbackParams.getRequest().getEventId().equals(NOTIFY_DEFENDANT_AMEND_RESTITCH_BUNDLE)
+            ? TASK_ID_DEF_ONE : TASK_ID_DEF_TWO;
     }
 
     @Override
