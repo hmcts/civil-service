@@ -62,7 +62,7 @@ class InterestCalculatorTest {
             .build();
         caseData = caseData.toBuilder().submittedDate(dateTime).build();
         BigDecimal actual = interestCalculator.calculateInterest(caseData);
-        assertThat(actual).isEqualTo(BigDecimal.valueOf(1.10).setScale(2, RoundingMode.UNNECESSARY));
+        assertThat(actual).isEqualTo(BigDecimal.valueOf(0.00).setScale(2, RoundingMode.UNNECESSARY));
     }
 
     @Test
@@ -83,7 +83,7 @@ class InterestCalculatorTest {
 
         caseData = caseData.toBuilder().submittedDate(dateTime).build();
         BigDecimal actual = interestCalculator.calculateInterest(caseData);
-        assertThat(actual).isEqualTo(BigDecimal.valueOf(1.37).setScale(2, RoundingMode.UNNECESSARY));
+        assertThat(actual).isEqualTo(BigDecimal.valueOf(0.00).setScale(2, RoundingMode.UNNECESSARY));
     }
 
     @Test
@@ -230,7 +230,7 @@ class InterestCalculatorTest {
         ;
 
         BigDecimal actual = interestCalculator.calculateInterest(caseData);
-        assertThat(actual).isEqualTo(BigDecimal.valueOf(28.77).setScale(2, RoundingMode.UNNECESSARY));
+        assertThat(actual).isEqualTo(BigDecimal.valueOf(27.40).setScale(2, RoundingMode.UNNECESSARY));
     }
 
     @Test

@@ -55,7 +55,7 @@ public class InterestCalculator {
 
     private BigDecimal calculateInterestAmount(CaseData caseData, BigDecimal interestRate, LocalDate interestToDate) {
         if (caseData.getInterestClaimFrom().equals(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)) {
-            LocalDate interestFromDate = getSubmittedDate(caseData).minus(1, ChronoUnit.DAYS);
+            LocalDate interestFromDate = getSubmittedDate(caseData);
             return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate, interestFromDate, interestToDate);
         } else if (caseData.getInterestClaimFrom().equals(InterestClaimFromType.FROM_A_SPECIFIC_DATE)) {
             return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate,
