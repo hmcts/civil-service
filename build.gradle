@@ -270,7 +270,7 @@ task smoke(description: 'Runs the smoke tests.') {
 
 task functional(description: 'Runs the functional tests.') {
   dependsOn(inStrictOrder(awaitApplicationReadiness,
-    runProdApiTests, runNonProdApiTestsByGroups, runNightlyApiTests))
+    runNightlyApiTests, runProdApiTests, runNonProdApiTestsByGroups))
 }
 
 project.tasks['sonarqube'].dependsOn test, jacocoTestReport
