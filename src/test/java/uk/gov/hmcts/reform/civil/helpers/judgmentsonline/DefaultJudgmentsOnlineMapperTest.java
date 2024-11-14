@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -33,12 +32,15 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @ExtendWith(MockitoExtension.class)
 class DefaultJudgmentsOnlineMapperTest {
 
-    @MockBean
-    private Time time;
-    private InterestCalculator interestCalculator = new InterestCalculator(time);
+    private InterestCalculator interestCalculator;
     private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
+    private DefaultJudgmentOnlineMapper defaultJudgmentOnlineMapper;
 
-    private DefaultJudgmentOnlineMapper defaultJudgmentOnlineMapper  = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
+    @BeforeEach
+    public void setUp() {
+        interestCalculator = new InterestCalculator();
+        defaultJudgmentOnlineMapper = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
+    }
 
     @Test
     void testIfDefaultJudgmentIsMarkedActive_1v1() {
@@ -101,10 +103,10 @@ class DefaultJudgmentsOnlineMapperTest {
             .partialPayment(YesOrNo.YES)
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
             .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("Test User")
-                                                 .build())
-                                      .build())
+                .value(DynamicListElement.builder()
+                    .label("Test User")
+                    .build())
+                .build())
             .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
             .repaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_WEEK)
             .repaymentSuggestion("100")
@@ -144,10 +146,10 @@ class DefaultJudgmentsOnlineMapperTest {
             .partialPayment(YesOrNo.YES)
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
             .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("Test User")
-                                                 .build())
-                                      .build())
+                .value(DynamicListElement.builder()
+                    .label("Test User")
+                    .build())
+                .build())
             .paymentTypeSelection(DJPaymentTypeSelection.SET_DATE)
             .paymentSetDate(LocalDate.now().plusDays(10))
             .build();

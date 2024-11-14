@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +53,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_2V1;
 
 @ExtendWith(SpringExtension.class)
-public class SealedClaimFormGeneratorForSpecTest {
+public class  SealedClaimFormGeneratorForSpecTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String REFERENCE_NUMBER = "000DC001";
@@ -88,6 +89,7 @@ public class SealedClaimFormGeneratorForSpecTest {
         when(representativeService.getRespondent2Representative(any())).thenReturn(representative2);
         when(representativeService.getApplicantRepresentative(any())).thenReturn(getRepresentative());
         when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(BigDecimal.ZERO);
+        when(interestCalculator.getInterestPerDayBreakdown(any(CaseData.class))).thenReturn("Interest will accrue at the daily rate of £0.50 up to the date of claim issue");
     }
 
     private Representative getRepresentative() {
@@ -139,6 +141,8 @@ public class SealedClaimFormGeneratorForSpecTest {
                              .partyName("name")
                              .build())
             .respondent2SameLegalRepresentative(YesOrNo.YES)
+            .submittedDate(LocalDateTime.now().minusDays(30))
+            .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
             .build();
 
         when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(28)))

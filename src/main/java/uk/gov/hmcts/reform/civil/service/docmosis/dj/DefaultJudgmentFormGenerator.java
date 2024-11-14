@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
@@ -10,20 +11,18 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
-import uk.gov.hmcts.reform.civil.model.Address;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentForm;
-import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
+import uk.gov.hmcts.reform.civil.utils.AddressUtils;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.DefaultJudgmentUtils;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -50,6 +49,7 @@ import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent1
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent2SolicitorRef;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<DefaultJudgmentForm> {
 
@@ -57,8 +57,6 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
     private final DocumentGeneratorService documentGeneratorService;
     private final AssignCategoryId assignCategoryId;
     private final OrganisationService organisationService;
-    private final FeesService feesService;
-    private final FeatureToggleService featureToggleService;
     private final InterestCalculator interestCalculator;
     private static final String APPLICANT_1 = "applicant1";
     private static final String APPLICANT_2 = "applicant2";
@@ -70,6 +68,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
         DocmosisDocument docmosisDocument2;
         List<DefaultJudgmentForm> templateData = getDefaultJudgmentForms(caseData, event);
         DocmosisTemplates docmosisTemplate = getDocmosisTemplate(event);
+        log.info("Template for case {} for caseId {}", docmosisTemplate.getTemplate(), caseData.getCcdCaseReference());
         DocmosisDocument docmosisDocument1 =
             documentGeneratorService.generateDocmosisDocument(templateData.get(0), docmosisTemplate);
         caseDocuments.add(documentManagementService.uploadDocument(
@@ -109,23 +108,33 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
     private List<DefaultJudgmentForm> getDefaultJudgmentForms(CaseData caseData, String event) {
         List<DefaultJudgmentForm> defaultJudgmentForms = new ArrayList<>();
 
-        defaultJudgmentForms.add(getDefaultJudgmentForm(caseData, caseData.getRespondent1(), event));
+        defaultJudgmentForms.add(getDefaultJudgmentForm(caseData, caseData.getRespondent1(), event, true));
         if (caseData.getRespondent2() != null) {
 
-            defaultJudgmentForms.add(getDefaultJudgmentForm(caseData, caseData.getRespondent2(), event));
+            defaultJudgmentForms.add(getDefaultJudgmentForm(caseData, caseData.getRespondent2(), event, false));
         }
 
         return defaultJudgmentForms;
 
     }
 
-    private DefaultJudgmentForm getDefaultJudgmentForm(CaseData caseData,
-                                                       uk.gov.hmcts.reform.civil.model.Party respondent,
-                                                       String event) {
+    protected DefaultJudgmentForm getDefaultJudgmentForm(CaseData caseData,
+                                                         uk.gov.hmcts.reform.civil.model.Party respondent,
+                                                         String event,
+                                                         boolean addReferenceOfSecondRes) {
         BigDecimal debtAmount = event.equals(GENERATE_DJ_FORM_SPEC.name())
-            ? JudgmentsOnlineHelper.getDebtAmount(caseData, interestCalculator).setScale(2) : new BigDecimal(0);
+            ? JudgmentsOnlineHelper.getDebtAmount(caseData, interestCalculator).setScale(2) : BigDecimal.ZERO;
         BigDecimal cost = event.equals(GENERATE_DJ_FORM_SPEC.name())
-            ? getClaimFee(caseData) : new BigDecimal(0);
+            ? getClaimFee(caseData) : BigDecimal.ZERO;
+        ;
+
+        if (debtAmount.signum() < 1) {
+            cost = cost.add(debtAmount);
+            debtAmount = BigDecimal.ZERO;
+        }
+
+        String respReference = addReferenceOfSecondRes ? caseData.getSolicitorReferences()
+            .getRespondentSolicitor1Reference() : null;
 
         return DefaultJudgmentForm.builder()
             .caseNumber(caseData.getLegacyCaseReference())
@@ -138,11 +147,10 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
             .costs(cost.toString())
             .totalCost(debtAmount.add(cost).setScale(2).toString())
             .applicantReference(Objects.isNull(caseData.getSolicitorReferences())
-                                    ? null : caseData.getSolicitorReferences()
+                ? null : caseData.getSolicitorReferences()
                 .getApplicantSolicitor1Reference())
             .respondentReference(Objects.isNull(caseData.getSolicitorReferences())
-                                     ? null : caseData.getSolicitorReferences()
-                .getRespondentSolicitor1Reference()).build();
+                ? null : respReference).build();
     }
 
     private DefaultJudgmentForm getDefaultJudgmentFormNonDivergent(CaseData caseData, String partyType) {
@@ -167,11 +175,13 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
             .claimantLR(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
             .applicantDetails(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
             .paymentPlan(caseData.getPaymentTypeSelection().name())
-            .payByDate(Objects.isNull(caseData.getPaymentSetDate()) ? null : DateFormatHelper.formatLocalDate(caseData.getPaymentSetDate(), DateFormatHelper.DATE))
+            .payByDate(Objects.isNull(caseData.getPaymentSetDate()) ? null :
+                DateFormatHelper.formatLocalDate(caseData.getPaymentSetDate(), DateFormatHelper.DATE))
             .repaymentFrequency(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentFrequency(caseData.getRepaymentFrequency()))
             .paymentStr(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentString(caseData.getRepaymentFrequency()))
             .installmentAmount(Objects.isNull(caseData.getRepaymentSuggestion()) ? null : getInstallmentAmount(caseData.getRepaymentSuggestion()))
-            .repaymentDate(Objects.isNull(caseData.getRepaymentDate()) ? null : DateFormatHelper.formatLocalDate(caseData.getRepaymentDate(), DateFormatHelper.DATE));
+            .repaymentDate(Objects.isNull(caseData.getRepaymentDate()) ? null :
+                DateFormatHelper.formatLocalDate(caseData.getRepaymentDate(), DateFormatHelper.DATE));
         return builder.build();
     }
 
@@ -182,19 +192,27 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
 
     private String getRepaymentString(RepaymentFrequencyDJ repaymentFrequency) {
         switch (repaymentFrequency) {
-            case ONCE_ONE_WEEK : return "each week";
-            case ONCE_ONE_MONTH: return "each month";
-            case ONCE_TWO_WEEKS: return "every 2 weeks";
-            default: return null;
+            case ONCE_ONE_WEEK:
+                return "each week";
+            case ONCE_ONE_MONTH:
+                return "each month";
+            case ONCE_TWO_WEEKS:
+                return "every 2 weeks";
+            default:
+                return null;
         }
     }
 
     private String getRepaymentFrequency(RepaymentFrequencyDJ repaymentFrequencyDJ) {
         switch (repaymentFrequencyDJ) {
-            case ONCE_ONE_WEEK : return "per week";
-            case ONCE_ONE_MONTH: return "per month";
-            case ONCE_TWO_WEEKS: return "every 2 weeks";
-            default: return null;
+            case ONCE_ONE_WEEK:
+                return "per week";
+            case ONCE_ONE_MONTH:
+                return "per month";
+            case ONCE_TWO_WEEKS:
+                return "every 2 weeks";
+            default:
+                return null;
         }
     }
 
@@ -261,24 +279,13 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
             .map(organisationService::findOrganisationById)
             .flatMap(value -> value.map(o -> Party.builder()
                 .name(o.getName())
-                .primaryAddress(getAddress(o.getContactInformation().get(0)))
+                .primaryAddress(AddressUtils.getAddress(o.getContactInformation().get(0)))
                 .build())).orElse(null);
     }
 
-    private Address getAddress(ContactInformation address) {
-        return Address.builder().addressLine1(address.getAddressLine1())
-            .addressLine2(address.getAddressLine1())
-            .addressLine3(address.getAddressLine1())
-            .country(address.getCountry())
-            .county(address.getCounty())
-            .postCode(address.getPostCode())
-            .postTown(address.getTownCity())
-            .build();
-    }
-
     private BigDecimal getClaimFee(CaseData caseData) {
-        var claimfee = feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount());
-        var claimFeePounds = MonetaryConversions.penniesToPounds(claimfee.getCalculatedAmountInPence());
+        Fee claimfee = caseData.getClaimFee();
+        BigDecimal claimFeePounds = MonetaryConversions.penniesToPounds(claimfee.getCalculatedAmountInPence());
 
         if (caseData.isHelpWithFees()
             && caseData.getOutstandingFeeInPounds() != null) {
@@ -313,7 +320,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
             }
         } else {
             defaultJudgmentForms.add(getDefaultJudgmentFormNonDivergent(caseData,
-                                                                        RESPONDENT_1
+                RESPONDENT_1
             ));
             if (caseData.getRespondent2() != null) {
                 defaultJudgmentForms.add(getDefaultJudgmentFormNonDivergent(caseData, RESPONDENT_2));
@@ -323,14 +330,14 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
     }
 
     private List<CaseDocument> generateDocmosisDocsForNonDivergent(List<DefaultJudgmentForm> defaultJudgmentForms,
-                                                   String authorisation, CaseData caseData, String event) {
+                                                                   String authorisation, CaseData caseData, String event) {
         List<CaseDocument> caseDocuments = new ArrayList<>();
         for (int i = 0; i < defaultJudgmentForms.size(); i++) {
             DefaultJudgmentForm defaultJudgmentForm = defaultJudgmentForms.get(i);
             DocumentType documentType = getDocumentTypeBasedOnEvent(i, event);
             DocmosisTemplates docmosisTemplate = getDocmosisTemplate(event);
             DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(defaultJudgmentForm,
-                                                                                                  docmosisTemplate);
+                docmosisTemplate);
             CaseDocument caseDocument = documentManagementService.uploadDocument(
                 authorisation,
                 new PDF(
