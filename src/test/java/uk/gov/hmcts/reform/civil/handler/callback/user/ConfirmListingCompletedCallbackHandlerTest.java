@@ -53,7 +53,7 @@ class ConfirmListingCompletedCallbackHandlerTest extends BaseCallbackHandlerTest
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .confirmListingTickBox(confirmList)
-        .build();
+            .build();
         CallbackParams params = callbackParamsOf(caseData, MID, "validate-confirmed");
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
