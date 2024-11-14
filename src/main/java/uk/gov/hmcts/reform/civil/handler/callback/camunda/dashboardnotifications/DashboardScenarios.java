@@ -210,6 +210,10 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_FEE_PAID_TASK("Scenario.AAA6.CP.Stay.Lifted.Reset.Hearing.Fee.Paid.Task"),
     SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_CLAIMANT("Scenario.AAA6.CP.Stay.Lifted.Reset.Hearing.Tasks.Claimant"),
     SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_DEFENDANT("Scenario.AAA6.CP.Stay.Lifted.Reset.Hearing.Tasks.Defendant"),
+    SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_AVAILABLE_CLAIMANT("Scenario.AAA6.CP.Stay.Lifted.View.Documents.Task.Available.Claimant"),
+    SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_CLAIMANT("Scenario.AAA6.CP.Stay.Lifted.View.Documents.Task.Not.Available.Claimant"),
+    SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_AVAILABLE_DEFENDANT("Scenario.AAA6.CP.Stay.Lifted.View.Documents.Task.Available.Defendant"),
+    SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_DEFENDANT("Scenario.AAA6.CP.Stay.Lifted.View.Documents.Task.Not.Available.Defendant"),
     SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT("Scenario.AAA6.Update.CaseProceedsInCaseman.Defendant"),
     SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK("Scenario.AAA6.Update.CaseProceedsInCaseman.Defendant.FastTrack");
 

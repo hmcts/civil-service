@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
+import java.time.LocalDateTime;
+
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -30,6 +32,7 @@ public class StayLiftedClaimantScenarioTest extends DashboardBaseIntegrationTest
             .ccdCaseReference(Long.valueOf(caseId))
             .ccdState(CaseState.CASE_PROGRESSION)
             .preStayState(CaseState.HEARING_READINESS.toString())
+            .caseDocumentUploadDate(LocalDateTime.now())
             .applicant1Represented(YesOrNo.NO)
             .build();
 
@@ -64,15 +67,25 @@ public class StayLiftedClaimantScenarioTest extends DashboardBaseIntegrationTest
                 jsonPath("$[1].currentStatusEn").value(TaskStatus.NOT_AVAILABLE_YET.getName()),
                 jsonPath("$[1].currentStatusCy").value(TaskStatus.NOT_AVAILABLE_YET.getWelshName()),
                 jsonPath("$[2].reference").value(caseId),
-                jsonPath("$[2].taskNameEn").value("<a>Add the trial arrangements</a>"),
-                jsonPath("$[2].taskNameCy").value("<a>Ychwanegu trefniadau'r treial</a>"),
-                jsonPath("$[2].currentStatusEn").value(TaskStatus.NOT_AVAILABLE_YET.getName()),
-                jsonPath("$[2].currentStatusCy").value(TaskStatus.NOT_AVAILABLE_YET.getWelshName()),
+                jsonPath("$[2].taskNameEn").value("<a href=\"{UPLOAD_HEARING_DOCUMENTS}\" class=\"govuk-link\">Upload hearing documents</a>"),
+                jsonPath("$[2].taskNameCy").value("<a href=\"{UPLOAD_HEARING_DOCUMENTS}\" class=\"govuk-link\">Llwytho dogfennau'r gwrandawiad</a>"),
+                jsonPath("$[2].currentStatusEn").value(TaskStatus.IN_PROGRESS.getName()),
+                jsonPath("$[2].currentStatusCy").value(TaskStatus.IN_PROGRESS.getWelshName()),
                 jsonPath("$[3].reference").value(caseId),
-                jsonPath("$[3].taskNameEn").value("<a>View the bundle</a>"),
-                jsonPath("$[3].taskNameCy").value("<a>Gweld y bwndel</a>"),
-                jsonPath("$[3].currentStatusEn").value(TaskStatus.NOT_AVAILABLE_YET.getName()),
-                jsonPath("$[3].currentStatusCy").value(TaskStatus.NOT_AVAILABLE_YET.getWelshName())
+                jsonPath("$[3].taskNameEn").value("<a href=\"{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}\" class=\"govuk-link\">View documents</a>"),
+                jsonPath("$[3].taskNameCy").value("<a href=\"{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}\" class=\"govuk-link\">Gweld y dogfennau</a>"),
+                jsonPath("$[3].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
+                jsonPath("$[3].currentStatusCy").value(TaskStatus.AVAILABLE.getWelshName()),
+                jsonPath("$[4].reference").value(caseId),
+                jsonPath("$[4].taskNameEn").value("<a>Add the trial arrangements</a>"),
+                jsonPath("$[4].taskNameCy").value("<a>Ychwanegu trefniadau'r treial</a>"),
+                jsonPath("$[4].currentStatusEn").value(TaskStatus.NOT_AVAILABLE_YET.getName()),
+                jsonPath("$[4].currentStatusCy").value(TaskStatus.NOT_AVAILABLE_YET.getWelshName()),
+                jsonPath("$[5].reference").value(caseId),
+                jsonPath("$[5].taskNameEn").value("<a>View the bundle</a>"),
+                jsonPath("$[5].taskNameCy").value("<a>Gweld y bwndel</a>"),
+                jsonPath("$[5].currentStatusEn").value(TaskStatus.NOT_AVAILABLE_YET.getName()),
+                jsonPath("$[5].currentStatusCy").value(TaskStatus.NOT_AVAILABLE_YET.getWelshName())
             );
     }
 }

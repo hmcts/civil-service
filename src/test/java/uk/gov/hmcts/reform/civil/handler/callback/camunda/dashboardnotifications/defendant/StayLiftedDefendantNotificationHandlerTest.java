@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 
@@ -38,6 +39,8 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_AVAILABLE_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_DEFENDANT;
 
 @ExtendWith(MockitoExtension.class)
 public class StayLiftedDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -122,7 +125,8 @@ public class StayLiftedDefendantNotificationHandlerTest extends BaseCallbackHand
             handler.handle(callbackParams);
 
             verifyRecordedScenarios(List.of(
-                SCENARIO_AAA6_CP_STAY_LIFTED_DEFENDANT.getScenario()
+                SCENARIO_AAA6_CP_STAY_LIFTED_DEFENDANT.getScenario(),
+                SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_DEFENDANT.getScenario()
             ));
         }
 
@@ -144,7 +148,8 @@ public class StayLiftedDefendantNotificationHandlerTest extends BaseCallbackHand
             handler.handle(callbackParams);
 
             verifyRecordedScenarios(List.of(
-                SCENARIO_AAA6_CP_STAY_LIFTED_DEFENDANT.getScenario()
+                SCENARIO_AAA6_CP_STAY_LIFTED_DEFENDANT.getScenario(),
+                SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_DEFENDANT.getScenario()
             ));
         }
 
@@ -166,7 +171,8 @@ public class StayLiftedDefendantNotificationHandlerTest extends BaseCallbackHand
             handler.handle(callbackParams);
 
             verifyRecordedScenarios(List.of(
-                SCENARIO_AAA6_CP_STAY_LIFTED_DEFENDANT.getScenario()
+                SCENARIO_AAA6_CP_STAY_LIFTED_DEFENDANT.getScenario(),
+                SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_DEFENDANT.getScenario()
             ));
         }
 
@@ -189,7 +195,8 @@ public class StayLiftedDefendantNotificationHandlerTest extends BaseCallbackHand
 
             verifyRecordedScenarios(List.of(
                 SCENARIO_AAA6_CP_STAY_LIFTED_DEFENDANT.getScenario(),
-                SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_DEFENDANT.getScenario()
+                SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_DEFENDANT.getScenario(),
+                SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_DEFENDANT.getScenario()
             ));
         }
 
@@ -212,7 +219,33 @@ public class StayLiftedDefendantNotificationHandlerTest extends BaseCallbackHand
 
             verifyRecordedScenarios(List.of(
                 SCENARIO_AAA6_CP_STAY_LIFTED_DEFENDANT.getScenario(),
-                SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_DEFENDANT.getScenario())
+                SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_DEFENDANT.getScenario(),
+                SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_DEFENDANT.getScenario())
+            );
+        }
+
+        @Test
+        void shouldRecordExpectedScenarios_whenEvidenceUploaded() {
+            when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
+                .toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .preStayState(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString())
+                .caseDocumentUploadDateRes(LocalDateTime.now())
+                .build();
+
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .build();
+
+            handler.handle(callbackParams);
+
+            verifyRecordedScenarios(List.of(
+                SCENARIO_AAA6_CP_STAY_LIFTED_DEFENDANT.getScenario(),
+                SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_DEFENDANT.getScenario(),
+                SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_AVAILABLE_DEFENDANT.getScenario())
             );
         }
 
