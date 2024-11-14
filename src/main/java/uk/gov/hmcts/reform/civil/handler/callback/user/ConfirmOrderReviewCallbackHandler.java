@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Collections;
 import java.util.List;
@@ -27,15 +28,26 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CONFIRM_ORDER_REVIEW);
 
+    private final FeatureToggleService featureToggleService;
+
     private final ObjectMapper objectMapper;
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-            callbackKey(ABOUT_TO_SUBMIT), this::confirmOrderReview,
-            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
-        );
+
+        if (featureToggleService.isCaseEventsEnabled()) {
+            return Map.of(
+                callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+                callbackKey(ABOUT_TO_SUBMIT), this::confirmOrderReview,
+                callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
+            );
+        } else {
+            return Map.of(
+                callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+                callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
+                callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
+            );
+        }
     }
 
     @Override
