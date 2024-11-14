@@ -20,10 +20,7 @@ import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersJudgePapers;
 import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
-import uk.gov.hmcts.reform.civil.enums.hearing.HearingChannel;
-import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
-import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
-import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
+import uk.gov.hmcts.reform.civil.enums.hearing.*;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.caseprogression.HearingOtherComments;
 import uk.gov.hmcts.reform.civil.model.caseprogression.RevisedHearingRequirements;
@@ -224,6 +221,12 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private HearingOtherComments respondent2HearingOtherComments;
     @Builder.Default
     private final List<Element<CaseDocument>> trialReadyDocuments = new ArrayList<>();
+
+    // request hearing
+    private HearingTypes requestHearingNoticeIntermediate;
+    private HearingTypes requestHearingNoticeMulti;
+    private YesOrNo requestAnotherHearing;
+    private String hearingWaTaskTypeToTrigger;
 
     /**
      * Claimant has requested a reconsideration of the SDO.
