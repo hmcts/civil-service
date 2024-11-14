@@ -59,7 +59,7 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmit {
 
         @Test
-        void shouldAddCaseNoteToList_whenInvoked() {
+        void shouldConfirmOrderReview_whenInvoked() {
 
             CaseData caseData = CaseData.builder()
                 .build();
@@ -73,6 +73,19 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("camundaEvent", "status")
                 .containsOnly(CONFIRM_ORDER_REVIEW.name(), "READY");
         }
+
+        @Test
+        void shouldReturnEmptyResponse_whenInvoked() {
+            Mockito.when(toggleService.isCaseEventsEnabled()).thenReturn(false);
+            CaseData caseData = CaseData.builder()
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response).isEqualTo(AboutToStartOrSubmitCallbackResponse.builder().build());
+        }
     }
 
     @Nested
@@ -80,6 +93,7 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnEmptyResponse_whenInvoked() {
+            Mockito.when(toggleService.isCaseEventsEnabled()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.SUBMITTED);
@@ -88,5 +102,6 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response).isEqualTo(SubmittedCallbackResponse.builder().build());
         }
+
     }
 }
