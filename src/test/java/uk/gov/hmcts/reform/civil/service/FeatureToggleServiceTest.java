@@ -184,15 +184,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenEarlyAdopterEnabled(Boolean toggleStat) {
-        var caseFileKey = "early-adopters";
-        givenToggle(caseFileKey, toggleStat);
-
-        assertThat(featureToggleService.isEarlyAdoptersEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsSdoR2Enabled(Boolean toggleStat) {
         var sdoR2Key = "isSdoR2Enabled";
         givenToggle(sdoR2Key, toggleStat);
@@ -262,17 +253,6 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).isEqualTo(toggleStat);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsPartOfNationalRollout(Boolean toggleStat) {
-        final String feature = "national-rollout-whitelist";
-        String location = "000000";
-        when(featureToggleApi.isFeatureEnabledForLocation(eq(feature), eq(location), eq(false)))
-            .thenReturn(toggleStat);
-
-        assertThat(featureToggleService.isPartOfNationalRollout(location)).isEqualTo(toggleStat);
-    }
-
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(eq(feature)))
             .thenReturn(state);
@@ -304,5 +284,14 @@ class FeatureToggleServiceTest {
         givenToggle(isCoSCEnabledKey, toggleStat);
 
         assertThat(featureToggleService.isCoSCEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsHmcNroCEnabled(Boolean toggleStat) {
+        var isCoSCEnabledKey = "hmc-nro";
+        givenToggle(isCoSCEnabledKey, toggleStat);
+
+        assertThat(featureToggleService.isHmcNroEnabled()).isEqualTo(toggleStat);
     }
 }

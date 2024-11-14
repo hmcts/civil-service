@@ -119,14 +119,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
         CaseData caseData = callbackParams.getCaseData();
 
-        // If Pre SDO allow GA in all locations.
-        // If Post SDO including JUDICIAL REFERRAL, allow GA in all locations, except Birmingham
-        if (inStateAfterJudicialReferral(caseData.getCcdState())
-            && !featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
-            log.info("Gen apps for case {} not part of national rollout, post SDO", caseData.getCcdCaseReference());
-            errors.add(NOT_IN_EA_REGION);
-        }
-
         if (!initiateGeneralApplicationService.respondentAssigned(caseData)) {
             errors.add(RESP_NOT_ASSIGNED_ERROR);
         }
@@ -365,7 +357,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
         Map<String, Object> data = initiateGeneralApplicationService
                 .buildCaseData(dataBuilder, caseData, userDetails, callbackParams.getParams().get(BEARER_TOKEN)
-                        .toString()).toMap(objectMapper);
+                        .toString(), feesService).toMap(objectMapper);
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(data).build();
     }
