@@ -207,9 +207,6 @@ class DefaultJudgmentFormGeneratorTest {
         when(interestCalculator.calculateInterest(any(CaseData.class)))
             .thenReturn(new BigDecimal(10));
 
-        when(feesService.getFeeDataByTotalClaimAmount(new BigDecimal(2000)))
-            .thenReturn(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build());
-
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .totalClaimAmount(new BigDecimal(2000))
             .fixedCosts(FixedCosts.builder()
@@ -238,9 +235,6 @@ class DefaultJudgmentFormGeneratorTest {
 
         when(interestCalculator.calculateInterest(any(CaseData.class)))
             .thenReturn(new BigDecimal(10));
-
-        when(feesService.getFeeDataByTotalClaimAmount(new BigDecimal(2000)))
-            .thenReturn(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build());
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .totalClaimAmount(new BigDecimal(2000))

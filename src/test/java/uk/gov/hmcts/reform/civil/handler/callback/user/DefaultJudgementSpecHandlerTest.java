@@ -597,12 +597,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             BigDecimal interestAmount = new BigDecimal(100);
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(1));
-            when(feesService.getFeeDataByTotalClaimAmount(any()))
-                .thenReturn(Fee.builder()
-                                .calculatedAmountInPence(BigDecimal.valueOf(1))
-                                .version("1")
-                                .code("CODE")
-                                .build());
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .partialPayment(YES)
@@ -632,12 +626,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             BigDecimal interestAmount = new BigDecimal(100);
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(1));
-            when(feesService.getFeeDataByTotalClaimAmount(any()))
-                .thenReturn(Fee.builder()
-                                .calculatedAmountInPence(BigDecimal.valueOf(1))
-                                .version("1")
-                                .code("CODE")
-                                .build());
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .partialPayment(YES)
@@ -672,12 +660,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             BigDecimal interestAmount = new BigDecimal(100);
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(1));
-            when(feesService.getFeeDataByTotalClaimAmount(any()))
-                .thenReturn(Fee.builder()
-                                .calculatedAmountInPence(BigDecimal.valueOf(1))
-                                .version("1")
-                                .code("CODE")
-                                .build());
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .partialPayment(YES)
@@ -828,12 +810,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(0)
                 );
-            when(feesService.getFeeDataByTotalClaimAmount(any()))
-                .thenReturn(Fee.builder()
-                                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                                .version("1")
-                                .code("CODE")
-                                .build());
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .partialPayment(YES)
@@ -877,12 +853,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(0)
                 );
-            when(feesService.getFeeDataByTotalClaimAmount(any()))
-                .thenReturn(Fee.builder()
-                                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                                .version("1")
-                                .code("CODE")
-                                .build());
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .partialPayment(YES)
@@ -926,12 +896,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(0)
                 );
-            when(feesService.getFeeDataByTotalClaimAmount(any()))
-                .thenReturn(Fee.builder()
-                                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                                .version("1")
-                                .code("CODE")
-                                .build());
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .partialPayment(YES)
@@ -975,12 +939,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(0)
                 );
-            when(feesService.getFeeDataByTotalClaimAmount(any()))
-                .thenReturn(Fee.builder()
-                                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                                .version("1")
-                                .code("CODE")
-                                .build());
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .partialPayment(YES)
@@ -1024,12 +982,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(0)
                 );
-            when(feesService.getFeeDataByTotalClaimAmount(any()))
-                .thenReturn(Fee.builder()
-                                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                                .version("1")
-                                .code("CODE")
-                                .build());
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .partialPayment(YES)
@@ -1072,12 +1024,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(0)
                 );
-            when(feesService.getFeeDataByTotalClaimAmount(any()))
-                .thenReturn(Fee.builder()
-                                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                                .version("1")
-                                .code("CODE")
-                                .build());
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .partialPayment(YES)
