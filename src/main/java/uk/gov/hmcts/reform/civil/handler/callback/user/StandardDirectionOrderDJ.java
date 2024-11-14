@@ -771,25 +771,18 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                       document -> document.getValue().getDocumentLink(), "caseManagementOrders");
         caseDataBuilder.businessProcess(BusinessProcess.ready(STANDARD_DIRECTION_ORDER_DJ));
 
-        var state = "CASE_PROGRESSION";
         caseDataBuilder.hearingNotes(getHearingNotes(caseData));
 
-        if (featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
-            log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
-            caseDataBuilder.eaCourtLocation(YES);
-
-            if (featureToggleService.isHmcEnabled()
-                && !caseData.isApplicantLiP()
-                && !caseData.isRespondent1LiP()
-                && !caseData.isRespondent2LiP()) {
-                caseDataBuilder.hmcEaCourtLocation(featureToggleService.isLocationWhiteListedForCaseProgression(
-                    caseData.getCaseManagementLocation().getBaseLocation()) ? YES : NO);
-            }
-        } else {
-            log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
-            caseDataBuilder.eaCourtLocation(NO);
+        caseDataBuilder.eaCourtLocation(YES);
+        if (featureToggleService.isHmcEnabled()
+            && !caseData.isApplicantLiP()
+            && !caseData.isRespondent1LiP()
+            && !caseData.isRespondent2LiP()) {
+            caseDataBuilder.hmcEaCourtLocation(featureToggleService.isLocationWhiteListedForCaseProgression(
+                caseData.getCaseManagementLocation().getBaseLocation()) ? YES : NO);
         }
 
+        var state = "CASE_PROGRESSION";
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(state)
