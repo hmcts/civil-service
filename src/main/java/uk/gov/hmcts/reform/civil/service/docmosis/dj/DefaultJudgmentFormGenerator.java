@@ -133,8 +133,11 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
             debtAmount = BigDecimal.ZERO;
         }
 
-        String respReference = addReferenceOfSecondRes ? caseData.getSolicitorReferences()
-            .getRespondentSolicitor1Reference() : null;
+        String respReference = null;
+        if (caseData.getSolicitorReferences() != null) {
+            respReference = addReferenceOfSecondRes ? caseData.getSolicitorReferences()
+                .getRespondentSolicitor1Reference() : null;
+        }
 
         return DefaultJudgmentForm.builder()
             .caseNumber(caseData.getLegacyCaseReference())
