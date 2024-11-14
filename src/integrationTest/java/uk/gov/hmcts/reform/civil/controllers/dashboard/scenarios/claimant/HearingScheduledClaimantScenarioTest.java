@@ -52,7 +52,7 @@ public class HearingScheduledClaimantScenarioTest extends CaseProgressionDashboa
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(LocationRefData.builder().siteName("Name").courtAddress("Loc").postcode("1").build());
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
 
         DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();
         DynamicList list = DynamicList.builder().value(location).listItems(List.of(location)).build();
@@ -122,7 +122,7 @@ public class HearingScheduledClaimantScenarioTest extends CaseProgressionDashboa
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(LocationRefData.builder().siteName("Name").courtAddress("Loc").postcode("1").build());
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
         when(hearingFeesService.getFeeForHearingSmallClaims(any()))
             .thenReturn(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build());
         when(hearingNoticeCamundaService.getProcessVariables(any()))
@@ -201,7 +201,7 @@ public class HearingScheduledClaimantScenarioTest extends CaseProgressionDashboa
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(LocationRefData.builder().siteName("Name").courtAddress("Loc").postcode("1").build());
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
 
         DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();
         DynamicList list = DynamicList.builder().value(location).listItems(List.of(location)).build();
@@ -264,7 +264,7 @@ public class HearingScheduledClaimantScenarioTest extends CaseProgressionDashboa
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(LocationRefData.builder().siteName("Name").courtAddress("Loc").postcode("1").build());
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
         when(hearingFeesService.getFeeForHearingSmallClaims(any()))
             .thenReturn(Fee.builder().calculatedAmountInPence(new BigDecimal(20000)).build());
         when(hearingNoticeCamundaService.getProcessVariables(any()))
