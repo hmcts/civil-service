@@ -576,6 +576,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         void shouldShowOldFixedCostsPage_whenNoErrorsAndPreClaimIssueFixedCosts() {
             BigDecimal claimAmount = new BigDecimal(2000);
             BigDecimal interestAmount = new BigDecimal(100);
+            when(interestCalculator.calculateInterest(any()))
+                .thenReturn(BigDecimal.valueOf(100));
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
@@ -643,7 +645,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                                 .claimFixedCosts(YES)
                                 .fixedCostAmount("10000")
                                 .build())
-                .partialPaymentAmount("209000")
+                .partialPaymentAmount("199500")
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -676,7 +678,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .fixedCosts(FixedCosts.builder()
                                 .claimFixedCosts(NO)
                                 .build())
-                .partialPaymentAmount("209000")
+                .partialPaymentAmount("2090")
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
