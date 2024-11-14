@@ -52,6 +52,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.utils.DefaultJudgmentUtils.calculateFixedCosts;
+import static uk.gov.hmcts.reform.civil.utils.DefaultJudgmentUtils.calculateFixedCostsOnEntry;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
@@ -270,8 +271,48 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             }
         }
 
+        if (!errors.isEmpty()) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(errors)
+                .build();
+        }
+
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        // show old fixed costs screen if claim was created before new fixed
+        // costs screen at claim issue was released
+        if (caseData.getFixedCosts() == null) {
+            caseDataBuilder.showOldDJFixedCostsScreen(YesOrNo.YES);
+        }
+
+        // otherwise show new dj fixed costs screen if judgment amount is more
+        // than 25. judgment amount = claim amount + interest - partial amount
+        if (caseData.getFixedCosts() != null) {
+            BigDecimal judgmentAmount = calculateJudgmentAmountForFixedCosts(caseData);
+            if (YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
+                if (judgmentAmount.compareTo(BigDecimal.valueOf(25)) > 0) {
+                    caseDataBuilder.showDJFixedCostsScreen(YesOrNo.YES);
+                } else {
+                    caseDataBuilder.showDJFixedCostsScreen(YesOrNo.NO);
+                }
+            }
+            // if case is applicable to new fixed costs but new screen will not
+            // be shown due to the above conditions, then skip straight to
+            // repayment breakdown screen
+            if (caseDataBuilder.build().getShowDJFixedCostsScreen() == null
+                || YesOrNo.NO.equals(caseDataBuilder.build().getShowDJFixedCostsScreen())) {
+                // calculate repayment breakdown
+                StringBuilder repaymentBreakdown = buildRepaymentBreakdown(
+                    caseData,
+                    callbackParams);
+
+                caseDataBuilder.repaymentSummaryObject(repaymentBreakdown.toString());
+            }
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
@@ -296,22 +337,10 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        BigDecimal interest = interestCalculator.calculateInterest(caseData);
-        Fee claimfee = caseData.getClaimFee();
-        BigDecimal claimFeePounds;
-        if (caseData.getOutstandingFeeInPounds() != null) {
-            claimFeePounds = caseData.getOutstandingFeeInPounds();
-        } else {
-            claimFeePounds = MonetaryConversions.penniesToPounds(claimfee.getCalculatedAmountInPence());
-        }
-        BigDecimal fixedCost = calculateFixedCosts(caseData);
+
         StringBuilder repaymentBreakdown = buildRepaymentBreakdown(
             caseData,
-            interest,
-            claimFeePounds,
-            fixedCost,
-            callbackParams
-        );
+            callbackParams);
 
         caseDataBuilder.repaymentSummaryObject(repaymentBreakdown.toString());
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -320,19 +349,30 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     @NotNull
-    private StringBuilder buildRepaymentBreakdown(CaseData caseData, BigDecimal interest, BigDecimal claimFeePounds,
-                                                  BigDecimal fixedCost, CallbackParams callbackParams) {
+    private StringBuilder buildRepaymentBreakdown(CaseData caseData, CallbackParams callbackParams) {
 
+        BigDecimal interest = interestCalculator.calculateInterest(caseData);
+        Fee claimfee = caseData.getClaimFee();
+        BigDecimal claimFeePounds;
+        if (caseData.getOutstandingFeeInPounds() != null) {
+            claimFeePounds = caseData.getOutstandingFeeInPounds();
+        } else {
+            claimFeePounds = MonetaryConversions.penniesToPounds(claimfee.getCalculatedAmountInPence());
+        }
+
+        BigDecimal fixedCost = BigDecimal.valueOf(0);
+        if (caseData.getFixedCosts() == null) {
+            fixedCost = calculateFixedCosts(caseData);
+        } else {
+            if (caseData.getFixedCosts() != null && caseData.getFixedCosts().getFixedCostAmount() != null) {
+                fixedCost = calculateFixedCostsOnEntry(caseData, calculateJudgmentAmountForFixedCosts(caseData));
+            }
+        }
         BigDecimal partialPaymentPounds = getPartialPayment(caseData);
         //calculate the relevant total, total claim value + interest if any, claim fee for case,
         // and subtract any partial payment
-        var subTotal = caseData.getTotalClaimAmount()
-            .add(interest)
-            .add(claimFeePounds);
-        if (caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.YES) {
-            subTotal = subTotal.add(fixedCost);
-        }
-        theOverallTotal = subTotal.subtract(partialPaymentPounds);
+        BigDecimal subTotal = getSubTotal(caseData, interest, claimFeePounds, fixedCost);
+        theOverallTotal = calculateOverallTotal(partialPaymentPounds, subTotal);
         //creates  the text on the page, based on calculated values
         StringBuilder repaymentBreakdown = new StringBuilder();
         if (caseData.isLRvLipOneVOne()
@@ -358,7 +398,9 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             repaymentBreakdown.append("\n ### Claim interest amount \n").append("£").append(interest.setScale(2));
         }
 
-        if (caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.YES) {
+        if ((caseData.getFixedCosts() != null
+            && YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts()))
+            || caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.YES) {
             repaymentBreakdown.append("\n ### Fixed cost amount \n").append("£").append(fixedCost.setScale(2));
         }
         repaymentBreakdown.append("\n").append("### Claim fee amount \n £").append(claimFeePounds.setScale(2)).append(
@@ -372,6 +414,19 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
         repaymentBreakdown.append("\n ## Total still owed \n £").append(theOverallTotal.setScale(2));
         return repaymentBreakdown;
+    }
+
+    @NotNull
+    private BigDecimal getSubTotal(CaseData caseData, BigDecimal interest, BigDecimal claimFeePounds, BigDecimal fixedCost) {
+        var subTotal = caseData.getTotalClaimAmount()
+            .add(interest)
+            .add(claimFeePounds);
+        if (caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.YES
+            || (caseData.getFixedCosts() != null
+            && YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts()))) {
+            subTotal = subTotal.add(fixedCost);
+        }
+        return subTotal;
     }
 
     private BigDecimal getPartialPayment(CaseData caseData) {
@@ -452,6 +507,18 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(nextState)
             .build();
+    }
+
+    private BigDecimal calculateOverallTotal(BigDecimal partialPaymentPounds, BigDecimal subTotal) {
+        return subTotal.subtract(partialPaymentPounds);
+    }
+
+    private BigDecimal calculateJudgmentAmountForFixedCosts(CaseData caseData) {
+        BigDecimal interest = interestCalculator.calculateInterest(caseData);
+
+        BigDecimal subTotal = caseData.getTotalClaimAmount().add(interest);
+        BigDecimal partialPaymentPounds = getPartialPayment(caseData);
+        return calculateOverallTotal(partialPaymentPounds, subTotal);
     }
 }
 
