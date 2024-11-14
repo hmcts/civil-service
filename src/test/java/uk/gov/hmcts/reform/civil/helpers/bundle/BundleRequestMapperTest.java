@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
@@ -34,8 +35,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.BDDMockito.given;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.LITIGANT_IN_PERSON_CLAIM_FORM;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.LIP_CLAIM_FORM;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 
 @ExtendWith(MockitoExtension.class)
 class BundleRequestMapperTest {
@@ -392,25 +398,6 @@ class BundleRequestMapperTest {
             .build();
     }
 
-    private CaseData getCaseDataWithUnbundledFolderId() {
-        return CaseData.builder().ccdCaseReference(1L)
-            .systemGeneratedCaseDocuments(setupSystemGeneratedCaseDocsUnbundledFolderId())
-            .applicant1(Party.builder().individualLastName("lastname").individualFirstName("cl1Fname").partyName(
-                "applicant1").type(Party.Type.INDIVIDUAL).build())
-            .respondent1(Party.builder().individualLastName("lastname").individualFirstName("df1Fname").partyName(
-                "respondent1").type(Party.Type.INDIVIDUAL).build())
-            .addApplicant2(YesOrNo.YES)
-            .addRespondent2(YesOrNo.YES)
-            .applicant2(Party.builder().individualLastName("lastname").individualFirstName("cl2Fname").partyName(
-                "applicant2").type(Party.Type.INDIVIDUAL).build())
-            .respondent2(Party.builder().individualLastName("lastname").individualFirstName("df2Fname").partyName(
-                "respondent2").type(Party.Type.INDIVIDUAL).build())
-            .hearingDate(LocalDate.now())
-            .submittedDate(LocalDateTime.of(2023, 2, 10, 2,
-                                            2, 2))
-            .build();
-    }
-
     private CaseData getCaseData() {
         return CaseData.builder().ccdCaseReference(1L)
             .documentWitnessStatement(getWitnessDocs())
@@ -640,15 +627,13 @@ class BundleRequestMapperTest {
 
     private List<Element<UploadEvidenceDocumentType>> getDocumentEvidenceForTrial() {
         List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = new ArrayList<>();
-        Arrays.stream(TypeOfDocDocumentaryEvidenceOfTrial.values()).toList().forEach(type -> {
-            otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
-                                                           .builder()
-                                                           .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                               .documentFileName(TEST_FILE_NAME).categoryID("").build())
-                                                           .typeOfDocument(type.getDisplayNames().get(0))
-                                                           .documentIssuedDate(LocalDate.of(2023, 1, 12))
-                                                           .build()));
-        });
+        Arrays.stream(TypeOfDocDocumentaryEvidenceOfTrial.values()).toList().forEach(type -> otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
+                                                       .builder()
+                                                       .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
+                                                                           .documentFileName(TEST_FILE_NAME).categoryID("").build())
+                                                       .typeOfDocument(type.getDisplayNames().get(0))
+                                                       .documentIssuedDate(LocalDate.of(2023, 1, 12))
+                                                       .build())));
         otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
                                                        .builder()
                                                        .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
@@ -689,34 +674,28 @@ class BundleRequestMapperTest {
     private List<Element<UploadEvidenceWitness>> getWitnessDocs() {
         List<String> witnessNames = new ArrayList<>(Arrays.asList("cl1Fname", "df1Fname", "cl2Fname", "df2Fname", "FirstName LastName"));
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
-        LocalDateTime createdDateTime = LocalDateTime.of(2023, 12, 12, 8, 8, 5);
-        witnessNames.forEach(witnessName -> {
-            witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
-                                                             .builder()
-                                                             .witnessOptionDocument(Document.builder().documentBinaryUrl(
-                                                                     TEST_URL)
-                                                                                        .documentFileName(TEST_FILE_NAME).build())
-                                                             .witnessOptionName(witnessName)
-                                                             .witnessOptionUploadDate(LocalDate.of(2023, 2, 10).plusDays(witnessNames.indexOf(witnessName)))
-                                                             .createdDatetime(LocalDateTime.of(2023, 12, 12, 8, 8, 5)).build()));
-        });
+        witnessNames.forEach(witnessName -> witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
+                                                         .builder()
+                                                         .witnessOptionDocument(Document.builder().documentBinaryUrl(
+                                                                 TEST_URL)
+                                                                                    .documentFileName(TEST_FILE_NAME).build())
+                                                         .witnessOptionName(witnessName)
+                                                         .witnessOptionUploadDate(LocalDate.of(2023, 2, 10).plusDays(witnessNames.indexOf(witnessName)))
+                                                         .createdDatetime(LocalDateTime.of(2023, 12, 12, 8, 8, 5)).build())));
         return witnessEvidenceDocs;
     }
 
     private List<Element<UploadEvidenceWitness>> getWitnessDocsCategoryId() {
         List<String> witnessNames = new ArrayList<>(Arrays.asList("cl1Fname", "df1Fname", "cl2Fname", "df2Fname", "FirstName LastName"));
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
-        LocalDateTime createdDateTime = LocalDateTime.of(2023, 12, 12, 8, 8, 5);
-        witnessNames.forEach(witnessName -> {
-            witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
-                                                             .builder()
-                                                             .witnessOptionDocument(Document.builder().documentBinaryUrl(
-                                                                     TEST_URL)
-                                                                                        .documentFileName(TEST_FILE_NAME).categoryID("").build())
-                                                             .witnessOptionName(witnessName)
-                                                             .witnessOptionUploadDate(LocalDate.of(2023, 2, 10).plusDays(witnessNames.indexOf(witnessName)))
-                                                             .createdDatetime(LocalDateTime.of(2023, 12, 12, 8, 8, 5)).build()));
-        });
+        witnessNames.forEach(witnessName -> witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
+                                                         .builder()
+                                                         .witnessOptionDocument(Document.builder().documentBinaryUrl(
+                                                                 TEST_URL)
+                                                                                    .documentFileName(TEST_FILE_NAME).categoryID("").build())
+                                                         .witnessOptionName(witnessName)
+                                                         .witnessOptionUploadDate(LocalDate.of(2023, 2, 10).plusDays(witnessNames.indexOf(witnessName)))
+                                                         .createdDatetime(LocalDateTime.of(2023, 12, 12, 8, 8, 5)).build())));
         return witnessEvidenceDocs;
     }
 
@@ -765,55 +744,10 @@ class BundleRequestMapperTest {
         return systemGeneratedCaseDocuments;
     }
 
-    private List<Element<CaseDocument>> setupSystemGeneratedCaseDocsUnbundledFolderId() {
-        List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
-        CaseDocument caseDocumentDQDef1 =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(TEST_URL)
-                                  .documentFileName("ONE").categoryID("UnbundledFolder").build())
-                .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
-                                                  2, 2)).build();
-        CaseDocument caseDocumentDQApp1 =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(TEST_URL)
-                                  .documentFileName("TWO").categoryID("UnbundledFolder").build())
-                .createdDatetime(LocalDateTime.of(2023, 3, 10, 2,
-                                                  2, 2)).build();
-        CaseDocument caseDocumentDQDef22 =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(TEST_URL)
-                                  .documentFileName("THREE").categoryID("UnbundledFolder").build())
-                .createdDatetime(LocalDateTime.of(2023, 4, 11, 2,
-                                                  2, 2)).build();
-        CaseDocument caseDocumentDQDef21 =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(TEST_URL)
-                                  .documentFileName("FOUR").categoryID("UnbundledFolder").build())
-                .createdDatetime(LocalDateTime.of(2023, 5, 10, 2,
-                                                  2, 2)).build();
-        CaseDocument caseDocumentDQDef23 =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(TEST_URL)
-                                  .documentFileName("FIVE").build())
-                .createdDatetime(LocalDateTime.of(2023, 6, 10, 2,
-                                                  2, 2)).build();
-        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef1));
-        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQApp1));
-        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef22));
-        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef21));
-        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef23));
-        return systemGeneratedCaseDocuments;
-    }
-
     private List<Element<CaseDocument>> setupSystemGeneratedCaseDocs() {
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         CaseDocument caseDocumentClaim =
-            CaseDocument.builder().documentType(DocumentType.SEALED_CLAIM).documentLink(Document.builder().documentUrl(
+            CaseDocument.builder().documentType(SEALED_CLAIM).documentLink(Document.builder().documentUrl(
                 TEST_URL).documentFileName(TEST_FILE_NAME).categoryID("detailsOfClaim").build()).createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
                  2, 2)).build();
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentClaim));
@@ -954,8 +888,8 @@ class BundleRequestMapperTest {
                                                                                                        "test", "test"
         );
         // Then: hasApplicant2 and hasRespondant2 should return false
-        assertEquals(false, bundleCreateRequest.getCaseDetails().getCaseData().isHasApplicant2());
-        assertEquals(false, bundleCreateRequest.getCaseDetails().getCaseData().isHasRespondant2());
+        assertFalse(bundleCreateRequest.getCaseDetails().getCaseData().isHasApplicant2());
+        assertFalse(bundleCreateRequest.getCaseDetails().getCaseData().isHasRespondant2());
     }
 
     @Test
@@ -977,7 +911,60 @@ class BundleRequestMapperTest {
                                                                                                        "test", "test"
         );
         // Then: hasApplicant2 and hasRespondant2 should return false
-        assertEquals(false, bundleCreateRequest.getCaseDetails().getCaseData().isHasApplicant2());
-        assertEquals(false, bundleCreateRequest.getCaseDetails().getCaseData().isHasRespondant2());
+        assertFalse(bundleCreateRequest.getCaseDetails().getCaseData().isHasApplicant2());
+        assertFalse(bundleCreateRequest.getCaseDetails().getCaseData().isHasRespondant2());
     }
+
+    @Test
+    void mapBundleCreateRequestForSealedFormForAysncCall() {
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(1L,
+                                                                                                       documents,
+                                                                                                       "sealedBundleForm",
+                                                                                                       "sealedForm",
+                                                                                                       "CIVIL",
+                                                                                                       "CIVIL");
+        // Then: hasApplicant2 and hasRespondant2 should return false
+        assertEquals(2, bundleCreateRequest.getCaseDetails().getCaseData().getSealedFormDocuments().size());
+    }
+
+    private static final CaseDocument CLAIM_FORM =
+        CaseDocument.builder()
+            .createdBy("John")
+            .documentName(String.format(N1.getDocumentTitle(), "000DC001"))
+            .documentSize(0L)
+            .documentType(SEALED_CLAIM)
+            .createdDatetime(LocalDateTime.now())
+            .documentLink(Document.builder()
+                              .documentUrl("fake-url")
+                              .documentFileName("file-name")
+                              .documentBinaryUrl("binary-url")
+                              .build())
+            .build();
+
+    private static final CaseDocument LIP_FORM =
+        CaseDocument.builder()
+            .createdBy("John")
+            .documentName(String.format(LIP_CLAIM_FORM.getDocumentTitle(), "000DC001"))
+            .documentSize(0L)
+            .documentType(LITIGANT_IN_PERSON_CLAIM_FORM)
+            .createdDatetime(LocalDateTime.now())
+            .documentLink(Document.builder()
+                              .documentUrl("fake-url")
+                              .documentFileName("file-name")
+                              .documentBinaryUrl("binary-url")
+                              .build())
+            .build();
+
+    private final List<DocumentMetaData> documents = Arrays.asList(
+        new DocumentMetaData(
+            CLAIM_FORM.getDocumentLink(),
+            "Sealed Claim Form",
+            LocalDate.now().toString()
+        ),
+        new DocumentMetaData(
+            LIP_FORM.getDocumentLink(),
+            "Litigant in person claim form",
+            LocalDate.now().toString()
+        )
+    );
 }
