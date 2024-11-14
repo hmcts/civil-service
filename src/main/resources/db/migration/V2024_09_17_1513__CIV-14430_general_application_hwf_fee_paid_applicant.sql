@@ -9,8 +9,8 @@ VALUES ('Scenario.AAA6.GeneralApps.HwF.FeePaid.Applicant',
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA6.GeneralApps.HwF.FeePaid.Applicant',
-        'The ${applicationFeeTypeEn} fee has been paid',
+        'The ${applicationFeeTypeEn} has been paid',
         'Mae’r ffi gwneud ${applicationFeeTypeCy} wedi cael ei thalu',
-        '<p class="govuk-body">The ${applicationFeeTypeEn} fee has been paid in full.</p>',
+        '<p class="govuk-body">The ${applicationFeeTypeEn} has been paid in full.</p>',
         '<p class="govuk-body">Mae‘r ffi gwneud ${applicationFeeTypeCy} wedi cael ei thalu’n llawn.</p>',
         'APPLICANT');
