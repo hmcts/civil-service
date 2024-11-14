@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.dashboard.data.Notification;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -64,14 +65,15 @@ public class DashboardController {
     public ResponseEntity<List<TaskList>> getTaskListByCaseIdentifierAndRole(
         @PathVariable("ccd-case-identifier") String ccdCaseIdentifier,
         @PathVariable("role-type") String roleType,
-        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
+        @RequestParam(name = "nonProgressable", defaultValue = "false") boolean nonProgressable
     ) {
         log.info(
             "Get Task Lists for ccd-case-identifier: {}, role-type : {}",
             ccdCaseIdentifier, roleType
         );
 
-        var taskListResponse = taskListService.getTaskList(ccdCaseIdentifier, roleType);
+        var taskListResponse = taskListService.getTaskList(ccdCaseIdentifier, roleType, nonProgressable);
 
         return new ResponseEntity<>(taskListResponse, HttpStatus.OK);
     }

@@ -14,13 +14,20 @@ import uk.gov.hmcts.reform.dashboard.utilities.StringUtility;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+
+import static java.util.Objects.nonNull;
 
 @Service
 @Slf4j
 public class TaskListService {
+
+    private static final List<Integer> EXCLUDED_TASKS = List.of(
+            TaskStatus.AVAILABLE.getPlaceValue(),
+            TaskStatus.DONE.getPlaceValue(),
+            TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
+    );
 
     private final TaskListRepository taskListRepository;
     private final TaskItemTemplateRepository taskItemTemplateRepository;
@@ -31,7 +38,7 @@ public class TaskListService {
         this.taskItemTemplateRepository = taskItemTemplateRepository;
     }
 
-    public List<TaskList> getTaskList(String ccdCaseIdentifier, String roleType) {
+    public List<TaskList> getTaskList(String ccdCaseIdentifier, String roleType, boolean returnAsNonProgressable) {
 
         List<TaskListEntity> taskListEntityList = taskListRepository.findByReferenceAndTaskItemTemplateRole(
             ccdCaseIdentifier,
@@ -39,9 +46,10 @@ public class TaskListService {
         );
 
         return taskListEntityList.stream()
-            .sorted(Comparator.comparingInt(t -> t.getTaskItemTemplate().getTaskOrder()))
-            .map(TaskList::from)
-            .toList();
+           .sorted(Comparator.comparingInt(t -> t.getTaskItemTemplate().getTaskOrder()))
+           .map(t -> nonNull(returnAsNonProgressable) && returnAsNonProgressable ? createAsNonProgressable(t) : t)
+           .map(TaskList::from)
+           .toList();
     }
 
     public TaskListEntity saveOrUpdate(TaskListEntity taskList) {
@@ -74,31 +82,37 @@ public class TaskListService {
 
     public void makeProgressAbleTasksInactiveForCaseIdentifierAndRole(String caseIdentifier, String role, String excludedCategory) {
         List<TaskListEntity> tasks = new ArrayList<>();
-        if (Objects.nonNull(excludedCategory)) {
+        if (nonNull(excludedCategory)) {
             List<TaskItemTemplateEntity> categories = taskItemTemplateRepository.findByCategoryEnAndRole(excludedCategory, role);
-            if (Objects.nonNull(categories)) {
+            if (nonNull(categories)) {
                 List<Long> catIds = categories.stream().map(TaskItemTemplateEntity::getId).toList();
                 tasks = taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplate_IdNotIn(
-                    caseIdentifier, role, List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(),
-                                                  TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()), catIds
+                    caseIdentifier, role, EXCLUDED_TASKS, catIds
                 );
             }
         } else {
             tasks = taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotIn(
-                caseIdentifier, role, List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(),
-                                              TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()));
+                caseIdentifier, role, EXCLUDED_TASKS);
         }
         tasks.forEach(t -> {
-            TaskListEntity task = t.toBuilder()
+            TaskListEntity task = buildNonProgressableTask(t);
+            taskListRepository.save(task);
+        });
+        log.info("{} tasks made inactive for claim = {}", tasks.size(), caseIdentifier);
+    }
+
+    TaskListEntity createAsNonProgressable(TaskListEntity task) {
+        return !EXCLUDED_TASKS.contains(task) ? buildNonProgressableTask(task) : task;
+    }
+
+    TaskListEntity buildNonProgressableTask(TaskListEntity task) {
+        return task.toBuilder()
                 .currentStatus(TaskStatus.INACTIVE.getPlaceValue())
                 .nextStatus(TaskStatus.INACTIVE.getPlaceValue())
                 .hintTextCy("")
                 .hintTextEn("")
-                .taskNameEn(StringUtility.removeAnchor(t.getTaskNameEn()))
-                .taskNameCy(StringUtility.removeAnchor(t.getTaskNameCy()))
+                .taskNameEn(StringUtility.removeAnchor(task.getTaskNameEn()))
+                .taskNameCy(StringUtility.removeAnchor(task.getTaskNameCy()))
                 .build();
-            taskListRepository.save(task);
-        });
-        log.info("{} tasks made inactive for claim = {}", tasks.size(), caseIdentifier);
     }
 }

@@ -66,17 +66,18 @@ class DashboardControllerTest {
 
         //given
         List<TaskList> taskList = getTaskListList();
-        when(taskListService.getTaskList(any(), any())).thenReturn(taskList);
+        when(taskListService.getTaskList(any(), any(), any())).thenReturn(taskList);
 
         //when
         ResponseEntity<List<TaskList>> output = dashboardController.getTaskListByCaseIdentifierAndRole(
             "123",
             "Claimant",
-            AUTHORISATION
+            AUTHORISATION,
+            false
         );
 
         //then
-        verify(taskListService).getTaskList("123", "Claimant");
+        verify(taskListService).getTaskList("123", "Claimant", false);
         assertThat(output.getStatusCode().is2xxSuccessful()).isTrue();
         assertThat(output.getBody()).isEqualTo(taskList);
     }
@@ -85,18 +86,19 @@ class DashboardControllerTest {
     void shouldReturnEmptyTaskListForCaseReferenceAndRoleIfNotPresent() {
 
         //given
-        when(taskListService.getTaskList(any(), any()))
+        when(taskListService.getTaskList(any(), any(), any()))
             .thenReturn(List.of());
 
         //when
         ResponseEntity<List<TaskList>> output = dashboardController.getTaskListByCaseIdentifierAndRole(
             "123",
             "Claimant",
-            AUTHORISATION
+            AUTHORISATION,
+            false
         );
 
         //then
-        verify(taskListService).getTaskList("123", "Claimant");
+        verify(taskListService).getTaskList("123", "Claimant", false);
         assertThat(output.getStatusCode().is2xxSuccessful()).isTrue();
         assertThat(output.getBody().isEmpty()).isTrue();
     }
@@ -105,14 +107,15 @@ class DashboardControllerTest {
     void shouldThrow500ErrorForCaseReferenceAndRoleIfException() {
 
         //given
-        when(taskListService.getTaskList(any(), any()))
+        when(taskListService.getTaskList(any(), any(), any()))
             .thenThrow(new RuntimeException());
 
         //then
         assertThrows(RuntimeException.class, () -> dashboardController.getTaskListByCaseIdentifierAndRole(
             "123",
             "Claimant",
-            AUTHORISATION
+            AUTHORISATION,
+            false
         ));
     }
 

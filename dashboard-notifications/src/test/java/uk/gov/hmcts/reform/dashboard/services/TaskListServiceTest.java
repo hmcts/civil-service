@@ -50,7 +50,7 @@ class TaskListServiceTest {
         when(taskListRepository.findByReferenceAndTaskItemTemplateRole(any(), any())).thenReturn(List.of());
 
         //when
-        List<TaskList> actual = taskListService.getTaskList("123", "Claimant");
+        List<TaskList> actual = taskListService.getTaskList("123", "Claimant", false);
 
         //then
         verify(taskListRepository).findByReferenceAndTaskItemTemplateRole("123", "Claimant");
@@ -67,7 +67,7 @@ class TaskListServiceTest {
         )).thenReturn(getTaskListEntityList());
 
         //when
-        List<TaskList> actual = taskListService.getTaskList("123", "Claimant");
+        List<TaskList> actual = taskListService.getTaskList("123", "Claimant", false);
 
         //then
         verify(taskListRepository).findByReferenceAndTaskItemTemplateRole("123", "Claimant");
