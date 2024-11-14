@@ -20,6 +20,7 @@ public class StayCaseClaimantNotificationHandler extends CaseEventsDashboardCall
     private static final List<CaseEvent> EVENTS =
         List.of(CREATE_DASHBOARD_NOTIFICATION_STAY_CASE_CLAIMANT);
     public static final String TASK_ID = "GenerateDashboardNotificationStayCaseClaimant";
+    public static final String GA = "Applications";
 
     public StayCaseClaimantNotificationHandler(DashboardApiClient dashboardApiClient,
                                                DashboardNotificationsParamsMapper mapper,

@@ -289,6 +289,7 @@ public class HmcDataUtils {
         return getAttendeesBySubChannel(hearing, subChannel).stream()
                 .flatMap(attendee -> hearing.getPartyDetails().stream()
                         .filter(party -> party.getPartyID().equals(attendee.getPartyID()))
+                        .filter(party -> party.getIndividualDetails() != null)
                         .map(party -> StringUtils.joinNonNull(" ", party.getIndividualDetails().getFirstName(),
                                 party.getIndividualDetails().getLastName()))
                 ).collect(Collectors.toList());
