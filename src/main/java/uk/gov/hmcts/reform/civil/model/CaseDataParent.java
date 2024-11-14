@@ -482,6 +482,9 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private SmallClaimsMediation smallClaimsMediationSectionStatement;
 
     private FixedCosts fixedCosts;
+    private YesOrNo showDJFixedCostsScreen;
+    private YesOrNo showOldDJFixedCostsScreen;
+    private YesOrNo claimFixedCostsOnEntryDJ;
 
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {
