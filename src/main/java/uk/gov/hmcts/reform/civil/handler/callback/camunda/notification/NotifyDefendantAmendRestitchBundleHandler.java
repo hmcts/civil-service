@@ -43,7 +43,7 @@ public class NotifyDefendantAmendRestitchBundleHandler extends CallbackHandler i
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return callbackParams.getRequest().getEventId().equals(NOTIFY_DEFENDANT_AMEND_RESTITCH_BUNDLE)
+        return callbackParams.getRequest().getEventId().equals(NOTIFY_DEFENDANT_AMEND_RESTITCH_BUNDLE.name())
             ? TASK_ID_DEF_ONE : TASK_ID_DEF_TWO;
     }
 

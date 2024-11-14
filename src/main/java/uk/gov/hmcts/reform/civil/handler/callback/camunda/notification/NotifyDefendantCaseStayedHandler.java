@@ -70,7 +70,7 @@ public class NotifyDefendantCaseStayedHandler extends AbstractNotifyCaseStayedHa
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return callbackParams.getRequest().getEventId().equals(NOTIFY_DEFENDANT_STAY_CASE)
+        return callbackParams.getRequest().getEventId().equals(NOTIFY_DEFENDANT_STAY_CASE.name())
             ? TASK_ID_DEF_ONE : TASK_ID_DEF_TWO;
     }
 
