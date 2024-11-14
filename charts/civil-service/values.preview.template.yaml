@@ -12,6 +12,7 @@ java:
     CMC_DB_PASSWORD: ${POSTGRES_PASSWORD}
     CMC_DB_CONNECTION_OPTIONS: '?sslmode=allow'
     REFERENCE_DATABASE_MIGRATION: true
+    EM_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-em-ccdorc
     CAMUNDA_URL: http://${SERVICE_NAME}-camunda/engine-rest/
     SERVICE_REQUEST_UPDATE: https://${SERVICE_NAME}.preview.platform.hmcts.net/service-request-update
     SERVICE_REQUEST_UPDATE_CLAIM_ISSUED: https://${SERVICE_NAME}.preview.platform.hmcts.net/service-request-update-claim-issued

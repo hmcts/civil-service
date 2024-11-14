@@ -188,7 +188,7 @@ public class BundleRequestMapper {
         return ElementUtils.wrapElements(bundlingRequestDocuments);
     }
 
-    public static String getFileNamePrefix(String fileName) {
+    private static String getFileNamePrefix(String fileName) {
         int dotIndex = fileName.lastIndexOf('.');
         if (dotIndex > 0) {
             return fileName.substring(0, dotIndex);
