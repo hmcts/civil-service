@@ -27,19 +27,26 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.LITIGANT_IN_PERSON_CLAIM_FORM;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.LIP_CLAIM_FORM;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 
 @ExtendWith(SpringExtension.class)
 class BundleCreationServiceTest {
@@ -202,5 +209,66 @@ class BundleCreationServiceTest {
         //Then: BundleRest API should be called
         verify(evidenceManagementApiClient).createNewBundle(anyString(), anyString(), any());
     }
+
+    @Test
+    void testNewBundleApiClientIsInvokedThroughEvent()  {
+        //Given: case details with all document type
+        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        given(bundleRequestMapper.mapCaseDataToBundleCreateRequest(any(), any(), any(), any())).willReturn(null);
+        given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(null);
+        given(coreCaseDataService.getCase(1L)).willReturn(caseDetails);
+        given(userConfig.getUserName()).willReturn("test");
+        given(userConfig.getPassword()).willReturn("test");
+        given(objectMapper.convertValue(caseDetails.getData(), CaseData.class)).willReturn(caseData);
+        given(authTokenGenerator.generate()).willReturn("test");
+        given(userService.getAccessToken("test", "test")).willReturn("test");
+
+        //When: bundlecreation service is called
+        bundlingService.createBundle(1L, documents, "file-name");
+
+        //Then: BundleRest API should be called
+        verify(evidenceManagementApiClient).createNewBundle(anyString(), anyString(), any());
+    }
+
+    private static final CaseDocument CLAIM_FORM =
+        CaseDocument.builder()
+            .createdBy("John")
+            .documentName(String.format(N1.getDocumentTitle(), "000DC001"))
+            .documentSize(0L)
+            .documentType(SEALED_CLAIM)
+            .createdDatetime(LocalDateTime.now())
+            .documentLink(Document.builder()
+                              .documentUrl("fake-url")
+                              .documentFileName("file-name")
+                              .documentBinaryUrl("binary-url")
+                              .build())
+            .build();
+
+    private static final CaseDocument LIP_FORM =
+        CaseDocument.builder()
+            .createdBy("John")
+            .documentName(String.format(LIP_CLAIM_FORM.getDocumentTitle(), "000DC001"))
+            .documentSize(0L)
+            .documentType(LITIGANT_IN_PERSON_CLAIM_FORM)
+            .createdDatetime(LocalDateTime.now())
+            .documentLink(Document.builder()
+                              .documentUrl("fake-url")
+                              .documentFileName("file-name")
+                              .documentBinaryUrl("binary-url")
+                              .build())
+            .build();
+
+    private final List<DocumentMetaData> documents = Arrays.asList(
+        new DocumentMetaData(
+            CLAIM_FORM.getDocumentLink(),
+            "Sealed Claim Form",
+            LocalDate.now().toString()
+        ),
+        new DocumentMetaData(
+            LIP_FORM.getDocumentLink(),
+            "Litigant in person claim form",
+            LocalDate.now().toString()
+        )
+    );
 
 }

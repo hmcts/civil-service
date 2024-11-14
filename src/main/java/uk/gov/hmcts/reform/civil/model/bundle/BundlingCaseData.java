@@ -18,6 +18,8 @@ public class BundlingCaseData {
     public String bundleConfiguration;
     @JsonProperty("id")
     public long id;
+    @JsonProperty("sealedFormDocuments")
+    List<Element<BundlingRequestDocument>> sealedFormDocuments;
     @JsonProperty("trialDocuments")
     private final List<Element<BundlingRequestDocument>> trialDocuments;
     @JsonProperty("statementsOfCaseDocuments")

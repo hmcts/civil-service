@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.bundle.BundlingRequestDocument;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
@@ -65,6 +66,47 @@ public class BundleRequestMapper {
             )
             .caseTypeId(caseTypeId)
             .jurisdictionId(jurisdiction).build();
+    }
+
+    public BundleCreateRequest mapCaseDataToBundleCreateRequest(Long caseId,
+                                                                List<DocumentMetaData> documentMetaData,
+                                                                String bundleConfigFileName,
+                                                                String sealedFormName,
+                                                                String jurisdiction,
+                                                                String caseTypeId) {
+        log.info("Mapping sealed form to BundleCreateRequest for case ID: {}", caseId);
+        String fileNameIdentifier = getFileNamePrefix(sealedFormName);
+        return BundleCreateRequest.builder()
+            .caseDetails(BundlingCaseDetails.builder()
+                             .caseData(mapStitchData(
+                                 caseId,
+                                 documentMetaData,
+                                 bundleConfigFileName
+                             ))
+                             .filenamePrefix(fileNameIdentifier)
+                             .build()
+            )
+            .caseTypeId(caseTypeId)
+            .jurisdictionId(jurisdiction).build();
+    }
+
+    private BundlingCaseData mapStitchData(Long caseId,
+                                           List<DocumentMetaData> documentMetaData,
+                                           String bundleConfigFileName) {
+        return  BundlingCaseData.builder().id(caseId).bundleConfiguration(bundleConfigFileName)
+                .sealedFormDocuments(mapSealedForms(documentMetaData))
+                .ccdCaseReference(caseId)
+                .build();
+    }
+
+    private List<Element<BundlingRequestDocument>> mapSealedForms(List<DocumentMetaData> documentMetaData) {
+        List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
+
+        documentMetaData
+                .forEach(poc -> bundlingRequestDocuments.add(
+                    buildBundlingRequestDoc(poc.getDocument().getDocumentFileName(), poc.getDocument(), "")));
+
+        return ElementUtils.wrapElements(bundlingRequestDocuments);
     }
 
     private BundlingCaseData mapCaseData(CaseData caseData, String bundleConfigFileName) {
@@ -144,6 +186,14 @@ public class BundleRequestMapper {
         });
 
         return ElementUtils.wrapElements(bundlingRequestDocuments);
+    }
+
+    public static String getFileNamePrefix(String fileName) {
+        int dotIndex = fileName.lastIndexOf('.');
+        if (dotIndex > 0) {
+            return fileName.substring(0, dotIndex);
+        }
+        return fileName; // If there's no dot, return the entire name
     }
 
     private String generateFileName(CaseData caseData) {

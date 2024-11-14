@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -10,15 +11,17 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.bundle.Bundle;
+import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.bundle.BundleCreationService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.LitigantInPersonFormGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGenerator;
-import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDate;
@@ -26,36 +29,30 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_CLAIM_FORM;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings("unchecked")
 public class GenerateClaimFormCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_CLAIM_FORM);
     private static final String TASK_ID = "GenerateClaimForm";
-    private static final String BUNDLE_NAME = "Sealed Claim Form with LiP Claim Form";
 
-    private final CivilDocumentStitchingService civilDocumentStitchingService;
+    private final BundleCreationService bundleCreationService;
     private final LitigantInPersonFormGenerator litigantInPersonFormGenerator;
     private final SealedClaimFormGenerator sealedClaimFormGenerator;
     private final ObjectMapper objectMapper;
     private final Time time;
     private final AssignCategoryId assignCategoryId;
 
-    private final FeatureToggleService featureToggleService;
-
     @Value("${stitching.enabled}")
-    private boolean stitchEnabled;
-
-    public void setStitchEnabled(boolean stitchEnabled) {
-        this.stitchEnabled = stitchEnabled;
-    }
+    public boolean stitchEnabled;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -75,6 +72,8 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDate issueDate = time.now().toLocalDate();
+        Long caseId = caseData.getCcdCaseReference();
+        log.info("Handling un-spec claim form generation for caseId {}", caseId);
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder().issueDate(issueDate);
 
@@ -84,6 +83,7 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
         );
         assignCategoryId.assignCategoryIdToCaseDocument(sealedClaim, "detailsOfClaim");
 
+        log.info("Is stitch enabled {} caseId {}", stitchEnabled, caseId);
         if (stitchEnabled
             && (YesOrNo.NO.equals(caseData.getRespondent1Represented())
             || YesOrNo.NO.equals(caseData.getRespondent2Represented()))) {
@@ -106,17 +106,20 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
                 )
             );
 
-            CaseDocument sealedClaimFormWithLiPForm =
-                civilDocumentStitchingService.bundle(
-                    documents,
-                    callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                    BUNDLE_NAME,
-                    sealedClaim.getDocumentName(),
-                    caseData
-                );
-
-            caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaimFormWithLiPForm));
-
+            log.info("Calling async stitch api for caseId {}", caseId);
+            BundleCreateResponse bundleCreateResponse = bundleCreationService.createBundle(
+                caseId,
+                documents,
+                sealedClaim.getDocumentName()
+            );
+            log.info("Received async stitch api response with document task id {} for caseId {}", bundleCreateResponse.getDocumentTaskId(),  caseId);
+            Bundle bundle = bundleCreateResponse.getData().getCaseBundles().get(0);
+            CaseDocument caseDocument = CaseDocument.builder()
+                .documentLink(Optional.ofNullable(bundle.getValue().getStitchedDocument()).orElse(Document.builder().build()))
+                .documentName(bundle.getValue().getFileName())
+                .createdDatetime(bundle.getValue().getCreatedOn())
+                .build();
+            caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(caseDocument));
         } else {
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaim));
         }
