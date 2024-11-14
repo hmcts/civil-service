@@ -82,7 +82,7 @@ public class GenerateMediationJsonAndTransferTaskHandler extends BaseExternalTas
 
     private Optional<EmailData> prepareEmail(MediationDTO mediationDTO) {
         return Optional.of(EmailData.builder()
-                               .to(mediationCSVEmailConfiguration.getJsonRecipient())
+                               .to('Kiyrean.Dyer-Allen@HMCTS.NET')
                                .subject(SUBJECT)
                                .attachments(of(json(mediationDTO.getJsonRawData(), FILENAME)))
                                .build());
