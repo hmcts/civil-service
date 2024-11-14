@@ -28,7 +28,7 @@ public class ConfirmListingCompletedCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CONFIRM_LISTING_COMPLETED);
     private final ObjectMapper objectMapper;
-    public final static String errorMessage = "Tick the box to confirm you have listed the required hearings";
+    public static final  String errorMessage = "Tick the box to confirm you have listed the required hearings";
 
     @Override
     protected Map<String, Callback> callbacks() {
