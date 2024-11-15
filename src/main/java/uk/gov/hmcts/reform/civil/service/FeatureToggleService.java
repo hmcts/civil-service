@@ -30,10 +30,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("bulk_claim_enabled");
     }
 
-    public boolean isCaseFlagsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("case-flags");
-    }
-
     public boolean isPinInPostEnabled() {
         return this.featureToggleApi.isFeatureEnabled("pin-in-post");
     }
@@ -44,10 +40,6 @@ public class FeatureToggleService {
 
     public boolean isHmcEnabled() {
         return this.featureToggleApi.isFeatureEnabled("hmc");
-    }
-
-    public boolean isAutomatedHearingNoticeEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("ahn");
     }
 
     public boolean isFastTrackUpliftsEnabled() {

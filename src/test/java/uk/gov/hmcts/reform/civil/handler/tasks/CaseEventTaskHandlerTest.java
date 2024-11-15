@@ -40,7 +40,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
@@ -106,9 +105,6 @@ class CaseEventTaskHandlerTest {
     @MockBean
     private CoreCaseDataService coreCaseDataService;
 
-    @MockBean
-    private FeatureToggleService featureToggleService;
-
     @Captor
     ArgumentCaptor<CaseDataContent> caseDataContentArgumentCaptor;
 
@@ -134,7 +130,6 @@ class CaseEventTaskHandlerTest {
 
             when(mockTask.getAllVariables()).thenReturn(variables);
             when(mockTask.getVariable(FLOW_STATE)).thenReturn(PENDING_CLAIM_ISSUED.fullName());
-            when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(false);
         }
 
         @Test

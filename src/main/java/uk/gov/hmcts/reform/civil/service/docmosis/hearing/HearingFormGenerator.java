@@ -29,13 +29,9 @@ import java.util.List;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_APPLICATION;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_APPLICATION_AHN;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_TRIAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_TRIAL_AHN;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_OTHER;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_OTHER_AHN;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_SMALL_CLAIMS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_SMALL_CLAIMS_AHN;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.formatHearingDuration;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingTimeFormatted;
@@ -62,12 +58,12 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
         DocmosisDocument document =
             documentGeneratorService.generateDocmosisDocument(templateData, template);
         CaseDocument caseDocument = documentManagementService.uploadDocument(
-                authorisation,
-                new PDF(
-                        getFileName(caseData, template),
-                        document.getBytes(),
-                        DocumentType.HEARING_FORM
-                )
+            authorisation,
+            new PDF(
+                getFileName(caseData, template),
+                document.getBytes(),
+                DocumentType.HEARING_FORM
+            )
         );
         assignCategoryId.assignCategoryIdToCaseDocument(caseDocument, DocCategory.HEARING_NOTICES.getValue());
         caseDocuments.add(caseDocument);
@@ -117,7 +113,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
                 && caseData.getHearingFeePaymentDetails().getStatus().equals(PaymentStatus.SUCCESS)) {
                 return "DO_NOT_SHOW";
             }
-        } else  {
+        } else {
             if (caseData.getListingOrRelisting().equals(ListingOrRelisting.RELISTING)) {
                 return "DO_NOT_SHOW";
             }
@@ -137,7 +133,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
     }
 
     private String fixSepDateIssue(String fixDate) {
-        return  fixDate.contains("Sept") ? fixDate.replace("Sept", "Sep") : fixDate;
+        return fixDate.contains("Sept") ? fixDate.replace("Sept", "Sep") : fixDate;
 
     }
 
@@ -146,28 +142,15 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
     }
 
     private DocmosisTemplates getTemplate(CaseData caseData) {
-        if (!featureToggleService.isAutomatedHearingNoticeEnabled()) {
-            switch (caseData.getHearingNoticeList()) {
-                case SMALL_CLAIMS:
-                    return HEARING_SMALL_CLAIMS;
-                case FAST_TRACK_TRIAL:
-                    return HEARING_TRIAL;
-                case HEARING_OF_APPLICATION:
-                    return HEARING_APPLICATION;
-                default:
-                    return HEARING_OTHER;
-            }
-        } else {
-            switch (caseData.getHearingNoticeList()) {
-                case SMALL_CLAIMS:
-                    return HEARING_SMALL_CLAIMS_AHN;
-                case FAST_TRACK_TRIAL:
-                    return HEARING_TRIAL_AHN;
-                case HEARING_OF_APPLICATION:
-                    return HEARING_APPLICATION_AHN;
-                default:
-                    return HEARING_OTHER_AHN;
-            }
+        switch (caseData.getHearingNoticeList()) {
+            case SMALL_CLAIMS:
+                return HEARING_SMALL_CLAIMS_AHN;
+            case FAST_TRACK_TRIAL:
+                return HEARING_TRIAL_AHN;
+            case HEARING_OF_APPLICATION:
+                return HEARING_APPLICATION_AHN;
+            default:
+                return HEARING_OTHER_AHN;
         }
     }
 }
