@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.FixedCosts;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
@@ -207,6 +208,70 @@ public class DefaultJudgmentFormGeneratorTest {
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT));
 
+    }
+
+    @Test
+    void shouldDefaultJudgmentFormGeneratorOneForm_whenFixedCostsAtClaimIssueOnly() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N121_SPEC)))
+            .thenReturn(new DocmosisDocument(N121_SPEC.getDocumentTitle(), bytes));
+
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT)))
+            .thenReturn(CASE_DOCUMENT);
+
+        when(interestCalculator.calculateInterest(any(CaseData.class)))
+            .thenReturn(new BigDecimal(10));
+
+        when(feesService.getFeeDataByTotalClaimAmount(new BigDecimal(2000)))
+            .thenReturn(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build());
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .totalClaimAmount(new BigDecimal(2000))
+            .fixedCosts(FixedCosts.builder()
+                            .claimFixedCosts(YesOrNo.YES)
+                            .fixedCostAmount("10000")
+                            .build())
+            .claimFixedCostsOnEntryDJ(YesOrNo.NO)
+            .caseDataLiP(CaseDataLiP.builder().helpWithFees(HelpWithFees.builder().helpWithFee(YesOrNo.NO).build()).build())
+            .build();
+        List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN, GENERATE_DJ_FORM_SPEC.name());
+
+        assertThat(caseDocuments.size()).isEqualTo(1);
+
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT));
+    }
+
+    @Test
+    void shouldDefaultJudgmentFormGeneratorOneForm_whenFixedCostsAtClaimIssueAndDJ() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N121_SPEC)))
+            .thenReturn(new DocmosisDocument(N121_SPEC.getDocumentTitle(), bytes));
+
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT)))
+            .thenReturn(CASE_DOCUMENT);
+
+        when(interestCalculator.calculateInterest(any(CaseData.class)))
+            .thenReturn(new BigDecimal(10));
+
+        when(feesService.getFeeDataByTotalClaimAmount(new BigDecimal(2000)))
+            .thenReturn(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build());
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .totalClaimAmount(new BigDecimal(2000))
+            .fixedCosts(FixedCosts.builder()
+                            .claimFixedCosts(YesOrNo.YES)
+                            .fixedCostAmount("10000")
+                            .build())
+            .claimFixedCostsOnEntryDJ(YesOrNo.YES)
+            .caseDataLiP(CaseDataLiP.builder().helpWithFees(HelpWithFees.builder().helpWithFee(YesOrNo.NO).build()).build())
+            .build();
+        List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN, GENERATE_DJ_FORM_SPEC.name());
+
+        assertThat(caseDocuments.size()).isEqualTo(1);
+
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT));
     }
 
     @Test
