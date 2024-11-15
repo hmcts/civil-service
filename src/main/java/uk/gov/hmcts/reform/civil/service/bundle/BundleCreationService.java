@@ -53,7 +53,7 @@ public class BundleCreationService {
     }
 
     public BundleCreateResponse createBundle(Long caseId, List<DocumentMetaData> documentMetaDataList, String sealedFormName) {
-        log.info("Handling create bundle request for claim forms for case id {}", caseId);
+        log.info("Handling create bundle request for claim forms for case id {} with formConfig {}", caseId, bundleFormConfig);
         CaseDetails caseDetails = coreCaseDataService.getCase(caseId);
         BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(
             caseId,
