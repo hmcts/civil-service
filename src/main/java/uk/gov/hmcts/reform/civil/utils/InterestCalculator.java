@@ -126,7 +126,7 @@ public class InterestCalculator {
                 }
             }
             description.append(interestPerDay.setScale(2, RoundingMode.HALF_UP));
-            description.append(" up to the date of judgment");
+            description.append(" up to the date of judgment or settlement");
             return description.toString();
         }
     }
