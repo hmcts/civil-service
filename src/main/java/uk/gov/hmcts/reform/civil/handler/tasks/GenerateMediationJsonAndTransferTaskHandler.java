@@ -38,16 +38,12 @@ public class GenerateMediationJsonAndTransferTaskHandler extends BaseExternalTas
     private final MediationJsonService mediationJsonService;
     private final SendGridClient sendGridClient;
     private final MediationCSVEmailConfiguration mediationCSVEmailConfiguration;
-    private final FeatureToggleService featureToggleService;
     private static final String SUBJECT = "OCMC Mediation Data";
     private static final String FILENAME = "ocmc_mediation_data.json";
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        if (!featureToggleService.isFeatureEnabled("carm")) {
-            return ExternalTaskData.builder().build();
-        }
         List<CaseData> inMediationCases;
         LocalDate claimMovedDate;
         if (externalTask.getVariable("claimMovedDate") != null) {

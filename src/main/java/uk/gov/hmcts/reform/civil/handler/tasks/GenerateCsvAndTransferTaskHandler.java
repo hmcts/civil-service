@@ -39,8 +39,6 @@ public class GenerateCsvAndTransferTaskHandler extends BaseExternalTaskHandler {
     private static final String SUBJECT = "OCMC Mediation Data";
     private static final String FILENAME = "ocmc_mediation_data.csv";
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-    private final FeatureToggleService toggleService;
-    private final RuntimeService runtimeService;
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -59,8 +57,6 @@ public class GenerateCsvAndTransferTaskHandler extends BaseExternalTaskHandler {
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), inMediationCases.size());
         String[] headers = getCSVHeaders();
         StringBuilder csvColContent = new StringBuilder();
-        runtimeService.setVariable(externalTask.getProcessInstanceId(), "carmFeatureEnabled",
-                                   toggleService.isFeatureEnabled("carm"));
         try {
             if (!inMediationCases.isEmpty()) {
                 inMediationCases.forEach(caseData ->

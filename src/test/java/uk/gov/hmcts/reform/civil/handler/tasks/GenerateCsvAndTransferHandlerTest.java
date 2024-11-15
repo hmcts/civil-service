@@ -110,7 +110,6 @@ class GenerateCsvAndTransferHandlerTest {
     void shouldSetFeatureToggleCarmVariableWhenEnabled() {
         when(searchService.getInMediationCases(claimToBeProcessed, false)).thenReturn(List.of(caseDetailsWithInMediationState));
         when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationState)).thenReturn(caseDataInMediation);
-        when(toggleService.isFeatureEnabled(eq("carm"))).thenReturn(true);
         when(mediationCsvServiceFactory.getMediationCSVService(any())).thenReturn(mediationCSVLrvLipService);
         when(mediationCSVEmailConfiguration.getRecipient()).thenReturn(SENDER);
         when(mediationCSVEmailConfiguration.getSender()).thenReturn(RECIPIENT);
