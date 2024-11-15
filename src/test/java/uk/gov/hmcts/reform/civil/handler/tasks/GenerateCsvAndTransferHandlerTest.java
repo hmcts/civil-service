@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
-import org.camunda.bpm.engine.RuntimeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,7 +14,6 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCSVLrvLipService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCsvServiceFactory;
 import uk.gov.hmcts.reform.civil.service.search.MediationCasesSearchService;
@@ -31,7 +29,6 @@ import java.util.Map;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -67,12 +64,6 @@ class GenerateCsvAndTransferHandlerTest {
     @Mock
     private MediationCSVLrvLipService mediationCSVLrvLipService;
 
-    @Mock
-    private FeatureToggleService toggleService;
-
-    @Mock
-    private RuntimeService runTimeService;
-
     private CaseDetails caseDetailsWithInMediationState;
     private CaseDetails caseDetailsWithInMediationStateNotToProcess;
     private CaseData caseDataInMediation;
@@ -102,24 +93,7 @@ class GenerateCsvAndTransferHandlerTest {
         verify(searchService).getInMediationCases(claimToBeProcessed, false);
         verify(sendGridClient).sendEmail(anyString(), any());
         verify(sendGridClient, times(1)).sendEmail(anyString(), any());
-        verify(runTimeService).setVariable(externalTask.getProcessInstanceId(), "carmFeatureEnabled", false);
         verify(externalTaskService).complete(externalTask, null);
-    }
-
-    @Test
-    void shouldSetFeatureToggleCarmVariableWhenEnabled() {
-        when(searchService.getInMediationCases(claimToBeProcessed, false)).thenReturn(List.of(caseDetailsWithInMediationState));
-        when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationState)).thenReturn(caseDataInMediation);
-        when(mediationCsvServiceFactory.getMediationCSVService(any())).thenReturn(mediationCSVLrvLipService);
-        when(mediationCSVEmailConfiguration.getRecipient()).thenReturn(SENDER);
-        when(mediationCSVEmailConfiguration.getSender()).thenReturn(RECIPIENT);
-
-        inMediationCsvHandler.execute(externalTask, externalTaskService);
-        verify(searchService).getInMediationCases(claimToBeProcessed, false);
-        verify(sendGridClient).sendEmail(anyString(), any());
-        verify(sendGridClient, times(1)).sendEmail(anyString(), any());
-        verify(externalTaskService).complete(externalTask, null);
-        verify(runTimeService).setVariable(externalTask.getProcessInstanceId(), "carmFeatureEnabled", true);
     }
 
     @Test
