@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_JUDGEMENT_BY_ADMISSION_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_JUDGEMENTS_ONLINE_ISSUED_CCJ_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_JUDGEMENTS_ONLINE_ISSUED_CCJ_CLAIMANT;
 
 @Service
 public class JudgementByAdmissionIssuedClaimantDashboardNotificationHandler extends DashboardJudgementOnlineCallbackHandler {
@@ -43,7 +43,7 @@ public class JudgementByAdmissionIssuedClaimantDashboardNotificationHandler exte
     public String getScenario(CaseData caseData) {
         if (isJudgmentOrderIssued(caseData)) {
             return
-                SCENARIO_AAA6_JUDGEMENTS_ONLINE_ISSUED_CCJ_CLAIMANT.getScenario();
+                SCENARIO_AAA6_UPDATE_JUDGEMENTS_ONLINE_ISSUED_CCJ_CLAIMANT.getScenario();
         }
         return null;
     }
