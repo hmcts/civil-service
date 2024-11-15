@@ -95,6 +95,7 @@ java:
             CREATE DATABASE "definition-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
             CREATE DATABASE "camunda" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
             CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "emstitch" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
     auth:
       username: ${POSTGRES_USER}
       password: ${POSTGRES_PASSWORD}
@@ -155,6 +156,7 @@ ccd:
   global:
     ccdApiGatewayIngress: http://${SERVICE_NAME}-ccd-api-gw
     ccdDataStoreUrl: http://${SERVICE_NAME}-ccd-data-store-api
+    ccdStitchUrl: http://${SERVICE_NAME}-emstitch
     ccdDefinitionStoreUrl: http://${SERVICE_NAME}-ccd-definition-store
     ccdUserProfileUrl: http://ccd-user-profile-api-aat.service.core-compute-aat.internal
     dmStoreUrl: http://dm-store-aat.service.core-compute-aat.internal
@@ -252,11 +254,35 @@ em-ccdorc:
       IDAM_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
       OPEN_ID_API_BASE_URI: https://idam-web-public.aat.platform.hmcts.net/o
       S2S_BASE_URI: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-      EM_STITCHING_API_URL: http://em-stitching-aat.service.core-compute-aat.internal
+      EM_STITCHING_API_URL: https://${SERVICE_FQDN}-em-stitching
       DM_STORE_APP_URL: http://dm-store-aat.service.core-compute-aat.internal
       CCD_DATA_API_URL: http://${SERVICE_NAME}-ccd-data-store-api
       CALLBACK_HTTP_SCHEME: https
       CALLBACK_DOMAIN: em-ccdorc-${SERVICE_FQDN}
+
+em-stitching:
+  enabled: true
+  java:
+    imagePullPolicy: Always
+    releaseNameOverride: ${SERVICE_NAME}-em-stitching
+    image: hmctspublic.azurecr.io/em/stitching:latest
+    ingressHost: ${SERVICE_FQDN}-em-stitching
+    environment:
+      IDAM_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
+      OPEN_ID_API_BASE_URI: https://idam-web-public.aat.platform.hmcts.net/o
+      S2S_BASE_URI: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+      DM_STORE_APP_URL: http://dm-store-aat.service.core-compute-aat.internal
+      CDAM_URL: http://${SERVICE_NAME}-ccd-case-document-am-api
+      SPRING_DATASOURCE_HOST: ${SERVICE_NAME}-postgresql
+      SPRING_DATASOURCE_NAME: emstitch
+      SPRING_DATASOURCE_OPTIONS: "?ssl=disable"
+      SPRING_DATASOURCE_PORT: 5432
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      ENABLE_DB_MIGRATE: true
+      RUN_DB_MIGRATION_ON_STARTUP: true
+      FLYWAY_POSTGRESQL_TRANSACTIONAL_LOCK: false
+      LOGGING_LEVEL_UK_GOV_HMCTS_REFORM_EM: DEBUG
 
 aac-manage-case-assignment:
   enabled: true
