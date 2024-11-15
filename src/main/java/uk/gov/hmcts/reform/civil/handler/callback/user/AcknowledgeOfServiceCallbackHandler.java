@@ -140,6 +140,7 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             var updatedRespondent2 = caseData.getRespondent2().toBuilder()
                 .build();
+            caseDataBuilder.respondent2(updatedRespondent2);
             caseDataBuilder.respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
         }
 
