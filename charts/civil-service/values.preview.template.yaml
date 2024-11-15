@@ -272,7 +272,7 @@ em-stitching:
       OPEN_ID_API_BASE_URI: https://idam-web-public.aat.platform.hmcts.net/o
       S2S_BASE_URI: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       DM_STORE_APP_URL: http://dm-store-aat.service.core-compute-aat.internal
-      CDAM_URL: http://${SERVICE_NAME}-ccd-case-document-am-api
+      CDAM_URL: http://ccd-case-document-am-api-aat.service.core-compute-aat.internal
       SPRING_DATASOURCE_HOST: ${SERVICE_NAME}-postgresql
       SPRING_DATASOURCE_NAME: emstitch
       SPRING_DATASOURCE_OPTIONS: "?ssl=disable"
