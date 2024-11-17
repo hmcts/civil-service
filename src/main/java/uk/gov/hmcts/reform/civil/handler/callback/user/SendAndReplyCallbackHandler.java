@@ -66,7 +66,6 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toBuilder()
                       .messageHistory(messageService.renderMessageTableList(messageToReplyTo))
-                      .sendAndReplyOption(null)
                       .build().toMap(objectMapper))
             .build();
     }
@@ -85,7 +84,7 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper)).build();
+            .data(builder.sendAndReplyOption(null).build().toMap(objectMapper)).build();
     }
 
     private Element<Message> getMessageToReplyTo(CaseData caseData) {
