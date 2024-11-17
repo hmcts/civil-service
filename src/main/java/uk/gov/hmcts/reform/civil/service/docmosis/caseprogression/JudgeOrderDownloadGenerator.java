@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataServ
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -52,6 +53,7 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
     public static final String FAST_NO_BAND_WITH_REASON = "This case is allocated to the Fast Track and is not allocated a complexity band because %s.";
     public static final String FAST_WITH_BAND_NO_REASON = "This case is allocated to the Fast Track and is allocated to complexity band %s.";
     public static final String FAST_WITH_BAND_WITH_REASON = "This case is allocated to the Fast Track and is allocated to complexity band %s because %s.";
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
 
     public JudgeOrderDownloadGenerator(DocumentManagementService documentManagementService, DocumentGeneratorService documentGeneratorService,
                                        UserService userService, LocationReferenceDataService locationRefDataService,
@@ -141,7 +143,8 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
             .defendant1Name(caseData.getRespondent1().getPartyName())
             .defendant2Name(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
             .claimantNum(nonNull(caseData.getApplicant2()) ? "Claimant 1" : "Claimant")
-            .defendantNum(nonNull(caseData.getRespondent2()) ? "Defendant 1" : "Defendant");
+            .defendantNum(nonNull(caseData.getRespondent2()) ? "Defendant 1" : "Defendant")
+            .dateNowPlus7(LocalDate.now().plusDays(7).format(formatter));
     }
 
     public String getTrackAndComplexityText(CaseData caseData) {
