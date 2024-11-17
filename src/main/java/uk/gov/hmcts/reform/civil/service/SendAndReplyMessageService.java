@@ -160,8 +160,8 @@ public class SendAndReplyMessageService {
     }
 
     private DynamicListElement createMessageListItems(Element<Message> message) {
-        String formattedSentDate = message.getValue().getSentTime()
-            .format(DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm:ss a"));
+        String formattedSentDate =
+            formatDateTime(DATE_TIME_PATTERN, message.getValue().getSentTime());
         return DynamicListElement.dynamicElementFromCode(
             message.getId().toString(),
             String.format("%s, %s", message.getValue().getHeaderSubject(), formattedSentDate)

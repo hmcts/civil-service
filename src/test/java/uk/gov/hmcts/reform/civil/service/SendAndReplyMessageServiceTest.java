@@ -1000,14 +1000,14 @@ class SendAndReplyMessageServiceTest {
                                      .code(message1.getId().toString())
                                      .label(
                                          String.format(
-                                             "%s, 14 Nov 2024, 10:30:00 am",
+                                             "%s, 14 Nov 2024, 10:30:00 AM",
                                              message1.getValue().getHeaderSubject()
                                          ))
                                      .build(),
                                  DynamicListElement.builder()
                                      .code(message2.getId().toString())
                                      .label(String.format(
-                                         "%s, 14 Nov 2024, 12:45:00 pm",
+                                         "%s, 14 Nov 2024, 12:45:00 PM",
                                          message2.getValue().getHeaderSubject()
                                      ))
                                      .build()
