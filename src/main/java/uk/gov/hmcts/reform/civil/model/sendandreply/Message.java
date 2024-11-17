@@ -5,9 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.sendandreply.RolePool;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.SubjectOption;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Builder(toBuilder = true)
@@ -17,23 +21,26 @@ public class Message {
 
     private LocalDateTime sentTime;
     private LocalDateTime updatedTime;
-    private String senderRoleType;
+    private RolePool senderRoleType;
     private String senderName;
-    private String recipientRoleType;
-    private YesOrNo isUrgent;
+    private RolePool recipientRoleType;
+    private SubjectOption subjectType;
     private String headerSubject;
     private String contentSubject;
     private String messageContent;
+    private YesOrNo isUrgent;
 
-    public static Message from(SendMessageMetadata messageContext) {
-        String subject = SubjectOption.OTHER.equals(messageContext.getSubject())
-            ? messageContext.getOtherSubjectName() : messageContext.getSubject().getLabel();
-        return Message.builder()
-            .recipientRoleType(messageContext.getRecipientRoleType().getLabel())
-            .isUrgent(messageContext.getIsUrgent())
-            .headerSubject(subject)
-            .contentSubject(subject)
+    @Builder.Default
+    private List<Element<MessageReply>> history = new ArrayList<>();
+
+    public Message buildFullReplyMessage(MessageReply reply) {
+        return this.toBuilder()
+            .sentTime(reply.getSentTime())
+            .isUrgent(reply.getIsUrgent())
+            .senderName(reply.getSenderName())
+            .senderRoleType(reply.getSenderRoleType())
+            .messageContent(reply.getMessageContent())
+            .recipientRoleType(reply.getRecipientRoleType())
             .build();
     }
-
 }

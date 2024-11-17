@@ -98,6 +98,7 @@ import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
+import uk.gov.hmcts.reform.civil.model.sendandreply.MessageReply;
 import uk.gov.hmcts.reform.civil.model.sendandreply.Message;
 import uk.gov.hmcts.reform.civil.model.sendandreply.SendMessageMetadata;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.TransferCaseDetails;
@@ -733,6 +734,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private SendAndReplyOption sendAndReplyOption;
     private SendMessageMetadata sendMessageMetadata;
     private String sendMessageContent;
+    private MessageReply messageReplyMetadata;
+    private String messageHistory;
+    private DynamicList messagesToReplyTo;
     private List<Element<Message>> messages;
 
 
