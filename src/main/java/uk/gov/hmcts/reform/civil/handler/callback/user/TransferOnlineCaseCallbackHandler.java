@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -35,6 +34,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRANSFER_ONLINE_CASE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_TASK_RECONFIG_GA;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 
 @Service
@@ -123,11 +124,18 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
         }
 
         if (nonNull(newCourtLocation)) {
-            caseDataBuilder.eaCourtLocation(YesOrNo.YES);
-            if (!caseData.isApplicantLiP() && !caseData.isRespondent1LiP() && !caseData.isRespondent2LiP()) {
-                caseDataBuilder.hmcEaCourtLocation(
-                    featureToggleService.isLocationWhiteListedForCaseProgression(newCourtLocation.getEpimmsId())
-                        ? YesOrNo.YES : YesOrNo.NO);
+            boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
+            boolean isLocationWhiteListed = featureToggleService.isLocationWhiteListedForCaseProgression(newCourtLocation.getEpimmsId());
+
+            if (!isLipCase) {
+                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+                caseDataBuilder.eaCourtLocation(YES);
+                caseDataBuilder.hmcEaCourtLocation(!isLipCase && isLocationWhiteListed ? YES : NO);
+            } else if (isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData, newCourtLocation.getEpimmsId())) {
+                caseDataBuilder.eaCourtLocation(YES);
+            } else {
+                log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
+                caseDataBuilder.eaCourtLocation(NO);
             }
         }
 
@@ -138,6 +146,11 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private boolean isLipCaseWithProgressionEnabledAndCourtWhiteListed(CaseData caseData, String newCourtLocation) {
+        return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne())
+            && featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(newCourtLocation);
     }
 
     private boolean ifSameCourtSelected(CallbackParams callbackParams) {

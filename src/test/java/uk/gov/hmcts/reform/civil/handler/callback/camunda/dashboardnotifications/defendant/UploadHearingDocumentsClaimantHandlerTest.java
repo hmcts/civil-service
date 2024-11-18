@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.UploadHearingDocumentsClaimantHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -68,9 +70,12 @@ class UploadHearingDocumentsClaimantHandlerTest extends BaseCallbackHandlerTest 
     void createDashboardNotifications() {
 
         params.put("ccdCaseReference", "1239988");
-
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+
+        DynamicListElement selectedCourt = DynamicListElement.builder()
+            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
@@ -79,6 +84,7 @@ class UploadHearingDocumentsClaimantHandlerTest extends BaseCallbackHandlerTest 
             .drawDirectionsOrderRequired(YesOrNo.NO)
             .claimsTrack(ClaimsTrack.fastTrack)
             .ccdState(CaseState.CASE_PROGRESSION)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
