@@ -763,21 +763,17 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        // Casefileview will show any document uploaded even without an categoryID under uncategorized section,
-        //  we only use orderSDODocumentDJ as a preview and do not want it shown on case file view, so to prevent it
+        // Case File View will show any document uploaded even without an categoryID under uncategorized section,
+        // we only use orderSDODocumentDJ as a preview and do not want it shown on case file view, so to prevent it
         // showing, we remove.
         caseDataBuilder.orderSDODocumentDJ(null);
         assignCategoryId.assignCategoryIdToCollection(caseData.getOrderSDODocumentDJCollection(),
                                                       document -> document.getValue().getDocumentLink(), "caseManagementOrders");
         caseDataBuilder.businessProcess(BusinessProcess.ready(STANDARD_DIRECTION_ORDER_DJ));
-
         caseDataBuilder.hearingNotes(getHearingNotes(caseData));
-
         caseDataBuilder.eaCourtLocation(YES);
-        if (featureToggleService.isHmcEnabled()
-            && !caseData.isApplicantLiP()
-            && !caseData.isRespondent1LiP()
-            && !caseData.isRespondent2LiP()) {
+
+        if (!caseData.isApplicantLiP() && !caseData.isRespondent1LiP() && !caseData.isRespondent2LiP()) {
             caseDataBuilder.hmcEaCourtLocation(featureToggleService.isLocationWhiteListedForCaseProgression(
                 caseData.getCaseManagementLocation().getBaseLocation()) ? YES : NO);
         }

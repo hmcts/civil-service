@@ -506,7 +506,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAddEventAndDateAddedToClaimantExpertsAndWitness() {
-            when(featureToggleService.isHmcEnabled()).thenReturn(true);
             when(featureToggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()

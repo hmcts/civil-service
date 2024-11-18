@@ -124,10 +124,7 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
 
         if (nonNull(newCourtLocation)) {
             caseDataBuilder.eaCourtLocation(YesOrNo.YES);
-            if (featureToggleService.isHmcEnabled()
-                && !caseData.isApplicantLiP()
-                && !caseData.isRespondent1LiP()
-                && !caseData.isRespondent2LiP()) {
+            if (!caseData.isApplicantLiP() && !caseData.isRespondent1LiP() && !caseData.isRespondent2LiP()) {
                 caseDataBuilder.hmcEaCourtLocation(
                     featureToggleService.isLocationWhiteListedForCaseProgression(newCourtLocation.getEpimmsId())
                         ? YesOrNo.YES : YesOrNo.NO);

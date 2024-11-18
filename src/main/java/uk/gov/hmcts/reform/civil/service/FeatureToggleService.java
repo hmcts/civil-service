@@ -38,10 +38,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("enable-rpa-emails");
     }
 
-    public boolean isHmcEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("hmc");
-    }
-
     public boolean isFastTrackUpliftsEnabled() {
         return this.featureToggleApi.isFeatureEnabled("fast-track-uplifts");
     }

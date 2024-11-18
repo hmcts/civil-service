@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -66,7 +64,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -237,7 +234,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                                  .documentLink(Document.builder()
                                                                                    .documentUrl("url")
                                                                                    .documentHash("hash")
-                                                                                   .documentFileName("respondent defense")
+                                                                                   .documentFileName(
+                                                                                       "respondent defense")
                                                                                    .documentBinaryUrl("binUrl")
                                                                                    .build()).build()))
                     .build();
@@ -258,7 +256,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                                  .documentLink(Document.builder()
                                                                                    .documentUrl("url")
                                                                                    .documentHash("hash")
-                                                                                   .documentFileName("respondent defense")
+                                                                                   .documentFileName(
+                                                                                       "respondent defense")
                                                                                    .documentBinaryUrl("binUrl")
                                                                                    .build()).build()))
                     .build();
@@ -279,7 +278,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                                  .documentLink(Document.builder()
                                                                                    .documentUrl("url")
                                                                                    .documentHash("hash")
-                                                                                   .documentFileName("respondent defense")
+                                                                                   .documentFileName(
+                                                                                       "respondent defense")
                                                                                    .documentBinaryUrl("binUrl")
                                                                                    .build()).build()))
                     .build();
@@ -687,8 +687,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAddPartyIdsToPartyFields_whenInvoked() {
-            when(featureToggleService.isHmcEnabled()).thenReturn(true);
-
             var caseData = CaseDataBuilder.builder()
                 .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
                 .build();
@@ -698,28 +696,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("applicant1").hasFieldOrProperty("partyID");
             assertThat(response.getData()).extracting("respondent1").hasFieldOrProperty("partyID");
-        }
-
-        @Test
-        void shouldNotAddPartyIdsToPartyFields_whenInvokedWithHMCToggleOff() {
-            when(featureToggleService.isHmcEnabled()).thenReturn(false);
-
-            var objectMapper = new ObjectMapper();
-            objectMapper.findAndRegisterModules();
-            objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-
-            var caseData = CaseDataBuilder.builder()
-                .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
-                .build();
-
-            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("applicant1")
-                .isEqualTo(objectMapper.convertValue(caseData.getApplicant1(), HashMap.class));
-            assertThat(response.getData()).extracting("respondent1")
-                .isEqualTo(objectMapper.convertValue(caseData.getRespondent1(), HashMap.class));
         }
 
         @Test
@@ -1240,14 +1216,22 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             System.out.println(updatedData.getClaimantResponseDocuments());
             //Then
-            assertThat(updatedData.getClaimantResponseDocuments().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("directionsQuestionnaire");
-            assertThat(updatedData.getClaimantResponseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("directionsQuestionnaire");
-            assertThat(updatedData.getClaimantResponseDocuments().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo("directionsQuestionnaire");
-            assertThat(updatedData.getClaimantResponseDocuments().get(3).getValue().getDocumentLink().getCategoryID()).isEqualTo("directionsQuestionnaire");
-            assertThat(updatedData.getDuplicateClaimantDefendantResponseDocs().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQApplicant");
-            assertThat(updatedData.getDuplicateClaimantDefendantResponseDocs().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQApplicant");
-            assertThat(updatedData.getDuplicateClaimantDefendantResponseDocs().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQApplicant");
-            assertThat(updatedData.getDuplicateClaimantDefendantResponseDocs().get(3).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQApplicant");
+            assertThat(updatedData.getClaimantResponseDocuments().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+                "directionsQuestionnaire");
+            assertThat(updatedData.getClaimantResponseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+                "directionsQuestionnaire");
+            assertThat(updatedData.getClaimantResponseDocuments().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+                "directionsQuestionnaire");
+            assertThat(updatedData.getClaimantResponseDocuments().get(3).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+                "directionsQuestionnaire");
+            assertThat(updatedData.getDuplicateClaimantDefendantResponseDocs().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+                "DQApplicant");
+            assertThat(updatedData.getDuplicateClaimantDefendantResponseDocs().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+                "DQApplicant");
+            assertThat(updatedData.getDuplicateClaimantDefendantResponseDocs().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+                "DQApplicant");
+            assertThat(updatedData.getDuplicateClaimantDefendantResponseDocs().get(3).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+                "DQApplicant");
 
         }
 
@@ -1269,7 +1253,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             System.out.println(updatedData.getClaimantResponseDocuments());
             //Then
-            assertThat(updatedData.getApplicant1DQ().getApplicant1DQFixedRecoverableCostsIntermediate().getFrcSupportingDocument().getCategoryID()).isEqualTo("DQApplicant");
+            assertThat(updatedData.getApplicant1DQ().getApplicant1DQFixedRecoverableCostsIntermediate().getFrcSupportingDocument().getCategoryID()).isEqualTo(
+                "DQApplicant");
         }
 
         @Nested
@@ -1372,7 +1357,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             var caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.ccmccEpimsId).region("ccmcRegion").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.ccmccEpimsId).region(
+                    "ccmcRegion").build())
                 .build();
             //When
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
