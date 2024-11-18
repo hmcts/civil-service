@@ -147,7 +147,14 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("isCoSCEnabled");
     }
 
+    public boolean isCaseProgressionEnabledAndLocationWhiteListed(String location) {
+        return location != null
+            && featureToggleApi.isFeatureEnabledForLocation("case-progression-location-whitelist", location, true)
+            && isCaseProgressionEnabled();
+    }
+
     public boolean isHmcNroEnabled() {
         return featureToggleApi.isFeatureEnabled("hmc-nro");
+
     }
 }
