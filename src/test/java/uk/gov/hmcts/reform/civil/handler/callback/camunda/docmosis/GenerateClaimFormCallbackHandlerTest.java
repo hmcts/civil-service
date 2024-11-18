@@ -10,30 +10,28 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.NestedTestConfiguration;
-
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
+import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.LitigantInPersonFormGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGenerator;
-import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
+import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
 
 import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -51,7 +49,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private Time time;
     @Mock
-    private CivilDocumentStitchingService civilDocumentStitchingService;
+    private CivilStitchService civilStitchService;
     @Mock
     private LitigantInPersonFormGenerator litigantInPersonFormGenerator;
     @Mock
@@ -111,19 +109,6 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
                               .build())
             .build();
 
-    private final List<DocumentMetaData> documents = Arrays.asList(
-        new DocumentMetaData(
-            CLAIM_FORM.getDocumentLink(),
-            "Sealed Claim Form",
-            LocalDate.now().toString()
-        ),
-        new DocumentMetaData(
-            LIP_FORM.getDocumentLink(),
-            "Litigant in person claim form",
-            LocalDate.now().toString()
-        )
-    );
-
     private final LocalDate issueDate = now();
 
     @Nested
@@ -132,7 +117,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             mapper = new ObjectMapper();
-            handler = new GenerateClaimFormCallbackHandler(civilDocumentStitchingService, litigantInPersonFormGenerator,
+            handler = new GenerateClaimFormCallbackHandler(civilStitchService, litigantInPersonFormGenerator,
                                                            sealedClaimFormGenerator, mapper, time, assignCategoryId, featureToggleService);
             handler.setStitchEnabled(true);
             mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
@@ -154,7 +139,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             verify(sealedClaimFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
             verifyNoInteractions(litigantInPersonFormGenerator);
-            verifyNoInteractions(civilDocumentStitchingService);
+            verifyNoInteractions(civilStitchService);
         }
 
         @Test
@@ -175,7 +160,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             verify(sealedClaimFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
             verifyNoInteractions(litigantInPersonFormGenerator);
-            verifyNoInteractions(civilDocumentStitchingService);
+            verifyNoInteractions(civilStitchService);
         }
 
         @Test
@@ -200,7 +185,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             mapper = new ObjectMapper();
-            handler = new GenerateClaimFormCallbackHandler(civilDocumentStitchingService, litigantInPersonFormGenerator,
+            handler = new GenerateClaimFormCallbackHandler(civilStitchService, litigantInPersonFormGenerator,
                                                            sealedClaimFormGenerator, mapper, time, assignCategoryId, featureToggleService);
             handler.setStitchEnabled(true);
             mapper.registerModule(new JavaTimeModule());
@@ -214,8 +199,8 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             when(sealedClaimFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
             when(litigantInPersonFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(LIP_FORM);
-            when(civilDocumentStitchingService.bundle(org.mockito.ArgumentMatchers.anyList(), anyString(), anyString(), anyString(),
-                                                      any(CaseData.class))).thenReturn(STITCHED_DOC);
+            when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(),
+                                                                 anyString())).thenReturn(STITCHED_DOC);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -224,9 +209,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             verify(sealedClaimFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
             verify(litigantInPersonFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
-            verify(civilDocumentStitchingService).bundle(eq(documents), anyString(), anyString(), anyString(),
-                                                         eq(caseData)
-            );
+            verify(civilStitchService).generateStitchedCaseDocument(anyList(), anyString(), anyLong(), anyString());
         }
 
         @Test
@@ -238,8 +221,8 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             when(sealedClaimFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
             when(litigantInPersonFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(LIP_FORM);
-            when(civilDocumentStitchingService.bundle(org.mockito.ArgumentMatchers.anyList(), anyString(), anyString(), anyString(),
-                                                      any(CaseData.class))).thenReturn(STITCHED_DOC);
+            when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(),
+                                                                 anyString())).thenReturn(STITCHED_DOC);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -247,9 +230,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(STITCHED_DOC);
             verify(sealedClaimFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
             verify(litigantInPersonFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
-            verify(civilDocumentStitchingService).bundle(eq(documents), anyString(), anyString(), anyString(),
-                                                         eq(caseData)
-            );
+            verify(civilStitchService).generateStitchedCaseDocument(anyList(), anyString(), anyLong(), anyString());
         }
 
         @Test
@@ -261,8 +242,8 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             when(sealedClaimFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
             when(litigantInPersonFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(LIP_FORM);
-            when(civilDocumentStitchingService.bundle(org.mockito.ArgumentMatchers.anyList(), anyString(), anyString(), anyString(),
-                                                      any(CaseData.class))).thenReturn(STITCHED_DOC);
+            when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(),
+                                                                 anyString())).thenReturn(STITCHED_DOC);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -270,17 +251,15 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(STITCHED_DOC);
             verify(sealedClaimFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
             verify(litigantInPersonFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
-            verify(civilDocumentStitchingService).bundle(eq(documents), anyString(), anyString(), anyString(),
-                                                         eq(caseData)
-            );
+            verify(civilStitchService).generateStitchedCaseDocument(anyList(), anyString(), anyLong(), anyString());
         }
 
         @Test
         void shouldStitchClaimFormWithLipForm_whenOneVsTwo_andBothDefendantsAreLitigantInPerson() {
             when(sealedClaimFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
             when(litigantInPersonFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(LIP_FORM);
-            when(civilDocumentStitchingService.bundle(org.mockito.ArgumentMatchers.anyList(), anyString(), anyString(), anyString(),
-                                                      any(CaseData.class))).thenReturn(STITCHED_DOC);
+            when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(),
+                                                                 anyString())).thenReturn(STITCHED_DOC);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimSubmittedNoRespondentRepresented()
                 .build();
@@ -292,9 +271,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(STITCHED_DOC);
             verify(sealedClaimFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
             verify(litigantInPersonFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
-            verify(civilDocumentStitchingService).bundle(eq(documents), anyString(), anyString(), anyString(),
-                                                         eq(caseData)
-            );
+            verify(civilStitchService).generateStitchedCaseDocument(anyList(), anyString(), anyLong(), anyString());
         }
     }
 
@@ -315,7 +292,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Mock
         private Time time;
         @Mock
-        private CivilDocumentStitchingService civilDocumentStitchingService;
+        private CivilStitchService civilStitchService;
         @Mock
         private LitigantInPersonFormGenerator litigantInPersonFormGenerator;
         @Mock
@@ -333,7 +310,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             mapper = new ObjectMapper();
-            handler = new GenerateClaimFormCallbackHandler(civilDocumentStitchingService, litigantInPersonFormGenerator,
+            handler = new GenerateClaimFormCallbackHandler(civilStitchService, litigantInPersonFormGenerator,
                                                            sealedClaimFormGenerator, mapper, time, assignCategoryId, featureToggleService);
             handler.setStitchEnabled(false);
             mapper.registerModule(new JavaTimeModule());
