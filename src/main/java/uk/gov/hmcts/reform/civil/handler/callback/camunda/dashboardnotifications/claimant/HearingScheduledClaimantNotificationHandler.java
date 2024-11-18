@@ -56,7 +56,7 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
     private final HearingFeesService hearingFeesService;
 
     @Override
-    protected Map<String, Callback> callbacks() { 
+    protected Map<String, Callback> callbacks() {
         return toggleService.isCaseProgressionEnabled()
             ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForHearingScheduled)
             : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
@@ -80,7 +80,7 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<LocationRefData> locations = (locationRefDataService
-            .getCourtLocationsForDefaultJudgments(authToken));
+            .getHearingCourtLocations(authToken));
         LocationRefData locationRefData = fillPreferredLocationData(locations, caseData.getHearingLocation());
         if (nonNull(locationRefData)) {
             caseData = caseData.toBuilder().hearingLocationCourtName(locationRefData.getSiteName()).build();

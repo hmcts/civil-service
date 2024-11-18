@@ -59,7 +59,7 @@ public class HearingScheduledDefendantNotificationHandler extends CallbackHandle
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<LocationRefData> locations = (locationRefDataService
-            .getCourtLocationsForDefaultJudgments(authToken));
+            .getHearingCourtLocations(authToken));
         LocationRefData locationRefData = fillPreferredLocationData(locations, caseData.getHearingLocation());
         if (nonNull(locationRefData)) {
             caseData = caseData.toBuilder().hearingLocationCourtName(locationRefData.getSiteName()).build();
