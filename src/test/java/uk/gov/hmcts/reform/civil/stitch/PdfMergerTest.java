@@ -12,7 +12,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PdfMergerTest {
 
@@ -37,6 +39,28 @@ class PdfMergerTest {
             assertThat(actualPdfPage1).hasSameContentAs(expectedPdfPage1);
             assertThat(actualPdfPage2).hasSameContentAs(expectedPdfPage2);
         }
+    }
+
+    @Test
+    void should_return_a_merged_pdf_same_as_original_pdf_when_single_pdf_is_sent() throws Exception {
+        //given
+        byte[] testPdf = loadResource("stitch-documents/test1.pdf");
+
+        //when
+        byte[] actualMergedPdf = PdfMerger.mergeDocuments(singletonList(testPdf), "civil_service");
+
+        // then
+        assertThat(actualMergedPdf).containsExactly(testPdf);
+    }
+
+    @Test
+    void should_throw_pdf_merge_exception_when_doc_is_not_pdf_stream() {
+        assertThatThrownBy(PdfMergerTest::merge)
+            .isInstanceOf(PdfMergeException.class);
+    }
+
+    private static void merge() {
+        PdfMerger.mergeDocuments(asList("test1".getBytes(), "test2".getBytes()), "civil_service");
     }
 
     private byte[] loadResource(final String filePath) throws Exception {
