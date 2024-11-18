@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -43,9 +42,9 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
-public class SendAndReplyCallbackHandlerTest {
+class SendAndReplyCallbackHandlerTest {
 
-    private static String AUTH = "BEARER_TOKEN";
+    private static final String AUTH_TOKEN = "BEARER_TOKEN";
 
     @Mock
     SendAndReplyMessageService messageService;
@@ -53,7 +52,7 @@ public class SendAndReplyCallbackHandlerTest {
     private SendAndReplyCallbackHandler handler;
 
     @BeforeEach
-    public void setup() {
+    void  setup() {
         handler = new SendAndReplyCallbackHandler(messageService, new ObjectMapper());
     }
 
@@ -99,7 +98,7 @@ public class SendAndReplyCallbackHandlerTest {
 
             assertThat(responseCaseData.getMessagesToReplyTo()).isEqualTo(expectedMessages);
 
-            verify(messageService, times(1)).createMessageSelectionList(eq(messages));
+            verify(messageService, times(1)).createMessageSelectionList(messages);
         }
 
         @Test
@@ -164,9 +163,9 @@ public class SendAndReplyCallbackHandlerTest {
             assertThat(responseCaseData.getMessageHistory()).isEqualTo(expectedTableMarkup);
 
             verify(messageService, times(1))
-                .getMessageById(eq(caseData.getMessages()), eq(messagesToReplyTo.getValue().getCode()));
+                .getMessageById(caseData.getMessages(), messagesToReplyTo.getValue().getCode());
             verify(messageService, times(1))
-                .renderMessageTableList(eq(message));
+                .renderMessageTableList(message);
         }
     }
 
@@ -186,7 +185,7 @@ public class SendAndReplyCallbackHandlerTest {
                 .sendMessageContent(messageContent)
                 .build();
 
-            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH))
+            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN))
                 .thenReturn(wrapElements(expectedMessages));
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -202,7 +201,7 @@ public class SendAndReplyCallbackHandlerTest {
             assertThat(unwrapElements(responseCaseData.getMessages())).isEqualTo(expectedMessages);
 
             verify(messageService, times(1))
-                .addMessage(eq(null), eq(messageMetaData), eq(messageContent), eq(AUTH));
+                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
         }
     }
 
@@ -231,7 +230,7 @@ public class SendAndReplyCallbackHandlerTest {
             .messageHistory("message history markup")
             .build();
 
-        when(messageService.addReplyToMessage(messages, replyList.getCode(), messageReply, AUTH)).thenReturn(
+        when(messageService.addReplyToMessage(messages, replyList.getCode(), messageReply, AUTH_TOKEN)).thenReturn(
             updatedMessages);
 
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -248,7 +247,7 @@ public class SendAndReplyCallbackHandlerTest {
         assertThat(responseCaseData.getMessages()).isEqualTo(updatedMessages);
 
         verify(messageService, times(1))
-            .addReplyToMessage(eq(messages), eq(replyList.getCode()), eq(messageReply), eq(AUTH));
+            .addReplyToMessage(messages, replyList.getCode(), messageReply, AUTH_TOKEN);
     }
 
     @Nested

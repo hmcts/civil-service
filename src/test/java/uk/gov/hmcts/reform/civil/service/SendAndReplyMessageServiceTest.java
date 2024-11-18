@@ -43,8 +43,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 @ExtendWith(SpringExtension.class)
 class SendAndReplyMessageServiceTest {
 
-    private static String USER_AUTH = "auth";
-    private static String USER_NAME = "Test User";
+    private static final String USER_AUTH = "auth";
+    private static final String USER_NAME = "Test User";
 
     private static final UserDetails USER_DETAILS = UserDetails.builder()
         .id("uid")
@@ -52,14 +52,14 @@ class SendAndReplyMessageServiceTest {
         .surname("User")
         .build();
 
-    private static SendMessageMetadata MESSAGE_METADATA = SendMessageMetadata.builder()
+    private static final SendMessageMetadata MESSAGE_METADATA = SendMessageMetadata.builder()
         .subject(OTHER)
         .subject(HEARING)
         .recipientRoleType(CIRCUIT_JUDGE)
         .isUrgent(YES)
         .build();
-    private static String MESSAGE_CONTENT = "Message Content";
-    private static LocalDateTime NOW = LocalDateTime.of(2014, 11, 1, 0, 0, 0);
+    private static final String MESSAGE_CONTENT = "Message Content";
+    private static final LocalDateTime NOW = LocalDateTime.of(2014, 11, 1, 0, 0, 0);
 
     private Message message;
 
@@ -79,7 +79,7 @@ class SendAndReplyMessageServiceTest {
     private SendAndReplyMessageService messageService;
 
     @BeforeEach
-    public void setupTest() {
+    void setupTest() {
         when(time.now()).thenReturn(NOW);
         when(tableMarkupService.buildTableMarkUp(any())).thenReturn("<div>Some markup</div>");
 
@@ -96,7 +96,7 @@ class SendAndReplyMessageServiceTest {
     @Nested
     class AddMessage {
         @Test
-        public void should_returnExpectedMessage_whenExistingMessagesAreNull() {
+        void should_returnExpectedMessage_whenExistingMessagesAreNull() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
             RolePool expectedSenderRoleCategory = RolePool.ADMIN;
@@ -122,7 +122,7 @@ class SendAndReplyMessageServiceTest {
         }
 
         @Test
-        public void shouldAddMessageReplyToMessageHistory_forHearingCentreAdmin() {
+        void shouldAddMessageReplyToMessageHistory_forHearingCentreAdmin() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
             RolePool expectedSenderRoleCategory = RolePool.ADMIN;
@@ -162,7 +162,7 @@ class SendAndReplyMessageServiceTest {
         }
 
         @Test
-        public void should_returnExpectedMessage_forHearingCentreTeamLeader() {
+        void should_returnExpectedMessage_forHearingCentreTeamLeader() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
             RolePool expectedSenderRoleCategory = RolePool.ADMIN;
@@ -195,7 +195,7 @@ class SendAndReplyMessageServiceTest {
         }
 
         @Test
-        public void should_returnExpectedMessage_forCtsc() {
+        void should_returnExpectedMessage_forCtsc() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
             String expectedUserRoleLabel = "CTSC";
@@ -224,7 +224,7 @@ class SendAndReplyMessageServiceTest {
         }
 
         @Test
-        public void should_returnExpectedMessage_forCtscTeamLeader() {
+        void should_returnExpectedMessage_forCtscTeamLeader() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
             RolePool expectedSenderRoleCategory = RolePool.ADMIN;
@@ -256,7 +256,7 @@ class SendAndReplyMessageServiceTest {
         }
 
         @Test
-        public void should_returnExpectedMessage_forTribunalCaseworker() {
+        void should_returnExpectedMessage_forTribunalCaseworker() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
             RolePool expectedSenderRoleCategory = RolePool.LEGAL_OPERATIONS;
@@ -287,7 +287,7 @@ class SendAndReplyMessageServiceTest {
         }
 
         @Test
-        public void should_returnExpectedMessage_forSeniorTribunalCaseworker() {
+        void should_returnExpectedMessage_forSeniorTribunalCaseworker() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
             RolePool expectedSenderRoleCategory = RolePool.LEGAL_OPERATIONS;
@@ -320,7 +320,7 @@ class SendAndReplyMessageServiceTest {
         }
 
         @Test
-        public void should_returnExpectedMessage_forNationalBusinessCentre() {
+        void should_returnExpectedMessage_forNationalBusinessCentre() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
             RolePool expectedSenderRoleCategory = RolePool.ADMIN;
@@ -351,7 +351,7 @@ class SendAndReplyMessageServiceTest {
         }
 
         @Test
-        public void should_returnExpectedMessage_forNationalBusinessCentreTeamLeader() {
+        void should_returnExpectedMessage_forNationalBusinessCentreTeamLeader() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
             RolePool expectedSenderRoleCategory = RolePool.ADMIN;
@@ -384,7 +384,7 @@ class SendAndReplyMessageServiceTest {
         }
 
         @Test
-        public void should_returnExpectedMessage_forDistrictJudge() {
+        void should_returnExpectedMessage_forDistrictJudge() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
             RolePool expectedSenderRoleCategory = RolePool.JUDICIAL;
@@ -416,7 +416,7 @@ class SendAndReplyMessageServiceTest {
         }
 
         @Test
-        public void should_returnExpectedMessage_forCircuitJudge() {
+        void should_returnExpectedMessage_forCircuitJudge() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
             RolePool expectedSenderRoleCategory = RolePool.JUDICIAL;
@@ -448,7 +448,7 @@ class SendAndReplyMessageServiceTest {
         }
 
         @Test
-        public void should_returnExpectedMessage_forJudge() {
+        void should_returnExpectedMessage_forJudge() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
             RolePool expectedSenderRoleCategory = RolePool.JUDICIAL;
@@ -504,7 +504,7 @@ class SendAndReplyMessageServiceTest {
     class AddReplyToMessage {
 
         @Test
-        public void shouldAddMessageReplyToMessageHistory_asHearingCentreAdmin() {
+        void shouldAddMessageReplyToMessageHistory_asHearingCentreAdmin() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
             RolePool expectedSenderRoleCategory = RolePool.ADMIN;
@@ -542,7 +542,7 @@ class SendAndReplyMessageServiceTest {
         }
 
         @Test
-        public void shouldAddMessageReplyToMessageHistory_forHearingCentreTeamLeader() {
+        void shouldAddMessageReplyToMessageHistory_forHearingCentreTeamLeader() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
             RolePool expectedSenderRoleCategory = RolePool.ADMIN;
@@ -584,7 +584,7 @@ class SendAndReplyMessageServiceTest {
         }
 
         @Test
-        public void shouldAddMessageReplyToMessageHistory_forCtsc() {
+        void shouldAddMessageReplyToMessageHistory_forCtsc() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
             RolePool expectedSenderRoleCategory = RolePool.ADMIN;
@@ -623,7 +623,7 @@ class SendAndReplyMessageServiceTest {
         }
 
         @Test
-        public void shouldAddMessageReplyToMessageHistory_forCtscTeamLeader() {
+        void shouldAddMessageReplyToMessageHistory_forCtscTeamLeader() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
             RolePool expectedSenderRoleCategory = RolePool.ADMIN;
@@ -664,7 +664,7 @@ class SendAndReplyMessageServiceTest {
         }
 
         @Test
-        public void shouldAddMessageReplyToMessageHistory_forTribunalCaseworker() {
+        void shouldAddMessageReplyToMessageHistory_forTribunalCaseworker() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
             RolePool expectedSenderRoleCategory = RolePool.LEGAL_OPERATIONS;
@@ -704,7 +704,7 @@ class SendAndReplyMessageServiceTest {
         }
 
         @Test
-        public void shouldAddMessageReplyToMessageHistory_forSeniorTribunalCaseworker() {
+        void shouldAddMessageReplyToMessageHistory_forSeniorTribunalCaseworker() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
             RolePool expectedSenderRoleCategory = RolePool.LEGAL_OPERATIONS;
@@ -746,7 +746,7 @@ class SendAndReplyMessageServiceTest {
         }
 
         @Test
-        public void shouldAddMessageReplyToMessageHistory_forDistrictJudge() {
+        void shouldAddMessageReplyToMessageHistory_forDistrictJudge() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
             RolePool expectedSenderRoleCategory = RolePool.JUDICIAL;
@@ -787,7 +787,7 @@ class SendAndReplyMessageServiceTest {
         }
 
         @Test
-        public void shouldAddMessageReplyToMessageHistory_forCircuitJudge() {
+        void shouldAddMessageReplyToMessageHistory_forCircuitJudge() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
             RolePool expectedSenderRoleCategory = RolePool.JUDICIAL;
@@ -828,7 +828,7 @@ class SendAndReplyMessageServiceTest {
         }
 
         @Test
-        public void shouldAddMessageReplyToMessageHistory_forJudge() {
+        void shouldAddMessageReplyToMessageHistory_forJudge() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
             RolePool expectedSenderRoleCategory = RolePool.JUDICIAL;
@@ -867,7 +867,7 @@ class SendAndReplyMessageServiceTest {
         }
 
         @Test
-        public void shouldAddMessageReplyToExistingHistory_withTwoExistingReplies() {
+        void shouldAddMessageReplyToExistingHistory_withTwoExistingReplies() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
             when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
@@ -950,7 +950,7 @@ class SendAndReplyMessageServiceTest {
         }
 
         @Test
-        public void shouldReturnMessage_whenMessageIdMatches() {
+        void shouldReturnMessage_whenMessageIdMatches() {
             String messageId = message1.getId().toString();
 
             Element<Message> result = messageService.getMessageById(messages, messageId);
@@ -959,7 +959,7 @@ class SendAndReplyMessageServiceTest {
         }
 
         @Test
-        public void shouldReturnNull_whenMessageIdDoesNotMatch() {
+        void shouldReturnNull_whenMessageIdDoesNotMatch() {
             String nonExistentMessageId = UUID.randomUUID().toString();
 
             Element<Message> result = messageService.getMessageById(messages, nonExistentMessageId);
@@ -991,7 +991,7 @@ class SendAndReplyMessageServiceTest {
         }
 
         @Test
-        public void shouldCreateMessageSelectionList_withCorrectFormat() {
+        void shouldCreateMessageSelectionList_withCorrectFormat() {
             DynamicList result = messageService.createMessageSelectionList(messages);
 
             assertEquals(DynamicList.builder()
@@ -1016,7 +1016,7 @@ class SendAndReplyMessageServiceTest {
         }
 
         @Test
-        public void shouldReturnEmptyList_whenNoMessages() {
+        void shouldReturnEmptyList_whenNoMessages() {
             List<Element<Message>> emptyMessages = new ArrayList<>();
 
             DynamicList result = messageService.createMessageSelectionList(emptyMessages);
@@ -1039,6 +1039,7 @@ class SendAndReplyMessageServiceTest {
                                   .sentTime(LocalDateTime.of(2024, 11, 14, 10, 30, 0))
                                   .senderName("Sender 1")
                                   .senderRoleType(RolePool.ADMIN)
+                                  .recipientRoleType(RolePool.JUDICIAL)
                                   .isUrgent(YES)
                                   .subjectType(OTHER)
                                   .contentSubject("Subject 1")
@@ -1047,13 +1048,13 @@ class SendAndReplyMessageServiceTest {
         }
 
         @Test
-        public void shouldCallTableMarkupService_withExpectedRowData_withoutReplies() {
+        void shouldCallTableMarkupService_withExpectedRowData_withoutReplies() {
             messageService.renderMessageTableList(message);
 
             verify(tableMarkupService, times(1)).buildTableMarkUp(Map.of(
                 "Date and time sent", "14 Nov 2024, 10:30:00 AM",
                 "Sender's name", "Sender 1",
-                "Recipient role", "Court staff",
+                "Recipient role", RolePool.JUDICIAL.getLabel(),
                 "Urgency", "Yes",
                 "What is it about", "Other",
                 "Subject", "Subject 1",
@@ -1062,12 +1063,13 @@ class SendAndReplyMessageServiceTest {
         }
 
         @Test
-        public void shouldCallTableMarkupService_withExpectedRowData_withReplies() {
+        void shouldCallTableMarkupService_withExpectedRowData_withReplies() {
             message.getValue().getHistory().add(element(MessageReply.builder()
                                                             .messageContent("This is a reply message")
                                                             .isUrgent(NO)
                                                             .senderName("Sender 2")
                                                             .senderRoleType(RolePool.ADMIN)
+                                                            .recipientRoleType(RolePool.JUDICIAL)
                                                             .sentTime(NOW.plusHours(5))
                                                             .build()));
 
@@ -1076,7 +1078,7 @@ class SendAndReplyMessageServiceTest {
             verify(tableMarkupService, times(1)).buildTableMarkUp(Map.of(
                 "Date and time sent", "14 Nov 2024, 10:30:00 AM",
                 "Sender's name", "Sender 1",
-                "Recipient role", RolePool.ADMIN.getLabel(),
+                "Recipient role", RolePool.JUDICIAL.getLabel(),
                 "Urgency", "Yes",
                 "What is it about", "Other",
                 "Subject", "Subject 1",

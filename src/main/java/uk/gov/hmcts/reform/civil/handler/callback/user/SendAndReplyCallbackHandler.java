@@ -77,7 +77,7 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
 
     private CallbackResponse handleAboutToStart(CallbackParams params) {
         CaseData caseData = params.getCaseData();
-        CaseData.CaseDataBuilder builder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
         if (nonNull(caseData.getMessages()) && !caseData.getMessages().isEmpty()) {
             builder.messagesToReplyTo(messageService.createMessageSelectionList(caseData.getMessages()));
@@ -94,7 +94,7 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
 
     private CallbackResponse handleAboutToSubmit(CallbackParams params) {
         CaseData caseData = params.getCaseData();
-        CaseData.CaseDataBuilder builder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         String userAuth = params.getParams().get(BEARER_TOKEN).toString();
 
         if (SendAndReplyOption.SEND.equals(caseData.getSendAndReplyOption())) {
@@ -112,7 +112,7 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
             builder.messages(
                     messageService.addReplyToMessage(
                         caseData.getMessages(),
-                        caseData.getMessagesToReplyTo().getValue().getCode().toString(),
+                        caseData.getMessagesToReplyTo().getValue().getCode(),
                         caseData.getMessageReplyMetadata(),
                         userAuth
                     )

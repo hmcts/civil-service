@@ -2536,6 +2536,6 @@ class FlowStateAllowedEventServiceTest {
             CaseDetailsBuilder.builder()
                 .atStateAwaitingCaseDetailsNotification().build();
         assertThat(flowStateAllowedEventService.isAllowed(caseDetails, SEND_AND_REPLY))
-            .isEqualTo(true);
+            .isTrue();
     }
 }

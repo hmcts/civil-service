@@ -103,7 +103,8 @@ public class SendAndReplyMessageService {
         Element<Message> messageToReplyTo = getMessageById(messages, messageId);
         Message baseMessageDetails = createBaseMessageWithSenderDetails(userAuth);
         Element<MessageReply> newMessage = element(messageReply.toBuilder()
-                                                       .recipientRoleType(getLatestMessage(messageToReplyTo).getSenderRoleType())
+                                                       .recipientRoleType(ofNullable(getLatestMessage(messageToReplyTo))
+                                                                              .orElse(Message.builder().build()).getSenderRoleType())
                                                        .senderName(baseMessageDetails.getSenderName())
                                                        .senderRoleType(baseMessageDetails.getSenderRoleType())
                                                        .sentTime(baseMessageDetails.getSentTime()).build());
@@ -145,7 +146,7 @@ public class SendAndReplyMessageService {
         Map<String, String> tableRows = new LinkedHashMap<>();
         tableRows.put("Date and time sent", formatDateTime(DATE_TIME_PATTERN, message.getSentTime()));
         tableRows.put("Sender's name", message.getSenderName());
-        tableRows.put("Recipient role", message.getSenderRoleType().getLabel());
+        tableRows.put("Recipient role", message.getRecipientRoleType().getLabel());
         tableRows.put("Urgency", message.getIsUrgent().getLabel());
         tableRows.put("What is it about", message.getSubjectType().getLabel());
         tableRows.put("Subject", message.getContentSubject());
