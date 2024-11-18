@@ -60,6 +60,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -7805,6 +7806,82 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
 
+        }
+
+        @Test
+        public void shouldgenerateRPAfeedfor_DJNoDivergent_case_online_999_event() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged().build().toBuilder()
+                .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+                .totalClaimAmount(new BigDecimal(1000))
+                .repaymentSuggestion("100")
+                .repaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
+                .repaymentSummaryObject(
+                    "The judgment will order dsfsdf ffdg to pay £1072.00, "
+                        + "including the claim fee and interest,"
+                        + " if applicable, as shown:\n### Claim amount \n"
+                        + " £1000.00\n ### Fixed cost amount"
+                        + " \n£102.00\n### Claim fee amount \n £70.00\n ## "
+                        + "Subtotal \n £1172.00\n\n ### Amount"
+                        + " already paid \n£100.00\n ## Total still owed \n £1072.00")
+                .respondent2SameLegalRepresentative(YES)
+                .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("Both")
+                                                     .build())
+                                          .build())
+                .build();
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+            assertThat(eventHistory).extracting("defaultJudgment").asList()
+                .extracting("eventCode").asString().contains("[230, 230]");
+
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventCode").asString().contains("999");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventDetailsText").asString().contains("Judgment recorded");
+        }
+
+        @Test
+        public void shouldgenerateRPAfeedfor_DJNoDivergent_case_offline_999_event() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged().build().toBuilder()
+                .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+                .totalClaimAmount(new BigDecimal(1000))
+                .repaymentSuggestion("100")
+                .repaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
+                .repaymentSummaryObject(
+                    "The judgment will order dsfsdf ffdg to pay £1072.00, "
+                        + "including the claim fee and interest,"
+                        + " if applicable, as shown:\n### Claim amount \n"
+                        + " £1000.00\n ### Fixed cost amount"
+                        + " \n£102.00\n### Claim fee amount \n £70.00\n ## "
+                        + "Subtotal \n £1172.00\n\n ### Amount"
+                        + " already paid \n£100.00\n ## Total still owed \n £1072.00")
+                .respondent2SameLegalRepresentative(YES)
+                .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("Both")
+                                                     .build())
+                                          .build())
+                .build();
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+            assertThat(eventHistory).extracting("defaultJudgment").asList()
+                .extracting("eventCode").asString().contains("[230, 230]");
+
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventCode").asString().contains("999");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventDetailsText").asString().contains(Arrays.asList("RPA Reason: Default Judgment requested and claim moved offline."));
         }
 
     }
