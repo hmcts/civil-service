@@ -29,6 +29,8 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -83,7 +85,11 @@ public class HearingFormGeneratorTest {
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
     @MockBean
+    private AssignCategoryId assignCategoryId;
+    @MockBean
     FeatureToggleService featureToggleService;
+    @MockBean
+    private LocationReferenceDataService locationRefDataService;
     @Autowired
     private HearingFormGenerator generator;
     @MockBean
