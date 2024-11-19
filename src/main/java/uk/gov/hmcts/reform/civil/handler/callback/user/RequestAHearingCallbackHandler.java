@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
-import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -36,14 +35,10 @@ public class RequestAHearingCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::clearFields,
-            callbackKey(ABOUT_TO_SUBMIT), this::setWaTaskToTrigger,
+            callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
-    //Todo:
-    // Tests
-    // about to submit should only apply to multi intermediate cases
-    // change your answers being weird
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -56,25 +51,7 @@ public class RequestAHearingCallbackHandler extends CallbackHandler {
 
         caseDataUpdated.requestHearingNoticeIntermediate(null);
         caseDataUpdated.requestHearingNoticeMulti(null);
-        caseDataUpdated.hearingWaTaskTypeToTrigger(null);
         caseDataUpdated.requestAnotherHearing(null);
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataUpdated.build().toMap(objectMapper))
-            .build();
-    }
-
-    private CallbackResponse setWaTaskToTrigger(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataUpdated = caseData.toBuilder();
-
-        StringBuilder hearingWaTask;
-        if (nonNull(caseData.getRequestHearingNoticeIntermediate())) {
-            hearingWaTask = new StringBuilder(caseData.getRequestHearingNoticeIntermediate().toString()).append("_INTERMEDIATE");
-        } else {
-            hearingWaTask = new StringBuilder(caseData.getRequestHearingNoticeMulti().toString()).append("_MULTI");
-        }
-        caseDataUpdated.hearingWaTaskTypeToTrigger(hearingWaTask.toString());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.build().toMap(objectMapper))
@@ -96,6 +73,5 @@ public class RequestAHearingCallbackHandler extends CallbackHandler {
     private String getBody() {
         return format(LISTING_REQUESTED_TASKS);
     }
-
 
 }
