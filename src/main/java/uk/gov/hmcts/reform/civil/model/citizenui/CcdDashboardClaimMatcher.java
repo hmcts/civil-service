@@ -127,18 +127,24 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isSDOOrderCreatedPreCP() {
-        Optional<LocalDateTime> lastNonSdoOrderTime = getTimeOfLastNonSDOOrder();
-        Optional<LocalDateTime> sdoTime = getSDOTime();
-        return !featureToggleService.isCaseProgressionEnabled()
-            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState());
+        String baseLocation = Optional.ofNullable(caseData.getCaseManagementLocation())
+            .map(location -> location.getBaseLocation())
+            .orElse(null);
+        return CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+            && baseLocation != null
+            && !featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(baseLocation);
     }
 
     @Override
     public boolean isSDOOrderCreatedCP() {
+        String baseLocation = Optional.ofNullable(caseData.getCaseManagementLocation())
+            .map(location -> location.getBaseLocation())
+            .orElse(null);
         Optional<LocalDateTime> lastNonSdoOrderTime = getTimeOfLastNonSDOOrder();
         Optional<LocalDateTime> sdoTime = getSDOTime();
-        return featureToggleService.isCaseProgressionEnabled()
-            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+        return CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+            && baseLocation != null
+            && featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
             && !isSDOOrderLegalAdviserCreated()
             && !isSDOOrderInReview()
             && !isSDOOrderInReviewOtherParty()
