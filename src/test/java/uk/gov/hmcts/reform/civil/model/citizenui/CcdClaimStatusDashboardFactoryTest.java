@@ -31,7 +31,9 @@ import uk.gov.hmcts.reform.civil.model.MediationSuccessful;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentUponCourtOrder;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.ClaimantResponseOnCourtDecisionType;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
@@ -46,6 +48,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HWF_REFERENCE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
@@ -398,7 +401,7 @@ class CcdClaimStatusDashboardFactoryTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void given_SDOBeenDrawn_whenGetStatus_sdoOrderCreatedRequired(boolean caseProgressionEnabled) {
-        Mockito.when(featureToggleService.isCaseProgressionEnabled()).thenReturn(caseProgressionEnabled);
+        Mockito.when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(caseProgressionEnabled);
         Element<CaseDocument> document = new Element<>(
             UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
             CaseDocument.builder()
@@ -406,10 +409,13 @@ class CcdClaimStatusDashboardFactoryTest {
                 .documentType(DocumentType.SDO_ORDER)
                 .build()
         );
+        DynamicListElement selectedCourt = DynamicListElement.builder()
+            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())
             .systemGeneratedCaseDocuments(List.of(document))
             .ccdState(CaseState.CASE_PROGRESSION)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
             .build();
         DashboardClaimStatus status =
             ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
