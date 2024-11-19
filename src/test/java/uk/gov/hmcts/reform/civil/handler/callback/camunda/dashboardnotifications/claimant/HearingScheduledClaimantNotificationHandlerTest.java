@@ -429,7 +429,6 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
         verifyNoInteractions(dashboardApiClient);
     }
 
-
     @ParameterizedTest
     @MethodSource("provideTestCases")
     void shouldNotCreateDashboardNotificationsForHearingFee(CaseState ccdState, ListingOrRelisting listingOrRelisting,
