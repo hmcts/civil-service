@@ -14,10 +14,10 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.LitigantInPersonFormGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGenerator;
@@ -54,9 +54,6 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
     private LitigantInPersonFormGenerator litigantInPersonFormGenerator;
     @Mock
     private SealedClaimFormGenerator sealedClaimFormGenerator;
-
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private GenerateClaimFormCallbackHandler handler;
@@ -118,7 +115,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
         void setup() {
             mapper = new ObjectMapper();
             handler = new GenerateClaimFormCallbackHandler(civilStitchService, litigantInPersonFormGenerator,
-                                                           sealedClaimFormGenerator, mapper, time, assignCategoryId, featureToggleService);
+                                                           sealedClaimFormGenerator, mapper, time, assignCategoryId);
             handler.setStitchEnabled(true);
             mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
             when(time.now()).thenReturn(issueDate.atStartOfDay());
@@ -135,6 +132,8 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(CLAIM_FORM);
+            assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0)
+                    .getValue().getDocumentLink().getCategoryID()).isEqualTo(DocCategory.CLAIMANT1_DETAILS_OF_CLAIM.getValue());
             assertThat(updatedData.getIssueDate()).isEqualTo(issueDate);
 
             verify(sealedClaimFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
@@ -186,7 +185,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
         void setup() {
             mapper = new ObjectMapper();
             handler = new GenerateClaimFormCallbackHandler(civilStitchService, litigantInPersonFormGenerator,
-                                                           sealedClaimFormGenerator, mapper, time, assignCategoryId, featureToggleService);
+                                                           sealedClaimFormGenerator, mapper, time, assignCategoryId);
             handler.setStitchEnabled(true);
             mapper.registerModule(new JavaTimeModule());
             when(time.now()).thenReturn(issueDate.atStartOfDay());
@@ -304,14 +303,11 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
         @InjectMocks
         private AssignCategoryId assignCategoryId;
 
-        @Mock
-        private FeatureToggleService featureToggleService;
-
         @BeforeEach
         void setup() {
             mapper = new ObjectMapper();
             handler = new GenerateClaimFormCallbackHandler(civilStitchService, litigantInPersonFormGenerator,
-                                                           sealedClaimFormGenerator, mapper, time, assignCategoryId, featureToggleService);
+                                                           sealedClaimFormGenerator, mapper, time, assignCategoryId);
             handler.setStitchEnabled(false);
             mapper.registerModule(new JavaTimeModule());
             when(sealedClaimFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);

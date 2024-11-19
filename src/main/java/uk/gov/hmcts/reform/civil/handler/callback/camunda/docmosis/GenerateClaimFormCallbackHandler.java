@@ -13,10 +13,10 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.LitigantInPersonFormGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGenerator;
@@ -49,8 +49,6 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
     private final Time time;
     private final AssignCategoryId assignCategoryId;
 
-    private final FeatureToggleService featureToggleService;
-
     @Setter
     @Value("${stitching.enabled}")
     private boolean stitchEnabled;
@@ -73,7 +71,7 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         Long caseId = caseData.getCcdCaseReference();
-        log.info("generation claim form for caseId {}", caseId);
+        log.info("Generating claim form for un-spec claim for caseId {}", caseId);
         LocalDate issueDate = time.now().toLocalDate();
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder().issueDate(issueDate);
@@ -82,7 +80,7 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
             caseDataBuilder.build(),
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-        assignCategoryId.assignCategoryIdToCaseDocument(sealedClaim, "detailsOfClaim");
+        assignCategoryId.assignCategoryIdToCaseDocument(sealedClaim, DocCategory.CLAIMANT1_DETAILS_OF_CLAIM.getValue());
 
         if (stitchEnabled
             && (YesOrNo.NO.equals(caseData.getRespondent1Represented())
@@ -105,16 +103,18 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
                     LocalDate.now().toString()
                 )
             );
-            log.info("Calling civil stitch service for caseId {}", caseId);
+            log.info("Calling civil stitch service from un-spec claim form generation for caseId {}", caseId);
             String auth = callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString();
-            CaseDocument sealedClaimFormWithLiPForm =
+            CaseDocument stitchedDocument =
                 civilStitchService.generateStitchedCaseDocument(documents,
-                                                                generateDocumentName(caseData.getLegacyCaseReference()),
+                                                                generateDocumentName("sealed_claim_form_%s.pdf",
+                                                                                     caseData.getLegacyCaseReference()),
                                                                 caseId,
                                                                 auth);
-            sealedClaimFormWithLiPForm.setDocumentName("Stitched document");
-            log.info("Civil stitch service response {} for caseId {}", sealedClaimFormWithLiPForm, caseId);
-            caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaimFormWithLiPForm));
+            stitchedDocument.setDocumentName("Stitched document");
+            log.info("Civil stitch service un-spec response {} for caseId {}", stitchedDocument, caseId);
+            assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.CLAIMANT1_DETAILS_OF_CLAIM.getValue());
+            caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(stitchedDocument));
         } else {
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaim));
         }
@@ -122,9 +122,5 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
-    }
-
-    private String generateDocumentName(final String caseReference) {
-        return String.format("sealed_claim_form_%s.pdf", caseReference);
     }
 }
