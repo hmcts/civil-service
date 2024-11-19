@@ -182,7 +182,9 @@ public class InitiateGeneralApplicationService {
         itemList.add(element(civil));
         applicationBuilder.caseManagementCategory(
             GACaseManagementCategory.builder().value(civil).list_items(itemList).build());
-        if (featureToggleService.isGaForLipsEnabled() && caseContainsLiP(caseData) && hasSDOBeenMade(caseData.getCcdState())) {
+        if (featureToggleService.isGaForLipsEnabled()
+            && caseContainsLiP(caseData)
+            && hasSDOBeenMade(caseData.getCcdState())) {
             LocationRefData  locationDetails = getWorkAllocationLocationDetails(caseData.getCaseManagementLocation().getBaseLocation(), authToken);
             applicationBuilder.caseManagementLocation(CaseLocationCivil.builder()
                                                           .region(caseData.getCaseManagementLocation().getRegion())
@@ -192,7 +194,7 @@ public class InitiateGeneralApplicationService {
                                                           .postcode(locationDetails.getPostcode())
                                                           .build());
             applicationBuilder.locationName(locationDetails.getSiteName());
-            applicationBuilder.isCcmccLocation(NO);
+            applicationBuilder.isCtscLocation(NO);
         } else {
             Pair<CaseLocationCivil, Boolean> caseLocation = getWorkAllocationLocation(caseData, authToken);
             if (Objects.isNull(caseLocation.getLeft().getBaseLocation()) && !caseLocation.getRight()) {
@@ -210,7 +212,7 @@ public class InitiateGeneralApplicationService {
             applicationBuilder.caseManagementLocation(caseLocation.getLeft());
             applicationBuilder.locationName(hasSDOBeenMade(caseData.getCcdState())
                                                 ? caseData.getLocationName() : caseLocation.getLeft().getSiteName());
-            applicationBuilder.isCcmccLocation(caseLocation.getRight() ? YES : NO);
+            applicationBuilder.isCtscLocation(caseLocation.getRight() ? YES : NO);
         }
         LocalDateTime deadline = deadlinesCalculator
             .calculateApplicantResponseDeadline(

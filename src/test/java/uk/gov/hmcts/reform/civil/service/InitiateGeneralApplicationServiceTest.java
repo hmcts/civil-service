@@ -1176,7 +1176,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .isEqualTo("420219");
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getRegion())
             .isEqualTo("2");
-        assertThat(result.getGeneralApplications().get(0).getValue().getIsCcmccLocation()).isEqualTo(YES);
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsCtscLocation()).isEqualTo(YES);
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementCategory().getValue().getLabel())
             .isEqualTo("Civil");
     }
@@ -1198,7 +1198,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .isEqualTo("1");
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getSiteName())
             .isEqualTo("transferred sitename");
-        assertThat(result.getGeneralApplications().get(0).getValue().getIsCcmccLocation()).isEqualTo(YES);
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsCtscLocation()).isEqualTo(YES);
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementCategory().getValue().getLabel())
             .isEqualTo("Civil");
     }

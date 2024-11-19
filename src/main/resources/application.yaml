@@ -122,10 +122,10 @@ genApp:
       certificateOfSatisfaction: CoS
   lrd:
     endpoint: /refdata/location/court-venues
-    ccmcc:
-#      claims with value under this amount in pounds are assigned to CCMCC
+    ctsc:
+#      claims with value under this amount in pounds are assigned to CTSC
       amountPounds: 1000
-      epimsId: 192280
+      epimsId: 366774
       regionId: 4
   jrd:
     endpoint: /refdata/judicial/users/search
@@ -490,10 +490,10 @@ http:
 court-location:
   specified-claim:
     region-id: "2"
-    epimms-id: "420219"
+    epimms-id: "283922"
   unspecified-claim:
     region-id: "4"
-    epimms-id: "192280"
+    epimms-id: "366774"
 
 role-initialisation:
   enabled: ${ASSIGN_ROLES_ON_STARTUP:false}

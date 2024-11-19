@@ -2364,7 +2364,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("caseManagementLocation")
                 .extracting("region", "baseLocation")
-                .containsExactly("2", "420219");
+                .containsExactly("2", "283922");
         }
 
         @Test

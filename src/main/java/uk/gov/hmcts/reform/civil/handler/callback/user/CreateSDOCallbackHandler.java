@@ -227,10 +227,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     static final String witnessStatementString = "This witness statement is limited to 10 pages per party, including any appendices.";
     static final String laterThanFourPmString = "later than 4pm on";
     static final String claimantEvidenceString = "and the claimant's evidence in reply if so advised to be uploaded by 4pm on";
-    @Value("${genApp.lrd.ccmcc.amountPounds}")
-    BigDecimal ccmccAmount;
+    @Value("${genApp.lrd.ctsc.amountPounds}")
+    BigDecimal ctscAmount;
     @Value("${court-location.unspecified-claim.epimms-id}")
-    String ccmccEpimsId;
+    String ctscEpimsId;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -1826,7 +1826,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private Optional<RequestedCourt> updateCaseManagementLocationIfLegalAdvisorSdo(CaseData.CaseDataBuilder<?, ?> updatedData, CaseData caseData) {
         Optional<RequestedCourt> preferredCourt;
-        if (isSpecClaim1000OrLessAndCcmcc(ccmccAmount).test(caseData)) {
+        if (isSpecClaim1000OrLessAndCtsc(ctscAmount).test(caseData)) {
             preferredCourt = locationHelper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData, true);
             preferredCourt.map(RequestedCourt::getCaseLocation)
                 .ifPresent(updatedData::caseManagementLocation);
@@ -1836,11 +1836,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
     }
 
-    public Predicate<CaseData> isSpecClaim1000OrLessAndCcmcc(BigDecimal ccmccAmount) {
+    public Predicate<CaseData> isSpecClaim1000OrLessAndCtsc(BigDecimal ctscAmount) {
         return caseData ->
             caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
-                && ccmccAmount.compareTo(caseData.getTotalClaimAmount()) >= 0
-                && caseData.getCaseManagementLocation().getBaseLocation().equals(ccmccEpimsId);
+                && ctscAmount.compareTo(caseData.getTotalClaimAmount()) >= 0
+                && caseData.getCaseManagementLocation().getBaseLocation().equals(ctscEpimsId);
     }
 
 }

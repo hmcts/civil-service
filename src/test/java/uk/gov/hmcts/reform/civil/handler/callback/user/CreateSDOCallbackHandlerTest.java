@@ -790,7 +790,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldUpdateCaseManagementLocation_whenUnder1000SpecCcmcc() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
                 .caseAccessCategory(SPEC_CLAIM)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.ccmccEpimsId).region(
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.ctscEpimsId).region(
                     "ccmcRegion").build())
                 .totalClaimAmount(BigDecimal.valueOf(999))
                 .claimsTrack(ClaimsTrack.smallClaimsTrack)

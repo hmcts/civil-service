@@ -33,18 +33,18 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 public class LocationHelper {
 
     private static final Set<Party.Type> PEOPLE = EnumSet.of(Party.Type.INDIVIDUAL, Party.Type.SOLE_TRADER);
-    private final BigDecimal ccmccAmount;
-    private final String ccmccRegionId;
-    private final String ccmccEpimsId;
+    private final BigDecimal ctscAmount;
+    private final String ctscRegionId;
+    private final String ctscEpimsId;
 
     public LocationHelper(
-        @Value("${genApp.lrd.ccmcc.amountPounds}") BigDecimal ccmccAmount,
-        @Value("${genApp.lrd.ccmcc.epimsId}") String ccmccEpimsId,
-        @Value("${genApp.lrd.ccmcc.regionId}") String ccmccRegionId) {
+        @Value("${genApp.lrd.ctsc.amountPounds}") BigDecimal ctscAmount,
+        @Value("${genApp.lrd.ctsc.epimsId}") String ctscEpimsId,
+        @Value("${genApp.lrd.ctsc.regionId}") String ctscRegionId) {
 
-        this.ccmccAmount = ccmccAmount;
-        this.ccmccRegionId = ccmccRegionId;
-        this.ccmccEpimsId = ccmccEpimsId;
+        this.ctscAmount = ctscAmount;
+        this.ctscRegionId = ctscRegionId;
+        this.ctscEpimsId = ctscEpimsId;
     }
 
     public Optional<RequestedCourt> getCaseManagementLocation(CaseData caseData) {
@@ -73,10 +73,10 @@ public class LocationHelper {
         }
 
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && ccmccAmount.compareTo(getClaimValue(caseData)) >= 0) {
+            && ctscAmount.compareTo(getClaimValue(caseData)) >= 0) {
             if (!isLegalAdvisorSdo) {
-                log.debug("Case {}, specified claim under 1000, CML set to CCMCC", caseData.getLegacyCaseReference());
-                return Optional.of(RequestedCourt.builder().caseLocation(getCcmccCaseLocation()).build());
+                log.debug("Case {}, specified claim under 1000, CML set to ctsc", caseData.getLegacyCaseReference());
+                return Optional.of(RequestedCourt.builder().caseLocation(getCtscCaseLocation()).build());
             } else {
                 log.debug("Case {}, specified claim under 1000, Legal advisor,  CML set to preferred location", caseData.getLegacyCaseReference());
                 assignSpecPreferredCourt(caseData, getDefendantType, getDefendantCourt, prioritized);
@@ -84,7 +84,7 @@ public class LocationHelper {
             }
         }
 
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && ccmccAmount.compareTo(getClaimValue(caseData)) <= 0) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && ctscAmount.compareTo(getClaimValue(caseData)) <= 0) {
             assignSpecPreferredCourt(caseData, getDefendantType, getDefendantCourt, prioritized);
             return prioritized.stream().findFirst();
         }
@@ -133,8 +133,8 @@ public class LocationHelper {
             .orElse(BigDecimal.ZERO);
     }
 
-    private CaseLocationCivil getCcmccCaseLocation() {
-        return CaseLocationCivil.builder().baseLocation(ccmccEpimsId).region(ccmccRegionId).build();
+    private CaseLocationCivil getCtscCaseLocation() {
+        return CaseLocationCivil.builder().baseLocation(ctscEpimsId).region(ctscRegionId).build();
     }
 
     /**

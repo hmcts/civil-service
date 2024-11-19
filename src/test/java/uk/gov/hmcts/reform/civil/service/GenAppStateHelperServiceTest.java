@@ -426,11 +426,11 @@ class GenAppStateHelperServiceTest {
 
             assertThat(getGADetailsFromUpdatedCaseData(updatedData, "1234")).isNotNull();
             assertThat(updatedData.getGeneralApplications().get(0).getValue().getCaseManagementLocation()).isEqualTo(caseLocation.getLeft());
-            assertThat(updatedData.getGeneralApplications().get(0).getValue().getIsCcmccLocation()).isEqualTo(YesOrNo.NO);
+            assertThat(updatedData.getGeneralApplications().get(0).getValue().getIsCtscLocation()).isEqualTo(YesOrNo.NO);
             assertThat(updatedData.getGeneralApplications().get(1).getValue().getCaseManagementLocation()).isEqualTo(caseLocation.getLeft());
-            assertThat(updatedData.getGeneralApplications().get(1).getValue().getIsCcmccLocation()).isEqualTo(YesOrNo.NO);
+            assertThat(updatedData.getGeneralApplications().get(1).getValue().getIsCtscLocation()).isEqualTo(YesOrNo.NO);
             assertThat(updatedData.getGeneralApplications().get(2).getValue().getCaseManagementLocation()).isEqualTo(caseLocation.getLeft());
-            assertThat(updatedData.getGeneralApplications().get(2).getValue().getIsCcmccLocation()).isEqualTo(YesOrNo.NO);
+            assertThat(updatedData.getGeneralApplications().get(2).getValue().getIsCtscLocation()).isEqualTo(YesOrNo.NO);
         }
 
         protected List<LocationRefData> getSampleCourLocationsRefObject() {

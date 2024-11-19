@@ -28,10 +28,10 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 
 class LocationHelperTest {
 
-    private static final BigDecimal CCMCC_AMOUNT = BigDecimal.valueOf(1000);
-    private static final String CCMCC_REGION_ID = "ccmccRegionId";
-    private static final String CCMCC_EPIMS = "ccmccEpims";
-    private final LocationHelper helper = new LocationHelper(CCMCC_AMOUNT, CCMCC_EPIMS, CCMCC_REGION_ID);
+    private static final BigDecimal CTSC_AMOUNT = BigDecimal.valueOf(1000);
+    private static final String CTSC_REGION_ID = "ctscRegionId";
+    private static final String CTSC_EPIMS = "ctscEpims";
+    private final LocationHelper helper = new LocationHelper(CTSC_AMOUNT, CTSC_EPIMS, CTSC_REGION_ID);
     private final CaseLocationCivil claimantPreferredCourt = CaseLocationCivil.builder()
         .baseLocation("123456").region("region 1").build();
     private final CaseLocationCivil defendant1PreferredCourt = CaseLocationCivil.builder()
@@ -93,7 +93,7 @@ class LocationHelperTest {
     }
 
     @Test
-    void whenLessThan1000AndSpecifiedClaim_locationIsCcmcc() {
+    void whenLessThan1000AndSpecifiedClaim_locationIsCtsc() {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .claimValue(ClaimValue.builder()
@@ -124,7 +124,7 @@ class LocationHelperTest {
 
         Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
         Assertions.assertThat(court.orElseThrow().getCaseLocation())
-            .isEqualTo(CaseLocationCivil.builder().baseLocation(CCMCC_EPIMS).region(CCMCC_REGION_ID).build());
+            .isEqualTo(CaseLocationCivil.builder().baseLocation(CTSC_EPIMS).region(CTSC_REGION_ID).build());
     }
 
     @Test
