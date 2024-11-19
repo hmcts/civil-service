@@ -123,10 +123,14 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
                 return "DO_NOT_SHOW";
             }
         }
-        boolean hasPaidFee = (caseData.getHearingFeePaymentDetails() != null
-            && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus())) || caseData.hearingFeePaymentDoneWithHWF();
+        if (featureToggleService.isCaseEventsEnabled()) {
+            boolean hasPaidFee = (caseData.getHearingFeePaymentDetails() != null
+                && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus())) || caseData.hearingFeePaymentDoneWithHWF();
 
-        return hasPaidFee ? "DO_NOT_SHOW" : "SHOW";
+            return hasPaidFee ? "DO_NOT_SHOW" : "SHOW";
+        } else {
+            return "SHOW";
+        }
     }
 
     private String getFileName(CaseData caseData, DocmosisTemplates template) {
