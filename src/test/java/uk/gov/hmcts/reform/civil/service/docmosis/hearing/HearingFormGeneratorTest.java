@@ -414,11 +414,25 @@ public class HearingFormGeneratorTest {
         assertThat(generator.listingOrRelistingWithFeeDue(caseData)).isEqualTo("DO_NOT_SHOW");
     }
 
+    private static Stream<Arguments> provideTestCases() {
+        return Stream.of(
+            Arguments.of(CaseState.HEARING_READINESS, ListingOrRelisting.LISTING, YesOrNo.NO, YesOrNo.NO,
+                         PaymentDetails.builder().status(PaymentStatus.SUCCESS).build(), null, "DO_NOT_SHOW"),
+            Arguments.of(CaseState.HEARING_READINESS, ListingOrRelisting.LISTING, YesOrNo.NO, YesOrNo.NO,
+                         null, FeePaymentOutcomeDetails.builder().hwfFullRemissionGrantedForHearingFee(YesOrNo.YES).build(), "DO_NOT_SHOW"),
+            Arguments.of(CaseState.HEARING_READINESS, ListingOrRelisting.LISTING, YesOrNo.NO, YesOrNo.NO,
+                         PaymentDetails.builder().status(PaymentStatus.FAILED).build(), null, "SHOW"),
+            Arguments.of(CaseState.HEARING_READINESS, ListingOrRelisting.LISTING, YesOrNo.NO, YesOrNo.NO,
+                         PaymentDetails.builder().status(PaymentStatus.FAILED).build(), null, "SHOW")
+        );
+    }
+
     @ParameterizedTest
     @MethodSource("provideTestCases")
     void shouldNotCreateDashboardNotificationsForHearingFee(CaseState ccdState, ListingOrRelisting listingOrRelisting,
                                                             YesOrNo applicant1Represented, YesOrNo respondent1Represented,
-                                                            PaymentDetails hearingFeePaymentDetails, FeePaymentOutcomeDetails feePaymentOutcomeDetails) {
+                                                            PaymentDetails hearingFeePaymentDetails, FeePaymentOutcomeDetails feePaymentOutcomeDetails,
+                                                            String expected) {
         when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
@@ -433,15 +447,6 @@ public class HearingFormGeneratorTest {
             .feePaymentOutcomeDetails(feePaymentOutcomeDetails)
             .build();
 
-        assertThat(generator.listingOrRelistingWithFeeDue(caseData)).isEqualTo("DO_NOT_SHOW");
-    }
-
-    private static Stream<Arguments> provideTestCases() {
-        return Stream.of(
-            Arguments.of(CaseState.HEARING_READINESS, ListingOrRelisting.LISTING, YesOrNo.NO, YesOrNo.NO,
-                         PaymentDetails.builder().status(PaymentStatus.SUCCESS).build(), null),
-            Arguments.of(CaseState.HEARING_READINESS, ListingOrRelisting.LISTING, YesOrNo.NO, YesOrNo.NO,
-                         null, FeePaymentOutcomeDetails.builder().hwfFullRemissionGrantedForHearingFee(YesOrNo.YES).build())
-        );
+        assertThat(generator.listingOrRelistingWithFeeDue(caseData)).isEqualTo(expected);
     }
 }

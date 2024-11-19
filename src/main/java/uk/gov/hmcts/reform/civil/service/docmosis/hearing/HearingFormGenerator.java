@@ -112,24 +112,27 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
     }
 
     public String listingOrRelistingWithFeeDue(CaseData caseData) {
+        String doNotShow = "DO_NOT_SHOW";
+        String show = "SHOW";
+
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
             if (caseData.getListingOrRelisting().equals(ListingOrRelisting.RELISTING)
                 && caseData.getHearingFeePaymentDetails() != null
                 && caseData.getHearingFeePaymentDetails().getStatus().equals(PaymentStatus.SUCCESS)) {
-                return "DO_NOT_SHOW";
+                return doNotShow;
             }
         } else {
             if (caseData.getListingOrRelisting().equals(ListingOrRelisting.RELISTING)) {
-                return "DO_NOT_SHOW";
+                return doNotShow;
             }
         }
         if (featureToggleService.isCaseEventsEnabled()) {
             boolean hasPaidFee = (caseData.getHearingFeePaymentDetails() != null
                 && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus())) || caseData.hearingFeePaymentDoneWithHWF();
 
-            return hasPaidFee ? "DO_NOT_SHOW" : "SHOW";
+            return hasPaidFee ? doNotShow : show;
         } else {
-            return "SHOW";
+            return show;
         }
     }
 
