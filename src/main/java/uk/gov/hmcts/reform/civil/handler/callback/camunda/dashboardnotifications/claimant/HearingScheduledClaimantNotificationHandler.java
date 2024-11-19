@@ -106,8 +106,8 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
             caseData.setHearingFee(HearingFeeUtils.calculateAndApplyFee(hearingFeesService, caseData, caseData.getAssignedTrack()));
         }
 
-        boolean shouldRecordFeeScenario = caseData.isApplicant1NotRepresented() && !hasPaidFee &&
-            ((!isAutoHearingNotice && caseData.getCcdState() == HEARING_READINESS && caseData.getListingOrRelisting() == LISTING)
+        boolean shouldRecordFeeScenario = caseData.isApplicant1NotRepresented() && !hasPaidFee
+            && ((!isAutoHearingNotice && caseData.getCcdState() == HEARING_READINESS && caseData.getListingOrRelisting() == LISTING)
                 || (isAutoHearingNotice && hearingFeeRequired(camundaVars.getHearingType())));
 
         if (shouldRecordFeeScenario) {
