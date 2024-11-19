@@ -1891,6 +1891,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 REQUEST_FOR_RECONSIDERATION,
+                DECISION_ON_RECONSIDERATION_REQUEST,
+                AMEND_RESTITCH_BUNDLE,
                 HEARING_SCHEDULED,
                 HEARING_SCHEDULED_RETRIGGER,
                 TRIAL_READY_CHECK,

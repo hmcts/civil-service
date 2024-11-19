@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.util.Map;
 import java.util.Optional;
@@ -34,10 +35,11 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 
 @ExtendWith(MockitoExtension.class)
 class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -105,7 +107,34 @@ class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldNotifyRespondentLiP_whenInvoked() {
-            when(notificationsProperties.getSdoOrderedSpec()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
+                .toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .build();
+            CallbackParams params = CallbackParams.builder()
+                .caseData(caseData)
+                .type(ABOUT_TO_SUBMIT)
+                .request(CallbackRequest.builder()
+                             .eventId(CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_SDO_TRIGGERED.name())
+                             .build())
+                .build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                caseData.getRespondent1().getPartyEmail(),
+                TEMPLATE_ID,
+                getNotificationDataLipMap1(caseData),
+                LEGACY_REFERENCE
+            );
+        }
+
+        @Test
+        void shouldNotifyRespondentLiP_whenInvokedEA() {
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
@@ -132,7 +161,7 @@ class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldNotifyRespondentLiPWithBilingual_whenDefendantResponseIsBilingual() {
-            when(notificationsProperties.getSdoOrderedSpecBilingual()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(TEMPLATE_ID);
 
             Party party = PartyBuilder.builder()
                 .individual(DEFENDANT_NAME)
@@ -178,7 +207,8 @@ class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHandlerTes
         private Map<String, String> getNotificationDataLipMap(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                RESPONDENT_NAME, caseData.getRespondent1().getPartyName()
+                PARTY_NAME, caseData.getRespondent1().getPartyName(),
+                CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
             );
         }
 
@@ -186,8 +216,8 @@ class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHandlerTes
         private Map<String, String> getNotificationDataLipMap1(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                CLAIM_LEGAL_ORG_NAME_SPEC, caseData.getRespondent1().getPartyName(),
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+                PARTY_NAME, caseData.getRespondent1().getPartyName(),
+                CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
             );
         }
     }
