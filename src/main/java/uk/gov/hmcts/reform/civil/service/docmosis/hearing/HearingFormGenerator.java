@@ -29,6 +29,7 @@ import java.util.List;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_APPLICATION;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_APPLICATION_AHN;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_TRIAL;
@@ -117,12 +118,15 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
                 && caseData.getHearingFeePaymentDetails().getStatus().equals(PaymentStatus.SUCCESS)) {
                 return "DO_NOT_SHOW";
             }
-        } else  {
+        } else {
             if (caseData.getListingOrRelisting().equals(ListingOrRelisting.RELISTING)) {
                 return "DO_NOT_SHOW";
             }
         }
-        return "SHOW";
+        boolean hasPaidFee = (caseData.getHearingFeePaymentDetails() != null
+            && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus())) || caseData.hearingFeePaymentDoneWithHWF();
+
+        return hasPaidFee ? "DO_NOT_SHOW" : "SHOW";
     }
 
     private String getFileName(CaseData caseData, DocmosisTemplates template) {
