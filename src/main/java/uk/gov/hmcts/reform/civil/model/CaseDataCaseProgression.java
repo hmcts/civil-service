@@ -226,7 +226,6 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private HearingTypes requestHearingNoticeIntermediate;
     private HearingTypes requestHearingNoticeMulti;
     private YesOrNo requestAnotherHearing;
-    private String hearingWaTaskTypeToTrigger;
 
     /**
      * Claimant has requested a reconsideration of the SDO.
