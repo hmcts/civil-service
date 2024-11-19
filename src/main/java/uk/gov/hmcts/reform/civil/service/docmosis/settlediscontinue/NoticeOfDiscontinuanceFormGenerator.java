@@ -10,12 +10,13 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.settleanddiscontinue.NoticeOfDiscontinuanceForm;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
-
+import java.time.LocalDate;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.NOTICE_OF_DISCONTINUANCE_PDF;
 
@@ -27,8 +28,8 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
 
-    public CaseDocument generateDocs(CaseData caseData, String authorisation) {
-        NoticeOfDiscontinuanceForm templateData = getNoticeOfDiscontinueData(caseData);
+    public CaseDocument generateDocs(CaseData caseData, Party party, String authorisation) {
+        NoticeOfDiscontinuanceForm templateData = getNoticeOfDiscontinueData(caseData, party);
         DocmosisTemplates docmosisTemplate = NOTICE_OF_DISCONTINUANCE_PDF;
         DocmosisDocument docmosisDocument =
                 documentGeneratorService.generateDocmosisDocument(templateData, docmosisTemplate);
@@ -47,9 +48,17 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
         return String.format(docmosisTemplate.getDocumentTitle(), caseData.getLegacyCaseReference());
     }
 
-    private NoticeOfDiscontinuanceForm getNoticeOfDiscontinueData(CaseData caseData) {
+    private NoticeOfDiscontinuanceForm getNoticeOfDiscontinueData(CaseData caseData, Party party) {
         var noticeOfDiscontinueBuilder = NoticeOfDiscontinuanceForm.builder()
                 .caseNumber(caseData.getLegacyCaseReference())
+                .claimReferenceNumber(caseData.getLegacyCaseReference())
+                .letterIssueDate(LocalDate.now())
+                .dateOfEvent(LocalDate.now())
+                .coverLetterName(party.getPartyName())
+                .addressLine1(party.getPrimaryAddress().getAddressLine1())
+                .addressLine2(party.getPrimaryAddress().getAddressLine2())
+                .addressLine3(party.getPrimaryAddress().getAddressLine3())
+                .postCode(party.getPrimaryAddress().getPostCode())
                 .claimant1Name(caseData.getApplicant1().getPartyName())
                 .claimant2Name(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
                 .defendant1Name(caseData.getRespondent1().getPartyName())
