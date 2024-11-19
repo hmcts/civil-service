@@ -509,7 +509,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             BigDecimal claimAmount = new BigDecimal(2000);
             BigDecimal interestAmount = new BigDecimal(100);
             BigDecimal claimFeeAmount = new BigDecimal(50);
-            BigDecimal partialPaymentAmount = new BigDecimal(2200);
+            BigDecimal partialPaymentAmount = new BigDecimal(2260);
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .totalClaimAmount(claimAmount)
