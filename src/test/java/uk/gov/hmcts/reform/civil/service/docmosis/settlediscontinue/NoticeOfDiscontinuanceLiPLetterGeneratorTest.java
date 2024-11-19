@@ -52,7 +52,8 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
                 .respondent1Represented(YesOrNo.NO)
                 .applicant1(applicant)
                 .respondent1(defendant)
-                .noticeOfDiscontinueAllParitiesDoc(caseDocument).build();
+                .respondent1NoticeOfDiscontinueAllPartyViewDoc(caseDocument
+                ).build();
 
         given(documentDownloadService.downloadDocument(
                 any(),
@@ -78,7 +79,7 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
                 .respondent1Represented(YesOrNo.NO)
                 .applicant1(applicant)
                 .respondent1(defendant)
-                .noticeOfDiscontinueAllParitiesDoc(null).build();
+                .respondent1NoticeOfDiscontinueAllPartyViewDoc(null).build();
 
         liPLetterGenerator.printNoticeOfDiscontinuanceLetter(caseData, BEARER_TOKEN);
 
