@@ -259,6 +259,7 @@ notifications:
   respondentDefendantResponseForSpec: "2c4435ae-af57-4988-9e79-cb28db4bba49"
   sdoOrdered: "4847cf11-8f5f-4b51-aca4-d29b88389ee5"
   sdoOrderedSpec: "0cf6bb95-f3f7-4072-b07f-c752af03b490"
+  sdoOrderedSpecEa: "1c1a200c-b3c1-45eb-9768-aeea56857420"
   sdoOrderedSpecBilingual: "0ae860e7-80b5-46f8-95b7-8f19d6f974cf"
   claimantSolicitorConfirmsNotToProceedSpec: "ebb4c5b9-6522-42a9-92a5-c7616ed3a4c2"
   claimantSolicitorConfirmsNotToProceedSpecLip: "57fa7156-3af0-4c78-8677-ee1cf6aaed43"
