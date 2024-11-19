@@ -286,9 +286,9 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         }
 
         // otherwise show new dj fixed costs screen if judgment amount is more
-        // than 25. judgment amount = claim amount + interest - partial amount
+        // than 25. judgment amount = claim amount + interest + fixed commencent costs + claim fee  - partial amount
         if (caseData.getFixedCosts() != null) {
-            BigDecimal judgmentAmount = calculateJudgmentAmountForFixedCosts(caseData).add(getFixedCostsOnCommencement(caseData));
+            BigDecimal judgmentAmount = getJudgmentAmount(caseData);
             if (YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
                 if (judgmentAmount.compareTo(BigDecimal.valueOf(25)) > 0) {
                     caseDataBuilder.showDJFixedCostsScreen(YesOrNo.YES);
@@ -314,6 +314,13 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             .errors(errors)
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    @NotNull
+    private BigDecimal getJudgmentAmount(CaseData caseData) {
+        BigDecimal judgmentAmount = calculateJudgmentAmountForFixedCosts(caseData)
+            .add(getFixedCostsOnCommencement(caseData)).add(getClaimFeePounds(caseData, caseData.getClaimFee()));
+        return judgmentAmount;
     }
 
     private BigDecimal getFixedCostsOnCommencement(CaseData caseData) {

@@ -624,7 +624,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotShowNewFixedCostsPage_whenJudgmentAmountLessThan25AndYesClaimIssueFixedCostsAndCalculateRepaymentBreakdown() {
+        void  shouldNotShowNewFixedCostsPage_whenJudgmentAmountLessThan25AndYesClaimIssueFixedCostsAndShouldNotCalculateRepaymentBreakdown() {
             BigDecimal claimAmount = new BigDecimal(2000);
             BigDecimal interestAmount = new BigDecimal(100);
             when(interestCalculator.calculateInterest(any()))
@@ -645,7 +645,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                               .build())
                 .fixedCosts(FixedCosts.builder()
                                 .claimFixedCosts(YES)
-                                .fixedCostAmount("10000")
+                                .fixedCostAmount("10")
                                 .build())
                 .partialPaymentAmount("199500")
                 .build();
@@ -656,6 +656,76 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("showOldDJFixedCostsScreen")).isNull();
             assertThat(response.getData().get("showDJFixedCostsScreen")).isEqualTo("No");
             assertThat(response.getData().get("repaymentSummaryObject")).isNotNull();
+        }
+
+        @Test
+        void  shouldShowNewFixedCostsPage_whenJudgmentAmountMoreThan25AndYesClaimIssueFixedCostsAndCalculateRepaymentBreakdown() {
+            BigDecimal claimAmount = new BigDecimal(2000);
+            BigDecimal interestAmount = new BigDecimal(100);
+            when(interestCalculator.calculateInterest(any()))
+                .thenReturn(BigDecimal.valueOf(1));
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .partialPayment(YES)
+                .totalClaimAmount(claimAmount)
+                .totalInterest(interestAmount)
+                .defendantDetailsSpec(DynamicList.builder()
+                    .value(DynamicListElement.builder()
+                        .label("Test User")
+                        .build())
+                    .build())
+                .claimFee(Fee.builder()
+                    .calculatedAmountInPence(BigDecimal.valueOf(1))
+                    .build())
+                .fixedCosts(FixedCosts.builder()
+                    .claimFixedCosts(YES)
+                    .fixedCostAmount("100")
+                    .build())
+                .partialPaymentAmount("199500")
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData().get("showOldDJFixedCostsScreen")).isNull();
+            assertThat(response.getData().get("showDJFixedCostsScreen")).isEqualTo("Yes");
+            assertThat(response.getData().get("repaymentSummaryObject")).isNull();
+        }
+
+        @Test
+        void  shouldShowNewFixedCostsPage_whenJudgmentAmountMoreThan25WithFeeAndNoClaimIssueFixedCosts() {
+            BigDecimal claimAmount = new BigDecimal(2000);
+            BigDecimal interestAmount = new BigDecimal(100);
+            when(interestCalculator.calculateInterest(any()))
+                .thenReturn(BigDecimal.valueOf(1));
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .partialPayment(YES)
+                .totalClaimAmount(claimAmount)
+                .totalInterest(interestAmount)
+                .defendantDetailsSpec(DynamicList.builder()
+                    .value(DynamicListElement.builder()
+                        .label("Test User")
+                        .build())
+                    .build())
+                .claimFee(Fee.builder()
+                    .calculatedAmountInPence(BigDecimal.valueOf(10000))
+                    .build())
+                .fixedCosts(FixedCosts.builder()
+                    .claimFixedCosts(YES)
+                    .fixedCostAmount("100")
+                    .build())
+                .partialPaymentAmount("199400")
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData().get("showOldDJFixedCostsScreen")).isNull();
+            assertThat(response.getData().get("showDJFixedCostsScreen")).isEqualTo("Yes");
+            assertThat(response.getData().get("repaymentSummaryObject")).isNull();
         }
 
         @Test
