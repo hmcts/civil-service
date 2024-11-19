@@ -648,4 +648,7 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String notifyClaimantLRCoscApplied;
+
+    @NotEmpty
+    private String sdoOrderedSpecEa;
 }
