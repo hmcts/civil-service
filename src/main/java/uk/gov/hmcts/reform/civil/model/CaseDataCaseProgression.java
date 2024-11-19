@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingChannel;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
-import uk.gov.hmcts.reform.civil.enums.hearing.HearingTypes;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.caseprogression.HearingOtherComments;
@@ -227,8 +226,7 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private final List<Element<CaseDocument>> trialReadyDocuments = new ArrayList<>();
 
     // request hearing
-    private HearingTypes requestHearingNoticeIntermediate;
-    private HearingTypes requestHearingNoticeMulti;
+    private DynamicList requestHearingNoticeDynamic;
     private YesOrNo requestAnotherHearing;
 
     /**

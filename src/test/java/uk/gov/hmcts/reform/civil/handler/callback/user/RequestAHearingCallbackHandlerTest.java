@@ -10,7 +10,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.enums.hearing.HearingTypes;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -30,31 +31,57 @@ class RequestAHearingCallbackHandlerTest extends BaseCallbackHandlerTest {
     @InjectMocks
     private RequestAHearingCallbackHandler handler;
 
+    private ObjectMapper objectMapper;
+
     @BeforeEach
     void setUp() {
-        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         handler = new RequestAHearingCallbackHandler(objectMapper);
     }
 
     @Test
-    void shouldClearData_whenInvoked() {
+    void shouldPopulateIntermediateList_whenInvoked() {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .requestHearingNoticeIntermediate(HearingTypes.CASE_MANAGEMENT_CONFERENCE)
+            .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
             .requestAnotherHearing(YES)
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
 
-        assertThat(response.getData().get("requestHearingNoticeIntermediate")).isNull();
+        assertThat(updatedData.getRequestHearingNoticeDynamic().getListItems().size()).isEqualTo(4);
+    }
+
+    @Test
+    void shouldPopulateMultiList_whenInvoked() {
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .responseClaimTrack("MULTI_CLAIM")
+            .requestAnotherHearing(YES)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+        assertThat(updatedData.getRequestHearingNoticeDynamic().getListItems().size()).isEqualTo(5);
+    }
+
+    @Test
+    void shouldClearData_whenInvoked() {
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .requestAnotherHearing(YES)
+            .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
         assertThat(response.getData().get("requestAnotherHearing")).isNull();
     }
 
     @Test
     void shouldCreateConfirmationScreen_whenInvoked() {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .requestHearingNoticeMulti(HearingTypes.CASE_MANAGEMENT_CONFERENCE)
-            .requestAnotherHearing(YES)
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
