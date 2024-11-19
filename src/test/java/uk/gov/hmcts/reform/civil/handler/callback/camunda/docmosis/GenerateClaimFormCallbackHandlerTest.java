@@ -198,7 +198,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             when(sealedClaimFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
             when(litigantInPersonFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(LIP_FORM);
-            when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(),
+            when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(SEALED_CLAIM),
                                                                  anyString())).thenReturn(STITCHED_DOC);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -208,7 +208,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             verify(sealedClaimFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
             verify(litigantInPersonFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
-            verify(civilStitchService).generateStitchedCaseDocument(anyList(), anyString(), anyLong(), anyString());
+            verify(civilStitchService).generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(SEALED_CLAIM), anyString());
         }
 
         @Test
@@ -220,7 +220,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             when(sealedClaimFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
             when(litigantInPersonFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(LIP_FORM);
-            when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(),
+            when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(SEALED_CLAIM),
                                                                  anyString())).thenReturn(STITCHED_DOC);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -229,7 +229,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(STITCHED_DOC);
             verify(sealedClaimFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
             verify(litigantInPersonFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
-            verify(civilStitchService).generateStitchedCaseDocument(anyList(), anyString(), anyLong(), anyString());
+            verify(civilStitchService).generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(SEALED_CLAIM), anyString());
         }
 
         @Test
@@ -241,7 +241,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             when(sealedClaimFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
             when(litigantInPersonFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(LIP_FORM);
-            when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(),
+            when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(SEALED_CLAIM),
                                                                  anyString())).thenReturn(STITCHED_DOC);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -250,14 +250,14 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(STITCHED_DOC);
             verify(sealedClaimFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
             verify(litigantInPersonFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
-            verify(civilStitchService).generateStitchedCaseDocument(anyList(), anyString(), anyLong(), anyString());
+            verify(civilStitchService).generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(SEALED_CLAIM), anyString());
         }
 
         @Test
         void shouldStitchClaimFormWithLipForm_whenOneVsTwo_andBothDefendantsAreLitigantInPerson() {
             when(sealedClaimFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
             when(litigantInPersonFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(LIP_FORM);
-            when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(),
+            when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(SEALED_CLAIM),
                                                                  anyString())).thenReturn(STITCHED_DOC);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimSubmittedNoRespondentRepresented()
@@ -270,7 +270,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(STITCHED_DOC);
             verify(sealedClaimFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
             verify(litigantInPersonFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
-            verify(civilStitchService).generateStitchedCaseDocument(anyList(), anyString(), anyLong(), anyString());
+            verify(civilStitchService).generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(SEALED_CLAIM), anyString());
         }
     }
 

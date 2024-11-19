@@ -194,7 +194,7 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldGenerateClaimFormWithClaimTimeLineDocs_whenUploadedByRespondent() {
             when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
-            when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(),
+            when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(SEALED_CLAIM),
                                                                  anyString())).thenReturn(STITCHED_DOC);
             when(time.now()).thenReturn(issueDate.atStartOfDay());
             documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
@@ -229,7 +229,8 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(STITCHED_DOC);
             verify(sealedClaimFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
-            verify(civilStitchService).generateStitchedCaseDocument(eq(specClaimTimelineDocuments), anyString(), anyLong(), anyString());
+            verify(civilStitchService).generateStitchedCaseDocument(eq(specClaimTimelineDocuments),
+                                                                    anyString(), anyLong(), eq(SEALED_CLAIM), anyString());
         }
     }
 
@@ -267,7 +268,7 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
     void shouldAssignCategoryIdParticulars_whenInvoked() {
         // Given
         when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
-        when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(),
+        when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(SEALED_CLAIM),
                                                              anyString())).thenReturn(STITCHED_DOC);
         when(time.now()).thenReturn(issueDate.atStartOfDay());
         documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
@@ -303,7 +304,7 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
     void shouldAssignCategoryIdTimeline_whenInvoked() {
         // Given
         when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
-        when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(),
+        when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(SEALED_CLAIM),
                                                              anyString())).thenReturn(STITCHED_DOC);
         when(time.now()).thenReturn(issueDate.atStartOfDay());
         documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
@@ -339,7 +340,7 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
     void shouldAssignCategoryIdBothTimelineAndParticulars_whenInvoked() {
         // Given
         when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
-        when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(),
+        when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(SEALED_CLAIM),
                                                              anyString())).thenReturn(STITCHED_DOC);
         when(time.now()).thenReturn(issueDate.atStartOfDay());
         documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
@@ -378,7 +379,7 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
     void shouldNullDocuments_whenInvokedAndCaseFileEnabled() {
         // Given
         when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
-        when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(),
+        when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(SEALED_CLAIM),
                                                              anyString())).thenReturn(STITCHED_DOC);
         when(time.now()).thenReturn(issueDate.atStartOfDay());
         documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),

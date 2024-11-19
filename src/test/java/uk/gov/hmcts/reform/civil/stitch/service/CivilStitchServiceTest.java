@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.stitch.PdfMerger;
@@ -53,6 +54,7 @@ class CivilStitchServiceTest {
         CaseDocument caseDocument = civilStitchService.generateStitchedCaseDocument(documents,
                                                                                     "seal-form-000-DC-123.pdf",
                                                                                     1L,
+                                                                                    DocumentType.SEALED_CLAIM,
                                                                                     BEARER_TOKEN);
         assertEquals(STITCHED_DOC, caseDocument);
     }

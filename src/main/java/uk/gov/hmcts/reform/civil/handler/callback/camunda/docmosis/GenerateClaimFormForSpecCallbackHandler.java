@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
@@ -121,6 +122,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
                                                                 generateDocumentName("sealed_claim_form_%s.pdf",
                                                                                      caseData.getLegacyCaseReference()),
                                                                 caseId,
+                                                                DocumentType.SEALED_CLAIM,
                                                                 auth);
             stitchedDocument.setDocumentName("Stitched document");
             log.info("Civil stitch service spec response {} for caseId {}", stitchedDocument, caseId);

@@ -22,6 +22,7 @@ public class CivilStitchService {
     public CaseDocument generateStitchedCaseDocument(List<DocumentMetaData> documents,
                                                      String documentName,
                                                      Long caseId,
+                                                     DocumentType documentType,
                                                      String authorisation) {
 
         log.info("Generating stitched case document for caseId {} with filename {}", caseId, documentName);
@@ -30,10 +31,10 @@ public class CivilStitchService {
 
         byte[] bytes = PdfMerger.mergeDocuments(docs, String.valueOf(caseId));
 
-        return managementService.uploadDocument(authorisation, getPdf(bytes, documentName));
+        return managementService.uploadDocument(authorisation, getPdf(bytes, documentName, documentType));
     }
 
-    private PDF getPdf(byte[] bytes, String documentName) {
-        return new PDF(documentName, bytes, DocumentType.SEALED_CLAIM);
+    private PDF getPdf(byte[] bytes, String documentName, DocumentType documentType) {
+        return new PDF(documentName, bytes, documentType);
     }
 }
