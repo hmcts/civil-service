@@ -105,14 +105,15 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
                     LocalDate.now().toString()
                 )
             );
-            log.info("calling civil stitch service for caseId {}", caseId);
+            log.info("Calling civil stitch service for caseId {}", caseId);
             String auth = callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString();
             CaseDocument sealedClaimFormWithLiPForm =
                 civilStitchService.generateStitchedCaseDocument(documents,
                                                                 generateDocumentName(caseData.getLegacyCaseReference()),
                                                                 caseId,
                                                                 auth);
-            log.info("calling civil stitch service response {} for caseId {}", sealedClaimFormWithLiPForm, caseId);
+            sealedClaimFormWithLiPForm.setDocumentName("Stitched document");
+            log.info("Civil stitch service response {} for caseId {}", sealedClaimFormWithLiPForm, caseId);
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaimFormWithLiPForm));
         } else {
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaim));
