@@ -1937,6 +1937,8 @@ class FlowStateAllowedEventServiceTest {
                         TRIAL_READY_CHECK,
                         TRIAL_READY_NOTIFICATION,
                         MOVE_TO_DECISION_OUTCOME,
+                        DECISION_ON_RECONSIDERATION_REQUEST,
+                        AMEND_RESTITCH_BUNDLE,
                         HEARING_FEE_UNPAID,
                         HEARING_FEE_PAID,
                         REFER_TO_JUDGE,
