@@ -2248,7 +2248,8 @@ public class EventHistoryMapper {
         String miscTextRequested =  "RPA Reason: Default Judgment requested and claim moved offline.";
         String miscTextGranted = "RPA Reason: Default Judgment granted and claim moved offline.";
 
-        if (caseData.getCcdState() == CaseState.All_FINAL_ORDERS_ISSUED) {
+        if (featureToggleService.isJudgmentOnlineLive()
+            && caseData.getCcdState() == CaseState.All_FINAL_ORDERS_ISSUED) {
             miscTextRequested = miscTextGranted = "Judgment recorded.";
         }
 

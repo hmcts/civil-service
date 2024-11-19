@@ -73,6 +73,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
@@ -7809,6 +7810,8 @@ class EventHistoryMapperTest {
 
         @Test
         public void shouldgenerateRPAfeedfor_DJNoDivergent_case_online_999_event() {
+
+            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged().build().toBuilder()
                 .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
@@ -7847,6 +7850,8 @@ class EventHistoryMapperTest {
 
         @Test
         public void shouldgenerateRPAfeedfor_DJNoDivergent_case_offline_999_event() {
+
+            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged().build().toBuilder()
                 .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
