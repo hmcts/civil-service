@@ -21,7 +21,9 @@ import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.math.BigDecimal;
@@ -34,6 +36,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 
 class DashboardClaimStatusFactoryTest {
 
@@ -71,6 +74,7 @@ class DashboardClaimStatusFactoryTest {
     @BeforeEach
     void prepare() {
         Mockito.when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
+        Mockito.when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
     }
 
     @ParameterizedTest
@@ -134,7 +138,7 @@ class DashboardClaimStatusFactoryTest {
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectStatus_fastClaimSdo(boolean caseProgressionEnabled) {
         List<CaseEventDetail> eventHistory = new ArrayList<>();
-        Mockito.when(toggleService.isCaseProgressionEnabled()).thenReturn(caseProgressionEnabled);
+        Mockito.when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(caseProgressionEnabled);
         fastClaim(eventHistory, toggleService);
     }
 
@@ -203,7 +207,7 @@ class DashboardClaimStatusFactoryTest {
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectStatus_smallClaimSdo(boolean caseProgressionEnabled) {
         List<CaseEventDetail> eventHistory = new ArrayList<>();
-        Mockito.when(toggleService.isCaseProgressionEnabled()).thenReturn(caseProgressionEnabled);
+        Mockito.when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(caseProgressionEnabled);
         smallClaim(eventHistory, toggleService);
     }
 
@@ -312,16 +316,20 @@ class DashboardClaimStatusFactoryTest {
             .documentType(DocumentType.SDO_ORDER)
             .createdDatetime(LocalDateTime.now())
             .build();
+        DynamicListElement selectedCourt = DynamicListElement.builder()
+            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+
         CaseData caseData = CaseData.builder()
             .ccdState(CaseState.CASE_PROGRESSION)
             .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
             .totalClaimAmount(BigDecimal.valueOf(1000))
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
             .systemGeneratedCaseDocuments(List.of(Element.<CaseDocument>builder()
                                                       .value(sdoDocument).build()))
             .drawDirectionsOrderRequired(YesOrNo.NO)
             .claimsTrack(ClaimsTrack.fastTrack)
             .build();
-        if (toggleService.isCaseProgressionEnabled()) {
+        if (toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())) {
             checkStatus(caseData, eventHistory,
                         DashboardClaimStatus.SDO_ORDER_CREATED_CP,
                         DashboardClaimStatus.SDO_ORDER_CREATED_CP
@@ -540,14 +548,17 @@ class DashboardClaimStatusFactoryTest {
             .documentType(DocumentType.SDO_ORDER)
             .createdDatetime(LocalDateTime.now())
             .build();
+        DynamicListElement selectedCourt = DynamicListElement.builder()
+            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
         CaseData caseData = CaseData.builder()
             .ccdState(CaseState.CASE_PROGRESSION)
             .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
             .totalClaimAmount(BigDecimal.valueOf(999))
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
             .systemGeneratedCaseDocuments(List.of(Element.<CaseDocument>builder()
                                                       .value(sdoDocument).build()))
             .build();
-        if (toggleService.isCaseProgressionEnabled()) {
+        if (toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())) {
             checkStatus(caseData, eventHistory,
                         DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED,
                         DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED
