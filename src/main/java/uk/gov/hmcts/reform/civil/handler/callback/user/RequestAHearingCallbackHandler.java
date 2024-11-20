@@ -34,7 +34,7 @@ public class RequestAHearingCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(HEARING_SCHEDULED_RETRIGGER);
     private final ObjectMapper objectMapper;
     public static final String LISTING_REQUESTED = "## Listing Requested";
-    public static final String LISTING_REQUESTED_TASKS = "A work allocation will be created for a listing officer to list the hearing.";
+    public static final String LISTING_REQUESTED_TASKS = "A work allocation task will be created for a listing officer to list the hearing.";
     private static final DynamicList INTERMEDIATE_LIST = DynamicList.builder().listItems(List.of(DynamicListElement.builder()
                                                                                                      .code("CASE_MANAGEMENT_CONFERENCE")
                                                                                                      .label("Case Management Conference (CMC)")
