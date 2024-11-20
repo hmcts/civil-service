@@ -16,29 +16,7 @@ import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.CaseNoteType;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.ClaimType;
-import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
-import uk.gov.hmcts.reform.civil.enums.ConfirmationToggle;
-import uk.gov.hmcts.reform.civil.enums.CoscApplicationStatus;
-import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
-import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
-import uk.gov.hmcts.reform.civil.enums.FeeType;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.PaymentType;
-import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
-import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
-import uk.gov.hmcts.reform.civil.enums.SettlementReason;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
-import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.*;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.ConfirmOrderGivesPermission;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.MarkPaidConsentList;
@@ -733,6 +711,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
     private LocalDate coscSchedulerDeadline;
     private CoscApplicationStatus coSCApplicationStatus;
+    private YesOrNo obligationDatePresent;
+    private CourtStaffNextSteps courtStaffNextSteps;
 
 
     /**
