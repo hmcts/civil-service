@@ -96,7 +96,8 @@ public class UpdateClaimStateService {
     private boolean shouldNotChangeStateMinti(CaseData caseData) {
         return featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
             && isMultiOrIntermediateSpecClaim(caseData)
-            && isLipCase(caseData);
+            && isLipCase(caseData)
+            && isProceedOrNotSettleClaim(caseData);
     }
 
     private boolean isMultiOrIntermediateSpecClaim(CaseData caseData) {
