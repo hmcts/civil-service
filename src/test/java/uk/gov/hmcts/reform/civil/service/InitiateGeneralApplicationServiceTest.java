@@ -3,6 +3,9 @@ package uk.gov.hmcts.reform.civil.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -19,7 +22,9 @@ import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.DebtPaymentOptions;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -80,15 +85,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.CONFIRM
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.GA_DOC_CATEGORY_ID;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_TRIAL_DATE_RANGE;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_UNAVAILABILITY_RANGE;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.TRIAL_DATE_FROM_REQUIRED;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.UNAVAILABLE_DATE_RANGE_MISSING;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.UNAVAILABLE_FROM_MUST_BE_PROVIDED;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.URGENCY_DATE_CANNOT_BE_IN_PAST;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.URGENCY_DATE_REQUIRED;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.URGENCY_DATE_SHOULD_NOT_BE_PROVIDED;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.*;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -436,6 +433,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         result.getGeneralApplications().forEach(generalApplicationElement -> {
             assertCaseManagementCategoryPopulated(generalApplicationElement.getValue().getCaseManagementCategory());
         });
+        assertThat(result.getGeneralApplications().get(0).getValue().getGaWaTrackLabel()).isEqualTo(MULTI_CLAIM_TRACK);
     }
 
     @Test
@@ -585,6 +583,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .isNull();
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppStatementOfTruth().getRole())
             .isNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getGaWaTrackLabel()).isEqualTo(INTERMEDIATE_CLAIM_TRACK);
     }
 
     @Test
@@ -604,7 +603,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     @Test
     void shoulAddUnSpecClaimType() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataSPEC(null);
+            .getTestCaseDataSPEC(UNSPEC_CLAIM);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(getSampleCourLocationsRefObjectPostSdo());
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
@@ -950,7 +949,27 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         assertThat(result.getGeneralApplications().get(0).getValue().getDefendant1PartyName()).isEqualTo("Respondent1");
         assertThat(result.getGeneralApplications().get(0).getValue().getDefendant2PartyName()).isEqualTo("Respondent2");
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseNameGaInternal()).isEqualTo("Internal caseName");
+        assertThat(result.getGeneralApplications().get(0).getValue().getGaWaTrackLabel()).isEqualTo(FAST_CLAIM_TRACK);
     }
+
+//    @ParameterizedTest
+//    @EnumSource(
+//        value = AllocatedTrack.class,
+//        names = {"SMALL_CLAIM", "FAST_CLAIM", "MULTI_CLAIM", "INTERMEDIATE_CLAIM"})
+//    @ValueSource(strings = {"track: Small claim", "track: Fast claim", "track: Multi claim", "track: Intermediate claim"} )
+//    void shouldPopulateClaimTrackDetails(AllocatedTrack allocatedTrack, String track) {
+//        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+//            .getTestCaseData(CaseDataBuilder.builder().build());
+//
+//        CaseData.CaseDataBuilder builder = caseData.toBuilder();
+//        builder.allocatedTrack(allocatedTrack);
+//
+//        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+//            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+//
+//
+//        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
+//        assertThat(result.getGeneralApplications().get(0).getValue().getGaWaTrackLabel()).isEqualTo("");    }
 
     @Test
     void shouldReturnTrue_whenApplicantIsClaimantAtMainCase() {
@@ -1255,6 +1274,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         assertThat(result.getGeneralApplications().get(0)
                        .getValue().getGeneralAppEvidenceDocument().get(1).getValue().getCategoryID())
             .isEqualTo(GA_DOC_CATEGORY_ID);
+        assertThat(result.getGeneralApplications().get(0).getValue().getGaWaTrackLabel()).isEqualTo(SMALL_CLAIM_TRACK);
+
     }
 
     @Test

@@ -46,12 +46,14 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRANSFER_ONLINE_CASE;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
@@ -103,6 +105,10 @@ public class InitiateGeneralApplicationService {
     private static final List<CaseState> statesBeforeSDO = Arrays.asList(PENDING_CASE_ISSUED, CASE_ISSUED,
             AWAITING_CASE_DETAILS_NOTIFICATION, AWAITING_RESPONDENT_ACKNOWLEDGEMENT, IN_MEDIATION,
             AWAITING_APPLICANT_INTENTION);
+    public static final String MULTI_CLAIM_TRACK = "track: Multi claim";
+    public static final String INTERMEDIATE_CLAIM_TRACK = "track: Intermediate claim";
+    public static final String SMALL_CLAIM_TRACK = "track: Small claim";
+    public static final String FAST_CLAIM_TRACK = "track: Fast claim";
 
     public CaseData buildCaseData(CaseData.CaseDataBuilder dataBuilder, CaseData caseData, UserDetails userDetails,
                                   String authToken, GeneralAppFeesService feesService) {
@@ -126,6 +132,7 @@ public class InitiateGeneralApplicationService {
             .generalAppHearingDetails(GAHearingDetails.builder().build())
             .generalAppEvidenceDocument(java.util.Collections.emptyList())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().build())
+            .gaWaTrackLabel(null)
             .build();
     }
 
@@ -151,7 +158,7 @@ public class InitiateGeneralApplicationService {
 
         final var caseType = SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             ? CaseCategory.SPEC_CLAIM
-            : CaseCategory.UNSPEC_CLAIM;
+            : UNSPEC_CLAIM;
 
         if (caseData.getGeneralAppRespondentAgreement() != null) {
             if (YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())
@@ -201,7 +208,7 @@ public class InitiateGeneralApplicationService {
             }
             //Setting Work Allocation location and location name
             if (Objects.isNull(caseLocation.getLeft().getSiteName())
-                && Objects.nonNull(caseLocation.getLeft().getBaseLocation())) {
+                && nonNull(caseLocation.getLeft().getBaseLocation())) {
                 LocationRefData  locationDetails = getWorkAllocationLocationDetails(caseLocation.getLeft().getBaseLocation(), authToken);
                 caseLocation.getLeft().setSiteName(locationDetails.getSiteName());
                 caseLocation.getLeft().setAddress(locationDetails.getCourtAddress());
@@ -257,8 +264,8 @@ public class InitiateGeneralApplicationService {
         }
         if (featureToggleService.isCoSCEnabled()
             && caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID)) {
-            if (Objects.nonNull(caseData.getCertOfSC().getDebtPaymentEvidence())
-                && Objects.nonNull(caseData.getCertOfSC().getDebtPaymentEvidence().getDebtPaymentOption())) {
+            if (nonNull(caseData.getCertOfSC().getDebtPaymentEvidence())
+                && nonNull(caseData.getCertOfSC().getDebtPaymentEvidence().getDebtPaymentOption())) {
                 DebtPaymentOptions deptPaymentOption = caseData.getCertOfSC().getDebtPaymentEvidence().getDebtPaymentOption();
                 if (DebtPaymentOptions.MADE_FULL_PAYMENT_TO_COURT.equals(deptPaymentOption)
                     || DebtPaymentOptions.UPLOAD_EVIDENCE_DEBT_PAID_IN_FULL.equals(deptPaymentOption)) {
@@ -270,6 +277,7 @@ public class InitiateGeneralApplicationService {
             applicationBuilder.certOfSC(caseData.getCertOfSC());
         }
         applicationBuilder.caseNameGaInternal(caseData.getCaseNameHmctsInternal());
+        applicationBuilder.gaWaTrackLabel(setClaimTrackForTaskName(caseData));
         return helper.setRespondentDetailsIfPresent(applicationBuilder.build(), caseData, userDetails, feesService);
     }
 
@@ -465,5 +473,21 @@ public class InitiateGeneralApplicationService {
             .postcode(caseManagementLocationDetails.getPostcode())
             .build();
         return courtLocation;
+    }
+
+    private String setClaimTrackForTaskName(CaseData caseData) {
+        String taskTrackName = "";
+        if (caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM) && nonNull(caseData.getAllocatedTrack())) {
+            taskTrackName =  caseData.getAllocatedTrack().name();
+        } else if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM) && nonNull(caseData.getResponseClaimTrack())) {
+            taskTrackName =  caseData.getResponseClaimTrack();
+        }
+        return switch (taskTrackName) {
+            case "MULTI_CLAIM" -> MULTI_CLAIM_TRACK;
+            case "INTERMEDIATE_CLAIM" -> INTERMEDIATE_CLAIM_TRACK;
+            case "SMALL_CLAIM" -> SMALL_CLAIM_TRACK;
+            case "FAST_CLAIM" -> FAST_CLAIM_TRACK;
+            default -> ("");
+        };
     }
 }
