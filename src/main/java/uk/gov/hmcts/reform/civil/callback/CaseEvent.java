@@ -90,6 +90,8 @@ public enum CaseEvent {
     ADD_UNAVAILABLE_DATES(USER),
     COURT_OFFICER_ORDER(USER),
 
+    CONFIRM_ORDER_REVIEW(USER),
+
     REVIEW_HEARING_EXCEPTION(USER),
     UpdateNextHearingInfo(USER),
 
