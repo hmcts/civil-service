@@ -117,7 +117,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
         boolean isRelisting = caseData.getListingOrRelisting().equals(ListingOrRelisting.RELISTING);
         boolean hasPaidFee = caseData.getHearingFeePaymentDetails() != null
             && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus());
-        boolean isHWF = caseData.hearingFeePaymentDoneWithHWF();
+        boolean isHWFFullRemissionGranted = caseData.hearingFeePaymentDoneWithHWF();
 
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
             if (isRelisting && hasPaidFee) {
@@ -128,7 +128,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
         }
 
         if (featureToggleService.isCaseEventsEnabled()) {
-            return (hasPaidFee || isHWF) ? DO_NOT_SHOW : SHOW;
+            return (hasPaidFee || isHWFFullRemissionGranted) ? DO_NOT_SHOW : SHOW;
         }
 
         return SHOW;
