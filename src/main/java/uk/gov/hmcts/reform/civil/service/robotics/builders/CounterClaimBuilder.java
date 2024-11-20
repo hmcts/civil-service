@@ -24,6 +24,7 @@ public class CounterClaimBuilder extends BaseEventBuilder {
 
     @Override
     public void buildEvent(EventHistoryDTO eventHistoryDTO) {
+        log.info("Building event: {} for case id: {} ", eventHistoryDTO.getEventType(), eventHistoryDTO.getCaseData().getCcdCaseReference());
         EventHistory.EventHistoryBuilder builder = eventHistoryDTO.getBuilder();
         CaseData caseData = eventHistoryDTO.getCaseData();
         buildRespondentCounterClaim(builder, caseData);

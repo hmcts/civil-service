@@ -23,8 +23,9 @@ public class MiscellaneousJudgmentEventBuilder {
     public void buildMiscellaneousJudgmentEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData,
                                                 Predicate<CaseData> grantedFlagPredicate, String miscTextRequested,
                                                 String miscTextGranted, DynamicList details) {
-        Boolean grantedFlag = grantedFlagPredicate.test(caseData);
+        log.info("Building event: {} for case id: {} ", "MISCELLANEOUS_JUDGMENT", caseData.getCcdCaseReference());
 
+        Boolean grantedFlag = grantedFlagPredicate.test(caseData);
         if (details != null) {
             builder.miscellaneous(
                 Event.builder()

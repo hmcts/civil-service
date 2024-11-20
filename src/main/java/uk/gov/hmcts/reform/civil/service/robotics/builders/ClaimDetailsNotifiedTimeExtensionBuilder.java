@@ -25,6 +25,7 @@ public class ClaimDetailsNotifiedTimeExtensionBuilder extends BaseEventBuilder {
 
     @Override
     public void buildEvent(EventHistoryDTO eventHistoryDTO) {
+        log.info("Building event: {} for case id: {} ", eventHistoryDTO.getEventType(), eventHistoryDTO.getCaseData().getCcdCaseReference());
         EventHistory.EventHistoryBuilder builder = eventHistoryDTO.getBuilder();
         CaseData caseData = eventHistoryDTO.getCaseData();
         buildConsentExtensionFilingDefence(builder, caseData);

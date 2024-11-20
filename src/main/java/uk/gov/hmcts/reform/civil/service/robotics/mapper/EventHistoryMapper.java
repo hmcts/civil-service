@@ -87,7 +87,8 @@ public class EventHistoryMapper {
     private void handleEventScenario(CaseData caseData, String authToken, FlowState.Main flowState, EventHistory.EventHistoryBuilder builder) {
         EventBuilder eventBuilder = eventBuilderFactory.getBuilder(flowState);
         if (eventBuilder != null) {
-            EventHistoryDTO eventHistoryDTO = EventHistoryDTO.builder().caseData(caseData).builder(builder).authToken(authToken).build();
+            EventHistoryDTO eventHistoryDTO = EventHistoryDTO.builder().caseData(caseData).builder(builder).authToken(authToken)
+                .eventType(flowState.fullName()).build();
             eventBuilder.buildEvent(eventHistoryDTO);
         }
     }

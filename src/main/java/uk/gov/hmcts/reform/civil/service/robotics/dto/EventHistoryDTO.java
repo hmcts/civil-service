@@ -16,4 +16,5 @@ public class EventHistoryDTO {
     private EventHistory.EventHistoryBuilder builder;
     private CaseData caseData;
     private String authToken;
+    private String eventType;
 }

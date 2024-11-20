@@ -37,6 +37,7 @@ public class DivergentResponseBuilder extends BaseEventBuilder {
 
     @Override
     public void buildEvent(EventHistoryDTO eventHistoryDTO) {
+        log.info("Building event: {} for case id: {} ", eventHistoryDTO.getEventType(), eventHistoryDTO.getCaseData().getCcdCaseReference());
         boolean isOffline = false;
         EventHistory.EventHistoryBuilder builder = eventHistoryDTO.getBuilder();
         CaseData caseData = eventHistoryDTO.getCaseData();

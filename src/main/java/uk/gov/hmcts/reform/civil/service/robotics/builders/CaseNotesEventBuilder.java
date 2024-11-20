@@ -24,6 +24,7 @@ public class CaseNotesEventBuilder {
 
     public void buildCaseNotesEvents(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         if (isNotEmpty(caseData.getCaseNotes())) {
+            log.info("Building event: {} for case id: {} ", "CASE_NOTES", caseData.getCcdCaseReference());
             buildMiscellaneousCaseNotesEvent(builder, caseData);
         }
     }

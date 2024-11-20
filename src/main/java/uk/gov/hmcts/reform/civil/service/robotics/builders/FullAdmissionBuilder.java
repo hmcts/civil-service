@@ -28,6 +28,7 @@ public class FullAdmissionBuilder extends BaseEventBuilder {
     private EventHistoryMapper mapper;
 
     public void buildEvent(EventHistoryDTO eventHistoryDTO) {
+        log.info("Building event: {} for case id: {} ", eventHistoryDTO.getEventType(), eventHistoryDTO.getCaseData().getCcdCaseReference());
         EventHistory.EventHistoryBuilder builder = eventHistoryDTO.getBuilder();
         CaseData caseData = eventHistoryDTO.getCaseData();
         buildRespondentFullAdmission(builder, caseData);

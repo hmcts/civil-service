@@ -20,6 +20,8 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 public class RespondentsLitigationFriendEventBuilder {
 
     public void buildRespondentsLitigationFriendEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        log.info("Building event: {} for case id: {} ", "RESPONDENTS_LITIGATION_FRIEND", caseData.getCcdCaseReference());
+
         boolean respondent1 = caseData.getRespondent1LitigationFriendCreatedDate() != null;
         boolean respondent2 = caseData.getRespondent2LitigationFriendCreatedDate() != null;
 

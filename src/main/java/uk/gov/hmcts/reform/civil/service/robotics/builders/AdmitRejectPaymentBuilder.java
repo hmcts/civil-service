@@ -21,6 +21,7 @@ public class AdmitRejectPaymentBuilder extends BaseEventBuilder {
 
     @Override
     public void buildEvent(EventHistoryDTO eventHistoryDTO) {
+        log.info("Building event {} for case {} ", eventHistoryDTO.getEventType(), eventHistoryDTO.getCaseData().getCcdCaseReference());
         EventHistory.EventHistoryBuilder builder = eventHistoryDTO.getBuilder();
         CaseData caseData = eventHistoryDTO.getCaseData();
         buildSpecAdmitRejectRepayment(builder, caseData);

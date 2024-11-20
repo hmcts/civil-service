@@ -24,8 +24,8 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.
 public class InterlocutoryJudgementBuilder {
 
     public void buildInterlocutoryJudgment(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        log.info("Building event: {} for case id: {} ", "INTERLOCUTORY_JUDGMENT", caseData.getCcdCaseReference());
         List<Event> events = new ArrayList<>();
-
         boolean grantedFlag = PredicateUtils.grantedFlagDefendantPredicate.test(caseData);
         if (!grantedFlag && null != caseData.getHearingSupportRequirementsDJ()) {
             events.add(prepareInterlocutoryJudgment(builder, RESPONDENT_ID));

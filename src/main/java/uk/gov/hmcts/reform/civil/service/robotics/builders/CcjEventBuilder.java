@@ -31,6 +31,7 @@ public class CcjEventBuilder {
 
     public void buildCcjEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         if (caseData.isCcjRequestJudgmentByAdmission()) {
+            log.info("Building event: {} for case id: {} ", "JUDGMENT_BY_ADMISSION", caseData.getCcdCaseReference());
             buildJudgmentByAdmissionEventDetails(builder, caseData);
             builder.miscellaneous((Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
@@ -79,6 +80,5 @@ public class CcjEventBuilder {
             .eventDetails(judgmentByAdmissionEvent)
             .eventDetailsText("")
             .build()));
-
     }
 }

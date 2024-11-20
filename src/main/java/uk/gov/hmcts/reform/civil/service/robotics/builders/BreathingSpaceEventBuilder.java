@@ -71,6 +71,7 @@ public class BreathingSpaceEventBuilder {
 
     private void buildBreathingSpaceEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData,
                                           EventType eventType, String bsStatus) {
+        log.info("Building event: {} for case id: {} ", eventType.toString(), caseData.getCcdCaseReference());
         String eventDetails = buildEventDetails(caseData, bsStatus);
 
         LocalDateTime dateReceived = determineDateReceived(caseData, eventType);

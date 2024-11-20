@@ -27,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2AckExists
 public class NotificationAcknowledgedBuilder extends BaseEventBuilder {
 
     public void buildEvent(EventHistoryDTO eventHistoryDTO) {
+        log.info("Building event: {} for case id: {} ", eventHistoryDTO.getEventType(), eventHistoryDTO.getCaseData().getCcdCaseReference());
         EventHistory.EventHistoryBuilder builder = eventHistoryDTO.getBuilder();
         CaseData caseData = eventHistoryDTO.getCaseData();
         buildAcknowledgementOfServiceReceived(builder, caseData);

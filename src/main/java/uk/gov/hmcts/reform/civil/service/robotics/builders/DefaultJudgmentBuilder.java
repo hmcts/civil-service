@@ -34,6 +34,7 @@ public class DefaultJudgmentBuilder {
     private final FeatureToggleService featureToggleService;
 
     public void buildDefaultJudgment(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        log.info("Building event: {} for case id: {} ", "DEFAULT_JUDGMENT", caseData.getCcdCaseReference());
         List<Event> events = new ArrayList<>();
         boolean grantedFlag = PredicateUtils.grantedFlagDefendantSpecPredicate.test(caseData);
 
