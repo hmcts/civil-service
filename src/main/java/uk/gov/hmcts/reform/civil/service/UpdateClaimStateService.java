@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -95,6 +96,7 @@ public class UpdateClaimStateService {
 
     private boolean shouldNotChangeStateMinti(CaseData caseData) {
         return featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
+            && CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && isMultiOrIntermediateSpecClaim(caseData)
             && isLipCase(caseData)
             && isProceedOrNotSettleClaim(caseData);
