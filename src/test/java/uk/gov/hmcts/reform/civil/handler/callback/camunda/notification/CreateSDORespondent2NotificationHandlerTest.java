@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.util.Map;
 import java.util.Optional;
@@ -30,8 +31,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 
 @ExtendWith(MockitoExtension.class)
@@ -102,7 +105,7 @@ class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldNotifyRespondentLiP_whenInvoked() {
-            when(notificationsProperties.getSdoOrdered()).thenReturn("template-id");
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id");
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
@@ -128,8 +131,8 @@ class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHandlerTes
                 "template-id",
                 Map.of(
                     CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                    CLAIM_LEGAL_ORG_NAME_SPEC, "Company 2",
-                    PARTY_REFERENCES, "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided"
+                    PARTY_NAME, "Mr. Sole Trader",
+                    CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
                 ),
                 "create-sdo-respondent-2-notification-000DC001"
             );
