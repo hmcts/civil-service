@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
-import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -32,12 +31,12 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_APPLICATION;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_APPLICATION_AHN;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_TRIAL;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_TRIAL_AHN;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_OTHER;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_OTHER_AHN;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_SMALL_CLAIMS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_SMALL_CLAIMS_AHN;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_TRIAL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_TRIAL_AHN;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.formatHearingDuration;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingTimeFormatted;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingType;
@@ -112,28 +111,27 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
     }
 
     public String listingOrRelistingWithFeeDue(CaseData caseData) {
-        String doNotShow = "DO_NOT_SHOW";
-        String show = "SHOW";
+        final String DO_NOT_SHOW = "DO_NOT_SHOW";
+        final String SHOW = "SHOW";
+
+        boolean isRelisting = caseData.getListingOrRelisting().equals(ListingOrRelisting.RELISTING);
+        boolean hasPaidFee = caseData.getHearingFeePaymentDetails() != null
+            && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus());
+        boolean isHWF = caseData.hearingFeePaymentDoneWithHWF();
 
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-            if (caseData.getListingOrRelisting().equals(ListingOrRelisting.RELISTING)
-                && caseData.getHearingFeePaymentDetails() != null
-                && caseData.getHearingFeePaymentDetails().getStatus().equals(PaymentStatus.SUCCESS)) {
-                return doNotShow;
+            if (isRelisting && hasPaidFee) {
+                return DO_NOT_SHOW;
             }
-        } else {
-            if (caseData.getListingOrRelisting().equals(ListingOrRelisting.RELISTING)) {
-                return doNotShow;
-            }
+        } else if (isRelisting) {
+            return DO_NOT_SHOW;
         }
-        if (featureToggleService.isCaseEventsEnabled()) {
-            boolean hasPaidFee = (caseData.getHearingFeePaymentDetails() != null
-                && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus())) || caseData.hearingFeePaymentDoneWithHWF();
 
-            return hasPaidFee ? doNotShow : show;
-        } else {
-            return show;
+        if (featureToggleService.isCaseEventsEnabled()) {
+            return (hasPaidFee || isHWF) ? DO_NOT_SHOW : SHOW;
         }
+
+        return SHOW;
     }
 
     private String getFileName(CaseData caseData, DocmosisTemplates template) {
