@@ -41,11 +41,27 @@ public abstract class ElasticSearchService {
             claimMovedDate = LocalDate.now().minusDays(1);
         }
         SearchResult searchResult = coreCaseDataService.searchCases(queryInMediationCases(START_INDEX, claimMovedDate, carmEnabled));
+        log.info("mediation total found: {}", searchResult.getTotal());
         int pages = calculatePages(searchResult);
         List<CaseDetails> caseDetails = new ArrayList<>(searchResult.getCases());
-
+        if (!caseDetails.isEmpty()) {
+            StringBuilder sb = new StringBuilder().append("Mediation query case IDs: ");
+            for (CaseDetails caseDetail : caseDetails) {
+                sb.append(caseDetail.getId());
+                sb.append("\n");
+            }
+            log.info(sb.toString());
+        }
         for (int i = 1; i < pages; i++) {
             SearchResult result = coreCaseDataService.searchCases(queryInMediationCases(i * ES_DEFAULT_SEARCH_LIMIT, claimMovedDate, carmEnabled));
+            if (!result.getCases().isEmpty()) {
+                StringBuilder sb = new StringBuilder().append("Page ").append(i).append(" Mediation query case IDs: ");
+                for (CaseDetails caseDetail : result.getCases()) {
+                    sb.append(caseDetail.getId());
+                    sb.append("\n");
+                }
+                log.info(sb.toString());
+            }
             caseDetails.addAll(result.getCases());
         }
 
