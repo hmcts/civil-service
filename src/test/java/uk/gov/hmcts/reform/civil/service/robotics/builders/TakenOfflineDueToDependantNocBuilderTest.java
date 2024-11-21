@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.robotics.builders;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,7 +27,7 @@ class TakenOfflineDueToDependantNocBuilderTest {
     private Time time;
 
     @Test
-    public void buildEvent() {
+    void buildEvent() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
         caseData = caseData.toBuilder()
             .respondent1Represented(NO)
@@ -49,7 +50,7 @@ class TakenOfflineDueToDependantNocBuilderTest {
         assertThat(builder.build()).isNotNull();
         assertThat(builder.build())
             .extracting("miscellaneous")
-            .asList()
+            .asInstanceOf(InstanceOfAssertFactories.list(Event.class))
             .containsExactly(expectedEvent);
     }
 }

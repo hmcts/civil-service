@@ -151,8 +151,8 @@ public class TakenOfflineByStaffBuilder extends BaseEventBuilder {
                                                     List<Element<GeneralApplication>> generalApplicationsStrikeOut) {
 
         List<Event> generalApplicationsEvents = IntStream.range(0, generalApplicationsStrikeOut.size())
-            .mapToObj(index -> {
-                return Event.builder()
+            .mapToObj(index ->
+                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(DEFENCE_STRUCK_OUT.getCode())
                     .dateReceived(generalApplicationsStrikeOut
@@ -163,8 +163,7 @@ public class TakenOfflineByStaffBuilder extends BaseEventBuilder {
                         .get(index)
                         .getValue()
                         .getLitigiousPartyID())
-                    .build();
-            })
+                    .build())
             .toList();
 
         builder.defenceStruckOut(generalApplicationsEvents);

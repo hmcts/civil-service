@@ -27,7 +27,7 @@ class UnrepresentedDefendantBuilderTest {
     private Time time;
 
     @Test
-    public void buildEvent() {
+    void buildEvent() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
         caseData = caseData.toBuilder()
             .respondent1Represented(NO)
