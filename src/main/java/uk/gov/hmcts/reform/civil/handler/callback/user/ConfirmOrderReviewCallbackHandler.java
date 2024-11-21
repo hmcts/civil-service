@@ -87,7 +87,6 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
 
         CaseData updatedCaseData = caseData.toBuilder()
-            .businessProcess(BusinessProcess.ready(CONFIRM_ORDER_REVIEW))
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
