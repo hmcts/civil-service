@@ -105,10 +105,10 @@ public class InitiateGeneralApplicationService {
     private static final List<CaseState> statesBeforeSDO = Arrays.asList(PENDING_CASE_ISSUED, CASE_ISSUED,
             AWAITING_CASE_DETAILS_NOTIFICATION, AWAITING_RESPONDENT_ACKNOWLEDGEMENT, IN_MEDIATION,
             AWAITING_APPLICANT_INTENTION);
-    public static final String MULTI_CLAIM_TRACK = "track: Multi claim";
-    public static final String INTERMEDIATE_CLAIM_TRACK = "track: Intermediate claim";
-    public static final String SMALL_CLAIM_TRACK = "track: Small claim";
-    public static final String FAST_CLAIM_TRACK = "track: Fast claim";
+    public static final String MULTI_CLAIM_TRACK = " - Multi Track";
+    public static final String INTERMEDIATE_CLAIM_TRACK = " - Intermediate Track";
+    public static final String SMALL_CLAIM_TRACK = " - Small Claims";
+    public static final String FAST_CLAIM_TRACK = " - Fast Track";
 
     public CaseData buildCaseData(CaseData.CaseDataBuilder dataBuilder, CaseData caseData, UserDetails userDetails,
                                   String authToken, GeneralAppFeesService feesService) {
@@ -487,7 +487,7 @@ public class InitiateGeneralApplicationService {
             case "INTERMEDIATE_CLAIM" -> INTERMEDIATE_CLAIM_TRACK;
             case "SMALL_CLAIM" -> SMALL_CLAIM_TRACK;
             case "FAST_CLAIM" -> FAST_CLAIM_TRACK;
-            default -> ("");
+            default -> (" ");
         };
     }
 }
