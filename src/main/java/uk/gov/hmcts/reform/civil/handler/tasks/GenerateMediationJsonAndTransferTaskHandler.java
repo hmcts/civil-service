@@ -48,7 +48,6 @@ public class GenerateMediationJsonAndTransferTaskHandler extends BaseExternalTas
         if (!featureToggleService.isFeatureEnabled("carm")) {
             return ExternalTaskData.builder().build();
         }
-        List<CaseData> inMediationCases;
         LocalDate claimMovedDate;
         if (externalTask.getVariable("claimMovedDate") != null) {
             claimMovedDate = LocalDate.parse(externalTask.getVariable("claimMovedDate").toString(), DATE_FORMATTER);
@@ -65,7 +64,7 @@ public class GenerateMediationJsonAndTransferTaskHandler extends BaseExternalTas
             }
             log.info(sb.toString());
         }
-        inMediationCases = cases.stream()
+        List<CaseData> inMediationCases = cases.stream()
             .map(caseDetailsConverter::toCaseData)
             .toList();
         try {

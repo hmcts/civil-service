@@ -44,8 +44,6 @@ public class GenerateCsvAndTransferTaskHandler extends BaseExternalTaskHandler {
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-
-        List<CaseData> inMediationCases;
         LocalDate claimMovedDate;
         if (externalTask.getVariable("claimMovedDate") != null) {
             claimMovedDate = LocalDate.parse(externalTask.getVariable("claimMovedDate").toString(), DATE_FORMATTER);
@@ -62,7 +60,7 @@ public class GenerateCsvAndTransferTaskHandler extends BaseExternalTaskHandler {
             }
             log.info(sb.toString());
         }
-        inMediationCases = cases.stream()
+        List<CaseData> inMediationCases = cases.stream()
             .map(caseDetailsConverter::toCaseData)
             .toList();
         String[] headers = getCSVHeaders();
