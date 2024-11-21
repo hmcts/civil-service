@@ -20,11 +20,11 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 
 @SpringBootTest(classes = {
     ConfirmOrderReviewCallbackHandler.class,
@@ -145,7 +145,7 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
                 .build();
             caseData.builder().obligationDatePresent(YesOrNo.NO).build();
-            CallbackParams params = callbackParamsOf(caseData, CallbackType.SUBMITTED);
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
@@ -162,7 +162,7 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
                 .build();
             caseData = caseData.builder().obligationDatePresent(YesOrNo.YES).build();
-            CallbackParams params = callbackParamsOf(caseData, CallbackType.SUBMITTED);
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
@@ -178,7 +178,7 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
             Mockito.when(toggleService.isCaseEventsEnabled()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
                 .build();
-            CallbackParams params = callbackParamsOf(caseData, CallbackType.SUBMITTED);
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
