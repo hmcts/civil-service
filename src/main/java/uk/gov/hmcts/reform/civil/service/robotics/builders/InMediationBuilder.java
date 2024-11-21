@@ -9,15 +9,18 @@ import uk.gov.hmcts.reform.civil.model.ClaimantResponseDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.robotics.dto.EventHistoryDTO;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DIRECTIONS_QUESTIONNAIRE_FILED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.RPA_IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.getPreferredCourtCode;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.isStayClaim;
@@ -31,6 +34,11 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.
 public class InMediationBuilder extends BaseEventBuilder {
 
     private EventHistoryMapper mapper;
+
+    @Override
+    public Set<FlowState.Main> supportedFlowStates() {
+        return Set.of(IN_MEDIATION);
+    }
 
     @Override
     public void buildEvent(EventHistoryDTO eventHistoryDTO) {

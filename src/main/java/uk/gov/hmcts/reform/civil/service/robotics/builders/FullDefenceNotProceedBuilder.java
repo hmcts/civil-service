@@ -7,17 +7,26 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.robotics.dto.EventHistoryDTO;
+
+import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_NOT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.prepareEventSequence;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class FullDefenceNotProceedBuilder extends BaseEventBuilder {
+
+    @Override
+    public Set<FlowState.Main> supportedFlowStates() {
+        return Set.of(FULL_DEFENCE_NOT_PROCEED);
+    }
 
     @Override
     public void buildEvent(EventHistoryDTO eventHistoryDTO) {

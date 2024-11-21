@@ -12,12 +12,14 @@ import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.robotics.dto.EventHistoryDTO;
 import uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -25,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DIRECTIONS_QUESTIONNAIRE_FILED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.CLAIMANTS_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.CLAIMANT_PROCEEDS;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.NOT_PROCEED;
@@ -40,6 +43,11 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.
 public class FullDefenceProceedBuilder extends BaseEventBuilder {
 
     private final LocationRefDataUtil locationRefDataUtil;
+
+    @Override
+    public Set<FlowState.Main> supportedFlowStates() {
+        return Set.of(FULL_DEFENCE_PROCEED);
+    }
 
     @Override
     public void buildEvent(EventHistoryDTO eventHistoryDTO) {

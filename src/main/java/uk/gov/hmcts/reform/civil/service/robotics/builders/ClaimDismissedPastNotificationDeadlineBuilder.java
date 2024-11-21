@@ -13,8 +13,11 @@ import uk.gov.hmcts.reform.civil.service.robotics.dto.EventHistoryDTO;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.util.List;
+import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.prepareEventSequence;
 
 @Slf4j
@@ -23,6 +26,12 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.
 public class ClaimDismissedPastNotificationDeadlineBuilder extends BaseEventBuilder {
 
     private final IStateFlowEngine stateFlowEngine;
+
+    @Override
+    public Set<FlowState.Main> supportedFlowStates() {
+        return Set.of(CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE,
+            CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE);
+    }
 
     @Override
     public void buildEvent(EventHistoryDTO eventHistoryDTO) {
@@ -34,7 +43,7 @@ public class ClaimDismissedPastNotificationDeadlineBuilder extends BaseEventBuil
         State state = caseHistory.get(caseHistory.size() - 1);
         FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state.getName());
         String miscText = null;
-        if (flowState.equals(FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE)) {
+        if (flowState.equals(CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE)) {
             miscText = "RPA Reason: Claim dismissed. Claimant hasn't notified defendant of the "
                 + "claim details within the allowed 2 weeks.";
         } else {

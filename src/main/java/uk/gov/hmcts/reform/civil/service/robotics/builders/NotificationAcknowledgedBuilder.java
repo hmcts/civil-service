@@ -7,16 +7,19 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.robotics.dto.EventHistoryDTO;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.prepareEventSequence;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1AckExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2AckExists;
@@ -25,6 +28,11 @@ import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2AckExists
 @Component
 @RequiredArgsConstructor
 public class NotificationAcknowledgedBuilder extends BaseEventBuilder {
+
+    @Override
+    public Set<FlowState.Main> supportedFlowStates() {
+        return Set.of(NOTIFICATION_ACKNOWLEDGED);
+    }
 
     public void buildEvent(EventHistoryDTO eventHistoryDTO) {
         log.info("Building event: {} for case id: {} ", eventHistoryDTO.getEventType(), eventHistoryDTO.getCaseData().getCcdCaseReference());

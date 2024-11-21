@@ -6,12 +6,15 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.robotics.dto.EventHistoryDTO;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_ADMISSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.buildRespondentResponseText;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.prepareEventSequence;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
@@ -26,6 +29,11 @@ import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseE
 public class FullAdmissionBuilder extends BaseEventBuilder {
 
     private EventHistoryMapper mapper;
+
+    @Override
+    public Set<FlowState.Main> supportedFlowStates() {
+        return Set.of(FULL_ADMISSION);
+    }
 
     public void buildEvent(EventHistoryDTO eventHistoryDTO) {
         log.info("Building event: {} for case id: {} ", eventHistoryDTO.getEventType(), eventHistoryDTO.getCaseData().getCcdCaseReference());

@@ -13,8 +13,10 @@ import uk.gov.hmcts.reform.civil.service.robotics.dto.EventHistoryDTO;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.util.List;
+import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.getPreviousState;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.prepareEventSequence;
 
@@ -24,6 +26,11 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.
 public class ClaimDismissedPastDeadlineBuilder extends BaseEventBuilder {
 
     private final IStateFlowEngine stateFlowEngine;
+
+    @Override
+    public Set<FlowState.Main> supportedFlowStates() {
+        return Set.of(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE);
+    }
 
     @Override
     public void buildEvent(EventHistoryDTO eventHistoryDTO) {

@@ -9,12 +9,15 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.robotics.dto.EventHistoryDTO;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseExists;
@@ -25,6 +28,11 @@ import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseE
 @Component
 @RequiredArgsConstructor
 public class FullDefenceBuilder extends BaseEventBuilder {
+
+    @Override
+    public Set<FlowState.Main> supportedFlowStates() {
+        return Set.of(FULL_DEFENCE);
+    }
 
     @Override
     public void buildEvent(EventHistoryDTO eventHistoryDTO) {

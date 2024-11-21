@@ -7,15 +7,24 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.robotics.dto.EventHistoryDTO;
 
+import java.util.Set;
+
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.prepareEventSequence;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class ClaimNotifiedBuilder extends BaseEventBuilder {
+
+    @Override
+    public Set<FlowState.Main> supportedFlowStates() {
+        return Set.of(CLAIM_NOTIFIED);
+    }
 
     @Override
     public void buildEvent(EventHistoryDTO eventHistoryDTO) {

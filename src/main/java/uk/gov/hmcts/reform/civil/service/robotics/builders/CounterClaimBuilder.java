@@ -7,11 +7,14 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.robotics.dto.EventHistoryDTO;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.prepareEventSequence;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1v2SameSolicitorSameResponse;
@@ -21,6 +24,11 @@ import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseE
 @Component
 @AllArgsConstructor
 public class CounterClaimBuilder extends BaseEventBuilder {
+
+    @Override
+    public Set<FlowState.Main> supportedFlowStates() {
+        return Set.of(COUNTER_CLAIM);
+    }
 
     @Override
     public void buildEvent(EventHistoryDTO eventHistoryDTO) {

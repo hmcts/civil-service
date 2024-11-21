@@ -7,11 +7,14 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.robotics.dto.EventHistoryDTO;
 
 import java.util.List;
+import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.RPA_REASON_ONLY_ONE_OF_THE_RESPONDENT_IS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.prepareEventSequence;
 
@@ -19,6 +22,11 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.
 @Component
 @RequiredArgsConstructor
 public class TakenOfflineAfterClaimDetailsNotifiedBuilder extends BaseEventBuilder {
+
+    @Override
+    public Set<FlowState.Main> supportedFlowStates() {
+        return Set.of(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED);
+    }
 
     @Override
     public void buildEvent(EventHistoryDTO eventHistoryDTO) {

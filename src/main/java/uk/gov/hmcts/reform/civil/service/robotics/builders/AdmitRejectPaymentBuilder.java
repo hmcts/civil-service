@@ -7,9 +7,14 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.robotics.dto.EventHistoryDTO;
 
+import java.util.Set;
+
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_REJECT_REPAYMENT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_REJECT_REPAYMENT;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.RPA_REASON_MANUAL_DETERMINATION;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.prepareEventSequence;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.setApplicant1ResponseDate;
@@ -18,6 +23,12 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.
 @Component
 @RequiredArgsConstructor
 public class AdmitRejectPaymentBuilder extends BaseEventBuilder {
+
+    @Override
+    public Set<FlowState.Main> supportedFlowStates() {
+        return Set.of(PART_ADMIT_REJECT_REPAYMENT,
+            FULL_ADMIT_REJECT_REPAYMENT);
+    }
 
     @Override
     public void buildEvent(EventHistoryDTO eventHistoryDTO) {

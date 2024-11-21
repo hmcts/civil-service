@@ -7,13 +7,17 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.robotics.dto.EventHistoryDTO;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.prepareEventSequence;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ExtensionExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ExtensionExists;
@@ -22,6 +26,12 @@ import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2Extension
 @Component
 @RequiredArgsConstructor
 public class ClaimDetailsNotifiedTimeExtensionBuilder extends BaseEventBuilder {
+
+    @Override
+    public Set<FlowState.Main> supportedFlowStates() {
+        return Set.of(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION,
+            CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION);
+    }
 
     @Override
     public void buildEvent(EventHistoryDTO eventHistoryDTO) {
