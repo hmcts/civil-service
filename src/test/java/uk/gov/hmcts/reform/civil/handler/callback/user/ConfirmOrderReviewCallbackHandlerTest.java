@@ -83,11 +83,7 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors().get(0))
-                .isEqualTo("### Order review not completed \n" +
-                                      "\n" +
-                                      "You must complete the tasks in the order before you can submit your order review \n" +
-                                      "\n" +
-                                      "Once you have completed the task you can submit your order review by clicking on the link on your task list.");
+                .isEqualTo(TASKS_LEFT_ERROR);
         }
 
         @Test
