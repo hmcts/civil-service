@@ -56,10 +56,18 @@ public class GenerateMediationJsonAndTransferTaskHandler extends BaseExternalTas
             claimMovedDate = LocalDate.now().minusDays(1);
         }
         List<CaseDetails> cases = caseSearchService.getInMediationCases(claimMovedDate, true);
+        log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
+        if (!cases.isEmpty()) {
+            StringBuilder sb = new StringBuilder().append("JSON case IDs: ");
+            for (CaseDetails caseDetail : cases) {
+                sb.append(caseDetail.getId());
+                sb.append("\n");
+            }
+            log.info(sb.toString());
+        }
         inMediationCases = cases.stream()
             .map(caseDetailsConverter::toCaseData)
             .toList();
-        log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), inMediationCases.size());
         try {
             if (!inMediationCases.isEmpty()) {
                 List<MediationCase> casesList = new ArrayList<>();
