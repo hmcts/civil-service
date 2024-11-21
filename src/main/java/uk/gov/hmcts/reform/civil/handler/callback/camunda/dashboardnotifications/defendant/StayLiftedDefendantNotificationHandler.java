@@ -18,6 +18,8 @@ import java.util.Map;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_STAY_LIFTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_DEFENDANT;
@@ -58,7 +60,7 @@ public class StayLiftedDefendantNotificationHandler extends CaseEventsDashboardC
             return Map.of(
                 SCENARIO_AAA6_CP_STAY_LIFTED_DEFENDANT.getScenario(), true,
                 SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_DEFENDANT.getScenario(), hadHearingScheduled(caseData),
-                getViewDocumentsScenario(caseData).getScenario(), true
+                getViewDocumentsScenario(caseData).getScenario(), !isPreCaseProgression(caseData)
             );
         }
 
@@ -69,6 +71,13 @@ public class StayLiftedDefendantNotificationHandler extends CaseEventsDashboardC
         return List.of(
             HEARING_READINESS,
             PREPARE_FOR_HEARING_CONDUCT_HEARING
+        ).contains(CaseState.valueOf(caseData.getPreStayState()));
+    }
+
+    private boolean isPreCaseProgression(CaseData caseData) {
+        return List.of(
+            JUDICIAL_REFERRAL,
+            IN_MEDIATION
         ).contains(CaseState.valueOf(caseData.getPreStayState()));
     }
 
