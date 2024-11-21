@@ -90,6 +90,8 @@ public class FullDefenceProceedBuilder extends BaseEventBuilder {
             case TWO_V_ONE:
                 handleTwoVOne(builder, caseData, claimType, track, applicant1MediationRequired, applicant2MediationRequired, miscEventText);
                 break;
+            default:
+                log.error("Couldn't find appropriate multiparty scenario for case id: {}", caseData.getCcdCaseReference());
         }
     }
 
