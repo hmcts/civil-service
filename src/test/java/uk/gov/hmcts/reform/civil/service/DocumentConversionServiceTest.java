@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpEntity;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -32,14 +33,13 @@ public class DocumentConversionServiceTest {
     public static final String AUTH = "auth";
     private static final String PDF_MIME_TYPE = "application/pdf";
     private static final String WORD_MIME_TYPE = "application/msword";
+    
     @InjectMocks
     private DocumentConversionService documentConversionService;
-
     @Mock
     private RestTemplate restTemplate;
     @Mock
     private Tika tika;
-
     @Mock
     private DocumentManagementService service;
 
@@ -80,5 +80,24 @@ public class DocumentConversionServiceTest {
         assertEquals("Document already is a pdf", exception.getMessage());
         verify(tika, times(1)).detect(documentToConvert.getDocumentFileName());
         verifyNoInteractions(restTemplate);
+    }
+
+    @Test
+    void convertDocumentToPdf_ThrowsExceptionOnClientError() {
+
+        byte[] mockFileBytes = "dummy content".getBytes();
+        when(tika.detect(documentToConvert.getDocumentFileName())).thenReturn(WORD_MIME_TYPE);
+        when(service.downloadDocument(AUTH, documentToConvert.getDocumentBinaryUrl())).thenReturn(mockFileBytes);
+        when(restTemplate.postForObject(anyString(), any(HttpEntity.class), eq(byte[].class)))
+                .thenThrow(new HttpClientErrorException(org.springframework.http.HttpStatus.BAD_REQUEST));
+
+        DocumentConversionException exception = assertThrows(DocumentConversionException.class, () -> {
+            documentConversionService.convertDocumentToPdf(documentToConvert, AUTH);
+        });
+
+        assertEquals("Error converting document to pdf", exception.getMessage());
+        verify(tika, times(1)).detect(documentToConvert.getDocumentFileName());
+        verify(service, times(1)).downloadDocument(AUTH, documentToConvert.getDocumentBinaryUrl());
+        verify(restTemplate, times(1)).postForObject(anyString(), any(HttpEntity.class), eq(byte[].class));
     }
 }
