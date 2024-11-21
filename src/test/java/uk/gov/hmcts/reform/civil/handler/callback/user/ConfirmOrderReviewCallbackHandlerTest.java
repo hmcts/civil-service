@@ -178,6 +178,7 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
             Mockito.when(toggleService.isCaseEventsEnabled()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
                 .build();
+
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
