@@ -5,17 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
-import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.robotics.dto.EventHistoryDTO;
-
-import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class InformAgreedExtensionDateSpecBuilder  {
+public class InformAgreedExtensionDateSpecBuilder {
 
     private final ClaimDetailsNotifiedTimeExtensionBuilder notifiedTimeExtensionBuilder;
 
