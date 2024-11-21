@@ -128,8 +128,7 @@ public class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandl
             handler.handle(callbackParams);
 
             verifyRecordedScenarios(List.of(
-                SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT.getScenario(),
-                SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_CLAIMANT.getScenario()
+                SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT.getScenario()
             ));
         }
 
@@ -151,8 +150,7 @@ public class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandl
             handler.handle(callbackParams);
 
             verifyRecordedScenarios(List.of(
-                SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT.getScenario(),
-                SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_CLAIMANT.getScenario())
+                SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT.getScenario())
             );
         }
 
