@@ -28,7 +28,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW;
 import static uk.gov.hmcts.reform.civil.enums.CourtStaffNextSteps.STILL_TASKS;
 
-
 @Service
 @RequiredArgsConstructor
 public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
@@ -46,7 +45,6 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
     private static final String TASKS_LEFT_ERROR = "### Order review not completed \n\n" +
         "You must complete the tasks in the order before you can submit your order review \n\n" +
         "Once you have completed the task you can submit your order review by clicking on the link on your task list.";
-
 
     @Override
     protected Map<String, Callback> callbacks() {
