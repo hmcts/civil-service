@@ -32,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.CLAIMANT_PROCEEDS;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.NOT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.PROCEED;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.RPA_REASON_MULTITRACK_UNSPEC_GOING_OFFLINE;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.getPreferredCourtCode;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.isStayClaim;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.prepareEventDetailsText;
@@ -192,15 +193,14 @@ public class FullDefenceProceedBuilder extends BaseEventBuilder {
 
     private void buildTakenOfflineMultitrackUnspec(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         if (AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
-            String miscText = "RPA Reason:Multitrack Unspec going offline.";
             builder.miscellaneous(
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(MISCELLANEOUS.getCode())
                     .dateReceived(caseData.getApplicant1ResponseDate())
-                    .eventDetailsText(miscText)
+                    .eventDetailsText(RPA_REASON_MULTITRACK_UNSPEC_GOING_OFFLINE)
                     .eventDetails(EventDetails.builder()
-                        .miscText(miscText)
+                        .miscText(RPA_REASON_MULTITRACK_UNSPEC_GOING_OFFLINE)
                         .build())
                     .build());
         }
@@ -211,58 +211,64 @@ public class FullDefenceProceedBuilder extends BaseEventBuilder {
         String currentTime = time.now().toLocalDate().toString();
 
         switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP: {
-                eventDetailsText.add(String.format(
-                    "RPA Reason: [1 of 2 - %s] Claimant has provided intention: %s against defendant: %s",
-                    currentTime,
-                    YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
-                        ? PROCEED
-                        : NOT_PROCEED,
-                    caseData.getRespondent1().getPartyName()
-                ));
-                eventDetailsText.add(String.format(
-                    "RPA Reason: [2 of 2 - %s] Claimant has provided intention: %s against defendant: %s",
-                    currentTime,
-                    YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())
-                        ? PROCEED
-                        : NOT_PROCEED,
-                    caseData.getRespondent2().getPartyName()
-                ));
+            case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP:
+                multipartyHandleOneVTwo(caseData, eventDetailsText, currentTime);
                 break;
-            }
-            case TWO_V_ONE: {
-                YesOrNo app1Proceeds;
-                YesOrNo app2Proceeds;
-                if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-                    app1Proceeds = caseData.getApplicant1ProceedWithClaimSpec2v1();
-                    app2Proceeds = app1Proceeds;
-                } else {
-                    app1Proceeds = caseData.getApplicant1ProceedWithClaimMultiParty2v1();
-                    app2Proceeds = caseData.getApplicant2ProceedWithClaimMultiParty2v1();
-                }
-                eventDetailsText.add(String.format(
-                    "RPA Reason: [1 of 2 - %s] Claimant: %s has provided intention: %s",
-                    currentTime,
-                    caseData.getApplicant1().getPartyName(),
-                    YES.equals(app1Proceeds)
-                        ? PROCEED
-                        : NOT_PROCEED
-                ));
-                eventDetailsText.add(String.format(
-                    "RPA Reason: [2 of 2 - %s] Claimant: %s has provided intention: %s",
-                    currentTime,
-                    caseData.getApplicant2().getPartyName(),
-                    YES.equals(app2Proceeds)
-                        ? PROCEED
-                        : NOT_PROCEED
-                ));
+            case TWO_V_ONE:
+                multipartyHandleTwoVOne(caseData, eventDetailsText, currentTime);
                 break;
-            }
             case ONE_V_ONE:
             default: {
-                eventDetailsText.add("RPA Reason: Claimant proceeds.");
+                eventDetailsText.add(EventHistoryUtil.RPA_REASON_CLAIMANT_PROCEEDS1);
             }
         }
         return eventDetailsText;
+    }
+
+    private static void multipartyHandleOneVTwo(CaseData caseData, List<String> eventDetailsText, String currentTime) {
+        eventDetailsText.add(String.format(
+            EventHistoryUtil.RPA_REASON_1_OF_2_S_CLAIMANT_HAS_PROVIDED_INTENTION_S_AGAINST_DEFENDANT_S,
+            currentTime,
+            YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
+                ? PROCEED
+                : NOT_PROCEED,
+            caseData.getRespondent1().getPartyName()
+        ));
+        eventDetailsText.add(String.format(
+            EventHistoryUtil.RPA_REASON_2_OF_2_S_CLAIMANT_HAS_PROVIDED_INTENTION_S_AGAINST_DEFENDANT_S,
+            currentTime,
+            YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())
+                ? PROCEED
+                : NOT_PROCEED,
+            caseData.getRespondent2().getPartyName()
+        ));
+    }
+
+    private static void multipartyHandleTwoVOne(CaseData caseData, List<String> eventDetailsText, String currentTime) {
+        YesOrNo app1Proceeds;
+        YesOrNo app2Proceeds;
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            app1Proceeds = caseData.getApplicant1ProceedWithClaimSpec2v1();
+            app2Proceeds = app1Proceeds;
+        } else {
+            app1Proceeds = caseData.getApplicant1ProceedWithClaimMultiParty2v1();
+            app2Proceeds = caseData.getApplicant2ProceedWithClaimMultiParty2v1();
+        }
+        eventDetailsText.add(String.format(
+            EventHistoryUtil.RPA_REASON_1_OF_2_S_CLAIMANT_S_HAS_PROVIDED_INTENTION_S,
+            currentTime,
+            caseData.getApplicant1().getPartyName(),
+            YES.equals(app1Proceeds)
+                ? PROCEED
+                : NOT_PROCEED
+        ));
+        eventDetailsText.add(String.format(
+            EventHistoryUtil.RPA_REASON_2_OF_2_S_CLAIMANT_S_HAS_PROVIDED_INTENTION_S,
+            currentTime,
+            caseData.getApplicant2().getPartyName(),
+            YES.equals(app2Proceeds)
+                ? PROCEED
+                : NOT_PROCEED
+        ));
     }
 }

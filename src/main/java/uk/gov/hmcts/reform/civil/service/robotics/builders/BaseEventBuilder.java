@@ -260,6 +260,47 @@ public abstract class BaseEventBuilder implements EventBuilder {
                 .build());
     }
 
+    protected void handleIfAllIsPaid(BigDecimal totalClaimAmount, RespondToClaim respondToClaim, List<Event> statesPaidEvents,
+                                     EventHistory.EventHistoryBuilder builder, LocalDateTime responseDate,
+                                     String respondentId, List<Event> defenceFiledEvents) {
+        if (isAllPaid(totalClaimAmount, respondToClaim)) {
+            handlePaid(statesPaidEvents, builder, responseDate, respondentId);
+        } else {
+            handleNotPaid(defenceFiledEvents, builder, responseDate, respondentId);
+        }
+    }
+
+    protected void handleIfAllIsPaid(boolean isAllPaid, List<Event> statesPaidEvents,
+                                     EventHistory.EventHistoryBuilder builder, LocalDateTime responseDate,
+                                     String respondentId, List<Event> defenceFiledEvents) {
+        if (isAllPaid) {
+            handlePaid(statesPaidEvents, builder, responseDate, respondentId);
+        } else {
+            handleNotPaid(defenceFiledEvents, builder, responseDate, respondentId);
+        }
+    }
+
+    protected void handlePaid(List<Event> statesPaidEvents, EventHistory.EventHistoryBuilder builder, LocalDateTime responseDate,
+                              String respondentId) {
+        statesPaidEvents.add(buildDefenceFiledEvent(
+            builder,
+            responseDate,
+            respondentId,
+            true
+        ));
+    }
+
+    protected void handleNotPaid(List<Event> defenceFiledEvents, EventHistory.EventHistoryBuilder builder, LocalDateTime responseDate,
+                                 String respondentId) {
+        defenceFiledEvents.add(
+            buildDefenceFiledEvent(
+                builder,
+                responseDate,
+                respondentId,
+                false
+            ));
+    }
+
     protected boolean isAllPaid(BigDecimal totalClaimAmount, RespondToClaim claimResponse) {
         return totalClaimAmount != null
             && Optional.ofNullable(claimResponse).map(RespondToClaim::getHowMuchWasPaid)

@@ -80,23 +80,9 @@ public class FullDefenceBuilder extends BaseEventBuilder {
         if (caseData.isLRvLipOneVOne() || caseData.isLipvLipOneVOne()) {
             buildLrVLipFullDefenceEvent(builder, caseData, defenceFiledEvents, statesPaidEvents);
         } else {
-            if (isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim())) {
-                statesPaidEvents.add(buildDefenceFiledEvent(
-                    builder,
-                    respondent1ResponseDate,
-                    RESPONDENT_ID,
-                    true
-                ));
-            } else {
-                defenceFiledEvents.add(
-                    buildDefenceFiledEvent(
-                        builder,
-                        respondent1ResponseDate,
-                        RESPONDENT_ID,
-                        false
-                    ));
-            }
+            handleIfAllIsPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim(), statesPaidEvents, builder, respondent1ResponseDate, RESPONDENT_ID, defenceFiledEvents);
         }
+
         directionsQuestionnaireFiledEvents.add(
             buildDirectionsQuestionnaireFiledEvent(builder, caseData,
                 respondent1ResponseDate,
@@ -127,20 +113,11 @@ public class FullDefenceBuilder extends BaseEventBuilder {
             ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
 
         if (isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim())) {
-            statesPaidEvents.add(buildDefenceFiledEvent(
-                builder,
-                respondent1ResponseDate,
-                RESPONDENT2_ID,
-                true
-            ));
+            handlePaid(statesPaidEvents, builder, respondent1ResponseDate, RESPONDENT2_ID);
         }
-        defenceFiledEvents.add(
-            buildDefenceFiledEvent(
-                builder,
-                respondent2ResponseDate,
-                RESPONDENT2_ID,
-                false
-            ));
+
+        handleNotPaid(defenceFiledEvents, builder, respondent2ResponseDate, RESPONDENT2_ID);
+
         directionsQuestionnaireFiledEvents.add(
             buildDirectionsQuestionnaireFiledEvent(builder, caseData,
                 respondent2ResponseDate,
@@ -158,23 +135,8 @@ public class FullDefenceBuilder extends BaseEventBuilder {
         Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
         LocalDateTime respondent2ResponseDate = caseData.getRespondent2ResponseDate();
 
-        if (isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim2())) {
-            statesPaidEvents.add(
-                buildDefenceFiledEvent(
-                    builder,
-                    respondent2ResponseDate,
-                    RESPONDENT2_ID,
-                    true
-                ));
-        } else {
-            defenceFiledEvents.add(
-                buildDefenceFiledEvent(
-                    builder,
-                    respondent2ResponseDate,
-                    RESPONDENT2_ID,
-                    false
-                ));
-        }
+        handleIfAllIsPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim2(), statesPaidEvents, builder, respondent2ResponseDate, RESPONDENT2_ID, defenceFiledEvents);
+
         directionsQuestionnaireFiledEvents.add(
             buildDirectionsQuestionnaireFiledEvent(builder, caseData,
                 respondent2ResponseDate,
@@ -187,23 +149,6 @@ public class FullDefenceBuilder extends BaseEventBuilder {
 
     private void buildLrVLipFullDefenceEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData,
                                              List<Event> defenceFiledEvents, List<Event> statesPaidEvents) {
-        LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
-
-        if (caseData.hasDefendantPaidTheAmountClaimed()) {
-            statesPaidEvents.add(buildDefenceFiledEvent(
-                builder,
-                respondent1ResponseDate,
-                RESPONDENT_ID,
-                true
-            ));
-        } else {
-            defenceFiledEvents.add(
-                buildDefenceFiledEvent(
-                    builder,
-                    respondent1ResponseDate,
-                    RESPONDENT_ID,
-                    false
-                ));
-        }
+        handleIfAllIsPaid(caseData.hasDefendantPaidTheAmountClaimed(), statesPaidEvents, builder, caseData.getRespondent1ResponseDate(), RESPONDENT_ID, defenceFiledEvents);
     }
 }

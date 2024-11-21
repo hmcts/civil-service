@@ -35,6 +35,8 @@ public class EventHistoryUtil {
     public static final String BS_END_DATE = "actual end date";
     public static final String RPA_REASON_MANUAL_DETERMINATION = "RPA Reason: Manual Determination Required.";
     public static final String RPA_REASON_JUDGMENT_BY_ADMISSION = "RPA Reason: Judgment by Admission requested and claim moved offline.";
+    public static final String RPA_CLAIMANTS_INTEND_NOT_TO_PROCEED = "RPA Reason: Claimants intend not to proceed.";
+    public static final String RPA_CLAIMANT_INTENDS_NOT_TO_PROCEED = "RPA Reason: Claimant intends not to proceed.";
     public static final String RPA_IN_MEDIATION = "IN MEDIATION";
     public static final String ENTER = "Enter";
     public static final String LIFTED = "Lifted";
@@ -51,6 +53,15 @@ public class EventHistoryUtil {
     public static final String MISC_TEXT_GRANTED_DJ = "RPA Reason: Default Judgment granted and claim moved offline.";
 
     public static final String RPA_REASON_ONLY_ONE_OF_THE_RESPONDENT_IS_NOTIFIED = "RPA Reason: Only one of the respondent is notified.";
+    public static final String RPA_REASON_CLAIMANT_PROCEEDS = "RPA Reason: Claimant proceeds.";
+    public static final String RPA_REASON_MULTITRACK_UNSPEC_GOING_OFFLINE = "RPA Reason:Multitrack Unspec going offline.";
+    public static final String RPA_REASON_1_OF_2_S_CLAIMANT_S_HAS_PROVIDED_INTENTION_S = "RPA Reason: [1 of 2 - %s] Claimant: %s has provided intention: %s";
+    public static final String RPA_REASON_2_OF_2_S_CLAIMANT_S_HAS_PROVIDED_INTENTION_S = "RPA Reason: [2 of 2 - %s] Claimant: %s has provided intention: %s";
+    public static final String RPA_REASON_1_OF_2_S_CLAIMANT_HAS_PROVIDED_INTENTION_S_AGAINST_DEFENDANT_S =
+        "RPA Reason: [1 of 2 - %s] Claimant has provided intention: %s against defendant: %s";
+    public static final String RPA_REASON_2_OF_2_S_CLAIMANT_HAS_PROVIDED_INTENTION_S_AGAINST_DEFENDANT_S =
+        "RPA Reason: [2 of 2 - %s] Claimant has provided intention: %s against defendant: %s";
+    public static final String RPA_REASON_CLAIMANT_PROCEEDS1 = "RPA Reason: Claimant proceeds.";
 
     private EventHistoryUtil() {
     }

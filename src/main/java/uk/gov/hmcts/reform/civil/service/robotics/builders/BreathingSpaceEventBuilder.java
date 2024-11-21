@@ -33,21 +33,18 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.
 public class BreathingSpaceEventBuilder {
 
     public void buildBreathingSpaceEvents(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (caseData.getBreathing() == null) {
-            return;
-        }
+        if (caseData.getBreathing() != null) {
+            BreathingSpaceInfo breathing = caseData.getBreathing();
+            BreathingSpaceType type = breathing.getEnter() != null ? breathing.getEnter().getType() : null;
+            boolean isLifted = breathing.getLift() != null;
 
-        BreathingSpaceInfo breathing = caseData.getBreathing();
-        BreathingSpaceType type = breathing.getEnter() != null ? breathing.getEnter().getType() : null;
-        boolean isLifted = breathing.getLift() != null;
-
-        if (type == null) {
-            return;
-        }
-        if (isLifted) {
-            buildBreathingSpaceLiftedEvents(builder, caseData, type);
-        } else {
-            buildBreathingSpaceEnteredEvent(builder, caseData, type);
+            if (type != null) {
+                if (isLifted) {
+                    buildBreathingSpaceLiftedEvents(builder, caseData, type);
+                } else {
+                    buildBreathingSpaceEnteredEvent(builder, caseData, type);
+                }
+            }
         }
     }
 

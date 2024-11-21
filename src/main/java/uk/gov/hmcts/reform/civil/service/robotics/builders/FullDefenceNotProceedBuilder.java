@@ -16,6 +16,8 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_NOT_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.RPA_CLAIMANTS_INTEND_NOT_TO_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.RPA_CLAIMANT_INTENDS_NOT_TO_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.prepareEventSequence;
 
 @Slf4j
@@ -38,8 +40,8 @@ public class FullDefenceNotProceedBuilder extends BaseEventBuilder {
 
     private void buildFullDefenceNotProceed(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         String miscText = getMultiPartyScenario(caseData).equals(TWO_V_ONE)
-            ? "RPA Reason: Claimants intend not to proceed."
-            : "RPA Reason: Claimant intends not to proceed.";
+            ? RPA_CLAIMANTS_INTEND_NOT_TO_PROCEED
+            : RPA_CLAIMANT_INTENDS_NOT_TO_PROCEED;
 
         builder.miscellaneous(Event.builder()
             .eventSequence(prepareEventSequence(builder.build()))
