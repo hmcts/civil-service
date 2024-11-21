@@ -134,12 +134,12 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
             && isServiceRequestNotRequested(caseData.getHearingFeePBADetails());
     }
 
-    private boolean isServiceRequestNotRequested(SRPbaDetails details) {
-        return isNull(details) || isNull(details.getServiceReqReference());
-    }
-
     private boolean isClaimFeeServiceRequest(CaseData caseData) {
         return isNull(caseData.getHearingDueDate())
             && isServiceRequestNotRequested(caseData.getClaimIssuedPBADetails());
+    }
+
+    private boolean isServiceRequestNotRequested(SRPbaDetails details) {
+        return isNull(details) || isNull(details.getServiceReqReference());
     }
 }
