@@ -259,7 +259,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         BigDecimal totalIncludeInterestAndFeeAndCosts = caseData.getTotalClaimAmount()
             .add(interestCalculator.calculateInterest(caseData))
             .add(claimFeeAmount)
-            .add(getFixedCostsOnCommencement(caseData));
+            .add(JudgmentsOnlineHelper.getFixedCostsOnCommencement(caseData));
 
         List<String> errors = new ArrayList<>();
 
@@ -319,17 +319,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     @NotNull
     private BigDecimal getJudgmentAmount(CaseData caseData) {
         BigDecimal judgmentAmount = calculateJudgmentAmountForFixedCosts(caseData)
-            .add(getFixedCostsOnCommencement(caseData)).add(getClaimFeePounds(caseData, caseData.getClaimFee()));
+            .add(JudgmentsOnlineHelper.getFixedCostsOnCommencement(caseData)).add(getClaimFeePounds(caseData, caseData.getClaimFee()));
         return judgmentAmount;
-    }
-
-    private BigDecimal getFixedCostsOnCommencement(CaseData caseData) {
-        BigDecimal fixedCostsCommencement = BigDecimal.valueOf(0);
-        if (caseData.getFixedCosts() != null && YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
-            fixedCostsCommencement = BigDecimal.valueOf(Integer.parseInt(
-                caseData.getFixedCosts().getFixedCostAmount()));
-        }
-        return fixedCostsCommencement;
     }
 
     private CallbackResponse validatePaymentDateDeadline(CallbackParams callbackParams) {
@@ -435,7 +426,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             fixedCost = calculateFixedCosts(caseData);
         } else {
             if (caseData.getFixedCosts() != null && caseData.getFixedCosts().getFixedCostAmount() != null) {
-                fixedCost = calculateFixedCostsOnEntry(caseData, calculateJudgmentAmountForFixedCosts(caseData));
+                fixedCost = calculateFixedCostsOnEntry(caseData, getJudgmentAmount(caseData));
             }
         }
         return fixedCost;

@@ -303,7 +303,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
             if (YesOrNo.YES.equals(caseData.getClaimFixedCostsOnEntryDJ())) {
                 // if new fixed costs was chosen in DJ
                 claimFeePounds = claimFeePounds.add(DefaultJudgmentUtils.calculateFixedCostsOnEntry(
-                    caseData, JudgmentsOnlineHelper.getDebtAmount(caseData, interestCalculator)));
+                    caseData, JudgmentsOnlineHelper.getSubTotal(caseData, interestCalculator)));
             } else if (YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
                 // only claimed new fixed costs at claim issue
                 claimFeePounds = claimFeePounds.add(MonetaryConversions.penniesToPounds(

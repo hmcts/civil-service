@@ -680,7 +680,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                     .build())
                 .fixedCosts(FixedCosts.builder()
                     .claimFixedCosts(YES)
-                    .fixedCostAmount("100")
+                    .fixedCostAmount("10000")
                     .build())
                 .partialPaymentAmount("199500")
                 .build();
