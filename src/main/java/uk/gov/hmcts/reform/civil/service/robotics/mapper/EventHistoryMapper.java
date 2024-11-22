@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.cosc.CoscRPAStatus;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
@@ -287,7 +288,7 @@ public class EventHistoryMapper {
         buildInformAgreedExtensionDateForSpec(builder, caseData);
         buildClaimTakenOfflineAfterDJ(builder, caseData);
         buildCcjEvent(builder, caseData);
-        buildCoscEvent(builder,caseData);
+        buildCoscEvent(builder, caseData);
         return eventHistorySequencer.sortEvents(builder.build());
     }
 
@@ -499,11 +500,15 @@ public class EventHistoryMapper {
         }
     }
 
-
     private void buildCoscEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         // CoSCApplicationStatus can be null if the claimant has mark the case as paid in full before defendant applies for a cosc
-        String coscStatus = String.valueOf(caseData.getActiveJudgment() != null
-                                               && caseData.getActiveJudgment().getFullyPaymentMadeDate() != null ? SATISFIED: CANCELLED);
+        CoscRPAStatus coscStatus = caseData.getActiveJudgment() != null
+                                               && caseData.getActiveJudgment().getFullyPaymentMadeDate() != null
+                                               ? SATISFIED : CANCELLED;
+
+        LocalDateTime paidInFullDate = caseData.getActiveJudgment() != null && caseData.getActiveJudgment().getFullyPaymentMadeDate() != null
+            ? caseData.getActiveJudgment().getFullyPaymentMadeDate().atStartOfDay()
+            : null;
 
         if (caseData.isCosc()) {
             builder.certificateOfSatisfactionOrCancellation((Event.builder()
@@ -512,8 +517,8 @@ public class EventHistoryMapper {
                 .litigiousPartyID(APPLICANT_ID)
                 .dateReceived(time.now())
                 .eventDetails(EventDetails.builder()
-                                  .coscStatus(coscStatus)
-                                  .coscDatePaidInFull(caseData.getActiveJudgment().getFullyPaymentMadeDate().atStartOfDay())
+                                  .coscStatus(String.valueOf(coscStatus))
+                                  .coscDatePaidInFull(paidInFullDate)
                                   .build())
                 .eventDetailsText("")
                 .build()));

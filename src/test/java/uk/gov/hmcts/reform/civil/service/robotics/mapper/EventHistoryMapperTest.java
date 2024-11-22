@@ -42,7 +42,6 @@ import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -8390,7 +8389,7 @@ class EventHistoryMapperTest {
     class Cosc {
 
         @Test
-        public void shouldGenerateRPA_forCosc() {
+        public void shouldGenerateRPA_forCosc_Satisfied() {
             CertOfSC certOfSC = CertOfSC.builder()
                 .defendantFinalPaymentDate(LocalDate.now())
                 .debtPaymentEvidence(DebtPaymentEvidence.builder()
@@ -8410,6 +8409,38 @@ class EventHistoryMapperTest {
                 .eventDetails(EventDetails.builder()
                                   .coscStatus(String.valueOf(SATISFIED))
                                   .coscDatePaidInFull(LocalDate.now().plusDays(15).atStartOfDay())
+                                  .build())
+                .build();
+
+            EventHistory eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+
+            assertThat(eventHistory).extracting("certificateOfSatisfactionOrCancellation").asList()
+                .extracting("eventCode").asString().contains("600");
+            assertThat(eventHistory).extracting("certificateOfSatisfactionOrCancellation")
+                .asList().containsExactly(expectedEvent);
+        }
+
+        @Test
+        public void shouldGenerateRPA_forCosc_Cancelled() {
+            CertOfSC certOfSC = CertOfSC.builder()
+                .defendantFinalPaymentDate(LocalDate.now())
+                .debtPaymentEvidence(DebtPaymentEvidence.builder()
+                                         .debtPaymentOption(DebtPaymentOptions.MADE_FULL_PAYMENT_TO_COURT).build()).build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31Days().toBuilder()
+                .certOfSC(certOfSC)
+                .build();
+
+            Event expectedEvent = Event.builder()
+                .eventSequence(1)
+                .eventCode("600")
+                .dateReceived(localDateTime)
+                .litigiousPartyID("001")
+                .eventDetailsText("")
+                .eventDetails(EventDetails.builder()
+                                  .coscStatus(String.valueOf(CANCELLED))
+                                  .coscDatePaidInFull(null)
                                   .build())
                 .build();
 
