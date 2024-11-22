@@ -37,7 +37,7 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private FeatureToggleService toggleService;
 
-    private static final String HEADER_CONFIRMATION = "The order review has been completed";
+    private static final String HEADER_CONFIRMATION = "# The order review has been completed";
     private static final String BODY_CONFIRMATION_NO_OBLIGATION = "&nbsp;";
     private static final String BODY_CONFIRMATION_OBLIGATION = "### What happens next \n\n" +
         "A new task will be generated on the review date.";
