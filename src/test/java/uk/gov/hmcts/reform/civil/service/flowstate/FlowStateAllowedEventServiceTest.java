@@ -30,37 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.of;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGEMENT_OF_SERVICE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CUI_UPLOAD_MEDIATION_DOCUMENTS;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_CUI;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EXTEND_RESPONSE_DEADLINE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FULL_REMISSION_HWF;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIP_CLAIM_SETTLED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_STAY;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MORE_INFORMATION_HWF;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_CUI_FOR_DEADLINE_EXTENSION;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_CUI_FOR_DEADLINE_EXTENSION;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESET_PIN;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARK_PAID_FULL;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_MEDIATION_DOCUMENTS;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.VALIDATE_DISCONTINUE_CLAIM_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UpdateNextHearingInfo;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HEARING_DETAILS;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_CASE_NOTE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_DEFENDANT_LITIGATION_FRIEND;
@@ -77,56 +46,88 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_LISTING_COMPLETED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CUI_UPLOAD_MEDIATION_DOCUMENTS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DECISION_ON_RECONSIDERATION_REQUEST;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_CUI;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CASE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EDIT_JUDGMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EXTEND_RESPONSE_DEADLINE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FULL_REMISSION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_PAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HWF_REFERENCE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_PAID_IN_FULL;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_JUDGE_DEFENCE_RECEIVED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIP_CLAIM_SETTLED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_STAY;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_SUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_UNSUCCESSFUL;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MORE_INFORMATION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MOVE_TO_DECISION_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOC_REQUEST;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_CUI_FOR_DEADLINE_EXTENSION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_CUI_FOR_DEADLINE_EXTENSION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_HEARING_PARTIES;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RECORD_JUDGMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EDIT_JUDGMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_JUDGE_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESET_PIN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARK_PAID_FULL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SET_ASIDE_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STAY_CASE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CASE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRANSFER_ONLINE_CASE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_CHECK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HEARING_DETAILS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_MEDIATION_DOCUMENTS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UpdateNextHearingInfo;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.VALIDATE_DISCONTINUE_CLAIM_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CASE_STAYED;
@@ -425,6 +426,7 @@ class FlowStateAllowedEventServiceTest {
                         MOVE_TO_DECISION_OUTCOME,
                         SERVICE_REQUEST_RECEIVED,
                         HEARING_SCHEDULED,
+                        CONFIRM_LISTING_COMPLETED,
                         EVIDENCE_UPLOAD_APPLICANT,
                         migrateCase,
                         EVIDENCE_UPLOAD_RESPONDENT,
@@ -469,6 +471,7 @@ class FlowStateAllowedEventServiceTest {
                         TAKE_CASE_OFFLINE,
                         EVIDENCE_UPLOAD_JUDGE,
                         HEARING_SCHEDULED,
+                        CONFIRM_LISTING_COMPLETED,
                         GENERATE_DIRECTIONS_ORDER,
                         TRANSFER_ONLINE_CASE,
                         SETTLE_CLAIM,
@@ -507,6 +510,7 @@ class FlowStateAllowedEventServiceTest {
                         TAKE_CASE_OFFLINE,
                         EVIDENCE_UPLOAD_JUDGE,
                         HEARING_SCHEDULED,
+                        CONFIRM_LISTING_COMPLETED,
                         GENERATE_DIRECTIONS_ORDER,
                         TRANSFER_ONLINE_CASE,
                         SETTLE_CLAIM,
@@ -555,6 +559,7 @@ class FlowStateAllowedEventServiceTest {
                         EVIDENCE_UPLOAD_JUDGE,
                         TRIAL_READINESS,
                         HEARING_SCHEDULED,
+                        CONFIRM_LISTING_COMPLETED,
                         TRIAL_READY_CHECK,
                         TRIAL_READY_NOTIFICATION,
                         MOVE_TO_DECISION_OUTCOME,
@@ -762,6 +767,7 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_SDO,
                         NotSuitable_SDO,
                         HEARING_SCHEDULED,
+                        CONFIRM_LISTING_COMPLETED,
                         HEARING_FEE_UNPAID,
                         HEARING_FEE_PAID,
                         TRIAL_READY_CHECK,
@@ -1041,6 +1047,7 @@ class FlowStateAllowedEventServiceTest {
                         HEARING_FEE_UNPAID,
                         HEARING_FEE_PAID,
                         HEARING_SCHEDULED,
+                        CONFIRM_LISTING_COMPLETED,
                         TRIAL_READY_CHECK,
                         TRIAL_READY_NOTIFICATION,
                         MOVE_TO_DECISION_OUTCOME,
@@ -1206,6 +1213,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         HEARING_SCHEDULED,
+                        CONFIRM_LISTING_COMPLETED,
                         NotSuitable_SDO,
                         REQUEST_FOR_RECONSIDERATION,
                         EVIDENCE_UPLOAD_JUDGE,
@@ -1262,6 +1270,7 @@ class FlowStateAllowedEventServiceTest {
                         NotSuitable_SDO,
                         REQUEST_FOR_RECONSIDERATION,
                         HEARING_SCHEDULED,
+                        CONFIRM_LISTING_COMPLETED,
                         TRIAL_READY_CHECK,
                         TRIAL_READY_NOTIFICATION,
                         MOVE_TO_DECISION_OUTCOME,
@@ -1340,6 +1349,7 @@ class FlowStateAllowedEventServiceTest {
                         EVIDENCE_UPLOAD_JUDGE,
                         TRIAL_READINESS,
                         HEARING_SCHEDULED,
+                        CONFIRM_LISTING_COMPLETED,
                         TRIAL_READY_CHECK,
                         TRIAL_READY_NOTIFICATION,
                         MOVE_TO_DECISION_OUTCOME,
@@ -1583,6 +1593,7 @@ class FlowStateAllowedEventServiceTest {
                         NotSuitable_SDO,
                         REQUEST_FOR_RECONSIDERATION,
                         HEARING_SCHEDULED,
+                        CONFIRM_LISTING_COMPLETED,
                         TRIAL_READY_CHECK,
                         TRIAL_READY_NOTIFICATION,
                         MOVE_TO_DECISION_OUTCOME,
@@ -1804,6 +1815,7 @@ class FlowStateAllowedEventServiceTest {
                         NotSuitable_SDO,
                         REQUEST_FOR_RECONSIDERATION,
                         HEARING_SCHEDULED,
+                        CONFIRM_LISTING_COMPLETED,
                         TRIAL_READY_CHECK,
                         TRIAL_READY_NOTIFICATION,
                         MOVE_TO_DECISION_OUTCOME,
@@ -1859,6 +1871,7 @@ class FlowStateAllowedEventServiceTest {
                         NotSuitable_SDO,
                         REQUEST_FOR_RECONSIDERATION,
                         HEARING_SCHEDULED,
+                        CONFIRM_LISTING_COMPLETED,
                         TRIAL_READY_CHECK,
                         TRIAL_READY_NOTIFICATION,
                         MOVE_TO_DECISION_OUTCOME,
@@ -1933,9 +1946,12 @@ class FlowStateAllowedEventServiceTest {
                         NotSuitable_SDO,
                         REQUEST_FOR_RECONSIDERATION,
                         HEARING_SCHEDULED,
+                        CONFIRM_LISTING_COMPLETED,
                         TRIAL_READY_CHECK,
                         TRIAL_READY_NOTIFICATION,
                         MOVE_TO_DECISION_OUTCOME,
+                        DECISION_ON_RECONSIDERATION_REQUEST,
+                        AMEND_RESTITCH_BUNDLE,
                         HEARING_FEE_UNPAID,
                         HEARING_FEE_PAID,
                         REFER_TO_JUDGE,
