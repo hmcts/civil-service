@@ -277,7 +277,9 @@ public class InitiateGeneralApplicationService {
             applicationBuilder.certOfSC(caseData.getCertOfSC());
         }
         applicationBuilder.caseNameGaInternal(caseData.getCaseNameHmctsInternal());
-        applicationBuilder.gaWaTrackLabel(setClaimTrackForTaskName(caseData));
+        if (featureToggleService.isMintiEnabled()) {
+            applicationBuilder.gaWaTrackLabel(setClaimTrackForTaskName(caseData));
+        }
         return helper.setRespondentDetailsIfPresent(applicationBuilder.build(), caseData, userDetails, feesService);
     }
 
