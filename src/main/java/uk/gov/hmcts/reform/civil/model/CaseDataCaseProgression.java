@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.ConfirmListingTickBox;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadDisclosure;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
@@ -225,9 +226,10 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     @Builder.Default
     private final List<Element<CaseDocument>> trialReadyDocuments = new ArrayList<>();
 
-    // request hearing
+    // // MINTI case prog
     private DynamicList requestHearingNoticeDynamic;
     private YesOrNo requestAnotherHearing;
+    private final List<ConfirmListingTickBox> confirmListingTickBox;
 
     /**
      * Claimant has requested a reconsideration of the SDO.
