@@ -1052,8 +1052,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return (isNull(whenWillThisAmountBePaid) && isNull(firstRepaymentDate))
             || (isDateAfterToday(whenWillThisAmountBePaid) && hasDoneSettlementAgreementInTime)
             || (isDateAfterToday(firstRepaymentDate) && hasDoneSettlementAgreementInTime)
-            || (isDateAfterToday(whenWillThisAmountBePaid) && isFullAdmitPayImmediatelyClaimSpec());
-
+            || (isDateAfterToday(whenWillThisAmountBePaid) && isFullAdmitPayImmediatelyClaimSpec())
+            || (isDateAfterToday(whenWillThisAmountBePaid) && isPartAdmitPayImmediatelyClaimSpec());
     }
 
     @JsonIgnore
