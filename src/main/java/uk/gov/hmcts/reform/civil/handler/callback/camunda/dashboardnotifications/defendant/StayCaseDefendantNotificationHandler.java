@@ -45,6 +45,12 @@ public class StayCaseDefendantNotificationHandler extends CaseEventsDashboardCal
 
     @Override
     protected void beforeRecordScenario(CaseData caseData, String authToken) {
+
+        dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "DEFENDANT",
+            authToken
+        );
         dashboardApiClient.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseData.getCcdCaseReference().toString(),
             "DEFENDANT",
