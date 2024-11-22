@@ -158,7 +158,7 @@ public class InitiateGeneralApplicationService {
 
         final var caseType = SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             ? CaseCategory.SPEC_CLAIM
-            : UNSPEC_CLAIM;
+            : CaseCategory.UNSPEC_CLAIM;
 
         if (caseData.getGeneralAppRespondentAgreement() != null) {
             if (YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())
@@ -208,7 +208,7 @@ public class InitiateGeneralApplicationService {
             }
             //Setting Work Allocation location and location name
             if (Objects.isNull(caseLocation.getLeft().getSiteName())
-                && nonNull(caseLocation.getLeft().getBaseLocation())) {
+                && Objects.nonNull(caseLocation.getLeft().getBaseLocation())) {
                 LocationRefData  locationDetails = getWorkAllocationLocationDetails(caseLocation.getLeft().getBaseLocation(), authToken);
                 caseLocation.getLeft().setSiteName(locationDetails.getSiteName());
                 caseLocation.getLeft().setAddress(locationDetails.getCourtAddress());
@@ -264,8 +264,8 @@ public class InitiateGeneralApplicationService {
         }
         if (featureToggleService.isCoSCEnabled()
             && caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID)) {
-            if (nonNull(caseData.getCertOfSC().getDebtPaymentEvidence())
-                && nonNull(caseData.getCertOfSC().getDebtPaymentEvidence().getDebtPaymentOption())) {
+            if (Objects.nonNull(caseData.getCertOfSC().getDebtPaymentEvidence())
+                && Objects.nonNull(caseData.getCertOfSC().getDebtPaymentEvidence().getDebtPaymentOption())) {
                 DebtPaymentOptions deptPaymentOption = caseData.getCertOfSC().getDebtPaymentEvidence().getDebtPaymentOption();
                 if (DebtPaymentOptions.MADE_FULL_PAYMENT_TO_COURT.equals(deptPaymentOption)
                     || DebtPaymentOptions.UPLOAD_EVIDENCE_DEBT_PAID_IN_FULL.equals(deptPaymentOption)) {
