@@ -75,11 +75,14 @@ import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenari
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.cosc.CoscRPAStatus.CANCELLED;
+import static uk.gov.hmcts.reform.civil.enums.cosc.CoscRPAStatus.SATISFIED;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.PROCEEDS_IN_HERITAGE;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_OUT;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE_ENTERED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE_LIFTED;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.CERTIFICATE_OF_SATISFACTION_OR_CANCELLATION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.CONSENT_EXTENSION_FILING_DEFENCE;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFAULT_JUDGMENT_GRANTED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
@@ -284,6 +287,7 @@ public class EventHistoryMapper {
         buildInformAgreedExtensionDateForSpec(builder, caseData);
         buildClaimTakenOfflineAfterDJ(builder, caseData);
         buildCcjEvent(builder, caseData);
+        buildCoscEvent(builder,caseData);
         return eventHistorySequencer.sortEvents(builder.build());
     }
 
@@ -492,6 +496,27 @@ public class EventHistoryMapper {
                 break;
             default:
                 break;
+        }
+    }
+
+
+    private void buildCoscEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        // CoSCApplicationStatus can be null if the claimant has mark the case as paid in full before defendant applies for a cosc
+        String coscStatus = String.valueOf(caseData.getActiveJudgment() != null
+                                               && caseData.getActiveJudgment().getFullyPaymentMadeDate() != null ? SATISFIED: CANCELLED);
+
+        if (caseData.isCosc()) {
+            builder.certificateOfSatisfactionOrCancellation((Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .eventCode(CERTIFICATE_OF_SATISFACTION_OR_CANCELLATION.getCode())
+                .litigiousPartyID(APPLICANT_ID)
+                .dateReceived(time.now())
+                .eventDetails(EventDetails.builder()
+                                  .coscStatus(coscStatus)
+                                  .coscDatePaidInFull(caseData.getActiveJudgment().getFullyPaymentMadeDate().atStartOfDay())
+                                  .build())
+                .eventDetailsText("")
+                .build()));
         }
     }
 

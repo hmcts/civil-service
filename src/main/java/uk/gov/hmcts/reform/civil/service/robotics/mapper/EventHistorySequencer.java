@@ -103,6 +103,10 @@ public class EventHistorySequencer {
                 case DEFENCE_STRUCK_OUT:
                     builder.defenceStruckOut(event);
                     break;
+                case CERTIFICATE_OF_SATISFACTION_OR_CANCELLATION:
+                    builder.certificateOfSatisfactionOrCancellation(event);
+                    break;
+
                 default:
                     throw new IllegalStateException("Unexpected event type: " + eventType);
             }
@@ -161,6 +165,9 @@ public class EventHistorySequencer {
         if (isEmpty(builder.build().getDefenceStruckOut())) {
             builder.defenceStruckOut(List.of(Event.builder().build()));
         }
+        if (isEmpty(builder.build().getDefenceStruckOut())) {
+            builder.certificateOfSatisfactionOrCancellation(List.of(Event.builder().build()));
+        }
         return builder
             .build();
     }
@@ -196,7 +203,8 @@ public class EventHistorySequencer {
             eventHistory.getDefaultJudgment(),
             eventHistory.getJudgmentByAdmission(),
             eventHistory.getGeneralFormOfApplication(),
-            eventHistory.getDefenceStruckOut()
+            eventHistory.getDefenceStruckOut(),
+            eventHistory.getCertificateOfSatisfactionOrCancellation()
         );
         return eventsList.stream()
             .filter(Objects::nonNull)

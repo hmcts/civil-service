@@ -35,5 +35,8 @@ public class EventDetails {
     private LocalDateTime dateOfJudgment;
     private Boolean jointJudgment;
     private Boolean judgmentToBeRegistered;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDateTime coscDatePaidInFull;
+    private String coscStatus;
 
 }
