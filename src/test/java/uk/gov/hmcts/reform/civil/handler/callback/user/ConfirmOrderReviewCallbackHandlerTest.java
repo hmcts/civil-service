@@ -42,9 +42,9 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
     private static final String BODY_CONFIRMATION_OBLIGATION = "### What happens next \n\n" +
         "A new task will be generated on the review date.";
 
-    private static final String TASKS_LEFT_ERROR = "### Order review not completed \n\n" +
-        "You must complete the tasks in the order before you can submit your order review \n\n" +
-        "Once you have completed the task you can submit your order review by clicking on the link on your task list.";
+    private static final String TASKS_LEFT_ERROR_1 = "Order review not completed";
+    private static final String TASKS_LEFT_ERROR_2 = "You must complete the tasks in the order before you can submit your order review.";
+    private static final String TASKS_LEFT_ERROR_3 = "Once you have completed the task you can submit your order review by clicking on the link on your task list.";
 
     @BeforeEach
     void caseEventsEnabled() {
@@ -82,7 +82,11 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors().get(0))
-                .isEqualTo(TASKS_LEFT_ERROR);
+                .isEqualTo(TASKS_LEFT_ERROR_1);
+            assertThat(response.getErrors().get(1))
+                .isEqualTo(TASKS_LEFT_ERROR_2);
+            assertThat(response.getErrors().get(2))
+                .isEqualTo(TASKS_LEFT_ERROR_3);
         }
 
         @Test
