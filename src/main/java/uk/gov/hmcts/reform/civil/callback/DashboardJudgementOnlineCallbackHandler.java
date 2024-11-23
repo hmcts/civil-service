@@ -14,6 +14,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 
 @RequiredArgsConstructor
 public abstract class DashboardJudgementOnlineCallbackHandler extends CallbackHandler {
@@ -25,8 +26,10 @@ public abstract class DashboardJudgementOnlineCallbackHandler extends CallbackHa
     @Override
     protected Map<String, Callback> callbacks() {
         return featureToggleService.isJudgmentOnlineLive()
-            ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureDashboardScenario)
-            : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
+            ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureDashboardScenario,
+                     callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse)
+            : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
+                     callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse);
     }
 
     protected abstract String getScenario(CaseData caseData);
