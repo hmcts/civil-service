@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -25,11 +26,14 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import java.util.HashMap;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_BUNDLE_CREATED_FOR_CLAIMANT1;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_BUNDLE_CREATED_CLAIMANT;
@@ -105,8 +109,13 @@ public class BundleCreationClaimantNotificationHandlerTest extends BaseCallbackH
             );
         }
 
+    }
+
+    @Nested
+    class SubmitCallback {
+
         @Test
-        void shouldRecordScenario_whenInvokedWhenTrialReady() {
+        void shouldRecordScenario_whenInvokedWhenTrialReadyCompletesThenNoConfirmationRequired() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyApplicant().build().toBuilder()
                 .applicant1Represented(YesOrNo.NO)
                 .drawDirectionsOrderRequired(YesOrNo.YES)
@@ -114,22 +123,14 @@ public class BundleCreationClaimantNotificationHandlerTest extends BaseCallbackH
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .orderType(OrderType.DECIDE_DAMAGES)
                 .build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_BUNDLE_CREATED_FOR_CLAIMANT1.name()).build()
             ).build();
 
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-
-            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-
-            handler.handle(params);
-
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_CLAIMANT.getScenario(),
-                "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
-            );
+            SubmittedCallbackResponse handle = (SubmittedCallbackResponse) handler.handle(params);
+            assertNull(handle.getConfirmationBody());
+            assertNull(handle.getConfirmationHeader());
+            verifyNoInteractions(dashboardApiClient);
         }
     }
 }
