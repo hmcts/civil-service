@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotification
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -94,8 +96,10 @@ public class DefaultJudgementIssuedClaimantNotificationHandlerTest extends BaseC
         );
     }
 
-    @Test
-    void emptySubmittedCallback() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void emptySubmittedCallback(boolean toggle) {
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(toggle);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)

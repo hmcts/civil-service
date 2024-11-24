@@ -108,8 +108,8 @@ public class StayCaseClaimantNotificationHandlerTest extends BaseCallbackHandler
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void emptySubmittedCallback(boolean emptySubmitted) {
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(emptySubmitted);
+    void emptySubmittedCallback(boolean toggle) {
+        when(featureToggleService.isCaseEventsEnabled()).thenReturn(toggle);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
             .toBuilder().applicant1Represented(YesOrNo.NO)
             .build();

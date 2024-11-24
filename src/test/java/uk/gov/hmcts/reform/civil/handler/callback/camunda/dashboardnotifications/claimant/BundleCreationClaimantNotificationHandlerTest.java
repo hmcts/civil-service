@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -114,8 +116,10 @@ public class BundleCreationClaimantNotificationHandlerTest extends BaseCallbackH
     @Nested
     class SubmitCallback {
 
-        @Test
-        void shouldRecordScenario_whenInvokedWhenTrialReadyCompletesThenNoConfirmationRequired() {
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldRecordScenario_whenInvokedWhenTrialReadyCompletesThenNoConfirmationRequired(boolean toggle) {
+            when(toggleService.isCaseProgressionEnabled()).thenReturn(toggle);
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyApplicant().build().toBuilder()
                 .applicant1Represented(YesOrNo.NO)
                 .drawDirectionsOrderRequired(YesOrNo.YES)
