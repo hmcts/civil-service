@@ -5,10 +5,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -35,10 +37,13 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CCJ_REQUEST_FOR_APPLICANT1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT;
@@ -112,6 +117,32 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void emptySubmittedCallback(boolean toggle) {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(toggle);
+        LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1ResponseDeadline(dateTime)
+            .defaultJudgmentDocuments(List.of(
+                Element.<CaseDocument>builder()
+                    .value(CaseDocument.builder().documentType(DocumentType.DEFAULT_JUDGMENT)
+                               .createdDatetime(LocalDateTime.now()).build()).build()))
+            .build();
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(SUBMITTED, caseData)
+            .build();
+
+        SubmittedCallbackResponse handle = (SubmittedCallbackResponse) handler.handle(callbackParams);
+        assertNull(handle.getConfirmationBody());
+        assertNull(handle.getConfirmationHeader());
+        verifyNoInteractions(dashboardApiClient);
     }
 
     @Test
