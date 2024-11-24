@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotification
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -104,8 +106,10 @@ public class StayCaseClaimantNotificationHandlerTest extends BaseCallbackHandler
         );
     }
 
-    @Test
-    void emptySubmittedCallback() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void emptySubmittedCallback(boolean emptySubmitted) {
+        when(featureToggleService.isCaseEventsEnabled()).thenReturn(emptySubmitted);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
             .toBuilder().applicant1Represented(YesOrNo.NO)
             .build();
