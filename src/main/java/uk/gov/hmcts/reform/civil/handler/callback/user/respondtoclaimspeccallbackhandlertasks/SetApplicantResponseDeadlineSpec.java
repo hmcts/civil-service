@@ -68,7 +68,7 @@ import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedT
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class SetApplicantResponseDeadline implements CaseTask {
+public class SetApplicantResponseDeadlineSpec implements CaseTask {
 
     private final UserService userService;
     private final CoreCaseUserService coreCaseUserService;

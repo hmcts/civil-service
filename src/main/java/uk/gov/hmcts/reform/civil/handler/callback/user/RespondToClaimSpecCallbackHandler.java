@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbac
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.HandleDefendAllClaim;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.HandleRespondentResponseTypeForSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.PopulateRespondent1Copy;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.SetApplicantResponseDeadline;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.SetApplicantResponseDeadlineSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.SetGenericResponseTypeFlag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.SetUploadTimelineTypeFlag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateDateOfBirth;
@@ -80,7 +80,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private final ValidateDateOfBirth validateDateOfBirth;
     private final ValidateRespondentPaymentDate validateRespondentPaymentDate;
     private final ValidateLengthOfUnemployment validateLengthOfUnemployment;
-    private final SetApplicantResponseDeadline setApplicantResponseDeadline;
+    private final SetApplicantResponseDeadlineSpec setApplicantResponseDeadline;
 
     @Override
     public List<CaseEvent> handledEvents() {

@@ -70,7 +70,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @ExtendWith(MockitoExtension.class)
 class SetApplicantResponseDeadlineTest {
 
-    private SetApplicantResponseDeadline setApplicantResponseDeadline;
+    private SetApplicantResponseDeadlineSpec setApplicantResponseDeadline;
 
     @Mock
     private IStateFlowEngine stateFlowEngine;
@@ -111,7 +111,7 @@ class SetApplicantResponseDeadlineTest {
     void setUp() {
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
-        setApplicantResponseDeadline = new SetApplicantResponseDeadline(
+        setApplicantResponseDeadline = new SetApplicantResponseDeadlineSpec(
             userService,
             coreCaseUserService,
             toggleService,
