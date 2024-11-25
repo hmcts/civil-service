@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RolePool;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.SubjectOption;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,5 +32,17 @@ public class Message {
     private YesOrNo isUrgent;
 
     @Builder.Default
-    private List<Element<Message>> history = new ArrayList<>();
+    private List<Element<MessageReply>> history = new ArrayList<>();
+
+    public Message buildFullReplyMessage(MessageReply reply, Message userDetails, Time time) {
+        return this.toBuilder()
+            .sentTime(reply.getSentTime())
+            .isUrgent(reply.getIsUrgent())
+            .senderName(userDetails.getSenderName())
+            .senderRoleType(userDetails.getSenderRoleType())
+            .messageContent(reply.getMessageContent())
+            .recipientRoleType(reply.getRecipientRoleType())
+            .updatedTime(time.now())
+            .build();
+    }
 }

@@ -740,7 +740,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private SendAndReplyOption sendAndReplyOption;
     private SendMessageMetadata sendMessageMetadata;
     private String sendMessageContent;
-    private Message messageReplyMetadata;
+    private MessageReply messageReplyMetadata;
     private String messageHistory;
     private DynamicList messagesToReplyTo;
     private List<Element<Message>> messages;

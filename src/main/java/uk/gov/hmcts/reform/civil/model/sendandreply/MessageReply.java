@@ -24,4 +24,17 @@ public class MessageReply {
     private SubjectOption subjectType;
     private String contentSubject;
     private String messageContent;
+
+    public MessageReply buildReplyOutOfMessage(Message message) {
+        return this.builder()
+            .sentTime(message.getSentTime())
+            .isUrgent(message.getIsUrgent())
+            .senderName(message.getSenderName())
+            .senderRoleType(message.getSenderRoleType())
+            .messageContent(message.getMessageContent())
+            .recipientRoleType(message.getRecipientRoleType())
+            .contentSubject(message.getContentSubject())
+            .subjectType(message.getSubjectType())
+            .build();
+    }
 }

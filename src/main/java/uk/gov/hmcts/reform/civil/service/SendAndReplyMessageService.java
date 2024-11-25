@@ -99,28 +99,17 @@ public class SendAndReplyMessageService {
             .build();
     }
 
-    public List<Element<Message>> addReplyToMessage(List<Element<Message>> messages, String messageId, Message messageReply, String userAuth) {
+    public List<Element<Message>> addReplyToMessage(List<Element<Message>> messages, String messageId, MessageReply messageReply, String userAuth) {
         Element<Message> messageToReplace = getMessageById(messages, messageId);
         Message baseMessageDetails = createBaseMessageWithSenderDetails(userAuth);
 
         //Move current base message to history
-        Element<Message> newHistoryMessage = element(messageToReplace.getValue().builder()
-                                                         .history(null)
-                                                         .updatedTime(null)
-                                                         .sentTime(messageToReplace.getValue().getUpdatedTime())
-                                                         .build());
+        MessageReply messageForHistory = MessageReply.builder().build();
+        Element<MessageReply> newHistoryMessage = element(messageForHistory.buildReplyOutOfMessage(messageToReplace.getValue()));
 
         //Switch out current base message with reply info
-        messageToReplace.setValue(messageToReplace.getValue()
-                                      .toBuilder()
-                                      .recipientRoleType(ofNullable(messageReply)
-                                                             .orElse(Message.builder().build()).getSenderRoleType())
-                                      .senderName(baseMessageDetails.getSenderName())
-                                      .senderRoleType(baseMessageDetails.getSenderRoleType())
-                                      .isUrgent(messageReply.getIsUrgent())
-                                      .messageContent(messageReply.getMessageContent())
-                                      .updatedTime(time.now())
-                                      .build());
+        messageToReplace.setValue(messageToReplace.getValue().buildFullReplyMessage(messageReply, baseMessageDetails, time));
+
         messageToReplace.getValue().getHistory().add(newHistoryMessage);
 
         return messages;
