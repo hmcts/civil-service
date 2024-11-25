@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandlertests;
+package uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandlertests.prepopulateorderdetailspagestests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -8,17 +8,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.CreateSDOCallbackHandlerUtils;
-import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.disposalhearing.DisposalHearingPopulator;
-import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.fasttrack.FastTrackPopulator;
-import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.PrePopulateOrderDetailsPages;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.PrePopulateSdoR2AndNihlFields;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.SmallClaimsPopulator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.disposalhearing.DisposalHearingPopulator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.fasttrack.FastTrackPopulator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.orderdetailspages.OrderDetailsPagesCaseFieldBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.prepopulateorderdetailspages.PrePopulateOrderDetailsPages;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -29,7 +29,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -45,8 +44,6 @@ class PrePopulateOrderDetailsPagesTest {
     @Mock
     private LocationReferenceDataService locationRefDataService;
     @Mock
-    private WorkingDayIndicator workingDayIndicator;
-    @Mock
     private FeatureToggleService featureToggleService;
     @Mock
     private LocationHelper locationHelper;
@@ -60,6 +57,8 @@ class PrePopulateOrderDetailsPagesTest {
     private DisposalHearingPopulator disposalHearingPopulator;
     @Mock
     private PrePopulateSdoR2AndNihlFields prePopulateSdoR2AndNihlFields;
+    @Mock
+    private List<OrderDetailsPagesCaseFieldBuilder> orderDetailsPagesCaseFieldBuilders;
 
     private PrePopulateOrderDetailsPages prePopulateOrderDetailsPages;
 
@@ -73,7 +72,6 @@ class PrePopulateOrderDetailsPagesTest {
         prePopulateOrderDetailsPages = new PrePopulateOrderDetailsPages(
                 objectMapper,
                 locationRefDataService,
-                workingDayIndicator,
                 featureToggleService,
                 locationHelper,
                 smallClaimsPopulator,
@@ -82,7 +80,8 @@ class PrePopulateOrderDetailsPagesTest {
                 disposalHearingPopulator,
                 prePopulateSdoR2AndNihlFields,
                 TEST_CCMCC_AMOUNT,
-                TEST_CCMCC_EPIMMS_ID
+                TEST_CCMCC_EPIMMS_ID,
+                orderDetailsPagesCaseFieldBuilders
         );
 
         when(createSDOCallbackHandlerUtils.getDynamicHearingMethodList(any(CallbackParams.class), any(CaseData.class)))
@@ -128,7 +127,6 @@ class PrePopulateOrderDetailsPagesTest {
                 .build();
 
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-        when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(LocalDate.now().plusDays(1));
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(List.of(LocationRefData.builder().build()));
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) prePopulateOrderDetailsPages.execute(callbackParams);
@@ -153,7 +151,6 @@ class PrePopulateOrderDetailsPagesTest {
                 .build();
 
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-        when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(LocalDate.now().plusDays(1));
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(List.of(LocationRefData.builder().build()));
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) prePopulateOrderDetailsPages.execute(callbackParams);
@@ -200,7 +197,6 @@ class PrePopulateOrderDetailsPagesTest {
                 .build();
 
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-        when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(LocalDate.now().plusDays(1));
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(List.of(LocationRefData.builder().build()));
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
@@ -225,7 +221,6 @@ class PrePopulateOrderDetailsPagesTest {
                 .build();
 
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-        when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(LocalDate.now().plusDays(1));
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(List.of(LocationRefData.builder().build()));
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) prePopulateOrderDetailsPages.execute(callbackParams);
