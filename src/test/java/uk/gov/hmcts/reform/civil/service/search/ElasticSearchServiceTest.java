@@ -115,12 +115,11 @@ abstract class ElasticSearchServiceTest {
 
         when(coreCaseDataService.searchCases(any())).thenReturn(searchResult);
 
-        assertThat(searchService.getInMediationCases(LocalDate.now().minusDays(1), false)).hasSize(2);
-        verify(coreCaseDataService, times(2)).searchCases(queryCaptor.capture());
+        assertThat(searchService.getInMediationCases(LocalDate.now().minusDays(1), false)).hasSize(1);
+        verify(coreCaseDataService, times(1)).searchCases(queryCaptor.capture());
 
         List<Query> capturedQueries = queryCaptor.getAllValues();
         assertThat(capturedQueries.get(0)).usingRecursiveComparison().isEqualTo(buildQueryInMediation(0, LocalDate.now().minusDays(1), false));
-        assertThat(capturedQueries.get(1)).usingRecursiveComparison().isEqualTo(buildQueryInMediation(10, LocalDate.now().minusDays(1), false));
     }
 
     @Test
@@ -129,12 +128,11 @@ abstract class ElasticSearchServiceTest {
 
         when(coreCaseDataService.searchCases(any())).thenReturn(searchResult);
 
-        assertThat(searchService.getInMediationCases(LocalDate.now().minusDays(1), true)).hasSize(2);
-        verify(coreCaseDataService, times(2)).searchCases(queryCaptor.capture());
+        assertThat(searchService.getInMediationCases(LocalDate.now().minusDays(1), true)).hasSize(1);
+        verify(coreCaseDataService, times(1)).searchCases(queryCaptor.capture());
 
         List<Query> capturedQueries = queryCaptor.getAllValues();
         assertThat(capturedQueries.get(0)).usingRecursiveComparison().isEqualTo(buildQueryInMediation(0, LocalDate.now().minusDays(1), true));
-        assertThat(capturedQueries.get(1)).usingRecursiveComparison().isEqualTo(buildQueryInMediation(10, LocalDate.now().minusDays(1), true));
     }
 
     @Test
