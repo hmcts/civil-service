@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import java.util.Optional;
 
 import static java.lang.String.format;
-import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 
 @Component
 public class JudgmentByAdmissionConfHeader implements RespondToResponseConfirmationHeaderGenerator {
