@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.controllers.testingsupport;
 
-
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +21,7 @@ import uk.gov.hmcts.reform.hmc.service.HearingsService;
 public class HmcSupportController {
 
     private final HearingsService hearingsService;
+
     @RequestMapping(
         method = RequestMethod.GET,
         value = "/hmc-support/hearing-details",
