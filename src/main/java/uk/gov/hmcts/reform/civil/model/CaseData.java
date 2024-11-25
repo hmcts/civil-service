@@ -46,13 +46,13 @@ import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrN
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
-import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -108,6 +108,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
@@ -146,6 +147,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final CaseState previousCCDState;
     private final String preStayState;
     private final String manageStayOption;
+    private final LocalDate manageStayUpdateRequestDate;
     private final GAApplicationType generalAppType;
     private final GAApplicationTypeLR generalAppTypeLR;
     private final GARespondentOrderAgreement generalAppRespondentAgreement;
@@ -721,8 +723,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private SettlementReason settleReason;
     private final MarkPaidConsentList markPaidConsent;
     private YesOrNo claimantsConsentToDiscontinuance;
-    private CaseDocument noticeOfDiscontinueCWDoc;
-    private CaseDocument noticeOfDiscontinueAllParitiesDoc;
+    private CaseDocument applicant1NoticeOfDiscontinueCWViewDoc;
+    private CaseDocument respondent1NoticeOfDiscontinueCWViewDoc;
+    private CaseDocument respondent2NoticeOfDiscontinueCWViewDoc;
+    private CaseDocument applicant1NoticeOfDiscontinueAllPartyViewDoc;
+    private CaseDocument respondent1NoticeOfDiscontinueAllPartyViewDoc;
+    private CaseDocument respondent2NoticeOfDiscontinueAllPartyViewDoc;
+
     @JsonUnwrapped
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
     private LocalDate coscSchedulerDeadline;
@@ -1188,12 +1195,19 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public Optional<Element<CaseDocument>> getSDODocument() {
-        if (getSystemGeneratedCaseDocuments() != null) {
-            return getSystemGeneratedCaseDocuments().stream()
-                .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
-                    .getDocumentType().equals(DocumentType.SDO_ORDER)).findAny();
-        }
-        return Optional.empty();
+        return Optional.ofNullable(systemGeneratedCaseDocuments)
+            .flatMap(docs -> docs.stream()
+                .filter(doc -> doc.getValue().getDocumentType().equals(DocumentType.SDO_ORDER))
+                .max(Comparator.comparing(doc -> doc.getValue().getCreatedDatetime())));
+    }
+
+    @JsonIgnore
+    public Optional<List<CaseDocument>> getDocumentListByType(List<Element<CaseDocument>> documentCollection, DocumentType documentType) {
+        List<CaseDocument> documents = documentCollection.stream()
+            .map(Element::getValue)
+            .filter(doc -> doc.getDocumentType().equals(documentType))
+            .toList();
+        return Optional.ofNullable(documents.isEmpty() ? null : documents);
     }
 
     @JsonIgnore

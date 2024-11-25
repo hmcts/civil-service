@@ -36,14 +36,12 @@ import uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
-import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingOnRadioOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.enums.sdo.PhysicalTrialBundleOptions;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
@@ -115,6 +113,7 @@ import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -904,8 +903,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(time.now()).willReturn(submittedDate);
 
             given(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).willReturn(true);
-
-            given(featureToggleService.isEarlyAdoptersEnabled()).willReturn(true);
         }
 
         @Test
@@ -968,52 +965,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({"true", "false"})
-    void shouldSetEarlyAdoptersFlag_whenDisposal(Boolean isLocationWhiteListed) {
-        DynamicList localOptions = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            )
-            .build();
-
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson)
-            .disposalHearingMethodInPerson(localOptions.toBuilder().value(selectedCourt).build())
-            .fastTrackMethodInPerson(localOptions)
-            .smallClaimsMethodInPerson(localOptions)
-            .disposalHearingMethodInPerson(localOptions.toBuilder().value(selectedCourt).build())
-            .disposalHearingMethodToggle(Collections.singletonList(OrderDetailsPagesSectionsToggle.SHOW))
-            .orderType(OrderType.DISPOSAL)
-            .build();
-
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-        when(featureToggleService.isLocationWhiteListedForCaseProgression(selectedCourt.getCode())).thenReturn(
-            isLocationWhiteListed);
-        when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())).thenReturn(
-            isLocationWhiteListed);
-        when(locationRefDataService.getLocationMatchingLabel(selectedCourt.getCode(), params.getParams().get(
-            CallbackParams.Params.BEARER_TOKEN).toString()))
-            .thenReturn(Optional.of(LocationRefData.builder()
-                                        .regionId("region id")
-                                        .epimmsId("epimms id")
-                                        .siteName("site name")
-                                        .build()));
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-
-        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
-    }
-
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
     void shouldSetEarlyAdoptersFlagToFalse_WhenLiP(Boolean isLocationWhiteListed) {
         DynamicList localOptions = DynamicList.builder()
             .listItems(List.of(
@@ -1040,7 +991,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
         when(featureToggleService.isLocationWhiteListedForCaseProgression(selectedCourt.getCode()))
             .thenReturn(isLocationWhiteListed);
         when(locationRefDataService.getLocationMatchingLabel(selectedCourt.getCode(), params.getParams().get(
@@ -1055,373 +1005,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
         assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(NO);
-    }
-
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void shouldSetEarlyAdoptersFlag_whenSmallClaims(Boolean isLocationWhiteListed) {
-        DynamicList localOptions = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            )
-            .build();
-
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
-            .disposalHearingMethodInPerson(localOptions)
-            .fastTrackMethodInPerson(localOptions)
-            .smallClaimsMethodInPerson(localOptions.toBuilder().value(selectedCourt).build())
-            .claimsTrack(ClaimsTrack.smallClaimsTrack)
-            .setSmallClaimsFlag(YES)
-            .drawDirectionsOrderRequired(NO)
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-        when(featureToggleService.isLocationWhiteListedForCaseProgression(selectedCourt.getCode()))
-            .thenReturn(isLocationWhiteListed);
-        when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation()))
-            .thenReturn(isLocationWhiteListed);
-        when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
-            CallbackParams.Params.BEARER_TOKEN).toString())).thenReturn(
-            Optional.of(LocationRefData.builder()
-                            .regionId("region id")
-                            .epimmsId("epimms id")
-                            .siteName("location name")
-                            .build()));
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-
-        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
-    }
-
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void shouldSetEarlyAdoptersFlag_whenFastTrack(Boolean isLocationWhiteListed) {
-        DynamicList localOptions = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            )
-            .build();
-
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson)
-            .smallClaimsMethodInPerson(localOptions)
-            .isSdoR2NewScreen(NO)
-            .fastTrackMethodInPerson(localOptions.toBuilder().value(selectedCourt).build())
-            .disposalHearingMethodInPerson(localOptions)
-            .claimsTrack(ClaimsTrack.fastTrack)
-            .setFastTrackFlag(YES)
-            .drawDirectionsOrderRequired(NO)
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-        when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation()))
-            .thenReturn(isLocationWhiteListed);
-        when(featureToggleService.isLocationWhiteListedForCaseProgression((selectedCourt.getCode()))).thenReturn(
-            isLocationWhiteListed);
-        when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
-            CallbackParams.Params.BEARER_TOKEN).toString())).thenReturn(
-            Optional.of(LocationRefData.builder()
-                            .regionId("region id")
-                            .epimmsId("epimms id")
-                            .siteName("location name")
-                            .build()));
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-
-        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
-    }
-
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void shouldSetEarlyAdoptersFlag_whenFastTrackNihl(Boolean isLocationWhiteListed) {
-        DynamicList localOptions = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            )
-            .build();
-
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson)
-            .fastClaims(List.of(FastTrack.fastClaimNoiseInducedHearingLoss))
-            .isSdoR2NewScreen(YES)
-            .disposalHearingMethodInPerson(localOptions)
-            .claimsTrack(ClaimsTrack.fastTrack)
-            .setFastTrackFlag(YES)
-            .drawDirectionsOrderRequired(NO)
-            .sdoR2Trial(SdoR2Trial.builder().hearingCourtLocationList(localOptions.toBuilder().value(selectedCourt).build()).build())
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-        when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())).thenReturn(
-            isLocationWhiteListed);
-        when(featureToggleService.isLocationWhiteListedForCaseProgression((selectedCourt.getCode()))).thenReturn(
-            isLocationWhiteListed);
-        when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
-            CallbackParams.Params.BEARER_TOKEN).toString())).thenReturn(
-            Optional.of(LocationRefData.builder()
-                            .regionId("region id")
-                            .epimmsId("epimms id")
-                            .siteName("location name")
-                            .build()));
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-
-        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
-    }
-
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void shouldSetEarlyAdoptersFlag_whenFastTrackNihlAltLocation(Boolean isLocationWhiteListed) {
-        DynamicList localOptions = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            )
-            .build();
-
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson)
-            .fastClaims(List.of(FastTrack.fastClaimNoiseInducedHearingLoss))
-            .isSdoR2NewScreen(YES)
-            .disposalHearingMethodInPerson(localOptions)
-            .claimsTrack(ClaimsTrack.fastTrack)
-            .setFastTrackFlag(YES)
-            .drawDirectionsOrderRequired(NO)
-            .sdoR2Trial(SdoR2Trial.builder().altHearingCourtLocationList(localOptions.toBuilder().value(selectedCourt).build()).build())
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-        when(featureToggleService.isLocationWhiteListedForCaseProgression(selectedCourt.getCode()))
-            .thenReturn(isLocationWhiteListed);
-        when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())).thenReturn(
-            isLocationWhiteListed);
-        when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
-            CallbackParams.Params.BEARER_TOKEN).toString())).thenReturn(
-            Optional.of(LocationRefData.builder()
-                            .regionId("region id")
-                            .epimmsId("epimms id")
-                            .siteName("location name")
-                            .build()));
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-
-        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
-    }
-
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void shouldSetEarlyAdoptersFlag_whenSmallClaimsDRH(Boolean isLocationWhiteListed) {
-        DynamicList localOptions = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            )
-            .build();
-
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .smallClaimsMethodInPerson(localOptions)
-            .isSdoR2NewScreen(YES)
-            .claimsTrack(ClaimsTrack.smallClaimsTrack)
-            .setSmallClaimsFlag(YES)
-            .drawDirectionsOrderRequired(NO)
-            .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
-            .sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder().hearingCourtLocationList(localOptions.toBuilder().value(
-                selectedCourt).build()).build())
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-        when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())).thenReturn(
-            isLocationWhiteListed);
-        when(featureToggleService.isLocationWhiteListedForCaseProgression((selectedCourt.getCode()))).thenReturn(
-            isLocationWhiteListed);
-        when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
-            CallbackParams.Params.BEARER_TOKEN).toString())).thenReturn(
-            Optional.of(LocationRefData.builder()
-                            .regionId("region id")
-                            .epimmsId("epimms id")
-                            .siteName("location name")
-                            .build()));
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-
-        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
-        assertThat(responseCaseData.getSdoR2SmallClaimsHearing().getHearingCourtLocationList().getListItems()).isNull();
-    }
-
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void shouldSetEarlyAdoptersFlag_whenSmallClaimsAndNotDRH(Boolean isLocationWhiteListed) {
-        DynamicList localOptions = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            )
-            .build();
-
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .smallClaimsMethodInPerson(localOptions.toBuilder().value(selectedCourt).build())
-            .claimsTrack(ClaimsTrack.smallClaimsTrack)
-            .setSmallClaimsFlag(YES)
-            .smallClaims(List.of(SmallTrack.smallClaimCreditHire))
-            .isSdoR2NewScreen(NO)
-            .drawDirectionsOrderRequired(NO)
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-        when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())).thenReturn(
-            isLocationWhiteListed);
-        when(featureToggleService.isLocationWhiteListedForCaseProgression((selectedCourt.getCode()))).thenReturn(
-            isLocationWhiteListed);
-        when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
-            CallbackParams.Params.BEARER_TOKEN).toString())).thenReturn(
-            Optional.of(LocationRefData.builder()
-                            .regionId("region id")
-                            .epimmsId("epimms id")
-                            .siteName("location name")
-                            .build()));
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-
-        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
-    }
-
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void shouldSetEarlyAdoptersFlag_whenSmallClaimDRHAltLocation(Boolean isLocationWhiteListed) {
-        DynamicList localOptions = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            )
-            .build();
-
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .smallClaimsMethodInPerson(localOptions)
-            .isSdoR2NewScreen(YES)
-            .disposalHearingMethodInPerson(localOptions)
-            .claimsTrack(ClaimsTrack.smallClaimsTrack)
-            .setSmallClaimsFlag(YES)
-            .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
-            .drawDirectionsOrderRequired(NO)
-            .sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder().altHearingCourtLocationList(localOptions.toBuilder().value(
-                selectedCourt).build()).build())
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-        when(featureToggleService.isLocationWhiteListedForCaseProgression((selectedCourt.getCode()))).thenReturn(
-            isLocationWhiteListed);
-        when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())).thenReturn(
-            isLocationWhiteListed);
-        when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
-            CallbackParams.Params.BEARER_TOKEN).toString())).thenReturn(
-            Optional.of(LocationRefData.builder()
-                            .regionId("region id")
-                            .epimmsId("epimms id")
-                            .siteName("location name")
-                            .build()));
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
-    }
-
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void shouldSetEarlyAdoptersFlag_whenPartOfNationalRolloutAndNationalRolloutEnabled(Boolean isLocationWhiteListed) {
-        DynamicList options = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            )
-            .build();
-
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson)
-            .disposalHearingMethodInPerson(options.toBuilder().value(selectedCourt).build())
-            .fastTrackMethodInPerson(options)
-            .smallClaimsMethodInPerson(options)
-            .disposalHearingMethodInPerson(options.toBuilder().value(selectedCourt).build())
-            .disposalHearingMethodToggle(Collections.singletonList(OrderDetailsPagesSectionsToggle.SHOW))
-            .orderType(OrderType.DISPOSAL)
-            .build();
-
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isPartOfNationalRollout(eq(selectedCourt.getCode()))).thenReturn(
-            isLocationWhiteListed);
-        when(locationRefDataService.getLocationMatchingLabel(selectedCourt.getCode(), params.getParams().get(
-            CallbackParams.Params.BEARER_TOKEN).toString()))
-            .thenReturn(Optional.of(LocationRefData.builder()
-                                        .regionId("region id")
-                                        .epimmsId("epimms id")
-                                        .siteName("site name")
-                                        .build()));
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-
-        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
     }
 
     @ParameterizedTest
@@ -1451,8 +1034,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isPartOfNationalRollout(eq(selectedCourt.getCode()))).thenReturn(
-            isLocationWhiteListed);
         when(featureToggleService.isHmcEnabled()).thenReturn(true);
         when(featureToggleService.isLocationWhiteListedForCaseProgression(eq(selectedCourt.getCode()))).thenReturn(
             isLocationWhiteListed);
@@ -1467,7 +1048,30 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
-        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
+        assertThat(responseCaseData.getHmcEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "true, NO, NO, YES",
+        "false, NO, NO, NO",
+        "true, YES, NO, YES"
+    })
+    void shouldSetEaCourtLocationBasedOnConditions(boolean isLocationWhiteListed, YesOrNo applicant1Represented, YesOrNo respondent1Represented, YesOrNo expectedEaCourtLocation) {
+        DynamicListElement selectedCourt = DynamicListElement.builder()
+            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+            .respondent1Represented(respondent1Represented)
+            .applicant1Represented(applicant1Represented)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isLocationWhiteListed);
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+        assertEquals(expectedEaCourtLocation, responseCaseData.getEaCourtLocation());
     }
 
     @Test
@@ -1494,8 +1098,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .disposalHearingMethodToggle(Collections.singletonList(OrderDetailsPagesSectionsToggle.SHOW))
             .orderType(OrderType.DISPOSAL)
             .build();
-        when(featureToggleService.isPartOfNationalRollout(eq(selectedCourt.getCode()))).thenReturn(
-            true);
         when(featureToggleService.isHmcEnabled()).thenReturn(true);
         when(featureToggleService.isLocationWhiteListedForCaseProgression(eq(selectedCourt.getCode()))).thenReturn(true);
 
@@ -1678,7 +1280,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     void whenClaimUnspecAndJudgeSelects_changeTrackOrMaintainAllocatedTrack(CaseData caseData, AllocatedTrack expectedAllocatedTrack) {
         // When judge selects a different track to which the claim is currently on, update allocatedTrack to match selection
         // or maintain allocatedTrack if selection already corresponds with selection made.
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -1767,7 +1368,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     void whenClaimSpecAndJudgeSelects_changeTrackOrMaintainClaimResponseTrack(CaseData caseData, String expectedClaimResponseTrack) {
         // When judge selects a different track to which the claim is currently on, update ClaimResponseTrack to match selection
         // or maintain ClaimResponseTrack if selection already corresponds with selection made.
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
