@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.prepopulateddor2andnihlfields;
+package uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,18 +14,34 @@ import uk.gov.hmcts.reform.civil.enums.sdo.PhysicalTrialBundleOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions;
-import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.CreateSDOCallbackHandlerUtils;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2AddendumReport;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ApplicationToRelyOnFurther;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ApplicationToRelyOnFurtherDetails;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2DisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2EvidenceAcousticEngineer;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ExpertEvidence;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FurtherAudiogram;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2PermissionToRelyOnExpert;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsClaimantExpert;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsToEntExpert;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictNoOfPagesDetails;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictNoOfWitnessDetails;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictPages;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictWitness;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ScheduleOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsBundleOfDocs;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingFirstOpenDateAfter;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingWindow;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsImpNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsMediation;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsPPI;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsRestrictPages;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsRestrictWitness;
@@ -34,7 +50,9 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialFirstOpenDateAfter;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialWindow;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2UploadOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -56,7 +74,6 @@ public class PrePopulateSdoR2AndNihlFields {
     private final LocationHelper locationHelper;
     private final CreateSDOCallbackHandlerUtils createSDOCallbackHandlerUtils;
     private final List<IncludeInOrderToggle> includeInOrderToggle = List.of(IncludeInOrderToggle.INCLUDE);
-    private final List<SdoR2AndNihlCaseFieldBuilder> prePopulateSdoR2AndNihlFields;
 
     public void populateDRHFields(CallbackParams callbackParams,
                                   CaseData.CaseDataBuilder<?, ?> updatedData,
@@ -71,7 +88,7 @@ public class PrePopulateSdoR2AndNihlFields {
 
         CaseData caseData = callbackParams.getCaseData();
         if (featureToggleService.isCarmEnabledForCase(caseData)) {
-            prePopulateSdoR2AndNihlFields.forEach(builder -> builder.build(updatedData));
+            setCarmFields(updatedData);
         }
     }
 
@@ -134,11 +151,31 @@ public class PrePopulateSdoR2AndNihlFields {
         updatedData.sdoR2DrhUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
     }
 
+    private void setCarmFields(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        updatedData.sdoR2SmallClaimsMediationSectionToggle(includeInOrderToggle);
+        updatedData.sdoR2SmallClaimsMediationSectionStatement(SdoR2SmallClaimsMediation.builder()
+                .input(SdoR2UiConstantSmallClaim.CARM_MEDIATION_TEXT)
+                .build());
+    }
+
     public void prePopulateNihlFields(CaseData.CaseDataBuilder<?, ?> updatedData, DynamicList hearingMethodList,
                                       Optional<RequestedCourt> preferredCourt, List<LocationRefData> locationRefDataList) {
         setHearingMethodInPerson(hearingMethodList);
-        prePopulateSdoR2AndNihlFields.forEach(builder -> builder.build(updatedData));
+        setFastTrackJudgesRecital(updatedData);
+        setDisclosureOfDocuments(updatedData);
+        setWitnessesOfFact(updatedData);
+        setScheduleOfLoss(updatedData);
         setTrialDetails(updatedData, hearingMethodList, preferredCourt, locationRefDataList);
+        setImportantNotes(updatedData);
+        setExpertEvidence(updatedData);
+        setAddendumReport(updatedData);
+        setFurtherAudiogram(updatedData);
+        setQuestionsClaimantExpert(updatedData);
+        setPermissionToRelyOnExpert(updatedData);
+        setEvidenceAcousticEngineer(updatedData);
+        setQuestionsToEntExpert(updatedData);
+        setUploadOfDocuments(updatedData);
+        setWelshLanguageUsage(updatedData);
     }
 
     private void setHearingMethodInPerson(DynamicList hearingMethodList) {
@@ -147,6 +184,57 @@ public class PrePopulateSdoR2AndNihlFields {
                 .findFirst()
                 .orElse(null);
         hearingMethodList.setValue(hearingMethodInPerson);
+    }
+
+    private void setFastTrackJudgesRecital(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        updatedData.sdoFastTrackJudgesRecital(FastTrackJudgesRecital.builder()
+                .input(SdoR2UiConstantFastTrack.JUDGE_RECITAL).build());
+    }
+
+    private void setDisclosureOfDocuments(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        updatedData.sdoR2DisclosureOfDocuments(SdoR2DisclosureOfDocuments.builder()
+                .standardDisclosureTxt(SdoR2UiConstantFastTrack.STANDARD_DISCLOSURE)
+                .standardDisclosureDate(LocalDate.now().plusDays(28))
+                .inspectionTxt(SdoR2UiConstantFastTrack.INSPECTION)
+                .inspectionDate(LocalDate.now().plusDays(42))
+                .requestsWillBeCompiledLabel(SdoR2UiConstantFastTrack.REQUEST_COMPILED_WITH)
+                .build());
+    }
+
+    private void setWitnessesOfFact(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        updatedData.sdoR2WitnessesOfFact(SdoR2WitnessOfFact.builder()
+                .sdoStatementOfWitness(SdoR2UiConstantFastTrack.STATEMENT_WITNESS)
+                .sdoR2RestrictWitness(SdoR2RestrictWitness.builder()
+                        .isRestrictWitness(NO)
+                        .restrictNoOfWitnessDetails(SdoR2RestrictNoOfWitnessDetails.builder()
+                                .noOfWitnessClaimant(3)
+                                .noOfWitnessDefendant(3)
+                                .partyIsCountedAsWitnessTxt(SdoR2UiConstantFastTrack.RESTRICT_WITNESS_TEXT)
+                                .build())
+                        .build())
+                .sdoRestrictPages(SdoR2RestrictPages.builder()
+                        .isRestrictPages(NO)
+                        .restrictNoOfPagesDetails(SdoR2RestrictNoOfPagesDetails.builder()
+                                .witnessShouldNotMoreThanTxt(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT1)
+                                .noOfPages(12)
+                                .fontDetails(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT2)
+                                .build())
+                        .build())
+                .sdoWitnessDeadline(SdoR2UiConstantFastTrack.DEADLINE)
+                .sdoWitnessDeadlineDate(LocalDate.now().plusDays(70))
+                .sdoWitnessDeadlineText(SdoR2UiConstantFastTrack.DEADLINE_EVIDENCE)
+                .build());
+    }
+
+    private void setScheduleOfLoss(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        updatedData.sdoR2ScheduleOfLoss(SdoR2ScheduleOfLoss.builder()
+                .sdoR2ScheduleOfLossClaimantText(SdoR2UiConstantFastTrack.SCHEDULE_OF_LOSS_CLAIMANT)
+                .isClaimForPecuniaryLoss(NO)
+                .sdoR2ScheduleOfLossClaimantDate(LocalDate.now().plusDays(364))
+                .sdoR2ScheduleOfLossDefendantText(SdoR2UiConstantFastTrack.SCHEDULE_OF_LOSS_DEFENDANT)
+                .sdoR2ScheduleOfLossDefendantDate(LocalDate.now().plusDays(378))
+                .sdoR2ScheduleOfLossPecuniaryLossTxt(SdoR2UiConstantFastTrack.PECUNIARY_LOSS)
+                .build());
     }
 
     private void setTrialDetails(CaseData.CaseDataBuilder<?, ?> updatedData, DynamicList hearingMethodList,
@@ -168,6 +256,102 @@ public class PrePopulateSdoR2AndNihlFields {
                         .build())
                 .altHearingCourtLocationList(getAlternativeCourtLocationsForNihl(locationRefDataList))
                 .physicalBundlePartyTxt(SdoR2UiConstantFastTrack.PHYSICAL_TRIAL_BUNDLE)
+                .build());
+    }
+
+    private void setImportantNotes(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        updatedData.sdoR2ImportantNotesTxt(SdoR2UiConstantFastTrack.IMPORTANT_NOTES);
+        updatedData.sdoR2ImportantNotesDate(LocalDate.now().plusDays(7));
+    }
+
+    private void setExpertEvidence(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        updatedData.sdoR2ExpertEvidence(SdoR2ExpertEvidence.builder()
+                .sdoClaimantPermissionToRelyTxt(SdoR2UiConstantFastTrack.CLAIMANT_PERMISSION_TO_RELY)
+                .build());
+    }
+
+    private void setAddendumReport(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        updatedData.sdoR2AddendumReport(SdoR2AddendumReport.builder()
+                .sdoAddendumReportTxt(SdoR2UiConstantFastTrack.ADDENDUM_REPORT)
+                .sdoAddendumReportDate(LocalDate.now().plusDays(56))
+                .build());
+    }
+
+    private void setFurtherAudiogram(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        updatedData.sdoR2FurtherAudiogram(SdoR2FurtherAudiogram.builder()
+                .sdoClaimantShallUndergoTxt(SdoR2UiConstantFastTrack.CLAIMANT_SHALL_UNDERGO)
+                .sdoServiceReportTxt(SdoR2UiConstantFastTrack.SERVICE_REPORT)
+                .sdoClaimantShallUndergoDate(LocalDate.now().plusDays(42))
+                .sdoServiceReportDate(LocalDate.now().plusDays(98))
+                .build());
+    }
+
+    private void setQuestionsClaimantExpert(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        updatedData.sdoR2QuestionsClaimantExpert(SdoR2QuestionsClaimantExpert.builder()
+                .sdoDefendantMayAskTxt(SdoR2UiConstantFastTrack.DEFENDANT_MAY_ASK)
+                .sdoDefendantMayAskDate(LocalDate.now().plusDays(126))
+                .sdoQuestionsShallBeAnsweredTxt(SdoR2UiConstantFastTrack.QUESTIONS_SHALL_BE_ANSWERED)
+                .sdoQuestionsShallBeAnsweredDate(LocalDate.now().plusDays(147))
+                .sdoUploadedToDigitalPortalTxt(SdoR2UiConstantFastTrack.UPLOADED_TO_DIGITAL_PORTAL)
+                .sdoApplicationToRelyOnFurther(SdoR2ApplicationToRelyOnFurther.builder()
+                        .doRequireApplicationToRely(NO)
+                        .applicationToRelyOnFurtherDetails(SdoR2ApplicationToRelyOnFurtherDetails.builder()
+                                .applicationToRelyDetailsTxt(SdoR2UiConstantFastTrack.APPLICATION_TO_RELY_DETAILS)
+                                .applicationToRelyDetailsDate(LocalDate.now().plusDays(161))
+                                .build())
+                        .build())
+                .build());
+    }
+
+    private void setPermissionToRelyOnExpert(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        updatedData.sdoR2PermissionToRelyOnExpert(SdoR2PermissionToRelyOnExpert.builder()
+                .sdoPermissionToRelyOnExpertTxt(SdoR2UiConstantFastTrack.PERMISSION_TO_RELY_ON_EXPERT)
+                .sdoPermissionToRelyOnExpertDate(LocalDate.now().plusDays(119))
+                .sdoJointMeetingOfExpertsTxt(SdoR2UiConstantFastTrack.JOINT_MEETING_OF_EXPERTS)
+                .sdoJointMeetingOfExpertsDate(LocalDate.now().plusDays(147))
+                .sdoUploadedToDigitalPortalTxt(SdoR2UiConstantFastTrack.UPLOADED_TO_DIGITAL_PORTAL_7_DAYS)
+                .build());
+    }
+
+    private void setEvidenceAcousticEngineer(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        updatedData.sdoR2EvidenceAcousticEngineer(SdoR2EvidenceAcousticEngineer.builder()
+                .sdoEvidenceAcousticEngineerTxt(SdoR2UiConstantFastTrack.EVIDENCE_ACOUSTIC_ENGINEER)
+                .sdoInstructionOfTheExpertTxt(SdoR2UiConstantFastTrack.INSTRUCTION_OF_EXPERT)
+                .sdoInstructionOfTheExpertDate(LocalDate.now().plusDays(42))
+                .sdoInstructionOfTheExpertTxtArea(SdoR2UiConstantFastTrack.INSTRUCTION_OF_EXPERT_TA)
+                .sdoExpertReportTxt(SdoR2UiConstantFastTrack.EXPERT_REPORT)
+                .sdoExpertReportDate(LocalDate.now().plusDays(280))
+                .sdoExpertReportDigitalPortalTxt(SdoR2UiConstantFastTrack.EXPERT_REPORT_DIGITAL_PORTAL)
+                .sdoWrittenQuestionsTxt(SdoR2UiConstantFastTrack.WRITTEN_QUESTIONS)
+                .sdoWrittenQuestionsDate(LocalDate.now().plusDays(294))
+                .sdoWrittenQuestionsDigitalPortalTxt(SdoR2UiConstantFastTrack.WRITTEN_QUESTIONS_DIGITAL_PORTAL)
+                .sdoRepliesTxt(SdoR2UiConstantFastTrack.REPLIES)
+                .sdoRepliesDate(LocalDate.now().plusDays(315))
+                .sdoRepliesDigitalPortalTxt(SdoR2UiConstantFastTrack.REPLIES_DIGITAL_PORTAL)
+                .sdoServiceOfOrderTxt(SdoR2UiConstantFastTrack.SERVICE_OF_ORDER)
+                .build());
+    }
+
+    private void setQuestionsToEntExpert(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        updatedData.sdoR2QuestionsToEntExpert(SdoR2QuestionsToEntExpert.builder()
+                .sdoWrittenQuestionsTxt(SdoR2UiConstantFastTrack.ENT_WRITTEN_QUESTIONS)
+                .sdoWrittenQuestionsDate(LocalDate.now().plusDays(336))
+                .sdoWrittenQuestionsDigPortalTxt(SdoR2UiConstantFastTrack.ENT_WRITTEN_QUESTIONS_DIG_PORTAL)
+                .sdoQuestionsShallBeAnsweredTxt(SdoR2UiConstantFastTrack.ENT_QUESTIONS_SHALL_BE_ANSWERED)
+                .sdoQuestionsShallBeAnsweredDate(LocalDate.now().plusDays(350))
+                .sdoShallBeUploadedTxt(SdoR2UiConstantFastTrack.ENT_SHALL_BE_UPLOADED)
+                .build());
+    }
+
+    private void setUploadOfDocuments(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        updatedData.sdoR2UploadOfDocuments(SdoR2UploadOfDocuments.builder()
+                .sdoUploadOfDocumentsTxt(SdoR2UiConstantFastTrack.UPLOAD_OF_DOCUMENTS)
+                .build());
+    }
+
+    private void setWelshLanguageUsage(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        updatedData.sdoR2NihlUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder()
+                .description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION)
                 .build());
     }
 
