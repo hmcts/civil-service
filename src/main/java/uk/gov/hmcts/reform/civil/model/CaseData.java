@@ -736,6 +736,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private CoscApplicationStatus coSCApplicationStatus;
     private YesOrNo obligationDatePresent;
     private CourtStaffNextSteps courtStaffNextSteps;
+    private List<Element<ObligationData>> obligationData;
 
 
     /**
