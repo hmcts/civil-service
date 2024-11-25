@@ -12,7 +12,6 @@ public class Query {
     private final QueryBuilder queryBuilder;
     private final List<String> dataToReturn;
     private final int startIndex;
-    private int size;
     private boolean initialSearch;
     private String searchAfterValue;
 
@@ -26,12 +25,11 @@ public class Query {
         this.startIndex = startIndex;
     }
 
-    public Query(QueryBuilder queryBuilder, List<String> dataToReturn, int startIndex, int size,
+    public Query(QueryBuilder queryBuilder, List<String> dataToReturn, int startIndex,
                  boolean initialSearch, String searchAfterValue) {
         this.queryBuilder = queryBuilder;
         this.dataToReturn = dataToReturn;
         this.startIndex = startIndex;
-        this.size = size;
         this.initialSearch = initialSearch;
         this.searchAfterValue = searchAfterValue;
     }
@@ -57,7 +55,7 @@ public class Query {
         return "{"
             + "\"query\": " + queryBuilder.toString() + ", "
             + "\"_source\": " + toJSONString(dataToReturn) + ", "
-            + " \"size\": " + size + ","
+            + " \"size\": 10,"
             + "\"sort\": ["
             + "{"
             + "\"reference.keyword\": \"asc\""
@@ -67,11 +65,11 @@ public class Query {
     }
 
     private String getInitialQuery() {
-        return String.format(getStartQuery(), size) + END_QUERY;
+        return getStartQuery() + END_QUERY;
     }
 
     private String getSubsequentQuery() {
-        return String.format(getStartQuery(), size) + "," + String.format(SEARCH_AFTER, searchAfterValue) + END_QUERY;
+        return getStartQuery() + "," + String.format(SEARCH_AFTER, searchAfterValue) + END_QUERY;
     }
 
     private static final String END_QUERY = "\n}";

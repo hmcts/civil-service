@@ -56,7 +56,7 @@ public abstract class ElasticSearchService {
             }
             for (int i = 1; i < pages; i++) {
                 String searchAfterValue = searchResult.getCases().get(searchResult.getCases().size() - 1).getId().toString();
-                SearchResult result = coreCaseDataService.searchMediationCases(queryInMediationCases(i * ES_DEFAULT_SEARCH_LIMIT, claimMovedDate,
+                SearchResult result = coreCaseDataService.searchMediationCases(queryInMediationCases(START_INDEX, claimMovedDate,
                                                                                             carmEnabled, false, searchAfterValue));
                 if (!result.getCases().isEmpty()) {
                     StringBuilder sb = new StringBuilder().append("Page ").append(i).append(" Mediation query case IDs: ");

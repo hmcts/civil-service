@@ -12,7 +12,6 @@ import java.time.format.DateTimeFormatter;
 
 import static java.util.Collections.emptyList;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
@@ -62,7 +61,6 @@ public class MediationCasesSearchService extends ElasticSearchService {
                                 .must(matchQuery("data.claimMovedToMediationOn", targetDateString))),
                 emptyList(),
                 startIndex,
-                10,
                 initialSearch,
                 searchAfterValue
             );

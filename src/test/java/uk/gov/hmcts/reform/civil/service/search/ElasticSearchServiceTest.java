@@ -141,8 +141,8 @@ abstract class ElasticSearchServiceTest {
         List<Query> capturedQueries = queryCaptor.getAllValues();
         assertThat(capturedQueries.get(0)).usingRecursiveComparison()
             .isEqualTo(buildQueryInMediation(0, LocalDate.now().minusDays(1), true, true, null));
-        assertThat(capturedQueries.get(0)).usingRecursiveComparison()
-            .isEqualTo(buildQueryInMediation(0, LocalDate.now().minusDays(1), true, false, "1L"));
+        assertThat(capturedQueries.get(1)).usingRecursiveComparison()
+            .isEqualTo(buildQueryInMediation(0, LocalDate.now().minusDays(1), true, false, "1"));
     }
 
     @Test

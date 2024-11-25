@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
@@ -41,7 +40,7 @@ public class MediationCasesSearchServiceTest extends ElasticSearchServiceTest {
                             .must(boolQuery().must(matchQuery("state", "IN_MEDIATION")))
                             .must(boolQuery().must(rangeQuery("data.submittedDate").gte(CARM_DATE)))
                             .must(matchQuery("data.claimMovedToMediationOn", targetDateString)));
-            return new Query(query, Collections.emptyList(), fromValue);
+            return new Query(query, Collections.emptyList(), fromValue, initialSearch, searchAfterValue);
         } else {
             BoolQueryBuilder query = boolQuery()
                 .minimumShouldMatch(1)
