@@ -8,13 +8,15 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import java.util.Optional;
 
 import static java.lang.String.format;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 
 @Component
 public class JudgmentByAdmissionConfHeader implements RespondToResponseConfirmationHeaderGenerator {
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        if (CaseState.All_FINAL_ORDERS_ISSUED == caseData.getCcdState()) {
+        if (CaseState.All_FINAL_ORDERS_ISSUED == caseData.getCcdState()
+            && (caseData.isPayBySetDate() || caseData.isPayByInstallment())) {
             String claimNumber = caseData.getLegacyCaseReference();
             return Optional.of(format(
                 "# Judgment Submitted %n## A county court judgment(CCJ) has been submitted for case %s",
