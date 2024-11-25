@@ -39,28 +39,28 @@ class PrePopulateSdoR2AndNihlFieldsTest {
     @Test
     void shouldPopulateDRHFields_whenCalled() {
         CallbackParams callbackParams = CallbackParams.builder()
-            .caseData(CaseData.builder().build())
-            .build();
+                .caseData(CaseData.builder().build())
+                .build();
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder();
 
         DynamicList hearingMethodList = DynamicList.builder()
-            .listItems(List.of(
-                DynamicListElement.builder().code("TELEPHONE").label("Telephone").build(),
-                DynamicListElement.builder().code("IN_PERSON").label("In Person").build()
-            ))
-            .build();
+                .listItems(List.of(
+                        DynamicListElement.builder().code("TELEPHONE").label("Telephone").build(),
+                        DynamicListElement.builder().code("IN_PERSON").label("In Person").build()
+                ))
+                .build();
 
         List<LocationRefData> locationRefDataList = List.of(
-            LocationRefData.builder()
-                .courtLocationCode("LOC001")
-                .courtName("Test Court")
-                .build()
+                LocationRefData.builder()
+                        .courtLocationCode("LOC001")
+                        .courtName("Test Court")
+                        .build()
         );
 
         RequestedCourt requestedCourt = RequestedCourt.builder()
-            .responseCourtCode("123")
-            .build();
+                .responseCourtCode("123")
+                .build();
 
         prePopulateSdoR2AndNihlFields.populateDRHFields(callbackParams, caseDataBuilder, Optional.of(requestedCourt), hearingMethodList, locationRefDataList);
 
@@ -72,22 +72,22 @@ class PrePopulateSdoR2AndNihlFieldsTest {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder();
 
         DynamicList hearingMethodList = DynamicList.builder()
-            .listItems(List.of(
-                DynamicListElement.builder().code("TELEPHONE").label("Telephone").build(),
-                DynamicListElement.builder().code("IN_PERSON").label("In Person").build()
-            ))
-            .build();
+                .listItems(List.of(
+                        DynamicListElement.builder().code("TELEPHONE").label("Telephone").build(),
+                        DynamicListElement.builder().code("IN_PERSON").label("In Person").build()
+                ))
+                .build();
 
         List<LocationRefData> locationRefDataList = List.of(
-            LocationRefData.builder()
-                .courtLocationCode("LOC001")
-                .courtName("Test Court")
-                .build()
+                LocationRefData.builder()
+                        .courtLocationCode("LOC001")
+                        .courtName("Test Court")
+                        .build()
         );
 
         RequestedCourt requestedCourt = RequestedCourt.builder()
-            .responseCourtCode("123")
-            .build();
+                .responseCourtCode("123")
+                .build();
 
         prePopulateSdoR2AndNihlFields.prePopulateNihlFields(caseDataBuilder, hearingMethodList, Optional.of(requestedCourt), locationRefDataList);
 

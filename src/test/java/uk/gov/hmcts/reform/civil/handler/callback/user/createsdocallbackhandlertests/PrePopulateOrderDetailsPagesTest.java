@@ -71,61 +71,61 @@ class PrePopulateOrderDetailsPagesTest {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         prePopulateOrderDetailsPages = new PrePopulateOrderDetailsPages(
-            objectMapper,
-            locationRefDataService,
-            workingDayIndicator,
-            featureToggleService,
-            locationHelper,
-            smallClaimsPopulator,
-            createSDOCallbackHandlerUtils,
-            fastTrackPopulator,
-            disposalHearingPopulator,
-            prePopulateSdoR2AndNihlFields,
-            TEST_CCMCC_AMOUNT,
-            TEST_CCMCC_EPIMMS_ID
+                objectMapper,
+                locationRefDataService,
+                workingDayIndicator,
+                featureToggleService,
+                locationHelper,
+                smallClaimsPopulator,
+                createSDOCallbackHandlerUtils,
+                fastTrackPopulator,
+                disposalHearingPopulator,
+                prePopulateSdoR2AndNihlFields,
+                TEST_CCMCC_AMOUNT,
+                TEST_CCMCC_EPIMMS_ID
         );
 
         when(createSDOCallbackHandlerUtils.getDynamicHearingMethodList(any(CallbackParams.class), any(CaseData.class)))
-            .thenReturn(createSampleDynamicList());
+                .thenReturn(createSampleDynamicList());
     }
 
     private DynamicList createSampleDynamicList() {
         DynamicListElement inPerson = DynamicListElement.builder()
-            .code("IN_PERSON")
-            .label("In Person")
-            .build();
+                .code("IN_PERSON")
+                .label("In Person")
+                .build();
 
         DynamicListElement telephone = DynamicListElement.builder()
-            .code("TELEPHONE")
-            .label("Telephone")
-            .build();
+                .code("TELEPHONE")
+                .label("Telephone")
+                .build();
 
         DynamicListElement video = DynamicListElement.builder()
-            .code("VIDEO")
-            .label("Video")
-            .build();
+                .code("VIDEO")
+                .label("Video")
+                .build();
 
         List<DynamicListElement> listItems = List.of(inPerson, telephone, video);
 
         return DynamicList.builder()
-            .listItems(listItems)
-            .value(inPerson)
-            .build();
+                .listItems(listItems)
+                .value(inPerson)
+                .build();
     }
 
     @Test
     void shouldPrePopulateOrderDetailsPages_whenSdoR2Enabled() {
         CaseData caseData = CaseData.builder()
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .totalClaimAmount(BigDecimal.valueOf(10000))
-            .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_SDO)
-            .build();
+                .ccdState(CaseState.CASE_PROGRESSION)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .totalClaimAmount(BigDecimal.valueOf(10000))
+                .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_SDO)
+                .build();
         CallbackParams callbackParams = CallbackParams.builder()
-            .caseData(caseData)
-            .version(V_1)
-            .params(Map.of(BEARER_TOKEN, "test-token"))
-            .build();
+                .caseData(caseData)
+                .version(V_1)
+                .params(Map.of(BEARER_TOKEN, "test-token"))
+                .build();
 
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(LocalDate.now().plusDays(1));
@@ -142,15 +142,15 @@ class PrePopulateOrderDetailsPagesTest {
     @Test
     void shouldPrePopulateOrderDetailsPages_whenSdoR2EnabledWithoutVersion() {
         CaseData caseData = CaseData.builder()
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .totalClaimAmount(BigDecimal.valueOf(10000))
-            .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_SDO)
-            .build();
+                .ccdState(CaseState.CASE_PROGRESSION)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .totalClaimAmount(BigDecimal.valueOf(10000))
+                .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_SDO)
+                .build();
         CallbackParams callbackParams = CallbackParams.builder()
-            .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "test-token"))
-            .build();
+                .caseData(caseData)
+                .params(Map.of(BEARER_TOKEN, "test-token"))
+                .build();
 
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(LocalDate.now().plusDays(1));
@@ -169,16 +169,16 @@ class PrePopulateOrderDetailsPagesTest {
         when(featureToggleService.isSdoR2Enabled()).thenReturn(false);
 
         CaseData caseData = CaseData.builder()
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .totalClaimAmount(BigDecimal.valueOf(10000))
-            .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_SDO)
-            .build();
+                .ccdState(CaseState.CASE_PROGRESSION)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .totalClaimAmount(BigDecimal.valueOf(10000))
+                .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_SDO)
+                .build();
         CallbackParams callbackParams = CallbackParams.builder()
-            .caseData(caseData)
-            .version(V_1)
-            .params(Map.of(BEARER_TOKEN, "test-token"))
-            .build();
+                .caseData(caseData)
+                .version(V_1)
+                .params(Map.of(BEARER_TOKEN, "test-token"))
+                .build();
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) prePopulateOrderDetailsPages.execute(callbackParams);
 
@@ -188,16 +188,16 @@ class PrePopulateOrderDetailsPagesTest {
     @Test
     void shouldPrePopulateOrderDetailsPages_whenCarmEnabledForCase() {
         CaseData caseData = CaseData.builder()
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .totalClaimAmount(BigDecimal.valueOf(10000))
-            .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_SDO)
-            .build();
+                .ccdState(CaseState.CASE_PROGRESSION)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .totalClaimAmount(BigDecimal.valueOf(10000))
+                .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_SDO)
+                .build();
         CallbackParams callbackParams = CallbackParams.builder()
-            .caseData(caseData)
-            .version(V_1)
-            .params(Map.of(BEARER_TOKEN, "test-token"))
-            .build();
+                .caseData(caseData)
+                .version(V_1)
+                .params(Map.of(BEARER_TOKEN, "test-token"))
+                .build();
 
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(LocalDate.now().plusDays(1));
@@ -213,16 +213,16 @@ class PrePopulateOrderDetailsPagesTest {
     @Test
     void shouldUpdateCaseManagementLocationIfSpecClaim1000OrLessAndCcmcc() {
         CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(TEST_CCMCC_EPIMMS_ID).region(
-                "ccmcRegion").build())
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .build();
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(TEST_CCMCC_EPIMMS_ID).region(
+                        "ccmcRegion").build())
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .build();
         CallbackParams callbackParams = CallbackParams.builder()
-            .caseData(caseData)
-            .version(V_1)
-            .params(Map.of(BEARER_TOKEN, "test-token"))
-            .build();
+                .caseData(caseData)
+                .version(V_1)
+                .params(Map.of(BEARER_TOKEN, "test-token"))
+                .build();
 
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(LocalDate.now().plusDays(1));

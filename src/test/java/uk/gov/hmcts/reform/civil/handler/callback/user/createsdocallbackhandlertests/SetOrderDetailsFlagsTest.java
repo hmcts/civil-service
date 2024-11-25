@@ -41,16 +41,16 @@ class SetOrderDetailsFlagsTest {
         objectMapper.registerModule(new JavaTimeModule());
         setOrderDetailsFlags = new SetOrderDetailsFlags(objectMapper, featureToggleService);
         callbackParams = CallbackParams.builder()
-            .caseData(CaseData.builder().build())
-            .build();
+                .caseData(CaseData.builder().build())
+                .build();
     }
 
     @Test
     void shouldSetFlagsToNoWhenFeatureToggleIsEnabled() {
         CaseData caseData = CaseData.builder().build();
         callbackParams = CallbackParams.builder()
-            .caseData(caseData)
-            .build();
+                .caseData(caseData)
+                .build();
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) setOrderDetailsFlags.execute(callbackParams);
 
@@ -62,8 +62,8 @@ class SetOrderDetailsFlagsTest {
     void shouldSetIsSdoR2NewScreenToNoWhenFeatureToggleIsEnabled() {
         CaseData caseData = CaseData.builder().build();
         callbackParams = CallbackParams.builder()
-            .caseData(caseData)
-            .build();
+                .caseData(caseData)
+                .build();
 
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
 
@@ -75,13 +75,13 @@ class SetOrderDetailsFlagsTest {
     @Test
     void shouldSetSmallClaimsFlagToYesWhenSmallClaimsTrack() {
         CaseData caseData = CaseData.builder()
-            .drawDirectionsOrderRequired(NO)
-            .claimsTrack(ClaimsTrack.smallClaimsTrack)
-            .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
-            .build();
+                .drawDirectionsOrderRequired(NO)
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+                .build();
         CallbackParams params = CallbackParams.builder()
-            .caseData(caseData)
-            .build();
+                .caseData(caseData)
+                .build();
 
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
 
@@ -94,14 +94,14 @@ class SetOrderDetailsFlagsTest {
     @Test
     void shouldSetFastTrackFlagToYesWhenFastTrack() {
         CaseData caseData = CaseData.builder()
-            .drawDirectionsOrderRequired(NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
-            .orderType(OrderType.DECIDE_DAMAGES)
-            .fastClaims(List.of(FastTrack.fastClaimNoiseInducedHearingLoss))
-            .build();
+                .drawDirectionsOrderRequired(NO)
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .orderType(OrderType.DECIDE_DAMAGES)
+                .fastClaims(List.of(FastTrack.fastClaimNoiseInducedHearingLoss))
+                .build();
         CallbackParams params = CallbackParams.builder()
-            .caseData(caseData)
-            .build();
+                .caseData(caseData)
+                .build();
 
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
 
@@ -113,22 +113,22 @@ class SetOrderDetailsFlagsTest {
     @Test
     void shouldSetJudgementDeductionValues() {
         CaseData caseData = CaseData.builder()
-            .drawDirectionsOrder(JudgementSum.builder().judgementSum(10.0).build())
-            .build();
+                .drawDirectionsOrder(JudgementSum.builder().judgementSum(10.0).build())
+                .build();
         CallbackParams params = CallbackParams.builder()
-            .caseData(caseData)
-            .build();
+                .caseData(caseData)
+                .build();
 
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) setOrderDetailsFlags.execute(params);
 
         assertThat(response.getData()).extracting("disposalHearingJudgementDeductionValue").extracting("value")
-            .isEqualTo("10.0%");
+                .isEqualTo("10.0%");
         assertThat(response.getData()).extracting("fastTrackJudgementDeductionValue").extracting("value")
-            .isEqualTo("10.0%");
+                .isEqualTo("10.0%");
         assertThat(response.getData()).extracting("smallClaimsJudgementDeductionValue").extracting("value")
-            .isEqualTo("10.0%");
+                .isEqualTo("10.0%");
     }
 
 }

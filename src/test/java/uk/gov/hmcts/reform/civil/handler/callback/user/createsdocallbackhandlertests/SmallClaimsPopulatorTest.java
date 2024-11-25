@@ -42,11 +42,11 @@ class SmallClaimsPopulatorTest {
     @BeforeEach
     void setUp() {
         caseData = CaseData.builder()
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .totalClaimAmount(BigDecimal.valueOf(10000))
-            .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_SDO)
-            .build();
+                .ccdState(CaseState.CASE_PROGRESSION)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .totalClaimAmount(BigDecimal.valueOf(10000))
+                .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_SDO)
+                .build();
     }
 
     @Test

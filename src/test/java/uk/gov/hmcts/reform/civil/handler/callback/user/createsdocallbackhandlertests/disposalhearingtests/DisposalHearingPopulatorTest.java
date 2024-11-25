@@ -44,8 +44,8 @@ class DisposalHearingPopulatorTest {
     @Test
     void shouldSetJudgementDeductionValues() {
         CaseData caseDataWithJudgementSum = CaseData.builder()
-            .drawDirectionsOrder(JudgementSum.builder().judgementSum(10.0).build())
-            .build();
+                .drawDirectionsOrder(JudgementSum.builder().judgementSum(10.0).build())
+                .build();
 
         CaseData.CaseDataBuilder<?, ?> updatedData = CaseData.builder();
         disposalHearingPopulator.setDisposalHearingFields(updatedData, caseDataWithJudgementSum);

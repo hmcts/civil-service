@@ -8,8 +8,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import java.util.List;
 
 @Slf4j
-@Component
 @RequiredArgsConstructor
+@Component
 public class TrialFirstOpenDateAfterNihlFieldValidator implements NihlFieldValidator {
 
     private final FieldsNihlUtils fieldsNihlUtils;

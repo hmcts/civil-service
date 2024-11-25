@@ -95,11 +95,7 @@ class CreateSDOCallbackHandlerUtilsTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-        "true, true",
-        "true, false",
-        "false, true",
-        "false, false"
+    @CsvSource({"true, true", "true, false", "false, true", "false, false"
     })
     void shouldSetCheckList(boolean isSdoR2Enabled, boolean isCarmEnabledForCase) {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder();
@@ -120,20 +116,20 @@ class CreateSDOCallbackHandlerUtilsTest {
         Map<CallbackParams.Params, Object> params = new HashMap<>();
         params.put(BEARER_TOKEN, "testToken");
         CallbackParams callbackParams = CallbackParams.builder()
-            .caseData(caseData)
-            .params(params)
-            .build();
+                .caseData(caseData)
+                .params(params)
+                .build();
         CategorySearchResult categorySearchResult = new CategorySearchResult();
         categorySearchResult.setCategories(List.of());
         DynamicListElement element = DynamicListElement.builder().label("Hearing Method 1").build();
         DynamicList dynamicList = DynamicList.builder().listItems(List.of(element)).build();
 
         when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), anyString(), anyString()))
-            .thenReturn(Optional.of(categorySearchResult));
+                .thenReturn(Optional.of(categorySearchResult));
 
         try (var mockedHearingMethodUtils = mockStatic(HearingMethodUtils.class)) {
             mockedHearingMethodUtils.when(() -> HearingMethodUtils.getHearingMethodList(categorySearchResult))
-                .thenReturn(dynamicList);
+                    .thenReturn(dynamicList);
 
             DynamicList result = createSDOCallbackHandlerUtils.getDynamicHearingMethodList(callbackParams, caseData);
 
@@ -147,18 +143,18 @@ class CreateSDOCallbackHandlerUtilsTest {
         Map<CallbackParams.Params, Object> params = new HashMap<>();
         params.put(BEARER_TOKEN, "testToken");
         CallbackParams callbackParams = CallbackParams.builder()
-            .caseData(caseData)
-            .params(params)
-            .build();
+                .caseData(caseData)
+                .params(params)
+                .build();
         DynamicListElement element = DynamicListElement.builder().label("Hearing Method 1").build();
         DynamicList dynamicList = DynamicList.builder().listItems(List.of(element)).build();
 
         when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), anyString(), anyString()))
-            .thenReturn(Optional.empty());
+                .thenReturn(Optional.empty());
 
         try (var mockedHearingMethodUtils = mockStatic(HearingMethodUtils.class)) {
             mockedHearingMethodUtils.when(() -> HearingMethodUtils.getHearingMethodList(null))
-                .thenReturn(dynamicList);
+                    .thenReturn(dynamicList);
 
             DynamicList result = createSDOCallbackHandlerUtils.getDynamicHearingMethodList(callbackParams, caseData);
 

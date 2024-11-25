@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
@@ -18,25 +19,24 @@ public class CourtLocationFieldUpdater implements SdoCaseDataFieldUpdater {
 
     @Override
     public void update(CaseData caseData, CaseData.CaseDataBuilder<?, ?> dataBuilder) {
-        if (!sdoSubmittedPreCPForLiPCase(caseData)) {
+        boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
+        boolean isHmcEnabled = featureToggleService.isHmcEnabled();
+        boolean isLocationWhiteListed = featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation());
+
+        if (!isLipCase) {
             log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
             dataBuilder.eaCourtLocation(YES);
-
-            if (featureToggleService.isHmcEnabled()
-                    && !caseData.isApplicantLiP()
-                    && !caseData.isRespondent1LiP()
-                    && !caseData.isRespondent2LiP()) {
-                dataBuilder.hmcEaCourtLocation(featureToggleService.isLocationWhiteListedForCaseProgression(
-                        caseData.getCaseManagementLocation().getBaseLocation()) ? YES : NO);
-            }
+            dataBuilder.hmcEaCourtLocation(isHmcEnabled && !isLipCase && isLocationWhiteListed ? YES : NO);
+        } else if (isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData)) {
+            dataBuilder.eaCourtLocation(YesOrNo.YES);
         } else {
             log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
             dataBuilder.eaCourtLocation(NO);
         }
     }
 
-    private boolean sdoSubmittedPreCPForLiPCase(CaseData caseData) {
-        return !featureToggleService.isCaseProgressionEnabled()
-                && (caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented());
+    private boolean isLipCaseWithProgressionEnabledAndCourtWhiteListed(CaseData caseData) {
+        return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne())
+                && featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation());
     }
 }
