@@ -126,7 +126,6 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
             ? JudgmentsOnlineHelper.getDebtAmount(caseData, interestCalculator).setScale(2) : BigDecimal.ZERO;
         BigDecimal cost = event.equals(GENERATE_DJ_FORM_SPEC.name())
             ? getClaimFee(caseData) : BigDecimal.ZERO;
-        ;
 
         if (debtAmount.signum() < 1) {
             cost = cost.add(debtAmount);
@@ -303,7 +302,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
             if (YesOrNo.YES.equals(caseData.getClaimFixedCostsOnEntryDJ())) {
                 // if new fixed costs was chosen in DJ
                 claimFeePounds = claimFeePounds.add(DefaultJudgmentUtils.calculateFixedCostsOnEntry(
-                    caseData, JudgmentsOnlineHelper.getSubTotal(caseData, interestCalculator)));
+                    caseData, JudgmentsOnlineHelper.getJudgmentAmount(caseData, interestCalculator)));
             } else if (YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
                 // only claimed new fixed costs at claim issue
                 claimFeePounds = claimFeePounds.add(MonetaryConversions.penniesToPounds(

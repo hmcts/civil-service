@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentAddress;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
@@ -117,13 +118,33 @@ public class JudgmentsOnlineHelper {
         return subTotal;
     }
 
-    public static BigDecimal getSubTotal(CaseData caseData, InterestCalculator interestCalculator) {
-        BigDecimal claimFeeAmount = MonetaryConversions.penniesToPounds(caseData.getCalculatedClaimFeeInPence());
-        BigDecimal totalIncludeInterestAndFeeAndCosts = caseData.getTotalClaimAmount()
-            .add(interestCalculator.calculateInterest(caseData))
-            .add(claimFeeAmount)
-            .add(getFixedCostsOnCommencement(caseData));
-        return totalIncludeInterestAndFeeAndCosts;
+    @NotNull
+    public static BigDecimal getJudgmentAmount(CaseData caseData, InterestCalculator interestCalculator) {
+        BigDecimal judgmentAmount = calculateJudgmentAmountForFixedCosts(caseData, interestCalculator)
+            .add(JudgmentsOnlineHelper.getFixedCostsOnCommencement(caseData)).add(getClaimFeePounds(caseData, caseData.getClaimFee()));
+        return judgmentAmount;
+    }
+
+    public static BigDecimal getClaimFeePounds(CaseData caseData, Fee claimfee) {
+        BigDecimal claimFeePounds;
+        if (caseData.getOutstandingFeeInPounds() != null) {
+            claimFeePounds = caseData.getOutstandingFeeInPounds();
+        } else {
+            claimFeePounds = MonetaryConversions.penniesToPounds(claimfee.getCalculatedAmountInPence());
+        }
+        return claimFeePounds;
+    }
+
+    private static BigDecimal calculateJudgmentAmountForFixedCosts(CaseData caseData, InterestCalculator interestCalculator) {
+        BigDecimal interest = interestCalculator.calculateInterest(caseData);
+
+        BigDecimal subTotal = caseData.getTotalClaimAmount().add(interest);
+        BigDecimal partialPaymentPounds = getPartialPayment(caseData);
+        return calculateOverallTotal(partialPaymentPounds, subTotal);
+    }
+
+    private static BigDecimal calculateOverallTotal(BigDecimal partialPaymentPounds, BigDecimal subTotal) {
+        return subTotal.subtract(partialPaymentPounds);
     }
 
     public static BigDecimal getFixedCostsOnCommencement(CaseData caseData) {

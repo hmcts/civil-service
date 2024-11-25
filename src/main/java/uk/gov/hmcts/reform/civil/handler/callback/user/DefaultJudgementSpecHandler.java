@@ -288,7 +288,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         // otherwise show new dj fixed costs screen if judgment amount is more
         // than 25. judgment amount = claim amount + interest + fixed commencent costs + claim fee  - partial amount
         if (caseData.getFixedCosts() != null) {
-            BigDecimal judgmentAmount = getJudgmentAmount(caseData);
+            BigDecimal judgmentAmount = JudgmentsOnlineHelper.getJudgmentAmount(caseData, interestCalculator);
             if (YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
                 if (judgmentAmount.compareTo(BigDecimal.valueOf(25)) > 0) {
                     caseDataBuilder.showDJFixedCostsScreen(YesOrNo.YES);
@@ -314,13 +314,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             .errors(errors)
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
-    }
-
-    @NotNull
-    private BigDecimal getJudgmentAmount(CaseData caseData) {
-        BigDecimal judgmentAmount = calculateJudgmentAmountForFixedCosts(caseData)
-            .add(JudgmentsOnlineHelper.getFixedCostsOnCommencement(caseData)).add(getClaimFeePounds(caseData, caseData.getClaimFee()));
-        return judgmentAmount;
     }
 
     private CallbackResponse validatePaymentDateDeadline(CallbackParams callbackParams) {
@@ -360,8 +353,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         Fee claimfee = caseData.getClaimFee();
-        BigDecimal claimFeePounds = getClaimFeePounds(caseData, claimfee);
-        BigDecimal fixedCost = getFixedCosts(caseData);
+        BigDecimal claimFeePounds = JudgmentsOnlineHelper.getClaimFeePounds(caseData, claimfee);
+        BigDecimal fixedCost = getFixedCosts(caseData, interestCalculator);
         BigDecimal partialPaymentPounds = getPartialPayment(caseData);
         //calculate the relevant total, total claim value + interest if any, claim fee for case,
         // and subtract any partial payment
@@ -410,23 +403,13 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         return repaymentBreakdown;
     }
 
-    private static BigDecimal getClaimFeePounds(CaseData caseData, Fee claimfee) {
-        BigDecimal claimFeePounds;
-        if (caseData.getOutstandingFeeInPounds() != null) {
-            claimFeePounds = caseData.getOutstandingFeeInPounds();
-        } else {
-            claimFeePounds = MonetaryConversions.penniesToPounds(claimfee.getCalculatedAmountInPence());
-        }
-        return claimFeePounds;
-    }
-
-    private BigDecimal getFixedCosts(CaseData caseData) {
+    private BigDecimal getFixedCosts(CaseData caseData, InterestCalculator interestCalculator) {
         BigDecimal fixedCost = BigDecimal.valueOf(0);
         if (caseData.getFixedCosts() == null) {
             fixedCost = calculateFixedCosts(caseData);
         } else {
             if (caseData.getFixedCosts() != null && caseData.getFixedCosts().getFixedCostAmount() != null) {
-                fixedCost = calculateFixedCostsOnEntry(caseData, getJudgmentAmount(caseData));
+                fixedCost = calculateFixedCostsOnEntry(caseData, JudgmentsOnlineHelper.getJudgmentAmount(caseData, interestCalculator));
             }
         }
         return fixedCost;
@@ -527,14 +510,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     private BigDecimal calculateOverallTotal(BigDecimal partialPaymentPounds, BigDecimal subTotal) {
         return subTotal.subtract(partialPaymentPounds);
-    }
-
-    private BigDecimal calculateJudgmentAmountForFixedCosts(CaseData caseData) {
-        BigDecimal interest = interestCalculator.calculateInterest(caseData);
-
-        BigDecimal subTotal = caseData.getTotalClaimAmount().add(interest);
-        BigDecimal partialPaymentPounds = getPartialPayment(caseData);
-        return calculateOverallTotal(partialPaymentPounds, subTotal);
     }
 }
 
