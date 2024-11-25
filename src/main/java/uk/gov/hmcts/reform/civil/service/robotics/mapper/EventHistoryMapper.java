@@ -502,15 +502,15 @@ public class EventHistoryMapper {
 
     private void buildCoscEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         // CoSCApplicationStatus can be null if the claimant has mark the case as paid in full before defendant applies for a cosc
-        CoscRPAStatus coscStatus = caseData.getActiveJudgment() != null
-                                               && caseData.getActiveJudgment().getFullyPaymentMadeDate() != null
-                                               ? SATISFIED : CANCELLED;
-
-        LocalDateTime paidInFullDate = caseData.getActiveJudgment() != null && caseData.getActiveJudgment().getFullyPaymentMadeDate() != null
-            ? caseData.getActiveJudgment().getFullyPaymentMadeDate().atStartOfDay()
-            : null;
-
         if (caseData.isCosc()) {
+            CoscRPAStatus coscStatus = caseData.getActiveJudgment() != null
+                && caseData.getActiveJudgment().getFullyPaymentMadeDate() != null
+                ? SATISFIED : CANCELLED;
+
+            LocalDateTime paidInFullDate = caseData.getActiveJudgment() != null && caseData.getActiveJudgment().getFullyPaymentMadeDate() != null
+                ? caseData.getActiveJudgment().getFullyPaymentMadeDate().atStartOfDay()
+                : null;
+
             builder.certificateOfSatisfactionOrCancellation((Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
                 .eventCode(CERTIFICATE_OF_SATISFACTION_OR_CANCELLATION.getCode())

@@ -165,7 +165,7 @@ public class EventHistorySequencer {
         if (isEmpty(builder.build().getDefenceStruckOut())) {
             builder.defenceStruckOut(List.of(Event.builder().build()));
         }
-        if (isEmpty(builder.build().getDefenceStruckOut())) {
+        if (isEmpty(builder.build().getCertificateOfSatisfactionOrCancellation())) {
             builder.certificateOfSatisfactionOrCancellation(List.of(Event.builder().build()));
         }
         return builder

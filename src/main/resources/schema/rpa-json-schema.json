@@ -2330,7 +2330,7 @@
             "$id": "#/definitions/certificateOfSatisfactionOrCancellationEventType/items/properties/eventCode",
             "type": "string",
             "const": "600",
-            "description": "The CASEMAN code for the certificateOfSatisfactionOrCancellation event."
+            "description": "The CASEMAN code for the certificateOfSatisfactionOrCancellationEventType event."
           },
           "dateReceived": {
             "$id": "#/definitions/certificateOfSatisfactionOrCancellationEventType/items/properties/dateReceived",
@@ -2349,8 +2349,7 @@
               "null"
             ],
             "required": [
-              "coscDatePaidInFull",
-              "coscStatus",
+              "coscStatus"
             ],
             "properties": {
               "coscStatus": {
@@ -2370,6 +2369,12 @@
                 ],
                 "maxLength": 250,
                 "description": ""
+              },
+              "miscText": {
+                "$id": "#/definitions/certificateOfSatisfactionOrCancellationEventType/items/properties/eventDetails/properties/miscText",
+                "type": "string",
+                "maxLength": 250,
+                "description": "The text for the miscellaneous event can contain any supporting explanatory text."
               }
             },
             "additionalProperties": false
