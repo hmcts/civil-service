@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RolePool;
+import uk.gov.hmcts.reform.civil.enums.sendandreply.SubjectOption;
 
 import java.time.LocalDateTime;
 
@@ -20,5 +21,7 @@ public class MessageReply {
     private RolePool senderRoleType;
     private String senderName;
     private YesOrNo isUrgent;
+    private SubjectOption subjectType;
+    private String contentSubject;
     private String messageContent;
 }

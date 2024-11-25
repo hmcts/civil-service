@@ -140,7 +140,7 @@ class SendAndReplyMessageServiceTest {
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(existingMessage);
 
-            MessageReply messageReply = MessageReply.builder().isUrgent(YES).messageContent("This is a reply message").build();
+            Message messageReply = Message.builder().isUrgent(YES).messageContent("This is a reply message").build();
 
             List<Message> actualMessages = unwrapElements(messageService.addReplyToMessage(
                 messages,
@@ -149,9 +149,9 @@ class SendAndReplyMessageServiceTest {
                 USER_AUTH
             ));
 
-            List<MessageReply> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
+            List<Message> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
 
-            assertEquals(List.of(MessageReply.builder()
+            assertEquals(List.of(Message.builder()
                                      .messageContent("This is a reply message")
                                      .isUrgent(YES)
                                      .senderName(String.format("%s, %s", USER_NAME, expectedUserRoleLabel))
@@ -520,7 +520,7 @@ class SendAndReplyMessageServiceTest {
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(existingMessage);
 
-            MessageReply messageReply = MessageReply.builder().isUrgent(YES).messageContent("This is a reply message").build();
+            Message messageReply = Message.builder().isUrgent(YES).messageContent("This is a reply message").build();
 
             List<Message> actualMessages = unwrapElements(messageService.addReplyToMessage(
                 messages,
@@ -529,9 +529,9 @@ class SendAndReplyMessageServiceTest {
                 USER_AUTH
             ));
 
-            List<MessageReply> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
+            List<Message> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
 
-            assertEquals(List.of(MessageReply.builder()
+            assertEquals(List.of(Message.builder()
                                      .messageContent("This is a reply message")
                                      .isUrgent(YES)
                                      .senderName(String.format("%s, %s", USER_NAME, expectedUserRoleLabel))
@@ -562,7 +562,7 @@ class SendAndReplyMessageServiceTest {
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(existingMessage);
 
-            MessageReply messageReply = MessageReply.builder().isUrgent(YES).messageContent("This is a reply message").build();
+            Message messageReply = Message.builder().isUrgent(YES).messageContent("This is a reply message").build();
 
             List<Message> actualMessages = unwrapElements(messageService.addReplyToMessage(
                 messages,
@@ -571,9 +571,9 @@ class SendAndReplyMessageServiceTest {
                 USER_AUTH
             ));
 
-            List<MessageReply> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
+            List<Message> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
 
-            assertEquals(List.of(MessageReply.builder()
+            assertEquals(List.of(Message.builder()
                                      .messageContent("This is a reply message")
                                      .isUrgent(YES)
                                      .senderName(String.format("%s, %s", USER_NAME, expectedUserRoleLabel))
@@ -601,7 +601,7 @@ class SendAndReplyMessageServiceTest {
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(existingMessage);
 
-            MessageReply messageReply = MessageReply.builder().isUrgent(YES).messageContent("This is a reply message").build();
+            Message messageReply = Message.builder().isUrgent(YES).messageContent("This is a reply message").build();
 
             List<Message> actualMessages = unwrapElements(messageService.addReplyToMessage(
                 messages,
@@ -610,9 +610,9 @@ class SendAndReplyMessageServiceTest {
                 USER_AUTH
             ));
 
-            List<MessageReply> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
+            List<Message> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
 
-            assertEquals(List.of(MessageReply.builder()
+            assertEquals(List.of(Message.builder()
                                      .messageContent("This is a reply message")
                                      .isUrgent(YES)
                                      .senderName(String.format("%s, %s", USER_NAME, expectedUserRoleLabel))
@@ -642,7 +642,7 @@ class SendAndReplyMessageServiceTest {
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(existingMessage);
 
-            MessageReply messageReply = MessageReply.builder().isUrgent(YES).messageContent("This is a reply message").build();
+            Message messageReply = Message.builder().isUrgent(YES).messageContent("This is a reply message").build();
 
             List<Message> actualMessages = unwrapElements(messageService.addReplyToMessage(
                 messages,
@@ -651,9 +651,9 @@ class SendAndReplyMessageServiceTest {
                 USER_AUTH
             ));
 
-            List<MessageReply> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
+            List<Message> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
 
-            assertEquals(List.of(MessageReply.builder()
+            assertEquals(List.of(Message.builder()
                                      .messageContent("This is a reply message")
                                      .isUrgent(YES)
                                      .senderName(String.format("%s, %s", USER_NAME, expectedUserRoleLabel))
@@ -682,7 +682,7 @@ class SendAndReplyMessageServiceTest {
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(existingMessage);
 
-            MessageReply messageReply = MessageReply.builder().isUrgent(YES).messageContent("This is a reply message").build();
+            Message messageReply = Message.builder().isUrgent(YES).messageContent("This is a reply message").build();
 
             List<Message> actualMessages = unwrapElements(messageService.addReplyToMessage(
                 messages,
@@ -691,9 +691,9 @@ class SendAndReplyMessageServiceTest {
                 USER_AUTH
             ));
 
-            List<MessageReply> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
+            List<Message> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
 
-            assertEquals(List.of(MessageReply.builder()
+            assertEquals(List.of(Message.builder()
                                      .messageContent("This is a reply message")
                                      .isUrgent(YES)
                                      .senderName(String.format("%s, %s", USER_NAME, expectedUserRoleLabel))
@@ -724,7 +724,7 @@ class SendAndReplyMessageServiceTest {
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(existingMessage);
 
-            MessageReply messageReply = MessageReply.builder().isUrgent(YES).messageContent("This is a reply message").build();
+            Message messageReply = Message.builder().isUrgent(YES).messageContent("This is a reply message").build();
 
             List<Message> actualMessages = unwrapElements(messageService.addReplyToMessage(
                 messages,
@@ -733,9 +733,9 @@ class SendAndReplyMessageServiceTest {
                 USER_AUTH
             ));
 
-            List<MessageReply> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
+            List<Message> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
 
-            assertEquals(List.of(MessageReply.builder()
+            assertEquals(List.of(Message.builder()
                                      .messageContent("This is a reply message")
                                      .isUrgent(YES)
                                      .senderName(String.format("%s, %s", USER_NAME, expectedUserRoleLabel))
@@ -765,7 +765,7 @@ class SendAndReplyMessageServiceTest {
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(existingMessage);
 
-            MessageReply messageReply = MessageReply.builder().isUrgent(YES).messageContent("This is a reply message").build();
+            Message messageReply = Message.builder().isUrgent(YES).messageContent("This is a reply message").build();
 
             List<Message> actualMessages = unwrapElements(messageService.addReplyToMessage(
                 messages,
@@ -774,9 +774,9 @@ class SendAndReplyMessageServiceTest {
                 USER_AUTH
             ));
 
-            List<MessageReply> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
+            List<Message> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
 
-            assertEquals(List.of(MessageReply.builder()
+            assertEquals(List.of(Message.builder()
                                      .messageContent("This is a reply message")
                                      .isUrgent(YES)
                                      .senderName(String.format("%s, %s", USER_NAME, expectedUserRoleLabel))
@@ -806,7 +806,7 @@ class SendAndReplyMessageServiceTest {
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(existingMessage);
 
-            MessageReply messageReply = MessageReply.builder().isUrgent(YES).messageContent("This is a reply message").build();
+            Message messageReply = Message.builder().isUrgent(YES).messageContent("This is a reply message").build();
 
             List<Message> actualMessages = unwrapElements(messageService.addReplyToMessage(
                 messages,
@@ -815,9 +815,9 @@ class SendAndReplyMessageServiceTest {
                 USER_AUTH
             ));
 
-            List<MessageReply> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
+            List<Message> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
 
-            assertEquals(List.of(MessageReply.builder()
+            assertEquals(List.of(Message.builder()
                                      .messageContent("This is a reply message")
                                      .isUrgent(YES)
                                      .senderName(String.format("%s, %s", USER_NAME, expectedUserRoleLabel))
@@ -845,7 +845,7 @@ class SendAndReplyMessageServiceTest {
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(existingMessage);
 
-            MessageReply messageReply = MessageReply.builder().isUrgent(YES).messageContent("This is a reply message").build();
+            Message messageReply = Message.builder().isUrgent(YES).messageContent("This is a reply message").build();
 
             List<Message> actualMessages = unwrapElements(messageService.addReplyToMessage(
                 messages,
@@ -854,9 +854,9 @@ class SendAndReplyMessageServiceTest {
                 USER_AUTH
             ));
 
-            List<MessageReply> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
+            List<Message> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
 
-            assertEquals(List.of(MessageReply.builder()
+            assertEquals(List.of(Message.builder()
                                      .messageContent("This is a reply message")
                                      .isUrgent(YES)
                                      .senderName(String.format("%s, %s", USER_NAME, expectedUserRoleLabel))
@@ -880,7 +880,7 @@ class SendAndReplyMessageServiceTest {
             );
 
             RolePool expectedSenderRoleCategory = RolePool.ADMIN;
-            MessageReply firstReply = MessageReply.builder()
+            Message firstReply = Message.builder()
                 .messageContent("First reply")
                 .isUrgent(NO)
                 .senderName("John Doe, Hearing Centre Team Leader")
@@ -888,7 +888,7 @@ class SendAndReplyMessageServiceTest {
                 .sentTime(NOW.minusDays(2))
                 .build();
 
-            MessageReply secondReplyReply = MessageReply.builder()
+            Message secondReplyReply = Message.builder()
                 .messageContent("Second reply")
                 .isUrgent(YES)
                 .senderName("Jane Smith, Hearing Centre Team Leader")
@@ -896,7 +896,7 @@ class SendAndReplyMessageServiceTest {
                 .sentTime(NOW.minusDays(1))
                 .build();
 
-            List<Element<MessageReply>> history = new ArrayList<>();
+            List<Element<Message>> history = new ArrayList<>();
             history.add(element(firstReply));
             history.add(element(secondReplyReply));
             Message existingMessage = message.toBuilder()
@@ -906,7 +906,7 @@ class SendAndReplyMessageServiceTest {
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(existingMessageElement);
 
-            MessageReply newReply = MessageReply.builder().isUrgent(YES).messageContent("This is a new reply message").build();
+            Message newReply = Message.builder().isUrgent(YES).messageContent("This is a new reply message").build();
 
             List<Message> actualMessages = unwrapElements(messageService.addReplyToMessage(
                 messages,
@@ -915,12 +915,12 @@ class SendAndReplyMessageServiceTest {
                 USER_AUTH
             ));
 
-            List<MessageReply> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
+            List<Message> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
 
-            List<MessageReply> expectedMessageHistory = List.of(
+            List<Message> expectedMessageHistory = List.of(
                 firstReply,
                 secondReplyReply,
-                MessageReply.builder()
+                Message.builder()
                     .messageContent("This is a new reply message")
                     .isUrgent(YES)
                     .senderName(String.format("%s, %s", USER_NAME, "Hearing Centre Team Leader"))
@@ -1064,7 +1064,7 @@ class SendAndReplyMessageServiceTest {
 
         @Test
         void shouldCallTableMarkupService_withExpectedRowData_withReplies() {
-            message.getValue().getHistory().add(element(MessageReply.builder()
+            message.getValue().getHistory().add(element(Message.builder()
                                                             .messageContent("This is a reply message")
                                                             .isUrgent(NO)
                                                             .senderName("Sender 2")

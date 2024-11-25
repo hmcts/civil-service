@@ -25,6 +25,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static java.util.Map.entry;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -37,25 +38,25 @@ public class SendAndReplyMessageService {
 
     // Order is important here as we only use the first matching role when mapping against a users role assignments.
     // Senior roles should always be before their non-senior counterpart.
-    private static final List<String> SUPPORTED_ROLES = List.of(
-        "ctsc-team-leader",
-        "ctsc",
-        "hearing-centre-team-leader",
-        "hearing-centre-admin",
-        "senior-tribunal-caseworker",
-        "tribunal-caseworker",
-        "nbc-team-leader",
-        "national-business-centre",
-        "circuit-judge",
-        "district-judge",
-        "judge"
+    private static final Map<String, RolePool> SUPPORTED_ROLES = Map.ofEntries(
+        entry("ctsc-team-leader", RolePool.ADMIN),
+        entry("ctsc", RolePool.ADMIN),
+        entry("hearing-centre-team-leader", RolePool.ADMIN),
+        entry("hearing-centre-admin", RolePool.ADMIN),
+        entry("senior-tribunal-caseworker",RolePool.LEGAL_OPERATIONS),
+        entry("tribunal-caseworker", RolePool.LEGAL_OPERATIONS),
+        entry("nbc-team-leader", RolePool.ADMIN),
+        entry("national-business-centre", RolePool.ADMIN),
+        entry("circuit-judge", RolePool.JUDICIAL_CIRCUIT),
+        entry("district-judge", RolePool.JUDICIAL_DISTRICT),
+        entry("judge", RolePool.JUDICIAL)
     );
 
     private static final Map<RecipientOption, RolePool> ROLE_SELECTION_TO_POOL = Map.of(
         RecipientOption.COURT_STAFF, RolePool.ADMIN,
         RecipientOption.LEGAL_ADVISOR, RolePool.LEGAL_OPERATIONS,
-        RecipientOption.DISTRICT_JUDGE, RolePool.JUDICIAL,
-        RecipientOption.CIRCUIT_JUDGE, RolePool.JUDICIAL
+        RecipientOption.DISTRICT_JUDGE, RolePool.JUDICIAL_DISTRICT,
+        RecipientOption.CIRCUIT_JUDGE, RolePool.JUDICIAL_CIRCUIT
     );
 
     private final RoleAssignmentsService roleAssignmentsService;
@@ -89,26 +90,39 @@ public class SendAndReplyMessageService {
 
     public Message createBaseMessageWithSenderDetails(String userAuth) {
         UserDetails details = userService.getUserDetails(userAuth);
-        RoleAssignmentResponse role = getFirstSupportedRole(userAuth, details.getId());
-        String senderName = String.format("%s, %s", details.getFullName(), role.getRoleLabel());
+        String role = getFirstSupportedRole(userAuth, details.getId());
+        String senderName = String.format("%s, %s", details.getFullName(), role);
 
         return Message.builder()
-            .sentTime(time.now())
             .senderName(senderName)
-            .senderRoleType(RolePool.valueOf(role.getRoleCategory()))
+            .senderRoleType(SUPPORTED_ROLES.get(role))
             .build();
     }
 
-    public List<Element<Message>> addReplyToMessage(List<Element<Message>> messages, String messageId, MessageReply messageReply, String userAuth) {
-        Element<Message> messageToReplyTo = getMessageById(messages, messageId);
+    public List<Element<Message>> addReplyToMessage(List<Element<Message>> messages, String messageId, Message messageReply, String userAuth) {
+        Element<Message> messageToReplace = getMessageById(messages, messageId);
         Message baseMessageDetails = createBaseMessageWithSenderDetails(userAuth);
-        Element<MessageReply> newMessage = element(messageReply.toBuilder()
-                                                       .recipientRoleType(ofNullable(getLatestMessage(messageToReplyTo))
-                                                                              .orElse(Message.builder().build()).getSenderRoleType())
-                                                       .senderName(baseMessageDetails.getSenderName())
-                                                       .senderRoleType(baseMessageDetails.getSenderRoleType())
-                                                       .sentTime(baseMessageDetails.getSentTime()).build());
-        messageToReplyTo.getValue().getHistory().add(newMessage);
+
+        //Move current base message to history
+        Element<Message> newHistoryMessage = element(messageToReplace.getValue().builder()
+                                                         .history(null)
+                                                         .updatedTime(null)
+                                                         .sentTime(messageToReplace.getValue().getUpdatedTime())
+                                                         .build());
+
+        //Switch out current base message with reply info
+        messageToReplace.setValue(messageToReplace.getValue()
+                                      .toBuilder()
+                                      .recipientRoleType(ofNullable(messageReply)
+                                                             .orElse(Message.builder().build()).getSenderRoleType())
+                                      .senderName(baseMessageDetails.getSenderName())
+                                      .senderRoleType(baseMessageDetails.getSenderRoleType())
+                                      .isUrgent(messageReply.getIsUrgent())
+                                      .messageContent(messageReply.getMessageContent())
+                                      .updatedTime(time.now())
+                                      .build());
+        messageToReplace.getValue().getHistory().add(newHistoryMessage);
+
         return messages;
     }
 
@@ -116,12 +130,13 @@ public class SendAndReplyMessageService {
         return messages.stream().filter(message -> code.equals(message.getId().toString())).findFirst().orElse(null);
     }
 
-    private RoleAssignmentResponse getFirstSupportedRole(String auth, String userId) {
+    private String getFirstSupportedRole(String auth, String userId) {
         var roleAssignments = roleAssignmentsService.getRoleAssignmentsWithLabels(userId, auth);
-        return roleAssignments.getRoleAssignmentResponse().stream()
-            .filter(userRole -> SUPPORTED_ROLES.contains(userRole.getRoleName()))
-            .min(Comparator.comparingInt(userRole -> SUPPORTED_ROLES.indexOf(userRole.getRoleName())))
+        RoleAssignmentResponse roleAssignment = roleAssignments.getRoleAssignmentResponse().stream()
+            .filter(userRole -> SUPPORTED_ROLES.containsKey(userRole.getRoleName()))
+            .min(Comparator.comparingInt(userRole -> SUPPORTED_ROLES.keySet().stream().toList().indexOf(userRole.getRoleName())))
             .orElse(RoleAssignmentResponse.builder().roleLabel("").roleCategory("").build());
+        return roleAssignment.getRoleLabel();
     }
 
     public String renderMessageTableList(Element<Message> message) {
@@ -133,13 +148,7 @@ public class SendAndReplyMessageService {
 
     private List<Message> retrieveFullMessageHistory(Element<Message> message) {
         return Stream.concat(Stream.of(message.getValue()), message.getValue().getHistory().stream()
-                .map(historyItem -> message.getValue().buildFullReplyMessage(historyItem.getValue())))
-            .sorted(Comparator.comparing(Message::getSentTime).reversed())
-            .toList();
-    }
-
-    private Message getLatestMessage(Element<Message> message) {
-        return retrieveFullMessageHistory(message).stream().findFirst().orElse(null);
+                .map(historyItem -> message.getValue())).toList();
     }
 
     private String renderMessageTable(Message message) {

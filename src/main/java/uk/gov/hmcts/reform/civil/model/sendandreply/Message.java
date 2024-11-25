@@ -31,16 +31,5 @@ public class Message {
     private YesOrNo isUrgent;
 
     @Builder.Default
-    private List<Element<MessageReply>> history = new ArrayList<>();
-
-    public Message buildFullReplyMessage(MessageReply reply) {
-        return this.toBuilder()
-            .sentTime(reply.getSentTime())
-            .isUrgent(reply.getIsUrgent())
-            .senderName(reply.getSenderName())
-            .senderRoleType(reply.getSenderRoleType())
-            .messageContent(reply.getMessageContent())
-            .recipientRoleType(reply.getRecipientRoleType())
-            .build();
-    }
+    private List<Element<Message>> history = new ArrayList<>();
 }
