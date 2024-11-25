@@ -23,10 +23,10 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbac
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateDateOfBirth;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateLengthOfUnemployment;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateMediationUnavailableDates;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateRespondentExperts;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateRespondentExpertsSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateRespondentPaymentDate;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateRespondentWitnesses;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateUnavailableDates;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateRespondentWitnessesSpec;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateUnavailableDatesSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
@@ -74,9 +74,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private final SetUploadTimelineTypeFlag setUploadTimelineTypeFlag;
     private final DetermineLoggedInSolicitor determineLoggedInSolicitor;
     private final PopulateRespondent1Copy populateRespondent1Copy;
-    private final ValidateRespondentWitnesses validateRespondentWitnesses;
-    private final ValidateRespondentExperts validateRespondentExperts;
-    private final ValidateUnavailableDates validateUnavailableDates;
+    private final ValidateRespondentWitnessesSpec validateRespondentWitnesses;
+    private final ValidateRespondentExpertsSpec validateRespondentExperts;
+    private final ValidateUnavailableDatesSpec validateUnavailableDates;
     private final ValidateDateOfBirth validateDateOfBirth;
     private final ValidateRespondentPaymentDate validateRespondentPaymentDate;
     private final ValidateLengthOfUnemployment validateLengthOfUnemployment;

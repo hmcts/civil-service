@@ -27,7 +27,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 class ValidateUnavailableDatesTest {
 
     @InjectMocks
-    private ValidateUnavailableDates validateUnavailableDates;
+    private ValidateUnavailableDatesSpec validateUnavailableDates;
 
     @Mock
     private UnavailableDateValidator unavailableDateValidator;

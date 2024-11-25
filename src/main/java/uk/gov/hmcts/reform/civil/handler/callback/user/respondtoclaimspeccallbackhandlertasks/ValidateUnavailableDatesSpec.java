@@ -20,7 +20,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ValidateUnavailableDates implements CaseTask {
+public class ValidateUnavailableDatesSpec implements CaseTask {
 
     private final UnavailableDateValidator unavailableDateValidator;
 

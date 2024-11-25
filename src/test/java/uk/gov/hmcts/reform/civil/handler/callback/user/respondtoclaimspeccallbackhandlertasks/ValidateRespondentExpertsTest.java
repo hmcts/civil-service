@@ -39,7 +39,7 @@ class ValidateRespondentExpertsTest {
     private CallbackParams callbackParams;
 
     @InjectMocks
-    private ValidateRespondentExperts validateRespondentExperts;
+    private ValidateRespondentExpertsSpec validateRespondentExperts;
 
     private CaseData caseData;
 

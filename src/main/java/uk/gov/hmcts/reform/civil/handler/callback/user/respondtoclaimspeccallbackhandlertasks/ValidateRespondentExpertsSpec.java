@@ -19,7 +19,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ValidateRespondentExperts implements CaseTask, ExpertsValidator {
+public class ValidateRespondentExpertsSpec implements CaseTask, ExpertsValidator {
 
     private final RespondToClaimSpecUtils respondToClaimSpecUtils;
 

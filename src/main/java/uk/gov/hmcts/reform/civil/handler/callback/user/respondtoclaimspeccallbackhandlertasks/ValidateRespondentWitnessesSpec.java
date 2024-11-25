@@ -24,7 +24,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ValidateRespondentWitnesses implements CaseTask, WitnessesValidator {
+public class ValidateRespondentWitnessesSpec implements CaseTask, WitnessesValidator {
 
     private final RespondToClaimSpecUtils respondToClaimSpecUtils;
 

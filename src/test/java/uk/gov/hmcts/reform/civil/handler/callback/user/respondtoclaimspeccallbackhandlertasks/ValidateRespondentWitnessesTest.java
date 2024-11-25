@@ -35,7 +35,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 class ValidateRespondentWitnessesTest {
 
     @InjectMocks
-    private ValidateRespondentWitnesses validateRespondentWitnesses;
+    private ValidateRespondentWitnessesSpec validateRespondentWitnesses;
 
     @Mock
     private RespondToClaimSpecUtils respondToClaimSpecUtils;

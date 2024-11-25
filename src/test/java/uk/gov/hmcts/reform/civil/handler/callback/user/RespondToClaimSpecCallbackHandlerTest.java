@@ -50,10 +50,10 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbac
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateDateOfBirth;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateLengthOfUnemployment;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateMediationUnavailableDates;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateRespondentExperts;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateRespondentExpertsSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateRespondentPaymentDate;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateRespondentWitnesses;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateUnavailableDates;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateRespondentWitnessesSpec;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateUnavailableDatesSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.CounterClaimConfirmationText;
@@ -186,12 +186,12 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     SetGenericResponseTypeFlag.class,
     SetUploadTimelineTypeFlag.class,
     ValidateMediationUnavailableDates.class,
-    ValidateUnavailableDates.class,
+    ValidateUnavailableDatesSpec.class,
     ValidateDateOfBirth.class,
     ValidateRespondentPaymentDate.class,
     ValidateLengthOfUnemployment.class,
-    ValidateRespondentWitnesses.class,
-    ValidateRespondentExperts.class
+    ValidateRespondentWitnessesSpec.class,
+    ValidateRespondentExpertsSpec.class
 })
 class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
