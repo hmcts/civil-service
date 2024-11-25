@@ -98,7 +98,6 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.STATES_PAID;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SPEC_DEFENDANT_NOC;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
@@ -502,7 +501,7 @@ public class EventHistoryMapper {
 
     private void buildCoscEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         // CoSCApplicationStatus can be null if the claimant has mark the case as paid in full before defendant applies for a cosc
-        if (caseData.isCosc()) {
+        if (caseData.hasCosc()) {
             CoscRPAStatus coscStatus = caseData.getActiveJudgment() != null
                 && caseData.getActiveJudgment().getFullyPaymentMadeDate() != null
                 ? SATISFIED : CANCELLED;
@@ -514,11 +513,12 @@ public class EventHistoryMapper {
             builder.certificateOfSatisfactionOrCancellation((Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
                 .eventCode(CERTIFICATE_OF_SATISFACTION_OR_CANCELLATION.getCode())
-                .litigiousPartyID(APPLICANT_ID)
+                .litigiousPartyID(RESPONDENT_ID)
                 .dateReceived(time.now())
                 .eventDetails(EventDetails.builder()
-                                  .coscStatus(String.valueOf(coscStatus))
-                                  .coscDatePaidInFull(paidInFullDate)
+                                  .status(String.valueOf(coscStatus))
+                                  .datePaidInFull(paidInFullDate)
+                                  .notificationReceiptDate(caseData.getCoscIssueDate().atStartOfDay())
                                   .build())
                 .eventDetailsText("")
                 .build()));

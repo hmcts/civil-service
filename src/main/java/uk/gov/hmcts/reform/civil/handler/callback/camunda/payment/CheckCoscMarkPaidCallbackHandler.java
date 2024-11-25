@@ -47,7 +47,7 @@ public class CheckCoscMarkPaidCallbackHandler extends CallbackHandler {
     private CallbackResponse checkIsMarkedPaid(CallbackParams callbackParams) {
 
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder().coscIssueDate(time.now().toLocalDate());
 
         if (Objects.nonNull(caseData.getActiveJudgment()) && (caseData.getActiveJudgment().getFullyPaymentMadeDate() == null)) {
             dataBuilder

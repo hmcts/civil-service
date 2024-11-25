@@ -71,6 +71,7 @@ class CheckCoscMarkPaidCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getErrors()).isNull();
         assertEquals(expectedlocalDate, responseCaseData.getCoscSchedulerDeadline());
         assertEquals(ACTIVE, responseCaseData.getCoSCApplicationStatus());
+        assertEquals(nowMock.toLocalDate(), responseCaseData.getCoscIssueDate());
     }
 
     @Test
@@ -93,6 +94,7 @@ class CheckCoscMarkPaidCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void doNotSetCoscSchedulerDeadline_whenActiveJudgementwithDate() {
+        when(time.now()).thenReturn(nowMock);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
             .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
             .build();

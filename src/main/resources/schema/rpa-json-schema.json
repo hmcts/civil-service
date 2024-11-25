@@ -2352,8 +2352,8 @@
               "coscStatus"
             ],
             "properties": {
-              "coscStatus": {
-                "$id": "#/definitions/certificateOfSatisfactionOrCancellationEventType/items/properties/eventDetails/properties/coscStatus",
+              "status": {
+                "$id": "#/definitions/certificateOfSatisfactionOrCancellationEventType/items/properties/eventDetails/properties/status",
                 "type": [
                   "string",
                   "null"
@@ -2361,13 +2361,14 @@
                 "maxLength": 250,
                 "description": ""
               },
-              "coscDatePaidInFull": {
-                "$id": "#/definitions/certificateOfSatisfactionOrCancellationEventType/items/properties/eventDetails/properties/coscDatePaidInFull",
-                "type": [
-                  "string",
-                  "null"
-                ],
-                "maxLength": 250,
+              "datePaidInFull": {
+                "$id": "#/definitions/certificateOfSatisfactionOrCancellationEventType/items/properties/eventDetails/properties/datePaidInFull",
+                "$ref": "#/definitions/formatDateOrNull",
+                "description": ""
+              },
+              "notificationReceiptDate": {
+                "$id": "#/definitions/certificateOfSatisfactionOrCancellationEventType/items/properties/eventDetails/properties/notificationReceiptDate",
+                "$ref": "#/definitions/formatDateOrNull",
                 "description": ""
               },
               "miscText": {

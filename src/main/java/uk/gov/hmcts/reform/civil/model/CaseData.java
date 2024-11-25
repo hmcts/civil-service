@@ -732,6 +732,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonUnwrapped
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
     private LocalDate coscSchedulerDeadline;
+    private LocalDate coscIssueDate;
     private CoscApplicationStatus coSCApplicationStatus;
 
 
@@ -1226,7 +1227,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isCosc() {
+    public boolean hasCosc() {
         return getCertOfSC() != null;
     }
 

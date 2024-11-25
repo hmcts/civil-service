@@ -8390,6 +8390,7 @@ class EventHistoryMapperTest {
 
         @Test
         public void shouldGenerateRPA_forCosc_Satisfied() {
+            LocalDate coscIssueDate = localDateTime.toLocalDate();
             CertOfSC certOfSC = CertOfSC.builder()
                 .defendantFinalPaymentDate(LocalDate.now())
                 .debtPaymentEvidence(DebtPaymentEvidence.builder()
@@ -8398,17 +8399,19 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31DaysForCosc().toBuilder()
                 .certOfSC(certOfSC)
+                .coscIssueDate(coscIssueDate)
                 .build();
 
             Event expectedEvent = Event.builder()
                 .eventSequence(1)
                 .eventCode("600")
                 .dateReceived(localDateTime)
-                .litigiousPartyID("001")
+                .litigiousPartyID("002")
                 .eventDetailsText("")
                 .eventDetails(EventDetails.builder()
-                                  .coscStatus(String.valueOf(SATISFIED))
-                                  .coscDatePaidInFull(LocalDate.now().plusDays(15).atStartOfDay())
+                                  .status(String.valueOf(SATISFIED))
+                                  .datePaidInFull(LocalDate.now().plusDays(15).atStartOfDay())
+                                  .notificationReceiptDate(coscIssueDate.atStartOfDay())
                                   .build())
                 .build();
 
@@ -8422,6 +8425,7 @@ class EventHistoryMapperTest {
 
         @Test
         public void shouldGenerateRPA_forCosc_Cancelled() {
+            LocalDate coscIssueDate = localDateTime.toLocalDate();
             CertOfSC certOfSC = CertOfSC.builder()
                 .defendantFinalPaymentDate(LocalDate.now())
                 .debtPaymentEvidence(DebtPaymentEvidence.builder()
@@ -8430,17 +8434,19 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31Days().toBuilder()
                 .certOfSC(certOfSC)
+                .coscIssueDate(coscIssueDate)
                 .build();
 
             Event expectedEvent = Event.builder()
                 .eventSequence(1)
                 .eventCode("600")
                 .dateReceived(localDateTime)
-                .litigiousPartyID("001")
+                .litigiousPartyID("002")
                 .eventDetailsText("")
                 .eventDetails(EventDetails.builder()
-                                  .coscStatus(String.valueOf(CANCELLED))
-                                  .coscDatePaidInFull(null)
+                                  .status(String.valueOf(CANCELLED))
+                                  .datePaidInFull(null)
+                                  .notificationReceiptDate(coscIssueDate.atStartOfDay())
                                   .build())
                 .build();
 
