@@ -48,15 +48,32 @@ public class MediationCasesSearchService extends ElasticSearchService {
     }
 
     @Override
-    Query queryInMediationCases(int startIndex, LocalDate claimMovedDate, boolean carmEnabled) {
+    Query queryInMediationCases(int startIndex, LocalDate claimMovedDate, boolean carmEnabled, boolean initialSearch,
+                                String searchAfterValue) {
         String targetDateString =
             claimMovedDate.format(DateTimeFormatter.ISO_DATE);
+        if (carmEnabled) {
+            return new Query(
+                boolQuery()
+                    .minimumShouldMatch(1)
+                    .should(boolQuery()
+                                .must(beState(IN_MEDIATION))
+                                .must(submittedDate(carmEnabled))
+                                .must(matchQuery("data.claimMovedToMediationOn", targetDateString))),
+                emptyList(),
+                startIndex,
+                10,
+                initialSearch,
+                searchAfterValue
+            );
+        }
         return new Query(
             boolQuery()
-                .must(matchAllQuery())
-                .must(beState(IN_MEDIATION))
-                .must(submittedDate(carmEnabled))
-                .must(matchQuery("data.claimMovedToMediationOn", targetDateString)),
+                .minimumShouldMatch(1)
+                .should(boolQuery()
+                            .must(beState(IN_MEDIATION))
+                            .must(submittedDate(carmEnabled))
+                            .must(matchQuery("data.claimMovedToMediationOn", targetDateString))),
             emptyList(),
             startIndex
         );
