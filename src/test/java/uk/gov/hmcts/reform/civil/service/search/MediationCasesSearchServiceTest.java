@@ -29,22 +29,26 @@ public class MediationCasesSearchServiceTest extends ElasticSearchServiceTest {
     }
 
     @Override
-    protected Query buildQueryInMediation(int fromValue, LocalDate date, boolean carmEnabled) {
+    protected Query buildQueryInMediation(int fromValue, LocalDate date, boolean carmEnabled,
+                                          boolean initialSearch,
+                                          String searchAfterValue) {
         String targetDateString =
             date.format(DateTimeFormatter.ISO_DATE);
         if (carmEnabled) {
             BoolQueryBuilder query = boolQuery()
-                .must(matchAllQuery())
-                .must(boolQuery().must(matchQuery("state", "IN_MEDIATION")))
-                .must(boolQuery().must(rangeQuery("data.submittedDate").gte(CARM_DATE)))
-                .must(matchQuery("data.claimMovedToMediationOn", targetDateString));
+                .minimumShouldMatch(1)
+                .should(boolQuery()
+                            .must(boolQuery().must(matchQuery("state", "IN_MEDIATION")))
+                            .must(boolQuery().must(rangeQuery("data.submittedDate").gte(CARM_DATE)))
+                            .must(matchQuery("data.claimMovedToMediationOn", targetDateString)));
             return new Query(query, Collections.emptyList(), fromValue);
         } else {
             BoolQueryBuilder query = boolQuery()
-                .must(matchAllQuery())
-                .must(boolQuery().must(matchQuery("state", "IN_MEDIATION")))
-                .must(boolQuery().must(rangeQuery("data.submittedDate").lt(CARM_DATE)))
-                .must(matchQuery("data.claimMovedToMediationOn", targetDateString));
+                .minimumShouldMatch(1)
+                .should(boolQuery()
+                            .must(boolQuery().must(matchQuery("state", "IN_MEDIATION")))
+                            .must(boolQuery().must(rangeQuery("data.submittedDate").lt(CARM_DATE)))
+                            .must(matchQuery("data.claimMovedToMediationOn", targetDateString)));
 
             return new Query(query, Collections.emptyList(), fromValue);
         }
