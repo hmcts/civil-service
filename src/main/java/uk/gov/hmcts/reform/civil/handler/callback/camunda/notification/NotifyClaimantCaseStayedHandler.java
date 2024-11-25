@@ -31,7 +31,8 @@ public class NotifyClaimantCaseStayedHandler extends AbstractNotifyCaseStayedHan
     }
 
     @Override
-    protected String getRecipient(CaseData caseData) {
+    protected String getRecipient(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
         return caseData.isApplicantLiP()
             ? caseData.getClaimantUserDetails().getEmail()
             : caseData.getApplicantSolicitor1UserDetails().getEmail();
@@ -48,7 +49,8 @@ public class NotifyClaimantCaseStayedHandler extends AbstractNotifyCaseStayedHan
     }
 
     @Override
-    protected String getPartyName(CaseData caseData) {
+    protected String getPartyName(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
         return caseData.getApplicant1().getPartyName();
     }
 
