@@ -16,7 +16,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
-public class CourtLocationFieldUpdaterTest {
+class CourtLocationFieldUpdaterTest {
 
     @Mock
     private FeatureToggleService featureToggleService;
