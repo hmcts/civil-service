@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +39,7 @@ public class ManageStayCallbackHandler extends CallbackHandler {
     private static final String HEADER_CONFIRMATION_REQUEST_UPDATE = "# You have requested an update on \n\n # this case \n\n ## All parties have been notified";
     private static final String BODY_CONFIRMATION = "&nbsp;";
     private static final String LIFT_STAY = "LIFT_STAY";
+    private static final String REQUEST_UPDATE = "REQUEST_UPDATE";
 
     private static final Map<String, CaseState> STATE_MAP = Map.of(
         CaseState.IN_MEDIATION.name(), CaseState.JUDICIAL_REFERRAL,
@@ -75,6 +77,9 @@ public class ManageStayCallbackHandler extends CallbackHandler {
         caseDataBuilder.businessProcess(BusinessProcess.ready(
             LIFT_STAY.equals(caseData.getManageStayOption()) ? STAY_LIFTED : STAY_UPDATE_REQUESTED
         ));
+        caseDataBuilder.manageStayUpdateRequestDate(
+            REQUEST_UPDATE.equals(caseData.getManageStayOption()) ? LocalDate.now() : null
+        );
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(mapper))
             .state(newState.name())

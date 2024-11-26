@@ -26,16 +26,21 @@ public abstract class AbstractCaseDismissNotificationHandler extends CallbackHan
         return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::sendNotification);
     }
 
-    @Override
-    public Map<String, String> addProperties(CaseData caseData) {
+    public Map<String, String> addProperties(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            PARTY_NAME, getPartyName(caseData),
+            PARTY_NAME, getPartyName(caseData, callbackParams),
             CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
         );
     }
 
-    protected abstract String getPartyName(CaseData caseData);
+    @Override
+    public Map<String, String> addProperties(CaseData caseData) {
+        return null;
+    }
+
+    protected abstract String getPartyName(CaseData caseData, CallbackParams callbackParams);
 
     public CallbackResponse sendNotification(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
@@ -43,7 +48,7 @@ public abstract class AbstractCaseDismissNotificationHandler extends CallbackHan
         notificationService.sendMail(
             getRecipient(callbackParams),
             getNotificationTemplate(callbackParams),
-            addProperties(caseData),
+            addProperties(callbackParams),
             String.format(getReferenceTemplate(), caseData.getCcdCaseReference())
         );
         return AboutToStartOrSubmitCallbackResponse.builder().build();
