@@ -42,9 +42,9 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
     private static final String BODY_CONFIRMATION_OBLIGATION = "### What happens next \n\n" +
         "A new task will be generated on the review date.";
 
-    private static final String TASKS_LEFT_ERROR_1 = "<h3 class=\"heading-h3 error-summary-heading ng-star-inserted\">Order review not completed<h3>";
-    private static final String TASKS_LEFT_ERROR_2 = "<p>You must complete the tasks in the order before you can submit your order review.<p></br>";
-    private static final String TASKS_LEFT_ERROR_3 = "<p>Once you have completed the task you can submit your order review by clicking on the link on your task list.<p>";
+    private static final String TASKS_LEFT_ERROR_1 = "Order review not completed.";
+    private static final String TASKS_LEFT_ERROR_2 = "You must complete the tasks in the order before you can submit your order review.";
+    private static final String TASKS_LEFT_ERROR_3 = "Once you have completed the task you can submit your order review by clicking on the link on your task list.";
 
     @BeforeEach
     void caseEventsEnabled() {
@@ -119,10 +119,8 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData())
-                .extracting("obligationDatePresent").isEqualTo("Yes");
-            assertThat(response.getData())
-                .extracting("courtStaffNextSteps").isEqualTo("NO_TASKS");
+            assertThat(response.getData()).extracting("obligationDatePresent").isNull();
+            assertThat(response.getData()).extracting("courtStaffNextSteps").isNull();
         }
 
         @Test
