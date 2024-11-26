@@ -7811,7 +7811,7 @@ class EventHistoryMapperTest {
         @Test
         public void shouldgenerateRPAfeedfor_DJNoDivergent_case_online_999_event() {
 
-            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
+            given(featureToggleService.isJOLiveFeedActive()).willReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged().build().toBuilder()
                 .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
@@ -7851,7 +7851,7 @@ class EventHistoryMapperTest {
         @Test
         public void shouldgenerateRPAfeedfor_DJNoDivergent_case_offline_999_event() {
 
-            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
+            given(featureToggleService.isJOLiveFeedActive()).willReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged().build().toBuilder()
                 .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
