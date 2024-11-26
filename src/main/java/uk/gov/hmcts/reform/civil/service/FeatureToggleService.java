@@ -159,7 +159,7 @@ public class FeatureToggleService {
     }
 
     public boolean isJOLiveFeedActive() {
-        return isJudgmentOnlineLive() &&
-            featureToggleApi.isFeatureEnabled("isJOLiveFeedActive");
+        return isJudgmentOnlineLive()
+            && featureToggleApi.isFeatureEnabled("isJOLiveFeedActive");
     }
 }
