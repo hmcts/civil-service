@@ -72,8 +72,6 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
         );
     }
 
-
-
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
