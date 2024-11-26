@@ -35,6 +35,14 @@ public abstract class ElasticSearchService {
         return caseDetails;
     }
 
+    /**
+     * For carm applicable cases, the returned query is sorted by ascending value of case reference. Since the
+     * queries are paginated, the value of the last case is used for the search_after property in the query to
+     * ensure that cases are returned in the right order of pages to prevent duplication.
+     * @param claimMovedDate claimMovedDate
+     * @param carmEnabled carmEnabled
+     * @return caseDetails
+     */
     public List<CaseDetails> getInMediationCases(LocalDate claimMovedDate, boolean carmEnabled) {
 
         if (claimMovedDate == null) {
@@ -46,29 +54,18 @@ public abstract class ElasticSearchService {
             log.info("mediation total found: {}", searchResult.getTotal());
             int pages = calculatePages(searchResult);
             List<CaseDetails> caseDetails = new ArrayList<>(searchResult.getCases());
-            if (!caseDetails.isEmpty()) {
-                StringBuilder sb = new StringBuilder().append("Mediation query case IDs: ");
-                for (CaseDetails caseDetail : caseDetails) {
-                    sb.append(caseDetail.getId());
-                    sb.append("\n");
-                }
-                log.info(sb.toString());
-            }
+            logMediationCaseIds(caseDetails, null);
+            // find the last case from that list
+            String searchAfterValue = searchResult.getCases().get(searchResult.getCases().size() - 1).getId().toString();
             for (int i = 1; i < pages; i++) {
-                String searchAfterValue = searchResult.getCases().get(searchResult.getCases().size() - 1).getId().toString();
+                // use the query again passing in the search after value
                 SearchResult result = coreCaseDataService.searchMediationCases(queryInMediationCases(START_INDEX, claimMovedDate,
                                                                                             carmEnabled, false, searchAfterValue));
-                if (!result.getCases().isEmpty()) {
-                    StringBuilder sb = new StringBuilder().append("Page ").append(i).append(" Mediation query case IDs: ");
-                    for (CaseDetails caseDetail : result.getCases()) {
-                        sb.append(caseDetail.getId());
-                        sb.append("\n");
-                    }
-                    log.info(sb.toString());
-                }
+                logMediationCaseIds(caseDetails, String.valueOf(i));
                 caseDetails.addAll(result.getCases());
+                // update the value from the new result
+                searchAfterValue = result.getCases().get(result.getCases().size() - 1).getId().toString();
             }
-
             return caseDetails;
         } else {
             SearchResult searchResult = coreCaseDataService.searchCases(queryInMediationCases(START_INDEX, claimMovedDate,
@@ -92,5 +89,19 @@ public abstract class ElasticSearchService {
 
     private int calculatePages(SearchResult searchResult) {
         return new BigDecimal(searchResult.getTotal()).divide(new BigDecimal(ES_DEFAULT_SEARCH_LIMIT), UP).intValue();
+    }
+
+    private void logMediationCaseIds(List<CaseDetails> caseDetails, String page) {
+        if (!caseDetails.isEmpty()) {
+            StringBuilder sb = new StringBuilder().append("Mediation query case IDs: ");
+            if (page != null) {
+                sb.append("page ").append(page).append(" ");
+            }
+            for (CaseDetails caseDetail : caseDetails) {
+                sb.append(caseDetail.getId());
+                sb.append("\n");
+            }
+            log.info(sb.toString());
+        }
     }
 }

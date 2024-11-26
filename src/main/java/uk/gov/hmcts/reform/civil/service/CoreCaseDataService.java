@@ -148,7 +148,7 @@ public class CoreCaseDataService {
     public SearchResult searchMediationCases(Query query) {
         String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         String searchString = query.toMediationQueryString();
-        log.info("Searching Elasticsearch with query: " + searchString);
+        log.info("Searching Elasticsearch with mediation query: " + searchString);
         return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CASE_TYPE, searchString);
     }
 

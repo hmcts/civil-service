@@ -59,9 +59,8 @@ public class Query {
             + "\"sort\": ["
             + "{"
             + "\"reference.keyword\": \"asc\""
-            + " }"
-            + " ]"
-            + "}";
+            + "            }"
+            + "          ]";
     }
 
     private String getInitialQuery() {
