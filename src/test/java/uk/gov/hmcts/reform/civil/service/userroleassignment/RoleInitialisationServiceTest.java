@@ -69,7 +69,7 @@ class RoleInitialisationServiceTest {
                     .grantType(GrantType.STANDARD)
                     .roleCategory(RoleCategory.SYSTEM)
                     .roleName("hearing-manager")
-                    .attributes(Map.of("jurisdiction", "CIVIL", "caseType", "CIVIL"))
+                    .attributes(Map.of("jurisdiction", "CIVIL", "caseType", "Civil-5098"))
                     .readOnly(false)
                     .build(),
                 RoleAssignment.builder()
@@ -80,7 +80,7 @@ class RoleInitialisationServiceTest {
                     .grantType(GrantType.STANDARD)
                     .roleCategory(RoleCategory.SYSTEM)
                     .roleName("hearing-viewer")
-                    .attributes(Map.of("jurisdiction", "CIVIL", "caseType", "CIVIL"))
+                    .attributes(Map.of("jurisdiction", "CIVIL", "caseType", "Civil-5098"))
                     .readOnly(false)
                     .build()
             )).build();
