@@ -38,22 +38,7 @@ import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.DetermineLoggedInSolicitor;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.HandleAdmitPartOfClaim;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.HandleDefendAllClaim;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.HandleRespondentResponseTypeForSpec;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.PopulateRespondent1Copy;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.RespondToClaimSpecUtils;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.SetApplicantResponseDeadlineSpec;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.SetGenericResponseTypeFlag;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.SetUploadTimelineTypeFlag;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateDateOfBirth;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateLengthOfUnemployment;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateMediationUnavailableDates;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateRespondentExpertsSpec;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateRespondentPaymentDate;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateRespondentWitnessesSpec;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateUnavailableDatesSpec;
+import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.RespondToClaimSpecCallbackHandlerTestConfig;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.CounterClaimConfirmationText;
@@ -176,22 +161,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     SimpleStateFlowBuilder.class,
     AssignCategoryId.class,
     FrcDocumentsUtils.class,
-    DetermineLoggedInSolicitor.class,
-    HandleAdmitPartOfClaim.class,
-    HandleDefendAllClaim.class,
-    HandleRespondentResponseTypeForSpec.class,
-    PopulateRespondent1Copy.class,
-    RespondToClaimSpecUtils.class,
-    SetApplicantResponseDeadlineSpec.class,
-    SetGenericResponseTypeFlag.class,
-    SetUploadTimelineTypeFlag.class,
-    ValidateMediationUnavailableDates.class,
-    ValidateUnavailableDatesSpec.class,
-    ValidateDateOfBirth.class,
-    ValidateRespondentPaymentDate.class,
-    ValidateLengthOfUnemployment.class,
-    ValidateRespondentWitnessesSpec.class,
-    ValidateRespondentExpertsSpec.class
+    RespondToClaimSpecCallbackHandlerTestConfig.class
 })
 class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
