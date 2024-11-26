@@ -7,7 +7,7 @@ public class CaseDefinitionConstants {
     }
 
     public static final String JURISDICTION = "CIVIL";
-    public static final String CASE_TYPE = "CIVIL";
+    public static final String CASE_TYPE = "Civil-5098";
     public static final String GENERALAPPLICATION_CASE_TYPE = "GENERALAPPLICATION";
     public static final String CMC_JURISDICTION = "CMC";
     public static final String CMC_CASE_TYPE = "MoneyClaimCase";
