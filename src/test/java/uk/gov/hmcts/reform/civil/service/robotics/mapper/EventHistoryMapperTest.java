@@ -8411,7 +8411,7 @@ class EventHistoryMapperTest {
                 .applicant1Represented(YesOrNo.NO)
                 .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
                 .build();
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+            when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();

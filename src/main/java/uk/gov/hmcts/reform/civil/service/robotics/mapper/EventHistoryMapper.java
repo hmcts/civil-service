@@ -501,7 +501,7 @@ public class EventHistoryMapper {
             buildJudgmentByAdmissionEventDetails(builder, caseData);
 
             String miscTextRequested = RPA_REASON_JUDGMENT_BY_ADMISSION;
-            if (featureToggleService.isJudgmentOnlineLive()
+            if (featureToggleService.isJOLiveFeedActive()
                 && caseData.getCcdState() == CaseState.All_FINAL_ORDERS_ISSUED) {
                 miscTextRequested = RPA_RECORD_JUDGMENT;
             }
