@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -67,11 +69,12 @@ class NotifyDefendantAmendRestitchBundleHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "NO, NO, template-id",
-        "NO, YES, bilingual-template-id",
-        "YES, NO, 'template-LR-id'"
+        "NO, NO, NO, template-id",
+        "NO, YES, NO, bilingual-template-id",
+        "YES, NO, NO, 'template-LR-id'",
+        "YES, NO, YES, 'template-LR-id'"
     })
-    void shouldSendEmailBasedOnConditions(YesOrNo represented, YesOrNo bilingual, String expectedTemplateId) {
+    void shouldSendEmailBasedOnConditions(YesOrNo represented, YesOrNo bilingual, YesOrNo isRespondent2, String expectedTemplateId) {
         if (represented.equals(YesOrNo.NO)) {
             if (bilingual == YesOrNo.YES) {
                 caseData = caseData.toBuilder().caseDataLiP(CaseDataLiP.builder()
@@ -88,8 +91,20 @@ class NotifyDefendantAmendRestitchBundleHandlerTest {
         }
 
         caseData = caseData.toBuilder().respondent1Represented(represented).build();
-
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+        if (YesOrNo.YES.equals(isRespondent2)) {
+            caseData = caseData.toBuilder()
+                .respondent2(Party.builder().individualFirstName("John").individualLastName("Johnson")
+                                 .type(Party.Type.INDIVIDUAL).build())
+                .respondentSolicitor2EmailAddress("solicitor2@address.com")
+                .addRespondent2(isRespondent2)
+                .respondent2SameLegalRepresentative(YesOrNo.NO)
+                .build();
+        }
+        CallbackRequest callbackRequest = CallbackRequest.builder()
+            .eventId(YesOrNo.YES.equals(isRespondent2)
+                         ? CaseEvent.NOTIFY_DEFENDANT_TWO_AMEND_RESTITCH_BUNDLE.name()
+                            : CaseEvent.NOTIFY_DEFENDANT_AMEND_RESTITCH_BUNDLE.name()).build();
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(callbackRequest).build();
 
         handler.handle(params);
 
@@ -97,24 +112,24 @@ class NotifyDefendantAmendRestitchBundleHandlerTest {
             verify(notificationService).sendMail(
                 "respondentLip@example.com",
                 expectedTemplateId,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(caseData, isRespondent2),
                 "amend-restitch-bundle-defendant-notification-1594901956117591"
             );
         } else {
             verify(notificationService).sendMail(
-                "respondentsolicitor@example.com",
+                YesOrNo.YES.equals(isRespondent2) ? "solicitor2@address.com" : "respondentsolicitor@example.com",
                 expectedTemplateId,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(caseData, isRespondent2),
                 "amend-restitch-bundle-defendant-notification-1594901956117591"
             );
         }
     }
 
-    private Map<String, String> getNotificationDataMap(CaseData caseData) {
+    private Map<String, String> getNotificationDataMap(CaseData caseData, YesOrNo isRespondent2) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            PARTY_NAME, "Jack Jackson",
-            CLAIMANT_V_DEFENDANT, "John Doe V Jack Jackson",
+            PARTY_NAME, YesOrNo.YES.equals(isRespondent2) ? "John Johnson" : "Jack Jackson",
+            CLAIMANT_V_DEFENDANT, YesOrNo.YES.equals(isRespondent2) ? "John Doe V Jack Jackson, John Johnson" : "John Doe V Jack Jackson",
             BUNDLE_RESTITCH_DATE, LocalDate.now().format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK))
         );
     }
