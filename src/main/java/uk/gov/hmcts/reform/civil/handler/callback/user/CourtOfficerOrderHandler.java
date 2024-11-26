@@ -26,7 +26,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.CourtOfficerOrderGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
-import uk.gov.hmcts.reform.civil.utils.HearingReferenceNumber;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
@@ -80,7 +79,6 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
     private CallbackResponse handleAboutToSubmit(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.hearingReferenceNumber(HearingReferenceNumber.generateHearingReference());
 
         caseDataBuilder.businessProcess(BusinessProcess.ready(COURT_OFFICER_ORDER));
         return AboutToStartOrSubmitCallbackResponse.builder()
