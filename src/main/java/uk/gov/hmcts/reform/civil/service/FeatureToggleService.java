@@ -157,4 +157,9 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("hmc-nro");
 
     }
+
+    public boolean isJOLiveFeedActive() {
+        return featureToggleApi.isFeatureEnabled("isJOLiveFeedActive")
+            && isJudgmentOnlineLive();
+    }
 }
