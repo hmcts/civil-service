@@ -34,15 +34,23 @@ public class Message {
     @Builder.Default
     private List<Element<MessageReply>> history = new ArrayList<>();
 
-    public Message buildFullReplyMessage(MessageReply reply, Message userDetails, Time time) {
+    public Message buildNewFullReplyMessage(MessageReply reply, Message userDetails, Time time) {
         return this.toBuilder()
-            .sentTime(reply.getSentTime())
             .isUrgent(reply.getIsUrgent())
             .senderName(userDetails.getSenderName())
             .senderRoleType(userDetails.getSenderRoleType())
             .messageContent(reply.getMessageContent())
-            .recipientRoleType(reply.getRecipientRoleType())
+            .recipientRoleType(this.senderRoleType)
             .updatedTime(time.now())
+            .build();
+    }
+
+    public Message buildFullReplyMessageForTable(MessageReply reply) {
+        return this.toBuilder()
+            .sentTime(reply.getSentTime())
+            .isUrgent(reply.getIsUrgent())
+            .messageContent(reply.getMessageContent())
+            .recipientRoleType(this.senderRoleType)
             .build();
     }
 }

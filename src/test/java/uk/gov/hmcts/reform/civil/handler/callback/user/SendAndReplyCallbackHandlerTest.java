@@ -208,7 +208,7 @@ class SendAndReplyCallbackHandlerTest {
     @Test
     void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_andSendAndReplyOptionIsReply() {
         Element<Message> message = element(Message.builder().messageContent("Original Message").build());
-        Message messageReply = Message.builder().messageContent("Reply to message").build();
+        MessageReply messageReply = MessageReply.builder().messageContent("Reply to message").build();
         List<Element<Message>> messages = List.of(message);
 
         List<Element<Message>> updatedMessages = List.of(
@@ -216,7 +216,7 @@ class SendAndReplyCallbackHandlerTest {
                 .id(message.getId())
                 .value(
                     message.getValue().toBuilder()
-                        .history(List.of(Element.<Message>builder().id(UUID.randomUUID()).value(messageReply).build()))
+                        .history(List.of(element(messageService.buildReplyOutOfMessage(message.getValue()))))
                         .build())
                 .build());
 

@@ -90,12 +90,12 @@ public class SendAndReplyMessageService {
 
     public Message createBaseMessageWithSenderDetails(String userAuth) {
         UserDetails details = userService.getUserDetails(userAuth);
-        String role = getFirstSupportedRole(userAuth, details.getId());
-        String senderName = String.format("%s, %s", details.getFullName(), role);
+        RoleAssignmentResponse role = getFirstSupportedRole(userAuth, details.getId());
+        String senderName = String.format("%s, %s", details.getFullName(), role.getRoleLabel());
 
         return Message.builder()
             .senderName(senderName)
-            .senderRoleType(SUPPORTED_ROLES.get(role))
+            .senderRoleType(SUPPORTED_ROLES.get(role.getRoleName()))
             .build();
     }
 
@@ -104,11 +104,11 @@ public class SendAndReplyMessageService {
         Message baseMessageDetails = createBaseMessageWithSenderDetails(userAuth);
 
         //Move current base message to history
-        MessageReply messageForHistory = MessageReply.builder().build();
-        Element<MessageReply> newHistoryMessage = element(messageForHistory.buildReplyOutOfMessage(messageToReplace.getValue()));
+        MessageReply messageForHistory = buildReplyOutOfMessage(messageToReplace.getValue());
+        Element<MessageReply> newHistoryMessage = element(messageForHistory);
 
         //Switch out current base message with reply info
-        messageToReplace.setValue(messageToReplace.getValue().buildFullReplyMessage(messageReply, baseMessageDetails, time));
+        messageToReplace.setValue(messageToReplace.getValue().buildNewFullReplyMessage(messageReply, baseMessageDetails, time));
 
         messageToReplace.getValue().getHistory().add(newHistoryMessage);
 
@@ -119,13 +119,13 @@ public class SendAndReplyMessageService {
         return messages.stream().filter(message -> code.equals(message.getId().toString())).findFirst().orElse(null);
     }
 
-    private String getFirstSupportedRole(String auth, String userId) {
+    private RoleAssignmentResponse getFirstSupportedRole(String auth, String userId) {
         var roleAssignments = roleAssignmentsService.getRoleAssignmentsWithLabels(userId, auth);
         RoleAssignmentResponse roleAssignment = roleAssignments.getRoleAssignmentResponse().stream()
             .filter(userRole -> SUPPORTED_ROLES.containsKey(userRole.getRoleName()))
             .min(Comparator.comparingInt(userRole -> SUPPORTED_ROLES.keySet().stream().toList().indexOf(userRole.getRoleName())))
             .orElse(RoleAssignmentResponse.builder().roleLabel("").roleCategory("").build());
-        return roleAssignment.getRoleLabel();
+        return roleAssignment;
     }
 
     public String renderMessageTableList(Element<Message> message) {
@@ -137,7 +137,9 @@ public class SendAndReplyMessageService {
 
     private List<Message> retrieveFullMessageHistory(Element<Message> message) {
         return Stream.concat(Stream.of(message.getValue()), message.getValue().getHistory().stream()
-                .map(historyItem -> message.getValue())).toList();
+                .map(historyItem -> message.getValue().buildFullReplyMessageForTable(historyItem.getValue())))
+                .sorted(Comparator.comparing(Message::getSentTime).reversed())
+                .toList();
     }
 
     private String renderMessageTable(Message message) {
@@ -172,4 +174,16 @@ public class SendAndReplyMessageService {
             .replace("am", "AM").replace("pm", "PM");
     }
 
+    public MessageReply buildReplyOutOfMessage(Message message) {
+        return MessageReply.builder()
+            .sentTime(message.getSentTime())
+            .isUrgent(message.getIsUrgent())
+            .senderName(message.getSenderName())
+            .senderRoleType(message.getSenderRoleType())
+            .messageContent(message.getMessageContent())
+            .recipientRoleType(message.getRecipientRoleType())
+            .contentSubject(message.getContentSubject())
+            .subjectType(message.getSubjectType())
+            .build();
+    }
 }
