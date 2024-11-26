@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -12,12 +15,16 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingChannel;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -34,6 +41,7 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -404,5 +412,41 @@ public class HearingFormGeneratorTest {
             .build();
 
         assertThat(generator.listingOrRelistingWithFeeDue(caseData)).isEqualTo("DO_NOT_SHOW");
+    }
+
+    private static Stream<Arguments> provideTestCases() {
+        return Stream.of(
+            Arguments.of(CaseState.HEARING_READINESS, ListingOrRelisting.LISTING, YesOrNo.NO, YesOrNo.NO,
+                         PaymentDetails.builder().status(PaymentStatus.SUCCESS).build(), null, "DO_NOT_SHOW"),
+            Arguments.of(CaseState.HEARING_READINESS, ListingOrRelisting.LISTING, YesOrNo.NO, YesOrNo.NO,
+                         null, FeePaymentOutcomeDetails.builder().hwfFullRemissionGrantedForHearingFee(YesOrNo.YES).build(), "DO_NOT_SHOW"),
+            Arguments.of(CaseState.HEARING_READINESS, ListingOrRelisting.LISTING, YesOrNo.NO, YesOrNo.NO,
+                         PaymentDetails.builder().status(PaymentStatus.FAILED).build(), null, "SHOW"),
+            Arguments.of(CaseState.HEARING_READINESS, ListingOrRelisting.LISTING, YesOrNo.NO, YesOrNo.NO,
+                         PaymentDetails.builder().status(PaymentStatus.FAILED).build(), null, "SHOW")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideTestCases")
+    void shouldNotCreateDashboardNotificationsForHearingFee(CaseState ccdState, ListingOrRelisting listingOrRelisting,
+                                                            YesOrNo applicant1Represented, YesOrNo respondent1Represented,
+                                                            PaymentDetails hearingFeePaymentDetails, FeePaymentOutcomeDetails feePaymentOutcomeDetails,
+                                                            String expected) {
+        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .ccdState(ccdState)
+            .listingOrRelisting(listingOrRelisting)
+            .applicant1Represented(applicant1Represented)
+            .respondent1Represented(respondent1Represented)
+            .hearingFeePaymentDetails(hearingFeePaymentDetails)
+            .hearingHelpFeesReferenceNumber("123")
+            .feePaymentOutcomeDetails(feePaymentOutcomeDetails)
+            .build();
+
+        assertThat(generator.listingOrRelistingWithFeeDue(caseData)).isEqualTo(expected);
     }
 }
