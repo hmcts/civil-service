@@ -80,7 +80,7 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<LocationRefData> locations = (locationRefDataService
-            .getHearingCourtLocations(authToken));
+                .getHearingCourtLocations(authToken));
         LocationRefData locationRefData = fillPreferredLocationData(locations, caseData.getHearingLocation());
         if (nonNull(locationRefData)) {
             caseData = caseData.toBuilder().hearingLocationCourtName(locationRefData.getSiteName()).build();
@@ -88,28 +88,29 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
 
         if (caseData.isApplicant1NotRepresented()) {
             dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
-                                              SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario(), authToken,
-                                              ScenarioRequestParams.builder().params(
-                                                  mapper.mapCaseDataToParams(caseData)).build()
+                    SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario(), authToken,
+                    ScenarioRequestParams.builder().params(
+                            mapper.mapCaseDataToParams(caseData)).build()
             );
         }
 
         boolean isAutoHearingNotice = isEvent(callbackParams, CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC);
-        boolean requiresHearingFee = false;
-        boolean hasPaidFee = false;
+        boolean hasPaidFee = (caseData.getHearingFeePaymentDetails() != null
+            && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus())) || caseData.hearingFeePaymentDoneWithHWF();
 
-        if (isAutoHearingNotice) {
-            HearingNoticeVariables camundaVars = camundaService.getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId());
-            requiresHearingFee = hearingFeeRequired(camundaVars.getHearingType());
-            hasPaidFee = (caseData.getHearingFeePaymentDetails() != null
-                && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus())) || caseData.hearingFeePaymentDoneWithHWF();
-            if (requiresHearingFee && !hasPaidFee) {
-                caseData.setHearingFee(HearingFeeUtils.calculateAndApplyFee(hearingFeesService, caseData, caseData.getAssignedTrack()));
-            }
+        HearingNoticeVariables camundaVars = isAutoHearingNotice
+            ? camundaService.getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId())
+            : null;
+
+        if (isAutoHearingNotice && hearingFeeRequired(camundaVars.getHearingType()) && !hasPaidFee) {
+            caseData.setHearingFee(HearingFeeUtils.calculateAndApplyFee(hearingFeesService, caseData, caseData.getAssignedTrack()));
         }
 
-        if (caseData.isApplicant1NotRepresented() && ((!isAutoHearingNotice && caseData.getCcdState() == HEARING_READINESS && caseData.getListingOrRelisting() == LISTING)
-            || (isAutoHearingNotice && requiresHearingFee && !hasPaidFee))) {
+        boolean shouldRecordFeeScenario = caseData.isApplicant1NotRepresented() && !hasPaidFee
+            && ((!isAutoHearingNotice && caseData.getCcdState() == HEARING_READINESS && caseData.getListingOrRelisting() == LISTING)
+                || (isAutoHearingNotice && hearingFeeRequired(camundaVars.getHearingType())));
+
+        if (shouldRecordFeeScenario) {
             dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
                                               SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT.getScenario(), authToken,
                                               ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
