@@ -136,6 +136,8 @@ public class ShowConditionFlagsCaseUpdaterTest {
         updater.update(caseData, caseDataBuilder);
 
         CaseData updatedCaseData = caseDataBuilder.build();
+
+        assertThat(updatedCaseData.getShowConditionFlags()).isNotEmpty();
         assertThat(updatedCaseData.getShowConditionFlags()).doesNotContain(NEED_FINANCIAL_DETAILS_1);
     }
 
@@ -200,6 +202,8 @@ public class ShowConditionFlagsCaseUpdaterTest {
         updater.update(caseData, caseDataBuilder);
 
         CaseData updatedCaseData = caseDataBuilder.build();
+
+        assertThat(updatedCaseData.getShowConditionFlags()).isNotEmpty();
         assertThat(updatedCaseData.getShowConditionFlags()).doesNotContain(REPAYMENT_PLAN_2);
     }
 
@@ -244,6 +248,8 @@ public class ShowConditionFlagsCaseUpdaterTest {
         updater.update(caseData, caseDataBuilder);
 
         CaseData updatedCaseData = caseDataBuilder.build();
+
+        assertThat(updatedCaseData.getShowConditionFlags()).isNotEmpty();
         assertThat(updatedCaseData.getShowConditionFlags()).doesNotContain(WHEN_WILL_CLAIM_BE_PAID);
     }
 }

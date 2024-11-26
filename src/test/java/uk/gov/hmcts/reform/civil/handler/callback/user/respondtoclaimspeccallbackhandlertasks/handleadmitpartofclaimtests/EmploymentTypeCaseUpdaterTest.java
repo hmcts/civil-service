@@ -15,7 +15,7 @@ import java.util.Collections;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-public class EmploymentTypeCaseUpdaterTest {
+class EmploymentTypeCaseUpdaterTest {
 
     @InjectMocks
     private EmploymentTypeCaseUpdater employmentTypeCaseUpdater;

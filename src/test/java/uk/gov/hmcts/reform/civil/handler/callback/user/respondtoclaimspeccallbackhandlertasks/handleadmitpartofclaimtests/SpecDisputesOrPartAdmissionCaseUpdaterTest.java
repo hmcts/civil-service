@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 @ExtendWith(MockitoExtension.class)
-public class SpecDisputesOrPartAdmissionCaseUpdaterTest {
+class SpecDisputesOrPartAdmissionCaseUpdaterTest {
 
     @InjectMocks
     private SpecDisputesOrPartAdmissionCaseUpdater updater;
