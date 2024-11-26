@@ -69,7 +69,7 @@ public class RoleAssignmentInitialisationService {
             .grantType(GrantType.STANDARD)
             .roleCategory(RoleCategory.SYSTEM)
             .roleName(roleName)
-            .attributes(Map.of("jurisdiction", "CIVIL", "caseType", "CIVIL"))
+            .attributes(Map.of("jurisdiction", "CIVIL", "caseType", "Civil-5098"))
             .readOnly(false)
             .build()).toList();
     }
