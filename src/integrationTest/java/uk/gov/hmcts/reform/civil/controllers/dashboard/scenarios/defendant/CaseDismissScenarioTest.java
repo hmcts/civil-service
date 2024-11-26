@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.CaseDismissDefendantDashboardNotificationHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.CaseDismissDefendantDashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
