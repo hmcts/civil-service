@@ -155,4 +155,8 @@ public class FeatureToggleService {
     public boolean isCoSCEnabled() {
         return featureToggleApi.isFeatureEnabled("isCoSCEnabled");
     }
+
+    public boolean isDefendantNoCOnline()  {
+        return featureToggleApi.isFeatureEnabled("isDefendantNoCOnline", false);
+    }
 }
