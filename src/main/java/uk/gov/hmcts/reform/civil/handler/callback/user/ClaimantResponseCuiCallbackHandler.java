@@ -115,9 +115,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             builder.claimMovedToMediationOn(LocalDate.now());
         }
         updateCcjRequestPaymentDetails(builder, caseData);
-        if (featureToggleService.isHmcEnabled()) {
-            populateDQPartyIds(builder);
-        }
+        populateDQPartyIds(builder);
 
         if (featureToggleService.isUpdateContactDetailsEnabled()) {
             addEventAndDateAddedToApplicantExperts(builder);

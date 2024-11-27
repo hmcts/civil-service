@@ -82,35 +82,27 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             .applicant1ResponseDate(time.now());
 
         persistFlagsForParties(oldCaseData, caseData, builder);
-
         setResponseDocumentNull(builder);
-
         updateCaselocationDetails(callbackParams, caseData, builder);
-
         updateApplicant1DQ(callbackParams, caseData, builder);
-
         assignApplicant1DQExpertsIfPresent(caseData, builder);
-
         assignApplicant2DQExpertsIfPresent(caseData, builder);
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder,
-                                                                       featureToggleService.isUpdateContactDetailsEnabled());
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(
+            builder, featureToggleService.isUpdateContactDetailsEnabled());
 
         if (featureToggleService.isUpdateContactDetailsEnabled()) {
             addEventAndDateAddedToApplicantExperts(builder);
             addEventAndDateAddedToApplicantWitnesses(builder);
         }
 
-        if (featureToggleService.isHmcEnabled()) {
-            populateDQPartyIds(builder);
-        }
+        populateDQPartyIds(builder);
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, builder);
         moveClaimToMediation(callbackParams, caseData, builder);
 
         String nextState = putCaseStateInJudicialReferral(caseData);
         BusinessProcess businessProcess = BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC);
-
         nextState = determineNextState.determineNextState(caseData, callbackParams, builder, nextState, businessProcess);
 
         frcDocumentsUtils.assembleClaimantsFRCDocuments(caseData);
