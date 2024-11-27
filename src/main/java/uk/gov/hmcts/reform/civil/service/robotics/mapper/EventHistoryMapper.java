@@ -2250,7 +2250,7 @@ public class EventHistoryMapper {
 
         if (featureToggleService.isJOLiveFeedActive()
             && caseData.getCcdState() == CaseState.All_FINAL_ORDERS_ISSUED) {
-            miscTextRequested = miscTextGranted = "Judgment recorded.";
+            miscTextGranted = "Judgment recorded.";
         }
 
         if (caseData.getDefendantDetailsSpec() != null) {
