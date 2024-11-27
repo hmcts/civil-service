@@ -33,7 +33,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -124,46 +123,6 @@ class SendAndReplyMessageServiceTest {
                 List.of(buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)),
                 unwrapElements(actual)
             );
-        }
-
-        @Test
-        void shouldAddMessageReplyToMessageHistory_forHearingCentreAdmin() {
-            when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
-
-            RolePool expectedSenderRoleCategory = RolePool.ADMIN;
-            String expectedUserRoleLabel = "Hearing Centre Admin";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
-                buildRoleAssignmentsResponse(List.of(
-                                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                                 RoleAssignmentResponse.builder().roleName("hearing-centre-admin").roleLabel("Hearing Centre Admin").roleCategory(
-                                                     "ADMIN").build()
-                                             )
-                )
-            );
-
-            Element<Message> existingMessage = element(message);
-            List<Element<Message>> messages = new ArrayList<>();
-            messages.add(existingMessage);
-
-            MessageReply messageReply = MessageReply.builder().isUrgent(YES).messageContent("This is a reply message").build();
-
-            List<Message> actualMessages = unwrapElements(messageService.addReplyToMessage(
-                messages,
-                existingMessage.getId().toString(),
-                messageReply,
-                USER_AUTH
-            ));
-
-            List<MessageReply> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
-
-            assertEquals(List.of(Message.builder()
-                                     .messageContent("This is a reply message")
-                                     .isUrgent(YES)
-                                     .senderName(String.format("%s, %s", USER_NAME, expectedUserRoleLabel))
-                                     .senderRoleType(expectedSenderRoleCategory)
-                                     .recipientRoleType(RolePool.ADMIN)
-                                     .sentTime(NOW)
-                                     .build()), actualMessageHistory);
         }
 
         @Test
@@ -392,7 +351,7 @@ class SendAndReplyMessageServiceTest {
         void should_returnExpectedMessage_forDistrictJudge() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
-            RolePool expectedSenderRoleCategory = RolePool.JUDICIAL;
+            RolePool expectedSenderRoleCategory = RolePool.JUDICIAL_DISTRICT;
             String expectedUserRoleLabel = "District Judge";
             when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
@@ -424,7 +383,7 @@ class SendAndReplyMessageServiceTest {
         void should_returnExpectedMessage_forCircuitJudge() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
-            RolePool expectedSenderRoleCategory = RolePool.JUDICIAL;
+            RolePool expectedSenderRoleCategory = RolePool.JUDICIAL_CIRCUIT;
             String expectedUserRoleLabel = "Circuit Judge";
             when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
@@ -497,7 +456,7 @@ class SendAndReplyMessageServiceTest {
                 .headerSubject(MESSAGE_METADATA.getSubject().getLabel())
                 .contentSubject(MESSAGE_METADATA.getSubject().getLabel())
                 .isUrgent(MESSAGE_METADATA.getIsUrgent())
-                .recipientRoleType(RolePool.JUDICIAL)
+                .recipientRoleType(RolePool.JUDICIAL_CIRCUIT)
                 .senderName(String.format("%s, %s", USER_NAME, expectedUserRoleLabel))
                 .senderRoleType(expectedUserRole)
                 .build();
@@ -515,13 +474,94 @@ class SendAndReplyMessageServiceTest {
                              List.of(RoleAssignmentResponse.builder().roleName("hearing-centre-admin").roleLabel("Hearing Centre Administrator").roleCategory("ADMIN").build()),
                              "Hearing Centre Administrator",
                              "Judge"
-                )
+                ),
+                Arguments.of(RolePool.JUDICIAL,
+                             RolePool.ADMIN,
+                             List.of(
+                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
+                                 RoleAssignmentResponse.builder().roleName("hearing-centre-admin").roleLabel(
+                                     "Hearing Centre Administrator").roleCategory("ADMIN").build(),
+                                 RoleAssignmentResponse.builder().roleName("hearing-centre-team-leader").roleLabel(
+                                     "Hearing Centre Team Leader").roleCategory("ADMIN").build()
+                             ),
+                             "Hearing Centre Team Leader",
+                             "Judge"),
+                Arguments.of(RolePool.JUDICIAL,
+                             RolePool.ADMIN,
+                             List.of(
+                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
+                                 RoleAssignmentResponse.builder().roleName("ctsc").roleLabel("CTSC").roleCategory("ADMIN").build()
+                             ),
+                             "CTSC",
+                             "Judge"
+                ),
+                Arguments.of(RolePool.JUDICIAL,
+                             RolePool.ADMIN,
+                             List.of(
+                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
+                                 RoleAssignmentResponse.builder().roleName("ctsc").roleLabel("CTSC").roleCategory("ADMIN").build(),
+                                 RoleAssignmentResponse.builder().roleName("ctsc-team-leader").roleLabel("CTSC Team Leader").roleCategory(
+                                     "ADMIN").build()
+                             ),
+                             "CTSC Team Leader",
+                             "Judge"),
+                Arguments.of(RolePool.JUDICIAL,
+                             RolePool.LEGAL_OPERATIONS,
+                             List.of(
+                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
+                                 RoleAssignmentResponse.builder().roleName("tribunal-caseworker").roleLabel("Tribunal Caseworker").roleCategory(
+                                     "LEGAL_OPERATIONS").build()
+                             ),
+                             "Tribunal Caseworker",
+                             "Judge"),
+                Arguments.of(RolePool.JUDICIAL,
+                             RolePool.LEGAL_OPERATIONS,
+                             List.of(
+                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
+                                 RoleAssignmentResponse.builder().roleName("tribunal-caseworker").roleLabel("Tribunal Caseworker").roleCategory(
+                                     "LEGAL_OPERATIONS").build(),
+                                 RoleAssignmentResponse.builder().roleName("senior-tribunal-caseworker").roleLabel(
+                                     "Senior Tribunal Caseworker").roleCategory("LEGAL_OPERATIONS").build()
+                             ),
+                             "Senior Tribunal Caseworker",
+                             "Judge"),
+                Arguments.of(RolePool.ADMIN,
+                             RolePool.JUDICIAL_DISTRICT,
+                             List.of(
+                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
+                                 RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build(),
+                                 RoleAssignmentResponse.builder().roleName("district-judge").roleLabel("District Judge").roleCategory(
+                                     "JUDICIAL").build()
+                             ),
+                             "District Judge",
+                             "Hearing centre admin"),
+                Arguments.of(RolePool.ADMIN,
+                             RolePool.JUDICIAL_CIRCUIT,
+                             List.of(
+                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
+                                 RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build(),
+                                 RoleAssignmentResponse.builder().roleName("circuit-judge").roleLabel("Circuit Judge").roleCategory(
+                                     "JUDICIAL").build()
+                             ),
+                             "Circuit Judge",
+                             "Hearing centre admin"),
+                Arguments.of(RolePool.ADMIN,
+                             RolePool.JUDICIAL,
+                             List.of(
+                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
+                                 RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build()
+                             ),
+                             "Judge",
+                             "Hearing centre admin")
             );
         }
 
         @ParameterizedTest
         @MethodSource("provideUserData")
-        void shouldAddMessageReplyasBaseAndBaseToMessageHistory_asHearingCentreAdmin(RolePool originalSender, RolePool currentSender, List<RoleAssignmentResponse> roleAssignmentResponses, String newRoleLabel, String oldRoleLabel) {
+        void shouldAddMessageReplyasBaseAndBaseToMessageHistory_asHearingCentreAdmin(RolePool originalSender,
+                                                                                     RolePool currentSender,
+                                                                                     List<RoleAssignmentResponse> roleAssignmentResponses,
+                                                                                     String newRoleLabel, String oldRoleLabel) {
             LocalDateTime updatedTime = LocalDateTime.of(2025, 1, 1, 10, 10);
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
             when(time.now()).thenReturn(updatedTime);
@@ -580,331 +620,6 @@ class SendAndReplyMessageServiceTest {
         }
 
         @Test
-        void shouldAddMessageReplyToMessageHistory_forHearingCentreTeamLeader() {
-            when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
-
-            RolePool expectedSenderRoleCategory = RolePool.ADMIN;
-            String expectedUserRoleLabel = "Hearing Centre Team Leader";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
-                buildRoleAssignmentsResponse(List.of(
-                                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                                 RoleAssignmentResponse.builder().roleName("hearing-centre-admin").roleLabel(
-                                                     "Hearing Centre Administrator").roleCategory("ADMIN").build(),
-                                                 RoleAssignmentResponse.builder().roleName("hearing-centre-team-leader").roleLabel(
-                                                     "Hearing Centre Team Leader").roleCategory("ADMIN").build()
-                                             )
-                )
-            );
-
-            Element<Message> existingMessage = element(message.toBuilder().recipientRoleType(RolePool.ADMIN).build());
-            List<Element<Message>> messages = new ArrayList<>();
-            messages.add(existingMessage);
-
-            MessageReply messageReply = MessageReply.builder().isUrgent(YES).messageContent("This is a reply message").build();
-
-            List<Message> actualMessages = unwrapElements(messageService.addReplyToMessage(
-                messages,
-                existingMessage.getId().toString(),
-                messageReply,
-                USER_AUTH
-            ));
-
-            List<MessageReply> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
-
-            assertEquals(List.of(Message.builder()
-                                     .messageContent("This is a reply message")
-                                     .isUrgent(YES)
-                                     .senderName(String.format("%s, %s", USER_NAME, expectedUserRoleLabel))
-                                     .senderRoleType(expectedSenderRoleCategory)
-                                     .recipientRoleType(RolePool.ADMIN)
-                                     .sentTime(NOW)
-                                     .build()), actualMessageHistory);
-        }
-
-        @Test
-        void shouldAddMessageReplyToMessageHistory_forCtsc() {
-            when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
-
-            RolePool expectedSenderRoleCategory = RolePool.ADMIN;
-            String expectedUserRoleLabel = "CTSC";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
-                buildRoleAssignmentsResponse(List.of(
-                                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                                 RoleAssignmentResponse.builder().roleName("ctsc").roleLabel("CTSC").roleCategory("ADMIN").build()
-                                             )
-                )
-            );
-
-            Element<Message> existingMessage = element(message);
-            List<Element<Message>> messages = new ArrayList<>();
-            messages.add(existingMessage);
-
-            MessageReply messageReply = MessageReply.builder().isUrgent(YES).messageContent("This is a reply message").build();
-
-            List<Message> actualMessages = unwrapElements(messageService.addReplyToMessage(
-                messages,
-                existingMessage.getId().toString(),
-                messageReply,
-                USER_AUTH
-            ));
-
-            List<MessageReply> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
-
-            assertEquals(List.of(Message.builder()
-                                     .messageContent("This is a reply message")
-                                     .isUrgent(YES)
-                                     .senderName(String.format("%s, %s", USER_NAME, expectedUserRoleLabel))
-                                     .senderRoleType(expectedSenderRoleCategory)
-                                     .recipientRoleType(RolePool.ADMIN)
-                                     .sentTime(NOW)
-                                     .build()), actualMessageHistory);
-        }
-
-        @Test
-        void shouldAddMessageReplyToMessageHistory_forCtscTeamLeader() {
-            when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
-
-            RolePool expectedSenderRoleCategory = RolePool.ADMIN;
-            String expectedUserRoleLabel = "CTSC Team Leader";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
-                buildRoleAssignmentsResponse(List.of(
-                                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                                 RoleAssignmentResponse.builder().roleName("ctsc").roleLabel("CTSC").roleCategory("ADMIN").build(),
-                                                 RoleAssignmentResponse.builder().roleName("ctsc-team-leader").roleLabel("CTSC Team Leader").roleCategory(
-                                                     "ADMIN").build()
-                                             )
-                )
-            );
-
-            Element<Message> existingMessage = element(message);
-            List<Element<Message>> messages = new ArrayList<>();
-            messages.add(existingMessage);
-
-            MessageReply messageReply = MessageReply.builder().isUrgent(YES).messageContent("This is a reply message").build();
-
-            List<Message> actualMessages = unwrapElements(messageService.addReplyToMessage(
-                messages,
-                existingMessage.getId().toString(),
-                messageReply,
-                USER_AUTH
-            ));
-
-            List<MessageReply> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
-
-            assertEquals(List.of(Message.builder()
-                                     .messageContent("This is a reply message")
-                                     .isUrgent(YES)
-                                     .senderName(String.format("%s, %s", USER_NAME, expectedUserRoleLabel))
-                                     .senderRoleType(expectedSenderRoleCategory)
-                                     .recipientRoleType(RolePool.ADMIN)
-                                     .sentTime(NOW)
-                                     .build()), actualMessageHistory);
-        }
-
-        @Test
-        void shouldAddMessageReplyToMessageHistory_forTribunalCaseworker() {
-            when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
-
-            RolePool expectedSenderRoleCategory = RolePool.LEGAL_OPERATIONS;
-            String expectedUserRoleLabel = "Tribunal Caseworker";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
-                buildRoleAssignmentsResponse(List.of(
-                                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                                 RoleAssignmentResponse.builder().roleName("tribunal-caseworker").roleLabel("Tribunal Caseworker").roleCategory(
-                                                     "LEGAL_OPERATIONS").build()
-                                             )
-                )
-            );
-
-            Element<Message> existingMessage = element(message);
-            List<Element<Message>> messages = new ArrayList<>();
-            messages.add(existingMessage);
-
-            MessageReply messageReply = MessageReply.builder().isUrgent(YES).messageContent("This is a reply message").build();
-
-            List<Message> actualMessages = unwrapElements(messageService.addReplyToMessage(
-                messages,
-                existingMessage.getId().toString(),
-                messageReply,
-                USER_AUTH
-            ));
-
-            List<MessageReply> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
-
-            assertEquals(List.of(Message.builder()
-                                     .messageContent("This is a reply message")
-                                     .isUrgent(YES)
-                                     .senderName(String.format("%s, %s", USER_NAME, expectedUserRoleLabel))
-                                     .senderRoleType(expectedSenderRoleCategory)
-                                     .recipientRoleType(RolePool.ADMIN)
-                                     .sentTime(NOW)
-                                     .build()), actualMessageHistory);
-        }
-
-        @Test
-        void shouldAddMessageReplyToMessageHistory_forSeniorTribunalCaseworker() {
-            when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
-
-            RolePool expectedSenderRoleCategory = RolePool.LEGAL_OPERATIONS;
-            String expectedUserRoleLabel = "Senior Tribunal Caseworker";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
-                buildRoleAssignmentsResponse(List.of(
-                                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                                 RoleAssignmentResponse.builder().roleName("tribunal-caseworker").roleLabel("Tribunal Caseworker").roleCategory(
-                                                     "LEGAL_OPERATIONS").build(),
-                                                 RoleAssignmentResponse.builder().roleName("senior-tribunal-caseworker").roleLabel(
-                                                     "Senior Tribunal Caseworker").roleCategory("LEGAL_OPERATIONS").build()
-                                             )
-                )
-            );
-
-            Element<Message> existingMessage = element(message);
-            List<Element<Message>> messages = new ArrayList<>();
-            messages.add(existingMessage);
-
-            MessageReply messageReply = MessageReply.builder().isUrgent(YES).messageContent("This is a reply message").build();
-
-            List<Message> actualMessages = unwrapElements(messageService.addReplyToMessage(
-                messages,
-                existingMessage.getId().toString(),
-                messageReply,
-                USER_AUTH
-            ));
-
-            List<MessageReply> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
-
-            assertEquals(List.of(Message.builder()
-                                     .messageContent("This is a reply message")
-                                     .isUrgent(YES)
-                                     .senderName(String.format("%s, %s", USER_NAME, expectedUserRoleLabel))
-                                     .senderRoleType(expectedSenderRoleCategory)
-                                     .recipientRoleType(RolePool.ADMIN)
-                                     .sentTime(NOW)
-                                     .build()), actualMessageHistory);
-        }
-
-        @Test
-        void shouldAddMessageReplyToMessageHistory_forDistrictJudge() {
-            when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
-
-            RolePool expectedSenderRoleCategory = RolePool.JUDICIAL;
-            String expectedUserRoleLabel = "District Judge";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
-                buildRoleAssignmentsResponse(List.of(
-                                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                                 RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build(),
-                                                 RoleAssignmentResponse.builder().roleName("district-judge").roleLabel("District Judge").roleCategory(
-                                                     "JUDICIAL").build()
-                                             )
-                )
-            );
-
-            Element<Message> existingMessage = element(message);
-            List<Element<Message>> messages = new ArrayList<>();
-            messages.add(existingMessage);
-
-            MessageReply messageReply = MessageReply.builder().isUrgent(YES).messageContent("This is a reply message").build();
-
-            List<Message> actualMessages = unwrapElements(messageService.addReplyToMessage(
-                messages,
-                existingMessage.getId().toString(),
-                messageReply,
-                USER_AUTH
-            ));
-
-            List<MessageReply> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
-
-            assertEquals(List.of(Message.builder()
-                                     .messageContent("This is a reply message")
-                                     .isUrgent(YES)
-                                     .senderName(String.format("%s, %s", USER_NAME, expectedUserRoleLabel))
-                                     .senderRoleType(expectedSenderRoleCategory)
-                                     .recipientRoleType(RolePool.ADMIN)
-                                     .sentTime(NOW)
-                                     .build()), actualMessageHistory);
-        }
-
-        @Test
-        void shouldAddMessageReplyToMessageHistory_forCircuitJudge() {
-            when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
-
-            RolePool expectedSenderRoleCategory = RolePool.JUDICIAL;
-            String expectedUserRoleLabel = "Circuit Judge";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
-                buildRoleAssignmentsResponse(List.of(
-                                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                                 RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build(),
-                                                 RoleAssignmentResponse.builder().roleName("circuit-judge").roleLabel("Circuit Judge").roleCategory(
-                                                     "JUDICIAL").build()
-                                             )
-                )
-            );
-
-            Element<Message> existingMessage = element(message);
-            List<Element<Message>> messages = new ArrayList<>();
-            messages.add(existingMessage);
-
-            MessageReply messageReply = MessageReply.builder().isUrgent(YES).messageContent("This is a reply message").build();
-
-            List<Message> actualMessages = unwrapElements(messageService.addReplyToMessage(
-                messages,
-                existingMessage.getId().toString(),
-                messageReply,
-                USER_AUTH
-            ));
-
-            List<MessageReply> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
-
-            assertEquals(List.of(Message.builder()
-                                     .messageContent("This is a reply message")
-                                     .isUrgent(YES)
-                                     .senderName(String.format("%s, %s", USER_NAME, expectedUserRoleLabel))
-                                     .senderRoleType(expectedSenderRoleCategory)
-                                     .recipientRoleType(RolePool.ADMIN)
-                                     .sentTime(NOW)
-                                     .build()), actualMessageHistory);
-        }
-
-        @Test
-        void shouldAddMessageReplyToMessageHistory_forJudge() {
-            when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
-
-            RolePool expectedSenderRoleCategory = RolePool.JUDICIAL;
-            String expectedUserRoleLabel = "Judge";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
-                buildRoleAssignmentsResponse(List.of(
-                                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                                 RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build()
-                                             )
-                )
-            );
-
-            Element<Message> existingMessage = element(message);
-            List<Element<Message>> messages = new ArrayList<>();
-            messages.add(existingMessage);
-
-            MessageReply messageReply = MessageReply.builder().isUrgent(YES).messageContent("This is a reply message").build();
-
-            List<Message> actualMessages = unwrapElements(messageService.addReplyToMessage(
-                messages,
-                existingMessage.getId().toString(),
-                messageReply,
-                USER_AUTH
-            ));
-
-            List<MessageReply> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
-
-            assertEquals(List.of(Message.builder()
-                                     .messageContent("This is a reply message")
-                                     .isUrgent(YES)
-                                     .senderName(String.format("%s, %s", USER_NAME, expectedUserRoleLabel))
-                                     .senderRoleType(expectedSenderRoleCategory)
-                                     .recipientRoleType(RolePool.ADMIN)
-                                     .sentTime(NOW)
-                                     .build()), actualMessageHistory);
-        }
-
-        @Test
         void shouldAddMessageReplyToExistingHistory_withTwoExistingReplies() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
             when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
@@ -918,7 +633,7 @@ class SendAndReplyMessageServiceTest {
             );
 
             RolePool expectedSenderRoleCategory = RolePool.ADMIN;
-            MessageReply firstReply = MessageReply.builder()
+            MessageReply baseMessage = MessageReply.builder()
                 .messageContent("First reply")
                 .isUrgent(NO)
                 .senderName("John Doe, Hearing Centre Team Leader")
@@ -926,7 +641,7 @@ class SendAndReplyMessageServiceTest {
                 .sentTime(NOW.minusDays(2))
                 .build();
 
-            MessageReply secondReplyReply = MessageReply.builder()
+            MessageReply firstReply = MessageReply.builder()
                 .messageContent("Second reply")
                 .isUrgent(YES)
                 .senderName("Jane Smith, Hearing Centre Team Leader")
@@ -936,11 +651,12 @@ class SendAndReplyMessageServiceTest {
 
             List<Element<MessageReply>> history = new ArrayList<>();
             history.add(element(firstReply));
-            history.add(element(secondReplyReply));
-            Message existingMessage = message.toBuilder()
+            history.add(element(baseMessage));
+
+            Message secondReply = message.toBuilder()
                 .history(history).build();
 
-            Element<Message> existingMessageElement = element(existingMessage);
+            Element<Message> existingMessageElement = element(secondReply);
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(existingMessageElement);
 
@@ -956,16 +672,9 @@ class SendAndReplyMessageServiceTest {
             List<MessageReply> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
 
             List<MessageReply> expectedMessageHistory = List.of(
+                messageService.buildReplyOutOfMessage(secondReply),
                 firstReply,
-                secondReplyReply,
-                MessageReply.builder()
-                    .messageContent("This is a new reply message")
-                    .isUrgent(YES)
-                    .senderName(String.format("%s, %s", USER_NAME, "Hearing Centre Team Leader"))
-                    .senderRoleType(expectedSenderRoleCategory)
-                    .recipientRoleType(RolePool.ADMIN)
-                    .sentTime(NOW)
-                    .build()
+                baseMessage
             );
 
             assertEquals(expectedMessageHistory, actualMessageHistory);

@@ -38,18 +38,32 @@ public class SendAndReplyMessageService {
 
     // Order is important here as we only use the first matching role when mapping against a users role assignments.
     // Senior roles should always be before their non-senior counterpart.
-    private static final Map<String, RolePool> SUPPORTED_ROLES = Map.ofEntries(
+    private static final Map<String, RolePool> SUPPORTED_ROLES_MAP = Map.ofEntries(
         entry("ctsc-team-leader", RolePool.ADMIN),
         entry("ctsc", RolePool.ADMIN),
         entry("hearing-centre-team-leader", RolePool.ADMIN),
         entry("hearing-centre-admin", RolePool.ADMIN),
-        entry("senior-tribunal-caseworker",RolePool.LEGAL_OPERATIONS),
+        entry("senior-tribunal-caseworker", RolePool.LEGAL_OPERATIONS),
         entry("tribunal-caseworker", RolePool.LEGAL_OPERATIONS),
         entry("nbc-team-leader", RolePool.ADMIN),
         entry("national-business-centre", RolePool.ADMIN),
         entry("circuit-judge", RolePool.JUDICIAL_CIRCUIT),
         entry("district-judge", RolePool.JUDICIAL_DISTRICT),
         entry("judge", RolePool.JUDICIAL)
+    );
+
+    private static final List<String> SUPPORTED_ROLES = List.of(
+        "ctsc-team-leader",
+        "ctsc",
+        "hearing-centre-team-leader",
+        "hearing-centre-admin",
+        "senior-tribunal-caseworker",
+        "tribunal-caseworker",
+        "nbc-team-leader",
+        "national-business-centre",
+        "circuit-judge",
+        "district-judge",
+        "judge"
     );
 
     private static final Map<RecipientOption, RolePool> ROLE_SELECTION_TO_POOL = Map.of(
@@ -77,6 +91,7 @@ public class SendAndReplyMessageService {
             createBaseMessageWithSenderDetails(userAuth)
                 .toBuilder()
                 .updatedTime(time.now())
+                .sentTime(time.now())
                 .recipientRoleType(ROLE_SELECTION_TO_POOL.get(messageMetaData.getRecipientRoleType()))
                 .isUrgent(messageMetaData.getIsUrgent())
                 .subjectType(messageMetaData.getSubject())
@@ -95,7 +110,7 @@ public class SendAndReplyMessageService {
 
         return Message.builder()
             .senderName(senderName)
-            .senderRoleType(SUPPORTED_ROLES.get(role.getRoleName()))
+            .senderRoleType(SUPPORTED_ROLES_MAP.get(role.getRoleName()))
             .build();
     }
 
@@ -110,7 +125,7 @@ public class SendAndReplyMessageService {
         //Switch out current base message with reply info
         messageToReplace.setValue(messageToReplace.getValue().buildNewFullReplyMessage(messageReply, baseMessageDetails, time));
 
-        messageToReplace.getValue().getHistory().add(newHistoryMessage);
+        messageToReplace.getValue().getHistory().add(0, newHistoryMessage);
 
         return messages;
     }
@@ -121,9 +136,10 @@ public class SendAndReplyMessageService {
 
     private RoleAssignmentResponse getFirstSupportedRole(String auth, String userId) {
         var roleAssignments = roleAssignmentsService.getRoleAssignmentsWithLabels(userId, auth);
+
         RoleAssignmentResponse roleAssignment = roleAssignments.getRoleAssignmentResponse().stream()
-            .filter(userRole -> SUPPORTED_ROLES.containsKey(userRole.getRoleName()))
-            .min(Comparator.comparingInt(userRole -> SUPPORTED_ROLES.keySet().stream().toList().indexOf(userRole.getRoleName())))
+            .filter(userRole -> SUPPORTED_ROLES.contains(userRole.getRoleName()))
+            .min(Comparator.comparingInt(userRole -> SUPPORTED_ROLES.indexOf(userRole.getRoleName())))
             .orElse(RoleAssignmentResponse.builder().roleLabel("").roleCategory("").build());
         return roleAssignment;
     }
