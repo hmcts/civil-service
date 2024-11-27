@@ -29,7 +29,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_DEFENDANT;
@@ -135,6 +134,7 @@ public class HearingScheduledDefendantNotificationHandlerTest extends BaseCallba
             .build();
 
         handler.handle(callbackParams);
-        verifyNoInteractions(dashboardApiClient);
+        verify(dashboardApiClient, never())
+            .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
     }
 }

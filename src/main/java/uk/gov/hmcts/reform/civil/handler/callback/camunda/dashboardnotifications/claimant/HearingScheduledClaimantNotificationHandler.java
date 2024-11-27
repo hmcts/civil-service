@@ -119,7 +119,7 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
             );
         }
 
-        if (isNull(caseData.getTrialReadyApplicant())) {
+        if (caseData.isApplicant1NotRepresented() && isNull(caseData.getTrialReadyApplicant())) {
             dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
                                               SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_CLAIMANT.getScenario(), authToken,
                                               ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
