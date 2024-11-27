@@ -36,9 +36,9 @@ public class EventDetails {
     private Boolean jointJudgment;
     private Boolean judgmentToBeRegistered;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDateTime datePaidInFull;
+    private LocalDate datePaidInFull;
     private String status;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDateTime notificationReceiptDate;
+    private LocalDate notificationReceiptDate;
 
 }

@@ -501,13 +501,14 @@ public class EventHistoryMapper {
 
     private void buildCoscEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         // CoSCApplicationStatus can be null if the claimant has mark the case as paid in full before defendant applies for a cosc
-        if (caseData.hasCosc()) {
-            CoscRPAStatus coscStatus = caseData.getActiveJudgment() != null
-                && caseData.getActiveJudgment().getFullyPaymentMadeDate() != null
-                ? SATISFIED : CANCELLED;
+        if (featureToggleService.isJOLiveFeedActive()
+            && featureToggleService.isCoSCEnabled()
+            && caseData.hasCosc()) {
 
-            LocalDateTime paidInFullDate = caseData.getActiveJudgment() != null && caseData.getActiveJudgment().getFullyPaymentMadeDate() != null
-                ? caseData.getActiveJudgment().getFullyPaymentMadeDate().atStartOfDay()
+            CoscRPAStatus coscStatus = getCoscStatus(caseData);
+
+            LocalDate paidInFullDate = caseData.getActiveJudgment() != null && caseData.getActiveJudgment().getFullyPaymentMadeDate() != null
+                ? caseData.getActiveJudgment().getFullyPaymentMadeDate()
                 : null;
 
             builder.certificateOfSatisfactionOrCancellation((Event.builder()
@@ -518,7 +519,7 @@ public class EventHistoryMapper {
                 .eventDetails(EventDetails.builder()
                                   .status(String.valueOf(coscStatus))
                                   .datePaidInFull(paidInFullDate)
-                                  .notificationReceiptDate(caseData.getCoscIssueDate().atStartOfDay())
+                                  .notificationReceiptDate(caseData.getCoscIssueDate())
                                   .build())
                 .eventDetailsText("")
                 .build()));
@@ -2440,5 +2441,22 @@ public class EventHistoryMapper {
             applicant1ResponseDate = LocalDateTime.now();
         }
         return applicant1ResponseDate;
+    }
+
+    private CoscRPAStatus getCoscStatus(CaseData caseData) {
+        if (caseData.getActiveJudgment() != null) {
+            switch (caseData.getActiveJudgment().getState()) {
+                case CANCELLED:
+                    return CANCELLED;
+                case SATISFIED:
+                    return SATISFIED;
+                default:
+                    return caseData.getCoscSchedulerDeadline() == null
+                        || (caseData.getActiveJudgment().getFullyPaymentMadeDate() != null
+                            && caseData.getCoscSchedulerDeadline().isAfter(time.now().toLocalDate().plusDays(1)))
+                        ? SATISFIED : CANCELLED;
+            }
+        }
+        throw new IllegalArgumentException("Active Judgment cannot be null");
     }
 }

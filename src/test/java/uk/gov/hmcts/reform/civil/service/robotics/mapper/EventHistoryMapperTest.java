@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -91,6 +92,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.cosc.CoscRPAStatus.CANCELLED;
 import static uk.gov.hmcts.reform.civil.enums.cosc.CoscRPAStatus.SATISFIED;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.PROCEEDS_IN_HERITAGE;
+import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState.ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
@@ -8388,8 +8390,14 @@ class EventHistoryMapperTest {
     @Nested
     class Cosc {
 
+        @BeforeEach
+        void setup() {
+            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
+            when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
+        }
+
         @Test
-        public void shouldGenerateRPA_forCosc_Satisfied() {
+        public void shouldGenerateRPA_forCosc_Satisfied_JoState() {
             LocalDate coscIssueDate = localDateTime.toLocalDate();
             CertOfSC certOfSC = CertOfSC.builder()
                 .defendantFinalPaymentDate(LocalDate.now())
@@ -8410,8 +8418,81 @@ class EventHistoryMapperTest {
                 .eventDetailsText("")
                 .eventDetails(EventDetails.builder()
                                   .status(String.valueOf(SATISFIED))
-                                  .datePaidInFull(LocalDate.now().plusDays(15).atStartOfDay())
-                                  .notificationReceiptDate(coscIssueDate.atStartOfDay())
+                                  .datePaidInFull(LocalDate.now().plusDays(15))
+                                  .notificationReceiptDate(coscIssueDate)
+                                  .build())
+                .build();
+
+            EventHistory eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+
+            assertThat(eventHistory).extracting("certificateOfSatisfactionOrCancellation").asList()
+                .extracting("eventCode").asString().contains("600");
+            assertThat(eventHistory).extracting("certificateOfSatisfactionOrCancellation")
+                .asList().containsExactly(expectedEvent);
+        }
+
+        @Test
+        public void shouldGenerateRPA_forCosc_Cancelled_JoState() {
+            LocalDate coscIssueDate = localDateTime.toLocalDate();
+            CertOfSC certOfSC = CertOfSC.builder()
+                .defendantFinalPaymentDate(LocalDate.now())
+                .debtPaymentEvidence(DebtPaymentEvidence.builder()
+                                         .debtPaymentOption(DebtPaymentOptions.MADE_FULL_PAYMENT_TO_COURT).build()).build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().toBuilder()
+                .certOfSC(certOfSC)
+                .coscIssueDate(coscIssueDate)
+                .build();
+
+            Event expectedEvent = Event.builder()
+                .eventSequence(1)
+                .eventCode("600")
+                .dateReceived(localDateTime)
+                .litigiousPartyID("002")
+                .eventDetailsText("")
+                .eventDetails(EventDetails.builder()
+                                  .status(String.valueOf(CANCELLED))
+                                  .datePaidInFull(null)
+                                  .notificationReceiptDate(coscIssueDate)
+                                  .build())
+                .build();
+
+            EventHistory eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+
+            assertThat(eventHistory).extracting("certificateOfSatisfactionOrCancellation").asList()
+                .extracting("eventCode").asString().contains("600");
+            assertThat(eventHistory).extracting("certificateOfSatisfactionOrCancellation")
+                .asList().containsExactly(expectedEvent);
+        }
+
+        @Test
+        public void shouldGenerateRPA_forCosc_Satisfied() {
+            LocalDate coscIssueDate = localDateTime.toLocalDate();
+            CertOfSC certOfSC = CertOfSC.builder()
+                .defendantFinalPaymentDate(LocalDate.now())
+                .debtPaymentEvidence(DebtPaymentEvidence.builder()
+                                         .debtPaymentOption(DebtPaymentOptions.MADE_FULL_PAYMENT_TO_COURT).build()).build();
+
+            CaseData caseData = CaseData.builder()
+                .activeJudgment(JudgmentDetails.builder()
+                                    .state(ISSUED)
+                                    .fullyPaymentMadeDate(LocalDate.now().minusDays(5))
+                                    .build())
+                .certOfSC(certOfSC)
+                .coscIssueDate(coscIssueDate)
+                .build();
+
+            Event expectedEvent = Event.builder()
+                .eventSequence(1)
+                .eventCode("600")
+                .dateReceived(localDateTime)
+                .litigiousPartyID("002")
+                .eventDetailsText("")
+                .eventDetails(EventDetails.builder()
+                                  .status(String.valueOf(SATISFIED))
+                                  .datePaidInFull(LocalDate.now().minusDays(5))
+                                  .notificationReceiptDate(coscIssueDate)
                                   .build())
                 .build();
 
@@ -8431,10 +8512,13 @@ class EventHistoryMapperTest {
                 .debtPaymentEvidence(DebtPaymentEvidence.builder()
                                          .debtPaymentOption(DebtPaymentOptions.MADE_FULL_PAYMENT_TO_COURT).build()).build();
 
-            CaseData caseData = CaseDataBuilder.builder()
-                .buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31Days().toBuilder()
+            CaseData caseData = CaseData.builder()
+                .activeJudgment(JudgmentDetails.builder()
+                                    .state(ISSUED)
+                                    .build())
                 .certOfSC(certOfSC)
                 .coscIssueDate(coscIssueDate)
+                .coscSchedulerDeadline(time.now().toLocalDate().plusDays(5))
                 .build();
 
             Event expectedEvent = Event.builder()
@@ -8446,7 +8530,7 @@ class EventHistoryMapperTest {
                 .eventDetails(EventDetails.builder()
                                   .status(String.valueOf(CANCELLED))
                                   .datePaidInFull(null)
-                                  .notificationReceiptDate(coscIssueDate.atStartOfDay())
+                                  .notificationReceiptDate(coscIssueDate)
                                   .build())
                 .build();
 
