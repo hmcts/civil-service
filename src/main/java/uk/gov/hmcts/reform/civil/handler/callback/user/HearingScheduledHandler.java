@@ -100,7 +100,8 @@ public class HearingScheduledHandler extends CallbackHandler {
             .hearingTimeHourMinute(null)
             .hearingDuration(null)
             .information(null)
-            .hearingNoticeListOther(null);
+            .hearingNoticeListOther(null)
+            .trialReadyNotified(null);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
