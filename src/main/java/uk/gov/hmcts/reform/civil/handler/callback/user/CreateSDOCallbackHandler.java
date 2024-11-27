@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
@@ -1586,18 +1587,15 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         dataBuilder.hearingNotes(getHearingNotes(caseData));
 
         // LiP check ensures any LiP cases will always create takeCaseOffline WA task until CP goes live
-        if (!sdoSubmittedPreCPForLiPCase(caseData)
-            && featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
+        boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
+        boolean isLocationWhiteListed = featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation());
+
+        if (!isLipCase) {
             log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
             dataBuilder.eaCourtLocation(YES);
-
-            if (featureToggleService.isHmcEnabled()
-                && !caseData.isApplicantLiP()
-                && !caseData.isRespondent1LiP()
-                && !caseData.isRespondent2LiP()) {
-                dataBuilder.hmcEaCourtLocation(featureToggleService.isLocationWhiteListedForCaseProgression(
-                    caseData.getCaseManagementLocation().getBaseLocation()) ? YES : NO);
-            }
+            dataBuilder.hmcEaCourtLocation(!isLipCase && isLocationWhiteListed ? YES : NO);
+        } else if (isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData)) {
+            dataBuilder.eaCourtLocation(YesOrNo.YES);
         } else {
             log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
             dataBuilder.eaCourtLocation(NO);
@@ -1632,6 +1630,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private boolean isLipCaseWithProgressionEnabledAndCourtWhiteListed(CaseData caseData) {
+        return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne())
+            && featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation());
     }
 
     private SdoR2SmallClaimsHearing updateHearingAfterDeletingLocationList(SdoR2SmallClaimsHearing sdoR2SmallClaimsHearing) {
