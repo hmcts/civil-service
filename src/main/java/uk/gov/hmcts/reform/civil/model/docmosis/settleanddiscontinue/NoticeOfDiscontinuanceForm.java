@@ -37,4 +37,16 @@ public class NoticeOfDiscontinuanceForm implements MappableObject {
     private String typeOfDiscontinuance;
     private String typeOfDiscontinuanceTxt;
     private String partOfDiscontinuanceTxt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
+    @JsonSerialize(using = LocalDateSerializer.class)
+    private final LocalDate letterIssueDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
+    @JsonSerialize(using = LocalDateSerializer.class)
+    private final LocalDate dateOfEvent;
+    private final String coverLetterName;
+    private final String addressLine1;
+    private final String addressLine2;
+    private final String addressLine3;
+    private final String postCode;
+    private final String claimReferenceNumber;
 }
