@@ -116,7 +116,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
     void setUp() {
         mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
-        CaseFlagsInitialiser caseFlagsInitialiser = new CaseFlagsInitialiser(featureToggleService, organisationService);
+        CaseFlagsInitialiser caseFlagsInitialiser = new CaseFlagsInitialiser(organisationService);
         JudgementService judgementService = new JudgementService(featureToggleService);
         CourtLocationUtils courtLocationUtils = new CourtLocationUtils();
         UpdateCaseManagementDetailsService updateCaseManagementLocationDetailsService = new UpdateCaseManagementDetailsService(locationHelper,
@@ -420,8 +420,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAddTheCaseFlagIntialiazerForClaimant() {
-            when(featureToggleService.isHmcEnabled()).thenReturn(true);
-            when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
                 .respondent1(Party.builder()
@@ -462,8 +460,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldUpdateCaseManagementLocationForFlightDelayClaimSpecificAirline() {
             given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                 .willReturn(getSampleCourLocationsRefObject());
-            when(featureToggleService.isHmcEnabled()).thenReturn(true);
-            when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
             when(airlineEpimsService.getEpimsIdForAirlineIgnoreCase("Sri Lankan")).thenReturn("111");
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
@@ -488,8 +484,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldUpdateCaseManagementLocationForFlightDelayClaimInvalidAirline() {
             given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                 .willReturn(getSampleCourLocationsRefObject());
-            when(featureToggleService.isHmcEnabled()).thenReturn(true);
-            when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
             when(airlineEpimsService.getEpimsIdForAirlineIgnoreCase("INVALID_AIRLINE")).thenReturn(null);
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
@@ -512,7 +506,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAddEventAndDateAddedToClaimantExpertsAndWitness() {
-            when(featureToggleService.isHmcEnabled()).thenReturn(true);
             when(featureToggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
