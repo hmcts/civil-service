@@ -10,22 +10,23 @@ import java.util.List;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
 
-class DecisionOutcomeSearchServiceTest extends ElasticSearchServiceTest {
+@SuppressWarnings("unchecked")
+class ManageStayUpdateRequestedSearchServiceTest extends ElasticSearchServiceTest {
 
     @BeforeEach
     void setup() {
-        searchService = new DecisionOutcomeSearchService(coreCaseDataService);
+        searchService = new ManageStayUpdateRequestedSearchService(coreCaseDataService);
     }
 
-    @Override
     protected Query buildQuery(int fromValue) {
         BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)
             .should(boolQuery()
-                .must(rangeQuery("data.hearingDate").lte("now"))
-                .must(boolQuery().must(matchQuery("state", "PREPARE_FOR_HEARING_CONDUCT_HEARING"))));
-
+                        .must(rangeQuery("data.manageStayUpdateRequestDate").lt("now-7d/d"))
+                        .must(matchQuery("state", CASE_STAYED.toString()))
+            );
         return new Query(query, List.of("reference"), fromValue);
     }
 
@@ -35,4 +36,5 @@ class DecisionOutcomeSearchServiceTest extends ElasticSearchServiceTest {
                                           String searchAfterValue) {
         return null;
     }
+
 }
