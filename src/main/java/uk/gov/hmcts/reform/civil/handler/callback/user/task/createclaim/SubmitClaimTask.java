@@ -181,9 +181,7 @@ public class SubmitClaimTask {
             dataBuilder.respondentSolicitor2OrganisationDetails(caseData.getRespondentSolicitor1OrganisationDetails());
         }
 
-        if (featureToggleService.isHmcEnabled()) {
-            populateWithPartyIds(dataBuilder);
-        }
+        populateWithPartyIds(dataBuilder);
 
         if (featureToggleService.isCaseEventsEnabled()) {
             dataBuilder.anyRepresented(YES);
