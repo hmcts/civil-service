@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -178,9 +179,10 @@ class CaseProceedsInCasemanRespondentNotificationHandlerTest extends BaseCallbac
                 multiPartyScenarioMockedStatic.when(() -> MultiPartyScenario.getMultiPartyScenario(any()))
                     .thenReturn(ONE_V_ONE);
 
-                handler.handle(params);
+                var response = handler.handle(params);
 
                 verifyNoInteractions(notificationService);
+                assertThat(response).isEqualTo(AboutToStartOrSubmitCallbackResponse.builder().build());
             }
         }
 
