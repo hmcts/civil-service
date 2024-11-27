@@ -27,7 +27,7 @@ public class CaseDismissClaimantNotificationHandler extends AbstractCaseDismissN
     }
 
     @Override
-    protected String getPartyName(CaseData caseData) {
+    protected String getPartyName(CaseData caseData, CallbackParams callbackParams) {
         return caseData.getApplicant1().getPartyName();
     }
 

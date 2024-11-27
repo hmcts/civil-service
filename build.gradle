@@ -28,7 +28,8 @@ def versions = [
   camunda           : '7.20.0',
   jackson           : '2.18.0',
   testcontainers    : '1.20.3',
-  pdfbox            : '3.0.2'
+  pdfbox            : '3.0.2',
+  tika              : '2.9.2'
 ]
 
 allprojects {
@@ -362,7 +363,7 @@ dependencies {
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-openfeign-core'
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.2'
-
+  implementation group: 'org.apache.tika', name: 'tika-core', version: versions.tika
   implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.5'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
