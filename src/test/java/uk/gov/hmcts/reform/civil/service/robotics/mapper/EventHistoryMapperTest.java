@@ -8381,7 +8381,7 @@ class EventHistoryMapperTest {
         }
 
         @Test
-        public void shouldGenerateRPA_WhenClaimPayImmediately() {
+        void shouldGenerateRPA_WhenClaimPayImmediately() {
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
 
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
