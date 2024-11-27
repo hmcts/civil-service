@@ -1533,9 +1533,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             addEventAndDateAddedToRespondentWitnesses(updatedData);
         }
 
-        if (toggleService.isHmcEnabled()) {
-            populateDQPartyIds(updatedData);
-        }
+        populateDQPartyIds(updatedData);
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_SPEC, updatedData);
 
