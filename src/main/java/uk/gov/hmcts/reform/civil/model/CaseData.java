@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
 import uk.gov.hmcts.reform.civil.enums.ConfirmationToggle;
 import uk.gov.hmcts.reform.civil.enums.cosc.CoscApplicationStatus;
+import uk.gov.hmcts.reform.civil.enums.CourtStaffNextSteps;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
@@ -153,7 +154,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final GARespondentOrderAgreement generalAppRespondentAgreement;
     private final GAPbaDetails generalAppPBADetails;
     private final String generalAppDetailsOfOrder;
+    private final List<Element<String>> generalAppDetailsOfOrderColl;
     private final String generalAppReasonsOfOrder;
+    private final List<Element<String>> generalAppReasonsOfOrderColl;
     private final YesOrNo generalAppAskForCosts;
     private final GAInformOtherParty generalAppInformOtherParty;
     private final GAUrgencyRequirement generalAppUrgencyRequirement;
@@ -735,6 +738,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private LocalDate coscSchedulerDeadline;
     private LocalDate coscIssueDate;
     private CoscApplicationStatus coSCApplicationStatus;
+    private YesOrNo obligationDatePresent;
+    private CourtStaffNextSteps courtStaffNextSteps;
 
 
     /**

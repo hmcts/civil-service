@@ -133,7 +133,7 @@ public class SetApplicantResponseDeadline implements CaseTask {
 
         updateClaimsDetailsForClaimDetailsTab(updatedData, caseData);
 
-        updateDQPartyIdsIfHmcEnabled(updatedData);
+        populateDQPartyIds(updatedData);
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE, updatedData);
 
@@ -162,12 +162,6 @@ public class SetApplicantResponseDeadline implements CaseTask {
         updatedData.respondent1DetailsForClaimDetailsTab(updatedData.build().getRespondent1().toBuilder().flags(null).build());
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             updatedData.respondent2DetailsForClaimDetailsTab(updatedData.build().getRespondent2().toBuilder().flags(null).build());
-        }
-    }
-
-    private void updateDQPartyIdsIfHmcEnabled(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        if (toggleService.isHmcEnabled()) {
-            populateDQPartyIds(updatedData);
         }
     }
 
