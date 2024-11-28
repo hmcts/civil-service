@@ -30,24 +30,12 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("bulk_claim_enabled");
     }
 
-    public boolean isCaseFlagsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("case-flags");
-    }
-
     public boolean isPinInPostEnabled() {
         return this.featureToggleApi.isFeatureEnabled("pin-in-post");
     }
 
     public boolean isRPAEmailEnabled() {
         return this.featureToggleApi.isFeatureEnabled("enable-rpa-emails");
-    }
-
-    public boolean isHmcEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("hmc");
-    }
-
-    public boolean isAutomatedHearingNoticeEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("ahn");
     }
 
     public boolean isFastTrackUpliftsEnabled() {
@@ -147,7 +135,19 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("isCoSCEnabled");
     }
 
+    public boolean isCaseProgressionEnabledAndLocationWhiteListed(String location) {
+        return location != null
+            && featureToggleApi.isFeatureEnabledForLocation("case-progression-location-whitelist", location, true)
+            && isCaseProgressionEnabled();
+    }
+
     public boolean isHmcNroEnabled() {
         return featureToggleApi.isFeatureEnabled("hmc-nro");
+
+    }
+
+    public boolean isJOLiveFeedActive() {
+        return isJudgmentOnlineLive()
+            && featureToggleApi.isFeatureEnabled("isJOLiveFeedActive");
     }
 }

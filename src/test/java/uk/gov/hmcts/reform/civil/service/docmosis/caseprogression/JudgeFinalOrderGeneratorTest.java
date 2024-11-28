@@ -175,12 +175,10 @@ class JudgeFinalOrderGeneratorTest {
         when(locationRefDataService.getCcmccLocation(any())).thenReturn(locationRefData);
         when(locationRefDataService.getCnbcLocation(any())).thenReturn(locationRefData);
         when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(List.of(locationRefData));
-        when(featureToggleService.isHmcEnabled()).thenReturn(true);
     }
 
     @Test
     void shouldThrowException_whenBaseCourtLocationNotFound() {
-        when(featureToggleService.isHmcEnabled()).thenReturn(false);
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(FREE_FORM_ORDER_PDF)))
             .thenReturn(new DocmosisDocument(FREE_FORM_ORDER_PDF.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
@@ -193,27 +191,6 @@ class JudgeFinalOrderGeneratorTest {
             .build();
 
         assertThrows(IllegalArgumentException.class, () -> generator.generate(caseData, BEARER_TOKEN));
-    }
-
-    @Test
-    void shouldGenerateFreeFormOrder_whenHmcToggleDisabled() {
-        LocalDate appealDate = LocalDate.now();
-        when(featureToggleService.isHmcEnabled()).thenReturn(false);
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(FREE_FORM_ORDER_PDF)))
-            .thenReturn(new DocmosisDocument(FREE_FORM_ORDER_PDF.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
-            .thenReturn(FREE_FROM_ORDER);
-        when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
-        when(orderDetailsPopulator.populateOrderDetails(any(), any())).thenReturn(JudgeFinalOrderForm.builder().initiativeDate(appealDate));
-
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
-            .caseManagementLocation(caseManagementLocation)
-            .build();
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-
-        assertNotNull(caseDocument);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER));
     }
 
     @Test
@@ -341,57 +318,6 @@ class JudgeFinalOrderGeneratorTest {
 
         assertNotNull(caseDocument);
         verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER));
-    }
-
-    @Test
-    void shouldGenerateAssistedFormOrder_whenHmcToggleDisabled() {
-        //Given: case data without recitals selected
-        LocalDate appealDate = LocalDate.now();
-        when(featureToggleService.isHmcEnabled()).thenReturn(false);
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(ASSISTED_ORDER_PDF)))
-            .thenReturn(new DocmosisDocument(ASSISTED_ORDER_PDF.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(assistedForm, bytes, JUDGE_FINAL_ORDER)))
-            .thenReturn(ASSISTED_FROM_ORDER);
-        when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
-        when(appealInitiativePopulator.populateInitiativeOrWithoutNoticeDetails(any(), any())).thenReturn(
-            JudgeFinalOrderForm.builder().initiativeDate(appealDate));
-
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .caseManagementLocation(caseManagementLocation)
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
-            // Order made section
-            .finalOrderMadeSelection(NO)
-            // judge heard from section
-            .finalOrderJudgeHeardFrom(null)
-            // recitals section
-            .finalOrderRecitals(null)
-            // ordered section
-            .finalOrderOrderedThatText("order text")
-            // Further hearing section
-            .finalOrderFurtherHearingToggle(null)
-            .finalOrderFurtherHearingComplex(null)
-            // Costs section
-            .assistedOrderCostList(AssistedCostTypesList.COSTS_IN_THE_CASE)
-            .assistedOrderMakeAnOrderForCosts(null)
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder().makeAnOrderForCostsList(null).build())
-            .publicFundingCostsProtection(NO)
-            // Appeal section
-            .finalOrderAppealToggle(null)
-            // initiative or without notice section
-            .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
-            .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder()
-                                              .ownInitiativeText("own initiative test")
-                                              .ownInitiativeDate(LocalDate.now())
-                                              .build())
-            .finalOrderGiveReasonsYesNo(NO)
-            .build();
-
-        //When: Assisted order document generation called
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-        //Then: It should generate assisted order document
-        assertNotNull(caseDocument);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(assistedForm, bytes, JUDGE_FINAL_ORDER));
     }
 
     @Test
