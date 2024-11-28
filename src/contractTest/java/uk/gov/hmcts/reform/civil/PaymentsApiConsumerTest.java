@@ -62,7 +62,6 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
         .contactInformation(List.of(ContactInformation.builder().build()))
         .build();
 
-
     @Autowired
     private PaymentsService paymentsService;
 
@@ -80,7 +79,6 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
 
     @MockBean
     private PaymentsConfiguration paymentsConfiguration;
-
 
     @Pact(consumer = "civil-service")
     public RequestResponsePact doCardPaymentRequest(PactDslWithProvider builder)
