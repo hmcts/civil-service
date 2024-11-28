@@ -951,7 +951,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation(options.getValue().getCode()).build())
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isHmcEnabled()).thenReturn(true);
+
         when(featureToggleService.isLocationWhiteListedForCaseProgression(eq(options.getValue().getCode()))).thenReturn(
             isLocationWhiteListed);
 
@@ -978,7 +978,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             .disposalHearingMethodInPersonDJ(options)
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation(options.getValue().getCode()).build())
             .build();
-        when(featureToggleService.isHmcEnabled()).thenReturn(true);
 
         CallbackParams params = callbackParamsOf(caseData.toBuilder()
                                                      .applicant1Represented(YesOrNo.NO)

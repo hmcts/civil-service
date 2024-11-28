@@ -210,7 +210,6 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
         @ParameterizedTest
         @CsvSource({"true", "false"})
         void shouldPopulateHmcEaCourtLocation_whenLocationIsWhiteListed(Boolean isLocationWhiteListed) {
-            when(featureToggleService.isHmcEnabled()).thenReturn(true);
             when(featureToggleService.isLocationWhiteListedForCaseProgression(any())).thenReturn(isLocationWhiteListed);
             when(courtLocationUtils.findPreferredLocationData(any(), any()))
                 .thenReturn(LocationRefData.builder().siteName("")
@@ -233,7 +232,6 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotPopulateHmcEaCourtLocation_whenLiP() {
-            when(featureToggleService.isHmcEnabled()).thenReturn(true);
             when(courtLocationUtils.findPreferredLocationData(any(), any()))
                 .thenReturn(LocationRefData.builder().siteName("")
                                 .epimmsId("222")
