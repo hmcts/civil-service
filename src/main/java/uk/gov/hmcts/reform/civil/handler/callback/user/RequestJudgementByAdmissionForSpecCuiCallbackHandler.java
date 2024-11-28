@@ -82,6 +82,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
                 Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec()).map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(
                     null);
             if (featureToggleService.isJudgmentOnlineLive()
+                && whenWillThisAmountBePaid != null
                 && caseData.isDateAfterToday(whenWillThisAmountBePaid)
                 && caseData.isPartAdmitPayImmediatelyClaimSpec()) {
                 errors.add(format(NOT_VALID_DJ_BY_ADMISSION, formatLocalDateTime(whenWillThisAmountBePaid.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY), DATE_TIME_AT)));
