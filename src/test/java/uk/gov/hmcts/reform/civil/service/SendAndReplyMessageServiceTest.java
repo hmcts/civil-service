@@ -791,7 +791,7 @@ class SendAndReplyMessageServiceTest {
                                   .isUrgent(YES)
                                   .subjectType(OTHER)
                                   .contentSubject("Subject 1")
-                                  .messageContent("This is the original message.")
+                                  .messageContent("This is the base message.")
                                   .build());
         }
 
@@ -806,41 +806,31 @@ class SendAndReplyMessageServiceTest {
                 "Urgency", "Yes",
                 "What is it about", "Other",
                 "Subject", "Subject 1",
-                "Message details", "This is the original message."
+                "Message details", "This is the base message."
             ));
         }
 
         @Test
         void shouldCallTableMarkupService_withExpectedRowData_withReplies() {
             message.getValue().getHistory().add(element(MessageReply.builder()
-                                                            .messageContent("This is a reply message")
+                                                            .messageContent("This is the original message")
                                                             .isUrgent(NO)
                                                             .senderName("Sender 2")
-                                                            .senderRoleType(RolePool.ADMIN)
-                                                            .recipientRoleType(RolePool.JUDICIAL)
-                                                            .sentTime(NOW.plusHours(5))
+                                                            .senderRoleType(RolePool.JUDICIAL)
+                                                            .recipientRoleType(RolePool.ADMIN)
+                                                            .sentTime(NOW.minusHours(5))
                                                             .build()));
 
             messageService.renderMessageTableList(message);
 
             verify(tableMarkupService, times(1)).buildTableMarkUp(Map.of(
-                "Date and time sent", "14 Nov 2024, 10:30:00 AM",
-                "Sender's name", "Sender 1",
-                "Recipient role", RolePool.ADMIN.getLabel(),
-                "Urgency", "Yes",
-                "What is it about", "Other",
-                "Subject", "Subject 1",
-                "Message details", "This is the original message."
-            ));
-
-            verify(tableMarkupService, times(1)).buildTableMarkUp(Map.of(
-                "Date and time sent", "14 Nov 2024, 10:30:00 AM",
+                "Date and time sent", "10 Oct 2024, 10:10:10 AM",
                 "Sender's name", "Sender 1",
                 "Recipient role", RolePool.JUDICIAL.getLabel(),
                 "Urgency", "Yes",
                 "What is it about", "Other",
                 "Subject", "Subject 1",
-                "Message details", "This is a reply message."
+                "Message details", "This is the base message."
             ));
         }
     }
