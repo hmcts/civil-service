@@ -44,7 +44,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -52,13 +51,9 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFAULT_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_FORM;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_APPLICATION;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_APPLICATION_AHN;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_OTHER;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_OTHER_AHN;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_SMALL_CLAIMS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_SMALL_CLAIMS_AHN;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_TRIAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_TRIAL_AHN;
 
 @ExtendWith(SpringExtension.class)
@@ -72,13 +67,13 @@ public class HearingFormGeneratorTest {
     private static final String REFERENCE_NUMBER = "000DC001";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final String fileName_application = String.format(
-        HEARING_APPLICATION.getDocumentTitle(), REFERENCE_NUMBER);
+        HEARING_APPLICATION_AHN.getDocumentTitle(), REFERENCE_NUMBER);
     private static final String fileName_small_claim = String.format(
-        HEARING_SMALL_CLAIMS.getDocumentTitle(), REFERENCE_NUMBER);
+        HEARING_SMALL_CLAIMS_AHN.getDocumentTitle(), REFERENCE_NUMBER);
     private static final String fileName_fast_track = String.format(
-        HEARING_TRIAL.getDocumentTitle(), REFERENCE_NUMBER);
+        HEARING_TRIAL_AHN.getDocumentTitle(), REFERENCE_NUMBER);
     private static final String fileName_other_claim = String.format(
-        HEARING_OTHER.getDocumentTitle(), REFERENCE_NUMBER);
+        HEARING_OTHER_AHN.getDocumentTitle(), REFERENCE_NUMBER);
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
         .documentName(fileName_application)
         .documentType(DEFAULT_JUDGMENT)
@@ -114,144 +109,11 @@ public class HearingFormGeneratorTest {
     }
 
     @Test
-    void shouldThrowIllegalArg_whenCaseManagementLocationNotFound() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_APPLICATION)))
-            .thenReturn(new DocmosisDocument(HEARING_APPLICATION.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, HEARING_FORM)))
-            .thenReturn(CASE_DOCUMENT);
-        when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(false);
-        when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenThrow(IllegalArgumentException.class);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .listingOrRelisting(ListingOrRelisting.LISTING)
-            .totalClaimAmount(new BigDecimal(2000))
-            .build().toBuilder()
-            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
-                                 .build())
-            .hearingTimeHourMinute("0800")
-            .channel(HearingChannel.IN_PERSON)
-            .hearingDuration(HearingDuration.DAY_1)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000888").build())
-            .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION).build();
-
-        assertThrows(IllegalArgumentException.class, () -> generator.generate(caseData, BEARER_TOKEN));
-    }
-
-    @Test
-    void shouldHearingFormGeneratorOneForm_whenValidDataIsProvided_hearing_application() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_APPLICATION)))
-            .thenReturn(new DocmosisDocument(HEARING_APPLICATION.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, HEARING_FORM)))
-            .thenReturn(CASE_DOCUMENT);
-        when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(false);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .listingOrRelisting(ListingOrRelisting.LISTING)
-            .totalClaimAmount(new BigDecimal(2000))
-            .build().toBuilder()
-            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
-                                 .build())
-            .hearingTimeHourMinute("0800")
-            .channel(HearingChannel.IN_PERSON)
-            .hearingDuration(HearingDuration.DAY_1)
-            .caseManagementLocation(caseManagementLocation)
-            .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION).build();
-        List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN);
-
-        assertThat(caseDocuments.size()).isEqualTo(1);
-
-        verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, HEARING_FORM));
-    }
-
-    @Test
-    void shouldHearingFormGeneratorOneForm_whenValidDataIsProvided_hearing_small_claims() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_SMALL_CLAIMS)))
-            .thenReturn(new DocmosisDocument(HEARING_SMALL_CLAIMS.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName_small_claim, bytes, HEARING_FORM)))
-            .thenReturn(CASE_DOCUMENT);
-        when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(false);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .listingOrRelisting(ListingOrRelisting.LISTING)
-            .totalClaimAmount(new BigDecimal(2000))
-            .build().toBuilder()
-            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
-                                 .build())
-            .hearingTimeHourMinute("0800")
-            .channel(HearingChannel.IN_PERSON)
-            .hearingDuration(HearingDuration.DAY_1)
-            .caseManagementLocation(caseManagementLocation)
-            .hearingNoticeList(HearingNoticeList.SMALL_CLAIMS).build();
-        List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN);
-
-        assertThat(caseDocuments.size()).isEqualTo(1);
-
-        verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName_small_claim, bytes, HEARING_FORM));
-    }
-
-    @Test
-    void shouldHearingFormGeneratorOneForm_whenValidDataIsProvided_hearing_fast_track() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_TRIAL)))
-            .thenReturn(new DocmosisDocument(HEARING_TRIAL.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName_fast_track, bytes, HEARING_FORM)))
-            .thenReturn(CASE_DOCUMENT);
-        when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(false);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .listingOrRelisting(ListingOrRelisting.LISTING)
-            .totalClaimAmount(new BigDecimal(2000))
-            .build().toBuilder()
-            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
-                                 .build())
-            .hearingTimeHourMinute("0800")
-            .channel(HearingChannel.IN_PERSON)
-            .hearingDuration(HearingDuration.DAY_1)
-            .caseManagementLocation(caseManagementLocation)
-            .hearingNoticeList(HearingNoticeList.FAST_TRACK_TRIAL).build();
-        List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN);
-
-        assertThat(caseDocuments.size()).isEqualTo(1);
-
-        verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName_fast_track, bytes, HEARING_FORM));
-    }
-
-    @Test
-    void shouldHearingFormGeneratorOneForm_whenValidDataIsProvided_hearing_oher() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_OTHER)))
-            .thenReturn(new DocmosisDocument(HEARING_OTHER.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName_other_claim, bytes, HEARING_FORM)))
-            .thenReturn(CASE_DOCUMENT);
-        when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(false);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .listingOrRelisting(ListingOrRelisting.LISTING)
-            .totalClaimAmount(new BigDecimal(2000))
-            .build().toBuilder()
-            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
-                                 .build())
-            .hearingTimeHourMinute("0800")
-            .channel(HearingChannel.IN_PERSON)
-            .hearingDuration(HearingDuration.DAY_1)
-            .caseManagementLocation(caseManagementLocation)
-            .hearingNoticeList(HearingNoticeList.OTHER).build();
-        List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN);
-
-        assertThat(caseDocuments.size()).isEqualTo(1);
-
-        verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName_other_claim, bytes, HEARING_FORM));
-    }
-
-    @Test
     void shouldHearingFormGeneratorOneForm_whenValidDataIsProvided_hearing_application_ahn() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_APPLICATION_AHN)))
             .thenReturn(new DocmosisDocument(HEARING_APPLICATION_AHN.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
-        when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .listingOrRelisting(ListingOrRelisting.LISTING)
@@ -278,7 +140,6 @@ public class HearingFormGeneratorTest {
             .thenReturn(new DocmosisDocument(HEARING_SMALL_CLAIMS_AHN.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName_small_claim, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
-        when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .listingOrRelisting(ListingOrRelisting.LISTING)
@@ -305,7 +166,6 @@ public class HearingFormGeneratorTest {
             .thenReturn(new DocmosisDocument(HEARING_TRIAL_AHN.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName_fast_track, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
-        when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .listingOrRelisting(ListingOrRelisting.LISTING)
@@ -332,7 +192,6 @@ public class HearingFormGeneratorTest {
             .thenReturn(new DocmosisDocument(HEARING_OTHER_AHN.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName_other_claim, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
-        when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .listingOrRelisting(ListingOrRelisting.LISTING)

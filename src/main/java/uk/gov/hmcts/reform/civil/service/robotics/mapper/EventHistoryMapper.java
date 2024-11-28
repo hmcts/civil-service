@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
@@ -2252,8 +2253,14 @@ public class EventHistoryMapper {
             && caseData.getDefendantDetailsSpec() != null
             && !caseData.getDefendantDetailsSpec().getValue()
             .getLabel().startsWith("Both");
-        String miscTextRequested = "RPA Reason: Default Judgment requested and claim moved offline.";
+        String miscTextRequested =  "RPA Reason: Default Judgment requested and claim moved offline.";
         String miscTextGranted = "RPA Reason: Default Judgment granted and claim moved offline.";
+
+        if (featureToggleService.isJOLiveFeedActive()
+            && caseData.getCcdState() == CaseState.All_FINAL_ORDERS_ISSUED) {
+            miscTextGranted = "Judgment recorded.";
+        }
+
         if (caseData.getDefendantDetailsSpec() != null) {
             builder.miscellaneous(
                 Event.builder()

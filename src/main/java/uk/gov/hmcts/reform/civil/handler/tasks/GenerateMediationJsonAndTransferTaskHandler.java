@@ -79,7 +79,12 @@ public class GenerateMediationJsonAndTransferTaskHandler extends BaseExternalTas
 
                 Optional<EmailData> emailData = prepareEmail(mediationDTO);
 
-                emailData.ifPresent(data -> sendGridClient.sendEmail(mediationCSVEmailConfiguration.getSender(), data));
+                if (externalTask.getVariable("dontSendEmail") == null) {
+                    emailData.ifPresent(data -> sendGridClient.sendEmail(
+                        mediationCSVEmailConfiguration.getSender(),
+                        data
+                    ));
+                }
             }
         } catch (Exception e) {
             log.error(e.getMessage());
