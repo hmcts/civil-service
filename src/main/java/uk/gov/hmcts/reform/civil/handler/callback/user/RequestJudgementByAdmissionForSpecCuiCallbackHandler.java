@@ -87,7 +87,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         LocalDate whenWillThisAmountBePaid =
             Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec()).map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(
                 null);
-       return caseData.isDateAfterToday(whenWillThisAmountBePaid) && caseData.isPartAdmitPayImmediatelyClaimSpec();
+        return caseData.isDateAfterToday(whenWillThisAmountBePaid) && caseData.isPartAdmitPayImmediatelyClaimSpec();
     }
 
     private CallbackResponse buildJudgmentAmountSummaryDetails(CallbackParams callbackParams) {
