@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.CASE_PROGRESS
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.DASHBOARD_SERVICE_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.DEFENDANT_NOC_ONLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.GENERAL_APPLICATION_ENABLED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.IS_JO_LIVE_FEED_ACTIVE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.JO_ONLINE_LIVE_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseContainsLiP;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_SUBMITTED;
@@ -41,6 +42,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
                     JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive(),
+                    IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive(),
                     DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnline()
                 )), transitions)
             .moveTo(CLAIM_SUBMITTED, transitions)
@@ -58,6 +60,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
                     JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive(),
+                    IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive(),
                     DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnline()
                 )), transitions)
             // Only one unrepresented defendant
@@ -71,6 +74,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
                     JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive(),
+                    IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive(),
                     DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnline()
                 )), transitions)
             // Unrepresented defendant 1
@@ -87,6 +91,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
                     JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive(),
+                    IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive(),
                     DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnline()
                 )), transitions)
             // Unrepresented defendant 2
@@ -102,6 +107,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
                     JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive(),
+                    IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive(),
                     DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnline()
                 )), transitions)
             // Unrepresented defendants
@@ -117,6 +123,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
                     JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive(),
+                    IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive(),
                     DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnline()
                 )), transitions);
     }

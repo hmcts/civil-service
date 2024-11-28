@@ -146,7 +146,12 @@ public class FeatureToggleService {
 
     }
 
+    public boolean isJOLiveFeedActive() {
+        return isJudgmentOnlineLive()
+            && featureToggleApi.isFeatureEnabled("isJOLiveFeedActive");
+    }
+
     public boolean isDefendantNoCOnline()  {
-        return featureToggleApi.isFeatureEnabled("isDefendantNoCOnline", false);
+        return featureToggleApi.isFeatureEnabled("isDefendantNoCOnline");
     }
 }
