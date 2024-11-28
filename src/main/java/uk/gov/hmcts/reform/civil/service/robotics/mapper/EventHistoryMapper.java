@@ -504,7 +504,7 @@ public class EventHistoryMapper {
         // CoSCApplicationStatus can be null if the claimant has mark the case as paid in full before defendant applies for a cosc
         if (featureToggleService.isJOLiveFeedActive()
             && featureToggleService.isCoSCEnabled()
-            && caseData.hasCosc()) {
+            && caseData.hasCoscCert()) {
 
             CoscRPAStatus coscStatus = getCoscStatus(caseData);
 

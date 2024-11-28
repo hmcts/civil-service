@@ -8,6 +8,8 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.DebtPaymentOptions;
@@ -104,6 +106,7 @@ import static uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationSer
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_REASON_JUDGMENT_BY_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_REASON_MANUAL_DETERMINATION;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
@@ -8470,6 +8473,9 @@ class EventHistoryMapperTest {
 
     @Nested
     class Cosc {
+        CaseDocument caseDocument = CaseDocument.builder()
+            .documentType(DocumentType.CERTIFICATE_OF_DEBT_PAYMENT)
+            .build();
 
         @BeforeEach
         void setup() {
@@ -8489,6 +8495,7 @@ class EventHistoryMapperTest {
                 .buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31DaysForCosc().toBuilder()
                 .certOfSC(certOfSC)
                 .coscIssueDate(coscIssueDate)
+                .systemGeneratedCaseDocuments(wrapElements(caseDocument))
                 .build();
 
             Event expectedEvent = Event.builder()
@@ -8524,6 +8531,7 @@ class EventHistoryMapperTest {
                 .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().toBuilder()
                 .certOfSC(certOfSC)
                 .coscIssueDate(coscIssueDate)
+                .systemGeneratedCaseDocuments(wrapElements(caseDocument))
                 .build();
 
             Event expectedEvent = Event.builder()
@@ -8562,6 +8570,7 @@ class EventHistoryMapperTest {
                                     .build())
                 .certOfSC(certOfSC)
                 .coscIssueDate(coscIssueDate)
+                .systemGeneratedCaseDocuments(wrapElements(caseDocument))
                 .build();
 
             Event expectedEvent = Event.builder()
@@ -8600,6 +8609,7 @@ class EventHistoryMapperTest {
                 .certOfSC(certOfSC)
                 .coscIssueDate(coscIssueDate)
                 .coscSchedulerDeadline(time.now().toLocalDate().plusDays(5))
+                .systemGeneratedCaseDocuments(wrapElements(caseDocument))
                 .build();
 
             Event expectedEvent = Event.builder()
