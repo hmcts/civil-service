@@ -40,8 +40,6 @@ public class GenerateCsvAndTransferTaskHandler extends BaseExternalTaskHandler {
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-
-        List<CaseData> inMediationCases;
         LocalDate claimMovedDate;
         if (externalTask.getVariable("claimMovedDate") != null) {
             claimMovedDate = LocalDate.parse(externalTask.getVariable("claimMovedDate").toString(), DATE_FORMATTER);
@@ -49,10 +47,18 @@ public class GenerateCsvAndTransferTaskHandler extends BaseExternalTaskHandler {
             claimMovedDate = LocalDate.now().minusDays(1);
         }
         List<CaseDetails> cases = caseSearchService.getInMediationCases(claimMovedDate, false);
-        inMediationCases = cases.stream()
+        log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
+        if (!cases.isEmpty()) {
+            StringBuilder sb = new StringBuilder().append("CSV case IDs: ");
+            for (CaseDetails caseDetail : cases) {
+                sb.append(caseDetail.getId());
+                sb.append("\n");
+            }
+            log.info(sb.toString());
+        }
+        List<CaseData> inMediationCases = cases.stream()
             .map(caseDetailsConverter::toCaseData)
             .toList();
-        log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), inMediationCases.size());
         String[] headers = getCSVHeaders();
         StringBuilder csvColContent = new StringBuilder();
         try {
@@ -63,7 +69,9 @@ public class GenerateCsvAndTransferTaskHandler extends BaseExternalTaskHandler {
                 String generateCsvData = generateCSVRow(headers) + csvColContent;
                 Optional<EmailData> emailData = prepareEmail(generateCsvData);
 
-                emailData.ifPresent(data -> sendGridClient.sendEmail(mediationCSVEmailConfiguration.getSender(), data));
+                if (externalTask.getVariable("dontSendEmail") == null) {
+                    emailData.ifPresent(data -> sendGridClient.sendEmail(mediationCSVEmailConfiguration.getSender(), data));
+                }
             }
         } catch (Exception e) {
             log.error(e.getMessage());

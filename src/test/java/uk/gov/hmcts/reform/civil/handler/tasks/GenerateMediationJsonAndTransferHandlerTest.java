@@ -97,7 +97,7 @@ class GenerateMediationJsonAndTransferHandlerTest {
     void shouldNotGenerateJsonAndSendEmail() {
         List<CaseDetails> cases = new ArrayList<>();
         String date = (claimNotToBeProcessed.format(DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.UK)));
-        when(externalTask.getVariable(any())).thenReturn(date);
+        when(externalTask.getVariable(eq("claimMovedDate"))).thenReturn(date);
         when(searchService.getInMediationCases(any(), anyBoolean())).thenReturn(cases);
 
         mediationJsonHandler.execute(externalTask, externalTaskService);
@@ -109,7 +109,7 @@ class GenerateMediationJsonAndTransferHandlerTest {
     @Test
     void should_handle_task_from_external_variable() {
         String date = (claimNotToBeProcessed.format(DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.UK)));
-        when(externalTask.getVariable(any())).thenReturn(date);
+        when(externalTask.getVariable(eq("claimMovedDate"))).thenReturn(date);
         when(searchService.getInMediationCases(any(), anyBoolean())).thenReturn(List.of(caseDetailsWithInMediationState, caseDetailsWithInMediationStateNotToProcess));
         when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationState)).thenReturn(caseDataInMediation);
         when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationStateNotToProcess)).thenReturn(caseDataInMediationNotToProcess);
