@@ -239,11 +239,11 @@ public class DraftTransitionBuilderTest {
 
     @Test
     void shouldResolve_whenOnlyOneUnrepresentedDefendant() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendant()
-            .defendant1LIPAtClaimIssued(YES).build();
         when(mockFeatureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
         when(mockFeatureToggleService.isGaForLipsEnabled()).thenReturn(true);
         when(mockFeatureToggleService.isDefendantNoCOnline()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendant()
+            .defendant1LIPAtClaimIssued(YES).build();
 
         assertTrue(claimSubmittedOneUnrepresentedDefendantOnly.test(caseData));
         assertTrue(claimSubmittedRespondent1Unrepresented.test(caseData));

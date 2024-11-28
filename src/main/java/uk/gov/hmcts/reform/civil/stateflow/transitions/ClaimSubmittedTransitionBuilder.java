@@ -91,7 +91,7 @@ public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
                             FlowFlag.LIP_CASE.name(), true,
                             FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
                         )), transitions
-                );
+            );
         } else {
             this.moveTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL, transitions).onlyWhen(paymentSuccessful, transitions)
                 .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaffBeforeClaimIssued, transitions)
@@ -136,7 +136,7 @@ public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
                             FlowFlag.LIP_CASE.name(), true,
                             FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
                         )), transitions
-                );
+            );
         }
     }
 
