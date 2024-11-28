@@ -27,12 +27,11 @@ public class UpdateWaCourtLocationsService {
     private final ObjectMapper objectMapper;
     private final LocationReferenceDataService locationRefDataService;
 
-    public void updateSecondaryWALocations(String courtId, CaseData caseData, String authorisation, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+    public void updateCourtListingWALocations(String courtId, CaseData caseData, String authorisation, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
 
-        Map<String, Object> secondaryCourtMap = camundaRuntimeClient.getEvaluatedDmnCourtLocations(courtId, getClaimTrack(caseData));
-        DmnListingLocations dmnListingLocations = objectMapper.convertValue(secondaryCourtMap, DmnListingLocations.class);
+        Map<String, Object> evaluatedCourtMap = camundaRuntimeClient.getEvaluatedDmnCourtLocations(courtId, getClaimTrack(caseData));
+        DmnListingLocations dmnListingLocations = objectMapper.convertValue(evaluatedCourtMap, DmnListingLocations.class);
         List<LocationRefData> locationRefDataList = locationRefDataService.getHearingCourtLocations(authorisation);
-        log.info("hearing court list size {} with entries {}", locationRefDataList.size(), locationRefDataList);
 
         try {
             LocationRefData cmcListing = courtLocationDetails(locationRefDataList,
