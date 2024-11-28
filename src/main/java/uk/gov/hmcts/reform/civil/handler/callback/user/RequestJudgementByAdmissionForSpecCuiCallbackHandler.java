@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 
@@ -38,6 +39,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -72,22 +75,23 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
-        if (caseData.isJudgementDateNotPermitted()
-            || (featureToggleService.isJudgmentOnlineLive() && isJudgementDateNotPermittedPAPayImmediately(caseData))) {
+        if (caseData.isJudgementDateNotPermitted()) {
             errors.add(format(NOT_VALID_DJ_BY_ADMISSION, caseData.setUpJudgementFormattedPermittedDate(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())));
+        } else {
+            LocalDate whenWillThisAmountBePaid =
+                Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec()).map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(
+                    null);
+            if (featureToggleService.isJudgmentOnlineLive()
+                && caseData.isDateAfterToday(whenWillThisAmountBePaid)
+                && caseData.isPartAdmitPayImmediatelyClaimSpec()) {
+                errors.add(format(NOT_VALID_DJ_BY_ADMISSION, formatLocalDateTime(whenWillThisAmountBePaid.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY), DATE_TIME_AT)));
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(errors.isEmpty() ? caseDataBuilder.build().toMap(objectMapper) : null)
             .build();
-    }
-
-    private boolean isJudgementDateNotPermittedPAPayImmediately(CaseData caseData) {
-        LocalDate whenWillThisAmountBePaid =
-            Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec()).map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(
-                null);
-        return caseData.isDateAfterToday(whenWillThisAmountBePaid) && caseData.isPartAdmitPayImmediatelyClaimSpec();
     }
 
     private CallbackResponse buildJudgmentAmountSummaryDetails(CallbackParams callbackParams) {
