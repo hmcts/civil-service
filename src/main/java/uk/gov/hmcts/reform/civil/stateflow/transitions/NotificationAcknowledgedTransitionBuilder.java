@@ -106,11 +106,13 @@ public class NotificationAcknowledgedTransitionBuilder extends MidTransitionBuil
                     && caseData.getRespondent2AcknowledgeNotificationDate() != null
                     && caseData.getRespondent1TimeExtensionDate() == null
                     && caseData.getRespondent2TimeExtensionDate() == null
-                    && (caseData.getRespondent1ResponseDate() == null || caseData.getRespondent2ResponseDate() == null);
+                    && (caseData.getRespondent1ResponseDate() == null || caseData.getRespondent2ResponseDate() == null)
+                    && caseData.getTakenOfflineByStaffDate() == null;
             }
             return caseData.getRespondent1AcknowledgeNotificationDate() != null
                 && caseData.getRespondent1TimeExtensionDate() == null
-                && caseData.getRespondent1ResponseDate() == null;
+                && caseData.getRespondent1ResponseDate() == null
+                && caseData.getTakenOfflineByStaffDate() == null;
         }
         return false;
     };
