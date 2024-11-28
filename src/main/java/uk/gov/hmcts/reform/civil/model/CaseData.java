@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
 import uk.gov.hmcts.reform.civil.enums.ConfirmationToggle;
 import uk.gov.hmcts.reform.civil.enums.CoscApplicationStatus;
+import uk.gov.hmcts.reform.civil.enums.CourtStaffNextSteps;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
@@ -147,12 +148,15 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final CaseState previousCCDState;
     private final String preStayState;
     private final String manageStayOption;
+    private final LocalDate manageStayUpdateRequestDate;
     private final GAApplicationType generalAppType;
     private final GAApplicationTypeLR generalAppTypeLR;
     private final GARespondentOrderAgreement generalAppRespondentAgreement;
     private final GAPbaDetails generalAppPBADetails;
     private final String generalAppDetailsOfOrder;
+    private final List<Element<String>> generalAppDetailsOfOrderColl;
     private final String generalAppReasonsOfOrder;
+    private final List<Element<String>> generalAppReasonsOfOrderColl;
     private final YesOrNo generalAppAskForCosts;
     private final GAInformOtherParty generalAppInformOtherParty;
     private final GAUrgencyRequirement generalAppUrgencyRequirement;
@@ -733,6 +737,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
     private LocalDate coscSchedulerDeadline;
     private CoscApplicationStatus coSCApplicationStatus;
+    private YesOrNo obligationDatePresent;
+    private CourtStaffNextSteps courtStaffNextSteps;
 
 
     /**
