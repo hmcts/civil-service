@@ -28,9 +28,6 @@ import uk.gov.hmcts.reform.hmc.service.HearingsService;
 import uk.gov.hmcts.reform.payments.client.PaymentsApi;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.request.CardPaymentServiceRequestDTO;
-import uk.gov.hmcts.reform.payments.response.CardPaymentServiceRequestResponse;
-import uk.gov.hmcts.reform.payments.response.PBAServiceRequestResponse;
-import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -41,8 +38,6 @@ import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonBody;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
 @PactTestFor(providerName = "payment_api")
@@ -134,12 +129,12 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
 
     public static DslPart buildDoPaymentResponseDsl() {
         return newJsonBody(response ->
-                               response
-                                   .stringValue("external_reference", "DUMMY-EXT-REF")
-                                   .stringValue("payment_reference", "DUMMY-PAYMENT-REF")
-                                   .stringValue("status", "Initiated")
-                                   .stringValue("next_url", "cui-page.hmcts.platform.net")
-                                   .stringValue("date_created", "2020-02-20T20:20:20.222+0000")
+            response
+                .stringValue("external_reference", "DUMMY-EXT-REF")
+                .stringValue("payment_reference", "DUMMY-PAYMENT-REF")
+                .stringValue("status", "Initiated")
+                .stringValue("next_url", "cui-page.hmcts.platform.net")
+                .stringValue("date_created", "2020-02-20T20:20:20.222+0000")
         ).build();
     }
 
