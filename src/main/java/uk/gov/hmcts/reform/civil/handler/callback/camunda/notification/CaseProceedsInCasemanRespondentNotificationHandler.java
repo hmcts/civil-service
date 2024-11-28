@@ -73,8 +73,7 @@ public class CaseProceedsInCasemanRespondentNotificationHandler extends Callback
 
         var multiPartyScenario = getMultiPartyScenario(caseData);
 
-        if (NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_PROCEEDS_IN_CASEMAN.name()
-            .equals(callbackParams.getRequest().getEventId())
+        if (NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_PROCEEDS_IN_CASEMAN.name().equals(callbackParams.getRequest().getEventId())
             && ONE_V_TWO_TWO_LEGAL_REP != multiPartyScenario) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }

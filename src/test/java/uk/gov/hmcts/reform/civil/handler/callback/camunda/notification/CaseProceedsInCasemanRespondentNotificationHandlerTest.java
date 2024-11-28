@@ -174,6 +174,7 @@ class CaseProceedsInCasemanRespondentNotificationHandlerTest extends BaseCallbac
         void shouldNotNotifyRespondentSolicitor2_ifNoRespSolicitor2IsOnCase() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            params.getRequest().setEventId(NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_PROCEEDS_IN_CASEMAN.name());
 
             try (MockedStatic<MultiPartyScenario> multiPartyScenarioMockedStatic = Mockito.mockStatic(MultiPartyScenario.class)) {
                 multiPartyScenarioMockedStatic.when(() -> MultiPartyScenario.getMultiPartyScenario(any()))
