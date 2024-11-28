@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RecipientOption;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RolePool;
-import uk.gov.hmcts.reform.civil.enums.sendandreply.SubjectOption;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -84,9 +83,6 @@ public class SendAndReplyMessageService {
         String messageContent, String userAuth) {
         List<Element<Message>> messageList = ofNullable(messages).orElse(new ArrayList<>());
 
-        String subject = SubjectOption.OTHER.equals(messageMetaData.getSubject())
-            ? messageMetaData.getOtherSubjectName() : messageMetaData.getSubject().getLabel();
-
         messageList.add(element(
             createBaseMessageWithSenderDetails(userAuth)
                 .toBuilder()
@@ -94,9 +90,9 @@ public class SendAndReplyMessageService {
                 .sentTime(time.now())
                 .recipientRoleType(ROLE_SELECTION_TO_POOL.get(messageMetaData.getRecipientRoleType()))
                 .isUrgent(messageMetaData.getIsUrgent())
-                .subjectType(messageMetaData.getSubject())
-                .headerSubject(subject)
-                .contentSubject(subject)
+                .subjectType(messageMetaData.getSubjectType())
+                .headerSubject(messageMetaData.getSubject())
+                .contentSubject(messageMetaData.getSubject())
                 .messageContent(messageContent)
                 .build())
         );

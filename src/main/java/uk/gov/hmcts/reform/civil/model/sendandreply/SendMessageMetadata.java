@@ -16,7 +16,7 @@ public class SendMessageMetadata {
 
     private RecipientOption recipientRoleType;
     private YesOrNo isUrgent;
-    private SubjectOption subject;
-    private String otherSubjectName;
+    private SubjectOption subjectType;
+    private String subject;
 
 }

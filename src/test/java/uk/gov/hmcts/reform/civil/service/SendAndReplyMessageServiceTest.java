@@ -39,7 +39,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.sendandreply.RecipientOption.CIRCUIT_JUDGE;
-import static uk.gov.hmcts.reform.civil.enums.sendandreply.SubjectOption.HEARING;
 import static uk.gov.hmcts.reform.civil.enums.sendandreply.SubjectOption.OTHER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
@@ -57,8 +56,8 @@ class SendAndReplyMessageServiceTest {
         .build();
 
     private static final SendMessageMetadata MESSAGE_METADATA = SendMessageMetadata.builder()
-        .subject(OTHER)
-        .subject(HEARING)
+        .subjectType(OTHER)
+        .subject(OTHER.getLabel())
         .recipientRoleType(CIRCUIT_JUDGE)
         .isUrgent(YES)
         .build();
@@ -452,9 +451,9 @@ class SendAndReplyMessageServiceTest {
                 .messageContent(MESSAGE_CONTENT)
                 .sentTime(NOW)
                 .updatedTime(NOW)
-                .subjectType(MESSAGE_METADATA.getSubject())
-                .headerSubject(MESSAGE_METADATA.getSubject().getLabel())
-                .contentSubject(MESSAGE_METADATA.getSubject().getLabel())
+                .subjectType(MESSAGE_METADATA.getSubjectType())
+                .headerSubject(MESSAGE_METADATA.getSubjectType().getLabel())
+                .contentSubject(MESSAGE_METADATA.getSubjectType().getLabel())
                 .isUrgent(MESSAGE_METADATA.getIsUrgent())
                 .recipientRoleType(RolePool.JUDICIAL_CIRCUIT)
                 .senderName(String.format("%s, %s", USER_NAME, expectedUserRoleLabel))
