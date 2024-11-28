@@ -24,10 +24,9 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
-import uk.gov.hmcts.reform.hmc.service.HearingsService;
-import uk.gov.hmcts.reform.payments.client.PaymentsApi;
+import uk.gov.hmcts.reform.payments.client.models.FeeDto;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
-import uk.gov.hmcts.reform.payments.request.CardPaymentServiceRequestDTO;
+import uk.gov.hmcts.reform.payments.request.CreditAccountPaymentRequest;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -40,15 +39,12 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@PactTestFor(providerName = "payment_api")
+@PactTestFor(providerName = "payment_creditAccountPayment")
 @MockServerConfig(hostInterface = "localhost", port = "6670")
 @TestPropertySource(properties = "payments.api.url=http://localhost:6670")
 public class PaymentsApiConsumerTest extends BaseContractTest {
 
-    public static final String PAYMENT_REQUEST_ENDPOINT_PREFIX = "/service-request/";
-    public static final String PAYMENT_REQUEST_ENDPOINT_SUFFIX = "/card-payments";
-    private static final String SERVICE_REQUEST_ID_SUFFIX = "${service-request-reference}";
-    private static final String REFERENCE = "123456789";
+    public static final String PAYMENT_REQUEST_ENDPOINT_SUFFIX = "/credit-account-payments";
     private static final String SERVICE = "service";
     private static final String SITE_ID = "site_id";
     private static final String SPEC_SITE_ID = "spec_site_id";
@@ -60,14 +56,8 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
     @Autowired
     private PaymentsService paymentsService;
 
-    @Autowired
-    private PaymentsApi paymentsApi;
-
     @MockBean
     AuthTokenGenerator authTokenGenerator;
-
-    @MockBean
-    private HearingsService hearingsService;
 
     @MockBean
     private OrganisationService organisationService;
@@ -75,7 +65,7 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
     @MockBean
     private PaymentsConfiguration paymentsConfiguration;
 
-    @Pact(consumer = "civil-service")
+    @Pact(consumer = "civil_service")
     public RequestResponsePact doCardPaymentRequest(PactDslWithProvider builder)
         throws JSONException, IOException {
         return buildCardPaymentRequestPact(builder);
@@ -87,7 +77,7 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
         when(paymentsConfiguration.getSiteId()).thenReturn(SITE_ID);
         when(paymentsConfiguration.getSpecSiteId()).thenReturn(SPEC_SITE_ID);
         when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(ORGANISATION));
-        when(authTokenGenerator.generate()).thenReturn(AUTHORIZATION_TOKEN);
+        when(authTokenGenerator.generate()).thenReturn(SERVICE_AUTH_TOKEN);
     }
 
     @Test
@@ -95,8 +85,7 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
     public void verifyCreditCardPaymentRequest() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
         PaymentDto response = paymentsService.createCreditAccountPayment(caseData, AUTHORIZATION_TOKEN);
-        assertThat(response.getExternalReference(), is("DUMMY-EXT-REF"));
-        assertThat(response.getStatus(), is("Initiated"));
+        assertThat(response.getStatus(), is("Success"));
 
     }
 
@@ -105,37 +94,65 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
             .given("a request to create a payment in payments api")
             .uponReceiving("a request to create a payment in payments api with valid authorization")
             .pathFromProviderState(
-                PAYMENT_REQUEST_ENDPOINT_PREFIX + SERVICE_REQUEST_ID_SUFFIX + PAYMENT_REQUEST_ENDPOINT_SUFFIX,
-                PAYMENT_REQUEST_ENDPOINT_PREFIX + REFERENCE + PAYMENT_REQUEST_ENDPOINT_SUFFIX
+                PAYMENT_REQUEST_ENDPOINT_SUFFIX,
+                PAYMENT_REQUEST_ENDPOINT_SUFFIX
             )
             .headers(AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN, SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN)
             .method(HttpMethod.POST.toString())
+            .body(createJsonObject(buildCreditAccountPaymentRequest()))
             .willRespondWith()
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .body(buildDoPaymentResponseDsl())
+            .body(buildPBAPaymentResponseDsl("Success", "success", null, "Payment by account successful"))
             .status(HttpStatus.SC_OK)
             .toPact();
     }
 
-    public CardPaymentServiceRequestDTO buildPaymentRequest() {
-        return CardPaymentServiceRequestDTO.builder()
-            .language("En")
+
+    private CreditAccountPaymentRequest buildCreditAccountPaymentRequest() {
+        return CreditAccountPaymentRequest.builder()
+            .accountNumber("PBA0077597")
+            .amount(BigDecimal.valueOf(1.00).setScale(2))
+            .caseReference("000DC001")
+            .ccdCaseNumber("1594901956117591")
             .currency("GBP")
-            .amount(new BigDecimal(5000))
-            .returnUrl("cui-page.hmcts.platform.net")
+            .customerReference("12345")
+            .description("Claim issue payment")
+            .organisationName("test org")
+            .service("service")
+            .siteId("site_id")
+            .fees(new FeeDto[] {
+                FeeDto.builder()
+                    .calculatedAmount(BigDecimal.valueOf(1.00).setScale(2))
+                    .code("CODE")
+                    .version("1")
+                    .build()
+            })
             .build();
-
     }
 
-    public static DslPart buildDoPaymentResponseDsl() {
-        return newJsonBody(response ->
-            response
-                .stringValue("external_reference", "DUMMY-EXT-REF")
-                .stringValue("payment_reference", "DUMMY-PAYMENT-REF")
-                .stringValue("status", "Initiated")
-                .stringValue("next_url", "cui-page.hmcts.platform.net")
-                .stringValue("date_created", "2020-02-20T20:20:20.222+0000")
-        ).build();
+    private DslPart buildPBAPaymentResponseDsl(String status, String paymentStatus, String errorCode, String errorMessage) {
+        return getDslPart(status, paymentStatus, errorCode, errorMessage);
     }
 
+    static DslPart getDslPart(String status, String paymentStatus, String errorCode, String errorMessage) {
+        return newJsonBody((o) -> {
+            o.stringType("reference", "reference")
+                .stringType("status", status)
+                .minArrayLike("status_histories", 1, 1,
+                    (sh) -> {
+                        sh.stringMatcher("date_updated",
+                                "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}\\+\\d{4})$",
+                                "2020-10-06T18:54:48.785+0000")
+                            .stringMatcher("date_created",
+                                "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}\\+\\d{4})$",
+                                "2020-10-06T18:54:48.785+0000")
+                            .stringValue("status", paymentStatus);
+                        if (errorCode != null) {
+                            sh.stringValue("error_code", errorCode);
+                            sh.stringType("error_message",
+                                errorMessage);
+                        }
+                    });
+        }).build();
+    }
 }

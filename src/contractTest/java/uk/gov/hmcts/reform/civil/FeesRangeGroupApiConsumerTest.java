@@ -43,7 +43,7 @@ public class FeesRangeGroupApiConsumerTest extends BaseContractTest {
     @Autowired
     private FeesConfiguration feesConfiguration;
 
-    @Pact(consumer = "civil-service")
+    @Pact(consumer = "civil_service")
     public RequestResponsePact getRangeGroupFees(PactDslWithProvider builder) throws JSONException {
         return buildLookupRangeGroupFeesResponsePact(
             builder,
