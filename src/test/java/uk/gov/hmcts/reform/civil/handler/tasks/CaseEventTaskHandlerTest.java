@@ -134,13 +134,15 @@ class CaseEventTaskHandlerTest {
 
             when(mockTask.getAllVariables()).thenReturn(variables);
             when(mockTask.getVariable(FLOW_STATE)).thenReturn(PENDING_CLAIM_ISSUED.fullName());
-            when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(false);
         }
 
         @Test
         void shouldTriggerCCDEvent_whenHandlerIsExecuted() {
             CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .businessProcess(BusinessProcess.builder()
+                                     .status(BusinessProcessStatus.READY)
+                                     .processInstanceId("processInstanceId")
+                                     .build())
                 .build();
             VariableMap variables = Variables.createVariables();
             variables.putValue(FLOW_STATE, "MAIN.DRAFT");
@@ -197,7 +199,7 @@ class CaseEventTaskHandlerTest {
                             Request.create(
                                 requestType,
                                 exampleUrl,
-                                new HashMap<>(), //this field is required for construtor//
+                                new HashMap<>(),
                                 null,
                                 null,
                                 null
@@ -222,7 +224,10 @@ class CaseEventTaskHandlerTest {
         void shouldNotCallHandleFailureMethod_whenExceptionOnCompleteCall() {
             String errorMessage = "there was an error";
             CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .businessProcess(BusinessProcess.builder()
+                                     .status(BusinessProcessStatus.READY)
+                                     .processInstanceId("processInstanceId")
+                                     .build())
                 .build();
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
             when(coreCaseDataService.startUpdate(any(), any()))
@@ -282,7 +287,7 @@ class CaseEventTaskHandlerTest {
             when(mockTask.getVariable(FLOW_STATE)).thenReturn(state.fullName());
 
             CaseData caseData = getCaseData(state);
-
+            caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
             when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
@@ -331,6 +336,7 @@ class CaseEventTaskHandlerTest {
 
             CaseData caseData = getCaseData(TAKEN_OFFLINE_BY_STAFF);
             caseData.getClaimProceedsInCaseman().setReason(reason);
+            caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
             when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
@@ -358,6 +364,7 @@ class CaseEventTaskHandlerTest {
             when(mockTask.getVariable(FLOW_STATE)).thenReturn(state.fullName());
 
             CaseData caseData = getCaseData(state);
+            caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
             when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
@@ -387,6 +394,7 @@ class CaseEventTaskHandlerTest {
             when(mockTask.getVariable(FLOW_STATE)).thenReturn(state.fullName());
 
             CaseData caseData = getCaseData(state);
+            caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
             when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
@@ -416,6 +424,7 @@ class CaseEventTaskHandlerTest {
             when(mockTask.getVariable(FLOW_STATE)).thenReturn(state.fullName());
 
             CaseData caseData = getCaseData(state);
+            caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
             when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
@@ -438,7 +447,10 @@ class CaseEventTaskHandlerTest {
         @Nested
         class FullDefenceProceed {
             FlowState.Main state = FULL_DEFENCE_PROCEED;
-            BusinessProcess businessProcess = BusinessProcess.builder().status(BusinessProcessStatus.READY).build();
+            BusinessProcess businessProcess = BusinessProcess.builder()
+                .status(BusinessProcessStatus.READY)
+                .processInstanceId("processInstanceId")
+                .build();
 
             @BeforeEach
             void initForFullDefence() {
@@ -454,6 +466,7 @@ class CaseEventTaskHandlerTest {
                 @Test
                 void shouldHaveExpectedDescription() {
                     CaseData caseData = getCaseData(state);
+                    caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
                     CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
                     when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
