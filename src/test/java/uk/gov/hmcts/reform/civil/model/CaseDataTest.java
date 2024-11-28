@@ -946,21 +946,6 @@ public class CaseDataTest {
         }
 
         @Test
-        void shouldReturnTrueWhenWillThisAmountBePaidIsAfterCurrentDateAndPAPayImmediately() {
-            //Given
-            CaseData caseData = CaseData.builder()
-                .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                                   .whenWillThisAmountBePaid(LocalDate.now().plusDays(1)).build())
-                .build();
-            //When
-            boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
-            //Then
-            assertTrue(isJudgementDateNotPermitted);
-        }
-
-        @Test
         void shouldReturnTrueWhenFirstRepaymentDateIsAfterCurrentDateAndDefendantAcceptsSettlementAgreement() {
             //Given
             CaseDataLiP caseDataLiP = CaseDataLiP.builder()

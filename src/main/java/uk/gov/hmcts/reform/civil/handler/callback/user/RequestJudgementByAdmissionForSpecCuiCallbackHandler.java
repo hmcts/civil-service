@@ -19,12 +19,15 @@ import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Map;
 
 import static java.lang.String.format;
@@ -69,7 +72,8 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
-        if (caseData.isJudgementDateNotPermitted()) {
+        if (caseData.isJudgementDateNotPermitted()
+            || (featureToggleService.isJudgmentOnlineLive() && isJudgementDateNotPermittedPAPayImmediately(caseData))) {
             errors.add(format(NOT_VALID_DJ_BY_ADMISSION, caseData.setUpJudgementFormattedPermittedDate(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())));
         }
 
@@ -77,6 +81,13 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             .errors(errors)
             .data(errors.isEmpty() ? caseDataBuilder.build().toMap(objectMapper) : null)
             .build();
+    }
+
+    private boolean isJudgementDateNotPermittedPAPayImmediately(CaseData caseData) {
+        LocalDate whenWillThisAmountBePaid =
+            Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec()).map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(
+                null);
+       return caseData.isDateAfterToday(whenWillThisAmountBePaid) && caseData.isPartAdmitPayImmediatelyClaimSpec();
     }
 
     private CallbackResponse buildJudgmentAmountSummaryDetails(CallbackParams callbackParams) {

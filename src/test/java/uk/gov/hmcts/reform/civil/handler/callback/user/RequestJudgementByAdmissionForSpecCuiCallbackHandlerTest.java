@@ -120,6 +120,22 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .handle(params);
             assertThat(response.getErrors()).isEmpty();
         }
+
+        @Test
+        void shouldReturnError_WhenAboutToStartIsInvokedForPAPayImmediately() {
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .ccdState(AWAITING_APPLICANT_INTENTION)
+                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(whenWillPay).build())
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getErrors()).isNotEmpty();
+        }
     }
 
     @Nested

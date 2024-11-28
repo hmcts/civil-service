@@ -1058,8 +1058,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return (isNull(whenWillThisAmountBePaid) && isNull(firstRepaymentDate))
             || (isDateAfterToday(whenWillThisAmountBePaid) && hasDoneSettlementAgreementInTime)
             || (isDateAfterToday(firstRepaymentDate) && hasDoneSettlementAgreementInTime)
-            || (isDateAfterToday(whenWillThisAmountBePaid) && isFullAdmitPayImmediatelyClaimSpec())
-            || (isDateAfterToday(whenWillThisAmountBePaid) && isPartAdmitPayImmediatelyClaimSpec());
+            || (isDateAfterToday(whenWillThisAmountBePaid) && isFullAdmitPayImmediatelyClaimSpec());
+
     }
 
     @JsonIgnore
@@ -1484,7 +1484,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    private boolean isDateAfterToday(LocalDate date) {
+    public boolean isDateAfterToday(LocalDate date) {
         return nonNull(date)
             && date.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
     }
