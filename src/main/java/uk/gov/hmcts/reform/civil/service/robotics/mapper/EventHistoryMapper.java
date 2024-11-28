@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
@@ -2257,7 +2256,7 @@ public class EventHistoryMapper {
 
         if (featureToggleService.isJOLiveFeedActive()
             && caseData.getCcdState() == CaseState.All_FINAL_ORDERS_ISSUED) {
-            miscTextGranted = "Judgment recorded.";
+            miscTextGranted = RPA_RECORD_JUDGMENT;
         }
 
         if (caseData.getDefendantDetailsSpec() != null) {
