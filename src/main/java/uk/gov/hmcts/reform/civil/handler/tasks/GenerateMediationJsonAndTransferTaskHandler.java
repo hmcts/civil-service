@@ -43,7 +43,6 @@ public class GenerateMediationJsonAndTransferTaskHandler extends BaseExternalTas
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        List<CaseData> inMediationCases;
         LocalDate claimMovedDate;
         if (externalTask.getVariable("claimMovedDate") != null) {
             claimMovedDate = LocalDate.parse(externalTask.getVariable("claimMovedDate").toString(), DATE_FORMATTER);
