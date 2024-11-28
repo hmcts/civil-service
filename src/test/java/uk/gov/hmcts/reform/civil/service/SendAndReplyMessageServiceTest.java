@@ -784,6 +784,7 @@ class SendAndReplyMessageServiceTest {
 
             message = element(Message.builder()
                                   .sentTime(LocalDateTime.of(2024, 11, 14, 10, 30, 0))
+                                  .updatedTime(LocalDateTime.of(2024, 10, 10, 10, 10, 10))
                                   .senderName("Sender 1")
                                   .senderRoleType(RolePool.ADMIN)
                                   .recipientRoleType(RolePool.JUDICIAL)
@@ -799,7 +800,7 @@ class SendAndReplyMessageServiceTest {
             messageService.renderMessageTableList(message);
 
             verify(tableMarkupService, times(1)).buildTableMarkUp(Map.of(
-                "Date and time sent", "14 Nov 2024, 10:30:00 AM",
+                "Date and time sent", "10 Oct 2024, 10:10:10 AM",
                 "Sender's name", "Sender 1",
                 "Recipient role", RolePool.JUDICIAL.getLabel(),
                 "Urgency", "Yes",
@@ -825,11 +826,21 @@ class SendAndReplyMessageServiceTest {
             verify(tableMarkupService, times(1)).buildTableMarkUp(Map.of(
                 "Date and time sent", "14 Nov 2024, 10:30:00 AM",
                 "Sender's name", "Sender 1",
-                "Recipient role", RolePool.JUDICIAL.getLabel(),
+                "Recipient role", RolePool.ADMIN.getLabel(),
                 "Urgency", "Yes",
                 "What is it about", "Other",
                 "Subject", "Subject 1",
                 "Message details", "This is the original message."
+            ));
+
+            verify(tableMarkupService, times(1)).buildTableMarkUp(Map.of(
+                "Date and time sent", "14 Nov 2024, 10:30:00 AM",
+                "Sender's name", "Sender 1",
+                "Recipient role", RolePool.JUDICIAL.getLabel(),
+                "Urgency", "Yes",
+                "What is it about", "Other",
+                "Subject", "Subject 1",
+                "Message details", "This is a reply message."
             ));
         }
     }

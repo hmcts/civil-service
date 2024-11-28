@@ -152,7 +152,8 @@ public class SendAndReplyMessageService {
     }
 
     private List<Message> retrieveFullMessageHistory(Element<Message> message) {
-        return Stream.concat(Stream.of(message.getValue()), message.getValue().getHistory().stream()
+        Message baseMessage = message.getValue().toBuilder().sentTime(message.getValue().getUpdatedTime()).build();
+        return Stream.concat(Stream.of(baseMessage), message.getValue().getHistory().stream()
                 .map(historyItem -> message.getValue().buildFullReplyMessageForTable(historyItem.getValue())))
                 .sorted(Comparator.comparing(Message::getSentTime).reversed())
                 .toList();

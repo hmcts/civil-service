@@ -48,6 +48,7 @@ public class Message {
     public Message buildFullReplyMessageForTable(MessageReply reply) {
         return this.toBuilder()
             .sentTime(reply.getSentTime())
+            .senderName(reply.getSenderName())
             .isUrgent(reply.getIsUrgent())
             .messageContent(reply.getMessageContent())
             .recipientRoleType(this.senderRoleType)
