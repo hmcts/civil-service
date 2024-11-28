@@ -3,9 +3,9 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.CP.Trial.Arrangements.Relist.Hearing.Claimant',
-        '{"Notice.AAA6.CP.Trial.Arrangements.Required.Claimant"}',''),
+        '{"Notice.AAA6.CP.Trial.Arrangements.Required.Claimant"}','{}'),
        ('Scenario.AAA6.CP.Trial.Arrangements.Relist.Hearing.Defendant',
-        '{"Notice.AAA6.CP.Trial.Arrangements.Required.Defendant"}','');
+        '{"Notice.AAA6.CP.Trial.Arrangements.Required.Defendant"}','{}');
 
 /**
  * Add task item template

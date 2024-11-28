@@ -119,14 +119,14 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
             );
         }
 
-        if (caseData.isApplicant1NotRepresented() && isNull(caseData.getTrialReadyApplicant())) {
-            dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
-                                              SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_CLAIMANT.getScenario(), authToken,
-                                              ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
-            );
-        }
-
         if (caseData.isApplicant1NotRepresented()) {
+            if (isNull(caseData.getTrialReadyApplicant())) {
+                dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
+                                                  SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_CLAIMANT.getScenario(), authToken,
+                                                  ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
+                );
+            }
+
             dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
                                               SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT.getScenario(), authToken,
                                               ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()

@@ -8,10 +8,10 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.List;
 import java.util.Map;
@@ -92,9 +92,10 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
                 isLiP = isLiP(isApplicant, true, caseData);
                 if (isNull(caseData.getTrialReadyRespondent2())) {
                     emailAddress = getEmail(isApplicant, true, isLiP, caseData);
-                }
-                if (null == emailAddress && caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
-                    emailAddress = getEmail(isApplicant, false, isLiP, caseData);
+
+                    if (null == emailAddress && caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
+                        emailAddress = getEmail(isApplicant, false, isLiP, caseData);
+                    }
                 }
             }
         }
