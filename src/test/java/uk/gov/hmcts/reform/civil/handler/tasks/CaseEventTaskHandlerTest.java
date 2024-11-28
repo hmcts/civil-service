@@ -661,7 +661,8 @@ class CaseEventTaskHandlerTest {
                               FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false,
                               FlowFlag.CASE_PROGRESSION_ENABLED.name(), false,
                               FlowFlag.BULK_CLAIM_ENABLED.name(), false,
-                              FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false
+                              FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false,
+                              FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false
                 );
             } else if (state.equals(TAKEN_OFFLINE_BY_STAFF)
                 || state.equals(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT)
@@ -676,7 +677,8 @@ class CaseEventTaskHandlerTest {
                               FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false,
                               FlowFlag.CASE_PROGRESSION_ENABLED.name(), false,
                               FlowFlag.BULK_CLAIM_ENABLED.name(), false,
-                              FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false
+                              FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false,
+                              FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false
                 );
             } else if (state.equals(FULL_DEFENCE_PROCEED)) {
                 return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
@@ -685,14 +687,16 @@ class CaseEventTaskHandlerTest {
                               FlowFlag.CASE_PROGRESSION_ENABLED.name(), false,
                               FlowFlag.BULK_CLAIM_ENABLED.name(), false,
                               FlowFlag.MINTI_ENABLED.name(), false,
-                              FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false
+                              FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false,
+                              FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false
                 );
             }
             return Map.of(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
                           FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false,
                           FlowFlag.CASE_PROGRESSION_ENABLED.name(), false,
                           FlowFlag.BULK_CLAIM_ENABLED.name(), false,
-                          FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false
+                          FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false,
+                          FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false
                     );
         }
 
