@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.stateflow.transitions;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -20,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimSubmittedTransitionBuilder.claimIssueBilingual;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimSubmittedTransitionBuilder.claimIssueHwF;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimSubmittedTransitionBuilder.paymentFailed;
@@ -33,16 +33,13 @@ public class ClaimSubmittedTransitionBuilderTest {
 
     private List<Transition> result;
 
-    @BeforeEach
-    void setUp() {
+    @Test
+    void shouldSetUpTransitions_NocFlag_Off() {
+        when(mockFeatureToggleService.isDefendantNoCOnline()).thenReturn(false);
         ClaimSubmittedTransitionBuilder claimSubmittedTransitionBuilder = new ClaimSubmittedTransitionBuilder(
             mockFeatureToggleService);
         result = claimSubmittedTransitionBuilder.buildTransitions();
         assertNotNull(result);
-    }
-
-    @Test
-    void shouldSetUpTransitions() {
         assertThat(result).hasSize(7);
 
         assertTransition(result.get(0), "MAIN.CLAIM_SUBMITTED", "MAIN.CLAIM_ISSUED_PAYMENT_SUCCESSFUL");
@@ -52,6 +49,23 @@ public class ClaimSubmittedTransitionBuilderTest {
         assertTransition(result.get(4), "MAIN.CLAIM_SUBMITTED", "MAIN.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC");
         assertTransition(result.get(5), "MAIN.CLAIM_SUBMITTED", "MAIN.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC");
         assertTransition(result.get(6), "MAIN.CLAIM_SUBMITTED", "MAIN.SPEC_DEFENDANT_NOC");
+    }
+
+    @Test
+    void shouldSetUpTransitions_NocFlag_On() {
+        when(mockFeatureToggleService.isDefendantNoCOnline()).thenReturn(true);
+        ClaimSubmittedTransitionBuilder claimSubmittedTransitionBuilder = new ClaimSubmittedTransitionBuilder(
+            mockFeatureToggleService);
+        result = claimSubmittedTransitionBuilder.buildTransitions();
+        assertNotNull(result);
+        assertThat(result).hasSize(6);
+
+        assertTransition(result.get(0), "MAIN.CLAIM_SUBMITTED", "MAIN.CLAIM_ISSUED_PAYMENT_SUCCESSFUL");
+        assertTransition(result.get(1), "MAIN.CLAIM_SUBMITTED", "MAIN.TAKEN_OFFLINE_BY_STAFF");
+        assertTransition(result.get(2), "MAIN.CLAIM_SUBMITTED", "MAIN.CLAIM_ISSUED_PAYMENT_FAILED");
+        assertTransition(result.get(3), "MAIN.CLAIM_SUBMITTED", "MAIN.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC");
+        assertTransition(result.get(4), "MAIN.CLAIM_SUBMITTED", "MAIN.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC");
+        assertTransition(result.get(5), "MAIN.CLAIM_SUBMITTED", "MAIN.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC");
     }
 
     @Test
