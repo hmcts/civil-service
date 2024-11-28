@@ -111,7 +111,6 @@ public class TrialArrangementsClaimantNotificationHandlerTest extends BaseCallba
                     .drawDirectionsOrderSmallClaims(NO)
                     .claimsTrack(ClaimsTrack.fastTrack)
                     .orderType(OrderType.DECIDE_DAMAGES)
-                    .trialReadyApplicant(NO)
                     .build(),
                 true
             ),
