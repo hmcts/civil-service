@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.finalorders.DatesFinalOrders;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.CourtOfficerOrderGenerator;
@@ -57,16 +58,18 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
     private final CourtOfficerOrderGenerator courtOfficerOrderGenerator;
     private final UserService userService;
     private final AssignCategoryId assignCategoryId;
+    private final FeatureToggleService featureToggleService;
     private String ext = "";
 
     public static final String HEADER = "## Your order has been issued \n ### Case number \n ### #%s";
 
     @Override
     protected Map<String, Callback> callbacks() {
+        Callback aboutToSubmit = featureToggleService.isCaseEventsEnabled() ? this::handleAboutToSubmit : this::emptyCallbackResponse;
         return Map.of(
             callbackKey(ABOUT_TO_START), this::prePopulateValues,
             callbackKey(MID, "validateValues"), this::validateFormValuesAndGenerateDocument,
-            callbackKey(ABOUT_TO_SUBMIT), this::handleAboutToSubmit,
+            callbackKey(ABOUT_TO_SUBMIT), aboutToSubmit,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
