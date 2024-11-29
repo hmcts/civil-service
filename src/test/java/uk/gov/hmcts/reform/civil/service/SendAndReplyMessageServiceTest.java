@@ -610,7 +610,7 @@ class SendAndReplyMessageServiceTest {
                                      .senderName(String.format("%s, %s", USER_NAME, originalUserRoleLabel))
                                      .senderRoleType(originalSender)
                                      .recipientRoleType(currentSender)
-                                     .contentSubject("Subject")
+                                     .subject("Subject")
                                      .sentTime(NOW)
                                      .build()), actualMessageHistory);
             assertEquals(expectedMessage, existingMessageToBeChanged.getValue());
