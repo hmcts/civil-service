@@ -63,13 +63,13 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
             return TASK_ID_APPLICANT_COURT_OFFICER_ORDER;
         } else if (callbackParams.getRequest().getEventId().equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_GENERATE_ORDER.name())) {
             return TASK_ID_RESPONDENT1;
-        }else {
+        } else {
             return TASK_ID_RESPONDENT2;
         }
     }
 
     private String camundaEventId(CallbackParams callbackParams) {
-            return callbackParams.getType().getValue();
+        return callbackParams.getType().getValue();
     }
 
     private CallbackResponse notifyBundleCreated(CallbackParams callbackParams) {
@@ -99,12 +99,11 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
         if (isApplicantLip(caseData) && taskId.equals(TASK_ID_APPLICANT)) {
             isLip = true;
             isLipWelsh = caseData.isClaimantBilingual();
-        }else if (isApplicantLip(caseData) && taskId.equals(TASK_ID_APPLICANT_COURT_OFFICER_ORDER)) {
+        } else if (isApplicantLip(caseData) && taskId.equals(TASK_ID_APPLICANT_COURT_OFFICER_ORDER)) {
             isLip = true;
             isLipWelsh = caseData.isClaimantBilingual();
             isCourtOfficerOrderLipWelsh = true;
-        }
-        else if (isRespondent1Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT1)) {
+        } else if (isRespondent1Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT1)) {
             isLip = true;
             isLipWelsh = caseData.isRespondentResponseBilingual();
         } else if (isRespondent2Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT2)) {
@@ -114,10 +113,9 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
         if (isLip) {
             if (isLipWelsh && isCourtOfficerOrderLipWelsh) {
                 return notificationsProperties.getNotifyLipUpdateTemplateBilingual();
-            }else if (isLipWelsh) {
+            } else if (isLipWelsh) {
                 return notificationsProperties.getOrderBeingTranslatedTemplateWelsh();
-            }
-            else {
+            } else {
                 return notificationsProperties.getNotifyLipUpdateTemplate();
             }
         } else {
