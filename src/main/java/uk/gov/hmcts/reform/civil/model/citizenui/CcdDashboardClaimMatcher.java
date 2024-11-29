@@ -2,7 +2,9 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -125,18 +127,24 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isSDOOrderCreatedPreCP() {
-        Optional<LocalDateTime> lastNonSdoOrderTime = getTimeOfLastNonSDOOrder();
-        Optional<LocalDateTime> sdoTime = getSDOTime();
-        return !featureToggleService.isCaseProgressionEnabled()
-            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState());
+        String baseLocation = Optional.ofNullable(caseData.getCaseManagementLocation())
+            .map(location -> location.getBaseLocation())
+            .orElse(null);
+        return CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+            && baseLocation != null
+            && !featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(baseLocation);
     }
 
     @Override
     public boolean isSDOOrderCreatedCP() {
+        String baseLocation = Optional.ofNullable(caseData.getCaseManagementLocation())
+            .map(location -> location.getBaseLocation())
+            .orElse(null);
         Optional<LocalDateTime> lastNonSdoOrderTime = getTimeOfLastNonSDOOrder();
         Optional<LocalDateTime> sdoTime = getSDOTime();
-        return featureToggleService.isCaseProgressionEnabled()
-            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+        return CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+            && baseLocation != null
+            && featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
             && !isSDOOrderLegalAdviserCreated()
             && !isSDOOrderInReview()
             && !isSDOOrderInReviewOtherParty()
@@ -157,8 +165,20 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
             && !isSDOOrderInReviewOtherParty()
             && !isDecisionForReconsiderationMade()
             && sdoTime.isPresent()
+            && !isSDODoneAfterDecisionForReconsiderationMade()
+            && !isGeneralOrderAfterDecisionForReconsiderationMade()
             && (lastNonSdoOrderTime.isEmpty()
             || sdoTime.get().isAfter(lastNonSdoOrderTime.get()));
+    }
+
+    protected boolean isSDODoneAfterDecisionForReconsiderationMade() {
+        return caseData.getDecisionOnRequestReconsiderationOptions() == DecisionOnRequestReconsiderationOptions.CREATE_SDO
+            && caseData.getDocumentListByType(caseData.getSystemGeneratedCaseDocuments(), DocumentType.SDO_ORDER).map(List::size).orElse(0) == 2;
+    }
+
+    protected boolean isGeneralOrderAfterDecisionForReconsiderationMade() {
+        return caseData.getDecisionOnRequestReconsiderationOptions() == DecisionOnRequestReconsiderationOptions.CREATE_GENERAL_ORDER
+            && caseData.getDocumentListByType(caseData.getFinalOrderDocumentCollection(), DocumentType.JUDGE_FINAL_ORDER).isPresent();
     }
 
     @Override

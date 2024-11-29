@@ -30,24 +30,12 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("bulk_claim_enabled");
     }
 
-    public boolean isCaseFlagsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("case-flags");
-    }
-
     public boolean isPinInPostEnabled() {
         return this.featureToggleApi.isFeatureEnabled("pin-in-post");
     }
 
     public boolean isRPAEmailEnabled() {
         return this.featureToggleApi.isFeatureEnabled("enable-rpa-emails");
-    }
-
-    public boolean isHmcEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("hmc");
-    }
-
-    public boolean isAutomatedHearingNoticeEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("ahn");
     }
 
     public boolean isFastTrackUpliftsEnabled() {
@@ -80,10 +68,6 @@ public class FeatureToggleService {
 
     public boolean isCaseProgressionEnabled() {
         return featureToggleApi.isFeatureEnabled("cui-case-progression");
-    }
-
-    public boolean isEarlyAdoptersEnabled() {
-        return featureToggleApi.isFeatureEnabled("early-adopters");
     }
 
     public boolean isSdoR2Enabled() {
@@ -139,11 +123,6 @@ public class FeatureToggleService {
             && featureToggleApi.isFeatureEnabledForDate("is-dashboard-enabled-for-case", epoch, false);
     }
 
-    public boolean isPartOfNationalRollout(String locationEpimms) {
-        return locationEpimms != null && featureToggleApi
-            .isFeatureEnabledForLocation("national-rollout-whitelist", locationEpimms, false);
-    }
-
     public boolean isCaseEventsEnabled() {
         return featureToggleApi.isFeatureEnabled("cui-case-events-enabled");
     }
@@ -152,11 +131,23 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("amend-bundle-enabled");
     }
 
-    public boolean isGenAppsAllowedPreSdo() {
-        return featureToggleApi.isFeatureEnabled("ga-allowed-pre-sdo");
-    }
-
     public boolean isCoSCEnabled() {
         return featureToggleApi.isFeatureEnabled("isCoSCEnabled");
+    }
+
+    public boolean isCaseProgressionEnabledAndLocationWhiteListed(String location) {
+        return location != null
+            && featureToggleApi.isFeatureEnabledForLocation("case-progression-location-whitelist", location, true)
+            && isCaseProgressionEnabled();
+    }
+
+    public boolean isHmcNroEnabled() {
+        return featureToggleApi.isFeatureEnabled("hmc-nro");
+
+    }
+
+    public boolean isJOLiveFeedActive() {
+        return isJudgmentOnlineLive()
+            && featureToggleApi.isFeatureEnabled("isJOLiveFeedActive");
     }
 }

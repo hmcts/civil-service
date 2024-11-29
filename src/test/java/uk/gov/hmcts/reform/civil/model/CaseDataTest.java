@@ -2,9 +2,13 @@ package uk.gov.hmcts.reform.civil.model;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
@@ -26,12 +30,17 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
+
+import java.util.ArrayList;
 import java.util.Optional;
+import java.util.List;
+import java.util.stream.Stream;
+
 
 import static java.math.BigDecimal.ZERO;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -79,10 +88,10 @@ public class CaseDataTest {
         //Given
         CaseData caseData = CaseData.builder()
             .caseDataLiP(CaseDataLiP.builder()
-                .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                    .hasAgreedFreeMediation(MediationDecision.Yes)
-                    .build())
-                .build())
+                             .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
+                                                                          .hasAgreedFreeMediation(MediationDecision.Yes)
+                                                                          .build())
+                             .build())
             .build();
         //When
         boolean result = caseData.hasClaimantAgreedToFreeMediation();
@@ -105,10 +114,10 @@ public class CaseDataTest {
         //Given
         CaseData caseData = CaseData.builder()
             .caseDataLiP(CaseDataLiP.builder()
-                .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                    .hasAgreedFreeMediation(MediationDecision.No)
-                    .build())
-                .build())
+                             .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
+                                                                          .hasAgreedFreeMediation(MediationDecision.No)
+                                                                          .build())
+                             .build())
             .build();
         //When
         boolean result = caseData.hasClaimantAgreedToFreeMediation();
@@ -481,10 +490,10 @@ public class CaseDataTest {
         String organisationId = "1245";
         CaseData caseData = CaseData.builder()
             .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                .organisation(Organisation.builder()
-                    .organisationID(organisationId)
-                    .build())
-                .build())
+                                              .organisation(Organisation.builder()
+                                                                .organisationID(organisationId)
+                                                                .build())
+                                              .build())
             .build();
         //When
         String result = caseData.getApplicantOrganisationId();
@@ -529,7 +538,23 @@ public class CaseDataTest {
         //When
         Optional<Element<CaseDocument>> caseDocument = caseData.getSDODocument();
         //Then
-        assertEquals(caseDocument.get().getValue().getDocumentType(), SDO_ORDER);
+        assertEquals(SDO_ORDER, caseDocument.get().getValue().getDocumentType());
+    }
+
+    @Test
+    void getSDOOrderDocument_shouldReturnLatest_WhenItPresent() {
+        CaseData caseData = CaseData.builder()
+            .systemGeneratedCaseDocuments(wrapElements(
+                CaseDocument.builder().documentType(SDO_ORDER)
+                    .createdDatetime(LocalDateTime.now().minusDays(2)).documentName("Doc1").build(),
+                CaseDocument.builder().documentType(SDO_ORDER)
+                    .createdDatetime(LocalDateTime.now().minusDays(1)).documentName("Doc2").build()
+            )).build();
+        //When
+        Optional<Element<CaseDocument>> caseDocument = caseData.getSDODocument();
+        //Then
+        assertEquals(SDO_ORDER, caseDocument.get().getValue().getDocumentType());
+        assertEquals("Doc2", caseDocument.get().getValue().getDocumentName());
     }
 
     @Test
@@ -1157,8 +1182,8 @@ public class CaseDataTest {
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
                 .respondToAdmittedClaim(RespondToClaim.builder()
-                    .howMuchWasPaid(new BigDecimal(1000))
-                    .build())
+                                            .howMuchWasPaid(new BigDecimal(1000))
+                                            .build())
                 .totalClaimAmount(new BigDecimal(1000))
                 .build();
             //When
@@ -1181,31 +1206,50 @@ public class CaseDataTest {
         }
     }
 
-    @Nested
-    class ActiveJudgment {
-        @Test
-        void shouldReturnTrueIfActiveJudgmentRegisteredWithRTL() {
-            //Given
-            CaseData caseData = CaseData.builder()
-                .activeJudgment(JudgmentDetails.builder()
-                    .isRegisterWithRTL(YesOrNo.YES)
-                    .build())
-                .build();
-            //Then
-            assertThat(caseData.isActiveJudgmentRegisteredWithRTL().booleanValue()).isTrue();
-        }
+    @ParameterizedTest
+    @MethodSource("provideDocumentListTestData")
+    void shouldReturnExpectedDocumentList(DocumentType documentType, List<Element<CaseDocument>> documentCollection, Optional<List<CaseDocument>> expected) {
+        CaseData caseData = CaseData.builder()
+            .systemGeneratedCaseDocuments(documentCollection)
+            .finalOrderDocumentCollection(documentCollection)
+            .build();
 
-        @Test
-        void shouldReturnFalseIfActiveJudgmentRegisteredWithRTL() {
-            //Given
-            CaseData caseData = CaseData.builder()
-                .activeJudgment(JudgmentDetails.builder()
-                    .isRegisterWithRTL(YesOrNo.NO)
-                    .build())
-                .build();
-            //Then
-            assertThat(caseData.isActiveJudgmentRegisteredWithRTL().booleanValue()).isFalse();
-        }
+        List<Element<CaseDocument>> documents = DocumentType.SDO_ORDER.equals(documentType)
+            ? caseData.getSystemGeneratedCaseDocuments()
+            : caseData.getFinalOrderDocumentCollection();
+
+        Optional<List<CaseDocument>> result = caseData.getDocumentListByType(documents, documentType);
+        assertThat(result).isEqualTo(expected);
+    }
+
+    private static Stream<Arguments> provideDocumentListTestData() {
+        return Stream.of(
+            Arguments.of(DocumentType.SDO_ORDER, new ArrayList<>(), Optional.empty()),
+            Arguments.of(DocumentType.SDO_ORDER,
+                         List.of(ElementUtils.element(CaseDocument.builder().documentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT).build())),
+                         Optional.empty()
+            ),
+            Arguments.of(DocumentType.SDO_ORDER,
+                         List.of(
+                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.SDO_ORDER).build()),
+                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT).build())
+                         ),
+                         Optional.of(List.of(CaseDocument.builder().documentType(DocumentType.SDO_ORDER).build()))
+            ),
+            Arguments.of(DocumentType.JUDGE_FINAL_ORDER,
+                         List.of(
+                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build())
+                         ),
+                         Optional.of(List.of(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build()))
+            ),
+            Arguments.of(DocumentType.JUDGE_FINAL_ORDER,
+                         List.of(
+                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build()),
+                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT).build())
+                         ),
+                         Optional.of(List.of(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build()))
+            )
+        );
     }
 }
 
