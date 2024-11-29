@@ -47,6 +47,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.DECISION_OUTCOME;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateAndApplyFee;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateHearingDueDate;
@@ -100,8 +101,7 @@ public class HearingScheduledHandler extends CallbackHandler {
             .hearingTimeHourMinute(null)
             .hearingDuration(null)
             .information(null)
-            .hearingNoticeListOther(null)
-            .trialReadyNotified(null);
+            .hearingNoticeListOther(null);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -225,6 +225,7 @@ public class HearingScheduledHandler extends CallbackHandler {
         }
 
         caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
+        caseDataBuilder.trialReadyNotified(null);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .state(caseState.name())
             .data(caseDataBuilder.build().toMap(objectMapper))
