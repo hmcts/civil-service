@@ -87,7 +87,7 @@ public class StayLiftedClaimantNotificationHandler extends CaseEventsDashboardCa
     }
 
     private DashboardScenarios getViewDocumentsScenario(CaseData caseData) {
-        return nonNull(caseData.getCaseDocumentUploadDate())
+        return nonNull(caseData.getCaseDocumentUploadDate()) || nonNull(caseData.getCaseDocumentUploadDateRes())
             ? SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_AVAILABLE_CLAIMANT
             : SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_CLAIMANT;
     }

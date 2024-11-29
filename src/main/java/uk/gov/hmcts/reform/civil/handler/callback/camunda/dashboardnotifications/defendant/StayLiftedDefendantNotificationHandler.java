@@ -82,7 +82,7 @@ public class StayLiftedDefendantNotificationHandler extends CaseEventsDashboardC
     }
 
     private DashboardScenarios getViewDocumentsScenario(CaseData caseData) {
-        return nonNull(caseData.getCaseDocumentUploadDateRes())
+        return nonNull(caseData.getCaseDocumentUploadDateRes()) || nonNull(caseData.getCaseDocumentUploadDate())
             ? SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_AVAILABLE_DEFENDANT
             : SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_DEFENDANT;
     }

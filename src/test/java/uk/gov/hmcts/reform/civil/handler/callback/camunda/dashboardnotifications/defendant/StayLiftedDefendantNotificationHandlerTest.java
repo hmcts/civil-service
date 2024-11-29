@@ -223,7 +223,7 @@ public class StayLiftedDefendantNotificationHandlerTest extends BaseCallbackHand
         }
 
         @Test
-        void shouldRecordExpectedScenarios_whenEvidenceUploaded() {
+        void shouldRecordExpectedScenarios_whenEvidenceUploadedByDefendant() {
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
 
@@ -232,6 +232,31 @@ public class StayLiftedDefendantNotificationHandlerTest extends BaseCallbackHand
                 .respondent1Represented(YesOrNo.NO)
                 .preStayState(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString())
                 .caseDocumentUploadDateRes(LocalDateTime.now())
+                .build();
+
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .build();
+
+            handler.handle(callbackParams);
+
+            verifyRecordedScenarios(List.of(
+                SCENARIO_AAA6_CP_STAY_LIFTED_DEFENDANT.getScenario(),
+                SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_DEFENDANT.getScenario(),
+                SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_AVAILABLE_DEFENDANT.getScenario())
+            );
+        }
+
+        @Test
+        void shouldRecordExpectedScenarios_whenEvidenceUploadedByClaimant() {
+            when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
+                .toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .preStayState(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString())
+                .caseDocumentUploadDate(LocalDateTime.now())
                 .build();
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()

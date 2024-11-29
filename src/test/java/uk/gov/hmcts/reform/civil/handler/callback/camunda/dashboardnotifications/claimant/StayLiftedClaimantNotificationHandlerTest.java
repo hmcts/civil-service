@@ -253,7 +253,7 @@ public class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandl
         }
 
         @Test
-        void shouldRecordExpectedScenarios_whenEvidenceUploaded() {
+        void shouldRecordExpectedScenarios_whenEvidenceUploadedByClaimant() {
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
 
@@ -276,6 +276,33 @@ public class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandl
                 SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_CLAIMANT.getScenario(),
                 SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_AVAILABLE_CLAIMANT.getScenario()
               )
+            );
+        }
+
+        @Test
+        void shouldRecordExpectedScenarios_whenEvidenceUploadedByDefendant() {
+            when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
+                .toBuilder()
+                .applicant1Represented(YesOrNo.NO)
+                .preStayState(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString())
+                .caseDocumentUploadDate(LocalDateTime.now())
+                .build();
+
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .build();
+
+            handler.handle(callbackParams);
+
+            verifyRecordedScenarios(List.of(
+                                        SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT.getScenario(),
+                                        SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_FEE_PAID_TASK.getScenario(),
+                                        SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_CLAIMANT.getScenario(),
+                                        SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_AVAILABLE_CLAIMANT.getScenario()
+                                    )
             );
         }
 
