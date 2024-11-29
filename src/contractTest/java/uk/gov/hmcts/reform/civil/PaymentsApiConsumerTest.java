@@ -107,7 +107,6 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
             .toPact();
     }
 
-
     private CreditAccountPaymentRequest buildCreditAccountPaymentRequest() {
         return CreditAccountPaymentRequest.builder()
             .accountNumber("PBA0077597")

@@ -73,5 +73,4 @@ public class DocmosisApiConsumerTest extends BaseContractTest {
             .build();
     }
 
-
 }
