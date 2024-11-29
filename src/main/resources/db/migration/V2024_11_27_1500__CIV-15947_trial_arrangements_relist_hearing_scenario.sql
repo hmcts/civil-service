@@ -16,4 +16,4 @@ INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, cat
 values ('<a>Add the trial arrangements</a>', 'Hearing' ,'<a>Ychwanegu trefniadau''r treial</a>',
         'Gwrandawiad', 'Hearing.Arrangements.Add', 'Scenario.AAA6.CP.Trial.Arrangements.Relist.Hearing.Claimant', '{1, 1}', 'CLAIMANT', 11, null, null),
        ('<a>Add the trial arrangements</a>', 'Hearing' ,'<a>Ychwanegu trefniadau''r treial</a>',
-        'Gwrandawiad', 'Hearing.Arrangements.Add', 'Scenario.AAA6.CP.Trial.Arrangements.Relist.Hearing.Claimant', '{1, 1}', 'DEFENDANT', 11, null, null);
+        'Gwrandawiad', 'Hearing.Arrangements.Add', 'Scenario.AAA6.CP.Trial.Arrangements.Relist.Hearing.Defendant', '{1, 1}', 'DEFENDANT', 11, null, null);
