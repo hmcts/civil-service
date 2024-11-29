@@ -26,8 +26,7 @@ public class Message {
     private String senderName;
     private RolePool recipientRoleType;
     private SubjectOption subjectType;
-    private String headerSubject;
-    private String contentSubject;
+    private String subject;
     private String messageContent;
     private YesOrNo isUrgent;
 

@@ -89,8 +89,7 @@ class SendAndReplyMessageServiceTest {
         message = Message.builder()
             .updatedTime(LocalDateTime.of(2024, 1, 1, 0, 0, 0))
             .sentTime(LocalDateTime.of(2024, 1, 1, 0, 0, 0))
-            .headerSubject("Subject")
-            .contentSubject("Subject")
+            .subject("Subject")
             .senderRoleType(RolePool.ADMIN)
             .messageContent("Existing message")
             .build();
@@ -452,8 +451,7 @@ class SendAndReplyMessageServiceTest {
                 .sentTime(NOW)
                 .updatedTime(NOW)
                 .subjectType(MESSAGE_METADATA.getSubjectType())
-                .headerSubject(MESSAGE_METADATA.getSubjectType().getLabel())
-                .contentSubject(MESSAGE_METADATA.getSubjectType().getLabel())
+                .subject(MESSAGE_METADATA.getSubjectType().getLabel())
                 .isUrgent(MESSAGE_METADATA.getIsUrgent())
                 .recipientRoleType(RolePool.JUDICIAL_CIRCUIT)
                 .senderName(String.format("%s, %s", USER_NAME, expectedUserRoleLabel))
@@ -724,12 +722,12 @@ class SendAndReplyMessageServiceTest {
         @BeforeEach
         void setUp() {
             message1 = element(Message.builder()
-                                   .headerSubject("Subject 1")
+                                   .subject("Subject 1")
                                    .sentTime(LocalDateTime.of(2024, 11, 14, 10, 30, 0))
                                    .build());
 
             message2 = element(Message.builder()
-                                   .headerSubject("Subject 2")
+                                   .subject("Subject 2")
                                    .sentTime(LocalDateTime.of(2024, 11, 14, 12, 45, 0))
                                    .build());
 
@@ -747,14 +745,14 @@ class SendAndReplyMessageServiceTest {
                                      .label(
                                          String.format(
                                              "%s, 14 Nov 2024, 10:30:00 AM",
-                                             message1.getValue().getHeaderSubject()
+                                             message1.getValue().getSubject()
                                          ))
                                      .build(),
                                  DynamicListElement.builder()
                                      .code(message2.getId().toString())
                                      .label(String.format(
                                          "%s, 14 Nov 2024, 12:45:00 PM",
-                                         message2.getValue().getHeaderSubject()
+                                         message2.getValue().getSubject()
                                      ))
                                      .build()
                              ))
@@ -789,7 +787,7 @@ class SendAndReplyMessageServiceTest {
                                   .recipientRoleType(RolePool.JUDICIAL)
                                   .isUrgent(YES)
                                   .subjectType(OTHER)
-                                  .contentSubject("Subject 1")
+                                  .subject("Subject 1")
                                   .messageContent("This is the base message.")
                                   .build());
         }

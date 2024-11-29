@@ -22,6 +22,6 @@ public class MessageReply {
     private String senderName;
     private YesOrNo isUrgent;
     private SubjectOption subjectType;
-    private String contentSubject;
+    private String subject;
     private String messageContent;
 }

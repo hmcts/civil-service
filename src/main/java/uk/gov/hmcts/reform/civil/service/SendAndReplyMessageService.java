@@ -91,8 +91,7 @@ public class SendAndReplyMessageService {
                 .recipientRoleType(ROLE_SELECTION_TO_POOL.get(messageMetaData.getRecipientRoleType()))
                 .isUrgent(messageMetaData.getIsUrgent())
                 .subjectType(messageMetaData.getSubjectType())
-                .headerSubject(messageMetaData.getSubject())
-                .contentSubject(messageMetaData.getSubject())
+                .subject(messageMetaData.getSubject())
                 .messageContent(messageContent)
                 .build())
         );
@@ -162,7 +161,7 @@ public class SendAndReplyMessageService {
         tableRows.put("Recipient role", message.getRecipientRoleType().getLabel());
         tableRows.put("Urgency", message.getIsUrgent().getLabel());
         tableRows.put("What is it about", message.getSubjectType().getLabel());
-        tableRows.put("Subject", message.getContentSubject());
+        tableRows.put("Subject", message.getSubject());
         tableRows.put("Message details", message.getMessageContent());
         return tableMarkupService.buildTableMarkUp(tableRows);
     }
@@ -178,7 +177,7 @@ public class SendAndReplyMessageService {
             formatDateTime(DATE_TIME_PATTERN, message.getValue().getSentTime());
         return DynamicListElement.dynamicElementFromCode(
             message.getId().toString(),
-            String.format("%s, %s", message.getValue().getHeaderSubject(), formattedSentDate)
+            String.format("%s, %s", message.getValue().getSubject(), formattedSentDate)
         );
     }
 
@@ -195,7 +194,7 @@ public class SendAndReplyMessageService {
             .senderRoleType(message.getSenderRoleType())
             .messageContent(message.getMessageContent())
             .recipientRoleType(message.getRecipientRoleType())
-            .contentSubject(message.getContentSubject())
+            .subject(message.getSubject())
             .subjectType(message.getSubjectType())
             .build();
     }
