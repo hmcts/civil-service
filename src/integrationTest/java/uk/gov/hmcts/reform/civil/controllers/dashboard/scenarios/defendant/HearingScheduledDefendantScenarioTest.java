@@ -88,13 +88,13 @@ public class HearingScheduledDefendantScenarioTest extends CaseProgressionDashbo
                 jsonPath("$[0].taskNameCy").value(
                     "<a href={VIEW_HEARINGS}  rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld y gwrandawiad</a>"),
                 jsonPath("$[0].currentStatusCy").value(TaskStatus.AVAILABLE.getWelshName()),
-                jsonPath("$[2].reference").value(caseId.toString()),
-                jsonPath("$[2].taskNameEn").value(
+                jsonPath("$[3].reference").value(caseId.toString()),
+                jsonPath("$[3].taskNameEn").value(
                     "<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
-                jsonPath("$[2].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
-                jsonPath("$[2].taskNameCy").value(
+                jsonPath("$[3].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
+                jsonPath("$[3].taskNameCy").value(
                     "<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld gorchmynion a rhybuddion</a>"),
-                jsonPath("$[2].currentStatusCy").value(TaskStatus.AVAILABLE.getWelshName())
+                jsonPath("$[3].currentStatusCy").value(TaskStatus.AVAILABLE.getWelshName())
 
             );
     }
