@@ -22,7 +22,12 @@ public class SpecDefendantNocTransitionBuilder extends MidTransitionBuilder {
 
     @Override
     void setUpTransitions(List<Transition> transitions) {
-        this.moveTo(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC, transitions).onlyWhen(nocSubmittedForLiPDefendant, transitions);
+        if (!featureToggleService.isDefendantNoCOnline()) {
+            this.moveTo(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC, transitions).onlyWhen(
+                nocSubmittedForLiPDefendant,
+                transitions
+            );
+        }
     }
 
 }
