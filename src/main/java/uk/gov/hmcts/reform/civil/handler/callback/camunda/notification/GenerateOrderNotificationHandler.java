@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_GENERATE_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_GENERATE_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_GENERATE_ORDER;
@@ -37,9 +38,11 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
     private static final List<CaseEvent> EVENTS = List.of(
         NOTIFY_APPLICANT_SOLICITOR1_FOR_GENERATE_ORDER,
         NOTIFY_RESPONDENT_SOLICITOR1_FOR_GENERATE_ORDER,
-        NOTIFY_RESPONDENT_SOLICITOR2_FOR_GENERATE_ORDER
+        NOTIFY_RESPONDENT_SOLICITOR2_FOR_GENERATE_ORDER,
+        NOTIFY_APPLICANT_SOLICITOR1_FOR_COURT_OFFICER_ORDER
     );
     public static final String TASK_ID_APPLICANT = "GenerateOrderNotifyApplicantSolicitor1";
+    public static final String TASK_ID_APPLICANT_COURT_OFFICER_ORDER = "GenerateOrderNotifyApplicantCourtOfficerOrderSolicitor1";
     public static final String TASK_ID_RESPONDENT1 = "GenerateOrderNotifyRespondentSolicitor1";
     public static final String TASK_ID_RESPONDENT2 = "GenerateOrderNotifyRespondentSolicitor2";
 
@@ -56,11 +59,17 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
     public String camundaActivityId(CallbackParams callbackParams) {
         if (callbackParams.getRequest().getEventId().equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_GENERATE_ORDER.name())) {
             return TASK_ID_APPLICANT;
+        } else if (callbackParams.getRequest().getEventId().equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_COURT_OFFICER_ORDER.name())) {
+            return TASK_ID_APPLICANT_COURT_OFFICER_ORDER;
         } else if (callbackParams.getRequest().getEventId().equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_GENERATE_ORDER.name())) {
             return TASK_ID_RESPONDENT1;
-        } else {
+        }else {
             return TASK_ID_RESPONDENT2;
         }
+    }
+
+    private String camundaEventId(CallbackParams callbackParams) {
+            return callbackParams.getType().getValue();
     }
 
     private CallbackResponse notifyBundleCreated(CallbackParams callbackParams) {
@@ -86,10 +95,16 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
     private String getTemplate(CaseData caseData) {
         boolean isLip = false;
         boolean isLipWelsh = false;
+        boolean isCourtOfficerOrderLipWelsh = false;
         if (isApplicantLip(caseData) && taskId.equals(TASK_ID_APPLICANT)) {
             isLip = true;
             isLipWelsh = caseData.isClaimantBilingual();
-        } else if (isRespondent1Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT1)) {
+        }else if (isApplicantLip(caseData) && taskId.equals(TASK_ID_APPLICANT_COURT_OFFICER_ORDER)) {
+            isLip = true;
+            isLipWelsh = caseData.isClaimantBilingual();
+            isCourtOfficerOrderLipWelsh = true;
+        }
+        else if (isRespondent1Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT1)) {
             isLip = true;
             isLipWelsh = caseData.isRespondentResponseBilingual();
         } else if (isRespondent2Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT2)) {
@@ -97,9 +112,12 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
             isLip = true;
         }
         if (isLip) {
-            if (isLipWelsh) {
+            if (isLipWelsh && isCourtOfficerOrderLipWelsh) {
+                return notificationsProperties.getNotifyLipUpdateTemplateBilingual();
+            }else if (isLipWelsh) {
                 return notificationsProperties.getOrderBeingTranslatedTemplateWelsh();
-            } else {
+            }
+            else {
                 return notificationsProperties.getNotifyLipUpdateTemplate();
             }
         } else {
