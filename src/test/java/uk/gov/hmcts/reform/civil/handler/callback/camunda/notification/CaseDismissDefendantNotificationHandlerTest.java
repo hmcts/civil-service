@@ -53,7 +53,7 @@ class CaseDismissDefendantNotificationHandlerTest {
             .respondentSolicitor1EmailAddress("solicitor@example.com");
     }
 
-    private CaseData getCaseData(boolean isRespondentLiP, boolean isRespondentBilingual) {
+    private CaseData getCaseData(boolean isRespondentLiP, boolean isRespondentBilingual, boolean isRespondent1) {
         RespondentLiPResponse respondentLip = RespondentLiPResponse.builder()
             .respondent1ResponseLanguage(isRespondentBilingual ? Language.BOTH.toString()
                                              : Language.ENGLISH.toString()).build();
@@ -63,25 +63,34 @@ class CaseDismissDefendantNotificationHandlerTest {
             .build().toBuilder()
             .caseDataLiP(CaseDataLiP.builder()
                              .respondent1LiPResponse(respondentLip).build())
+            .respondent2(!isRespondent1 ? Party.builder().individualFirstName("John").individualLastName("Johnson")
+                             .partyEmail("defendant2@hmcts.net")
+                             .type(Party.Type.INDIVIDUAL).build() : null)
+            .respondentSolicitor2EmailAddress(!isRespondent1 ? "solicitor2@example.com" : null)
+            .addRespondent2(!isRespondent1 ? YesOrNo.YES : YesOrNo.NO)
+            .respondent2SameLegalRepresentative(!isRespondent1 ? YesOrNo.NO : null)
             .build();
     }
 
     static Stream<Arguments> provideCaseData() {
         return Stream.of(
-            Arguments.of(true, true, "bilingual-template"),
-            Arguments.of(true, false, "default-template"),
-            Arguments.of(false, false, "solicitor-template")
+            Arguments.of(true, true, true, "bilingual-template"),
+            Arguments.of(true, false, true, "default-template"),
+            Arguments.of(false, false, true, "solicitor-template"),
+            Arguments.of(false, false, false, "solicitor-template")
         );
     }
 
     @ParameterizedTest
     @MethodSource("provideCaseData")
-    void sendNotificationShouldSendEmail(boolean isRespondentLiP, boolean isRespondentBilingual, String template) {
-        CaseData caseData = getCaseData(isRespondentLiP, isRespondentBilingual);
+    void sendNotificationShouldSendEmail(boolean isRespondentLiP, boolean isRespondentBilingual, boolean isRespondent1, String template) {
+        CaseData caseData = getCaseData(isRespondentLiP, isRespondentBilingual, isRespondent1);
 
         CallbackRequest callbackRequest = CallbackRequest
             .builder()
-            .eventId(CaseEvent.NOTIFY_DEFENDANT_DISMISS_CASE.name())
+            .eventId(isRespondent1
+                         ? CaseEvent.NOTIFY_DEFENDANT_DISMISS_CASE.name()
+                         : CaseEvent.NOTIFY_DEFENDANT_TWO_DISMISS_CASE.name())
             .build();
         CallbackParams params = CallbackParams.builder()
             .request(callbackRequest)
@@ -99,13 +108,22 @@ class CaseDismissDefendantNotificationHandlerTest {
 
         CallbackResponse response = handler.sendNotification(params);
 
+        String email;
+        if (isRespondentLiP) {
+            email = "defendant@hmcts.net";
+        } else if (isRespondent1) {
+            email = "solicitor@example.com";
+        } else {
+            email = "solicitor2@example.com";
+        }
+
         verify(notificationService).sendMail(
-            isRespondentLiP ? "defendant@hmcts.net" : "solicitor@example.com",
+            email,
             template,
             Map.of(
                 "claimReferenceNumber", "1594901956117591",
-                "name", "Jack Jackson",
-                "claimantvdefendant", "John Doe V Jack Jackson"
+                "name", isRespondent1 ? "Jack Jackson" : "John Johnson",
+                "claimantvdefendant", isRespondent1 ? "John Doe V Jack Jackson" : "John Doe V Jack Jackson, John Johnson"
             ),
             "dismiss-case-defendant-notification-1594901956117591"
         );

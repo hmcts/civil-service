@@ -42,7 +42,7 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
     private static final String BODY_CONFIRMATION_OBLIGATION = "### What happens next \n\n" +
         "A new task will be generated on the review date.";
 
-    private static final String TASKS_LEFT_ERROR_1 = "Order review not completed";
+    private static final String TASKS_LEFT_ERROR_1 = "Order review not completed.";
     private static final String TASKS_LEFT_ERROR_2 = "You must complete the tasks in the order before you can submit your order review.";
     private static final String TASKS_LEFT_ERROR_3 = "Once you have completed the task you can submit your order review by clicking on the link on your task list.";
 
@@ -87,11 +87,16 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
 
     private CallbackResponse confirmOrderReview(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        CaseData updatedCaseData = caseData.toBuilder()
+            .obligationDatePresent(null)
+            .courtStaffNextSteps(null);
 
-        CaseData updatedCaseData = caseData.toBuilder().build();
+        if (YesOrNo.YES.equals(caseData.getObligationDatePresent())) {
+            updatedCaseData.businessProcess(BusinessProcess.ready(CONFIRM_ORDER_REVIEW));
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
+            .data(updatedCaseData.build().toMap(objectMapper))
             .build();
     }
 

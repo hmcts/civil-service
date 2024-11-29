@@ -148,12 +148,15 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final CaseState previousCCDState;
     private final String preStayState;
     private final String manageStayOption;
+    private final LocalDate manageStayUpdateRequestDate;
     private final GAApplicationType generalAppType;
     private final GAApplicationTypeLR generalAppTypeLR;
     private final GARespondentOrderAgreement generalAppRespondentAgreement;
     private final GAPbaDetails generalAppPBADetails;
     private final String generalAppDetailsOfOrder;
+    private final List<Element<String>> generalAppDetailsOfOrderColl;
     private final String generalAppReasonsOfOrder;
+    private final List<Element<String>> generalAppReasonsOfOrderColl;
     private final YesOrNo generalAppAskForCosts;
     private final GAInformOtherParty generalAppInformOtherParty;
     private final GAUrgencyRequirement generalAppUrgencyRequirement;
@@ -1063,12 +1066,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public String setUpJudgementFormattedPermittedDate(LocalDate extendedRespondent1ResponseDate) {
         if (isJudgementDateNotPermitted()) {
-            return formatLocalDateTime(
-                extendedRespondent1ResponseDate.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY),
-                DATE_TIME_AT
-            );
+            return getFormattedJudgementPermittedDate(extendedRespondent1ResponseDate);
         }
         return null;
+    }
+
+    @JsonIgnore
+    public String getFormattedJudgementPermittedDate(LocalDate extendedRespondent1ResponseDate) {
+        return formatLocalDateTime(
+            extendedRespondent1ResponseDate.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY),
+            DATE_TIME_AT
+        );
     }
 
     @JsonIgnore
@@ -1482,7 +1490,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    private boolean isDateAfterToday(LocalDate date) {
+    public boolean isDateAfterToday(LocalDate date) {
         return nonNull(date)
             && date.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
     }
