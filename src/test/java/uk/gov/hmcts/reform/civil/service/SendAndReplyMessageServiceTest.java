@@ -78,6 +78,8 @@ class SendAndReplyMessageServiceTest {
     @Mock
     private Time time;
 
+    private LocalDateTime updatedDateTime = LocalDateTime.of(2024, 1, 1, 0, 0, 0);
+
     @InjectMocks
     private SendAndReplyMessageService messageService;
 
@@ -87,7 +89,7 @@ class SendAndReplyMessageServiceTest {
         when(tableMarkupService.buildTableMarkUp(any())).thenReturn("<div>Some markup</div>");
 
         message = Message.builder()
-            .updatedTime(LocalDateTime.of(2024, 1, 1, 0, 0, 0))
+            .updatedTime(updatedDateTime)
             .sentTime(LocalDateTime.of(2024, 1, 1, 0, 0, 0))
             .subject("Subject")
             .senderRoleType(RolePool.ADMIN)
@@ -555,7 +557,7 @@ class SendAndReplyMessageServiceTest {
 
         @ParameterizedTest
         @MethodSource("provideUserData")
-        void shouldAddMessageReplyasBaseAndBaseToMessageHistory_asHearingCentreAdmin(RolePool originalSender,
+        void shouldAddMessageReplyasBaseAndBaseToMessageHistory(RolePool originalSender,
                                                                                      RolePool currentSender,
                                                                                      List<RoleAssignmentResponse> roleAssignmentResponses,
                                                                                      String newRoleLabel, String oldRoleLabel) {
@@ -583,6 +585,7 @@ class SendAndReplyMessageServiceTest {
             MessageReply messageReply = MessageReply.builder().isUrgent(NO)
                 .messageContent("This is a reply message")
                 .isUrgent(NO)
+                .sentTime(updatedDateTime)
                 .build();
 
             Message expectedMessage = message.toBuilder()
@@ -611,7 +614,7 @@ class SendAndReplyMessageServiceTest {
                                      .senderRoleType(originalSender)
                                      .recipientRoleType(currentSender)
                                      .subject("Subject")
-                                     .sentTime(NOW)
+                                     .sentTime(updatedDateTime)
                                      .build()), actualMessageHistory);
             assertEquals(expectedMessage, existingMessageToBeChanged.getValue());
         }

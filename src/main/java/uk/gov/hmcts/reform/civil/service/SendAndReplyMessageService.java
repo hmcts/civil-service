@@ -188,7 +188,7 @@ public class SendAndReplyMessageService {
 
     public MessageReply buildReplyOutOfMessage(Message message) {
         return MessageReply.builder()
-            .sentTime(message.getSentTime())
+            .sentTime(message.getUpdatedTime())
             .isUrgent(message.getIsUrgent())
             .senderName(message.getSenderName())
             .senderRoleType(message.getSenderRoleType())
