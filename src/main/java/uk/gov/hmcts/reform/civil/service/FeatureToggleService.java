@@ -150,4 +150,8 @@ public class FeatureToggleService {
         return isJudgmentOnlineLive()
             && featureToggleApi.isFeatureEnabled("isJOLiveFeedActive");
     }
+
+    public boolean isDefendantNoCOnline()  {
+        return featureToggleApi.isFeatureEnabled("isDefendantNoCOnline");
+    }
 }
