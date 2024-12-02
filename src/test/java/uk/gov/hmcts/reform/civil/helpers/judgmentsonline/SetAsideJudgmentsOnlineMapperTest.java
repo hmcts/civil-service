@@ -145,4 +145,23 @@ class SetAsideJudgmentsOnlineMapperTest {
         }
     }
 
+    @Test
+    void testIfSetAsideApplicationDateUpdatedCorrectly() {
+
+        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+        caseData.setActiveJudgment(recordJudgmentMapper.addUpdateActiveJudgment(caseData));
+
+        //SET ASIDE
+        caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
+        caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
+        caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
+        caseData.setJoSetAsideApplicationDate(LocalDate.of(2022, 12, 11));
+        judgmentOnlineMapper.moveToHistoricJudgment(caseData);
+
+        assertNull(caseData.getActiveJudgment());
+        assertNotNull(caseData.getHistoricJudgment());
+        JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
+        assertEquals(JudgmentState.SET_ASIDE, historicJudgment.getState());
+        assertEquals(LocalDate.of(2022, 12, 11), historicJudgment.getSetAsideApplicationDate());
+    }
 }

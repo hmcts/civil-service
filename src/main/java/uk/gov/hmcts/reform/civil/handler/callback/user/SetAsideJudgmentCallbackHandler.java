@@ -41,6 +41,8 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
     protected final ObjectMapper objectMapper;
     private final SetAsideJudgmentOnlineMapper setAsideJudgmentOnlineMapper;
     private static final String ERROR_MESSAGE_DATE_ORDER_MUST_BE_IN_PAST = "Date must be in the past";
+    private static final String ERROR_MESSAGE_APPLICATION_DATE =
+        "Application date to set aside judgment must be less than  or equal to the date of the order setting aside the judgement";
     private final DeadlinesCalculator deadlinesCalculator;
 
     @Override
@@ -61,6 +63,11 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
     private CallbackResponse validateDates(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
+
+        if (caseData.getJoSetAsideOrderType().equals(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION)
+            && caseData.getJoSetAsideApplicationDate().isAfter(caseData.getJoSetAsideOrderDate())) {
+            errors.add(ERROR_MESSAGE_APPLICATION_DATE);
+        }
 
         if (JudgmentsOnlineHelper.validateIfFutureDate(caseData.getJoSetAsideOrderType().equals(
             JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION) ? caseData.getJoSetAsideOrderDate() : caseData.getJoSetAsideDefenceReceivedDate())) {
