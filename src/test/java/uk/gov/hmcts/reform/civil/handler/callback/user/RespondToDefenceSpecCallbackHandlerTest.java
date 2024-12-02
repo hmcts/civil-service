@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -669,6 +667,20 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("applicantDefenceResponseDocumentAndDQFlag"))
                 .isEqualTo("No");
         }
+
+        @Test
+        void shouldSetVulnerability_whenApplicant1IsProceedWithClaimSpec2v1() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .applicant1ProceedWithClaimSpec2v1(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_2, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("showConditionFlags").asList()
+                .contains(DefendantResponseShowTag.VULNERABILITY.name());
+        }
     }
 
     @Nested
@@ -934,34 +946,10 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 ABOUT_TO_SUBMIT
             );
 
-            when(featureToggleService.isHmcEnabled()).thenReturn(true);
-
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("applicant1").hasFieldOrProperty("partyID");
             assertThat(response.getData()).extracting("respondent1").hasFieldOrProperty("partyID");
-        }
-
-        @Test
-        void shouldNotAddPartyIdsToPartyFields_whenInvokedWithHMCToggleOff() {
-            var objectMapper = new ObjectMapper();
-            objectMapper.findAndRegisterModules();
-            objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-
-            var caseData = CaseDataBuilder.builder().atState(FlowState.Main.FULL_DEFENCE).build();
-            when(featureToggleService.isHmcEnabled()).thenReturn(false);
-
-            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("applicant1").extracting("individualFirstName")
-                .isEqualTo(caseData.getApplicant1().getIndividualFirstName());
-            assertThat(response.getData()).extracting("respondent1").doesNotHaveToString("individualFirstName");
-
-            assertThat(response.getData()).extracting("applicant1").extracting("individualLastName")
-                .isEqualTo(caseData.getApplicant1().getIndividualLastName());
-            assertThat(response.getData()).extracting("respondent1").doesNotHaveToString("individualLastName");
         }
 
         @ParameterizedTest

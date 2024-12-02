@@ -33,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -78,11 +79,11 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldGenerateNoticeOfDiscontinueDocForCW_whenCourtPermissionRequired() {
-            when(formGenerator.generateDocs(any(CaseData.class), anyString())).thenReturn(getCaseDocument());
+            when(formGenerator.generateDocs(any(CaseData.class), any(Party.class), anyString())).thenReturn(getCaseDocument());
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                    .respondent1(getPartyDetails())
-                    .applicant1(getPartyDetails())
+                    .respondent1(getRespondent1PartyDetails())
+                    .applicant1(getApplicant1PartyDetails())
                     .courtPermissionNeeded(SettleDiscontinueYesOrNoList.YES)
                     .isPermissionGranted(SettleDiscontinueYesOrNoList.YES)
                     .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
@@ -93,19 +94,20 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            verify(formGenerator).generateDocs(any(CaseData.class), eq("BEARER_TOKEN"));
+            verify(formGenerator, times(2)).generateDocs(any(CaseData.class), any(Party.class), eq("BEARER_TOKEN"));
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getNoticeOfDiscontinueCWDoc()).isNotNull();
+            assertThat(updatedData.getApplicant1NoticeOfDiscontinueCWViewDoc()).isNotNull();
+            assertThat(updatedData.getRespondent1NoticeOfDiscontinueCWViewDoc()).isNotNull();
         }
 
         @Test
         void shouldGenerateNoticeOfDiscontinueDocForAllParties_whenNoCourtPermissionRequired() {
-            when(formGenerator.generateDocs(any(CaseData.class), anyString())).thenReturn(getCaseDocument());
+            when(formGenerator.generateDocs(any(CaseData.class), any(Party.class), anyString())).thenReturn(getCaseDocument());
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                    .respondent1(getPartyDetails())
-                    .applicant1(getPartyDetails())
+                    .respondent1(getRespondent1PartyDetails())
+                    .applicant1(getApplicant1PartyDetails())
                     .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO)
                     .typeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE)
                     .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
@@ -115,10 +117,11 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            verify(formGenerator).generateDocs(any(CaseData.class), eq("BEARER_TOKEN"));
+            verify(formGenerator, times(2)).generateDocs(any(CaseData.class), any(Party.class), eq("BEARER_TOKEN"));
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getNoticeOfDiscontinueAllParitiesDoc()).isNotNull();
+            assertThat(updatedData.getApplicant1NoticeOfDiscontinueAllPartyViewDoc()).isNotNull();
+            assertThat(updatedData.getRespondent1NoticeOfDiscontinueAllPartyViewDoc()).isNotNull();
         }
     }
 
@@ -134,10 +137,24 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
         assertThat(handler.handledEvents()).contains(GEN_NOTICE_OF_DISCONTINUANCE);
     }
 
-    private Party getPartyDetails() {
+    private Party getRespondent1PartyDetails() {
         return PartyBuilder.builder().individual().build().toBuilder()
                 .individualFirstName("John")
                 .individualLastName("Doe")
+                .build();
+    }
+
+    private Party getRespondent2PartyDetails() {
+        return PartyBuilder.builder().individual().build().toBuilder()
+                .individualFirstName("Jane")
+                .individualLastName("Doe")
+                .build();
+    }
+
+    private Party getApplicant1PartyDetails() {
+        return PartyBuilder.builder().individual().build().toBuilder()
+                .individualFirstName("Carl")
+                .individualLastName("Foster")
                 .build();
     }
 

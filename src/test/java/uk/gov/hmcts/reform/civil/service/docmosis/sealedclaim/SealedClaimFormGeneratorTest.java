@@ -289,7 +289,9 @@ class SealedClaimFormGeneratorTest {
                         .map(SolicitorReferences::getRespondentSolicitor1Reference)
                         .orElse("")
                 ),
-                () -> assertEquals(templateData.getCaseName(), DocmosisTemplateDataUtils.toCaseName.apply(caseData))
+                () -> assertEquals(templateData.getCaseName(), DocmosisTemplateDataUtils.toCaseName.apply(caseData)),
+                () -> assertEquals(templateData.getApplicantRepresentativeOrganisationName(), getApplicant(caseData)
+                    .get(0).getRepresentative().getOrganisationName())
             );
         }
 
@@ -320,7 +322,9 @@ class SealedClaimFormGeneratorTest {
                         .map(SolicitorReferences::getRespondentSolicitor1Reference)
                         .orElse("")
                 ),
-                () -> assertEquals(templateData.getCaseName(), DocmosisTemplateDataUtils.toCaseName.apply(caseData))
+                () -> assertEquals(templateData.getCaseName(), DocmosisTemplateDataUtils.toCaseName.apply(caseData)),
+                () -> assertEquals(templateData.getApplicantRepresentativeOrganisationName(), getApplicant(caseData)
+                    .get(0).getRepresentative().getOrganisationName())
             );
         }
 
@@ -352,7 +356,9 @@ class SealedClaimFormGeneratorTest {
                         .map(SolicitorReferences::getRespondentSolicitor1Reference)
                         .orElse("")
                 ),
-                () -> assertEquals(templateData.getCaseName(), DocmosisTemplateDataUtils.toCaseName.apply(caseData))
+                () -> assertEquals(templateData.getCaseName(), DocmosisTemplateDataUtils.toCaseName.apply(caseData)),
+                () -> assertEquals(templateData.getApplicantRepresentativeOrganisationName(), getApplicant(caseData)
+                    .get(0).getRepresentative().getOrganisationName())
             );
         }
 
@@ -390,7 +396,9 @@ class SealedClaimFormGeneratorTest {
                 () -> assertEquals(
                     templateData.getRespondent2ExternalReference(), caseData.getRespondentSolicitor2Reference()
                 ),
-                () -> assertEquals(templateData.getCaseName(), DocmosisTemplateDataUtils.toCaseName.apply(caseData))
+                () -> assertEquals(templateData.getCaseName(), DocmosisTemplateDataUtils.toCaseName.apply(caseData)),
+                () -> assertEquals(templateData.getApplicantRepresentativeOrganisationName(), getApplicant(caseData)
+                    .get(0).getRepresentative().getOrganisationName())
             );
         }
 

@@ -28,11 +28,11 @@ public abstract class OrderCallbackHandler extends DashboardWithParamsCallbackHa
     }
 
     protected boolean isEligibleForReconsideration(CaseData caseData) {
-        return caseData.isSmallClaim()
+        return featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
+            && caseData.isSmallClaim()
             && caseData.getTotalClaimAmount().compareTo(BigDecimal.valueOf(1000)) <= 0
             && (isNull(caseData.getDecisionOnRequestReconsiderationOptions())
-            || !DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(caseData.getDecisionOnRequestReconsiderationOptions()))
-            && featureToggleService.isCaseProgressionEnabled();
+            || !DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(caseData.getDecisionOnRequestReconsiderationOptions()));
     }
 
     protected boolean hasTrackChanged(CaseData caseData) {
