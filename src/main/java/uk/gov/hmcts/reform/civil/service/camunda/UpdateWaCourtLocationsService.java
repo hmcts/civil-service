@@ -29,9 +29,7 @@ public class UpdateWaCourtLocationsService {
     private final LocationReferenceDataService locationRefDataService;
     private final FeatureToggleService featureToggleService;
 
-    public void updateCourtListingWALocations(String authorisation, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
-        CaseData caseData = caseDataBuilder.build();
-
+    public void updateCourtListingWALocations(String authorisation, CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseData caseData) {
         if (!featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
             return;
         }
@@ -43,6 +41,7 @@ public class UpdateWaCourtLocationsService {
             caseDataBuilder.taskManagementLocations(null);
             return;
         }
+
         log.info("CASE MANAGMENT LOCATION IS {}", caseData.getCaseManagementLocation().getBaseLocation());
         log.info("CASE TRACK {}", claimTrack);
 

@@ -247,7 +247,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         }
 
         updateWaCourtLocationsService
-            .updateCourtListingWALocations(callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(), builder);
+            .updateCourtListingWALocations(callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(), builder, caseData);
     }
 
     private boolean isFlightDelayAndSmallClaim(CaseData caseData) {
