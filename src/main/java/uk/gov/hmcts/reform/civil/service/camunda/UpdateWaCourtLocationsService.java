@@ -6,10 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
-import uk.gov.hmcts.reform.civil.model.dmnWaCourtTaskLocation.DmnListingLocations;
-import uk.gov.hmcts.reform.civil.model.dmnWaCourtTaskLocation.TaskManagementLocationTypes;
-import uk.gov.hmcts.reform.civil.model.dmnWaCourtTaskLocation.TaskManagementLocationsModel;
+import uk.gov.hmcts.reform.civil.model.dmnacourttasklocation.DmnListingLocations;
+import uk.gov.hmcts.reform.civil.model.dmnacourttasklocation.TaskManagementLocationTypes;
+import uk.gov.hmcts.reform.civil.model.dmnacourttasklocation.TaskManagementLocationsModel;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
 import java.util.List;
@@ -26,10 +27,25 @@ public class UpdateWaCourtLocationsService {
     private final CamundaRuntimeClient camundaRuntimeClient;
     private final ObjectMapper objectMapper;
     private final LocationReferenceDataService locationRefDataService;
+    private final FeatureToggleService featureToggleService;
 
-    public void updateCourtListingWALocations(String courtId, CaseData caseData, String authorisation, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+    public void updateCourtListingWALocations(String authorisation, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+        CaseData caseData = caseDataBuilder.build();
 
-        Map<String, Object> evaluatedCourtMap = camundaRuntimeClient.getEvaluatedDmnCourtLocations(courtId, getClaimTrack(caseData));
+        if (!featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+            return;
+        }
+
+        String claimTrack = getClaimTrack(caseData);
+        if ("FAST_CLAIM".equals(claimTrack) || "SMALL_CLAIM".equals(claimTrack)) {
+            // when track is small or fast do not evaluate DMN, and also if claim was changed to small or fast
+            // remove any previously evaluated and populate locations from taskManagementLocations
+            caseDataBuilder.taskManagementLocations(null);
+            return;
+        }
+
+        Map<String, Object> evaluatedCourtMap = camundaRuntimeClient
+            .getEvaluatedDmnCourtLocations(caseData.getCaseManagementLocation().getBaseLocation(), claimTrack);
         DmnListingLocations dmnListingLocations = objectMapper.convertValue(evaluatedCourtMap, DmnListingLocations.class);
         List<LocationRefData> locationRefDataList = locationRefDataService.getHearingCourtLocations(authorisation);
 

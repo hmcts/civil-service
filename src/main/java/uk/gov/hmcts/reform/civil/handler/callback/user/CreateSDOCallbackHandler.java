@@ -128,6 +128,7 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -231,6 +232,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     BigDecimal ccmccAmount;
     @Value("${court-location.unspecified-claim.epimms-id}")
     String ccmccEpimsId;
+    private final UpdateWaCourtLocationsService updateWaCourtLocationsService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -1626,6 +1628,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             }
             dataBuilder.sdoR2Trial(sdoR2Trial);
         }
+
+        updateWaCourtLocationsService.updateCourtListingWALocations(callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
+                                                                    dataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))

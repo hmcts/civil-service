@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
@@ -91,6 +92,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     private final CaseDetailsConverter caseDetailsConverter;
     private final FrcDocumentsUtils frcDocumentsUtils;
     @Value("${court-location.unspecified-claim.epimms-id}") String ccmccEpimsId;
+    private final UpdateWaCourtLocationsService updateWaCourtLocationsService;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -358,6 +360,10 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                 () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
                     CallbackParams.Params.BEARER_TOKEN).toString())
             ));
+
+        updateWaCourtLocationsService
+            .updateCourtListingWALocations(callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(), builder);
+
         if (log.isDebugEnabled()) {
             log.debug("Case management location for {} is {}", caseData.getLegacyCaseReference(), builder.build().getCaseManagementLocation());
         }

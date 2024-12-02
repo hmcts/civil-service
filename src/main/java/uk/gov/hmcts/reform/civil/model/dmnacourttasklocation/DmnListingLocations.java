@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.model.dmnWaCourtTaskLocation;
+package uk.gov.hmcts.reform.civil.model.dmnacourttasklocation;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

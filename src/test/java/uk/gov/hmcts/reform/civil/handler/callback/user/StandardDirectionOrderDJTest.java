@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -103,6 +104,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     private FeatureToggleService featureToggleService;
     @MockBean
     private CategoryService categoryService;
+    @MockBean
+    private UpdateWaCourtLocationsService updateWaCourtLocationsService;
 
     @Nested
     class AboutToStartCallback {

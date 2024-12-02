@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
@@ -69,6 +70,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     private final FrcDocumentsUtils frcDocumentsUtils;
     private final DQResponseDocumentUtils dqResponseDocumentUtils;
     private final DetermineNextState determineNextState;
+    private final UpdateWaCourtLocationsService updateWaCourtLocationsService;
 
     @Value("${court-location.specified-claim.epimms-id}") String cnbcEpimsId;
 
@@ -243,6 +245,9 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
                         CallbackParams.Params.BEARER_TOKEN).toString())
                 ));
         }
+
+        updateWaCourtLocationsService
+            .updateCourtListingWALocations(callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(), builder);
     }
 
     private boolean isFlightDelayAndSmallClaim(CaseData caseData) {
