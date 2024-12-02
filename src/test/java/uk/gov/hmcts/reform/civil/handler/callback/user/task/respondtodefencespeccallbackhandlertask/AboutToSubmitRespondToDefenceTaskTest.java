@@ -199,7 +199,7 @@ class AboutToSubmitRespondToDefenceTaskTest {
     }
 
     @Test
-    void shouldPopulateDQPartyIdsWhenHmcIsEnabled() {
+    void shouldPopulateDQPartyIds() {
 
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1DQWithExperts()
@@ -207,16 +207,12 @@ class AboutToSubmitRespondToDefenceTaskTest {
             .atState(FULL_DEFENCE_PROCEED)
             .build();
 
-        when(featureToggleService.isHmcEnabled()).thenReturn(true);
-
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) task.execute(callbackParams(caseData));
 
         assertNotNull(response);
         assertThat(getCaseData(response)).extracting("applicant1").hasFieldOrProperty("partyID");
         assertThat(getCaseData(response)).extracting("respondent1").hasFieldOrProperty("partyID");
-        verify(featureToggleService, times(1)).isHmcEnabled();
-
     }
 
     private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {

@@ -226,7 +226,9 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     @Builder.Default
     private final List<Element<CaseDocument>> trialReadyDocuments = new ArrayList<>();
 
-    // MINTI case prog
+    // // MINTI case prog
+    private DynamicList requestHearingNoticeDynamic;
+    private YesOrNo requestAnotherHearing;
     private final List<ConfirmListingTickBox> confirmListingTickBox;
 
     /**
