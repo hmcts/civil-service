@@ -81,7 +81,7 @@ class ConfirmOrderReviewTaskHandlerTest {
     @Test
     void shouldHaveCorrectEventDetails_whenObligationDataIsProvided() {
         CaseData caseData = CaseData.builder()
-            .obligationData(List.of(Element.<ObligationData>builder().id(UUID.randomUUID()).value(ObligationData.builder().obligationReason(
+            .storedObligationData(List.of(Element.<ObligationData>builder().id(UUID.randomUUID()).value(ObligationData.builder().obligationReason(
                 ObligationReason.DISMISS_CASE).obligationDate(
                 null).obligationAction("action").build()).build()))
             .businessProcess(
