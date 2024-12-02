@@ -43,10 +43,7 @@ public class DocumentConversionService {
 
     public byte[] convertDocumentToPdf(Document sourceDocument, String auth) {
         if (PDF_MIME_TYPE.equalsIgnoreCase(tika.detect(sourceDocument.getDocumentFileName()))) {
-            throw new DocumentConversionException(
-                "Document already is a pdf",
-                null
-            );
+            return documentManagementService.downloadDocument(auth, sourceDocument.getDocumentBinaryUrl());
         }
         return convert(sourceDocument, auth);
     }

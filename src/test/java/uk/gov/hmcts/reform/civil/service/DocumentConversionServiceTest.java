@@ -33,7 +33,7 @@ public class DocumentConversionServiceTest {
     public static final String AUTH = "auth";
     private static final String PDF_MIME_TYPE = "application/pdf";
     private static final String WORD_MIME_TYPE = "application/msword";
-    
+
     @InjectMocks
     private DocumentConversionService documentConversionService;
     @Mock
@@ -61,7 +61,6 @@ public class DocumentConversionServiceTest {
         when(restTemplate.postForObject(anyString(), any(HttpEntity.class), eq(byte[].class))).thenReturn(CONVERTED_BINARY);
 
         byte[] result = documentConversionService.convertDocumentToPdf(documentToConvert, AUTH);
-        assertEquals(CONVERTED_BINARY, result);
 
         assertNotNull(result, "The returned byte array should not be null.");
         assertArrayEquals(CONVERTED_BINARY, result);
@@ -71,13 +70,15 @@ public class DocumentConversionServiceTest {
     }
 
     @Test
-    void convertDocumentToPdf_ThrowsExceptionWhenDocumentIsAlreadyPdf() {
+    void convertDocumentToPdf_ShouldReturnDocumentIsAlreadyPdf() {
+        byte[] bytes = "bytes".getBytes();
+        when(service.downloadDocument(AUTH, documentToConvert.getDocumentBinaryUrl())).thenReturn(bytes);
         when(tika.detect(documentToConvert.getDocumentFileName())).thenReturn(PDF_MIME_TYPE);
 
-        DocumentConversionException exception = assertThrows(DocumentConversionException.class,
-                () -> documentConversionService.convertDocumentToPdf(documentToConvert, AUTH));
+        byte[] result = documentConversionService.convertDocumentToPdf(documentToConvert, AUTH);
 
-        assertEquals("Document already is a pdf", exception.getMessage());
+        assertNotNull(result, "The returned byte array should not be null.");
+        assertArrayEquals(bytes, result);
         verify(tika, times(1)).detect(documentToConvert.getDocumentFileName());
         verifyNoInteractions(restTemplate);
     }
@@ -91,9 +92,8 @@ public class DocumentConversionServiceTest {
         when(restTemplate.postForObject(anyString(), any(HttpEntity.class), eq(byte[].class)))
                 .thenThrow(new HttpClientErrorException(org.springframework.http.HttpStatus.BAD_REQUEST));
 
-        DocumentConversionException exception = assertThrows(DocumentConversionException.class, () -> {
-            documentConversionService.convertDocumentToPdf(documentToConvert, AUTH);
-        });
+        DocumentConversionException exception = assertThrows(DocumentConversionException.class, () ->
+            documentConversionService.convertDocumentToPdf(documentToConvert, AUTH));
 
         assertEquals("Error converting document to pdf", exception.getMessage());
         verify(tika, times(1)).detect(documentToConvert.getDocumentFileName());
