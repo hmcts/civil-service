@@ -245,7 +245,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
                         CallbackParams.Params.BEARER_TOKEN).toString())
                 ));
         }
-
+        log.info("CASE DATA updateCaseManagementLocation {}", caseData);
         updateWaCourtLocationsService
             .updateCourtListingWALocations(callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(), builder, caseData);
     }
