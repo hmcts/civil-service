@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.CaseDefinitionConstants;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
-import uk.gov.hmcts.reform.civil.model.DefendantLinkStatus;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.PinDto;
 import uk.gov.hmcts.reform.civil.service.AssignCaseService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -86,22 +85,20 @@ public class CaseAssignmentController {
         @ApiResponse(responseCode = "200", description = "OK"),
         @ApiResponse(responseCode = "401", description = "Not Authorized"),
         @ApiResponse(responseCode = "400", description = "Bad Request")})
-    public ResponseEntity<DefendantLinkStatus> isDefendantLinked(
+    public ResponseEntity<Boolean> isDefendantLinked(
         @PathVariable("caseReference") String caseReference) {
         log.info("Check claim reference {} is linked to defendant", caseReference);
         CaseDetails caseDetails = caseByLegacyReferenceSearchService.getCivilOrOcmcCaseDataByCaseReference(caseReference);
-        boolean isOcmcCase = false;
         boolean status = false;
         if (caseDetails != null) {
-            isOcmcCase = caseDetails.getCaseTypeId().equals(CaseDefinitionConstants.CMC_CASE_TYPE);
+            boolean isOcmcCase = caseDetails.getCaseTypeId().equals(CaseDefinitionConstants.CMC_CASE_TYPE);
             if (isOcmcCase) {
                 status = defendantPinToPostLRspecService.isOcmcDefendantLinked(caseReference);
             } else {
                 status = defendantPinToPostLRspecService.isDefendantLinked(caseDetails);
             }
         }
-        DefendantLinkStatus defendantLinkStatus = new DefendantLinkStatus(isOcmcCase, status);
-        return new ResponseEntity<>(defendantLinkStatus, HttpStatus.OK);
+        return new ResponseEntity<>(status, HttpStatus.OK);
     }
 
     @Deprecated
