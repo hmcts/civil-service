@@ -60,8 +60,8 @@ public class SetAsideJudgmentOnlineMapper extends JudgmentOnlineMapper {
     private LocalDate getApplicationDateToSetAside(CaseData caseData) {
         if (JudgmentSetAsideReason.JUDGE_ORDER.equals(caseData.getJoSetAsideReason())
             && JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION.equals(caseData.getJoSetAsideOrderType())) {
-                return caseData.getJoSetAsideApplicationDate();
-            }
+            return caseData.getJoSetAsideApplicationDate();
+        }
         return null;
     }
 }

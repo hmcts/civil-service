@@ -46,6 +46,8 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     private DeadlinesCalculator deadlinesCalculator;
     private static final String ERROR_MESSAGE_SET_ASIDE_APPLICATION_DATE =
         "Application date to set aside judgment must be less than  or equal to the date of the order setting aside the judgement";
+    private static final String ERROR_MESSAGE_SET_ASIDE_DEFENCE_DATE =
+        "Date the defence was received must be less than or equal to the date of the order setting aside the judgement";
 
     @BeforeEach
     void setup() {
@@ -251,12 +253,13 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE);
+            caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
             caseData.setJoSetAsideDefenceReceivedDate(LocalDate.now().plusDays(5));
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-set-aside-dates");
             //When: handler is called with MID event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors()).contains("Date must be in the past");
+            assertThat(response.getErrors()).contains(ERROR_MESSAGE_SET_ASIDE_DEFENCE_DATE);
         }
 
         @Test
