@@ -741,6 +741,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo obligationDatePresent;
     private CourtStaffNextSteps courtStaffNextSteps;
     private List<Element<ObligationData>> obligationData;
+    private List<Element<ObligationData>> storedObligationData;
 
 
     /**

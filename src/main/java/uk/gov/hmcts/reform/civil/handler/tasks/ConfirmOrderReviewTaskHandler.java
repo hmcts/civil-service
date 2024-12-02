@@ -95,7 +95,7 @@ public class ConfirmOrderReviewTaskHandler extends BaseExternalTaskHandler {
     }
 
     private String getObligationReasons(CaseData caseData) {
-        return Optional.ofNullable(caseData.getObligationData())
+        return Optional.ofNullable(caseData.getStoredObligationData())
             .orElse(Collections.emptyList())
             .stream()
             .map(element -> {
@@ -111,7 +111,7 @@ public class ConfirmOrderReviewTaskHandler extends BaseExternalTaskHandler {
     }
 
     private String obligationActions(CaseData caseData) {
-        return Optional.ofNullable(caseData.getObligationData())
+        return Optional.ofNullable(caseData.getStoredObligationData())
             .orElse(Collections.emptyList())
             .stream()
             .map(element -> element.getValue().getObligationAction())
