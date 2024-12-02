@@ -362,7 +362,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             ));
 
         updateWaCourtLocationsService
-            .updateCourtListingWALocations(callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(), builder);
+            .updateCourtListingWALocations(callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(), builder, caseData);
 
         if (log.isDebugEnabled()) {
             log.debug("Case management location for {} is {}", caseData.getLegacyCaseReference(), builder.build().getCaseManagementLocation());

@@ -124,7 +124,7 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
             caseDataBuilder.caseManagementLocation(LocationHelper.buildCaseLocation(newCourtLocation));
             caseDataBuilder.locationName(newCourtLocation.getSiteName());
             updateWaCourtLocationsService.updateCourtListingWALocations(callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                                                                        caseDataBuilder);
+                                                                        caseDataBuilder, caseData);
         }
 
         if (nonNull(newCourtLocation)) {
