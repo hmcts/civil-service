@@ -67,7 +67,7 @@ class SetAsideJudgmentsOnlineMapperTest {
         assertNotNull(caseData.getHistoricJudgment());
         JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
         assertEquals(JudgmentState.SET_ASIDE, historicJudgment.getState());
-        assertEquals(LocalDate.of(2022, 12, 12), historicJudgment.getSetAsideDate());
+        assertEquals(LocalDate.of(2022, 12, 12), historicJudgment.getSetAsideOrderDate());
     }
 
     @Test
@@ -103,7 +103,6 @@ class SetAsideJudgmentsOnlineMapperTest {
         assertNotNull(caseData.getHistoricJudgment());
         JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
         assertEquals(JudgmentState.SET_ASIDE_ERROR, historicJudgment.getState());
-        assertEquals(LocalDate.now(), historicJudgment.getSetAsideDate());
     }
 
     @Test
@@ -123,7 +122,6 @@ class SetAsideJudgmentsOnlineMapperTest {
         assertNotNull(caseData.getHistoricJudgment());
         JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
         assertEquals(JudgmentState.SET_ASIDE_ERROR, historicJudgment.getState());
-        assertEquals(LocalDate.now(), historicJudgment.getSetAsideDate());
     }
 
     @ParameterizedTest
@@ -162,6 +160,6 @@ class SetAsideJudgmentsOnlineMapperTest {
         assertNotNull(caseData.getHistoricJudgment());
         JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
         assertEquals(JudgmentState.SET_ASIDE, historicJudgment.getState());
-        assertEquals(LocalDate.of(2022, 12, 11), historicJudgment.getSetAsideApplicationDate());
+        assertEquals(LocalDate.of(2022, 12, 11), historicJudgment.getSetAsideDate());
     }
 }

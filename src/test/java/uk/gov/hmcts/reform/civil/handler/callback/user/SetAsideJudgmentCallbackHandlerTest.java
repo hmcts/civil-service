@@ -95,7 +95,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("historicJudgment")).isNotNull();
             JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
             assertEquals(JudgmentState.SET_ASIDE, historicJudgment.getState());
-            assertEquals(caseData.getJoSetAsideOrderDate(), historicJudgment.getSetAsideDate());
+            assertEquals(caseData.getJoSetAsideOrderDate(), historicJudgment.getSetAsideOrderDate());
             assertThat(response.getData()).extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(SET_ASIDE_JUDGMENT.name(), "READY");
@@ -227,8 +227,8 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("historicJudgment")).isNotNull();
             JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
             assertEquals(JudgmentState.SET_ASIDE, historicJudgment.getState());
-            assertEquals(caseData.getJoSetAsideOrderDate(), historicJudgment.getSetAsideDate());
-            assertEquals(caseData.getJoSetAsideApplicationDate(), historicJudgment.getSetAsideApplicationDate());
+            assertEquals(caseData.getJoSetAsideOrderDate(), historicJudgment.getSetAsideOrderDate());
+            assertEquals(caseData.getJoSetAsideApplicationDate(), historicJudgment.getSetAsideDate());
         }
     }
 
