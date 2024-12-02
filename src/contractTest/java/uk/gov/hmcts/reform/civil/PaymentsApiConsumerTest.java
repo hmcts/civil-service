@@ -24,13 +24,12 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
-import uk.gov.hmcts.reform.payments.client.models.FeeDto;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
-import uk.gov.hmcts.reform.payments.request.CreditAccountPaymentRequest;
 
 import java.io.IOException;
-import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonBody;
@@ -44,14 +43,14 @@ import static org.mockito.Mockito.when;
 @TestPropertySource(properties = "payments.api.url=http://localhost:6670")
 public class PaymentsApiConsumerTest extends BaseContractTest {
 
-    public static final String PAYMENT_REQUEST_ENDPOINT_SUFFIX = "/credit-account-payments";
-    private static final String SERVICE = "service";
+    private static final String SERVICE = "CIVIL";
     private static final String SITE_ID = "site_id";
     private static final String SPEC_SITE_ID = "spec_site_id";
     private static final Organisation ORGANISATION = Organisation.builder()
         .name("test org")
         .contactInformation(List.of(ContactInformation.builder().build()))
         .build();
+    protected static final String ACCOUNT_NUMBER = "PBA0077597";
 
     @Autowired
     private PaymentsService paymentsService;
@@ -64,6 +63,8 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
 
     @MockBean
     private PaymentsConfiguration paymentsConfiguration;
+
+    private CaseData caseData = CaseDataBuilder.builder().buildClaimIssuedPaymentCaseDataWithPba(ACCOUNT_NUMBER);
 
     @Pact(consumer = "civil_service")
     public RequestResponsePact doCardPaymentRequest(PactDslWithProvider builder)
@@ -83,50 +84,30 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
     @Test
     @PactTestFor(pactMethod = "doCardPaymentRequest")
     public void verifyCreditCardPaymentRequest() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
         PaymentDto response = paymentsService.createCreditAccountPayment(caseData, AUTHORIZATION_TOKEN);
         assertThat(response.getStatus(), is("Success"));
 
     }
 
     private RequestResponsePact buildCardPaymentRequestPact(PactDslWithProvider builder) throws IOException {
+
+        Map<String, Object> paymentMap = new HashMap<>();
+        paymentMap.put("accountNumber", ACCOUNT_NUMBER);
+        paymentMap.put("availableBalance", "1000.00");
+        paymentMap.put("accountName", "test.account.name");
+
         return builder
-            .given("a request to create a payment in payments api")
+            .given("An active account has sufficient funds for a payment", paymentMap)
             .uponReceiving("a request to create a payment in payments api with valid authorization")
-            .pathFromProviderState(
-                PAYMENT_REQUEST_ENDPOINT_SUFFIX,
-                PAYMENT_REQUEST_ENDPOINT_SUFFIX
-            )
-            .headers(AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN, SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN)
+            .path("/credit-account-payments")
+            .headers(AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
             .method(HttpMethod.POST.toString())
-            .body(createJsonObject(buildCreditAccountPaymentRequest()))
+            .body(createJsonObject(paymentsService.buildRequest(caseData)))
             .willRespondWith()
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .body(buildPBAPaymentResponseDsl("Success", "success", null, "Payment by account successful"))
-            .status(HttpStatus.SC_OK)
+            .status(HttpStatus.SC_CREATED)
             .toPact();
-    }
-
-    private CreditAccountPaymentRequest buildCreditAccountPaymentRequest() {
-        return CreditAccountPaymentRequest.builder()
-            .accountNumber("PBA0077597")
-            .amount(BigDecimal.valueOf(1.00).setScale(2))
-            .caseReference("000DC001")
-            .ccdCaseNumber("1594901956117591")
-            .currency("GBP")
-            .customerReference("12345")
-            .description("Claim issue payment")
-            .organisationName("test org")
-            .service("service")
-            .siteId("site_id")
-            .fees(new FeeDto[] {
-                FeeDto.builder()
-                    .calculatedAmount(BigDecimal.valueOf(1.00).setScale(2))
-                    .code("CODE")
-                    .version("1")
-                    .build()
-            })
-            .build();
     }
 
     private DslPart buildPBAPaymentResponseDsl(String status, String paymentStatus, String errorCode, String errorMessage) {

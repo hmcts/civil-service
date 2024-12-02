@@ -6085,6 +6085,13 @@ public class CaseDataBuilder {
             .build();
     }
 
+    public CaseData buildClaimIssuedPaymentCaseDataWithPba(String pbaAccountNumber) {
+       return this.buildClaimIssuedPaymentCaseData().toBuilder()
+           .applicantSolicitor1PbaAccounts(DynamicList.builder().value(DynamicListElement.dynamicElement(pbaAccountNumber)).build())
+           .paymentReference("RC-1234-1234-1234-1234")
+           .build();
+    }
+
     public CaseData buildPaymentFailureCaseData() {
         Organisation orgId = Organisation.builder()
             .organisationID("OrgId").build();
