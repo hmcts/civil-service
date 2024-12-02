@@ -221,7 +221,6 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     private String putCaseStateInJudicialReferral(CaseData caseData) {
         if (caseData.isRespondentResponseFullDefence()
             && JudicialReferralUtils.shouldMoveToJudicialReferral(caseData, featureToggleService.isMultiOrIntermediateTrackEnabled(caseData))) {
-            log.info("moving to judicial referral");
             return CaseState.JUDICIAL_REFERRAL.name();
         }
         return null;

@@ -78,13 +78,6 @@ public class DetermineNextState  {
     }
 
     private boolean shouldNotChangeStateMinti(CaseData caseData) {
-        log.info("shouldNotChangeStateMinti");
-        log.info("isMultiOrIntermediateTrackEnabled " + featureToggleService.isMultiOrIntermediateTrackEnabled(caseData));
-        log.info("CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) " + CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory()));
-        log.info("isMultiOrIntermediateSpecClaim(caseData) " + isMultiOrIntermediateSpecClaim(caseData));
-        log.info("isLipCase(caseData) " + isLipCase(caseData));
-        log.info("isClaimNotSettled(caseData) " + isClaimNotSettled(caseData));
-        log.info("caseData.getApplicant1ProceedWithClaim() == YesOrNo.YES " + caseData.getApplicant1ProceedWithClaim());
         return featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
             && CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && isMultiOrIntermediateSpecClaim(caseData)
@@ -108,11 +101,6 @@ public class DetermineNextState  {
     }
 
     private static boolean isClaimNotSettled(CaseData caseData) {
-        log.info("claim not settled");
-        log.info("caseData.isClaimantNotSettlePartAdmitClaim() " + caseData.isClaimantNotSettlePartAdmitClaim());
-        log.info("caseData.hasClaimantNotAgreedToFreeMediation() " + caseData.hasClaimantNotAgreedToFreeMediation());
-        log.info("caseData.hasDefendantNotAgreedToFreeMediation() " + caseData.hasDefendantNotAgreedToFreeMediation());
-        log.info("caseData.isFastTrackClaim() " + caseData.isFastTrackClaim());
         return caseData.isClaimantNotSettlePartAdmitClaim()
             && ((caseData.hasClaimantNotAgreedToFreeMediation()
             || caseData.hasDefendantNotAgreedToFreeMediation())
