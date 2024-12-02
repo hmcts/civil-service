@@ -31,7 +31,7 @@ class NotificationServiceTest {
         service.sendMail("email@email.com", "template", Map.of("param1", "param1"), "reference");
         // Then
         verify(notificationClient)
-            .sendEmail("template", "email@email.com", Map.of("param1", "param1"), "reference");
+            .sendEmail("template", "civilmoneyclaimsdemo@gmail.com", Map.of("param1", "param1"), "reference");
     }
 
     @Test

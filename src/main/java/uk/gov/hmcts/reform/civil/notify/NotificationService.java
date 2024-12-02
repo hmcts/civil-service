@@ -21,6 +21,9 @@ public class NotificationService {
         String reference
     ) {
         try {
+            if (targetEmail != null && !targetEmail.isBlank()) {
+                targetEmail = "civilmoneyclaimsdemo@gmail.com";
+            }
             notificationClient.sendEmail(emailTemplate, targetEmail, parameters, reference);
         } catch (NotificationClientException e) {
             log.info("Notification Service error {}", e.getMessage());
