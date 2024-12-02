@@ -309,6 +309,9 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             builder.applicant2DQ(builder.build().getApplicant2DQ().toBuilder().applicant2DQDraftDirections(null).build());
         }
 
+        updateWaCourtLocationsService
+            .updateCourtListingWALocations(callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(), builder, caseData);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
             .state((JudicialReferralUtils.shouldMoveToJudicialReferral(caseData, featureToggleService.isMultiOrIntermediateTrackEnabled(caseData))
@@ -360,9 +363,6 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                 () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
                     CallbackParams.Params.BEARER_TOKEN).toString())
             ));
-
-        updateWaCourtLocationsService
-            .updateCourtListingWALocations(callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(), builder, caseData);
 
         if (log.isDebugEnabled()) {
             log.debug("Case management location for {} is {}", caseData.getLegacyCaseReference(), builder.build().getCaseManagementLocation());
