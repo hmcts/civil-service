@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.CaseProceedOfflineClaimantNotificationHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.CourtOfficerOrderClaimantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class CourtOfficerOrderClaimantScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
-    private CaseProceedOfflineClaimantNotificationHandler handler;
+    private CourtOfficerOrderClaimantNotificationHandler handler;
 
     @Test
     void should_create_court_officer_order_claimant_scenario() throws Exception {

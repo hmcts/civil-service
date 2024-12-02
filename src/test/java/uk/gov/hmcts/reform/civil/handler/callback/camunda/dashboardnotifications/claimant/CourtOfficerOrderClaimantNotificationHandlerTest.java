@@ -29,7 +29,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.DECISION_OUTCOME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
 public class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -85,7 +85,7 @@ public class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallba
             //then
             verify(dashboardApiClient).recordScenario(
                     caseData.getCcdCaseReference().toString(),
-                    SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_DEFENDANT.getScenario(),
+                    SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_CLAIMANT.getScenario(),
                     "BEARER_TOKEN",
                     ScenarioRequestParams.builder().params(scenarioParams).build()
             );
@@ -112,7 +112,7 @@ public class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallba
 
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_DEFENDANT.getScenario(),
+                SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_CLAIMANT.getScenario(),
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
@@ -138,7 +138,7 @@ public class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallba
             // Then
             verify(dashboardApiClient, never()).recordScenario(
                     caseData.getCcdCaseReference().toString(),
-                    SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_DEFENDANT.getScenario(),
+                    SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_CLAIMANT.getScenario(),
                     "BEARER_TOKEN",
                     ScenarioRequestParams.builder().params(scenarioParams).build()
             );
@@ -166,7 +166,7 @@ public class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallba
             // Then
             verify(dashboardApiClient, never()).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_DEFENDANT.getScenario(),
+                SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_CLAIMANT.getScenario(),
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
