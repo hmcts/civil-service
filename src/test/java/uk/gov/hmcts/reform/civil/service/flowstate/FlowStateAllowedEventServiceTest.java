@@ -1914,7 +1914,8 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
@@ -1935,6 +1936,8 @@ class FlowStateAllowedEventServiceTest {
                         TRIAL_READY_CHECK,
                         TRIAL_READY_NOTIFICATION,
                         MOVE_TO_DECISION_OUTCOME,
+                        DECISION_ON_RECONSIDERATION_REQUEST,
+                        AMEND_RESTITCH_BUNDLE,
                         HEARING_FEE_UNPAID,
                         HEARING_FEE_PAID,
                         REFER_TO_JUDGE,
@@ -2146,10 +2149,10 @@ class FlowStateAllowedEventServiceTest {
         @ArgumentsSource(GetAllowedCaseEventForFlowStateArgumentsSpec.class)
         void shouldReturnTrue_whenEventIsAllowedAtGivenState(FlowState.Main flowState, CaseEvent... caseEvents) {
             Arrays.stream(caseEvents).forEach(caseEvent ->
-                                                  assertTrue(flowStateAllowedEventService.isAllowedOnStateForSpec(
-                                                      flowState.fullName(),
-                                                      caseEvent
-                                                  ))
+                assertTrue(flowStateAllowedEventService.isAllowedOnStateForSpec(
+                    flowState.fullName(),
+                    caseEvent
+                ))
             );
         }
     }

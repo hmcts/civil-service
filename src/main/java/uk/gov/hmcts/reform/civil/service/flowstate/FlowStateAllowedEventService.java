@@ -1860,8 +1860,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                ADD_CASE_NOTE
-
+                ADD_CASE_NOTE,
+                INITIATE_GENERAL_APPLICATION
             )
         ),
         entry(
@@ -1878,6 +1878,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 REQUEST_FOR_RECONSIDERATION,
+                DECISION_ON_RECONSIDERATION_REQUEST,
+                AMEND_RESTITCH_BUNDLE,
                 HEARING_SCHEDULED,
                 TRIAL_READY_CHECK,
                 TRIAL_READY_NOTIFICATION,

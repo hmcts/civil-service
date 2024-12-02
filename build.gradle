@@ -102,7 +102,9 @@ allprojects {
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.9.25'
 
       dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
-      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.15'
+
+      //Solves CVE-2023-34034
+      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.2.1'
 
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
@@ -268,7 +270,7 @@ task smoke(description: 'Runs the smoke tests.') {
 
 task functional(description: 'Runs the functional tests.') {
   dependsOn(inStrictOrder(awaitApplicationReadiness,
-    runProdApiTests, runNonProdApiTestsByGroups, runNightlyApiTests))
+    runNightlyApiTests, runProdApiTests, runNonProdApiTestsByGroups))
 }
 
 project.tasks['sonarqube'].dependsOn test, jacocoTestReport
@@ -284,7 +286,7 @@ sonarqube {
     property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/request/servlet/** , **/controllers/**, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**, **/service/PaymentsService.java, **/DashboardWithParamsCallbackHandler.java, **/PaymentRequestUpdateCallbackService.java, **/advice/**"
     property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java, **/*CcdDashboardClaimantClaimMatcher.java, **/*CcdDashboardDefendantClaimMatcher.java"
     property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**, **/handler/callback/camunda/dashboardnotifications/claimant/CCJRequestedDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantCCJResponseNotificationHandler.java" +
-      ", **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantResponseNotificationHandler.java,  **/handler/callback/camunda/dashboardnotifications/defendant/MoreTimeRequestedDashboardNotificationDefendantHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantMediationSuccessfulDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimSettledDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/HearingScheduledClaimantNotificationHandler.java"
+      ", **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantResponseNotificationHandler.java, **/utils/HmcDataUtils.java, **/handler/callback/camunda/dashboardnotifications/defendant/MoreTimeRequestedDashboardNotificationDefendantHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantMediationSuccessfulDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimSettledDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/HearingScheduledClaimantNotificationHandler.java"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
     property "sonar.web.javaOpts", "-Xmx2G"
   }

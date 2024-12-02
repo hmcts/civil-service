@@ -20,6 +20,7 @@ public class StayCaseDefendantNotificationHandler extends CaseEventsDashboardCal
     private static final List<CaseEvent> EVENTS =
         List.of(CREATE_DASHBOARD_NOTIFICATION_STAY_CASE_DEFENDANT);
     public static final String TASK_ID = "GenerateDashboardNotificationStayCaseDefendant";
+    public static final String GA = "Applications";
 
     public StayCaseDefendantNotificationHandler(DashboardApiClient dashboardApiClient,
                                                 DashboardNotificationsParamsMapper mapper,
@@ -47,6 +48,7 @@ public class StayCaseDefendantNotificationHandler extends CaseEventsDashboardCal
         dashboardApiClient.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseData.getCcdCaseReference().toString(),
             "DEFENDANT",
+            GA,
             authToken
         );
     }

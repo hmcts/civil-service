@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -11,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -184,15 +186,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenEarlyAdopterEnabled(Boolean toggleStat) {
-        var caseFileKey = "early-adopters";
-        givenToggle(caseFileKey, toggleStat);
-
-        assertThat(featureToggleService.isEarlyAdoptersEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsSdoR2Enabled(Boolean toggleStat) {
         var sdoR2Key = "isSdoR2Enabled";
         givenToggle(sdoR2Key, toggleStat);
@@ -262,17 +255,6 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).isEqualTo(toggleStat);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsPartOfNationalRollout(Boolean toggleStat) {
-        final String feature = "national-rollout-whitelist";
-        String location = "000000";
-        when(featureToggleApi.isFeatureEnabledForLocation(eq(feature), eq(location), eq(false)))
-            .thenReturn(toggleStat);
-
-        assertThat(featureToggleService.isPartOfNationalRollout(location)).isEqualTo(toggleStat);
-    }
-
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(eq(feature)))
             .thenReturn(state);
@@ -304,5 +286,37 @@ class FeatureToggleServiceTest {
         givenToggle(isCoSCEnabledKey, toggleStat);
 
         assertThat(featureToggleService.isCoSCEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "someLocation, true, true",
+        "someLocation, false, false",
+        ", true, false",
+        ", false, false"
+    })
+    void shouldReturnCorrectValueBasedOnLocationAndFeatureToggle(String location, boolean isFeatureEnabled, boolean expected) {
+
+        if (isFeatureEnabled && location != null) {
+            when(featureToggleApi.isFeatureEnabledForLocation(
+                "case-progression-location-whitelist",
+                location,
+                true
+            )).thenReturn(isFeatureEnabled);
+            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isFeatureEnabled);
+        }
+
+        boolean result = featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(location);
+
+        assertEquals(expected, result);
+    }
+
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsHmcNroCEnabled(Boolean toggleStat) {
+        var isCoSCEnabledKey = "hmc-nro";
+        givenToggle(isCoSCEnabledKey, toggleStat);
+
+        assertThat(featureToggleService.isHmcNroEnabled()).isEqualTo(toggleStat);
+
     }
 }

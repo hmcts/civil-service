@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
@@ -13,7 +14,8 @@ import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
 public class MediationCasesSearchServiceTest extends ElasticSearchServiceTest {
 
-    private static final LocalDate CARM_DATE = LocalDate.of(2024, 11, 5);
+    private static final LocalDateTime CARM_DATE = LocalDateTime.of(2024, 11, 5,
+                                                                    7, 28, 35);
 
     @BeforeEach
     void setup() {
