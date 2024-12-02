@@ -43,6 +43,8 @@ public class UpdateWaCourtLocationsService {
             caseDataBuilder.taskManagementLocations(null);
             return;
         }
+        log.info("CASE MANAGMENT LOCATION IS {}", caseData.getCaseManagementLocation().getBaseLocation());
+        log.info("CASE TRACK {}", claimTrack);
 
         Map<String, Object> evaluatedCourtMap = camundaRuntimeClient
             .getEvaluatedDmnCourtLocations(caseData.getCaseManagementLocation().getBaseLocation(), claimTrack);
