@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_GENERATE_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_COURT_OFFICER_ORDER;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_GENERATE_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_GENERATE_ORDER;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
@@ -41,11 +42,13 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
         NOTIFY_RESPONDENT_SOLICITOR1_FOR_GENERATE_ORDER,
         NOTIFY_RESPONDENT_SOLICITOR2_FOR_GENERATE_ORDER,
         NOTIFY_APPLICANT_SOLICITOR1_FOR_COURT_OFFICER_ORDER,
-        NOTIFY_RESPONDENT_SOLICITOR1_FOR_COURT_OFFICER_ORDER
+        NOTIFY_RESPONDENT_SOLICITOR1_FOR_COURT_OFFICER_ORDER,
+        NOTIFY_RESPONDENT_SOLICITOR2_FOR_COURT_OFFICER_ORDER
     );
     public static final String TASK_ID_APPLICANT = "GenerateOrderNotifyApplicantSolicitor1";
     public static final String TASK_ID_APPLICANT_COURT_OFFICER_ORDER = "GenerateOrderNotifyApplicantCourtOfficerOrderSolicitor1";
     public static final String TASK_ID_RESPONDENT_COURT_OFFICER_ORDER = "GenerateOrderNotifyRespondentCourtOfficerOrderSolicitor1";
+    public static final String TASK_ID_RESPONDENT2_COURT_OFFICER_ORDER = "GenerateOrderNotifyRespondentCourtOfficerOrderSolicitor2";
     public static final String TASK_ID_RESPONDENT1 = "GenerateOrderNotifyRespondentSolicitor1";
     public static final String TASK_ID_RESPONDENT2 = "GenerateOrderNotifyRespondentSolicitor2";
 
@@ -66,6 +69,8 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
             return TASK_ID_APPLICANT_COURT_OFFICER_ORDER;
         } else if (callbackParams.getRequest().getEventId().equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_COURT_OFFICER_ORDER.name())) {
             return TASK_ID_RESPONDENT_COURT_OFFICER_ORDER;
+        } else if (callbackParams.getRequest().getEventId().equals(NOTIFY_RESPONDENT_SOLICITOR2_FOR_COURT_OFFICER_ORDER.name())) {
+            return TASK_ID_RESPONDENT2_COURT_OFFICER_ORDER;
         } else if (callbackParams.getRequest().getEventId().equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_GENERATE_ORDER.name())) {
             return TASK_ID_RESPONDENT1;
         } else {
@@ -111,6 +116,10 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
         } else if (isRespondent1Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT1)) {
             isLip = true;
             isLipWelsh = caseData.isRespondentResponseBilingual();
+        } else if (isRespondent2Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT2_COURT_OFFICER_ORDER)) {
+            isLip = true;
+            isLipWelsh = caseData.isClaimantBilingual();
+            isCourtOfficerOrderLipWelsh = true;
         } else if (isRespondent2Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT2)) {
             // TODO CIV-13814 not contemplated response 2 currently
             isLip = true;
