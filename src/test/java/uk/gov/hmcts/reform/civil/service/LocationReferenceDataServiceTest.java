@@ -312,7 +312,7 @@ class LocationReferenceDataServiceTest {
             ))
                 .thenReturn(mockedResponse);
 
-            LocationRefData result = refDataService.getCcmccLocation("user_token");
+            LocationRefData result = refDataService.getCtscLocation("user_token");
 
             assertThat(result.getEpimmsId()).isEqualTo("192280");
             assertThat(result.getRegionId()).isEqualTo("4");
@@ -411,7 +411,7 @@ class LocationReferenceDataServiceTest {
             ))
                 .thenReturn(new ArrayList<>());
 
-            LocationRefData courtLocations = refDataService.getCcmccLocation("user_token");
+            LocationRefData courtLocations = refDataService.getCtscLocation("user_token");
 
             assertThat(courtLocations.getRegionId()).isNull();
             assertThat(courtLocations.getEpimmsId()).isNull();
@@ -437,7 +437,7 @@ class LocationReferenceDataServiceTest {
             ))
                 .thenReturn(mockedResponse);
 
-            LocationRefData courtLocations = refDataService.getCcmccLocation("user_token");
+            LocationRefData courtLocations = refDataService.getCtscLocation("user_token");
 
             assertThat(courtLocations.getRegionId()).isIn("8", "4");
             assertThat(courtLocations.getEpimmsId()).isIn("192281", "192280");
@@ -453,7 +453,7 @@ class LocationReferenceDataServiceTest {
             ))
                 .thenThrow(new RestClientException("403"));
 
-            LocationRefData courtLocations = refDataService.getCcmccLocation("user_token");
+            LocationRefData courtLocations = refDataService.getCtscLocation("user_token");
 
             assertThat(courtLocations.getRegionId()).isNull();
             assertThat(courtLocations.getEpimmsId()).isNull();

@@ -423,14 +423,21 @@ public class InitiateGeneralApplicationService {
             courtLocation = assignCaseManagementLocationToMainCaseLocation(caseData, authToken);
             return Pair.of(courtLocation, true);
         } else {
-            LocationRefData cnbcLocation = locationRefDataService.getCnbcLocation(authToken);
+            LocationRefData ctscLocation;
+            if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+                ctscLocation = locationRefDataService.getCtscLocation(authToken, true);
+            } else {
+                ctscLocation = locationRefDataService.getCtscLocation(authToken, false);
+            }
+
             courtLocation = CaseLocationCivil.builder()
-                .region(cnbcLocation.getRegionId())
-                .baseLocation(cnbcLocation.getEpimmsId())
-                .siteName(cnbcLocation.getSiteName())
-                .address(cnbcLocation.getCourtAddress())
-                .postcode(cnbcLocation.getPostcode())
+                .region(ctscLocation.getRegionId())
+                .baseLocation(ctscLocation.getEpimmsId())
+                .siteName(ctscLocation.getSiteName())
+                .address(ctscLocation.getCourtAddress())
+                .postcode(ctscLocation.getPostcode())
                 .build();
+            return Pair.of(courtLocation, true);
         }
         return Pair.of(courtLocation, true);
     }

@@ -23,7 +23,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 public class DocumentHearingLocationHelper {
 
     @Value("${court-location.unspecified-claim.epimms-id}")
-    public String ccmccEpimmId;
+    public String ctscEpimmId;
     @Value("${court-location.specified-claim.epimms-id}")
     public String cnbcEpimmId;
     private final LocationReferenceDataService locationRefDataService;
@@ -71,13 +71,13 @@ public class DocumentHearingLocationHelper {
 
     public LocationRefData getCaseManagementLocationDetailsNro(CaseData caseData, LocationReferenceDataService locationRefDataService, String authorisation) {
         LocationRefData caseManagementLocationDetails = null;
-        if (checkIfCcmccOrCnbc(caseData) && caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
+        if (checkIfCtscOrCnbc(caseData) && caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
             caseManagementLocationDetails = locationRefDataService.getCnbcLocation(authorisation);
         }
-        if (checkIfCcmccOrCnbc(caseData) && caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
-            caseManagementLocationDetails = locationRefDataService.getCcmccLocation(authorisation);
+        if (checkIfCtscOrCnbc(caseData) && caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
+            caseManagementLocationDetails = locationRefDataService.getCtscLocation(authorisation);
         }
-        if (!checkIfCcmccOrCnbc(caseData)) {
+        if (!checkIfCtscOrCnbc(caseData)) {
             List<LocationRefData>  locationRefDataList = locationRefDataService.getHearingCourtLocations(authorisation);
             var foundLocations = locationRefDataList.stream()
                 .filter(location -> location.getEpimmsId().equals(caseData.getCaseManagementLocation().getBaseLocation())).toList();
@@ -90,8 +90,8 @@ public class DocumentHearingLocationHelper {
         return caseManagementLocationDetails;
     }
 
-    public Boolean checkIfCcmccOrCnbc(CaseData caseData) {
-        if (caseData.getCaseManagementLocation().getBaseLocation().equals(ccmccEpimmId)) {
+    public Boolean checkIfCtscOrCnbc(CaseData caseData) {
+        if (caseData.getCaseManagementLocation().getBaseLocation().equals(ctscEpimmId)) {
             return true;
         } else {
             return caseData.getCaseManagementLocation().getBaseLocation().equals(cnbcEpimmId);

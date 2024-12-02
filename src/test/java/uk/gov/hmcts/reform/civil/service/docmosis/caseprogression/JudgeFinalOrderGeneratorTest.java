@@ -172,7 +172,7 @@ class JudgeFinalOrderGeneratorTest {
             .thenReturn(new UserDetails("1", "test@email.com", "Test", "User", null));
 
         when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(locationRefData);
-        when(locationRefDataService.getCcmccLocation(any())).thenReturn(locationRefData);
+        when(locationRefDataService.getCtscLocation(any())).thenReturn(locationRefData);
         when(locationRefDataService.getCnbcLocation(any())).thenReturn(locationRefData);
         when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(List.of(locationRefData));
         when(featureToggleService.isHmcEnabled()).thenReturn(true);

@@ -55,22 +55,22 @@ public class LocationReferenceDataService {
         return LocationRefData.builder().build();
     }
 
-    public LocationRefData getCcmccLocation(String authToken) {
+    public LocationRefData getCtscLocation(String authToken) {
         try {
-            List<LocationRefData> ccmccLocations =
+            List<LocationRefData> ctscLocations =
                 locationReferenceDataApiClient.getCourtVenueByName(
                     authTokenGenerator.generate(),
                     authToken,
                     COUNTY_COURT_MONEY_CLAIMS_CENTRE
                 );
-            if (ccmccLocations == null || ccmccLocations.isEmpty()) {
-                log.warn("Location Reference Data Lookup did not return any CCMCC location");
+            if (ctscLocations == null || ctscLocations.isEmpty()) {
+                log.warn("Location Reference Data Lookup did not return any CTSC location");
                 return LocationRefData.builder().build();
             } else {
-                if (ccmccLocations.size() > 1) {
-                    log.warn("Location Reference Data Lookup returned more than one CCMCC location");
+                if (ctscLocations.size() > 1) {
+                    log.warn("Location Reference Data Lookup returned more than one CTSC location");
                 }
-                return ccmccLocations.get(0);
+                return ctscLocations.get(0);
             }
         } catch (Exception e) {
             log.error(LOCATION_REFERENCE_DATA_LOOKUP_FAILED, e.getMessage(), e);

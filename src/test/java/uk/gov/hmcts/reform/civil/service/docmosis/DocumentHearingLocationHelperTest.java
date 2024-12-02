@@ -117,7 +117,7 @@ public class DocumentHearingLocationHelperTest {
     @Test
     void whenCcmccLocation_thenReturnCcmcDetails() {
         String authorisation = "authorisation";
-        String ccmcEpimmId = hearingLocationHelper.ccmccEpimmId;
+        String ccmcEpimmId = hearingLocationHelper.ctscEpimmId;
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
             .caseManagementLocation(CaseLocationCivil.builder()
@@ -131,7 +131,7 @@ public class DocumentHearingLocationHelperTest {
             .epimmsId(caseData.getCaseManagementLocation().getBaseLocation())
             .build();
 
-        when(locationRefDataService.getCcmccLocation(authorisation)).thenReturn(LocationRefData
+        when(locationRefDataService.getCtscLocation(authorisation)).thenReturn(LocationRefData
                                                                                             .builder()
                                                                                             .epimmsId(ccmcEpimmId)
                                                                                             .regionId("CCMCC region")
