@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ObligationData {
-    
+
     private LocalDate obligationDate;
     private ObligationReason obligationReason;
     private String otherObligationReason;
