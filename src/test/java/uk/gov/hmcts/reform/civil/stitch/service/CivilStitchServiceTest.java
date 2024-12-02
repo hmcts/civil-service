@@ -24,6 +24,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.LITIGANT_IN_PERSON_CLAIM_FORM;
@@ -49,7 +50,7 @@ class CivilStitchServiceTest {
     @Test
     void shouldReturnStitchedDocuments() {
         byte[] docArray = {3, 5, 2, 4, 1};
-        when(conversionService.convertDocumentToPdf(any(Document.class), anyString())).thenReturn(docArray);
+        when(conversionService.convertDocumentToPdf(any(Document.class), anyLong(), anyString())).thenReturn(docArray);
         when(managementService.uploadDocument(anyString(), any(PDF.class))).thenReturn(STITCHED_DOC);
         pdfMergerMockedStatic = Mockito.mockStatic(PdfMerger.class);
         pdfMergerMockedStatic.when(() -> PdfMerger.mergeDocuments(anyList(), anyString())).thenReturn(docArray);

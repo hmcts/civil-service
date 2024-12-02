@@ -29,7 +29,7 @@ public class CivilStitchService {
 
         log.info("Generating stitched case document for caseId {} with filename {}", caseId, documentName);
         List<byte[]> docs = documents.stream()
-            .map(doc -> conversionService.convertDocumentToPdf(doc.getDocument(), authorisation)).toList();
+            .map(doc -> conversionService.convertDocumentToPdf(doc.getDocument(), caseId, authorisation)).toList();
 
         byte[] bytes = PdfMerger.mergeDocuments(docs, String.valueOf(caseId));
 
