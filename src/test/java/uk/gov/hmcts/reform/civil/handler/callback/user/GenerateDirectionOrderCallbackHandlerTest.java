@@ -57,6 +57,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeFinalOrderGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeOrderDownloadGenerator;
@@ -123,6 +124,9 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
     @Mock
     private FeatureToggleService featureToggleService;
 
+    @Mock
+    private UpdateWaCourtLocationsService updateWaCourtLocationsService;
+
     private ObjectMapper mapper;
 
     private static final String ON_INITIATIVE_SELECTION_TEXT = "As this order was made on the court's own initiative "
@@ -183,7 +187,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         handler = new GenerateDirectionOrderCallbackHandler(locationRefDataService, mapper, judgeFinalOrderGenerator, judgeOrderDownloadGenerator,
                                                             locationHelper, theUserService, workingDayIndicator,
-                                                             featureToggleService);
+                                                             featureToggleService, updateWaCourtLocationsService);
     }
 
     @Nested

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.model.dmnWaCourtTaskLocation;
+package uk.gov.hmcts.reform.civil.model.dmnacourttasklocation;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

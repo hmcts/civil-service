@@ -41,6 +41,7 @@ import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetailsOrderWithou
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeFinalOrderGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeOrderDownloadGenerator;
@@ -146,6 +147,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private final UserService userService;
     private final WorkingDayIndicator workingDayIndicator;
     private final FeatureToggleService featureToggleService;
+    private final UpdateWaCourtLocationsService updateWaCourtLocationsService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -603,6 +605,9 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                                  .build());
             }
         }
+
+        updateWaCourtLocationsService
+            .updateCourtListingWALocations(callbackParams.getParams().get(BEARER_TOKEN).toString(), caseDataBuilder);
 
         nullPreviousSelections(caseDataBuilder);
         return AboutToStartOrSubmitCallbackResponse.builder()
