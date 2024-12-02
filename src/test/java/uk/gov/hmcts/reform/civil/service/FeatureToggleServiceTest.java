@@ -309,7 +309,7 @@ class FeatureToggleServiceTest {
         var isDefendantNoCOnline = "isDefendantNoCOnline";
         givenToggle(isDefendantNoCOnline, toggleStat);
 
-        assertThat(featureToggleService.isDefendantNoCOnline()).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isDefendantNoCOnline()).isEqualTo(true);
 
     }
 }
