@@ -106,4 +106,8 @@ public abstract class CallbackHandler {
     protected CallbackResponse emptySubmittedCallbackResponse(CallbackParams callbackParams) {
         return SubmittedCallbackResponse.builder().build();
     }
+
+    public String generateDocumentName(String formName, final String caseReference) {
+        return String.format(formName, caseReference);
+    }
 }
