@@ -306,10 +306,6 @@ class FeatureToggleServiceTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsDefendantNoCOnline(Boolean toggleStat) {
-        //var isDefendantNoCOnline = "isDefendantNoCOnline";
-        //givenToggle(isDefendantNoCOnline, toggleStat);
-
         assertThat(featureToggleService.isDefendantNoCOnline()).isEqualTo(true);
-
     }
 }
