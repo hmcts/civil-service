@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringExpenseLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringIncomeLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
@@ -35,12 +34,10 @@ import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
-
 
 import static java.math.BigDecimal.ZERO;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -88,10 +85,10 @@ public class CaseDataTest {
         //Given
         CaseData caseData = CaseData.builder()
             .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                                                          .hasAgreedFreeMediation(MediationDecision.Yes)
-                                                                          .build())
-                             .build())
+                .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
+                    .hasAgreedFreeMediation(MediationDecision.Yes)
+                    .build())
+                .build())
             .build();
         //When
         boolean result = caseData.hasClaimantAgreedToFreeMediation();
@@ -114,10 +111,10 @@ public class CaseDataTest {
         //Given
         CaseData caseData = CaseData.builder()
             .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                                                          .hasAgreedFreeMediation(MediationDecision.No)
-                                                                          .build())
-                             .build())
+                .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
+                    .hasAgreedFreeMediation(MediationDecision.No)
+                    .build())
+                .build())
             .build();
         //When
         boolean result = caseData.hasClaimantAgreedToFreeMediation();
@@ -490,10 +487,10 @@ public class CaseDataTest {
         String organisationId = "1245";
         CaseData caseData = CaseData.builder()
             .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                              .organisation(Organisation.builder()
-                                                                .organisationID(organisationId)
-                                                                .build())
-                                              .build())
+                .organisation(Organisation.builder()
+                    .organisationID(organisationId)
+                    .build())
+                .build())
             .build();
         //When
         String result = caseData.getApplicantOrganisationId();
@@ -1182,8 +1179,8 @@ public class CaseDataTest {
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
                 .respondToAdmittedClaim(RespondToClaim.builder()
-                                            .howMuchWasPaid(new BigDecimal(1000))
-                                            .build())
+                    .howMuchWasPaid(new BigDecimal(1000))
+                    .build())
                 .totalClaimAmount(new BigDecimal(1000))
                 .build();
             //When
@@ -1208,7 +1205,8 @@ public class CaseDataTest {
 
     @ParameterizedTest
     @MethodSource("provideDocumentListTestData")
-    void shouldReturnExpectedDocumentList(DocumentType documentType, List<Element<CaseDocument>> documentCollection, Optional<List<CaseDocument>> expected) {
+    void shouldReturnExpectedDocumentList(DocumentType documentType, List<Element<CaseDocument>> documentCollection,
+                                          Optional<List<CaseDocument>> expected) {
         CaseData caseData = CaseData.builder()
             .systemGeneratedCaseDocuments(documentCollection)
             .finalOrderDocumentCollection(documentCollection)
@@ -1226,28 +1224,28 @@ public class CaseDataTest {
         return Stream.of(
             Arguments.of(DocumentType.SDO_ORDER, new ArrayList<>(), Optional.empty()),
             Arguments.of(DocumentType.SDO_ORDER,
-                         List.of(ElementUtils.element(CaseDocument.builder().documentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT).build())),
-                         Optional.empty()
+                List.of(ElementUtils.element(CaseDocument.builder().documentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT).build())),
+                Optional.empty()
             ),
             Arguments.of(DocumentType.SDO_ORDER,
-                         List.of(
-                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.SDO_ORDER).build()),
-                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT).build())
-                         ),
-                         Optional.of(List.of(CaseDocument.builder().documentType(DocumentType.SDO_ORDER).build()))
+                List.of(
+                    ElementUtils.element(CaseDocument.builder().documentType(DocumentType.SDO_ORDER).build()),
+                    ElementUtils.element(CaseDocument.builder().documentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT).build())
+                ),
+                Optional.of(List.of(CaseDocument.builder().documentType(DocumentType.SDO_ORDER).build()))
             ),
             Arguments.of(DocumentType.JUDGE_FINAL_ORDER,
-                         List.of(
-                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build())
-                         ),
-                         Optional.of(List.of(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build()))
+                List.of(
+                    ElementUtils.element(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build())
+                ),
+                Optional.of(List.of(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build()))
             ),
             Arguments.of(DocumentType.JUDGE_FINAL_ORDER,
-                         List.of(
-                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build()),
-                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT).build())
-                         ),
-                         Optional.of(List.of(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build()))
+                List.of(
+                    ElementUtils.element(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build()),
+                    ElementUtils.element(CaseDocument.builder().documentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT).build())
+                ),
+                Optional.of(List.of(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build()))
             )
         );
     }
