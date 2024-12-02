@@ -50,7 +50,8 @@ public class CourtOfficerOrderDefendantNotificationHandler extends CaseEventsDas
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
         boolean isLipvLipOrLRvLip = caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne();
-        return (caseData.getPreviousCCDState() != null && caseProceedInCaseManStates.contains(caseData.getPreviousCCDState()) && isLipvLipOrLRvLip) && featureToggleService.isCaseEventsEnabled();
+        return (caseData.getPreviousCCDState() != null && caseProceedInCaseManStates.contains(caseData.getPreviousCCDState())
+            && isLipvLipOrLRvLip) && featureToggleService.isCaseEventsEnabled();
     }
 
 }

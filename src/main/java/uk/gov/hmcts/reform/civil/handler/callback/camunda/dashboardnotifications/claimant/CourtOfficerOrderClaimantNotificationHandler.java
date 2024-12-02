@@ -40,7 +40,7 @@ public class CourtOfficerOrderClaimantNotificationHandler extends CaseEventsDash
 
     @Override
     public String getScenario(CaseData caseData) {
-            return SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_CLAIMANT.getScenario();
+        return SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_CLAIMANT.getScenario();
     }
 
     @Override

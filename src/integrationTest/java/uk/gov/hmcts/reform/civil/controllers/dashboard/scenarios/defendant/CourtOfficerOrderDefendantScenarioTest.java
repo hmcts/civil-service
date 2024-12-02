@@ -55,7 +55,6 @@ public class CourtOfficerOrderDefendantScenarioTest extends DashboardBaseIntegra
     @Test
     void should_create_court_officer_order_defendant_scenario_without_tasks() throws Exception {
 
-
         String caseId = "72016577183";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
