@@ -34,15 +34,13 @@ public class CaseLegacyReferenceSearchService {
 
     public CaseDetails getCivilOrOcmcCaseDataByCaseReference(String caseReference) {
         log.info("searching cases with reference {}", caseReference);
-        Query query = new Query(boolQuery().must(
-            boolQuery()
-                .should(matchQuery("data.legacyCaseReference", caseReference))
-                .should(matchQuery("data.previousServiceCaseReference", caseReference))
-                .minimumShouldMatch(1)
-        ), List.of(), 0);
-        SearchResult searchResult = coreCaseDataService.searchCases(query);
+        Query civilQuery = new Query(boolQuery().must(
+            matchQuery("data.legacyCaseReference", caseReference)), List.of(), 0);
+        SearchResult searchResult = coreCaseDataService.searchCases(civilQuery);
         if (searchResult == null || searchResult.getCases().isEmpty()) {
-            searchResult = coreCaseDataService.searchCMCCases(query);
+            Query ocmcQuery = new Query(boolQuery().must(
+                matchQuery("data.previousServiceCaseReference", caseReference)), List.of(), 0);
+            searchResult = coreCaseDataService.searchCMCCases(ocmcQuery);
             if (searchResult == null || searchResult.getCases().isEmpty()) {
                 log.error("no case found for {}", caseReference);
                 return null;

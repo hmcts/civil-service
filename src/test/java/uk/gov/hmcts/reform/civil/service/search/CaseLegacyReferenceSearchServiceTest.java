@@ -42,8 +42,10 @@ class CaseLegacyReferenceSearchServiceTest {
     private SearchResult searchResult;
 
     private static final String REFERENCE = "ABC";
-    private static final Query EXPECTED_QUERY =
+    private static final Query EXPECTED_CIVIL_QUERY =
         new Query(boolQuery().must(matchQuery("data.legacyCaseReference", REFERENCE)), List.of(), 0);
+    private static final Query EXPECTED_OCMC_QUERY =
+        new Query(boolQuery().must(matchQuery("data.previousServiceCaseReference", REFERENCE)), List.of(), 0);
 
     @BeforeEach
     private void setUp() {
@@ -59,7 +61,7 @@ class CaseLegacyReferenceSearchServiceTest {
         CaseDetails result = caseLegacyReferenceSearchService.getCaseDataByLegacyReference(REFERENCE);
 
         assertThat(result).isNotNull();
-        verify(coreCaseDataService).searchCases(refEq(EXPECTED_QUERY));
+        verify(coreCaseDataService).searchCases(refEq(EXPECTED_CIVIL_QUERY));
     }
 
     @Test
@@ -73,34 +75,19 @@ class CaseLegacyReferenceSearchServiceTest {
 
     @Test
     void shouldReturnCaseDetailsSuccessfully_getCivilOrOcmcCaseDataByCaseReference_whenCaseExits() {
-        Query expectedQuery =
-            new Query(boolQuery().must(
-                boolQuery()
-                    .should(matchQuery("data.legacyCaseReference", REFERENCE))
-                    .should(matchQuery("data.previousServiceCaseReference", REFERENCE))
-                    .minimumShouldMatch(1)
-            ), List.of(), 0);
-
         CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
         given(searchResult.getCases()).willReturn(Arrays.asList(caseDetails));
 
         CaseDetails result = caseLegacyReferenceSearchService.getCivilOrOcmcCaseDataByCaseReference(REFERENCE);
 
         assertThat(result).isNotNull();
-        verify(coreCaseDataService).searchCases(refEq(expectedQuery));
+        verify(coreCaseDataService).searchCases(refEq(EXPECTED_CIVIL_QUERY));
     }
 
     @Test
     void shouldReturnCaseDetailsSuccessfullyFromOCMC_getCivilOrOcmcCaseDataByCaseReference_whenCaseExits() {
         given(coreCaseDataService.searchCases(any())).willReturn(null);
         given(coreCaseDataService.searchCMCCases(any())).willReturn(searchResult);
-        Query expectedQuery =
-            new Query(boolQuery().must(
-                boolQuery()
-                    .should(matchQuery("data.legacyCaseReference", REFERENCE))
-                    .should(matchQuery("data.previousServiceCaseReference", REFERENCE))
-                    .minimumShouldMatch(1)
-            ), List.of(), 0);
 
         CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
         given(searchResult.getCases()).willReturn(Arrays.asList(caseDetails));
@@ -108,8 +95,8 @@ class CaseLegacyReferenceSearchServiceTest {
         CaseDetails result = caseLegacyReferenceSearchService.getCivilOrOcmcCaseDataByCaseReference(REFERENCE);
 
         assertThat(result).isNotNull();
-        verify(coreCaseDataService).searchCases(refEq(expectedQuery));
-        verify(coreCaseDataService).searchCMCCases(refEq(expectedQuery));
+        verify(coreCaseDataService).searchCases(refEq(EXPECTED_CIVIL_QUERY));
+        verify(coreCaseDataService).searchCMCCases(refEq(EXPECTED_OCMC_QUERY));
     }
 
     @Test

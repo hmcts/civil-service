@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.civil.CaseDefinitionConstants;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.PinDto;
 import uk.gov.hmcts.reform.civil.service.AssignCaseService;
@@ -28,6 +27,8 @@ import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecServi
 import uk.gov.hmcts.reform.civil.service.search.CaseLegacyReferenceSearchService;
 
 import java.util.Optional;
+
+import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CMC_CASE_TYPE;
 
 @Tag(name = "Case Assignment Controller")
 @Slf4j
@@ -91,7 +92,7 @@ public class CaseAssignmentController {
         CaseDetails caseDetails = caseByLegacyReferenceSearchService.getCivilOrOcmcCaseDataByCaseReference(caseReference);
         boolean status = false;
         if (caseDetails != null) {
-            boolean isOcmcCase = caseDetails.getCaseTypeId().equals(CaseDefinitionConstants.CMC_CASE_TYPE);
+            boolean isOcmcCase = caseDetails.getCaseTypeId().equals(CMC_CASE_TYPE);
             if (isOcmcCase) {
                 status = defendantPinToPostLRspecService.isOcmcDefendantLinked(caseReference);
             } else {
