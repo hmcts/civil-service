@@ -90,19 +90,19 @@ class CamundaRuntimeClientTest {
     @Test
     void shouldReturnEvaluatedCourtsWhenValid() {
         Map<String, Object> testMap = new HashMap<>();
-        testMap.put("Trial",Map.of(
+        testMap.put("Trial", Map.of(
             "type", "String",
             "value", "123456",
             "valueInfo", Map.of()));
-        testMap.put("CMC",Map.of(
+        testMap.put("CMC", Map.of(
             "type", "String",
             "value", "123456",
             "valueInfo", Map.of()));
-        testMap.put("CCMC",Map.of(
+        testMap.put("CCMC", Map.of(
             "type", "String",
             "value", "123456",
             "valueInfo", Map.of()));
-        testMap.put("PTR",Map.of(
+        testMap.put("PTR", Map.of(
             "type", "String",
             "value", "123456",
             "valueInfo", Map.of()));

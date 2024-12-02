@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.DocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
@@ -92,6 +93,9 @@ class AboutToSubmitRespondToDefenceTaskTest {
     @Mock
     private DQResponseDocumentUtils dqResponseDocumentUtils;
 
+    @Mock
+    private UpdateWaCourtLocationsService updateWaCourtLocationsService;
+
     private final LocalDateTime localDateTime = now();
 
     private ObjectMapper objectMapper;
@@ -105,7 +109,8 @@ class AboutToSubmitRespondToDefenceTaskTest {
                                                      courtLocationUtils, featureToggleService,
                                                      locationHelper, caseFlagsInitialiser,
                                                      caseDetailsConverter, frcDocumentsUtils,
-                                                     dqResponseDocumentUtils, determineNextState);
+                                                     dqResponseDocumentUtils, determineNextState,
+                                                     updateWaCourtLocationsService);
 
         Address address = Address.builder()
             .postCode("E11 5BB")

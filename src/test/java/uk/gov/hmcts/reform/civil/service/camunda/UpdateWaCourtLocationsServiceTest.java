@@ -150,7 +150,7 @@ class UpdateWaCourtLocationsServiceTest {
             .build();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        updateWaCourtLocationsService.updateCourtListingWALocations( "auth", caseDataBuilder);
+        updateWaCourtLocationsService.updateCourtListingWALocations("auth", caseDataBuilder);
         CaseData updatedCaseData = caseDataBuilder.build();
 
         assertEquals(updatedCaseData.getTaskManagementLocations(), testTaskManagementLocations);
@@ -182,7 +182,7 @@ class UpdateWaCourtLocationsServiceTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        updateWaCourtLocationsService.updateCourtListingWALocations( "auth", caseDataBuilder);
+        updateWaCourtLocationsService.updateCourtListingWALocations("auth", caseDataBuilder);
         CaseData updatedCaseData = caseDataBuilder.build();
 
         assertEquals(updatedCaseData.getTaskManagementLocations(), null);
@@ -207,7 +207,7 @@ class UpdateWaCourtLocationsServiceTest {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         assertThrows(IllegalArgumentException.class, () -> updateWaCourtLocationsService
-            .updateCourtListingWALocations( "auth", caseDataBuilder));
+            .updateCourtListingWALocations("auth", caseDataBuilder));
     }
 
     @Test
