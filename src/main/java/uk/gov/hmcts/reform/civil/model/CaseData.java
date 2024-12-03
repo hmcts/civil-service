@@ -188,6 +188,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final Party applicant2;
     private final CorrectEmail applicantSolicitor1CheckEmail;
     private final IdamUserDetails applicantSolicitor1UserDetails;
+
+    private final String userIdAfterNoc;
     private final YesOrNo addApplicant2;
     private final YesOrNo addRespondent2;
     private final YesOrNo respondent2SameLegalRepresentative;

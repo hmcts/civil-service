@@ -284,10 +284,10 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
                 .specApplicantCorrespondenceAddressRequired(NO);
         }
 
-        if (addedSolicitorDetails != null) {
+        if (addedSolicitorDetails != null && caseData.getUserIdAfterNoc() != null) {
             caseDataBuilder.applicantSolicitor1UserDetails(
                 IdamUserDetails.builder()
-                    .id(addedSolicitorDetails.getId())
+                    .id(caseData.getUserIdAfterNoc())
                     .email(addedSolicitorDetails.getEmail())
                     .build()
             );
