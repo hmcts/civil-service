@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentPaidInFullOnlin
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
-
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +24,8 @@ import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHECK_AND_MARK_PAID_IN_FULL;
+import static uk.gov.hmcts.reform.civil.enums.cosc.CoscRPAStatus.CANCELLED;
+import static uk.gov.hmcts.reform.civil.enums.cosc.CoscRPAStatus.SATISFIED;
 
 @Service
 @RequiredArgsConstructor
@@ -73,6 +75,7 @@ public class CheckAndMarkDefendantPaidInFullCallbackHandler extends CallbackHand
             ));
             caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(caseData.getActiveJudgment()));
         }
+        caseData.setJoCoscRpaStatus(JudgmentState.CANCELLED.equals(caseData.getActiveJudgment().getState()) ? CANCELLED : SATISFIED);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))

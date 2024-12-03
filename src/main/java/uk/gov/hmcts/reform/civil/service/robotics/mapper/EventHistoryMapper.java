@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.cosc.CoscRPAStatus;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
@@ -77,8 +76,6 @@ import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenari
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.enums.cosc.CoscRPAStatus.CANCELLED;
-import static uk.gov.hmcts.reform.civil.enums.cosc.CoscRPAStatus.SATISFIED;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.PROCEEDS_IN_HERITAGE;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_OUT;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED;
@@ -501,26 +498,23 @@ public class EventHistoryMapper {
     }
 
     private void buildCoscEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        // CoSCApplicationStatus can be null if the claimant has mark the case as paid in full before defendant applies for a cosc
         if (featureToggleService.isJOLiveFeedActive()
-            && featureToggleService.isCoSCEnabled()
-            && caseData.hasCoscCert()) {
+            && (caseData.getJoMarkedPaidInFullIssueDate() != null || caseData.hasCoscCert())) {
 
-            CoscRPAStatus coscStatus = getCoscStatus(caseData);
-
-            LocalDate paidInFullDate = caseData.getActiveJudgment() != null && caseData.getActiveJudgment().getFullyPaymentMadeDate() != null
-                ? caseData.getActiveJudgment().getFullyPaymentMadeDate()
-                : null;
+            // date received when mark paid in full by claimant is issued or when the scheduler runs at the cosc deadline at 4pm
+            LocalDateTime dateReceived = caseData.getJoMarkedPaidInFullIssueDate() != null
+                ? caseData.getJoMarkedPaidInFullIssueDate() : caseData.getCoscSchedulerDeadline().atTime(16,0);
 
             builder.certificateOfSatisfactionOrCancellation((Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
                 .eventCode(CERTIFICATE_OF_SATISFACTION_OR_CANCELLATION.getCode())
-                .litigiousPartyID(RESPONDENT_ID)
-                .dateReceived(time.now())
+                .dateReceived(dateReceived)
                 .eventDetails(EventDetails.builder()
-                                  .status(String.valueOf(coscStatus))
-                                  .datePaidInFull(paidInFullDate)
-                                  .notificationReceiptDate(caseData.getCoscIssueDate())
+                                  .status(caseData.getJoCoscRpaStatus().toString())
+                                  .datePaidInFull(getCoscDate(caseData))
+                                  .notificationReceiptDate(caseData.getJoMarkedPaidInFullIssueDate() != null
+                                                               ? caseData.getJoMarkedPaidInFullIssueDate().toLocalDate()
+                                                               : caseData.getCoscIssueDate())
                                   .build())
                 .eventDetailsText("")
                 .build()));
@@ -2450,20 +2444,13 @@ public class EventHistoryMapper {
         return applicant1ResponseDate;
     }
 
-    private CoscRPAStatus getCoscStatus(CaseData caseData) {
-        if (caseData.getActiveJudgment() != null) {
-            switch (caseData.getActiveJudgment().getState()) {
-                case CANCELLED:
-                    return CANCELLED;
-                case SATISFIED:
-                    return SATISFIED;
-                default:
-                    return caseData.getCoscSchedulerDeadline() == null
-                        || (caseData.getActiveJudgment().getFullyPaymentMadeDate() != null
-                            && caseData.getCoscSchedulerDeadline().isAfter(time.now().toLocalDate().plusDays(1)))
-                        ? SATISFIED : CANCELLED;
-            }
+    private LocalDate getCoscDate(CaseData caseData) {
+        if (caseData.getJoFullyPaymentMadeDate() != null) {
+            return caseData.getJoFullyPaymentMadeDate();
         }
-        throw new IllegalArgumentException("Active Judgment cannot be null");
+        else if (caseData.getCertOfSC() != null && caseData.getCertOfSC().getDefendantFinalPaymentDate() != null) {
+            return caseData.getCertOfSC().getDefendantFinalPaymentDate();
+        }
+        throw new IllegalArgumentException("Payment date cannot be null");
     }
 }

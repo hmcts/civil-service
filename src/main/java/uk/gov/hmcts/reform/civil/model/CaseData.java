@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.civil.enums.SettlementReason;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.cosc.CoscRPAStatus;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.ConfirmOrderGivesPermission;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.MarkPaidConsentList;
@@ -684,6 +685,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private LocalDate joIssueDate;
     private JudgmentState joState;
     private LocalDate joFullyPaymentMadeDate;
+    private LocalDateTime joMarkedPaidInFullIssueDate;
+    private CoscRPAStatus joCoscRpaStatus;
     private String joOrderedAmount;
     private String joCosts;
     private String joTotalAmount;
