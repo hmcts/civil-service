@@ -26,7 +26,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.pip.PiPLetter;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
-import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
+import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.math.BigDecimal;
@@ -37,10 +37,13 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.refEq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.PIP_LETTER;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
@@ -59,7 +62,7 @@ class PiPLetterGeneratorTest {
     private DocumentGeneratorService documentGeneratorService;
 
     @Mock
-    private CivilDocumentStitchingService civilDocumentStitchingService;
+    private CivilStitchService civilStitchService;
 
     @Mock
     private DocumentManagementService documentManagementService;
@@ -106,8 +109,8 @@ class PiPLetterGeneratorTest {
         given(documentManagementService.uploadDocument(any(), any(PDF.class))).willReturn(buildClaimFormDocument());
         given(documentDownloadService.downloadDocument(any(), any()))
             .willReturn(new DownloadedDocumentResponse(new ByteArrayResource(STITCHED_DOC_BYTES), "test", "test"));
-        given(civilDocumentStitchingService.bundle(anyList(), anyString(), anyString(), anyString(), any(CaseData.class)))
-            .willReturn(buildStitchedDocument());
+        when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(PIP_LETTER),
+                                                             anyString())).thenReturn(buildStitchedDocument());
         given(pipInPostConfiguration.getRespondToClaimUrl()).willReturn(CUI_URL);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
             .willReturn(DocmosisDocument.builder().bytes(new byte[]{1, 2, 3, 4, 5, 6}).build());
@@ -128,7 +131,7 @@ class PiPLetterGeneratorTest {
 
         // Then
         assertThat(downloadedLetter).isEqualTo(STITCHED_DOC_BYTES);
-        verify(documentGeneratorService).generateDocmosisDocument(refEq(LETTER_TEMPLATE_DATA), refEq(PIN_IN_THE_POST_LETTER));
+        verify(documentGeneratorService).generateDocmosisDocument(LETTER_TEMPLATE_DATA, PIN_IN_THE_POST_LETTER);
     }
 
     @Test
@@ -140,9 +143,9 @@ class PiPLetterGeneratorTest {
         piPLetterGenerator.downloadLetter(caseData, BEARER_TOKEN);
 
         // Then
-        verify(documentGeneratorService).generateDocmosisDocument(refEq(LETTER_TEMPLATE_DATA), refEq(PIN_IN_THE_POST_LETTER));
-        verify(civilDocumentStitchingService).bundle(specClaimTimelineDocuments, BEARER_TOKEN, "sealed_claim_form_000DC001.pdf",
-                                                     "sealed_claim_form_000DC001.pdf", caseData);
+        verify(documentGeneratorService).generateDocmosisDocument(LETTER_TEMPLATE_DATA, PIN_IN_THE_POST_LETTER);
+        verify(civilStitchService).generateStitchedCaseDocument(eq(specClaimTimelineDocuments),
+                                                                anyString(), anyLong(), eq(PIP_LETTER), anyString());
     }
 
     private CaseData buildCaseData(YesOrNo respondent1Represented, ServedDocumentFiles servedDocumentFiles) {
