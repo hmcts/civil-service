@@ -24,7 +24,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 @RequiredArgsConstructor
 @Service
 @Slf4j
-@ConditionalOnProperty(value = "court_location_dmn.dmn.simplification.enabled", havingValue = "true")
+//@ConditionalOnProperty(value = "court_location_dmn.dmn.simplification.enabled", havingValue = "true")
 public class UpdateWaCourtLocationsService {
 
     private final CamundaRuntimeClient camundaRuntimeClient;
