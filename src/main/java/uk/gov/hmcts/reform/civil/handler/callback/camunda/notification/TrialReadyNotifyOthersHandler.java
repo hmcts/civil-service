@@ -8,14 +8,15 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR_FOR_OTHER_TRIAL_READY;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_OTHER_TRIAL_READY;
@@ -70,24 +71,31 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
     private CallbackResponse notifySolicitorForOtherTrialReady(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String eventId = callbackParams.getRequest().getEventId();
-        String emailAddress;
+        String emailAddress = null;
         boolean isLiP;
         boolean isApplicant = false;
         switch (CaseEvent.valueOf(eventId)) {
             case NOTIFY_APPLICANT_SOLICITOR_FOR_OTHER_TRIAL_READY -> {
                 isApplicant = true;
                 isLiP = isLiP(isApplicant, false, caseData);
-                emailAddress = getEmail(isApplicant, false, isLiP, caseData);
+                if (isNull(caseData.getTrialReadyApplicant())) {
+                    emailAddress = getEmail(isApplicant, false, isLiP, caseData);
+                }
             }
             case NOTIFY_RESPONDENT_SOLICITOR1_FOR_OTHER_TRIAL_READY -> {
                 isLiP = isLiP(isApplicant, false, caseData);
-                emailAddress = getEmail(isApplicant, false, isLiP, caseData);
+                if (isNull(caseData.getTrialReadyRespondent1())) {
+                    emailAddress = getEmail(isApplicant, false, isLiP, caseData);
+                }
             }
             default -> {
                 isLiP = isLiP(isApplicant, true, caseData);
-                emailAddress = getEmail(isApplicant, true, isLiP, caseData);
-                if (null == emailAddress && caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
-                    emailAddress = getEmail(isApplicant, false, isLiP, caseData);
+                if (isNull(caseData.getTrialReadyRespondent2())) {
+                    emailAddress = getEmail(isApplicant, true, isLiP, caseData);
+
+                    if (null == emailAddress && caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
+                        emailAddress = getEmail(isApplicant, false, isLiP, caseData);
+                    }
                 }
             }
         }
