@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.event.FullAdmitPayImmediatelyNoPaymentFromDefen
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.search.FullAdmitPayImmediatelyNoPaymentFromDefendantSearchService;
 
-import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -22,7 +22,7 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantHandler extends BaseEx
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        List<CaseDetails> cases = caseSearchService.getCases();
+        Set<CaseDetails> cases = caseSearchService.getCases();
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
         cases.forEach(caseDetails -> {
