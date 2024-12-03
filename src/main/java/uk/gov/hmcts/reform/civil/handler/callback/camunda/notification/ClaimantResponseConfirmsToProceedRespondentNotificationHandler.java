@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -255,17 +256,16 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
 
     private String getLegalOrganisationName(CaseData caseData, CaseEvent caseEvent) {
         Optional<String> organisationIdOption = switch (caseEvent) {
-            case NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC ->
-                Optional.ofNullable(caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID());
+            case NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC -> caseData.isApplicantLiP()
+                ? Optional.empty()
+                : Optional.ofNullable(caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID());
             case NOTIFY_RES_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK -> caseData.isRespondent1LiP()
                 ? Optional.empty()
                 : Optional.ofNullable(caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID());
             case NOTIFY_RES_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK -> caseData.isRespondent2LiP()
                 ? Optional.empty()
                 : Optional.ofNullable(caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID());
-            default -> caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED)
-                ? Optional.ofNullable(caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
-                : Optional.ofNullable(caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID());
+            default -> getRespondentSolicitorOrganisationName(caseData, caseEvent);
         };
 
         return organisationIdOption
@@ -275,6 +275,18 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
                     ? organisation.get().getName()
                     : caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
             }).orElse(StringUtils.EMPTY);
+    }
+
+    @NotNull
+    private static Optional<String> getRespondentSolicitorOrganisationName(CaseData caseData, CaseEvent caseEvent) {
+        if (caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED)) {
+            return caseData.getRespondent1OrganisationPolicy().getOrganisation() == null
+                ? Optional.empty()
+                : Optional.of(caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID());
+        }
+        return caseData.getRespondent2OrganisationPolicy().getOrganisation() == null
+            ? Optional.empty()
+            : Optional.of(caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID());
     }
 
     private boolean isLRvLipToDefendant(CallbackParams callbackParams) {
