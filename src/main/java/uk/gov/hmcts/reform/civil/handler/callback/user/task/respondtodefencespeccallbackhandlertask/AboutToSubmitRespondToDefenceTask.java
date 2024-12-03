@@ -115,7 +115,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         clearTempDocuments(builder);
 
         updateWaCourtLocationsService
-            .updateCourtListingWALocations(callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(), builder, caseData);
+            .updateCourtListingWALocations(callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(), builder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))

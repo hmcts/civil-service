@@ -790,7 +790,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         }
 
         updateWaCourtLocationsService.updateCourtListingWALocations(callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                                                                    caseDataBuilder, caseData);
+                                                                    caseDataBuilder);
 
         var state = "CASE_PROGRESSION";
         return AboutToStartOrSubmitCallbackResponse.builder()
