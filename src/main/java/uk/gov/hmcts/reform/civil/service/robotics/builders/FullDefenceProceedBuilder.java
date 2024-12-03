@@ -220,7 +220,7 @@ public class FullDefenceProceedBuilder extends BaseEventBuilder {
                 break;
             case ONE_V_ONE:
             default: {
-                eventDetailsText.add(EventHistoryUtil.RPA_REASON_CLAIMANT_PROCEEDS1);
+                eventDetailsText.add(EventHistoryUtil.RPA_REASON_CLAIMANT_PROCEEDS);
             }
         }
         return eventDetailsText;

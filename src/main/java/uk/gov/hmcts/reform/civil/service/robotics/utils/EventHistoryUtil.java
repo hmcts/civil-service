@@ -38,6 +38,8 @@ public class EventHistoryUtil {
     public static final String RPA_CLAIMANTS_INTEND_NOT_TO_PROCEED = "RPA Reason: Claimants intend not to proceed.";
     public static final String RPA_CLAIMANT_INTENDS_NOT_TO_PROCEED = "RPA Reason: Claimant intends not to proceed.";
     public static final String RPA_IN_MEDIATION = "IN MEDIATION";
+    public static final String RPA_RECORD_JUDGMENT = "Judgment recorded.";
+
     public static final String ENTER = "Enter";
     public static final String LIFTED = "Lifted";
 
@@ -61,7 +63,6 @@ public class EventHistoryUtil {
         "RPA Reason: [1 of 2 - %s] Claimant has provided intention: %s against defendant: %s";
     public static final String RPA_REASON_2_OF_2_S_CLAIMANT_HAS_PROVIDED_INTENTION_S_AGAINST_DEFENDANT_S =
         "RPA Reason: [2 of 2 - %s] Claimant has provided intention: %s against defendant: %s";
-    public static final String RPA_REASON_CLAIMANT_PROCEEDS1 = "RPA Reason: Claimant proceeds.";
 
     private EventHistoryUtil() {
     }

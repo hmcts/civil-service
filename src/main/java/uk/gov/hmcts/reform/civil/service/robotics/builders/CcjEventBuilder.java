@@ -17,6 +17,7 @@ import static java.math.BigDecimal.ZERO;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.JUDGEMENT_BY_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.RPA_REASON_JUDGMENT_BY_ADMISSION;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.RPA_RECORD_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.getInstallmentAmount;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.prepareEventSequence;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.EventHistoryUtil.setApplicant1ResponseDate;
@@ -31,15 +32,19 @@ public class CcjEventBuilder {
 
     public void buildCcjEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         if (caseData.isCcjRequestJudgmentByAdmission()) {
+            String miscTextRequested = RPA_REASON_JUDGMENT_BY_ADMISSION;
+            if (featureToggleService.isJOLiveFeedActive()) {
+                miscTextRequested = RPA_RECORD_JUDGMENT;
+            }
             log.info("Building event: {} for case id: {} ", "JUDGMENT_BY_ADMISSION", caseData.getCcdCaseReference());
             buildJudgmentByAdmissionEventDetails(builder, caseData);
             builder.miscellaneous((Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
                 .eventCode(MISCELLANEOUS.getCode())
                 .dateReceived(setApplicant1ResponseDate(caseData))
-                .eventDetailsText(RPA_REASON_JUDGMENT_BY_ADMISSION)
+                .eventDetailsText(miscTextRequested)
                 .eventDetails(EventDetails.builder()
-                    .miscText(RPA_REASON_JUDGMENT_BY_ADMISSION)
+                    .miscText(miscTextRequested)
                     .build())
                 .build()));
         }

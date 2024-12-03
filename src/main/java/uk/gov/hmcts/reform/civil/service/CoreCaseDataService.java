@@ -145,6 +145,13 @@ public class CoreCaseDataService {
         return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CASE_TYPE, searchString);
     }
 
+    public SearchResult searchMediationCases(Query query) {
+        String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+        String searchString = query.toMediationQueryString();
+        log.info("Searching Elasticsearch with mediation query: " + searchString);
+        return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CASE_TYPE, searchString);
+    }
+
     public CaseDetails getCase(Long caseId) {
         String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         return coreCaseDataApi.getCase(userToken, authTokenGenerator.generate(), caseId.toString());
