@@ -36,7 +36,7 @@ public class StitchBundleApiConsumerTest extends BaseContractTest {
     @Autowired
     private EvidenceManagementApiClient evidenceManagementApiClient;
 
-    @Pact(consumer = "civil-service")
+    @Pact(consumer = "civil_service")
     public RequestResponsePact postStitchBundleServiceRequest(PactDslWithProvider builder)
         throws JSONException, IOException {
         return buildStitchBundleResponsePact(builder);
@@ -115,9 +115,5 @@ public class StitchBundleApiConsumerTest extends BaseContractTest {
                              .data(new HashMap<>())
                              .build())
             .build();
-    }
-
-    private String createJsonObject(Object obj) throws JSONException, IOException {
-        return objectMapper.writeValueAsString(obj);
     }
 }
