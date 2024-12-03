@@ -16,7 +16,7 @@ java:
     CAMUNDA_URL: http://${SERVICE_NAME}-camunda/engine-rest/
     SERVICE_REQUEST_UPDATE: https://${SERVICE_NAME}.preview.platform.hmcts.net/service-request-update
     SERVICE_REQUEST_UPDATE_CLAIM_ISSUED: https://${SERVICE_NAME}.preview.platform.hmcts.net/service-request-update-claim-issued
-    LAUNCH_DARKLY_ENV: ${SERVICE_FQDN}
+    LAUNCH_DARKLY_ENV: aat
     TESTING_SUPPORT_ENABLED: true
     POLLING_EVENT_EMITTER_ENABLED: true
     CASE_DOCUMENT_AM_URL:  http://${SERVICE_NAME}-cdam
