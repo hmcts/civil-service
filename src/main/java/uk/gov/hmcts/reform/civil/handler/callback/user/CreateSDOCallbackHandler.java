@@ -1630,7 +1630,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
 
         updateWaCourtLocationsService.updateCourtListingWALocations(callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                                                                    dataBuilder, caseData);
+                                                                    dataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))

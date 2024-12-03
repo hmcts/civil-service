@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.camunda;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
@@ -28,8 +29,11 @@ public class UpdateWaCourtLocationsService {
     private final ObjectMapper objectMapper;
     private final LocationReferenceDataService locationRefDataService;
     private final FeatureToggleService featureToggleService;
+    @Value("${court-location.specified-claim.epimms-id}") private String cnbcEpimmId;
 
-    public void updateCourtListingWALocations(String authorisation, CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseData caseData) {
+    public void updateCourtListingWALocations(String authorisation, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+        CaseData caseData = caseDataBuilder.build();
+
         if (!featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
             return;
         }
@@ -65,25 +69,25 @@ public class UpdateWaCourtLocationsService {
                                                                                 .region(cmcListing.getRegionId())
                                                                                 .regionName(cmcListing.getRegion())
                                                                                 .location(cmcListing.getEpimmsId())
-                                                                                .locationName(cmcListing.getVenueName())
+                                                                                .locationName(cmcListing.getSiteName())
                                                                                 .build())
                                                         .ccmcListingLocation(TaskManagementLocationsModel.builder()
                                                                                  .region(ccmcListing.getRegionId())
                                                                                  .regionName(ccmcListing.getRegion())
                                                                                  .location(ccmcListing.getEpimmsId())
-                                                                                 .locationName(ccmcListing.getVenueName())
+                                                                                 .locationName(ccmcListing.getSiteName())
                                                                                  .build())
                                                         .ptrListingLocation(TaskManagementLocationsModel.builder()
                                                                                 .region(preTrialListing.getRegionId())
                                                                                 .regionName(preTrialListing.getRegion())
                                                                                 .location(preTrialListing.getEpimmsId())
-                                                                                .locationName(preTrialListing.getVenueName())
+                                                                                .locationName(preTrialListing.getSiteName())
                                                                                 .build())
                                                         .trialListingLocation(TaskManagementLocationsModel.builder()
                                                                                   .region(trialListing.getRegionId())
                                                                                   .regionName(trialListing.getRegion())
                                                                                   .location(trialListing.getEpimmsId())
-                                                                                  .locationName(trialListing.getVenueName())
+                                                                                  .locationName(trialListing.getSiteName())
                                                                                   .build())
                                                         .build());
 
@@ -93,6 +97,17 @@ public class UpdateWaCourtLocationsService {
     }
 
     private LocationRefData courtLocationDetails(List<LocationRefData> locationRefDataList, String court, String courtType) {
+
+        // CNBC will not be returned by ref data call, so populate details manually
+        if (court.equals(cnbcEpimmId)) {
+            LocationRefData cnbcDetails = LocationRefData.builder()
+                .region("Midlands")
+                .regionId("2")
+                .epimmsId(cnbcEpimmId)
+                .siteName("Civil National Business Centre").build();
+            return cnbcDetails;
+        }
+
         LocationRefData courtTypeLocationDetails;
         var foundLocations = locationRefDataList.stream()
             .filter(location -> location.getEpimmsId().equals(court)).toList();
