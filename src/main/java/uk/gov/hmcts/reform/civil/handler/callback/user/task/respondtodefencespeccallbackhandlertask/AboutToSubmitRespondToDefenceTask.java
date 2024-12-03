@@ -114,6 +114,9 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
 
         clearTempDocuments(builder);
 
+        updateWaCourtLocationsService
+            .updateCourtListingWALocations(callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(), builder, caseData);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
             .state(nextState)
@@ -246,8 +249,6 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
                 ));
         }
         log.info("CASE DATA updateCaseManagementLocation {}", caseData);
-        updateWaCourtLocationsService
-            .updateCourtListingWALocations(callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(), builder, caseData);
     }
 
     private boolean isFlightDelayAndSmallClaim(CaseData caseData) {

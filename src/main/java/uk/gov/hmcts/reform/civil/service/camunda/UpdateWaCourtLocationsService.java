@@ -46,7 +46,7 @@ public class UpdateWaCourtLocationsService {
         log.info("CASE TRACK {}", claimTrack);
 
         Map<String, Object> evaluatedCourtMap = camundaRuntimeClient
-            .getEvaluatedDmnCourtLocations(caseData.getCaseManagementLocation().getBaseLocation(), claimTrack);
+            .getEvaluatedDmnCourtLocations(caseDataBuilder.build().getCaseManagementLocation().getBaseLocation(), claimTrack);
         DmnListingLocations dmnListingLocations = objectMapper.convertValue(evaluatedCourtMap, DmnListingLocations.class);
         List<LocationRefData> locationRefDataList = locationRefDataService.getHearingCourtLocations(authorisation);
 
