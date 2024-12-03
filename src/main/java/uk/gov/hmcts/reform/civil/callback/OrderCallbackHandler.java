@@ -2,9 +2,9 @@ package uk.gov.hmcts.reform.civil.callback;
 
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
-import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 
 @Slf4j
@@ -27,9 +28,11 @@ public abstract class OrderCallbackHandler extends DashboardWithParamsCallbackHa
     }
 
     protected boolean isEligibleForReconsideration(CaseData caseData) {
-        return caseData.isSmallClaim()
-            && (caseData.getTotalClaimAmount().compareTo(BigDecimal.valueOf(1000)) <= 0)
-            && featureToggleService.isCaseProgressionEnabled();
+        return featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
+            && caseData.isSmallClaim()
+            && caseData.getTotalClaimAmount().compareTo(BigDecimal.valueOf(1000)) <= 0
+            && (isNull(caseData.getDecisionOnRequestReconsiderationOptions())
+            || !DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(caseData.getDecisionOnRequestReconsiderationOptions()));
     }
 
     protected boolean hasTrackChanged(CaseData caseData) {

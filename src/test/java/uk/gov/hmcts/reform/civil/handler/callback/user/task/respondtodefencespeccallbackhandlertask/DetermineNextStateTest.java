@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -32,6 +33,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
@@ -171,6 +175,52 @@ class DetermineNextStateTest {
 
         assertNotNull(resultState);
         assertEquals(JUDICIAL_REFERRAL.name(), resultState);
+    }
+
+    @Test
+    void shouldNotSetStateWhenMultiClaimIsNotSettled() {
+
+        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+        BusinessProcess businessProcess = BusinessProcess.builder().build();
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1AcceptAdmitAmountPaidSpec(NO)
+            .applicant1ProceedWithClaim(YES)
+            .respondent1Represented(NO)
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .responseClaimTrack(MULTI_CLAIM.name())
+            .build();
+
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+        String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
+                                                                   builder, "", businessProcess);
+
+        assertNotNull(resultState);
+        assertEquals(AWAITING_APPLICANT_INTENTION.name(), resultState);
+    }
+
+    @Test
+    void shouldNotSetStateWhenIntermediateClaimIsNotSettled() {
+
+        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+        BusinessProcess businessProcess = BusinessProcess.builder().build();
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1ProceedWithClaim(YES)
+            .applicant1AcceptAdmitAmountPaidSpec(NO)
+            .respondent1Represented(NO)
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .responseClaimTrack(INTERMEDIATE_CLAIM.name())
+            .build();
+
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+        String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
+                                                                   builder, "", businessProcess);
+
+        assertNotNull(resultState);
+        assertEquals(AWAITING_APPLICANT_INTENTION.name(), resultState);
     }
 
     @Test

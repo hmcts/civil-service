@@ -84,7 +84,7 @@ public class ReasonMoneyTemplateData {
             .type(item.getType() == IncomeTypeLRspec.OTHER
                       ? "Other: " + item.getTypeOtherDetails()
                       : INCOME_TYPE_LIP_RESPONSE.get(item.getType()))
-            .amountPounds((MonetaryConversions.penniesToPounds(item.getAmount())).setScale(2, RoundingMode.CEILING))
+            .amountPounds(getAmountPounds(item.getAmount()))
             .build();
     }
 
@@ -94,7 +94,12 @@ public class ReasonMoneyTemplateData {
             .type(item.getType() == ExpenseTypeLRspec.OTHER
                       ? "Other: " + item.getTypeOtherDetails()
                       : EXPENSE_TYPE_LIP_RESPONSE.get(item.getType()))
-            .amountPounds((MonetaryConversions.penniesToPounds(item.getAmount())).setScale(2, RoundingMode.CEILING))
+            .amountPounds(getAmountPounds(item.getAmount()))
             .build();
     }
+
+    private static BigDecimal getAmountPounds(final BigDecimal item) {
+        return (item == null ? null : MonetaryConversions.penniesToPounds(item).setScale(2, RoundingMode.CEILING));
+    }
+
 }

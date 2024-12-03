@@ -4,11 +4,15 @@ import com.launchdarkly.shaded.org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -22,8 +26,10 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -274,6 +280,44 @@ public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 PARTY_NAME, isApplicant ? caseData.getApplicant1().getPartyName() : caseData.getRespondent1().getPartyName(),
                 CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource("provideCaseData")
+        void shouldNotSendEmailWhenTrialReadyFieldsAreNotNull(CaseData caseData, String eventId) {
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId(eventId).build())
+                .build();
+
+            handler.handle(params);
+
+            verify(notificationService, never()).sendMail(
+                anyString(),
+                anyString(),
+                anyMap(),
+                anyString()
+            );
+        }
+
+        private static Stream<Arguments> provideCaseData() {
+            return Stream.of(
+                Arguments.of(
+                    CaseDataBuilder.builder().atStateTrialReadyCheckLiP(true).build()
+                        .toBuilder().trialReadyApplicant(YesOrNo.YES).build(),
+                    NOTIFY_APPLICANT_SOLICITOR_FOR_OTHER_TRIAL_READY.name()
+                ),
+                Arguments.of(
+                    CaseDataBuilder.builder().atStateTrialReadyCheckLiP(true).build()
+                        .toBuilder().trialReadyRespondent1(YesOrNo.YES).build(),
+                    NOTIFY_RESPONDENT_SOLICITOR1_FOR_OTHER_TRIAL_READY.name()
+                ),
+                Arguments.of(
+                    CaseDataBuilder.builder().atStateTrialReadyCheckLiP(true).build()
+                        .toBuilder().trialReadyRespondent2(YesOrNo.YES).build(),
+                    NOTIFY_RESPONDENT_SOLICITOR2_FOR_OTHER_TRIAL_READY.name()
+                )
             );
         }
     }

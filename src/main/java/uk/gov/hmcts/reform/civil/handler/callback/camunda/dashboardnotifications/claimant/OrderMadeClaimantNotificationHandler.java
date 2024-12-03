@@ -110,10 +110,12 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
             }
 
         }
-        if (isSDODrawnPreCPRelease()) {
+        if (isSDODrawnPreCPRelease(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_SDO_DRAWN_PRE_CASE_PROGRESSION.getScenario();
         }
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         if (isFinalOrderIssued(callbackParams)) {
+            deleteNotificationAndInactiveTasks(caseData, authToken);
             if (isOrderMadeFastTrackTrialNotResponded(caseData)) {
                 return SCENARIO_AAA6_UPDATE_TASK_LIST_TRIAL_READY_FINALS_ORDERS_CLAIMANT.getScenario();
             }
@@ -134,8 +136,9 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
         return caseData.isApplicant1NotRepresented();
     }
 
-    private boolean isSDODrawnPreCPRelease() {
-        return !getFeatureToggleService().isCaseProgressionEnabled();
+    private boolean isSDODrawnPreCPRelease(CaseData caseData) {
+        return !getFeatureToggleService()
+            .isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation());
     }
 
     private boolean isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(CaseData caseData) {
@@ -153,5 +156,20 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
 
     private boolean isOrderMadeFastTrackTrialNotResponded(CaseData caseData) {
         return SdoHelper.isFastTrack(caseData) && isNull(caseData.getTrialReadyApplicant());
+    }
+
+    private void deleteNotificationAndInactiveTasks(CaseData caseData, String authToken) {
+
+        dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "CLAIMANT",
+            authToken
+        );
+
+        dashboardApiClient.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "CLAIMANT",
+            authToken
+        );
     }
 }

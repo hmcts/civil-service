@@ -5,6 +5,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
+
+import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED;
@@ -19,7 +22,7 @@ public class PendingClaimIssuedTransitionBuilder extends MidTransitionBuilder {
     }
 
     @Override
-    void setUpTransitions() {
-        this.moveTo(CLAIM_ISSUED).onlyWhen(claimIssued);
+    void setUpTransitions(List<Transition> transitions) {
+        this.moveTo(CLAIM_ISSUED, transitions).onlyWhen(claimIssued, transitions);
     }
 }

@@ -257,10 +257,9 @@ notifications:
   respondentSolicitorDefendantResponseForSpec: "91e32e2c-9fcc-4894-bb6e-772e208cce2e"
   respondentSolicitorDefResponseSpecWithClaimantAction: "00173434-a2c3-4f80-8eba-e37fe7fcb54e"
   respondentDefendantResponseForSpec: "2c4435ae-af57-4988-9e79-cb28db4bba49"
-  sdoOrdered: "027acc0f-e2e5-464d-9434-7df51096a858"
-  sdoOrderedSpec: "685fa352-3516-4385-8e66-443e2f7f3ab4"
-  sdoOrderedEA: "4ef43f0e-a39e-4620-ab7c-61d6dc73fe30"
-  sdoOrderedSpecEA: "e2348971-b785-49eb-92f7-c6207a930714"
+  sdoOrdered: "4847cf11-8f5f-4b51-aca4-d29b88389ee5"
+  sdoOrderedSpec: "0cf6bb95-f3f7-4072-b07f-c752af03b490"
+  sdoOrderedSpecEa: "1c1a200c-b3c1-45eb-9768-aeea56857420"
   sdoOrderedSpecBilingual: "0ae860e7-80b5-46f8-95b7-8f19d6f974cf"
   claimantSolicitorConfirmsNotToProceedSpec: "ebb4c5b9-6522-42a9-92a5-c7616ed3a4c2"
   claimantSolicitorConfirmsNotToProceedSpecLip: "57fa7156-3af0-4c78-8677-ee1cf6aaed43"
@@ -460,6 +459,7 @@ notifications:
   notifyLRStayUpdateRequested: "2bf8e191-d0aa-4cc3-9c54-42245c1d56a2"
   notifyLipStayUpdateRequested: "a08532c7-67f5-4c4f-a30d-81c4c0508ffc"
   notifyLipBilingualStayUpdateRequested: "95e2509e-7e8a-4c59-a756-605286b88847"
+  notifyClaimantLRCoscApplied: "a2f38927-7e54-4066-bbce-ff6ffda821ac"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}

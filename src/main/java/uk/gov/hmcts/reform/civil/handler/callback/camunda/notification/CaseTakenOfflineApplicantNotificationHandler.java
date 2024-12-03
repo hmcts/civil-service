@@ -58,6 +58,10 @@ public class CaseTakenOfflineApplicantNotificationHandler extends CallbackHandle
     private CallbackResponse notifyApplicantSolicitorForCaseTakenOffline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
+        if (caseData.isApplicantLiP()) {
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
+
         notificationService.sendMail(
             caseData.getApplicantSolicitor1UserDetails().getEmail(),
             getTemplate(caseData),

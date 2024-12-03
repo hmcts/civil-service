@@ -7,7 +7,9 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
@@ -39,28 +41,29 @@ public class ClaimDetailsNotifiedTransitionBuilder extends MidTransitionBuilder 
     }
 
     @Override
-    void setUpTransitions() {
-        this.moveTo(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION)
+    void setUpTransitions(List<Transition> transitions) {
+        this.moveTo(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION, transitions)
             .onlyWhen(respondentTimeExtension
-                          .and(not(notificationAcknowledged))
-                          .and(not(isInHearingReadiness)))
+                .and(not(notificationAcknowledged))
+                .and(not(isInHearingReadiness)), transitions)
             //Acknowledging Claim First
-            .moveTo(NOTIFICATION_ACKNOWLEDGED).onlyWhen(notificationAcknowledged.and(not(isInHearingReadiness)))
+            .moveTo(NOTIFICATION_ACKNOWLEDGED, transitions).onlyWhen(notificationAcknowledged.and(not(isInHearingReadiness)), transitions)
             //Direct Response, without Acknowledging
-            .moveTo(ALL_RESPONSES_RECEIVED)
-            .onlyWhen(allResponsesReceived.and(not(notificationAcknowledged)).and(not(respondentTimeExtension)).and(not(isInHearingReadiness)))
-            .moveTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
+            .moveTo(ALL_RESPONSES_RECEIVED, transitions)
+            .onlyWhen(allResponsesReceived.and(not(notificationAcknowledged)
+                .and(not(respondentTimeExtension)).and(not(isInHearingReadiness))), transitions)
+            .moveTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED, transitions)
             .onlyWhen(awaitingResponsesFullDefenceReceived
-                          .and(not(notificationAcknowledged)).and(not(respondentTimeExtension))
-                          .and(not(caseDismissedAfterDetailNotified)))
-            .moveTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED)
+                .and(not(notificationAcknowledged)).and(not(respondentTimeExtension))
+                .and(not(caseDismissedAfterDetailNotified)), transitions)
+            .moveTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED, transitions)
             .onlyWhen(awaitingResponsesNonFullDefenceReceived
-                          .and(not(notificationAcknowledged)).and(not(respondentTimeExtension)))
-            .moveTo(TAKEN_OFFLINE_BY_STAFF).onlyWhen(takenOfflineByStaffAfterClaimDetailsNotified)
-            .moveTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
-            .onlyWhen(caseDismissedAfterDetailNotified)
-            .moveTo(IN_HEARING_READINESS).onlyWhen(isInHearingReadiness)
-            .moveTo(TAKEN_OFFLINE_SDO_NOT_DRAWN).onlyWhen(takenOfflineSDONotDrawnAfterClaimDetailsNotified);
+                .and(not(notificationAcknowledged)).and(not(respondentTimeExtension)), transitions)
+            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaffAfterClaimDetailsNotified, transitions)
+            .moveTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA, transitions)
+            .onlyWhen(caseDismissedAfterDetailNotified.and(not(isInHearingReadiness)), transitions)
+            .moveTo(IN_HEARING_READINESS, transitions).onlyWhen(isInHearingReadiness, transitions)
+            .moveTo(TAKEN_OFFLINE_SDO_NOT_DRAWN, transitions).onlyWhen(takenOfflineSDONotDrawnAfterClaimDetailsNotified, transitions);
     }
 
     public static final Predicate<CaseData> takenOfflineSDONotDrawnAfterClaimDetailsNotified =

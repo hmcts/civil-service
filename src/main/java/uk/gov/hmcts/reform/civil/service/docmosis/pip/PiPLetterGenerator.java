@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
-import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
+import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -33,9 +33,10 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.PIN_I
 @Service
 public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
 
+    private static final String PIP_LETTER_NAME = DocmosisTemplates.PIN_IN_THE_POST_LETTER.getDocumentTitle();
     private final DocumentGeneratorService documentGeneratorService;
     private final PinInPostConfiguration pipInPostConfiguration;
-    private final CivilDocumentStitchingService civilDocumentStitchingService;
+    private final CivilStitchService civilStitchService;
     private final DocumentManagementService documentManagementService;
     private final DocumentDownloadService documentDownloadService;
 
@@ -47,33 +48,36 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
     }
 
     public byte[] downloadLetter(CaseData caseData, String authorisation) {
+        Long caseId = caseData.getCcdCaseReference();
+        log.info("Generating PiPLetter document for caseId {}", caseId);
         DocmosisDocument pipLetter = generate(caseData);
         CaseDocument pipLetterCaseDocument =  documentManagementService.uploadDocument(
             authorisation,
             new PDF(
-                DocmosisTemplates.PIN_IN_THE_POST_LETTER.getDocumentTitle(),
+                PIP_LETTER_NAME,
                 pipLetter.getBytes(),
                 DocumentType.ACKNOWLEDGEMENT_OF_CLAIM
             )
         );
 
         List<DocumentMetaData> documentMetaDataList = fetchDocumentsFromCaseData(caseData, pipLetterCaseDocument);
-        CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
-            documentMetaDataList,
-            authorisation,
-            pipLetterCaseDocument.getDocumentName(),
-            pipLetterCaseDocument.getDocumentName(),
-            caseData
-        );
+        log.info("Calling civil stitch service from pip letter generation for caseId {}", caseId);
+        CaseDocument stitchedDocument =
+            civilStitchService.generateStitchedCaseDocument(documentMetaDataList,
+                                                            PIP_LETTER_NAME,
+                                                            caseId,
+                                                            DocumentType.PIP_LETTER,
+                                                            authorisation);
 
-        String documentUrl = stitchedDocument.getDocumentLink().getDocumentUrl();
-        String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
+        log.info("Civil stitch service pip letter generation response {} for caseId {}", stitchedDocument, caseId);
+
         byte[] letterContent;
-
         try {
+            String documentUrl = stitchedDocument.getDocumentLink().getDocumentUrl();
+            String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
             letterContent = documentDownloadService.downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
         } catch (IOException e) {
-            log.error("Failed getting letter content for Pip Stitched Letter ");
+            log.error("Failed getting letter content for Pip Stitched Letter for caseId {}", caseId, e);
             throw new DocumentDownloadException(stitchedDocument.getDocumentLink().getDocumentFileName(), e);
         }
         return letterContent;
@@ -84,6 +88,7 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
         return PiPLetter
             .builder()
             .pin(caseData.getRespondent1PinToPostLRspec().getAccessCode())
+            .ccdCaseNumber(String.valueOf(caseData.getCcdCaseReference()))
             .claimReferenceNumber(caseData.getLegacyCaseReference())
             .claimantName(caseData.getApplicant1().getPartyName())
             .defendant(caseData.getRespondent1())
