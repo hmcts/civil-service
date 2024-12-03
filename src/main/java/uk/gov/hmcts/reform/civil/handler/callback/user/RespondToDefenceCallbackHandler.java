@@ -309,8 +309,12 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             builder.applicant2DQ(builder.build().getApplicant2DQ().toBuilder().applicant2DQDraftDirections(null).build());
         }
 
-        updateWaCourtLocationsService
-            .updateCourtListingWALocations(callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(), builder);
+        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+            updateWaCourtLocationsService.updateCourtListingWALocations(
+                callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
+                builder
+            );
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))

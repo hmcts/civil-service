@@ -1629,8 +1629,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             dataBuilder.sdoR2Trial(sdoR2Trial);
         }
 
-        updateWaCourtLocationsService.updateCourtListingWALocations(callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                                                                    dataBuilder);
+        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+            updateWaCourtLocationsService.updateCourtListingWALocations(
+                callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
+                dataBuilder
+            );
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))

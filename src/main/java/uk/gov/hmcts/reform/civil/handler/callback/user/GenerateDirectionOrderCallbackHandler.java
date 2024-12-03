@@ -606,8 +606,12 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             }
         }
 
-        updateWaCourtLocationsService
-            .updateCourtListingWALocations(callbackParams.getParams().get(BEARER_TOKEN).toString(), caseDataBuilder);
+        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+            updateWaCourtLocationsService.updateCourtListingWALocations(
+                callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
+                caseDataBuilder
+            );
+        }
 
         nullPreviousSelections(caseDataBuilder);
         return AboutToStartOrSubmitCallbackResponse.builder()

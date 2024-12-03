@@ -211,23 +211,6 @@ class UpdateWaCourtLocationsServiceTest {
     }
 
     @Test
-    void shouldNotUpdateEvaluateDmn_whenNonMintiCase() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(false);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("12345").region("1").build())
-            .allocatedTrack(AllocatedTrack.FAST_CLAIM)
-            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-            .build();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        updateWaCourtLocationsService.updateCourtListingWALocations("auth", caseDataBuilder);
-        CaseData updatedCaseData = caseDataBuilder.build();
-
-        assertNull(updatedCaseData.getTaskManagementLocations());
-        verifyNoInteractions(camundaClient);
-    }
-
-    @Test
     void shouldUpdateCourtListingWALocations_whenCourtFound_Unspec() {
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()

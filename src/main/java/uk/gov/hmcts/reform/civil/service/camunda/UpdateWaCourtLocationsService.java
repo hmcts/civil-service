@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
@@ -23,6 +24,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 @RequiredArgsConstructor
 @Service
 @Slf4j
+@ConditionalOnProperty(value = "court_location_dmn.dmn.simplification.enabled", havingValue = "true")
 public class UpdateWaCourtLocationsService {
 
     private final CamundaRuntimeClient camundaRuntimeClient;
@@ -33,10 +35,6 @@ public class UpdateWaCourtLocationsService {
 
     public void updateCourtListingWALocations(String authorisation, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         CaseData caseData = caseDataBuilder.build();
-
-        if (!featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-            return;
-        }
 
         String claimTrack = getClaimTrack(caseData);
         if ("FAST_CLAIM".equals(claimTrack) || "SMALL_CLAIM".equals(claimTrack)) {
