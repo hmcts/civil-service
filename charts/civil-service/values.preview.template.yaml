@@ -19,7 +19,7 @@ java:
     LAUNCH_DARKLY_ENV: ${SERVICE_FQDN}
     TESTING_SUPPORT_ENABLED: true
     POLLING_EVENT_EMITTER_ENABLED: true
-    CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-aat.service.core-compute-aat.internal
+    CASE_DOCUMENT_AM_URL:  http://${SERVICE_NAME}-cdam
     STITCHING_API_ENABLED: true
     ACA_SERVICE_API_BASEURL: http://${SERVICE_NAME}-aac-manage-case-assignment
     HMC_HEARINGS_SUBSCRIPTION_ENABLED: false
@@ -122,6 +122,7 @@ xui-webapp:
     devmemoryLimits: 8Gi
     devcpuLimits: 4500m
     environment:
+      FEATURE_ACCESS_MANAGEMENT_ENABLED: true
       HEALTH_CCD_COMPONENT_API: http://${SERVICE_NAME}-ccd-api-gw/health
       HEALTH_CCD_DATA_API: http://${SERVICE_NAME}-ccd-data-store-api/health
       HEALTH_TERMS_AND_CONDITIONS_API: http://xui-terms-and-conditions-${SERVICE_FQDN}.service.core-compute-preview.internal/health
