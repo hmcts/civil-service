@@ -31,7 +31,7 @@ public class JudgmentDetails {
     private LocalDate requestDate;
     private LocalDate issueDate;
     private LocalDate setAsideDate;
-    private LocalDate setAsideOrderDate;
+    private LocalDate setAsideApplicationDate;
     private LocalDate cancelDate;
     private LocalDate fullyPaymentMadeDate;
     private YesOrNo isJointJudgment;

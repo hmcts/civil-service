@@ -29,7 +29,7 @@ public class SetAsideJudgmentOnlineMapper extends JudgmentOnlineMapper {
             .lastUpdateTimeStamp(LocalDateTime.now())
             .cancelledTimeStamp(LocalDateTime.now())
             .rtlState(getNextRTLState(activeJudgment.getRtlState()))
-            .setAsideOrderDate(getOrderDateToSetAside(caseData))
+            .setAsideApplicationDate(getApplicationDateToSetAside(caseData))
             .build();
     }
 
@@ -48,7 +48,7 @@ public class SetAsideJudgmentOnlineMapper extends JudgmentOnlineMapper {
         LocalDate currentDate = LocalDate.now();
         if (JudgmentSetAsideReason.JUDGE_ORDER.equals(caseData.getJoSetAsideReason())) {
             if (JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION.equals(caseData.getJoSetAsideOrderType())) {
-                return caseData.getJoSetAsideApplicationDate();
+                return caseData.getJoSetAsideOrderDate();
             } else {
                 return caseData.getJoSetAsideDefenceReceivedDate();
             }
@@ -57,9 +57,10 @@ public class SetAsideJudgmentOnlineMapper extends JudgmentOnlineMapper {
         }
     }
 
-    private LocalDate getOrderDateToSetAside(CaseData caseData) {
-        if (JudgmentSetAsideReason.JUDGE_ORDER.equals(caseData.getJoSetAsideReason())) {
-            return caseData.getJoSetAsideOrderDate();
+    private LocalDate getApplicationDateToSetAside(CaseData caseData) {
+        if (JudgmentSetAsideReason.JUDGE_ORDER.equals(caseData.getJoSetAsideReason())
+            && JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION.equals(caseData.getJoSetAsideOrderType())) {
+            return caseData.getJoSetAsideApplicationDate();
         }
         return null;
     }
