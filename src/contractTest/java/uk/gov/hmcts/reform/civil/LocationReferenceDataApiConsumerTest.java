@@ -33,37 +33,37 @@ public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
     @Autowired
     private LocationReferenceDataApiClient locationReferenceDataApiClient;
 
-    @Pact(consumer = "civil-service")
+    @Pact(consumer = "civil_service")
     public RequestResponsePact getCourtVenueByName(PactDslWithProvider builder)
         throws JSONException, IOException {
         return buildCourtVenueByNameResponsePact(builder);
     }
 
-    @Pact(consumer = "civil-service")
+    @Pact(consumer = "civil_service")
     public RequestResponsePact getCourtVenueByEpimmsId(PactDslWithProvider builder)
         throws JSONException, IOException {
         return buildCourtVenueByEpimmsIdResponsePact(builder);
     }
 
-    @Pact(consumer = "civil-service")
+    @Pact(consumer = "civil_service")
     public RequestResponsePact getCourtVenueByEpimmsIdAndType(PactDslWithProvider builder)
         throws JSONException, IOException {
         return buildCourtVenueByEpimmsIdAndTypeResponsePact(builder);
     }
 
-    @Pact(consumer = "civil-service")
+    @Pact(consumer = "civil_service")
     public RequestResponsePact getCourtVenueByLocationCode(PactDslWithProvider builder)
         throws JSONException, IOException {
         return buildCourtVenueByLocationCodeResponsePact(builder);
     }
 
-    @Pact(consumer = "civil-service")
+    @Pact(consumer = "civil_service")
     public RequestResponsePact getHearingVenue(PactDslWithProvider builder)
         throws JSONException, IOException {
         return buildHearingVenueResponsePact(builder);
     }
 
-    @Pact(consumer = "civil-service")
+    @Pact(consumer = "civil_service")
     public RequestResponsePact getCourtVenue(PactDslWithProvider builder)
         throws JSONException, IOException {
         return buildCourtVenueResponsePact(builder);
@@ -284,7 +284,4 @@ public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
         ).build();
     }
 
-    private String createJsonObject(Object obj) throws JSONException, IOException {
-        return objectMapper.writeValueAsString(obj);
-    }
 }

@@ -19,6 +19,8 @@ import uk.gov.hmcts.reform.civil.config.FeesConfiguration;
 import uk.gov.hmcts.reform.civil.model.Fee2Dto;
 import uk.gov.hmcts.reform.civil.service.FeesClientService;
 
+import java.math.BigDecimal;
+
 import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonArray;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -41,7 +43,7 @@ public class FeesRangeGroupApiConsumerTest extends BaseContractTest {
     @Autowired
     private FeesConfiguration feesConfiguration;
 
-    @Pact(consumer = "civil-service")
+    @Pact(consumer = "civil_service")
     public RequestResponsePact getRangeGroupFees(PactDslWithProvider builder) throws JSONException {
         return buildLookupRangeGroupFeesResponsePact(
             builder,
@@ -55,7 +57,27 @@ public class FeesRangeGroupApiConsumerTest extends BaseContractTest {
     public void verifyRangeGroupFees() {
         Fee2Dto[] fee = feesClientService.findRangeGroup(feesConfiguration.getChannel(), feesConfiguration.getEvent()
         );
-        assertThat(fee[0].getCode(), is(equalTo("code")));
+        assertThat(fee[0].getCode(), is(equalTo("FEE0209")));
+        assertThat(fee[0].getFeeType(), is(equalTo("FEETYPE")));
+        assertThat(fee[0].getKeyword(), is(equalTo("MoneyClaim")));
+        assertThat(fee[0].getMinRange(), is(equalTo(BigDecimal.valueOf(100))));
+        assertThat(fee[0].getMaxRange(), is(equalTo(BigDecimal.valueOf(100))));
+        assertThat(fee[0].getRangeUnit(), is(equalTo("GBP")));
+        assertThat(fee[0].getUnspecifiedClaimAmount(), is(equalTo(true)));
+        assertThat(fee[0].getFeeVersions().get(0).getVersion(), is(equalTo(2)));
+        assertThat(fee[0].getFeeVersions().get(0).getAuthor(), is(equalTo("124756")));
+        assertThat(fee[0].getFeeVersions().get(0).getApprovedBy(), is(equalTo("39907")));
+        assertThat(fee[0].getFeeVersions().get(0).getDescription(), is(equalTo("Counter Claim - 5000.01 up to 10000 GBP")));
+        assertThat(fee[0].getFeeVersions().get(0).getStatus(), is(equalTo("approved")));
+        assertThat(fee[0].getFeeVersions().get(0).getValidFrom().toString(), is(equalTo("2015-03-09T00:00Z")));
+        assertThat(fee[0].getFeeVersions().get(0).getValidTo().toString(), is(equalTo("2022-03-09T00:00Z")));
+        assertThat(fee[0].getFeeVersions().get(0).getFlatAmount().getAmount(), is(equalTo(BigDecimal.valueOf(455))));
+        assertThat(fee[0].getFeeVersions().get(0).getMemoLine(), is(equalTo("RECEIPT OF FEES - Civil issue money")));
+        assertThat(fee[0].getFeeVersions().get(0).getStatutoryInstrument(), is(equalTo("2014 No 874")));
+        assertThat(fee[0].getFeeVersions().get(0).getSiRefId(), is(equalTo("1.1h")));
+        assertThat(fee[0].getFeeVersions().get(0).getNaturalAccountCode(), is(equalTo("4481102133")));
+        assertThat(fee[0].getFeeVersions().get(0).getPercentageAmount().getPercentage(), is(equalTo(BigDecimal.valueOf(5))));
+        assertThat(fee[0].getFeeVersions().get(0).getDirection(), is(equalTo("enhanced")));
     }
 
     private RequestResponsePact buildLookupRangeGroupFeesResponsePact(PactDslWithProvider builder,
@@ -82,85 +104,60 @@ public class FeesRangeGroupApiConsumerTest extends BaseContractTest {
     private DslPart buildRangeGroupFeesResponseBody() {
         return newJsonArray(response -> response
             .object(feeDto -> feeDto
-                .object("applicantType", applicantType ->
+                .object("applicant_type", applicantType ->
                     applicantType
-                        .stringMatcher("creationTime",
-                                       "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
-                                       "2020-10-06T18:54:48.785000")
-                        .stringMatcher("lastUpdated",
-                                       "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
-                                       "2020-10-06T18:54:48.785000")
-                        .stringType("name", "name"))
-                .object("channelType", channelTypeDto ->
+                        .stringValue("name", "all"))
+                .object("channel_type", channelTypeDto ->
                     channelTypeDto
-                        .stringMatcher("creationTime",
-                                       "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
-                                       "2020-10-06T18:54:48.785000")
-                        .stringMatcher("lastUpdated",
-                                       "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
-                                       "2020-10-06T18:54:48.785000")
-                        .stringType("name", "name"))
-                .stringType("code", "code")
-                .object("currentVersion", feeVersionDto ->
+                        .stringValue("name", "default"))
+                .stringValue("code", "FEE0209")
+                .object("current_version", feeVersionDto ->
                     getFeeVersionDto(feeVersionDto))
-                .object("eventType", eventType -> eventType
-                    .stringMatcher("creationTime",
-                                   "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
-                                   "2020-10-06T18:54:48.785000")
-                    .stringMatcher("lastUpdated",
-                                   "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
-                                   "2020-10-06T18:54:48.785000")
-                    .stringType("name", "name"))
-                .stringType("feeType", "FEETYPE")
-                .minArrayLike("feeVersions", 1, feeVersions -> getFeeVersionDto(feeVersions))
+                .object("event_type", eventType -> eventType
+                    .stringValue("name", "issue"))
+                .stringValue("fee_type", "FEETYPE")
+                .minArrayLike("fee_versions", 1, feeVersions -> getFeeVersionDto(feeVersions))
                 .object("jurisdiction1", jurisdiction1 ->
                     jurisdiction1
-                        .stringType("name", "name"))
+                        .stringValue("name", "civil"))
                 .object("jurisdiction2", jurisdiction2 ->
                     jurisdiction2
-                        .stringType("name", "name"))
-                .stringType("keyword", "keyword")
-                .object("matchingVersion", feeVersionDto ->
+                        .stringValue("name", "county court"))
+                .stringValue("keyword", "MoneyClaim")
+                .object("matching_version", feeVersionDto ->
                     getFeeVersionDto(feeVersionDto))
-                .numberType("maxRange", "maxRange")
-                .numberType("minRange", "minRange")
-                .stringType("rangeUnit", "rangeUnit")
-                .object("serviceType", serviceType -> serviceType
-                    .stringMatcher("creationTime",
-                                   "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
-                                   "2020-10-06T18:54:48.785000")
-                    .stringMatcher("lastUpdated",
-                                   "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
-                                   "2020-10-06T18:54:48.785000")
-                    .stringType("name", "name"))
-                .booleanType("unspecifiedClaimAmount")
+                .numberType("max_range", 100)
+                .numberType("min_range", 100)
+                .stringValue("range_unit", "GBP")
+                .object("service_type", serviceType -> serviceType
+                    .stringValue("name", "civil money claims"))
+                .booleanType("unspecified_claim_amount")
             )).build();
     }
 
     private static LambdaDslObject getFeeVersionDto(LambdaDslObject feeVersionDto) {
+
         return feeVersionDto
-            .stringType("approvedBy", "approvedBy")
-            .stringType("author", "author")
-            .stringType("description", "description")
-            .stringType("direction", "direction")
-            .object("flatAmount", flatAmount ->
+            .stringType("approvedBy", "39907")
+            .stringType("author", "124756")
+            .stringType("description", "Counter Claim - 5000.01 up to 10000 GBP")
+            .stringType("direction", "enhanced")
+            .object("flat_amount", flatAmount ->
                 flatAmount
-                    .numberType("amount"))
-            .stringType("memoLine", "memoLine")
-            .stringType("naturalAccountCode", "naturalAccountCode")
-            .object("percentageAmount", percentageAmount -> percentageAmount
-                .numberType("percentage"))
-            .stringType("siRefId", "siRefId")
-            .stringType("status", "status")
-            .stringType("statutoryInstrument", "statutoryInstrument")
-            .stringMatcher("validFrom",
-                           "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
-                           "2020-10-06T18:54:48.785000")
-            .stringMatcher("validTo",
-                           "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
-                           "2020-10-06T18:54:48.785000")
-            .numberType("version")
-            .object("volumeAmount", volumeAmount -> volumeAmount
-                .numberType("amount"));
+                    .numberType("amount", 455))
+            .stringType("memo_line", "RECEIPT OF FEES - Civil issue money")
+            .stringType("natural_account_code", "4481102133")
+            .object("percentage_amount", percentageAmount -> percentageAmount
+                .numberType("percentage", 5))
+            .stringType("si_ref_id", "1.1h")
+            .stringType("status", "approved")
+            .stringType("statutory_instrument", "2014 No 874")
+            .stringMatcher("valid_from",
+                "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{1,6}\\+\\d{2}:\\d{2})$",
+                "2015-03-09T00:00:00.000+00:00")
+            .stringMatcher("valid_to",
+                "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{1,6}\\+\\d{2}:\\d{2})$",
+                "2022-03-09T00:00:00.000+00:00")
+            .numberType("version", 2);
     }
 }
