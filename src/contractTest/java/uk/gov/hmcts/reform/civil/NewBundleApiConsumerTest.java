@@ -46,7 +46,7 @@ public class NewBundleApiConsumerTest extends BaseContractTest {
     @Autowired
     private EvidenceManagementApiClient evidenceManagementApiClient;
 
-    @Pact(consumer = "civil-service")
+    @Pact(consumer = "civil_service")
     public RequestResponsePact postCreateBundleServiceRequest(PactDslWithProvider builder)
         throws JSONException, IOException {
         return buildCreateBundleResponsePact(builder);
@@ -227,7 +227,4 @@ public class NewBundleApiConsumerTest extends BaseContractTest {
         ).build();
     }
 
-    private String createJsonObject(Object obj) throws JSONException, IOException {
-        return objectMapper.writeValueAsString(obj);
-    }
 }
