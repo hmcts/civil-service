@@ -53,8 +53,10 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting.LISTING;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
 public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -142,6 +144,7 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );
+        recordScenarioForTrialArrangementsAndDocumentsUpload(caseData, "BEARER_TOKEN");
         verifyNoMoreInteractions(dashboardApiClient);
     }
 
@@ -263,6 +266,21 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
         verify(hearingFeesService).getFeeForHearingSmallClaims(new BigDecimal(100).setScale(2, RoundingMode.UNNECESSARY));
     }
 
+    private void recordScenarioForTrialArrangementsAndDocumentsUpload(CaseData caseData, String authToken) {
+        verify(dashboardApiClient).recordScenario(
+            caseData.getCcdCaseReference().toString(),
+            SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_CLAIMANT.getScenario(),
+            authToken,
+            ScenarioRequestParams.builder().params(params).build()
+        );
+        verify(dashboardApiClient).recordScenario(
+            caseData.getCcdCaseReference().toString(),
+            SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT.getScenario(),
+            authToken,
+            ScenarioRequestParams.builder().params(params).build()
+        );
+    }
+
     @Test
     void shouldNotCreateDashboardNotificationsForHearingFeeIfFeePaymentSuccess_HMC() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
@@ -293,6 +311,7 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );
+        recordScenarioForTrialArrangementsAndDocumentsUpload(caseData, "BEARER_TOKEN");
         verifyNoMoreInteractions(dashboardApiClient);
         verifyNoInteractions(hearingFeesService);
     }
@@ -326,6 +345,7 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );
+        recordScenarioForTrialArrangementsAndDocumentsUpload(caseData, "BEARER_TOKEN");
         verifyNoMoreInteractions(dashboardApiClient);
         verifyNoInteractions(hearingFeesService);
     }
@@ -362,6 +382,7 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );
+        recordScenarioForTrialArrangementsAndDocumentsUpload(caseData, "BEARER_TOKEN");
         verifyNoMoreInteractions(dashboardApiClient);
         verifyNoInteractions(hearingFeesService);
     }
@@ -467,6 +488,7 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );
+        recordScenarioForTrialArrangementsAndDocumentsUpload(caseData, "BEARER_TOKEN");
     }
 
     private static Stream<Arguments> provideTestCases() {

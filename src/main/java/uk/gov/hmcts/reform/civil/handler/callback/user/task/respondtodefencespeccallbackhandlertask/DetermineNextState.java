@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnlineMapper;
@@ -17,6 +18,8 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.utils.CaseStateUtils.shouldMoveToInMediationState;
@@ -66,8 +69,30 @@ public class DetermineNextState  {
             businessProcess = BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC);
         }
 
+        if (shouldNotChangeStateMinti(caseData)) {
+            nextState = CaseState.AWAITING_APPLICANT_INTENTION.name();
+        }
+
         builder.businessProcess(businessProcess);
         return nextState;
+    }
+
+    private boolean shouldNotChangeStateMinti(CaseData caseData) {
+        return featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
+            && CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && isMultiOrIntermediateSpecClaim(caseData)
+            && isLipCase(caseData)
+            && (isClaimNotSettled(caseData)
+            || caseData.getApplicant1ProceedWithClaim() == YesOrNo.YES);
+    }
+
+    private boolean isMultiOrIntermediateSpecClaim(CaseData caseData) {
+        return INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
+            || MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack());
+    }
+
+    private boolean isLipCase(CaseData caseData) {
+        return caseData.isApplicantLiP() || caseData.isRespondent1LiP();
     }
 
     private boolean isDefenceAdmitPayImmediately(CaseData caseData) {

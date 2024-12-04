@@ -127,6 +127,7 @@ public class EventHistoryMapper {
     public static final String BS_END_DATE = "actual end date";
     public static final String RPA_REASON_MANUAL_DETERMINATION = "RPA Reason: Manual Determination Required.";
     public static final String RPA_REASON_JUDGMENT_BY_ADMISSION = "RPA Reason: Judgment by Admission requested and claim moved offline.";
+    public static final String RPA_RECORD_JUDGMENT = "Judgment recorded.";
     public static final String RPA_IN_MEDIATION = "IN MEDIATION";
     static final String ENTER = "Enter";
     static final String LIFTED = "Lifted";
@@ -527,13 +528,19 @@ public class EventHistoryMapper {
     private void buildCcjEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         if (caseData.isCcjRequestJudgmentByAdmission()) {
             buildJudgmentByAdmissionEventDetails(builder, caseData);
+
+            String miscTextRequested = RPA_REASON_JUDGMENT_BY_ADMISSION;
+            if (featureToggleService.isJOLiveFeedActive()) {
+                miscTextRequested = RPA_RECORD_JUDGMENT;
+            }
+
             builder.miscellaneous((Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
                 .eventCode(MISCELLANEOUS.getCode())
                 .dateReceived(setApplicant1ResponseDate(caseData))
-                .eventDetailsText(RPA_REASON_JUDGMENT_BY_ADMISSION)
+                .eventDetailsText(miscTextRequested)
                 .eventDetails(EventDetails.builder()
-                                  .miscText(RPA_REASON_JUDGMENT_BY_ADMISSION)
+                                  .miscText(miscTextRequested)
                                   .build())
                 .build()));
         }
@@ -574,7 +581,6 @@ public class EventHistoryMapper {
             .eventDetails(judgmentByAdmissionEvent)
             .eventDetailsText("")
             .build()));
-
     }
 
     private void buildRespondentDivergentResponse(EventHistory.EventHistoryBuilder builder, CaseData caseData,
@@ -2279,7 +2285,7 @@ public class EventHistoryMapper {
 
         if (featureToggleService.isJOLiveFeedActive()
             && caseData.getCcdState() == CaseState.All_FINAL_ORDERS_ISSUED) {
-            miscTextGranted = "Judgment recorded.";
+            miscTextGranted = RPA_RECORD_JUDGMENT;
         }
 
         if (caseData.getDefendantDetailsSpec() != null) {
