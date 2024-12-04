@@ -48,6 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -220,6 +221,46 @@ class AboutToSubmitRespondToDefenceTaskTest {
         assertNotNull(response);
         assertThat(getCaseData(response)).extracting("applicant1").hasFieldOrProperty("partyID");
         assertThat(getCaseData(response)).extracting("respondent1").hasFieldOrProperty("partyID");
+    }
+
+    @Test
+    void shouldCallUpdateWaCourtLocationsServiceWhenPresent_AndMintiEnabled() {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1DQWithExperts()
+            .applicant1DQWithWitnesses()
+            .atState(FULL_DEFENCE_PROCEED)
+            .build();
+
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) task.execute(callbackParams(caseData));
+
+        verify(updateWaCourtLocationsService).updateCourtListingWALocations(any(), any());
+    }
+
+    @Test
+    void shouldNotCallUpdateWaCourtLocationsServiceWhenNotPresent_AndMintiEnabled() {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+        task = new AboutToSubmitRespondToDefenceTask(objectMapper, time, locationRefDataService,
+                                                     courtLocationUtils, featureToggleService,
+                                                     locationHelper, caseFlagsInitialiser,
+                                                     caseDetailsConverter, frcDocumentsUtils,
+                                                     dqResponseDocumentUtils, determineNextState,
+                                                     Optional.empty()
+        );
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1DQWithExperts()
+            .applicant1DQWithWitnesses()
+            .atState(FULL_DEFENCE_PROCEED)
+            .build();
+
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) task.execute(callbackParams(caseData));
+
+        verifyNoInteractions(updateWaCourtLocationsService);
     }
 
     private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
