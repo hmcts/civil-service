@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
-import uk.gov.hmcts.reform.civil.service.Time;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,7 +31,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_PAID_IN_FULL;
 import static uk.gov.hmcts.reform.civil.enums.cosc.CoscRPAStatus.SATISFIED;
 import static uk.gov.hmcts.reform.civil.enums.cosc.CoscRPAStatus.CANCELLED;
-
 
 @Service
 @RequiredArgsConstructor
@@ -77,10 +75,9 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
         caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
         caseData.setActiveJudgment(paidInFullJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
         caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(caseData.getActiveJudgment()));
-//        caseData.setJoCoscRpaStatus(JudgmentState.CANCELLED.equals(caseData.getActiveJudgment().getState()) ? CANCELLED : SATISFIED);
-//        caseData.setJoMarkedPaidInFullIssueDate(time.now());
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.businessProcess(BusinessProcess.ready(JUDGMENT_PAID_IN_FULL))
+        caseDataBuilder
+            .businessProcess(BusinessProcess.ready(JUDGMENT_PAID_IN_FULL))
             .joCoscRpaStatus(JudgmentState.CANCELLED.equals(caseData.getActiveJudgment().getState()) ? CANCELLED : SATISFIED)
             .joMarkedPaidInFullIssueDate(LocalDateTime.now());
         return AboutToStartOrSubmitCallbackResponse.builder()

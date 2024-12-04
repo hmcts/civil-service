@@ -503,7 +503,7 @@ public class EventHistoryMapper {
 
             // date received when mark paid in full by claimant is issued or when the scheduler runs at the cosc deadline at 4pm
             LocalDateTime dateReceived = caseData.getJoMarkedPaidInFullIssueDate() != null
-                ? caseData.getJoMarkedPaidInFullIssueDate() : caseData.getCoscSchedulerDeadline().atTime(16,0);
+                ? caseData.getJoMarkedPaidInFullIssueDate() : caseData.getCoscSchedulerDeadline().atTime(16, 0);
 
             builder.certificateOfSatisfactionOrCancellation((Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
@@ -2447,8 +2447,7 @@ public class EventHistoryMapper {
     private LocalDate getCoscDate(CaseData caseData) {
         if (caseData.getJoFullyPaymentMadeDate() != null) {
             return caseData.getJoFullyPaymentMadeDate();
-        }
-        else if (caseData.getCertOfSC() != null && caseData.getCertOfSC().getDefendantFinalPaymentDate() != null) {
+        } else if (caseData.getCertOfSC() != null && caseData.getCertOfSC().getDefendantFinalPaymentDate() != null) {
             return caseData.getCertOfSC().getDefendantFinalPaymentDate();
         }
         throw new IllegalArgumentException("Payment date cannot be null");

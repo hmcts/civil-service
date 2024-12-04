@@ -1237,9 +1237,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean hasCoscCert() {
-        return getSystemGeneratedCaseDocuments().stream()
-            .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
-                .getDocumentType().equals(DocumentType.CERTIFICATE_OF_DEBT_PAYMENT)).findAny().isPresent();
+        if (getSystemGeneratedCaseDocuments() != null) {
+            return getSystemGeneratedCaseDocuments().stream()
+                .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
+                    .getDocumentType().equals(DocumentType.CERTIFICATE_OF_DEBT_PAYMENT)).findAny().isPresent();
+        }
+        return false;
     }
 
     @JsonIgnore
