@@ -2316,6 +2316,7 @@
         "required": [
           "eventSequence",
           "eventCode",
+          "litigiousPartyID",
           "dateReceived",
           "eventDetails",
           "eventDetailsText"

@@ -498,21 +498,24 @@ public class EventHistoryMapper {
     }
 
     private void buildCoscEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        boolean joMarkedPaidInFullDateExists = caseData.getJoMarkedPaidInFullIssueDate() != null;
+
         if (featureToggleService.isJOLiveFeedActive()
-            && (caseData.getJoMarkedPaidInFullIssueDate() != null || caseData.hasCoscCert())) {
+            && (joMarkedPaidInFullDateExists || caseData.hasCoscCert())) {
 
             // date received when mark paid in full by claimant is issued or when the scheduler runs at the cosc deadline at 4pm
-            LocalDateTime dateReceived = caseData.getJoMarkedPaidInFullIssueDate() != null
+            LocalDateTime dateReceived = joMarkedPaidInFullDateExists
                 ? caseData.getJoMarkedPaidInFullIssueDate() : caseData.getCoscSchedulerDeadline().atTime(16, 0);
 
             builder.certificateOfSatisfactionOrCancellation((Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
+                .litigiousPartyID(joMarkedPaidInFullDateExists ? APPLICANT_ID : RESPONDENT_ID)
                 .eventCode(CERTIFICATE_OF_SATISFACTION_OR_CANCELLATION.getCode())
                 .dateReceived(dateReceived)
                 .eventDetails(EventDetails.builder()
                                   .status(caseData.getJoCoscRpaStatus().toString())
                                   .datePaidInFull(getCoscDate(caseData))
-                                  .notificationReceiptDate(caseData.getJoMarkedPaidInFullIssueDate() != null
+                                  .notificationReceiptDate(joMarkedPaidInFullDateExists
                                                                ? caseData.getJoMarkedPaidInFullIssueDate().toLocalDate()
                                                                : caseData.getCoscIssueDate())
                                   .build())
