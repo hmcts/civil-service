@@ -207,28 +207,29 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateSetAsideData_WithApplicationDate() {
-            //Given : Casedata in All_FINAL_ORDERS_ISSUED State
+            //Given
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
-            caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
-            caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
-            caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
-            caseData.setJoSetAsideApplicationDate(LocalDate.of(2022, 11, 11));
-            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
+            CaseData updatedCaseData = caseData.toBuilder()
+                .joSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER)
+                .joSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION)
+                .joSetAsideOrderDate(LocalDate.of(2024, 11, 12))
+                .joSetAsideApplicationDate(LocalDate.of(2024, 11, 11))
+                .activeJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build()).build();
 
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(updatedCaseData, ABOUT_TO_SUBMIT);
 
-            //When: handler is called with ABOUT_TO_SUBMIT event
+            //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            //Then: setAsideApplicationDate should be set correctly
-            assertThat(response.getData()).containsEntry("joSetAsideOrderDate", "2022-12-12");
-            assertThat(response.getData()).containsEntry("joSetAsideApplicationDate", "2022-11-11");
+            //Then
+            assertThat(response.getData()).containsEntry("joSetAsideOrderDate", "2024-11-12");
+            assertThat(response.getData()).containsEntry("joSetAsideApplicationDate", "2024-11-11");
             assertThat(response.getData().get("activeJudgment")).isNull();
             assertThat(response.getData().get("historicJudgment")).isNotNull();
-            JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
+            JudgmentDetails historicJudgment = updatedCaseData.getHistoricJudgment().get(0).getValue();
             assertEquals(JudgmentState.SET_ASIDE, historicJudgment.getState());
-            assertEquals(caseData.getJoSetAsideOrderDate(), historicJudgment.getSetAsideDate());
-            assertEquals(caseData.getJoSetAsideApplicationDate(), historicJudgment.getSetAsideApplicationDate());
+            assertEquals(updatedCaseData.getJoSetAsideOrderDate(), historicJudgment.getSetAsideDate());
+            assertEquals(updatedCaseData.getJoSetAsideApplicationDate(), historicJudgment.getSetAsideApplicationDate());
         }
     }
 
@@ -266,11 +267,12 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldValidateSetAsideApplicationDate() {
 
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
-            caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
-            caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
-            caseData.setJoSetAsideApplicationDate(LocalDate.of(2022, 12, 23));
+            CaseData updatedCaseData = caseData.toBuilder()
+                .joSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION)
+                .joSetAsideOrderDate(LocalDate.of(2024, 11, 12))
+                .joSetAsideApplicationDate(LocalDate.of(2024, 11, 23)).build();
 
-            CallbackParams params = callbackParamsOf(caseData, MID, "validate-set-aside-dates");
+            CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-set-aside-dates");
             //When: handler is called with MID event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).contains(ERROR_MESSAGE_SET_ASIDE_APPLICATION_DATE);
