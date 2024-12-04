@@ -45,9 +45,9 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private DeadlinesCalculator deadlinesCalculator;
     private static final String ERROR_MESSAGE_SET_ASIDE_APPLICATION_DATE =
-        "Application date to set aside judgment must be on or before the date of the order setting aside Judgment";
+        "Application date to set aside judgment must be on or before the date of the order setting aside judgment";
     private static final String ERROR_MESSAGE_SET_ASIDE_DEFENCE_DATE =
-        "Date the defence was received must be on or before the date of the order setting aside Judgment";
+        "Date the defence was received must be on or before the date of the order setting aside judgment";
 
     @BeforeEach
     void setup() {
