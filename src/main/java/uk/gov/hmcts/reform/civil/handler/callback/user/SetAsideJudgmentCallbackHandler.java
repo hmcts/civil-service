@@ -41,6 +41,10 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
     protected final ObjectMapper objectMapper;
     private final SetAsideJudgmentOnlineMapper setAsideJudgmentOnlineMapper;
     private static final String ERROR_MESSAGE_DATE_ORDER_MUST_BE_IN_PAST = "Date must be in the past";
+    private static final String ERROR_MESSAGE_APPLICATION_DATE =
+        "Application date to set aside judgment must be on or before the date of the order setting aside Judgment";
+    private static final String ERROR_MESSAGE_DEFENCE_DATE =
+        "Date the defence was received must be on or before the date of the order setting aside Judgment";
     private final DeadlinesCalculator deadlinesCalculator;
 
     @Override
@@ -62,10 +66,18 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 
-        if (JudgmentsOnlineHelper.validateIfFutureDate(caseData.getJoSetAsideOrderType().equals(
-            JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION) ? caseData.getJoSetAsideOrderDate() : caseData.getJoSetAsideDefenceReceivedDate())) {
+        if (JudgmentsOnlineHelper.validateIfFutureDate(caseData.getJoSetAsideOrderDate())) {
             errors.add(ERROR_MESSAGE_DATE_ORDER_MUST_BE_IN_PAST);
         }
+        if (caseData.getJoSetAsideOrderType().equals(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION)
+            && caseData.getJoSetAsideApplicationDate().isAfter(caseData.getJoSetAsideOrderDate())) {
+            errors.add(ERROR_MESSAGE_APPLICATION_DATE);
+        }
+        if (caseData.getJoSetAsideOrderType().equals(JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE)
+            && caseData.getJoSetAsideDefenceReceivedDate().isAfter(caseData.getJoSetAsideOrderDate())) {
+            errors.add(ERROR_MESSAGE_DEFENCE_DATE);
+        }
+
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

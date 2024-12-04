@@ -671,6 +671,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private String joSetAsideJudgmentErrorText;
     private JudgmentSetAsideOrderType joSetAsideOrderType;
     private LocalDate joSetAsideOrderDate;
+    private LocalDate joSetAsideApplicationDate;
     private LocalDate joSetAsideDefenceReceivedDate;
     private YesOrNo joShowRegisteredWithRTLOption;
     private JudgmentDetails activeJudgment;
