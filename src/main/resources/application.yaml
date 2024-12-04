@@ -777,5 +777,5 @@ caseFlags:
 court_location_dmn:
   dmn:
     simplification:
-      enabled: ${COURT_LOCATION_WA_DMN_ENABLED:true}
+      enabled: true
 
