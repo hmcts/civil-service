@@ -23,7 +23,8 @@ public class CvpJoinLinkSchedulerHandler extends BaseExternalTaskHandler {
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
         List<CaseDetails> cases = searchService.getCases();
-        log.info("CVP Join Link Scheduler job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
+        List<Long> ids = cases.stream().map(CaseDetails::getId).sorted().toList();
+        log.info("CVP Join Link Scheduler job '{}' found {} case(s) with ids {}", externalTask.getTopicName(), cases.size(), ids);
 
         cases.forEach(caseDetails -> {
             try {
