@@ -251,7 +251,6 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
                         CallbackParams.Params.BEARER_TOKEN).toString())
                 ));
         }
-        log.info("CASE DATA updateCaseManagementLocation {}", caseData);
     }
 
     private boolean isFlightDelayAndSmallClaim(CaseData caseData) {
