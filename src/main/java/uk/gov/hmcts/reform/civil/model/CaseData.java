@@ -171,6 +171,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final SRPbaDetails claimIssuedPBADetails;
     private final String applicantPartyName;
     private final CertOfSC certOfSC;
+    private final String gaWaTrackLabel;
 
     private final YesOrNo generalAppVaryJudgementType;
     private final YesOrNo generalAppParentClaimantIsApplicant;
