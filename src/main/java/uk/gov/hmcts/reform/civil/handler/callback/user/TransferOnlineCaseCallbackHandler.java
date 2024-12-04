@@ -71,9 +71,6 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<String> errors = new ArrayList<>();
 
-//        System.out.println("TESTT " + redirectUrl);
-//        System.out.println("TESTT " + courtToggle);
-
         if (ifSameCourtSelected(callbackParams)) {
             errors.add(ERROR_SELECT_DIFF_LOCATION);
         }
