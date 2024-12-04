@@ -232,7 +232,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     BigDecimal ccmccAmount;
     @Value("${court-location.unspecified-claim.epimms-id}")
     String ccmccEpimsId;
-    private final UpdateWaCourtLocationsService updateWaCourtLocationsService;
+    private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -1630,10 +1630,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
 
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-            updateWaCourtLocationsService.updateCourtListingWALocations(
+            updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
                 callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
                 dataBuilder
-            );
+            ));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

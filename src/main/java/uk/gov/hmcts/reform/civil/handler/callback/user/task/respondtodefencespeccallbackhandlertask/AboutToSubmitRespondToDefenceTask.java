@@ -70,7 +70,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     private final FrcDocumentsUtils frcDocumentsUtils;
     private final DQResponseDocumentUtils dqResponseDocumentUtils;
     private final DetermineNextState determineNextState;
-    private final UpdateWaCourtLocationsService updateWaCourtLocationsService;
+    private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
     @Value("${court-location.specified-claim.epimms-id}") String cnbcEpimsId;
 
     public CallbackResponse execute(CallbackParams callbackParams) {
@@ -114,10 +114,10 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         clearTempDocuments(builder);
 
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-            updateWaCourtLocationsService.updateCourtListingWALocations(
+            updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
                 callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
                 builder
-            );
+            ));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

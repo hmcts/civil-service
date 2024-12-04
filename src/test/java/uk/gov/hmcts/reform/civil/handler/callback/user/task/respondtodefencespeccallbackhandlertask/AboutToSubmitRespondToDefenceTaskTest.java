@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import static java.time.LocalDateTime.now;
@@ -110,7 +111,8 @@ class AboutToSubmitRespondToDefenceTaskTest {
                                                      locationHelper, caseFlagsInitialiser,
                                                      caseDetailsConverter, frcDocumentsUtils,
                                                      dqResponseDocumentUtils, determineNextState,
-                                                     updateWaCourtLocationsService);
+                                                     Optional.of(updateWaCourtLocationsService)
+        );
 
         Address address = Address.builder()
             .postCode("E11 5BB")

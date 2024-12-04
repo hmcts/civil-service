@@ -147,7 +147,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private final UserService userService;
     private final WorkingDayIndicator workingDayIndicator;
     private final FeatureToggleService featureToggleService;
-    private final UpdateWaCourtLocationsService updateWaCourtLocationsService;
+    private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -607,10 +607,10 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         }
 
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-            updateWaCourtLocationsService.updateCourtListingWALocations(
+            updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
                 callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
                 caseDataBuilder
-            );
+            ));
         }
 
         nullPreviousSelections(caseDataBuilder);

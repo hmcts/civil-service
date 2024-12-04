@@ -123,7 +123,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     private final AssignCategoryId assignCategoryId;
     private final CategoryService categoryService;
     private final LocationHelper locationHelper;
-    private final UpdateWaCourtLocationsService updateWaCourtLocationsService;
+    private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
 
     @Autowired
     private final DeadlinesCalculator deadlinesCalculator;
@@ -790,10 +790,10 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         }
 
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-            updateWaCourtLocationsService.updateCourtListingWALocations(
+            updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
                 callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
                 caseDataBuilder
-            );
+            ));
         }
 
         var state = "CASE_PROGRESSION";

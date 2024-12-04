@@ -22,10 +22,7 @@ import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -51,7 +48,7 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
     private static final String ERROR_SELECT_DIFF_LOCATION = "Select a different hearing court location to transfer!";
     private static final String CONFIRMATION_HEADER = "# Case transferred to new location";
     private final FeatureToggleService featureToggleService;
-    private final UpdateWaCourtLocationsService updateWaCourtLocationsService;
+    private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -124,10 +121,10 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
             caseDataBuilder.caseManagementLocation(LocationHelper.buildCaseLocation(newCourtLocation));
             caseDataBuilder.locationName(newCourtLocation.getSiteName());
             if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-                updateWaCourtLocationsService.updateCourtListingWALocations(
+                updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
                     callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
                     caseDataBuilder
-                );
+                ));
             }
         }
 

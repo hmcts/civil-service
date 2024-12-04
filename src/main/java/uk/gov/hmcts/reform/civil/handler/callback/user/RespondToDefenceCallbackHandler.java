@@ -92,7 +92,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     private final CaseDetailsConverter caseDetailsConverter;
     private final FrcDocumentsUtils frcDocumentsUtils;
     @Value("${court-location.unspecified-claim.epimms-id}") String ccmccEpimsId;
-    private final UpdateWaCourtLocationsService updateWaCourtLocationsService;
+    private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -310,10 +310,10 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         }
 
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-            updateWaCourtLocationsService.updateCourtListingWALocations(
+            updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
                 callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
                 builder
-            );
+            ));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

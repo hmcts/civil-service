@@ -69,6 +69,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
@@ -187,7 +188,9 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         handler = new GenerateDirectionOrderCallbackHandler(locationRefDataService, mapper, judgeFinalOrderGenerator, judgeOrderDownloadGenerator,
                                                             locationHelper, theUserService, workingDayIndicator,
-                                                             featureToggleService, updateWaCourtLocationsService);
+                                                            featureToggleService,
+                                                            Optional.of(updateWaCourtLocationsService)
+        );
     }
 
     @Nested
