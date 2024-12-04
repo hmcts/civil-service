@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -53,6 +54,7 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
     private static final String CONFIRMATION_HEADER = "# Case transferred to new location";
     private final FeatureToggleService featureToggleService;
     private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
+    @Value("${court_location_dmn.enabled}") String courtToggle;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -68,6 +70,9 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<String> errors = new ArrayList<>();
+
+//        System.out.println("TESTT " + redirectUrl);
+//        System.out.println("TESTT " + courtToggle);
 
         if (ifSameCourtSelected(callbackParams)) {
             errors.add(ERROR_SELECT_DIFF_LOCATION);
@@ -124,7 +129,7 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
         if (nonNull(newCourtLocation)) {
             caseDataBuilder.caseManagementLocation(LocationHelper.buildCaseLocation(newCourtLocation));
             caseDataBuilder.locationName(newCourtLocation.getSiteName());
-            log.info("MINTI toggle {}", featureToggleService.isMultiOrIntermediateTrackEnabled(caseData));
+            log.info("MINTI toggle and {} and COURT DMN {}", featureToggleService.isMultiOrIntermediateTrackEnabled(caseData), courtToggle);
             if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
                 updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
                     callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),

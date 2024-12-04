@@ -24,13 +24,12 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 @RequiredArgsConstructor
 @Service
 @Slf4j
-@ConditionalOnProperty(value = "court_location_dmn.dmn.simplification.enabled", havingValue = "true")
+@ConditionalOnProperty(value = "court_location_dmn.enabled", havingValue = "true")
 public class UpdateWaCourtLocationsService {
 
     private final CamundaRuntimeClient camundaRuntimeClient;
     private final ObjectMapper objectMapper;
     private final LocationReferenceDataService locationRefDataService;
-    private final FeatureToggleService featureToggleService;
     @Value("${court-location.specified-claim.epimms-id}") private String cnbcEpimmId;
 
     public void updateCourtListingWALocations(String authorisation, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {

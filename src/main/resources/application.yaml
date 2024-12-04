@@ -773,9 +773,7 @@ idam:
 caseFlags:
   logging:
     enabled: ${CASE_FLAGS_LOGGING_ENABLED:false}
+---
 
 court_location_dmn:
-  dmn:
-    simplification:
-      enabled: true
-
+  enabled: ${COURT_LOCATION_WA_DMN_ENABLED:false}
