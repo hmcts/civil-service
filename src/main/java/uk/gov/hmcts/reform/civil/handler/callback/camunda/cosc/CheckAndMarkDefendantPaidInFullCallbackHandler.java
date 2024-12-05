@@ -16,8 +16,8 @@ import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
-import uk.gov.hmcts.reform.civil.service.Time;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -76,7 +76,7 @@ public class CheckAndMarkDefendantPaidInFullCallbackHandler extends CallbackHand
             ));
             caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(caseData.getActiveJudgment()));
         }
-        caseData.setJoDefendantMarkedPaidInFullIssueDate(time.now());
+        caseData.setJoDefendantMarkedPaidInFullIssueDate(LocalDateTime.now());
         caseData.setJoCoscRpaStatus(JudgmentState.CANCELLED.equals(caseData.getActiveJudgment().getState()) ? CANCELLED : SATISFIED);
 
         return AboutToStartOrSubmitCallbackResponse.builder()

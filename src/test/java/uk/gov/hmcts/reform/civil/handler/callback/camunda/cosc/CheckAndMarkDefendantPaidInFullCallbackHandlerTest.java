@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
-import uk.gov.hmcts.reform.civil.service.Time;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import static org.mockito.Mockito.times;

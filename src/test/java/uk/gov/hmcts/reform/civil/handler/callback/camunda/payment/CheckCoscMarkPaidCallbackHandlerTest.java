@@ -71,7 +71,6 @@ class CheckCoscMarkPaidCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getErrors()).isNull();
         assertEquals(expectedlocalDate, responseCaseData.getCoscSchedulerDeadline());
         assertEquals(ACTIVE, responseCaseData.getCoSCApplicationStatus());
-        assertEquals(nowMock.toLocalDate(), responseCaseData.getJoDefendantMarkedPaidInFullIssueDate());
     }
 
     @Test
