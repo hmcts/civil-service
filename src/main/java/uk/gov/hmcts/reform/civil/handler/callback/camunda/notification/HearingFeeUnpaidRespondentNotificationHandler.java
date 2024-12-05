@@ -103,7 +103,8 @@ public class HearingFeeUnpaidRespondentNotificationHandler extends CallbackHandl
         return new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
     }
 

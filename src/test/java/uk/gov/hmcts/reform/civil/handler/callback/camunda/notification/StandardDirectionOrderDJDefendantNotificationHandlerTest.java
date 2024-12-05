@@ -36,6 +36,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -177,7 +178,8 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
             return Map.of(
                 "legalOrgName", "Test Org Name",
                 "claimReferenceNumber", "1594901956117591",
-                "partyReferences", "Claimant reference: 12345 - Defendant reference: 6789"
+                "partyReferences", "Claimant reference: 12345 - Defendant reference: 6789",
+                CASEMAN_REF, "000DC001"
             );
         }
 
@@ -185,7 +187,8 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
             return Map.of(
                 "legalOrgName", "Mr. Sole Trader",
                 "claimReferenceNumber", "1594901956117591",
-                "partyReferences", "Claimant reference: 12345 - Defendant reference: 6789"
+                "partyReferences", "Claimant reference: 12345 - Defendant reference: 6789",
+                CASEMAN_REF, "000DC001"
             );
         }
 
@@ -193,7 +196,8 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
             return Map.of(
                 "legalOrgName", "Mr. John Rambo",
                 "claimReferenceNumber", "1594901956117591",
-                "partyReferences", "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: 01234"
+                "partyReferences", "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: 01234",
+                CASEMAN_REF, "000DC001"
             );
         }
     }

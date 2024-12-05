@@ -97,7 +97,8 @@ public class DJCaseworkerReceivedNotificationHandler extends CallbackHandler imp
             AMOUNT_OF_COSTS, amountOfCosts.toString(),
             AMOUNT_PAID, partialPayment.toString(),
             AMOUNT_OF_JUDGMENT, total.toString(),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
     }
 

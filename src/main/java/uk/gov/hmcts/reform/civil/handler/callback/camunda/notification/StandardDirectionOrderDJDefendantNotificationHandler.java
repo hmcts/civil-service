@@ -111,7 +111,8 @@ public class StandardDirectionOrderDJDefendantNotificationHandler extends Callba
         return new HashMap<>(Map.of(
             LEGAL_ORG_NAME, getLegalOrganizationName(caseData),
             CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
     }
 
@@ -119,7 +120,8 @@ public class StandardDirectionOrderDJDefendantNotificationHandler extends Callba
         return new HashMap<>(Map.of(
             LEGAL_ORG_NAME, getLegalOrganizationDef2Name(caseData),
             CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
     }
 

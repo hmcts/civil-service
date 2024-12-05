@@ -42,6 +42,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
@@ -596,7 +597,8 @@ public class NotificationDefendantOfHearingHandlerTest {
                 PARTY_REFERENCES, is1v2
                     ? "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: 6789"
                     : "Claimant reference: 12345 - Defendant reference: 6789",
-                CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
+                CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
+                CASEMAN_REF, "000DC001"
             );
         }
 
@@ -607,7 +609,8 @@ public class NotificationDefendantOfHearingHandlerTest {
                 "defendantReferenceNumber", "6789", "hearingDate", "07-10-2022",
                 "hearingTime", "03:30pm",
                 PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
+                CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
+                CASEMAN_REF, "000DC001"
             );
         }
 
@@ -618,7 +621,8 @@ public class NotificationDefendantOfHearingHandlerTest {
                 "defendantReferenceNumber", "", "hearingDate", "07-10-2022",
                 "hearingTime", "03:30pm",
                 PARTY_REFERENCES, "Claimant reference: Not provided - Defendant reference: Not provided",
-                CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
+                CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
+                CASEMAN_REF, "000DC001"
             );
         }
 
@@ -629,7 +633,8 @@ public class NotificationDefendantOfHearingHandlerTest {
                 "defendantReferenceNumber", "10111213", "hearingDate", "07-10-2022",
                 "hearingTime", "03:30pm",
                 PARTY_REFERENCES, "Claimant reference: Not provided - Defendant 1 reference: 6789 - Defendant 2 reference: 10111213",
-                CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
+                CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
+                CASEMAN_REF, "000DC001"
             );
         }
 
@@ -640,7 +645,8 @@ public class NotificationDefendantOfHearingHandlerTest {
                 "defendantReferenceNumber", "", "hearingDate", "07-10-2022",
                 "hearingTime", "03:30pm",
                 CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
-                PARTY_REFERENCES, "Claimant reference: Not provided - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided"
+                PARTY_REFERENCES, "Claimant reference: Not provided - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided",
+                CASEMAN_REF, "000DC001"
             );
         }
 
@@ -650,7 +656,8 @@ public class NotificationDefendantOfHearingHandlerTest {
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 "hearingDate", "17-05-2023", "hearingTime", "11:00am",
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                CLAIM_LEGAL_ORG_NAME_SPEC, "John Doe"
+                CLAIM_LEGAL_ORG_NAME_SPEC, "John Doe",
+                CASEMAN_REF, "000DC001"
             );
         }
 
@@ -660,7 +667,8 @@ public class NotificationDefendantOfHearingHandlerTest {
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 "hearingDate", "17-05-2023", "hearingTime", "01:00pm",
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                CLAIM_LEGAL_ORG_NAME_SPEC, "John Doe"
+                CLAIM_LEGAL_ORG_NAME_SPEC, "John Doe",
+                CASEMAN_REF, "000DC001"
             );
         }
 

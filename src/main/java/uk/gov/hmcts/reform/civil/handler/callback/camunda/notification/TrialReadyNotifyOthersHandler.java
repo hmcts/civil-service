@@ -170,7 +170,8 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
             PARTY_NAME,
             isApplicant ? caseData.getApplicant1().getPartyName() : caseData.getRespondent1().getPartyName(),
             CLAIMANT_V_DEFENDANT,
-            getAllPartyNames(caseData)
+            getAllPartyNames(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
@@ -179,7 +180,8 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
         return new HashMap<>(Map.of(
             HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
     }
 

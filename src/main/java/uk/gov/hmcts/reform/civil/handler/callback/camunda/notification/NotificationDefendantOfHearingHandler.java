@@ -126,7 +126,8 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
             hearingTime = NotificationUtils.getFormattedHearingTime(hearingStartDateTime.toLocalTime().toString());
         }
         return new HashMap<>(Map.of(CLAIM_REFERENCE_NUMBER, legacyCaseRef, HEARING_DATE, hearingDate, HEARING_TIME, hearingTime,
-                                    CLAIM_LEGAL_ORG_NAME_SPEC, orgName, PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)));
+                                    CLAIM_LEGAL_ORG_NAME_SPEC, orgName, PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                                    CASEMAN_REF, caseData.getLegacyCaseReference()));
     }
 
     public Map<String, String> addPropertiesHmc(final CaseData caseData, boolean isDefendant1) {
@@ -142,7 +143,8 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
             NotificationUtils.getFormattedHearingDate(hearingStartDateTime.toLocalDate()),
             HEARING_TIME,
             NotificationUtils.getFormattedHearingTime(hearingStartDateTime.toLocalTime().toString()),
-            CLAIM_LEGAL_ORG_NAME_SPEC, orgName, PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            CLAIM_LEGAL_ORG_NAME_SPEC, orgName, PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
     }
 

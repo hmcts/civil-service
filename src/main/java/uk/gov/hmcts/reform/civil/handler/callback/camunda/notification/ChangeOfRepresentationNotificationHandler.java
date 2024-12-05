@@ -141,7 +141,8 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
             FORMER_SOL, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToRemoveID()),
             NEW_SOL, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID()),
             OTHER_SOL_NAME, getOtherSolicitorOrganisationName(caseData, event),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference());
     }
 
     private String getOrganisationName(String orgToName) {

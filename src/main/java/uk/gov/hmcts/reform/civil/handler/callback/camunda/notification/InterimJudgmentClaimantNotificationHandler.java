@@ -101,7 +101,8 @@ public class InterimJudgmentClaimantNotificationHandler extends CallbackHandler 
             LEGAL_REP_CLAIMANT, getLegalOrganizationName(caseData),
             CLAIM_NUMBER_INTERIM, caseData.getCcdCaseReference().toString(),
             DEFENDANT_NAME_INTERIM, caseData.getRespondent1().getPartyName(),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
     }
 
@@ -110,7 +111,8 @@ public class InterimJudgmentClaimantNotificationHandler extends CallbackHandler 
             LEGAL_REP_CLAIMANT, getLegalOrganizationName(caseData),
             CLAIM_NUMBER_INTERIM, caseData.getCcdCaseReference().toString(),
             DEFENDANT_NAME_INTERIM, caseData.getRespondent2().getPartyName(),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
     }
 

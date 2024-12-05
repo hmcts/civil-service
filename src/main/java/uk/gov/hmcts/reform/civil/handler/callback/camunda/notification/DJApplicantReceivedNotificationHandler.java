@@ -146,7 +146,8 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
                                                                .getOrganisationID(), caseData),
             CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
@@ -165,7 +166,8 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
                                                               .getOrganisationID(), caseData),
             CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
             DEFENDANT_NAME, caseData.getDefendantDetailsSpec().getValue().getLabel(),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
@@ -176,7 +178,8 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
                                                               .getOrganisationID(), caseData),
             CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
@@ -187,7 +190,8 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
                                                               .getOrganisationID(), caseData),
             CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 

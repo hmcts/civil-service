@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.AMOUNT_OF_COSTS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.AMOUNT_OF_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.AMOUNT_PAID;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PAYMENT_TYPE;
@@ -173,7 +174,8 @@ class DJCaseworkerReceivedNotificationHandlerTest {
                 AMOUNT_OF_COSTS, "103.00",
                 AMOUNT_PAID, "0",
                 AMOUNT_OF_JUDGMENT, "1203.00",
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: 01234"
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: 01234",
+                CASEMAN_REF, "000DC001"
             );
         }
 
@@ -187,7 +189,8 @@ class DJCaseworkerReceivedNotificationHandlerTest {
                 AMOUNT_OF_COSTS, "103.00",
                 AMOUNT_PAID, "0",
                 AMOUNT_OF_JUDGMENT, "1203.00",
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: 01234"
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: 01234",
+                CASEMAN_REF, "000DC001"
             );
         }
     }

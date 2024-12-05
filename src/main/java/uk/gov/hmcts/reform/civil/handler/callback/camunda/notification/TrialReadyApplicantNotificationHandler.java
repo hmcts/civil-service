@@ -84,19 +84,12 @@ public class TrialReadyApplicantNotificationHandler extends CallbackHandler impl
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        String claimRefNumber;
-        if (caseData.getSolicitorReferences() == null
-            || caseData.getSolicitorReferences().getApplicantSolicitor1Reference() == null) {
-            claimRefNumber = "";
-        } else {
-            claimRefNumber = caseData.getSolicitorReferences().getApplicantSolicitor1Reference();
-        }
-
         return Map.of(
             HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService)
+            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
@@ -114,7 +107,8 @@ public class TrialReadyApplicantNotificationHandler extends CallbackHandler impl
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_NAME, caseData.getApplicant1().getPartyName(),
-            CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
+            CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 

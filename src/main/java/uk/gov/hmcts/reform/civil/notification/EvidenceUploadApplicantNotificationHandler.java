@@ -73,7 +73,8 @@ public class EvidenceUploadApplicantNotificationHandler implements NotificationD
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CLAIM_LEGAL_ORG_NAME_SPEC, YesOrNo.NO.equals(caseData.getApplicant1Represented())
             ? caseData.getApplicant1().getPartyName()
-                : getApplicantLegalOrganizationName(caseData, organisationService)
+                : getApplicantLegalOrganizationName(caseData, organisationService),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 }

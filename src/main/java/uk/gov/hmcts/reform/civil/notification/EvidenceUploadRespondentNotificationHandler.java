@@ -77,7 +77,8 @@ public class EvidenceUploadRespondentNotificationHandler implements Notification
     public Map<String, String> addProperties(CaseData caseData) {
         return new HashMap<>(Map.of(
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            UPLOADED_DOCUMENTS, caseData.getNotificationText()
+            UPLOADED_DOCUMENTS, caseData.getNotificationText(),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
     }
 

@@ -48,6 +48,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationClaimantOfHearingHandler.TASK_ID_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationClaimantOfHearingHandler.TASK_ID_CLAIMANT_HMC;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
@@ -663,7 +664,8 @@ class NotificationClaimantOfHearingHandlerTest {
             "hearingDate", "07-10-2022", "hearingTime", "03:30pm", "hearingDueDate", "23-11-2022",
             CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
             PARTY_REFERENCES, is1v2 ? "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided"
-                : "Claimant reference: 12345 - Defendant reference: 6789"
+                : "Claimant reference: 12345 - Defendant reference: 6789",
+            CASEMAN_REF, "000DC001"
         );
     }
 
@@ -673,7 +675,8 @@ class NotificationClaimantOfHearingHandlerTest {
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(), "hearingFee", "£300.00",
             "hearingDate", "07-10-2022", "hearingTime", "03:30pm", "hearingDueDate", "06-10-2022",
             CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+            CASEMAN_REF, "000DC001"
         );
     }
 
@@ -684,7 +687,8 @@ class NotificationClaimantOfHearingHandlerTest {
             "claimantReferenceNumber", "12345", "hearingDate", "07-10-2022", "hearingTime", "08:30am",
             CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
             PARTY_REFERENCES, is1v2 ? "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided"
-                : "Claimant reference: 12345 - Defendant reference: 6789"
+                : "Claimant reference: 12345 - Defendant reference: 6789",
+            CASEMAN_REF, "000DC001"
         );
     }
 
@@ -695,7 +699,8 @@ class NotificationClaimantOfHearingHandlerTest {
             "claimantReferenceNumber", "12345", "hearingDate", "07-10-2022",
             "hearingTime", "08:30am", "hearingDueDate", "",
             CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+            CASEMAN_REF, "000DC001"
         );
     }
 
@@ -705,7 +710,8 @@ class NotificationClaimantOfHearingHandlerTest {
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(), "hearingFee", "£0.00",
             "hearingDate", "07-10-2022", "hearingTime", "08:30am", "hearingDueDate", "06-10-2022",
             CLAIM_LEGAL_ORG_NAME_SPEC, caseData.getApplicant1().getPartyName(),
-            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+            CASEMAN_REF, "000DC001"
         );
     }
 
@@ -716,7 +722,8 @@ class NotificationClaimantOfHearingHandlerTest {
             "claimantReferenceNumber", "", "hearingFee", "£300.00",
             "hearingDate", "07-10-2022", "hearingTime", "03:30pm", "hearingDueDate", "06-10-2022",
             CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-            PARTY_REFERENCES, "Claimant reference: Not provided - Defendant reference: Not provided"
+            PARTY_REFERENCES, "Claimant reference: Not provided - Defendant reference: Not provided",
+            CASEMAN_REF, "000DC001"
         );
     }
 
@@ -726,7 +733,8 @@ class NotificationClaimantOfHearingHandlerTest {
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             "claimantReferenceNumber", "", "hearingDate", "07-10-2022", "hearingTime", "03:30pm",
             CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-            PARTY_REFERENCES, "Claimant reference: Not provided - Defendant reference: Not provided"
+            PARTY_REFERENCES, "Claimant reference: Not provided - Defendant reference: Not provided",
+            CASEMAN_REF, "000DC001"
         );
     }
 
@@ -736,7 +744,8 @@ class NotificationClaimantOfHearingHandlerTest {
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             "claimantReferenceNumber", "", "hearingDate", "07-10-2022", "hearingTime", "03:30pm",
             CLAIM_LEGAL_ORG_NAME_SPEC, caseData.getApplicant1().getPartyName(),
-            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+            CASEMAN_REF, "000DC001"
         );
     }
 
@@ -746,7 +755,8 @@ class NotificationClaimantOfHearingHandlerTest {
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             "hearingDate", "17-05-2023", "hearingTime", "10:30am",
             CLAIM_LEGAL_ORG_NAME_SPEC, caseData.getApplicant1().getPartyName(),
-            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+            CASEMAN_REF, "000DC001"
         );
     }
 
@@ -756,7 +766,8 @@ class NotificationClaimantOfHearingHandlerTest {
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(), "hearingFee", "£0.00",
             "hearingDate", "07-10-2022", "hearingTime", "03:30pm", "hearingDueDate", "06-10-2022",
             CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+            CASEMAN_REF, "000DC001"
         );
     }
 
