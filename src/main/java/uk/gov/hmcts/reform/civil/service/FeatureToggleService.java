@@ -49,7 +49,6 @@ public class FeatureToggleService {
     public boolean isLipVLipEnabled() {
         return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled");
     }
-
     public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
         return
             // because default value is true
@@ -139,6 +138,12 @@ public class FeatureToggleService {
         return location != null
             && featureToggleApi.isFeatureEnabledForLocation("case-progression-location-whitelist", location, true)
             && isCaseProgressionEnabled();
+    }
+
+    public boolean isGaForLipsEnabledAndLocationWhiteListed(String location) {
+        return location != null
+            && featureToggleApi.isFeatureEnabledForLocation("ea-courts-whitelisted-for-ga-lips", location, false)
+            && isGaForLipsEnabled();
     }
 
     public boolean isHmcNroEnabled() {
