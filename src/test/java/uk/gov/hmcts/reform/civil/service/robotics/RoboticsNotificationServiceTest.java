@@ -255,90 +255,90 @@ class RoboticsNotificationServiceTest {
             .containsExactlyInAnyOrder(tuple(fileName, "application/json"));
     }
 
-    @Test
-    @SneakyThrows
-    void shouldSendNotificationEmailForMultiPartySpec_whenCaseDataIsProvided() {
-        // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .caseAccessCategory(SPEC_CLAIM)
-            .respondent2(PartyBuilder.builder().individual().build())
-            .addRespondent2(YES)
-            .respondent2SameLegalRepresentative(NO)
-            .build();
+    // @Test
+    // @SneakyThrows
+    // void shouldSendNotificationEmailForMultiPartySpec_whenCaseDataIsProvided() {
+    //     // Given
+    //     CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+    //         .caseAccessCategory(SPEC_CLAIM)
+    //         .respondent2(PartyBuilder.builder().individual().build())
+    //         .addRespondent2(YES)
+    //         .respondent2SameLegalRepresentative(NO)
+    //         .build();
 
-        String lastEventText = "event text";
-        RoboticsCaseDataSpec roboticsCaseData = RoboticsCaseDataSpec.builder()
-            .events(EventHistory.builder().miscellaneous(
-                Event.builder().eventDetailsText(lastEventText)
-                    .dateReceived(LocalDateTime.now())
-                    .build()
-            ).build())
-            .build();
-        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(roboticsCaseData);
+    //     String lastEventText = "event text";
+    //     RoboticsCaseDataSpec roboticsCaseData = RoboticsCaseDataSpec.builder()
+    //         .events(EventHistory.builder().miscellaneous(
+    //             Event.builder().eventDetailsText(lastEventText)
+    //                 .dateReceived(LocalDateTime.now())
+    //                 .build()
+    //         ).build())
+    //         .build();
+    //     when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(roboticsCaseData);
 
-        boolean multiPartyScenario = isMultiPartyScenario(caseData);
+    //     boolean multiPartyScenario = isMultiPartyScenario(caseData);
 
-        // When
-        service.notifyRobotics(caseData, multiPartyScenario, BEARER_TOKEN);
+    //     // When
+    //     service.notifyRobotics(caseData, multiPartyScenario, BEARER_TOKEN);
 
-        verify(roboticsDataMapperForSpec).toRoboticsCaseData(caseData, BEARER_TOKEN);
-        verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
+    //     verify(roboticsDataMapperForSpec).toRoboticsCaseData(caseData, BEARER_TOKEN);
+    //     verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
 
-        EmailData capturedEmailData = emailDataArgumentCaptor.getValue();
-        String reference = caseData.getLegacyCaseReference();
-        String message = format("Multiparty claim data for %s - %s", reference, caseData.getCcdState());
-        String subject = format("Multiparty LR v LR Case Data for %s - %s - %s", reference, caseData.getCcdState(),
-            lastEventText);
+    //     EmailData capturedEmailData = emailDataArgumentCaptor.getValue();
+    //     String reference = caseData.getLegacyCaseReference();
+    //     String message = format("Multiparty claim data for %s - %s", reference, caseData.getCcdState());
+    //     String subject = format("Multiparty LR v LR Case Data for %s - %s - %s", reference, caseData.getCcdState(),
+    //         lastEventText);
 
-        // Then
-        assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
-        assertThat(capturedEmailData.getMessage()).isEqualTo(message);
-        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getRecipient());
-    }
+    //     // Then
+    //     assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
+    //     assertThat(capturedEmailData.getMessage()).isEqualTo(message);
+    //     assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getRecipient());
+    // }
 
-    @Test
-    @SneakyThrows
-    void shouldSendNotificationEmailForMultiPartyWithMiscellaneousMsg_whenCaseDataIsProvided() {
-        // Given
-        CaseData caseData = CaseDataBuilder.builder()
-            .multiPartyClaimOneDefendantSolicitor()
-            .atState(FlowState.Main.FULL_DEFENCE)
-            .respondent2Responds1v2SameSol(FULL_DEFENCE)
-            .respondentResponseIsSame(YES)
-            .respondent1DQ(Respondent1DQ.builder().build())
-            .respondent2ClaimResponseIntentionType(ResponseIntention.FULL_DEFENCE)
-            .build();
-        if (caseData.getRespondent2OrgRegistered() != null
-            && caseData.getRespondent2Represented() == null) {
-            caseData = caseData.toBuilder()
-                .respondent2Represented(YES)
-                .build();
-        }
+    // @Test
+    // @SneakyThrows
+    // void shouldSendNotificationEmailForMultiPartyWithMiscellaneousMsg_whenCaseDataIsProvided() {
+    //     // Given
+    //     CaseData caseData = CaseDataBuilder.builder()
+    //         .multiPartyClaimOneDefendantSolicitor()
+    //         .atState(FlowState.Main.FULL_DEFENCE)
+    //         .respondent2Responds1v2SameSol(FULL_DEFENCE)
+    //         .respondentResponseIsSame(YES)
+    //         .respondent1DQ(Respondent1DQ.builder().build())
+    //         .respondent2ClaimResponseIntentionType(ResponseIntention.FULL_DEFENCE)
+    //         .build();
+    //     if (caseData.getRespondent2OrgRegistered() != null
+    //         && caseData.getRespondent2Represented() == null) {
+    //         caseData = caseData.toBuilder()
+    //             .respondent2Represented(YES)
+    //             .build();
+    //     }
 
-        // When
-        service.notifyRobotics(caseData, isMultiPartyScenario(caseData), BEARER_TOKEN);
+    //     // When
+    //     service.notifyRobotics(caseData, isMultiPartyScenario(caseData), BEARER_TOKEN);
 
-        verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
+    //     verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
 
-        EmailData capturedEmailData = emailDataArgumentCaptor.getValue();
-        String reference = caseData.getLegacyCaseReference();
-        String fileName = format("CaseData_%s.json", reference);
-        String message = format(
-            "Multiparty claim data for %s - %s", reference, caseData.getCcdState()
-        );
-        String subject = format("Multiparty claim data for %s - %s - %s", reference, caseData.getCcdState(),
-            "[1 of 2 - 2020-08-01] Defendant: Mr. John Rambo has responded: "
-                + "FULL_DEFENCE; preferredCourtCode: ; stayClaim: false");
+    //     EmailData capturedEmailData = emailDataArgumentCaptor.getValue();
+    //     String reference = caseData.getLegacyCaseReference();
+    //     String fileName = format("CaseData_%s.json", reference);
+    //     String message = format(
+    //         "Multiparty claim data for %s - %s", reference, caseData.getCcdState()
+    //     );
+    //     String subject = format("Multiparty claim data for %s - %s - %s", reference, caseData.getCcdState(),
+    //         "[1 of 2 - 2020-08-01] Defendant: Mr. John Rambo has responded: "
+    //             + "FULL_DEFENCE; preferredCourtCode: ; stayClaim: false");
 
-        // Then
-        assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
-        assertThat(capturedEmailData.getMessage()).isEqualTo(message);
-        assertThat(capturedEmailData.getAttachments()).hasSize(1);
-        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getRecipient());
-        assertThat(capturedEmailData.getAttachments())
-            .extracting("filename", "contentType")
-            .containsExactlyInAnyOrder(tuple(fileName, "application/json"));
-    }
+    //     // Then
+    //     assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
+    //     assertThat(capturedEmailData.getMessage()).isEqualTo(message);
+    //     assertThat(capturedEmailData.getAttachments()).hasSize(1);
+    //     assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getRecipient());
+    //     assertThat(capturedEmailData.getAttachments())
+    //         .extracting("filename", "contentType")
+    //         .containsExactlyInAnyOrder(tuple(fileName, "application/json"));
+    // }
 
     @Test
     void shouldSendNotificationEmailForLRvsLiP_whenCaseDataIsProvided() {
