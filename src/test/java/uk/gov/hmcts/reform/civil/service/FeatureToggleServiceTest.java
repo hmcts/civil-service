@@ -196,9 +196,7 @@ class FeatureToggleServiceTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsCarmEnabled(Boolean toggleStat) {
-        var carmKey = "carm";
         var carmDateKey = "cam-enabled-for-case";
-        givenToggle(carmKey, toggleStat);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
             .setClaimTypeToSpecClaim()
@@ -301,5 +299,15 @@ class FeatureToggleServiceTest {
         when(featureToggleService.isJOLiveFeedActive())
             .thenReturn(toggleStat);
         assertThat(featureToggleService.isJOLiveFeedActive()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsDefendantNoCOnline(Boolean toggleStat) {
+        var isDefendantNoCOnline = "isDefendantNoCOnline";
+        givenToggle(isDefendantNoCOnline, toggleStat);
+
+        assertThat(featureToggleService.isDefendantNoCOnline()).isEqualTo(toggleStat);
+
     }
 }
