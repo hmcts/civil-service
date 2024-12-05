@@ -49,6 +49,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DECISION_ON_RECONSIDERATION_REQUEST;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
@@ -68,6 +69,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_PAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED_RETRIGGER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
@@ -112,6 +114,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOC
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_LISTING_COMPLETED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CASE_STAYED;
@@ -304,7 +307,8 @@ public class FlowStateAllowedEventService {
                 RECORD_JUDGMENT,
                 EDIT_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
-                SET_ASIDE_JUDGMENT
+                SET_ASIDE_JUDGMENT,
+                CONFIRM_ORDER_REVIEW
             )
         ),
 
@@ -336,7 +340,8 @@ public class FlowStateAllowedEventService {
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
                 DISCONTINUE_CLAIM_CLAIMANT,
-                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                CONFIRM_ORDER_REVIEW
             )
         ),
 
@@ -367,6 +372,8 @@ public class FlowStateAllowedEventService {
                 HEARING_FEE_UNPAID,
                 HEARING_FEE_PAID,
                 HEARING_SCHEDULED,
+                HEARING_SCHEDULED_RETRIGGER,
+                CONFIRM_LISTING_COMPLETED,
                 TRIAL_READY_CHECK,
                 TRIAL_READY_NOTIFICATION,
                 MOVE_TO_DECISION_OUTCOME,
@@ -386,7 +393,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW
             )
         ),
 
@@ -416,6 +424,8 @@ public class FlowStateAllowedEventService {
                 TAKE_CASE_OFFLINE,
                 EVIDENCE_UPLOAD_JUDGE,
                 HEARING_SCHEDULED,
+                HEARING_SCHEDULED_RETRIGGER,
+                CONFIRM_LISTING_COMPLETED,
                 GENERATE_DIRECTIONS_ORDER,
                 TRANSFER_ONLINE_CASE,
                 COURT_OFFICER_ORDER,
@@ -425,7 +435,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW
             )
         ),
 
@@ -455,6 +466,8 @@ public class FlowStateAllowedEventService {
                 TAKE_CASE_OFFLINE,
                 EVIDENCE_UPLOAD_JUDGE,
                 HEARING_SCHEDULED,
+                HEARING_SCHEDULED_RETRIGGER,
+                CONFIRM_LISTING_COMPLETED,
                 GENERATE_DIRECTIONS_ORDER,
                 TRANSFER_ONLINE_CASE,
                 COURT_OFFICER_ORDER,
@@ -464,7 +477,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW
             )
         ),
 
@@ -499,6 +513,8 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_JUDGE,
                 TRIAL_READINESS,
                 HEARING_SCHEDULED,
+                HEARING_SCHEDULED_RETRIGGER,
+                CONFIRM_LISTING_COMPLETED,
                 TRIAL_READY_CHECK,
                 TRIAL_READY_NOTIFICATION,
                 MOVE_TO_DECISION_OUTCOME,
@@ -512,7 +528,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW
             )
         ),
 
@@ -544,7 +561,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW
             )
         ),
 
@@ -576,7 +594,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW
             )
         ),
 
@@ -608,7 +627,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW
             )
         ),
 
@@ -637,7 +657,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW
             )
         ),
 
@@ -666,7 +687,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW
             )
         ),
 
@@ -690,7 +712,8 @@ public class FlowStateAllowedEventService {
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
                 DISCONTINUE_CLAIM_CLAIMANT,
-                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                CONFIRM_ORDER_REVIEW
             )
         ),
 
@@ -719,6 +742,8 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 REQUEST_FOR_RECONSIDERATION,
                 HEARING_SCHEDULED,
+                HEARING_SCHEDULED_RETRIGGER,
+                CONFIRM_LISTING_COMPLETED,
                 HEARING_FEE_PAID,
                 HEARING_FEE_UNPAID,
                 TRIAL_READY_CHECK,
@@ -752,7 +777,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW
             )
         ),
 
@@ -779,7 +805,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW
             )
         ),
         entry(
@@ -999,7 +1026,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW
             )
         ),
         entry(
@@ -1023,6 +1051,8 @@ public class FlowStateAllowedEventService {
                 HEARING_FEE_UNPAID,
                 HEARING_FEE_PAID,
                 HEARING_SCHEDULED,
+                HEARING_SCHEDULED_RETRIGGER,
+                CONFIRM_LISTING_COMPLETED,
                 TRIAL_READY_CHECK,
                 TRIAL_READY_NOTIFICATION,
                 MOVE_TO_DECISION_OUTCOME,
@@ -1045,7 +1075,8 @@ public class FlowStateAllowedEventService {
                 AMEND_RESTITCH_BUNDLE,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW
             )
         ),
         entry(
@@ -1155,6 +1186,8 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 HEARING_SCHEDULED,
+                HEARING_SCHEDULED_RETRIGGER,
+                CONFIRM_LISTING_COMPLETED,
                 NotSuitable_SDO,
                 REQUEST_FOR_RECONSIDERATION,
                 EVIDENCE_UPLOAD_JUDGE,
@@ -1182,7 +1215,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW
             )
         ),
         entry(
@@ -1211,6 +1245,8 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 REQUEST_FOR_RECONSIDERATION,
                 HEARING_SCHEDULED,
+                HEARING_SCHEDULED_RETRIGGER,
+                CONFIRM_LISTING_COMPLETED,
                 TRIAL_READY_CHECK,
                 TRIAL_READY_NOTIFICATION,
                 MOVE_TO_DECISION_OUTCOME,
@@ -1229,7 +1265,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW
             )
         ),
         entry(
@@ -1259,7 +1296,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW
             )
         ),
 
@@ -1290,6 +1328,8 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_JUDGE,
                 TRIAL_READINESS,
                 HEARING_SCHEDULED,
+                HEARING_SCHEDULED_RETRIGGER,
+                CONFIRM_LISTING_COMPLETED,
                 TRIAL_READY_CHECK,
                 TRIAL_READY_NOTIFICATION,
                 MOVE_TO_DECISION_OUTCOME,
@@ -1303,7 +1343,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW
             )
         ),
 
@@ -1338,7 +1379,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                CONFIRM_ORDER_REVIEW
             )
         ),
 
@@ -1373,7 +1415,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                CONFIRM_ORDER_REVIEW
             )
         ),
         entry(
@@ -1415,7 +1458,8 @@ public class FlowStateAllowedEventService {
                 FULL_REMISSION_HWF,
                 UPDATE_HELP_WITH_FEE_NUMBER,
                 INVALID_HWF_REFERENCE,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                CONFIRM_ORDER_REVIEW
             )
         ),
 
@@ -1448,7 +1492,8 @@ public class FlowStateAllowedEventService {
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
                 DISCONTINUE_CLAIM_CLAIMANT,
-                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                CONFIRM_ORDER_REVIEW
             )
         ),
         entry(
@@ -1478,7 +1523,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                CONFIRM_ORDER_REVIEW
             )
         ),
         entry(
@@ -1526,6 +1572,8 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 REQUEST_FOR_RECONSIDERATION,
                 HEARING_SCHEDULED,
+                HEARING_SCHEDULED_RETRIGGER,
+                CONFIRM_LISTING_COMPLETED,
                 TRIAL_READY_CHECK,
                 TRIAL_READY_NOTIFICATION,
                 MOVE_TO_DECISION_OUTCOME,
@@ -1572,7 +1620,8 @@ public class FlowStateAllowedEventService {
                 FULL_REMISSION_HWF,
                 UPDATE_HELP_WITH_FEE_NUMBER,
                 INVALID_HWF_REFERENCE,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                CONFIRM_ORDER_REVIEW
             )
         ),
 
@@ -1599,7 +1648,8 @@ public class FlowStateAllowedEventService {
                 SETTLE_CLAIM_MARK_PAID_FULL,
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                CONFIRM_ORDER_REVIEW
             )
         ),
         entry(
@@ -1693,7 +1743,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW
             )
         ),
         entry(
@@ -1711,7 +1762,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                CONFIRM_ORDER_REVIEW
             )
         ),
         entry(
@@ -1731,7 +1783,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW
             )
         ),
         entry(
@@ -1750,6 +1803,8 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 REQUEST_FOR_RECONSIDERATION,
                 HEARING_SCHEDULED,
+                HEARING_SCHEDULED_RETRIGGER,
+                CONFIRM_LISTING_COMPLETED,
                 TRIAL_READY_CHECK,
                 TRIAL_READY_NOTIFICATION,
                 MOVE_TO_DECISION_OUTCOME,
@@ -1787,7 +1842,8 @@ public class FlowStateAllowedEventService {
                 AMEND_RESTITCH_BUNDLE,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW
             )
         ),
         entry(
@@ -1805,6 +1861,8 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 REQUEST_FOR_RECONSIDERATION,
                 HEARING_SCHEDULED,
+                HEARING_SCHEDULED_RETRIGGER,
+                CONFIRM_LISTING_COMPLETED,
                 TRIAL_READY_CHECK,
                 TRIAL_READY_NOTIFICATION,
                 MOVE_TO_DECISION_OUTCOME,
@@ -1843,7 +1901,8 @@ public class FlowStateAllowedEventService {
                 FULL_REMISSION_HWF,
                 UPDATE_HELP_WITH_FEE_NUMBER,
                 INVALID_HWF_REFERENCE,
-                AMEND_RESTITCH_BUNDLE
+                AMEND_RESTITCH_BUNDLE,
+                CONFIRM_ORDER_REVIEW
             )
         ),
         entry(
@@ -1861,7 +1920,8 @@ public class FlowStateAllowedEventService {
                 DISMISS_CASE,
                 MANAGE_STAY,
                 ADD_CASE_NOTE,
-                INITIATE_GENERAL_APPLICATION
+                INITIATE_GENERAL_APPLICATION,
+                CONFIRM_ORDER_REVIEW
             )
         ),
         entry(
@@ -1878,7 +1938,11 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 REQUEST_FOR_RECONSIDERATION,
+                DECISION_ON_RECONSIDERATION_REQUEST,
+                AMEND_RESTITCH_BUNDLE,
                 HEARING_SCHEDULED,
+                HEARING_SCHEDULED_RETRIGGER,
+                CONFIRM_LISTING_COMPLETED,
                 TRIAL_READY_CHECK,
                 TRIAL_READY_NOTIFICATION,
                 MOVE_TO_DECISION_OUTCOME,
@@ -1909,7 +1973,8 @@ public class FlowStateAllowedEventService {
                 LIP_CLAIM_SETTLED,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW
             )
         ),
         entry(
@@ -1927,7 +1992,8 @@ public class FlowStateAllowedEventService {
                 AMEND_RESTITCH_BUNDLE,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW
             )
         ),
         entry(
@@ -2040,7 +2106,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                CONFIRM_ORDER_REVIEW
             )
         ),
         entry(

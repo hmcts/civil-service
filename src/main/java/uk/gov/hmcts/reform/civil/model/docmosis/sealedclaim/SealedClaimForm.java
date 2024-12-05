@@ -43,4 +43,5 @@ public class SealedClaimForm implements MappableObject {
     private final String courtFee;
     private final String hearingCourtLocation;
     private final StatementOfTruth statementOfTruth;
+    private final String applicantRepresentativeOrganisationName;
 }

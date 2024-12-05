@@ -24,7 +24,7 @@ public class NoticeOfDiscontinuanceLiPLetterGenerator {
     private static final String NOTICE_OF_DISCONTINUANCE_LETTER = "notice-of-discontinuance";
 
     public void printNoticeOfDiscontinuanceLetter(CaseData caseData, String authorisation) {
-        CaseDocument discontinuanceCaseDocument = caseData.getNoticeOfDiscontinueAllParitiesDoc();
+        CaseDocument discontinuanceCaseDocument = caseData.getRespondent1NoticeOfDiscontinueAllPartyViewDoc();
         if (nonNull(discontinuanceCaseDocument)) {
             String documentUrl = discontinuanceCaseDocument.getDocumentLink().getDocumentUrl();
             String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);

@@ -79,9 +79,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         CaseData caseData = getUpdatedCaseData(callbackParams);
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
-        if (featureToggleService.isHmcEnabled()) {
-            populateDQPartyIds(builder);
-        }
+        populateDQPartyIds(builder);
 
         if (featureToggleService.isUpdateContactDetailsEnabled()) {
             addEventAndDateAddedToRespondentExperts(builder);
@@ -118,11 +116,13 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     private CaseData getUpdatedCaseData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         final BigDecimal respondToAdmittedClaimOwingAmount = caseData.getRespondToAdmittedClaimOwingAmount();
-        log.info(
-            "case id: {}, respondToAdmittedClaimOwingAmount: {}",
-            callbackParams.getRequest().getCaseDetails().getId(),
-            respondToAdmittedClaimOwingAmount == null ? "" : respondToAdmittedClaimOwingAmount.toString()
-        );
+        if (respondToAdmittedClaimOwingAmount != null) {
+            log.info(
+                "case id: {}, respondToAdmittedClaimOwingAmount: {}",
+                callbackParams.getRequest().getCaseDetails().getId(),
+                 respondToAdmittedClaimOwingAmount
+            );
+        }
         CaseDocument dummyDocument = new CaseDocument(null, null, null, 0, null, null, null);
         LocalDateTime responseDate = time.now();
         return caseData.toBuilder()

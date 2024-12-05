@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
@@ -94,7 +95,6 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.STATES_PAID;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SPEC_DEFENDANT_NOC;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
@@ -126,6 +126,7 @@ public class EventHistoryMapper {
     public static final String BS_END_DATE = "actual end date";
     public static final String RPA_REASON_MANUAL_DETERMINATION = "RPA Reason: Manual Determination Required.";
     public static final String RPA_REASON_JUDGMENT_BY_ADMISSION = "RPA Reason: Judgment by Admission requested and claim moved offline.";
+    public static final String RPA_RECORD_JUDGMENT = "Judgment recorded.";
     public static final String RPA_IN_MEDIATION = "IN MEDIATION";
     static final String ENTER = "Enter";
     static final String LIFTED = "Lifted";
@@ -498,13 +499,19 @@ public class EventHistoryMapper {
     private void buildCcjEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         if (caseData.isCcjRequestJudgmentByAdmission()) {
             buildJudgmentByAdmissionEventDetails(builder, caseData);
+
+            String miscTextRequested = RPA_REASON_JUDGMENT_BY_ADMISSION;
+            if (featureToggleService.isJOLiveFeedActive()) {
+                miscTextRequested = RPA_RECORD_JUDGMENT;
+            }
+
             builder.miscellaneous((Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
                 .eventCode(MISCELLANEOUS.getCode())
                 .dateReceived(setApplicant1ResponseDate(caseData))
-                .eventDetailsText(RPA_REASON_JUDGMENT_BY_ADMISSION)
+                .eventDetailsText(miscTextRequested)
                 .eventDetails(EventDetails.builder()
-                                  .miscText(RPA_REASON_JUDGMENT_BY_ADMISSION)
+                                  .miscText(miscTextRequested)
                                   .build())
                 .build()));
         }
@@ -545,7 +552,6 @@ public class EventHistoryMapper {
             .eventDetails(judgmentByAdmissionEvent)
             .eventDetailsText("")
             .build()));
-
     }
 
     private void buildRespondentDivergentResponse(EventHistory.EventHistoryBuilder builder, CaseData caseData,
@@ -2245,8 +2251,14 @@ public class EventHistoryMapper {
             && caseData.getDefendantDetailsSpec() != null
             && !caseData.getDefendantDetailsSpec().getValue()
             .getLabel().startsWith("Both");
-        String miscTextRequested = "RPA Reason: Default Judgment requested and claim moved offline.";
+        String miscTextRequested =  "RPA Reason: Default Judgment requested and claim moved offline.";
         String miscTextGranted = "RPA Reason: Default Judgment granted and claim moved offline.";
+
+        if (featureToggleService.isJOLiveFeedActive()
+            && caseData.getCcdState() == CaseState.All_FINAL_ORDERS_ISSUED) {
+            miscTextGranted = RPA_RECORD_JUDGMENT;
+        }
+
         if (caseData.getDefendantDetailsSpec() != null) {
             builder.miscellaneous(
                 Event.builder()

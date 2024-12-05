@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
 import uk.gov.hmcts.reform.civil.enums.ConfirmationToggle;
 import uk.gov.hmcts.reform.civil.enums.CoscApplicationStatus;
+import uk.gov.hmcts.reform.civil.enums.CourtStaffNextSteps;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
@@ -126,6 +127,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
+import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
@@ -147,12 +149,15 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final CaseState previousCCDState;
     private final String preStayState;
     private final String manageStayOption;
+    private final LocalDate manageStayUpdateRequestDate;
     private final GAApplicationType generalAppType;
     private final GAApplicationTypeLR generalAppTypeLR;
     private final GARespondentOrderAgreement generalAppRespondentAgreement;
     private final GAPbaDetails generalAppPBADetails;
     private final String generalAppDetailsOfOrder;
+    private final List<Element<String>> generalAppDetailsOfOrderColl;
     private final String generalAppReasonsOfOrder;
+    private final List<Element<String>> generalAppReasonsOfOrderColl;
     private final YesOrNo generalAppAskForCosts;
     private final GAInformOtherParty generalAppInformOtherParty;
     private final GAUrgencyRequirement generalAppUrgencyRequirement;
@@ -163,6 +168,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final SRPbaDetails claimIssuedPBADetails;
     private final String applicantPartyName;
     private final CertOfSC certOfSC;
+    private final String gaWaTrackLabel;
 
     private final YesOrNo generalAppVaryJudgementType;
     private final YesOrNo generalAppParentClaimantIsApplicant;
@@ -722,12 +728,19 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private SettlementReason settleReason;
     private final MarkPaidConsentList markPaidConsent;
     private YesOrNo claimantsConsentToDiscontinuance;
-    private CaseDocument noticeOfDiscontinueCWDoc;
-    private CaseDocument noticeOfDiscontinueAllParitiesDoc;
+    private CaseDocument applicant1NoticeOfDiscontinueCWViewDoc;
+    private CaseDocument respondent1NoticeOfDiscontinueCWViewDoc;
+    private CaseDocument respondent2NoticeOfDiscontinueCWViewDoc;
+    private CaseDocument applicant1NoticeOfDiscontinueAllPartyViewDoc;
+    private CaseDocument respondent1NoticeOfDiscontinueAllPartyViewDoc;
+    private CaseDocument respondent2NoticeOfDiscontinueAllPartyViewDoc;
+
     @JsonUnwrapped
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
     private LocalDate coscSchedulerDeadline;
     private CoscApplicationStatus coSCApplicationStatus;
+    private YesOrNo obligationDatePresent;
+    private CourtStaffNextSteps courtStaffNextSteps;
 
 
     /**
@@ -1054,12 +1067,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public String setUpJudgementFormattedPermittedDate(LocalDate extendedRespondent1ResponseDate) {
         if (isJudgementDateNotPermitted()) {
-            return formatLocalDateTime(
-                extendedRespondent1ResponseDate.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY),
-                DATE_TIME_AT
-            );
+            return getFormattedJudgementPermittedDate(extendedRespondent1ResponseDate);
         }
         return null;
+    }
+
+    @JsonIgnore
+    public String getFormattedJudgementPermittedDate(LocalDate extendedRespondent1ResponseDate) {
+        return formatLocalDateTime(
+            extendedRespondent1ResponseDate.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY),
+            DATE_TIME_AT
+        );
     }
 
     @JsonIgnore
@@ -1473,7 +1491,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    private boolean isDateAfterToday(LocalDate date) {
+    public boolean isDateAfterToday(LocalDate date) {
         return nonNull(date)
             && date.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
     }
@@ -1600,5 +1618,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isLipCase() {
         return this.isApplicant1NotRepresented() || this.isRespondent1LiP();
+    }
+
+    @JsonIgnore
+    public boolean isHearingFeePaid() {
+        return nonNull(this.getHearingFeePaymentDetails())
+            && SUCCESS.equals(this.getHearingFeePaymentDetails().getStatus()) || this.hearingFeePaymentDoneWithHWF();
     }
 }

@@ -132,12 +132,10 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(time.now()).willReturn(submittedDate);
             given(specReferenceNumberRepository.getSpecReferenceNumber()).willReturn(REFERENCE_NUMBER);
             given(deadlinesCalculator.plus28DaysAt4pmDeadline(any())).willReturn(submittedDate);
-            when(toggleService.isHmcEnabled()).thenReturn(false);
         }
 
         @Test
         void shouldInitializePartyID_whenInvoked() {
-            when(toggleService.isHmcEnabled()).thenReturn(true);
             caseData = CaseDataBuilder.builder()
                 .respondent1(Party.builder()
                     .type(Party.Type.INDIVIDUAL)
