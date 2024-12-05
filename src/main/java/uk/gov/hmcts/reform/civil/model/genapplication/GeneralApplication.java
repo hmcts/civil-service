@@ -31,7 +31,9 @@ public class GeneralApplication implements MappableObject {
     private final GAPbaDetails generalAppPBADetails;
     private final YesOrNo generalAppAskForCosts;
     private final String generalAppDetailsOfOrder;
+    private final List<Element<String>> generalAppDetailsOfOrderColl;
     private final String generalAppReasonsOfOrder;
+    private final List<Element<String>> generalAppReasonsOfOrderColl;
     private final GAInformOtherParty generalAppInformOtherParty;
     private final YesOrNo generalAppConsentOrder;
     private final GAUrgencyRequirement generalAppUrgencyRequirement;
@@ -72,6 +74,8 @@ public class GeneralApplication implements MappableObject {
     private final CertOfSC certOfSC;
     //caseName
     private final String caseNameGaInternal;
+    //WA claim track description
+    private final String gaWaTrackLabel;
 
     @JsonCreator
     GeneralApplication(@JsonProperty("generalApplicationState") String generalApplicationState,
@@ -83,7 +87,9 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("generalAppPBADetails") GAPbaDetails generalAppPBADetails,
                        @JsonProperty("generalAppAskForCosts") YesOrNo generalAppAskForCosts,
                        @JsonProperty("generalAppDetailsOfOrder") String generalAppDetailsOfOrder,
+                       @JsonProperty("generalAppDetailsOfOrderColl") List<Element<String>> generalAppDetailsOfOrderColl,
                        @JsonProperty("generalAppReasonsOfOrder") String generalAppReasonsOfOrder,
+                       @JsonProperty("generalAppReasonsOfOrderColl") List<Element<String>> generalAppReasonsOfOrderColl,
                        @JsonProperty("generalAppInformOtherParty") GAInformOtherParty generalAppInformOtherParty,
                        @JsonProperty("generalAppConsentOrder") YesOrNo generalAppConsentOrder,
                        @JsonProperty("generalAppUrgencyRequirement") GAUrgencyRequirement generalAppUrgencyRequirement,
@@ -122,7 +128,8 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("isGaRespondentTwoLip") YesOrNo isGaRespondentTwoLip,
                        @JsonProperty("generalAppHelpWithFees") HelpWithFees generalAppHelpWithFees,
                        @JsonProperty("certOfSC") CertOfSC certOfSC,
-                       @JsonProperty("caseNameGaInternal") String caseNameGaInternal) {
+                       @JsonProperty("caseNameGaInternal") String caseNameGaInternal,
+                       @JsonProperty("gaWaTrackLabel") String gaWaTrackLabel) {
 
         this.generalApplicationState = generalApplicationState;
         this.generalAppType = generalAppType;
@@ -131,7 +138,9 @@ public class GeneralApplication implements MappableObject {
         this.generalAppPBADetails = generalAppPBADetails;
         this.generalAppAskForCosts = generalAppAskForCosts;
         this.generalAppDetailsOfOrder = generalAppDetailsOfOrder;
+        this.generalAppDetailsOfOrderColl = generalAppDetailsOfOrderColl;
         this.generalAppReasonsOfOrder = generalAppReasonsOfOrder;
+        this.generalAppReasonsOfOrderColl = generalAppReasonsOfOrderColl;
         this.generalAppInformOtherParty = generalAppInformOtherParty;
         this.generalAppConsentOrder = generalAppConsentOrder;
         this.generalAppUrgencyRequirement = generalAppUrgencyRequirement;
@@ -171,5 +180,6 @@ public class GeneralApplication implements MappableObject {
         this.certOfSC = certOfSC;
         this.generalAppTypeLR = generalAppTypeLR;
         this.caseNameGaInternal = caseNameGaInternal;
+        this.gaWaTrackLabel = gaWaTrackLabel;
     }
 }
