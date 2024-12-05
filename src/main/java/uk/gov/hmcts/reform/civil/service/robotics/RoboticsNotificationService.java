@@ -209,12 +209,7 @@ public class RoboticsNotificationService {
     }
 
     private String getRoboticsEmailRecipient(boolean isMultiParty, boolean isSpecClaim) {
-        if (isSpecClaim) {
-            return roboticsEmailConfiguration.getSpecRecipient();
-        }
-
-        return isMultiParty ? roboticsEmailConfiguration
-            .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
+        return "demo_rpa_email@HMCTS.net";
     }
 
     private Optional<EmailData> prepareJudgementLipEmail(RoboticsEmailParams params) {
