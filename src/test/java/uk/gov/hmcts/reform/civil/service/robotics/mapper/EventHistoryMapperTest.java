@@ -8475,7 +8475,7 @@ class EventHistoryMapperTest {
         LocalDate defendantFinalPaymentDate = LocalDate.of(2024, 1, 4);
         LocalDateTime markPaidInFullIssueDate = LocalDateTime.of(2024, 1, 2,  9, 0, 0);
         LocalDateTime schedulerDeadline = LocalDateTime.of(2024, 2, 2,  16, 0, 0);
-        LocalDate coscIssueDate = LocalDate.of(2024, 1, 3);
+        LocalDateTime joDefendantMarkedPaidInFullIssueDate = LocalDateTime.of(2024, 1, 3, 16, 0, 0);
         CaseDocument caseDocument = CaseDocument.builder()
             .documentType(DocumentType.CERTIFICATE_OF_DEBT_PAYMENT)
             .build();
@@ -8498,7 +8498,6 @@ class EventHistoryMapperTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().toBuilder()
                     .certOfSC(certOfSC)
-                    .coscIssueDate(coscIssueDate)
                     .systemGeneratedCaseDocuments(wrapElements(caseDocument))
                     .joMarkedPaidInFullIssueDate(markPaidInFullIssueDate)
                     .joCoscRpaStatus(CANCELLED)
@@ -8566,8 +8565,7 @@ class EventHistoryMapperTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().toBuilder()
                     .certOfSC(certOfSC)
-                    .coscIssueDate(coscIssueDate)
-                    .coscSchedulerDeadline(schedulerDeadline.toLocalDate())
+                    .joDefendantMarkedPaidInFullIssueDate(joDefendantMarkedPaidInFullIssueDate)
                     .systemGeneratedCaseDocuments(wrapElements(caseDocument))
                     .joMarkedPaidInFullIssueDate(null)
                     .joCoscRpaStatus(CANCELLED)
@@ -8578,12 +8576,12 @@ class EventHistoryMapperTest {
                     .eventSequence(1)
                     .eventCode("600")
                     .litigiousPartyID("002")
-                    .dateReceived(schedulerDeadline)
+                    .dateReceived(joDefendantMarkedPaidInFullIssueDate)
                     .eventDetailsText("")
                     .eventDetails(EventDetails.builder()
                                       .status(String.valueOf(CANCELLED))
                                       .datePaidInFull(defendantFinalPaymentDate)
-                                      .notificationReceiptDate(coscIssueDate)
+                                      .notificationReceiptDate(joDefendantMarkedPaidInFullIssueDate.toLocalDate())
                                       .build())
                     .build();
 
@@ -8608,7 +8606,6 @@ class EventHistoryMapperTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().toBuilder()
                     .certOfSC(certOfSC)
-                    .coscIssueDate(coscIssueDate)
                     .systemGeneratedCaseDocuments(wrapElements(caseDocument))
                     .joMarkedPaidInFullIssueDate(markPaidInFullIssueDate)
                     .joCoscRpaStatus(SATISFIED)

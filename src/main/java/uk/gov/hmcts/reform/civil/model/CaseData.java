@@ -686,6 +686,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private JudgmentState joState;
     private LocalDate joFullyPaymentMadeDate;
     private LocalDateTime joMarkedPaidInFullIssueDate;
+    private LocalDateTime joDefendantMarkedPaidInFullIssueDate;
     private CoscRPAStatus joCoscRpaStatus;
     private String joOrderedAmount;
     private String joCosts;
@@ -739,7 +740,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonUnwrapped
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
     private LocalDate coscSchedulerDeadline;
-    private LocalDate coscIssueDate;
     private CoscApplicationStatus coSCApplicationStatus;
     private YesOrNo obligationDatePresent;
     private CourtStaffNextSteps courtStaffNextSteps;

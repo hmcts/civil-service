@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.cosc.CoscApplicationStatus;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
@@ -501,11 +502,12 @@ public class EventHistoryMapper {
         boolean joMarkedPaidInFullDateExists = caseData.getJoMarkedPaidInFullIssueDate() != null;
 
         if (featureToggleService.isJOLiveFeedActive()
-            && (joMarkedPaidInFullDateExists || caseData.hasCoscCert())) {
-
+            && ((joMarkedPaidInFullDateExists && caseData.getJoDefendantMarkedPaidInFullIssueDate() == null)
+                || caseData.hasCoscCert())
+        ) {
             // date received when mark paid in full by claimant is issued or when the scheduler runs at the cosc deadline at 4pm
             LocalDateTime dateReceived = joMarkedPaidInFullDateExists
-                ? caseData.getJoMarkedPaidInFullIssueDate() : caseData.getCoscSchedulerDeadline().atTime(16, 0);
+                ? caseData.getJoMarkedPaidInFullIssueDate() : caseData.getJoDefendantMarkedPaidInFullIssueDate();
 
             builder.certificateOfSatisfactionOrCancellation((Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
@@ -517,7 +519,7 @@ public class EventHistoryMapper {
                                   .datePaidInFull(getCoscDate(caseData))
                                   .notificationReceiptDate(joMarkedPaidInFullDateExists
                                                                ? caseData.getJoMarkedPaidInFullIssueDate().toLocalDate()
-                                                               : caseData.getCoscIssueDate())
+                                                               : caseData.getJoDefendantMarkedPaidInFullIssueDate().toLocalDate())
                                   .build())
                 .eventDetailsText("")
                 .build()));

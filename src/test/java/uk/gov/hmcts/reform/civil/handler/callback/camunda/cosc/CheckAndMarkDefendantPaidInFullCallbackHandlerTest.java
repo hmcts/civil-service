@@ -17,8 +17,9 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import uk.gov.hmcts.reform.civil.service.Time;
 import java.time.LocalDate;
-
+import java.time.LocalDateTime;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -42,6 +43,7 @@ class CheckAndMarkDefendantPaidInFullCallbackHandlerTest extends BaseCallbackHan
     private static final String PROCESS_INSTANCE_ID = "process-instance-id";
     private static final String SEND_DETAILS_CJES = "sendDetailsToCJES";
     private static ObjectMapper objectMapper;
+    private final LocalDateTime nowMock = LocalDateTime.of(2024, 10, 8, 0, 0, 0);
 
     @BeforeEach
     void setup() {
@@ -105,6 +107,7 @@ class CheckAndMarkDefendantPaidInFullCallbackHandlerTest extends BaseCallbackHan
 
         assertEquals(expected, updatedData.getActiveJudgment());
         assertThat(updatedData.getJoCoscRpaStatus()).isEqualTo(SATISFIED);
+        assertThat(updatedData.getJoDefendantMarkedPaidInFullIssueDate()).isNotNull();
         verify(runtimeService, times(1)).setVariable(PROCESS_INSTANCE_ID, SEND_DETAILS_CJES, true);
     }
 
