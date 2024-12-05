@@ -1,5 +1,6 @@
-package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.CaseDismissDefendantDashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -28,13 +30,16 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 
 @ExtendWith(MockitoExtension.class)
-class CaseDismissClaimantDashboardNotificationHandlerTest extends BaseCallbackHandlerTest {
+class CaseDismissDefendantDashboardNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
-    private CaseDismissClaimantDashboardNotificationHandler handler;
+    private CaseDismissDefendantDashboardNotificationHandler handler;
 
     @Mock
     private FeatureToggleService featureToggleService;
+
+    @Mock
+    private ObjectMapper objectMapper;
 
     @Mock
     private DashboardApiClient dashboardApiClient;
@@ -52,7 +57,7 @@ class CaseDismissClaimantDashboardNotificationHandlerTest extends BaseCallbackHa
             .previousCCDState(AWAITING_APPLICANT_INTENTION).build();
 
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-            CallbackRequest.builder().eventId(CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DISMISS_CASE_CLAIMANT.name()).build()
+            CallbackRequest.builder().eventId(CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DISMISS_CASE_DEFENDANT.name()).build()
         ).build();
         when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
         HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -64,17 +69,17 @@ class CaseDismissClaimantDashboardNotificationHandlerTest extends BaseCallbackHa
         // Then
         verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
             caseData.getCcdCaseReference().toString(),
-            "CLAIMANT",
+            "DEFENDANT",
             "BEARER_TOKEN"
         );
         verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseData.getCcdCaseReference().toString(),
-            "CLAIMANT",
+            "DEFENDANT",
             "BEARER_TOKEN"
         );
         verify(dashboardApiClient).recordScenario(
             caseData.getCcdCaseReference().toString(),
-            DashboardScenarios.SCENARIO_AAA6_DISMISS_CASE_CLAIMANT.getScenario(),
+            DashboardScenarios.SCENARIO_AAA6_DISMISS_CASE_DEFENDANT.getScenario(),
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(scenarioParams).build()
         );

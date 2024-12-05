@@ -14,7 +14,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.CvpJoinLinkEvent;
 import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.CaseHearingDateSearchService;
 
 import java.util.List;
@@ -48,27 +47,13 @@ class CvpJoinLinkSchedulerHandlerTest {
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
 
-    @Mock
-    private FeatureToggleService featureToggleService;
-
     @InjectMocks
     private CvpJoinLinkSchedulerHandler handler;
 
     @BeforeEach
     void init() {
-        when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(true);
         when(mockTask.getTopicName()).thenReturn("test");
         when(mockTask.getWorkerId()).thenReturn("worker");
-    }
-
-    @Test
-    void shouldDoNothing_whenAHNFeatureToggleIsTurnedOff() {
-        when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(false);
-
-        handler.execute(mockTask, externalTaskService);
-
-        verifyNoInteractions(searchService);
-        verifyNoInteractions(applicationEventPublisher);
     }
 
     @Test

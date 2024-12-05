@@ -1034,7 +1034,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isHmcEnabled()).thenReturn(true);
         when(featureToggleService.isLocationWhiteListedForCaseProgression(eq(selectedCourt.getCode()))).thenReturn(
             isLocationWhiteListed);
         when(locationRefDataService.getLocationMatchingLabel(selectedCourt.getCode(), params.getParams().get(
@@ -1098,7 +1097,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .disposalHearingMethodToggle(Collections.singletonList(OrderDetailsPagesSectionsToggle.SHOW))
             .orderType(OrderType.DISPOSAL)
             .build();
-        when(featureToggleService.isHmcEnabled()).thenReturn(true);
+
         when(featureToggleService.isLocationWhiteListedForCaseProgression(eq(selectedCourt.getCode()))).thenReturn(true);
 
         CallbackParams params = callbackParamsOf(caseData.toBuilder()
