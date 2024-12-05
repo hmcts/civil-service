@@ -176,6 +176,7 @@ ccd:
   ccd-data-store-api:
     java:
       imagePullPolicy: Always
+      image: 'hmctspublic.azurecr.io/civil/service:pr-2506'
       devcpuRequests: 500m
       devmemoryRequests: 2048Mi
       devmemoryLimits: 4096Mi
