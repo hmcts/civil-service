@@ -113,7 +113,6 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(time.now()).willReturn(now);
             given(deadlinesCalculator.calculateApplicantResponseDeadline(any())).willReturn(respondToDeadline);
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-            when(featureToggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
         }
 
         @Test
@@ -278,8 +277,6 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAddEventAndDateAddedToRespondentExpertsAndWitnesses() {
-            when(featureToggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
-
             CaseData caseData = CaseDataBuilder.builder()
                 .totalClaimAmount(BigDecimal.valueOf(1000))
                 .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
