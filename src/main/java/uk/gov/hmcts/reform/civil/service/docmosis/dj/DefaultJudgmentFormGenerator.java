@@ -20,7 +20,6 @@ import java.util.List;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DJ_FORM_SPEC;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC_NON_IMMEDIATE;
 
 @Service
 @Slf4j
