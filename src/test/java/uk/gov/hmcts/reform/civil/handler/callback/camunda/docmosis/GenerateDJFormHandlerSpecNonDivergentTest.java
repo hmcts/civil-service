@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentFormGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.dj.nondivergent.NonDivergentSpecDefaultJudgmentFormGenerator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ class GenerateDJFormHandlerSpecNonDivergentTest extends BaseCallbackHandlerTest 
     @InjectMocks
     private GenerateDJFormHandlerSpecNonDivergent handler;
     @Mock
-    private DefaultJudgmentFormGenerator defaultJudgmentFormGenerator;
+    private NonDivergentSpecDefaultJudgmentFormGenerator defaultJudgmentFormGenerator;
     @Mock
     private FeatureToggleService featureToggleService;
 
