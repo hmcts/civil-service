@@ -50,7 +50,7 @@ public class Message {
             .senderName(reply.getSenderName())
             .isUrgent(reply.getIsUrgent())
             .messageContent(reply.getMessageContent())
-            .recipientRoleType(this.senderRoleType)
+            .recipientRoleType(reply.getRecipientRoleType())
             .build();
     }
 }
