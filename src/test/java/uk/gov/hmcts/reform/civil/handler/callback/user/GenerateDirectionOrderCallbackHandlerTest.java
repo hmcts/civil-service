@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ComplexityBand;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.OrderOnCourtsList;
@@ -34,6 +35,7 @@ import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CaseDataCaseSdo;
 import uk.gov.hmcts.reform.civil.model.HearingNotes;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -72,6 +74,7 @@ import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.map;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -131,6 +134,10 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
     private static final String WITHOUT_NOTICE_SELECTION_TEXT = "If you were not notified of the application before "
         + "this order was made, you may apply to set aside, vary or stay the order. Any such application must be made "
         + "by 4pm on";
+    public static final String NOT_ALLOWED_FOR_CITIZEN = "This claim involves a citizen. To allocate to Small Claims or Fast Track you must use the"
+        + " Standard Direction Order (SDO) otherwise use Not suitable for SDO.";
+    public static final String NOT_ALLOWED_FOR_TRACK = "The Make an order event is not available for Small Claims and Fast Track cases until the track has"
+        + " been allocated. You must use the Standard Direction Order (SDO) to proceed.";
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
     private static final byte[] bytes = {116, 101, 115, 116};
     private static final CaseDocumentBuilder CASE_DOCUMENT = CaseDocumentBuilder.builder()
@@ -191,10 +198,37 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldReturnNoError_WhenAboutToStartIsInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateSdoDisposal()
+                .build().toBuilder()
+                .allocatedTrack(AllocatedTrack.SMALL_CLAIM).build();
+            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        void shouldReturnError_WhenAboutToStartIsInvokedWithClaimantLip() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .applicant1Represented(NO).build();
+            when(featureToggleService.isMintiEnabled()).thenReturn(true);
+            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).hasSize(1);
+            assertThat(response.getErrors()).containsExactlyInAnyOrder(NOT_ALLOWED_FOR_CITIZEN);
+        }
+
+        @Test
+        void shouldReturnError_WhenAboutToStartIsInvokedWithRespondentLip() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .applicant1Represented(NO).build();
+            when(featureToggleService.isMintiEnabled()).thenReturn(true);
+            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).hasSize(1);
+            assertThat(response.getErrors()).containsExactlyInAnyOrder(NOT_ALLOWED_FOR_CITIZEN);
         }
 
         @Test
@@ -447,6 +481,38 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
     @Nested
     class MidEventPopulateTrackToggleAndPopulateDownloadTemplateOptions {
         private static final String PAGE_ID = "assign-track-toggle";
+
+        @Test
+        void shouldThrowError_whenFastTrackNotBeingReallocatedToMintiTrack() {
+            when(featureToggleService.isMintiEnabled()).thenReturn(true);
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                .build().toBuilder()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .allocatedTrack(AllocatedTrack.FAST_CLAIM)
+                .finalOrderAllocateToTrack(NO).build();
+            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, MID, PAGE_ID, JUDICIAL_REFERRAL);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).hasSize(1);
+            assertThat(response.getErrors()).containsExactlyInAnyOrder(NOT_ALLOWED_FOR_TRACK);
+        }
+
+        @Test
+        void shouldThrowError_whenSmallTrackNotBeingReallocatedToMintiTrack() {
+            when(featureToggleService.isMintiEnabled()).thenReturn(true);
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                .build().toBuilder()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+                .finalOrderAllocateToTrack(NO).build();
+            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, MID, PAGE_ID, JUDICIAL_REFERRAL);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).hasSize(1);
+            assertThat(response.getErrors()).containsExactlyInAnyOrder(NOT_ALLOWED_FOR_TRACK);
+        }
 
         @Nested
         class FinalOrderTrackNotAllocated {

@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
@@ -185,11 +184,10 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
         if (featureToggleService.isMintiEnabled()
             && (isJudicialReferral(callbackParams) || isMultiOrIntTrack(caseData))) {
-            caseDataBuilder.allowOrderTrackAllocation(YES)
-            .finalOrderTrackToggle(null);
+            caseDataBuilder.allowOrderTrackAllocation(YES).finalOrderTrackToggle(null);
         } else {
             caseDataBuilder.allowOrderTrackAllocation(NO);
-            assignTrackToggle(caseData, caseDataBuilder);
+            populateTrackToggle(caseData, caseDataBuilder);
         }
 
         return nullPreviousSelections(caseDataBuilder);
@@ -257,7 +255,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         if (caseData.getFinalOrderAllocateToTrack().equals(YES)) {
             caseDataBuilder.finalOrderTrackToggle(caseData.getFinalOrderTrackAllocation().name());
         } else {
-            assignTrackToggle(caseData, caseDataBuilder);
+            populateTrackToggle(caseData, caseDataBuilder);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -664,7 +662,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             && featureToggleService.isMintiEnabled();
     }
 
-    private void assignTrackToggle(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+    private void populateTrackToggle(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
             caseDataBuilder.finalOrderTrackToggle(caseData.getResponseClaimTrack());
 
