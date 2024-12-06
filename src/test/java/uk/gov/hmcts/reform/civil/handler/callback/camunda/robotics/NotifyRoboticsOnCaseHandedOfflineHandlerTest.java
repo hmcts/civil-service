@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
 import uk.gov.hmcts.reform.civil.service.notification.robotics.RoboticsNotifier;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
+import uk.gov.hmcts.reform.civil.service.robotics.builders.EventBuildersConfiguration;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
@@ -59,6 +60,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartySce
     AddressLinesMapper.class,
     EventHistorySequencer.class,
     EventHistoryMapper.class,
+    EventBuildersConfiguration.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
     TransitionsTestConfiguration.class,
