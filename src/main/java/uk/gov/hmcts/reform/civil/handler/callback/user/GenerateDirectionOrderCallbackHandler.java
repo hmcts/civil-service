@@ -184,7 +184,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         }
 
         if (featureToggleService.isMintiEnabled()
-         && (isJudicialReferral(callbackParams) || isMultiOrIntTrack(caseData))) {
+            && (isJudicialReferral(callbackParams) || isMultiOrIntTrack(caseData))) {
             caseDataBuilder.allowOrderTrackAllocation(YES)
             .finalOrderTrackToggle(null);
         } else {
@@ -220,7 +220,6 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         caseDataBuilder.finalOrderTrackAllocation(null)
             .finalOrderAllocateToTrack(null)
             .finalOrderIntermediateTrackComplexityBand(null)
-            .finalOrderFastTrackComplexityBand(null)
             .finalOrderDownloadTemplateOptions(null);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -245,6 +244,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (caseData.getFinalOrderAllocateToTrack().equals(NO)
+            && featureToggleService.isMintiEnabled()
             && isJudicialReferral(callbackParams)
             && isSmallOrFastTrack(caseData)) {
             return AboutToStartOrSubmitCallbackResponse.builder()
