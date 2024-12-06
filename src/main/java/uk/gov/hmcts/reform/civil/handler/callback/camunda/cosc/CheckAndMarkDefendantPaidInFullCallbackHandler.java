@@ -67,7 +67,6 @@ public class CheckAndMarkDefendantPaidInFullCallbackHandler extends CallbackHand
 
         if (nonNull(judgementPaidDate)) {
             runtimeService.setVariable(caseData.getBusinessProcess().getProcessInstanceId(), SEND_DETAILS_CJES, false);
-            caseData.setJoDefendantMarkedPaidInFullIssueDate(LocalDateTime.now());
         } else {
             runtimeService.setVariable(caseData.getBusinessProcess().getProcessInstanceId(), SEND_DETAILS_CJES, true);
             caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
@@ -76,6 +75,7 @@ public class CheckAndMarkDefendantPaidInFullCallbackHandler extends CallbackHand
                 caseData.getCertOfSC().getDefendantFinalPaymentDate()
             ));
             caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(caseData.getActiveJudgment()));
+            caseData.setJoDefendantMarkedPaidInFullIssueDate(LocalDateTime.now());
         }
         caseData.setJoCoscRpaStatus(JudgmentState.CANCELLED.equals(caseData.getActiveJudgment().getState()) ? CANCELLED : SATISFIED);
 
