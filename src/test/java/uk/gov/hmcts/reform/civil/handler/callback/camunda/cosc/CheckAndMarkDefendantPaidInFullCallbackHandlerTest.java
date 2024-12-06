@@ -106,8 +106,42 @@ class CheckAndMarkDefendantPaidInFullCallbackHandlerTest extends BaseCallbackHan
 
         assertEquals(expected, updatedData.getActiveJudgment());
         assertThat(updatedData.getJoCoscRpaStatus()).isEqualTo(SATISFIED);
-        assertThat(updatedData.getJoDefendantMarkedPaidInFullIssueDate()).isNotNull();
         verify(runtimeService, times(1)).setVariable(PROCESS_INSTANCE_ID, SEND_DETAILS_CJES, true);
+    }
+
+    @Test
+    void shouldUpdateJudgmentAndSetSendToCjesProcessVariableToTrue_whenJudgmentPaidClaimantDateProvided() {
+        LocalDate markedPaymentDate = LocalDate.of(2024, 9, 20);
+        JudgmentDetails activeJudgementWithoutPayment = JudgmentDetails.builder()
+            .fullyPaymentMadeDate(markedPaymentDate)
+            .issueDate(LocalDate.of(2024, 9, 9))
+            .totalAmount("900000")
+            .orderedAmount("900000")
+            .state(JudgmentState.SATISFIED)
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
+            .certOfSC(CertOfSC.builder()
+                                    .defendantFinalPaymentDate(markedPaymentDate)
+                                    .build())
+            .activeJudgment(activeJudgementWithoutPayment)
+            .build();
+
+        JudgmentDetails expected = caseData.getActiveJudgment().toBuilder()
+            .fullyPaymentMadeDate(markedPaymentDate)
+            .state(JudgmentState.SATISFIED)
+            .build();
+
+        var params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
+
+        var result = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = objectMapper.convertValue(result.getData(), CaseData.class);
+
+        assertEquals(expected, updatedData.getActiveJudgment());
+        assertThat(updatedData.getJoCoscRpaStatus()).isEqualTo(SATISFIED);
+        assertThat(updatedData.getJoDefendantMarkedPaidInFullIssueDate()).isNotNull();
+        verify(runtimeService, times(1)).setVariable(PROCESS_INSTANCE_ID, SEND_DETAILS_CJES, false);
     }
 
     @Test
