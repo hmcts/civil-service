@@ -170,7 +170,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void before() {
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-            when(featureToggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
         }
 
         @Test
@@ -506,8 +505,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAddEventAndDateAddedToClaimantExpertsAndWitness() {
-            when(featureToggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
-
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1ResponseDate(LocalDateTime.now())
                 .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
@@ -548,7 +545,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(expert.getEventAdded()).isEqualTo(CLAIMANT_INTENTION_EVENT.getValue());
             assertThat(witness.getDateAdded()).isEqualTo(LocalDateTime.now().toLocalDate());
             assertThat(witness.getEventAdded()).isEqualTo(CLAIMANT_INTENTION_EVENT.getValue());
-
         }
 
         @Test

@@ -235,7 +235,6 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
-
         LocalDateTime currentTime = time.now();
 
         CaseData.CaseDataBuilder builder = caseData.toBuilder()
@@ -273,15 +272,10 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         assembleResponseDocuments(caseData, builder);
         frcDocumentsUtils.assembleClaimantsFRCDocuments(caseData);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder,
-                                                                       featureToggleService.isUpdateContactDetailsEnabled());
-
-        if (featureToggleService.isUpdateContactDetailsEnabled()) {
-            addEventAndDateAddedToApplicantExperts(builder);
-            addEventAndDateAddedToApplicantWitnesses(builder);
-        }
-
+        addEventAndDateAddedToApplicantExperts(builder);
+        addEventAndDateAddedToApplicantWitnesses(builder);
         populateDQPartyIds(builder);
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE, builder);

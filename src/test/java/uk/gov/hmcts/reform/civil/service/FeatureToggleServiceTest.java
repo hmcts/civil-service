@@ -121,15 +121,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenUpdateContactDetailsEnabled(Boolean toggleStat) {
-        var caseFileKey = "update-contact-details";
-        givenToggle(caseFileKey, toggleStat);
-
-        assertThat(featureToggleService.isUpdateContactDetailsEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenLocationWhiteListed(Boolean toggleStat) {
         final String feature = "case-progression-location-whitelist";
         String location = "000000";
