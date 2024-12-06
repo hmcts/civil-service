@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW;
 
 @SpringBootTest(classes = {
     ConfirmOrderReviewCallbackHandler.class,
@@ -62,6 +63,8 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
+            assertThat(response.getData()).extracting("obligationDatePresent").isNull();
+            assertThat(response.getData()).extracting("courtStaffNextSteps").isNull();
             assertThat(response.getErrors()).isNull();
         }
     }
@@ -119,8 +122,10 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData()).extracting("obligationDatePresent").isNull();
-            assertThat(response.getData()).extracting("courtStaffNextSteps").isNull();
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(CONFIRM_ORDER_REVIEW.name(), "READY");
         }
 
         @Test
