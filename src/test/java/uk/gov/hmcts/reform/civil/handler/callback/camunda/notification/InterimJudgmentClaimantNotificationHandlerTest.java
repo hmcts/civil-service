@@ -28,6 +28,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 
 @ExtendWith(MockitoExtension.class)
 public class InterimJudgmentClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -87,8 +88,10 @@ public class InterimJudgmentClaimantNotificationHandlerTest extends BaseCallback
         private Map<String, String> getNotificationDataMap() {
             return Map.of(
                 "Legal Rep Claimant", "Test Org Name",
-                "Claim number", "000DC001",
-                "Defendant Name", "Mr. Sole Trader"
+                "Claim number", "1594901956117591",
+                "Defendant Name", "Mr. Sole Trader",
+                "partyReferences", "Claimant reference: 12345 - Defendant reference: 6789",
+                CASEMAN_REF, "000DC001"
             );
         }
     }

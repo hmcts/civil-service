@@ -16,14 +16,21 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
+import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.UPLOADED_DOCUMENTS;
 
 @ExtendWith(MockitoExtension.class)
@@ -40,6 +47,9 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
     private NotificationService notificationService;
     @Mock
     private NotificationsProperties notificationsProperties;
+    @Mock
+    private OrganisationService organisationService;
+
     @InjectMocks
     private EvidenceUploadRespondentNotificationHandler handler;
 
@@ -49,13 +59,15 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
         @Test
         void shouldNotifyRespondent1Solicitor_whenInvoked() {
             when(notificationsProperties.getEvidenceUploadTemplate()).thenReturn(TEMPLATE_ID);
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
             CaseData caseData = createCaseDataWithText(NOTIFICATION_TEXT);
             handler.notifyRespondentEvidenceUpload(caseData, true);
 
             verify(notificationService).sendMail(
                 RESPONDENT1_SOLICITOR_EMAIL,
                 TEMPLATE_ID,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(caseData, false, false),
                 "evidence-upload-notification-" + caseData.getLegacyCaseReference()
             );
         }
@@ -72,7 +84,7 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
             verify(notificationService).sendMail(
                 RESPONDENT1_LIP_EMAIL,
                 TEMPLATE_ID_LIP,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(caseData, true, false),
                 "evidence-upload-notification-" + caseData.getLegacyCaseReference()
             );
         }
@@ -94,7 +106,7 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
             verify(notificationService).sendMail(
                 RESPONDENT1_LIP_EMAIL,
                 TEMPLATE_ID_WELSH_LIP,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(caseData, true, false),
                 "evidence-upload-notification-" + caseData.getLegacyCaseReference()
             );
         }
@@ -103,8 +115,12 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
         void shouldNotifyRespondent2Solicitor_whenInvoked() {
             //given: case data has two respondent solicitor
             when(notificationsProperties.getEvidenceUploadTemplate()).thenReturn(TEMPLATE_ID);
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
             CaseData caseData = createCaseDataWithText(NOTIFICATION_TEXT).toBuilder()
+                .respondent2(Party.builder().build())
                 .addRespondent2(YesOrNo.YES)
+                .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .respondentSolicitor2EmailAddress(RESPONDENT2_SOLICITOR_EMAIL)
                 .build();
             //when: RepondentNotificationhandler for solictior2 is called
@@ -113,7 +129,7 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
             verify(notificationService).sendMail(
                 RESPONDENT2_SOLICITOR_EMAIL,
                 TEMPLATE_ID,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(caseData, false, true),
                 "evidence-upload-notification-" + caseData.getLegacyCaseReference()
             );
         }
@@ -122,11 +138,17 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
         void shouldNotifyRespondent2Lip_whenInvoked() {
             //given: case data has two respondents, with second being litigant in person
             when(notificationsProperties.getEvidenceUploadLipTemplate()).thenReturn(TEMPLATE_ID_LIP);
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
 
             CaseData caseData = createCaseDataWithText(NOTIFICATION_TEXT).toBuilder()
                 .addRespondent2(YesOrNo.YES)
                 .respondent2Represented(YesOrNo.NO)
-                .respondent2(Party.builder().partyName("Billy").partyEmail(RESPONDENT1_LIP_EMAIL).build())
+                .respondent2(Party.builder()
+                                 .individualLastName("Doe")
+                                 .individualFirstName("John")
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .partyName("Billy").partyEmail(RESPONDENT1_LIP_EMAIL).build())
                 .build();
             //when: RepondentNotificationhandler for respondent 2 is called
             handler.notifyRespondentEvidenceUpload(caseData, false);
@@ -134,7 +156,7 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
             verify(notificationService).sendMail(
                 RESPONDENT1_LIP_EMAIL,
                 TEMPLATE_ID_LIP,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(caseData, true, true),
                 "evidence-upload-notification-" + caseData.getLegacyCaseReference()
             );
         }
@@ -159,7 +181,8 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
         }
 
         private CaseData createCaseDataWithText(String notificationText) {
-            return CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            return CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .build().toBuilder()
                 .notificationText(notificationText)
                 .build();
         }
@@ -168,15 +191,24 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
             return CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .notificationText(notificationText)
                 .respondent1Represented(YesOrNo.NO)
-                .respondent1(Party.builder().partyName("Billy").partyEmail(RESPONDENT1_LIP_EMAIL).build())
+                .respondent1(Party.builder()
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .individualFirstName("John")
+                                 .individualLastName("Doe")
+                                 .partyName("Billy").partyEmail(RESPONDENT1_LIP_EMAIL).build())
                 .build();
         }
 
         @NotNull
-        private Map<String, String> getNotificationDataMap(CaseData caseData) {
+        private Map<String, String> getNotificationDataMap(CaseData caseData, boolean isLip, boolean is1v2) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                UPLOADED_DOCUMENTS, caseData.getNotificationText()
+                CLAIM_REFERENCE_NUMBER, isLip ? caseData.getLegacyCaseReference() : caseData.getCcdCaseReference().toString(),
+                UPLOADED_DOCUMENTS, caseData.getNotificationText(),
+                PARTY_REFERENCES, is1v2
+                    ? "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided"
+                    : "Claimant reference: 12345 - Defendant reference: 6789",
+                CLAIM_LEGAL_ORG_NAME_SPEC, isLip && !is1v2 ? "John Doe" : "org name",
+                CASEMAN_REF, "000DC001"
             );
         }
     }

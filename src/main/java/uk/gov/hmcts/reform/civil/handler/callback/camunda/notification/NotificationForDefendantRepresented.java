@@ -27,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_SOLI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_DEFENDANT_REPRESENTED;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service
 @RequiredArgsConstructor
@@ -105,7 +106,9 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
         return Map.of(
             DEFENDANT_NAME, caseData.getRespondent1().getPartyName(),
             CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString(),
-            LEGAL_REP_NAME, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID())
+            LEGAL_REP_NAME, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID()),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
             );
     }
 
@@ -124,7 +127,9 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
             ISSUE_DATE, formatLocalDate(caseData.getIssueDate(), DATE),
             CCD_REF, caseData.getCcdCaseReference().toString(),
             NEW_SOL, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID()),
-            OTHER_SOL_NAME, getOrganisationName(NocNotificationUtils.getOtherSolicitor1Name(caseData))
+            OTHER_SOL_NAME, getOrganisationName(NocNotificationUtils.getOtherSolicitor1Name(caseData)),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
