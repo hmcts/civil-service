@@ -141,6 +141,17 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenLocationWhiteListedForGaLips(Boolean toggleStat) {
+        final String feature = "ea-courts-whitelisted-for-ga-lips";
+        String location = "000000";
+        when(featureToggleApi.isFeatureEnabledForLocation(eq(feature), eq(location), eq(true)))
+            .thenReturn(toggleStat);
+
+        assertThat(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(location)).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsTransferCaseOnlineEnabled(Boolean toggleStat) {
         var transferCaseOnlineKey = "isTransferOnlineCaseEnabled";
         givenToggle(transferCaseOnlineKey, toggleStat);
