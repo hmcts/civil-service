@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.RepaymentPlanTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormParty;
-import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
@@ -186,17 +185,6 @@ public class JudgmentByAdmissionOrDeterminationMapper {
                 return null;
             }
         }
-    }
-
-    private Address getAddress(ContactInformation address) {
-        return uk.gov.hmcts.reform.civil.model.Address.builder().addressLine1(address.getAddressLine1())
-            .addressLine2(address.getAddressLine1())
-            .addressLine3(address.getAddressLine1())
-            .country(address.getCountry())
-            .county(address.getCounty())
-            .postCode(address.getPostCode())
-            .postTown(address.getTownCity())
-            .build();
     }
 
     private Party getRespondentLROrLipDetails(CaseData caseData) {
