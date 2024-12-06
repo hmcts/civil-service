@@ -8464,20 +8464,10 @@ class EventHistoryMapperTest {
         @Test
         void shouldGenerateRPA_WhenClaimPayImmediately() {
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
-
-            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-                .ccjPaymentPaidSomeOption(NO)
-                .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(1500))
-                .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(40))
-                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
-                .ccjPaymentPaidSomeAmountInPounds(ZERO)
-                .ccjJudgmentLipInterest(ZERO)
-                .build();
-
+            CCJPaymentDetails ccjPaymentDetails = buildCcjPaymentDetails();
             RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
                 .whenWillThisAmountBePaid(whenWillPay)
                 .build();
-
             CaseData caseData = CaseDataBuilder.builder()
                 .setClaimTypeToSpecClaim()
                 .atStateSpec1v1ClaimSubmitted()
@@ -8487,9 +8477,6 @@ class EventHistoryMapperTest {
                 .respondToClaimAdmitPartLRspec(paymentDetails)
                 .totalInterest(BigDecimal.ZERO)
                 .applicant1ResponseDate(LocalDateTime.now())
-                .respondent1Represented(YesOrNo.NO)
-                .specRespondent1Represented(YesOrNo.NO)
-                .applicant1Represented(YesOrNo.NO)
                 .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
                 .build();
             when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
@@ -8505,6 +8492,75 @@ class EventHistoryMapperTest {
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventDetailsText").asString().contains(RPA_RECORD_JUDGMENT);
+        }
+
+        @Test
+        public void shouldGenerateRPA_ForFullAdmit_WhenLipClaimAgreedRepaymentPlan_BySetDate_JoLiveFeed() {
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            CCJPaymentDetails ccjPaymentDetails = buildCcjPaymentDetails();
+            RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
+                .whenWillThisAmountBePaid(whenWillPay)
+                .build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .setClaimTypeToSpecClaim()
+                .atStateSpec1v1ClaimSubmitted()
+                .atStateRespondent1v1FullAdmissionSpec().build().toBuilder()
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+                .respondToClaimAdmitPartLRspec(paymentDetails)
+                .applicant1ResponseDate(LocalDateTime.now())
+                .totalInterest(BigDecimal.ZERO)
+                .build();
+            given(featureToggleService.isJOLiveFeedActive()).willReturn(true);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("eventCode").asString().contains("240");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventCode").asString().contains("999");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventDetailsText").asString().contains(RPA_RECORD_JUDGMENT);
+        }
+
+        @Test
+        public void shouldGenerateRPA_ForFullAdmit_WhenLipClaimAgreedRepaymentPlan_JoLiveFeed() {
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            CCJPaymentDetails ccjPaymentDetails = buildCcjPaymentDetails();
+            RepaymentPlanLRspec respondent1RepaymentPlan = RepaymentPlanLRspec.builder()
+                .firstRepaymentDate(whenWillPay)
+                .paymentAmount(BigDecimal.valueOf(10000))
+                .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                .build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .setClaimTypeToSpecClaim()
+                .atStateSpec1v1ClaimSubmitted()
+                .atStateRespondent1v1FullAdmissionSpec().build().toBuilder()
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+                .respondent1RepaymentPlan(respondent1RepaymentPlan)
+                .totalInterest(BigDecimal.ZERO)
+                .build();
+            given(featureToggleService.isJOLiveFeedActive()).willReturn(true);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("eventCode").asString().contains("240");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventCode").asString().contains("999");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventDetailsText").asString().contains(RPA_RECORD_JUDGMENT);
+        }
+
+        private CCJPaymentDetails buildCcjPaymentDetails() {
+            return CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeOption(NO)
+                .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(1500))
+                .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(40))
+                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
+                .ccjPaymentPaidSomeAmountInPounds(ZERO)
+                .build();
         }
     }
 }
