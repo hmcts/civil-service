@@ -1181,7 +1181,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                                                             .build());
 
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
-                                                         any(CaseData.class), any(UserDetails.class), anyString(), any(GeneralAppFeesService.class))).thenAnswer((Answer) invocation -> invocation.getArguments()[1]
+                    any(CaseData.class), any(UserDetails.class), anyString(), any(GeneralAppFeesService.class))).thenAnswer((Answer) invocation -> invocation.getArguments()[1]
             );
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
