@@ -2,7 +2,7 @@ apiVersion: v2
 description: A Helm chart for civil-service App
 name: civil-service
 home: https://github.com/hmcts/civil-service
-version: 0.0.72
+version: 0.0.73
 maintainers:
   - name: HMCTS Civil team
 
@@ -34,3 +34,15 @@ dependencies:
     version: 0.0.5
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: wiremock.enabled
+  - name: ccd-case-document-am-api
+    version: 1.7.14
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: ccd-case-document-am-api.enabled
+  - name: em-ccdorc
+    version: 2.0.25
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: em-ccdorc.enabled
+  - name: em-stitching
+    version: 1.0.55
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: em-stitching.enabled
