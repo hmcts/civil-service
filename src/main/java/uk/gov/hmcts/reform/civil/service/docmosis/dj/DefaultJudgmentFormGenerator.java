@@ -81,9 +81,6 @@ public class DefaultJudgmentFormGenerator {
 
     private DocmosisTemplates getDocmosisTemplate(String event, CaseData caseData) {
         if (event.equals(GENERATE_DJ_FORM_SPEC.name())) {
-            if (!caseData.getPaymentTypeSelection().equals(DJPaymentTypeSelection.IMMEDIATELY)) {
-                return N121_SPEC_NON_IMMEDIATE;
-            }
             return N121_SPEC;
         } else {
             return N121;
