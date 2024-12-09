@@ -595,6 +595,20 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         }
 
         @Test
+        void shouldNotThrowError_whenSmallTrackNotBeingReallocatedToMintiTrackMintiNotEnabled() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                .build().toBuilder()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+                .finalOrderAllocateToTrack(NO).build();
+            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, MID, PAGE_ID, JUDICIAL_REFERRAL);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
         void shouldNotThrowError_whenSmallTrackBeingReallocatedToMintiTrack() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
