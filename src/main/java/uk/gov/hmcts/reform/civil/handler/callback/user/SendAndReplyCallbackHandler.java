@@ -129,7 +129,7 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
         }
 
         Message lastMessage = messagesNew.stream()
-            .min(Comparator.comparing(message -> message.getValue().getUpdatedTime()))
+            .max(Comparator.comparing(message -> message.getValue().getUpdatedTime()))
             .get().getValue();
         builder.lastMessage(lastMessage);
 
