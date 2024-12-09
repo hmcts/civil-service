@@ -590,6 +590,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         caseDataBuilder.finalOrderDocument(null);
         caseDataBuilder.uploadOrderDocumentFromTemplate(null);
         caseDataBuilder.finalOrderDownloadTemplateDocument(null);
+        caseDataBuilder.allowOrderTrackAllocation(null);
 
         if (featureToggleService.isMintiEnabled()) {
             if (YES.equals(caseData.getFinalOrderAllocateToTrack())) {
