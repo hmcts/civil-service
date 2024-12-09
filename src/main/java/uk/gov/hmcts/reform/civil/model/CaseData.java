@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.civil.enums.SettlementReason;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.sendandreply.SendAndReplyOption;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.ConfirmOrderGivesPermission;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.MarkPaidConsentList;
@@ -98,6 +99,9 @@ import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
+import uk.gov.hmcts.reform.civil.model.sendandreply.MessageReply;
+import uk.gov.hmcts.reform.civil.model.sendandreply.Message;
+import uk.gov.hmcts.reform.civil.model.sendandreply.SendMessageMetadata;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.TransferCaseDetails;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -127,6 +131,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
+import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
@@ -167,6 +172,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final SRPbaDetails claimIssuedPBADetails;
     private final String applicantPartyName;
     private final CertOfSC certOfSC;
+    private final String gaWaTrackLabel;
 
     private final YesOrNo generalAppVaryJudgementType;
     private final YesOrNo generalAppParentClaimantIsApplicant;
@@ -737,9 +743,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
     private LocalDate coscSchedulerDeadline;
     private CoscApplicationStatus coSCApplicationStatus;
+  
+    //Caseworker events
     private YesOrNo obligationDatePresent;
     private CourtStaffNextSteps courtStaffNextSteps;
-
+    private SendAndReplyOption sendAndReplyOption;
+    private SendMessageMetadata sendMessageMetadata;
+    private String sendMessageContent;
+    private MessageReply messageReplyMetadata;
+    private String messageHistory;
+    private DynamicList messagesToReplyTo;
+    private List<Element<Message>> messages;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
@@ -1616,5 +1630,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isLipCase() {
         return this.isApplicant1NotRepresented() || this.isRespondent1LiP();
+    }
+
+    @JsonIgnore
+    public boolean isHearingFeePaid() {
+        return nonNull(this.getHearingFeePaymentDetails())
+            && SUCCESS.equals(this.getHearingFeePaymentDetails().getStatus()) || this.hearingFeePaymentDoneWithHWF();
     }
 }
