@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.documentmanagement;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
@@ -193,6 +194,10 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
             UserInfo userInfo = userService.getUserInfo(authorisation);
             String userRoles = String.join(",", this.documentManagementConfiguration.getUserRoles());
             Document documentMetadata = getDocumentMetaData(authorisation, documentPath);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            String jsonString = objectMapper.writeValueAsString(documentMetadata.metadata);
+            log.info(String.format("Document metadata for document path %s is: %s", documentPath, jsonString));
 
             ResponseEntity<Resource> responseEntity = caseDocumentClientApi.getDocumentBinary(
                 authorisation,
