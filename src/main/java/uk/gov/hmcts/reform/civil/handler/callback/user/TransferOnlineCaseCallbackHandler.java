@@ -126,7 +126,6 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
         if (nonNull(newCourtLocation)) {
             caseDataBuilder.caseManagementLocation(LocationHelper.buildCaseLocation(newCourtLocation));
             caseDataBuilder.locationName(newCourtLocation.getSiteName());
-            log.info("MINTI toggle and {} and COURT DMN {}", featureToggleService.isMultiOrIntermediateTrackEnabled(caseData), courtToggle);
             if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
                 updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
                     callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
