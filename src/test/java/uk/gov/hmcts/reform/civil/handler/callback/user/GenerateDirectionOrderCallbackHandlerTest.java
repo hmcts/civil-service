@@ -606,7 +606,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, MID, PAGE_ID, JUDICIAL_REFERRAL);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors()).isNull();;
+            assertThat(response.getErrors()).isNull();
         }
 
         @Test
@@ -616,6 +616,35 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .build().toBuilder()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+                .finalOrderAllocateToTrack(NO).build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        void shouldNotThrowError_whenFastTrackBeingReallocatedToMintiTrack() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                .build().toBuilder()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .allocatedTrack(AllocatedTrack.FAST_CLAIM)
+                .finalOrderTrackAllocation(AllocatedTrack.INTERMEDIATE_CLAIM)
+                .finalOrderAllocateToTrack(YES).build();
+            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, MID, PAGE_ID, JUDICIAL_REFERRAL);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        void shouldNotThrowError_whenFastTrackNotInJudicialReferral() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                .build().toBuilder()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .allocatedTrack(AllocatedTrack.FAST_CLAIM)
                 .finalOrderAllocateToTrack(NO).build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             // When
