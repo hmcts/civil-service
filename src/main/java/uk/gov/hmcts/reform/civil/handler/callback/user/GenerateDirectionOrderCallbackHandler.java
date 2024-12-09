@@ -175,7 +175,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private CallbackResponse nullPreviousSelections(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        if (isJudicialReferral(callbackParams) && featureToggleService.isMintiEnabled()
+        if (featureToggleService.isMintiEnabled()
+            && isJudicialReferral(callbackParams)
             && caseData.isLipCase()) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(NOT_ALLOWED_FOR_CITIZEN))
