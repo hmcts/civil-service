@@ -351,7 +351,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         }
 
         @Test
-        void shouldShowTrackALlocationPage_WhenMultiTrack() {
+        void shouldShowTrackAllocationPage_WhenMultiTrack() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
                 .finalOrderAllocateToTrack(YES)
@@ -936,6 +936,30 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(3).getLabel())
                     .isEqualTo(MULTI_OPTIONS.getListItems().get(3).getLabel());
             }
+        }
+
+    }
+
+    @Nested
+    class MidEventGenerateTemplatesMinti {
+        private static final String PAGE_ID = "create-download-template-document";
+
+        @Test
+        void shouldGenerateFreeFormOrder_onMidEventCallback() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                       .value(DynamicListElement.builder()
+                                                                  .label("Blank template to be used after a hearing")
+                                                                  .build())
+                                                       .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When
+            when(judgeOrderDownloadGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("finalOrderDownloadTemplateDocument").isNotNull();
         }
 
     }
