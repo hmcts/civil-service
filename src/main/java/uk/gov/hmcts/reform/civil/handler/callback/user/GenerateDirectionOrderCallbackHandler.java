@@ -241,8 +241,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        if (caseData.getFinalOrderAllocateToTrack().equals(NO)
-            && featureToggleService.isMintiEnabled()
+        if (featureToggleService.isMintiEnabled()
+            && caseData.getFinalOrderAllocateToTrack().equals(NO)
             && isJudicialReferral(callbackParams)
             && isSmallOrFastTrack(caseData)) {
             return AboutToStartOrSubmitCallbackResponse.builder()
