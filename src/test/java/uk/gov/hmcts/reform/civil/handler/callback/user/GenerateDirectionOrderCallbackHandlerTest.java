@@ -272,7 +272,8 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         }
 
         @Test
-        void shouldNotReturnError_WhenAboutToStartIsInvokedMintiNotEnabled() {
+        void shouldNotReturnError_WhenAboutToStartIsInvokedMintiNotJudicialReferralNotMintiTrack() {
+            when(featureToggleService.isMintiEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
                 .applicant1Represented(NO)
@@ -285,14 +286,15 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                        .value(DynamicListElement.builder()
                                                                   .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
                                                                   .build()).build()).build();
-            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
             assertThat(response.getData().get("allowOrderTrackAllocation")).isEqualTo("No");
         }
 
         @Test
-        void shouldNotReturnError_WhenMintiNotEnabled() {
+        void shouldNotReturnError_WhenMintiNotEnabledMintiNotJudicialReferralNotMintiTrack() {
+            when(featureToggleService.isMintiEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
                 .finalOrderAllocateToTrack(YES)
@@ -311,7 +313,8 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         }
 
         @Test
-        void shouldNotReturnError_WhenMintiNotEnabledNoJudicialReferralApplicantLip() {
+        void shouldNotReturnError_WhenMintiEnabledNoJudicialReferralApplicantLip() {
+            when(featureToggleService.isMintiEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
                 .applicant1Represented(NO)

@@ -183,12 +183,13 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                 .build();
         }
 
-        if (featureToggleService.isMintiEnabled()
-            && (isJudicialReferral(callbackParams) || isMultiOrIntTrack(caseData))) {
-            caseDataBuilder.allowOrderTrackAllocation(YES).finalOrderTrackToggle(null);
-        } else {
-            caseDataBuilder.allowOrderTrackAllocation(NO);
-            populateTrackToggle(caseData, caseDataBuilder);
+        if (featureToggleService.isMintiEnabled()) {
+            if (isJudicialReferral(callbackParams) || isMultiOrIntTrack(caseData)) {
+                caseDataBuilder.allowOrderTrackAllocation(YES).finalOrderTrackToggle(null);
+            } else {
+                caseDataBuilder.allowOrderTrackAllocation(NO);
+                populateTrackToggle(caseData, caseDataBuilder);
+            }
         }
 
         return nullPreviousSelections(caseDataBuilder);
