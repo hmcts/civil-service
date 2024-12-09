@@ -253,13 +253,15 @@ public class LocationHelper {
                                                                   RequestedCourt requestedCourt,
                                                                   Supplier<List<LocationRefData>> getLocations) {
         Optional<LocationRefData> matchingLocation = getMatching(getLocations.get(), requestedCourt);
-        String reference = updatedData.build().getLegacyCaseReference();
-        log.info("Case {}, requested court is {}", reference, requestedCourt != null ? "defined" : "undefined");
-        log.info(
-            "Case {}, there {} a location matching to requested court",
-            reference,
-            matchingLocation.isPresent() ? "is" : "is not"
-        );
+        Long reference = updatedData.build().getCcdCaseReference();
+        if (log.isInfoEnabled()) {
+            log.info("Case {}, requested court is {}", reference, requestedCourt != null ? "defined" : "undefined");
+            log.info(
+                "Case {}, there {} a location matching to requested court",
+                reference,
+                matchingLocation.isPresent() ? "is" : "is not"
+            );
+        }
         updatedData
             .caseManagementLocation(Stream.of(
                     Optional.ofNullable(requestedCourt).map(RequestedCourt::getCaseLocation),
