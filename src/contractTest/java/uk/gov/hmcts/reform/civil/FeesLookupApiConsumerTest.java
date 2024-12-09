@@ -67,7 +67,7 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
     @MockBean
     private FeatureToggleService featureToggleService;
 
-    @Pact(consumer = "civil-service")
+    @Pact(consumer = "civil_service")
     public RequestResponsePact getFeeForHearingSmallClaims(PactDslWithProvider builder) throws JSONException {
         return buildLookupFeeWithAmountPact(
             builder,
@@ -84,7 +84,7 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
         );
     }
 
-    @Pact(consumer = "civil-service")
+    @Pact(consumer = "civil_service")
     public RequestResponsePact getFeeForHearingFastTrackClaims(PactDslWithProvider builder) throws JSONException {
         return buildLookupFeeWithAmountPact(
             builder,
@@ -101,7 +101,7 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
         );
     }
 
-    @Pact(consumer = "civil-service")
+    @Pact(consumer = "civil_service")
     public RequestResponsePact getFeeForHearingMultiClaims(PactDslWithProvider builder) throws JSONException {
         return buildLookupFeeWithAmountPact(
             builder,
@@ -118,7 +118,7 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
         );
     }
 
-    @Pact(consumer = "civil-service")
+    @Pact(consumer = "civil_service")
     public RequestResponsePact getFeeForMoneyClaim(PactDslWithProvider builder) throws JSONException {
         return buildLookupFeeWithAmountPact(
             builder,
@@ -135,7 +135,7 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
         );
     }
 
-    @Pact(consumer = "civil-service")
+    @Pact(consumer = "civil_service")
     public RequestResponsePact getFeeForMoneyClaimWithoutKeyword(PactDslWithProvider builder) throws JSONException {
         return buildLookupFeeWithoutKeywordPact(
             builder,
@@ -151,7 +151,7 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
         );
     }
 
-    @Pact(consumer = "civil-service")
+    @Pact(consumer = "civil_service")
     public RequestResponsePact getFeeForGAWithNotice(PactDslWithProvider builder) throws JSONException {
         return buildLookupFeePact(
             builder,
@@ -167,7 +167,7 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
         );
     }
 
-    @Pact(consumer = "civil-service")
+    @Pact(consumer = "civil_service")
     public RequestResponsePact getFeeForConsentWithOrWithout(PactDslWithProvider builder) throws JSONException {
         return buildLookupFeePact(
             builder,
@@ -183,7 +183,7 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
         );
     }
 
-    @Pact(consumer = "civil-service")
+    @Pact(consumer = "civil_service")
     public RequestResponsePact getFeeForAppToVaryOrSuspend(PactDslWithProvider builder) throws JSONException {
         return buildLookupFeePact(
             builder,
@@ -288,7 +288,7 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
 
         Fee fee = generalAppFeesService.getFeeForGA(
             CaseData.builder().generalAppType(
-                    GAApplicationType.builder().types(List.of(GeneralApplicationTypes.VARY_ORDER))
+                    GAApplicationType.builder().types(List.of(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT))
                         .build())
                 .build());
         assertThat(fee.getCode(), is(equalTo("FEE0447")));

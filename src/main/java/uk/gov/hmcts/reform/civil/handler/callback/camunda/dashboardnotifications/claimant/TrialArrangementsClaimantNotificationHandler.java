@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_CP_TRIAL_ARRANGEMENTS_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_REQUIRED_CLAIMANT;
 
@@ -44,6 +45,7 @@ public class TrialArrangementsClaimantNotificationHandler extends CaseProgressio
 
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
-        return caseData.isApplicantNotRepresented() && SdoHelper.isFastTrack(caseData);
+        return caseData.isApplicantNotRepresented() && SdoHelper.isFastTrack(caseData)
+            && isNull(caseData.getTrialReadyApplicant());
     }
 }

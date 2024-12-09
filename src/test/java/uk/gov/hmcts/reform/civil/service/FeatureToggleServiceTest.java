@@ -40,24 +40,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenAutomatedHearingNoticeEnabledInvoked(Boolean toggleStat) {
-        var hearingAndListingKey = "ahn";
-        givenToggle(hearingAndListingKey, toggleStat);
-
-        assertThat(featureToggleService.isAutomatedHearingNoticeEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsCaseFlagsEnabledInvoked(Boolean toggleStat) {
-        var caseFlagsKey = "case-flags";
-        givenToggle(caseFlagsKey, toggleStat);
-
-        assertThat(featureToggleService.isCaseFlagsEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsGAForLipInvoked(Boolean toggleStat) {
         var caseFlagsKey = "GaForLips";
         givenToggle(caseFlagsKey, toggleStat);
@@ -117,15 +99,6 @@ class FeatureToggleServiceTest {
         givenToggle(pinInPostKey, toggleStat);
 
         assertThat(featureToggleService.isPinInPostEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenHmcIsEnabled(Boolean toggleStat) {
-        var hmcKey = "hmc";
-        givenToggle(hmcKey, toggleStat);
-
-        assertThat(featureToggleService.isHmcEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
@@ -223,9 +196,7 @@ class FeatureToggleServiceTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsCarmEnabled(Boolean toggleStat) {
-        var carmKey = "carm";
         var carmDateKey = "cam-enabled-for-case";
-        givenToggle(carmKey, toggleStat);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
             .setClaimTypeToSpecClaim()
@@ -317,6 +288,26 @@ class FeatureToggleServiceTest {
         givenToggle(isCoSCEnabledKey, toggleStat);
 
         assertThat(featureToggleService.isHmcNroEnabled()).isEqualTo(toggleStat);
+
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenisJOLiveFeedActive(Boolean toggleStat) {
+        when(featureToggleService.isJudgmentOnlineLive())
+            .thenReturn(toggleStat);
+        when(featureToggleService.isJOLiveFeedActive())
+            .thenReturn(toggleStat);
+        assertThat(featureToggleService.isJOLiveFeedActive()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsDefendantNoCOnline(Boolean toggleStat) {
+        var isDefendantNoCOnline = "isDefendantNoCOnline";
+        givenToggle(isDefendantNoCOnline, toggleStat);
+
+        assertThat(featureToggleService.isDefendantNoCOnline()).isEqualTo(toggleStat);
 
     }
 }
