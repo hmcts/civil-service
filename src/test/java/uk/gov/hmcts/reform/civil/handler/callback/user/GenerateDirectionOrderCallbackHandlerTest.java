@@ -594,6 +594,20 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             assertThat(response.getErrors()).containsExactlyInAnyOrder(NOT_ALLOWED_FOR_TRACK);
         }
 
+        @Test
+        void shouldNotThrowError_whenSmallTrackNotInJudicialReferral() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                .build().toBuilder()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+                .finalOrderAllocateToTrack(NO).build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+        }
+
         @Nested
         class FinalOrderTrackNotAllocated {
 
