@@ -743,7 +743,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             assertThat(response.getErrors()).isNull();
         }
 
-
         @Test
         void shouldNotThrowError_whenFastTrackBeingReallocatedToMintiTrackMintiEnabledNotJudicialReferral() {
             when(featureToggleService.isMintiEnabled()).thenReturn(true);
