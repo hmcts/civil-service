@@ -90,7 +90,7 @@ public class FeatureToggleService {
         ZoneId zoneId = ZoneId.systemDefault();
         long epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         boolean isSpecClaim = SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
-        return isSpecClaim && featureToggleApi.isFeatureEnabled("carm")
+        return isSpecClaim
             && featureToggleApi.isFeatureEnabledForDate("cam-enabled-for-case",
                                                         epoch, false);
     }
@@ -149,5 +149,9 @@ public class FeatureToggleService {
     public boolean isJOLiveFeedActive() {
         return isJudgmentOnlineLive()
             && featureToggleApi.isFeatureEnabled("isJOLiveFeedActive");
+    }
+
+    public boolean isDefendantNoCOnline()  {
+        return featureToggleApi.isFeatureEnabled("isDefendantNoCOnline");
     }
 }
