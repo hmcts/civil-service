@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.service.robotics.builders.EventBuildersConfiguration;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 
@@ -59,6 +60,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     TransitionsTestConfiguration.class,
     EventHistorySequencer.class,
     EventHistoryMapper.class,
+    EventBuildersConfiguration.class,
     RoboticsDataMapper.class,
     RoboticsAddressMapper.class,
     AddressLinesMapper.class,
