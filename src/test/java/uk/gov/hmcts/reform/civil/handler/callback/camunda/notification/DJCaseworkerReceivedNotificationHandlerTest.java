@@ -166,12 +166,12 @@ class DJCaseworkerReceivedNotificationHandlerTest {
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
                 CLAIM_NUMBER, caseData.getLegacyCaseReference(),
-                PAYMENT_TYPE, "Immediately £1203.00",
+                PAYMENT_TYPE, "Immediately £1193.00",
                 AMOUNT_CLAIMED, "1100",
                 RESPONDENT, "John Doe",
-                AMOUNT_OF_COSTS, "103.00",
+                AMOUNT_OF_COSTS, "93.00",
                 AMOUNT_PAID, "0",
-                AMOUNT_OF_JUDGMENT, "1203.00"
+                AMOUNT_OF_JUDGMENT, "1193.00"
             );
         }
 
@@ -182,9 +182,9 @@ class DJCaseworkerReceivedNotificationHandlerTest {
                 PAYMENT_TYPE, "By installments of £100.00 per two weeks",
                 AMOUNT_CLAIMED, "1100",
                 RESPONDENT, "John Doe",
-                AMOUNT_OF_COSTS, "103.00",
+                AMOUNT_OF_COSTS, "93.00",
                 AMOUNT_PAID, "0",
-                AMOUNT_OF_JUDGMENT, "1203.00"
+                AMOUNT_OF_JUDGMENT, "1193.00"
             );
         }
     }
