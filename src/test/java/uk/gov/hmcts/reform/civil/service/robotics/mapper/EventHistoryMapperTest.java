@@ -39,6 +39,10 @@ import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -7889,6 +7893,38 @@ class EventHistoryMapperTest {
                 .extracting("eventDetailsText").asString().isNotEmpty();
         }
 
+    }
+
+    @Nested
+    class SetAsideJudgment {
+        @Test
+        public void shouldGenerateRPAfeedfor_SetAside() {
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
+            caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
+            caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
+            caseData.setJoSetAsideApplicationDate(LocalDate.of(2022, 11, 11));
+            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
+            when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventCode").asString().contains("[170]");
+        }
+
+        @Test
+        public void shouldGenerateRPAfeedfor_SetAside_1v2() {
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate_Multi_party();
+            caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
+            caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
+            caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
+            caseData.setJoSetAsideApplicationDate(LocalDate.of(2022, 11, 11));
+            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
+            when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventCode").asString().contains("[170, 170]");
+
+        }
     }
 
     @Nested

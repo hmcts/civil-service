@@ -35,5 +35,13 @@ public class EventDetails {
     private LocalDateTime dateOfJudgment;
     private Boolean jointJudgment;
     private Boolean judgmentToBeRegistered;
+    //Set Aside Judgment
+    private String result;
+    private String applicant;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate applicationDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate resultDate;
+
 
 }
