@@ -12,8 +12,10 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,12 +23,16 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_BUNDLE_CREATED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_BUNDLE_CREATED;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 
 @Service
 @RequiredArgsConstructor
 public class BundleCreatedNotificationHandler extends CallbackHandler implements NotificationData {
 
     private final NotificationService notificationService;
+    private final OrganisationService organisationService;
     private final NotificationsProperties notificationsProperties;
     private static final List<CaseEvent> EVENTS = List.of(
         NOTIFY_APPLICANT_SOLICITOR1_FOR_BUNDLE_CREATED,
@@ -64,11 +70,18 @@ public class BundleCreatedNotificationHandler extends CallbackHandler implements
         }
         String emailAddress = getRecipientEmail(caseData, taskId);
         String template = getReferenceTemplateString(taskId);
+
+        Map<String, String> properties = new HashMap<>();
+        if (!isLip(caseData, taskId)) {
+            properties = addProperties(caseData);
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getOrgName(caseData, CaseEvent.valueOf(callbackParams.getRequest().getEventId())));
+        }
+
         if (nonNull(emailAddress)) {
             notificationService.sendMail(
                 emailAddress,
                 getTemplate(caseData, taskId),
-                isLip(caseData, taskId) ? addPropertiesLip(caseData, taskId) : addProperties(caseData),
+                isLip(caseData, taskId) ? addPropertiesLip(caseData, taskId) : properties,
                 String.format(template, caseData.getLegacyCaseReference())
             );
         }
@@ -135,10 +148,12 @@ public class BundleCreatedNotificationHandler extends CallbackHandler implements
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
-        );
+        return new HashMap<>(Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
+        ));
     }
 
     public Map<String, String> addPropertiesLip(CaseData caseData, String taskId) {
@@ -166,5 +181,23 @@ public class BundleCreatedNotificationHandler extends CallbackHandler implements
         } else {
             return false;
         }
+    }
+
+    private String getOrgName(CaseData caseData, CaseEvent caseEvent) {
+        return switch (caseEvent) {
+            case NOTIFY_APPLICANT_SOLICITOR1_FOR_BUNDLE_CREATED -> getApplicantLegalOrganizationName(
+                caseData,
+                organisationService
+            );
+            case NOTIFY_RESPONDENT_SOLICITOR1_FOR_BUNDLE_CREATED -> getRespondentLegalOrganizationName(
+                caseData.getRespondent1OrganisationPolicy(),
+                organisationService
+            );
+            case NOTIFY_RESPONDENT_SOLICITOR2_FOR_BUNDLE_CREATED -> getRespondentLegalOrganizationName(
+                caseData.getRespondent2OrganisationPolicy(),
+                organisationService
+            );
+            default -> throw new IllegalArgumentException("Invalid case event in " + caseEvent);
+        };
     }
 }
