@@ -84,6 +84,7 @@ java:
     CIVIL_S2S_AUTHORISED_SERVICES: payment_app,ccd_data,civil_service,civil-citizen-ui
     OCMC_CLIENT_ID: cmc_citizen
     CONSOLE_LOG_PATTERN: '%d{${LOGBACK_DATE_FORMAT}} %-5level [%thread] %logger{${LOGGER_LENGTH}}%ex{${EXCEPTION_LENGTH}} %mdc %msg%n}'
+    COURT_LOCATION_WA_DMN_ENABLED: false
 
   keyVaults:
     civil:

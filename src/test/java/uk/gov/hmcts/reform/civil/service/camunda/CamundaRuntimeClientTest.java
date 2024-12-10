@@ -8,14 +8,22 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class CamundaRuntimeClientTest {
 
     @InjectMocks
@@ -77,5 +85,42 @@ class CamundaRuntimeClientTest {
             ));
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void shouldReturnEvaluatedCourtsWhenValid() {
+        Map<String, Object> testMap = new HashMap<>();
+        testMap.put("Trial", Map.of(
+            "type", "String",
+            "value", "123456",
+            "valueInfo", Map.of()));
+        testMap.put("CMC", Map.of(
+            "type", "String",
+            "value", "123456",
+            "valueInfo", Map.of()));
+        testMap.put("CCMC", Map.of(
+            "type", "String",
+            "value", "123456",
+            "valueInfo", Map.of()));
+        testMap.put("PTR", Map.of(
+            "type", "String",
+            "value", "123456",
+            "valueInfo", Map.of()));
+        List<Map<String, Object>> evaluation = List.of(testMap);
+
+        when(camundaApi.evaluateDecision(any(), any(), any())).thenReturn(evaluation);
+
+        Map<String, Object> actual = camundaClient.getEvaluatedDmnCourtLocations("123456", "MULTI_CLAIM");
+
+        assertEquals(testMap, actual);
+    }
+
+    @Test
+    void shouldReturnNullWhenNoCourtInEvaluatedDmn() {
+        when(camundaApi.evaluateDecision(any(), any(), any())).thenReturn(Collections.emptyList());
+
+        Map<String, Object> actual = camundaClient.getEvaluatedDmnCourtLocations("123456", "MULTI_CLAIM");
+
+        assertNull(actual);
     }
 }
