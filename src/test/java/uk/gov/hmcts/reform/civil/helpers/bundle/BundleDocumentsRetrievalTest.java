@@ -9,7 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.BundleFileNameList;
-import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadFiles;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.bundle.BundlingRequestDocument;
@@ -62,12 +62,12 @@ class BundleDocumentsRetrievalTest {
     void shouldGetAllRemainingExpertsQuestions() {
 
         PartyType partyType = PartyType.CLAIMANT1;
-        EvidenceUploadFiles evidenceUploadFiles = EvidenceUploadFiles.NOTICE_OF_INTENTION;
+        EvidenceUploadType evidenceUploadFiles = EvidenceUploadType.NOTICE_OF_INTENTION;
         CaseData caseData = CaseData.builder().build();
 
         Document documentTest = new Document("testUrl", "binUrl",
-                                             "Name", "hash", null,
-                                             "14 Apr 2024 00:00:00"
+            "Name", "hash", null,
+            "14 Apr 2024 00:00:00"
         );
 
         UploadEvidenceExpert uploadEvidenceExpert = UploadEvidenceExpert.builder()
@@ -91,7 +91,7 @@ class BundleDocumentsRetrievalTest {
             when(conversionToBundleRequestDocs.covertExpertEvidenceTypeToBundleRequestDocs(
                 eq(listOfDocs),
                 eq(BundleFileNameList.QUESTIONS_TO.getDisplayName()),
-                eq(EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS.name())
+                eq(EvidenceUploadType.QUESTIONS_FOR_EXPERTS.name())
             )).thenReturn(expectedConvertedDocs);
 
             List<BundlingRequestDocument> result =
@@ -107,8 +107,8 @@ class BundleDocumentsRetrievalTest {
     void shouldGetAllOtherPartyQuestions() {
 
         Document documentTest = new Document("testUrl", "binUrl",
-                                             "Name", "hash", null,
-                                             "14 Apr 2024 00:00:00"
+            "Name", "hash", null,
+            "14 Apr 2024 00:00:00"
         );
 
         UploadEvidenceExpert uploadEvidenceExpert = UploadEvidenceExpert.builder()
@@ -176,7 +176,7 @@ class BundleDocumentsRetrievalTest {
         );
 
         PartyType partyType = PartyType.CLAIMANT1;
-        EvidenceUploadFiles evidenceUploadFiles = EvidenceUploadFiles.EXPERT_REPORT;
+        EvidenceUploadType evidenceUploadFiles = EvidenceUploadType.EXPERT_REPORT;
         CaseData caseData = CaseData.builder().build();
         BundleFileNameList bundleFileNameList = BundleFileNameList.CASE_SUMMARY_FILE_DISPLAY_NAME;
         Set<String> allExpertsNames = Set.of("Expert1", "Expert2");
