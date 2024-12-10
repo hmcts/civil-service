@@ -46,6 +46,7 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseEventDataService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -167,6 +168,9 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private CaseFlagsInitialiser caseFlagInitialiser;
+
+    @MockBean
+    CoreCaseEventDataService coreCaseEventDataService;
 
     @Autowired
     private AssignCategoryId assignCategoryId;
