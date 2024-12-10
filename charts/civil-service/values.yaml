@@ -10,8 +10,19 @@ camunda-bpm:
 
 aac-manage-case-assignment:
   enabled: false
+
 ccd:
   enabled: false
+
+ccd-case-document-am-api:
+  enabled: false
+
+em-ccdorc:
+  enabled: false
+
+em-stitching:
+  enabled: false
+
 java:
   applicationPort: 4000
   image: 'hmctspublic.azurecr.io/civil/service:latest'

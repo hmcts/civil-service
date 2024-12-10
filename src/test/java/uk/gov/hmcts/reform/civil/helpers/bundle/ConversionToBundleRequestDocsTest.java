@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadFiles;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.bundle.BundlingRequestDocument;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
@@ -101,7 +101,7 @@ class ConversionToBundleRequestDocsTest {
     @Test
     void shouldConvertEvidenceUploadToBundleRequestDocs() {
         String fileNamePrefix = "fileNamePrefix";
-        String documentType = EvidenceUploadFiles.SKELETON_ARGUMENT.name();
+        String documentType = EvidenceUploadType.SKELETON_ARGUMENT.name();
         PartyType partyType = PartyType.CLAIMANT1;
 
         Document document = Document.builder()
