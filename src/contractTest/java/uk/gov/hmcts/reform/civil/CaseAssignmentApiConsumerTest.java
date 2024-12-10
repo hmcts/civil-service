@@ -32,6 +32,10 @@ import static org.hamcrest.Matchers.is;
 public class CaseAssignmentApiConsumerTest extends BaseContractTest {
 
     public static final String ENDPOINT = "/case-users";
+    protected static final String CASE_REFERENCE = "1583841721773828";
+    protected static final String USER_ID = "1234";
+    protected static final String CASE_ROLE = "[CASE_ROLE_CAN_VIEW]";
+    protected static final String REMOVED_SUCCESSFULLY = "Case-User-Role assignments removed successfully";
 
     @Autowired
     private CaseAssignmentApi caseAssignmentApi;
@@ -58,7 +62,7 @@ public class CaseAssignmentApiConsumerTest extends BaseContractTest {
         );
         assertThat(
             response.getStatusMessage(),
-            is(equalTo("REMOVED"))
+            is(equalTo(REMOVED_SUCCESSFULLY))
         );
     }
 
@@ -68,11 +72,11 @@ public class CaseAssignmentApiConsumerTest extends BaseContractTest {
         CaseAssignmentUserRolesResource response = caseAssignmentApi.getUserRoles(
             AUTHORIZATION_TOKEN,
             SERVICE_AUTH_TOKEN,
-            List.of("1583841721773828")
+            List.of(CASE_REFERENCE)
         );
         assertThat(
             response.getCaseAssignmentUserRoles().get(0).getUserId(),
-            is(equalTo("userId123"))
+            is(equalTo(USER_ID))
         );
     }
 
@@ -80,11 +84,11 @@ public class CaseAssignmentApiConsumerTest extends BaseContractTest {
         return CaseAssignmentUserRolesRequest.builder()
             .caseAssignmentUserRolesWithOrganisation(
                 List.of(CaseAssignmentUserRoleWithOrganisation.builder()
-                            .caseDataId("caseDataIdTest")
-                            .caseRole("caseRoleTest")
-                            .userId("userIdTest")
-                            .organisationId("organisationIdTest")
-                            .build()))
+                    .caseDataId(CASE_REFERENCE)
+                    .caseRole(CASE_ROLE)
+                    .userId(USER_ID)
+                    .organisationId("organisationIdTest")
+                    .build()))
             .build();
     }
 
@@ -110,7 +114,7 @@ public class CaseAssignmentApiConsumerTest extends BaseContractTest {
             .path(ENDPOINT)
             .headers(SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN, AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
             .method(HttpMethod.GET.toString())
-            .matchQuery("case_ids", "1583841721773828", "1583841721773828")
+            .matchQuery("case_ids", CASE_REFERENCE, CASE_REFERENCE)
             .willRespondWith()
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .body(buildUserRolesResponseBody())
@@ -120,22 +124,22 @@ public class CaseAssignmentApiConsumerTest extends BaseContractTest {
 
     static DslPart buildRemoveUserRolesResponseBody() {
         return newJsonBody(response ->
-                               response
-                                   .stringMatcher("status_message", "REMOVED", "REMOVED")
+            response
+                .stringType("status_message", REMOVED_SUCCESSFULLY)
         ).build();
     }
 
     static DslPart buildUserRolesResponseBody() {
         return newJsonBody(response ->
-                               response
-                                   .minArrayLike(
-                                       "case_users",
-                                       1,
-                                       caseAssignmentUserRoles -> caseAssignmentUserRoles
-                                           .stringType("case_id", "1583841721773828")
-                                           .stringType("user_id", "userId123")
-                                           .stringType("case_role", "caseRole123")
-                                   )
+            response
+                .minArrayLike(
+                    "case_users",
+                    1,
+                    caseAssignmentUserRoles -> caseAssignmentUserRoles
+                        .stringType("case_id", CASE_REFERENCE)
+                        .stringType("user_id", USER_ID)
+                        .stringType("case_role", CASE_ROLE)
+                )
         ).build();
     }
 }
