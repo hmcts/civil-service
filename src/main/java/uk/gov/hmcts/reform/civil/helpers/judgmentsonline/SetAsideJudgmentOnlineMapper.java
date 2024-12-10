@@ -29,6 +29,7 @@ public class SetAsideJudgmentOnlineMapper extends JudgmentOnlineMapper {
             .lastUpdateTimeStamp(LocalDateTime.now())
             .cancelledTimeStamp(LocalDateTime.now())
             .rtlState(getNextRTLState(activeJudgment.getRtlState()))
+            .setAsideApplicationDate(getApplicationDateToSetAside(caseData))
             .build();
     }
 
@@ -54,5 +55,13 @@ public class SetAsideJudgmentOnlineMapper extends JudgmentOnlineMapper {
         } else {
             return currentDate;
         }
+    }
+
+    private LocalDate getApplicationDateToSetAside(CaseData caseData) {
+        if (JudgmentSetAsideReason.JUDGE_ORDER.equals(caseData.getJoSetAsideReason())
+            && JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION.equals(caseData.getJoSetAsideOrderType())) {
+            return caseData.getJoSetAsideApplicationDate();
+        }
+        return null;
     }
 }

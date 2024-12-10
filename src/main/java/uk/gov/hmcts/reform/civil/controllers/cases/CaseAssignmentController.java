@@ -28,6 +28,8 @@ import uk.gov.hmcts.reform.civil.service.search.CaseLegacyReferenceSearchService
 
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CMC_CASE_TYPE;
+
 @Tag(name = "Case Assignment Controller")
 @Slf4j
 @RestController
@@ -76,6 +78,31 @@ public class CaseAssignmentController {
         return new ResponseEntity<>(redirectUrl, HttpStatus.OK);
     }
 
+    @GetMapping(path = {
+        "/reference/{caseReference}/defendant-link-status"
+    })
+    @Operation(summary = "Check whether a claim is linked to a defendant")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized"),
+        @ApiResponse(responseCode = "400", description = "Bad Request")})
+    public ResponseEntity<Boolean> isDefendantLinked(
+        @PathVariable("caseReference") String caseReference) {
+        log.info("Check claim reference {} is linked to defendant", caseReference);
+        CaseDetails caseDetails = caseByLegacyReferenceSearchService.getCivilOrOcmcCaseDataByCaseReference(caseReference);
+        boolean status = false;
+        if (caseDetails != null) {
+            boolean isOcmcCase = caseDetails.getCaseTypeId().equals(CMC_CASE_TYPE);
+            if (isOcmcCase) {
+                status = defendantPinToPostLRspecService.isOcmcDefendantLinked(caseReference);
+            } else {
+                status = defendantPinToPostLRspecService.isDefendantLinked(caseDetails);
+            }
+        }
+        return new ResponseEntity<>(status, HttpStatus.OK);
+    }
+
+    @Deprecated
     @GetMapping(path = {
         "/reference/{caseReference}/ocmc"
     })

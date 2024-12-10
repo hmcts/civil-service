@@ -32,4 +32,20 @@ public class CaseLegacyReferenceSearchService {
         return searchResult.getCases().get(0);
     }
 
+    public CaseDetails getCivilOrOcmcCaseDataByCaseReference(String caseReference) {
+        log.info("searching cases with reference {}", caseReference);
+        Query civilQuery = new Query(boolQuery().must(
+            matchQuery("data.legacyCaseReference", caseReference)), List.of(), 0);
+        SearchResult searchResult = coreCaseDataService.searchCases(civilQuery);
+        if (searchResult == null || searchResult.getCases().isEmpty()) {
+            Query ocmcQuery = new Query(boolQuery().must(
+                matchQuery("data.previousServiceCaseReference", caseReference)), List.of(), 0);
+            searchResult = coreCaseDataService.searchCMCCases(ocmcQuery);
+            if (searchResult == null || searchResult.getCases().isEmpty()) {
+                log.error("no case found for {}", caseReference);
+                return null;
+            }
+        }
+        return searchResult.getCases().get(0);
+    }
 }

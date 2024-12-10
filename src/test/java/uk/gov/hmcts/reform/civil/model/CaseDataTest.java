@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOne
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
+import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -49,6 +50,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENCE_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
+import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -1201,6 +1204,58 @@ public class CaseDataTest {
             boolean isPaidLessThanClaimAmount = caseData.isPaidLessThanClaimAmount();
             //Then
             assertFalse(isPaidLessThanClaimAmount);
+        }
+
+        @Test
+        void shouldReturnTrueIfHearingFeePaymentStatusSuccess() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .hearingFeePaymentDetails(PaymentDetails.builder().status(SUCCESS).build())
+                .build();
+            //When
+            boolean isHearingFeePaid = caseData.isHearingFeePaid();
+            //Then
+            assertTrue(isHearingFeePaid);
+        }
+
+        @Test
+        void shouldReturnTrueIfHearingFeePaidWithHWF() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .hearingHelpFeesReferenceNumber("hwf-ref")
+                .feePaymentOutcomeDetails(
+                    FeePaymentOutcomeDetails.builder()
+                        .hwfFullRemissionGrantedForHearingFee(YES)
+                        .build())
+                .applicant1Represented(NO)
+                .respondent1Represented(NO)
+                .build();
+            //When
+            boolean isHearingFeePaid = caseData.isHearingFeePaid();
+            //Then
+            assertTrue(isHearingFeePaid);
+        }
+
+        @Test
+        void shouldReturnFalseIfHearingPaymentIsNotSuccess() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .hearingFeePaymentDetails(PaymentDetails.builder().status(FAILED).build())
+                .build();
+            //When
+            boolean isHearingFeePaid = caseData.isHearingFeePaid();
+            //Then
+            assertFalse(isHearingFeePaid);
+        }
+
+        @Test
+        void shouldReturnFalseIfHearingPaymentIsNullAndNoHWF() {
+            //Given
+            CaseData caseData = CaseData.builder().build();
+            //When
+            boolean isHearingFeePaid = caseData.isHearingFeePaid();
+            //Then
+            assertFalse(isHearingFeePaid);
         }
     }
 
