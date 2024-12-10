@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
+import uk.gov.hmcts.reform.civil.service.DocumentConversionService;
 import uk.gov.hmcts.reform.civil.stitch.PdfMerger;
 
 import java.time.LocalDate;
@@ -23,6 +24,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.LITIGANT_IN_PERSON_CLAIM_FORM;
@@ -40,13 +42,15 @@ class CivilStitchServiceTest {
 
     @Mock
     private DocumentManagementService managementService;
+    @Mock
+    private DocumentConversionService conversionService;
 
     MockedStatic<PdfMerger> pdfMergerMockedStatic;
 
     @Test
     void shouldReturnStitchedDocuments() {
         byte[] docArray = {3, 5, 2, 4, 1};
-        when(managementService.downloadDocument(anyString(), anyString())).thenReturn(docArray);
+        when(conversionService.convertDocumentToPdf(any(Document.class), anyLong(), anyString())).thenReturn(docArray);
         when(managementService.uploadDocument(anyString(), any(PDF.class))).thenReturn(STITCHED_DOC);
         pdfMergerMockedStatic = Mockito.mockStatic(PdfMerger.class);
         pdfMergerMockedStatic.when(() -> PdfMerger.mergeDocuments(anyList(), anyString())).thenReturn(docArray);
@@ -57,6 +61,7 @@ class CivilStitchServiceTest {
                                                                                     DocumentType.SEALED_CLAIM,
                                                                                     BEARER_TOKEN);
         assertEquals(STITCHED_DOC, caseDocument);
+        pdfMergerMockedStatic.close();
     }
 
     private final List<DocumentMetaData> documents = Arrays.asList(
