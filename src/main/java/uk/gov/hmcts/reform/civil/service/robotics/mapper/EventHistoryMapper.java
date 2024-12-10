@@ -539,7 +539,7 @@ public class EventHistoryMapper {
             .eventSequence(prepareEventSequence(builder.build()))
             .litigiousPartyID(litigiousPartyID)
             .eventCode(SET_ASIDE_JUDGMENT.getCode())
-            .dateReceived(LocalDateTime.now())
+            .dateReceived(caseData.getJoSetAsideCreatedDate())
             .eventDetails(getSetAsideEventDetails(caseData))
             .eventDetailsText("")
             .build();

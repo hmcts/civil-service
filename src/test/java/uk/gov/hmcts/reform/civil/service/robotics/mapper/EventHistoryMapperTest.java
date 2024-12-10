@@ -7898,12 +7898,13 @@ class EventHistoryMapperTest {
     @Nested
     class SetAsideJudgment {
         @Test
-        public void shouldGenerateRPAfeedfor_SetAside() {
+        public void shouldGenerateRPAFeedfor_SetAside() {
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
             caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
             caseData.setJoSetAsideApplicationDate(LocalDate.of(2022, 11, 11));
+            caseData.setJoSetAsideCreatedDate(LocalDateTime.now());
             caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
             when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
@@ -7918,6 +7919,7 @@ class EventHistoryMapperTest {
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
             caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
             caseData.setJoSetAsideApplicationDate(LocalDate.of(2022, 11, 11));
+            caseData.setJoSetAsideCreatedDate(LocalDateTime.now());
             caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
             when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
