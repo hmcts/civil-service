@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.BundleFileNameList;
-import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadFiles;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.TypeOfDocDocumentaryEvidenceOfTrial;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -121,12 +121,12 @@ public class BundleRequestMapper {
         Arrays.stream(PartyType.values()).toList().forEach(partyType -> {
             Set<String> allJointExpertsNames = bundleDocumentsRetrieval.getAllExpertsNames(
                 partyType,
-                EvidenceUploadFiles.JOINT_STATEMENT,
+                EvidenceUploadType.JOINT_STATEMENT,
                 caseData
             );
             bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getAllExpertReports(
                 partyType,
-                EvidenceUploadFiles.JOINT_STATEMENT,
+                EvidenceUploadType.JOINT_STATEMENT,
                 caseData,
                 BundleFileNameList.JOINT_STATEMENTS_OF_EXPERTS,
                 allJointExpertsNames
@@ -136,7 +136,7 @@ public class BundleRequestMapper {
             ));
             bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getAllExpertReports(
                 partyType,
-                EvidenceUploadFiles.ANSWERS_FOR_EXPERTS,
+                EvidenceUploadType.ANSWERS_FOR_EXPERTS,
                 caseData,
                 BundleFileNameList.REPLIES_FROM,
                 allJointExpertsNames
@@ -161,11 +161,11 @@ public class BundleRequestMapper {
         bundlingRequestDocuments.addAll(conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(
             getEvidenceUploadDocsByPartyAndDocType(
                 partyType,
-                EvidenceUploadFiles.COSTS,
+                EvidenceUploadType.COSTS,
                 caseData
             ),
             DOC_FILE_NAME_WITH_DATE,
-            EvidenceUploadFiles.COSTS.name(),
+            EvidenceUploadType.COSTS.name(),
             partyType
         ));
         return ElementUtils.wrapElements(bundlingRequestDocuments);
@@ -175,14 +175,14 @@ public class BundleRequestMapper {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         bundlingRequestDocuments.addAll(conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(
             getEvidenceUploadDocsByPartyAndDocType(partyType,
-                                                   EvidenceUploadFiles.DOCUMENTS_FOR_DISCLOSURE, caseData
+                                                   EvidenceUploadType.DOCUMENTS_FOR_DISCLOSURE, caseData
             ),
             DOC_FILE_NAME,
-            EvidenceUploadFiles.DOCUMENTS_FOR_DISCLOSURE.name(),
+            EvidenceUploadType.DOCUMENTS_FOR_DISCLOSURE.name(),
             partyType
         ));
         List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialList =
-            getEvidenceUploadDocsByPartyAndDocType(partyType, EvidenceUploadFiles.DOCUMENTARY, caseData);
+            getEvidenceUploadDocsByPartyAndDocType(partyType, EvidenceUploadType.DOCUMENTARY, caseData);
 
         if (documentEvidenceForTrialList != null) {
             bundlingRequestDocuments.addAll(conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(
@@ -192,7 +192,7 @@ public class BundleRequestMapper {
                     true
                 ),
                 DOC_FILE_NAME,
-                EvidenceUploadFiles.DOCUMENTARY.name(),
+                EvidenceUploadType.DOCUMENTARY.name(),
                 partyType
             ));
         }
@@ -203,17 +203,17 @@ public class BundleRequestMapper {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         Set<String> allExpertsNames = bundleDocumentsRetrieval.getAllExpertsNames(
             partyType,
-            EvidenceUploadFiles.EXPERT_REPORT,
+            EvidenceUploadType.EXPERT_REPORT,
             caseData
         );
         Set<String> allJointExpertsNames = bundleDocumentsRetrieval.getAllExpertsNames(
             partyType,
-            EvidenceUploadFiles.JOINT_STATEMENT,
+            EvidenceUploadType.JOINT_STATEMENT,
             caseData
         );
         bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getAllExpertReports(
             partyType,
-            EvidenceUploadFiles.EXPERT_REPORT,
+            EvidenceUploadType.EXPERT_REPORT,
             caseData,
             BundleFileNameList.EXPERT_EVIDENCE,
             allExpertsNames
@@ -223,19 +223,19 @@ public class BundleRequestMapper {
         ));
         bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getAllExpertReports(
             partyType,
-            EvidenceUploadFiles.ANSWERS_FOR_EXPERTS,
+            EvidenceUploadType.ANSWERS_FOR_EXPERTS,
             caseData,
             BundleFileNameList.REPLIES_FROM,
             allExpertsNames
         ));
         bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getAllRemainingExpertQuestions(
             partyType,
-            EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS,
+            EvidenceUploadType.QUESTIONS_FOR_EXPERTS,
             caseData
         ));
         bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getAllRemainingExpertReports(
             partyType,
-            EvidenceUploadFiles.ANSWERS_FOR_EXPERTS,
+            EvidenceUploadType.ANSWERS_FOR_EXPERTS,
             caseData,
             BundleFileNameList.REPLIES_FROM,
             allExpertsNames,
@@ -250,7 +250,7 @@ public class BundleRequestMapper {
         Map<String, List<Element<UploadEvidenceWitness>>> witnessStatmentsMap =
             bundleRequestDocsOrganizer.groupWitnessStatementsByName(getWitnessDocsByPartyAndDocType(
                 partyType,
-                EvidenceUploadFiles.WITNESS_STATEMENT,
+                EvidenceUploadType.WITNESS_STATEMENT,
                 caseData
             ));
         List<Element<UploadEvidenceWitness>> witnessStatementSelf = bundleDocumentsRetrieval.getSelfStatement(
@@ -260,44 +260,44 @@ public class BundleRequestMapper {
         bundlingRequestDocuments.addAll(conversionToBundleRequestDocs.covertWitnessEvidenceToBundleRequestDocs(
             witnessStatementSelf,
             BundleFileNameList.WITNESS_STATEMENT_DISPLAY_NAME.getDisplayName(),
-            EvidenceUploadFiles.WITNESS_STATEMENT.name(),
+            EvidenceUploadType.WITNESS_STATEMENT.name(),
             partyType,
             true
         ));
         bundlingRequestDocuments.addAll(conversionToBundleRequestDocs.covertOtherWitnessEvidenceToBundleRequestDocs(
             witnessStatmentsMap,
             BundleFileNameList.WITNESS_STATEMENT_OTHER_DISPLAY_NAME.getDisplayName(),
-            EvidenceUploadFiles.WITNESS_STATEMENT.name(),
+            EvidenceUploadType.WITNESS_STATEMENT.name(),
             party
         ));
         bundlingRequestDocuments.addAll(conversionToBundleRequestDocs.covertWitnessEvidenceToBundleRequestDocs(
-            getWitnessDocsByPartyAndDocType(partyType, EvidenceUploadFiles.WITNESS_SUMMARY, caseData),
+            getWitnessDocsByPartyAndDocType(partyType, EvidenceUploadType.WITNESS_SUMMARY, caseData),
             BundleFileNameList.WITNESS_SUMMARY.getDisplayName(),
-            EvidenceUploadFiles.WITNESS_SUMMARY.name(),
+            EvidenceUploadType.WITNESS_SUMMARY.name(),
             partyType,
             false
         ));
         bundlingRequestDocuments.addAll(conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(
             getEvidenceUploadDocsByPartyAndDocType(
                 partyType,
-                EvidenceUploadFiles.DOCUMENTS_REFERRED,
+                EvidenceUploadType.DOCUMENTS_REFERRED,
                 caseData
             ),
             BundleFileNameList.DOC_REFERRED_TO.getDisplayName(),
-            EvidenceUploadFiles.DOCUMENTS_REFERRED.name(),
+            EvidenceUploadType.DOCUMENTS_REFERRED.name(),
             partyType
         ));
         bundlingRequestDocuments.addAll(conversionToBundleRequestDocs.covertWitnessEvidenceToBundleRequestDocs(
             getWitnessDocsByPartyAndDocType(
-                partyType, EvidenceUploadFiles.NOTICE_OF_INTENTION, caseData),
+                partyType, EvidenceUploadType.NOTICE_OF_INTENTION, caseData),
             BundleFileNameList.HEARSAY_NOTICE.getDisplayName(),
-            EvidenceUploadFiles.NOTICE_OF_INTENTION.name(),
+            EvidenceUploadType.NOTICE_OF_INTENTION.name(),
             partyType,
             false
         ));
         List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrial = getEvidenceUploadDocsByPartyAndDocType(
             partyType,
-            EvidenceUploadFiles.DOCUMENTARY,
+            EvidenceUploadType.DOCUMENTARY,
             caseData
         );
         if (documentEvidenceForTrial != null) {
@@ -410,7 +410,7 @@ public class BundleRequestMapper {
                                                                        bundleDocumentsRetrieval.getDocumentaryEvidenceByType(
                                                                            getEvidenceUploadDocsByPartyAndDocType(
                                                                                partyType,
-                                                                               EvidenceUploadFiles.DOCUMENTARY,
+                                                                               EvidenceUploadType.DOCUMENTARY,
                                                                                caseData
                                                                            ),
                                                                            TypeOfDocDocumentaryEvidenceOfTrial.PART18.getDisplayNames(),
@@ -427,7 +427,7 @@ public class BundleRequestMapper {
                                                                        bundleDocumentsRetrieval.getDocumentaryEvidenceByType(
                                                                            getEvidenceUploadDocsByPartyAndDocType(
                                                                                partyType,
-                                                                               EvidenceUploadFiles.DOCUMENTARY,
+                                                                               EvidenceUploadType.DOCUMENTARY,
                                                                                caseData
                                                                            ),
                                                                            TypeOfDocDocumentaryEvidenceOfTrial.SCHEDULE_OF_LOSS.getDisplayNames(),
@@ -448,11 +448,11 @@ public class BundleRequestMapper {
                                                                    conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(
                                                                        getEvidenceUploadDocsByPartyAndDocType(
                                                                            partyType,
-                                                                           EvidenceUploadFiles.CASE_SUMMARY,
+                                                                           EvidenceUploadType.CASE_SUMMARY,
                                                                            caseData
                                                                        ),
                                                                        BundleFileNameList.CASE_SUMMARY_FILE_DISPLAY_NAME.getDisplayName(),
-                                                                       EvidenceUploadFiles.CASE_SUMMARY.name(),
+                                                                       EvidenceUploadType.CASE_SUMMARY.name(),
                                                                        partyType
                                                                    ))
         );
@@ -462,7 +462,7 @@ public class BundleRequestMapper {
                                                                        bundleDocumentsRetrieval.getDocumentaryEvidenceByType(
                                                                            getEvidenceUploadDocsByPartyAndDocType(
                                                                                partyType,
-                                                                               EvidenceUploadFiles.DOCUMENTARY,
+                                                                               EvidenceUploadType.DOCUMENTARY,
                                                                                caseData
                                                                            ),
                                                                            TypeOfDocDocumentaryEvidenceOfTrial.CHRONOLOGY.getDisplayNames(),
@@ -479,7 +479,7 @@ public class BundleRequestMapper {
                                                                        bundleDocumentsRetrieval.getDocumentaryEvidenceByType(
                                                                            getEvidenceUploadDocsByPartyAndDocType(
                                                                                partyType,
-                                                                               EvidenceUploadFiles.DOCUMENTARY,
+                                                                               EvidenceUploadType.DOCUMENTARY,
                                                                                caseData
                                                                            ),
                                                                            TypeOfDocDocumentaryEvidenceOfTrial.TIMETABLE.getDisplayNames(),
@@ -495,11 +495,11 @@ public class BundleRequestMapper {
                                                                    conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(
                                                                        getEvidenceUploadDocsByPartyAndDocType(
                                                                            partyType,
-                                                                           EvidenceUploadFiles.SKELETON_ARGUMENT,
+                                                                           EvidenceUploadType.SKELETON_ARGUMENT,
                                                                            caseData
                                                                        ),
                                                                        BundleFileNameList.SKELETON_ARGUMENT.getDisplayName(),
-                                                                       EvidenceUploadFiles.SKELETON_ARGUMENT.name(),
+                                                                       EvidenceUploadType.SKELETON_ARGUMENT.name(),
                                                                        partyType
                                                                    ))
         );
