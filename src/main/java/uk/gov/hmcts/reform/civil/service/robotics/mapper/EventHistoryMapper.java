@@ -559,10 +559,7 @@ public class EventHistoryMapper {
             resultDate = caseData.getJoSetAsideOrderDate();
 
         } else if (JudgmentSetAsideReason.JUDGMENT_ERROR.equals(caseData.getJoSetAsideReason())) {
-            if (JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION.equals(caseData.getJoSetAsideOrderType())) {
-                appDate = caseData.getJoSetAsideApplicationDate();
                 applicant = SetAsideApplicantTypeForRPA.PROPER_OFFICER.getValue();
-            }
         }
         return EventDetails.builder()
             .result(SetAsideResultTypeForRPA.GRANTED.name())

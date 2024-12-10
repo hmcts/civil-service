@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -94,11 +93,11 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         caseData.setJoIsLiveJudgmentExists(YesOrNo.NO);
         caseData.setJoIsDisplayInJudgmentTab(YesOrNo.NO);
-        caseData.setJoSetAsideCreatedDate(LocalDateTime.now());
         setAsideJudgmentOnlineMapper.moveToHistoricJudgment(caseData);
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.businessProcess(BusinessProcess.ready(SET_ASIDE_JUDGMENT));
+        caseDataBuilder.businessProcess(BusinessProcess.ready(SET_ASIDE_JUDGMENT))
+            .joSetAsideCreatedDate(LocalDateTime.now());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
