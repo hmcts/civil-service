@@ -211,7 +211,7 @@ class SendAndReplyCallbackHandlerTest {
             assertThat(responseCaseData.getSendMessageContent()).isNull();
             assertThat(unwrapElements(responseCaseData.getMessages())).isEqualTo(expectedMessages);
             assertThat(responseCaseData.getLastMessage()).isEqualTo(expectedMessage);
-            assertThat(responseCaseData.getLastMessageAllocatedTrack()).isEqualTo("Small Claim");
+            assertThat(responseCaseData.getLastMessageAllocatedTrack()).isEqualTo("Small claim");
             assertThat(responseCaseData.getLastMessageJudgeLabel()).isNull();
 
             verify(messageService, times(1))
@@ -251,7 +251,7 @@ class SendAndReplyCallbackHandlerTest {
             assertThat(responseCaseData.getSendMessageContent()).isNull();
             assertThat(unwrapElements(responseCaseData.getMessages())).isEqualTo(expectedMessages);
             assertThat(responseCaseData.getLastMessage()).isEqualTo(expectedMessage);
-            assertThat(responseCaseData.getLastMessageAllocatedTrack()).isEqualTo("Fast Track");
+            assertThat(responseCaseData.getLastMessageAllocatedTrack()).isEqualTo("Fast track");
             assertThat(responseCaseData.getLastMessageJudgeLabel()).isEqualTo("Judge");
 
             verify(messageService, times(1))
@@ -291,7 +291,7 @@ class SendAndReplyCallbackHandlerTest {
             assertThat(responseCaseData.getSendMessageContent()).isNull();
             assertThat(unwrapElements(responseCaseData.getMessages())).isEqualTo(expectedMessages);
             assertThat(responseCaseData.getLastMessage()).isEqualTo(expectedMessage);
-            assertThat(responseCaseData.getLastMessageAllocatedTrack()).isEqualTo("Fast Track");
+            assertThat(responseCaseData.getLastMessageAllocatedTrack()).isEqualTo("Fast track");
             assertThat(responseCaseData.getLastMessageJudgeLabel()).isEqualTo("CJ");
 
             verify(messageService, times(1))
@@ -331,7 +331,7 @@ class SendAndReplyCallbackHandlerTest {
             assertThat(responseCaseData.getSendMessageContent()).isNull();
             assertThat(unwrapElements(responseCaseData.getMessages())).isEqualTo(expectedMessages);
             assertThat(responseCaseData.getLastMessage()).isEqualTo(expectedMessage);
-            assertThat(responseCaseData.getLastMessageAllocatedTrack()).isEqualTo("Small Claim");
+            assertThat(responseCaseData.getLastMessageAllocatedTrack()).isEqualTo("Small claim");
             assertThat(responseCaseData.getLastMessageJudgeLabel()).isEqualTo("DJ");
 
             verify(messageService, times(1))

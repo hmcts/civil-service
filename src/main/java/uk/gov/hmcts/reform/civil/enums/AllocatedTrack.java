@@ -118,9 +118,9 @@ public enum AllocatedTrack {
     public static String toStringValueForMessage(AllocatedTrack allocatedTrack) {
         switch (allocatedTrack) {
             case FAST_CLAIM:
-                return "Fast Track";
+                return "Fast track";
             case SMALL_CLAIM:
-                return "Small Claim";
+                return "Small claim";
             default:
                 throw new IllegalArgumentException("Invalid track type in " + allocatedTrack);
         }
