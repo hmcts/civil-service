@@ -75,7 +75,7 @@ public class FeatureToggleService {
     }
 
     public boolean isJudgmentOnlineLive() {
-        return featureToggleApi.isFeatureEnabled("isJudgmentOnlineLive");
+        return false;
     }
 
     public boolean isMintiEnabled() {
@@ -83,7 +83,7 @@ public class FeatureToggleService {
     }
 
     public boolean isCjesServiceAvailable() {
-        return featureToggleApi.isFeatureEnabled("isCjesServiceAvailable");
+        return false;
     }
 
     public boolean isCarmEnabledForCase(CaseData caseData) {
