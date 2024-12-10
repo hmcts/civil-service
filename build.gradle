@@ -130,7 +130,7 @@ allprojects {
       }
 
       //Solves CVE-2023-6481
-      dependencySet(group: 'ch.qos.logback', version: '1.2.13') {
+      dependencySet(group: 'ch.qos.logback', version: '1.5.12') {
         entry 'logback-core'
         entry 'logback-classic'
       }
