@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
@@ -47,7 +48,10 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationClaimantOfHearingHandler.TASK_ID_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationClaimantOfHearingHandler.TASK_ID_CLAIMANT_HMC;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 
 @ExtendWith(MockitoExtension.class)
 class NotificationClaimantOfHearingHandlerTest {
@@ -60,6 +64,8 @@ class NotificationClaimantOfHearingHandlerTest {
     NotificationsProperties notificationsProperties;
     @Mock
     HearingNoticeCamundaService hearingNoticeCamundaService;
+    @Mock
+    private OrganisationService organisationService;
     @InjectMocks
     private NotificationClaimantOfHearingHandler handler;
 
@@ -92,7 +98,7 @@ class NotificationClaimantOfHearingHandlerTest {
             verify(notificationService).sendMail(
                 "applicantemail@hmcts.net",
                 "test-template-fee-claimant-id",
-                getNotificationFeeDataMap(caseData),
+                getNotificationFeeDataMap(caseData, false),
                 "notification-of-hearing-000HN001"
             );
         }
@@ -364,7 +370,7 @@ class NotificationClaimantOfHearingHandlerTest {
             verify(notificationService).sendMail(
                 "applicantemail@hmcts.net",
                 "test-template-fee-claimant-id",
-                getNotificationFeeDataMap(caseData),
+                getNotificationFeeDataMap(caseData, true),
                 "notification-of-hearing-000HN001"
             );
         }
@@ -395,7 +401,7 @@ class NotificationClaimantOfHearingHandlerTest {
             verify(notificationService).sendMail(
                 "applicantemail@hmcts.net",
                 "test-template-fee-claimant-id",
-                getNotificationFeeDataMap(caseData),
+                getNotificationFeeDataMap(caseData, false),
                 "notification-of-hearing-000HN001"
             );
         }
@@ -427,7 +433,7 @@ class NotificationClaimantOfHearingHandlerTest {
             verify(notificationService).sendMail(
                 "applicantemail@hmcts.net",
                 "test-template-no-fee-claimant-id",
-                getNotificationNoFeeDataMap(caseData),
+                getNotificationNoFeeDataMap(caseData, false),
                 "notification-of-hearing-000HN001"
             );
         }
@@ -488,7 +494,7 @@ class NotificationClaimantOfHearingHandlerTest {
             verify(notificationService).sendMail(
                 "applicantemail@hmcts.net",
                 "test-template-no-fee-claimant-id",
-                getNotificationNoFeeDataMap(caseData),
+                getNotificationNoFeeDataMap(caseData, false),
                 "notification-of-hearing-000HN001"
             );
         }
@@ -522,7 +528,7 @@ class NotificationClaimantOfHearingHandlerTest {
             verify(notificationService).sendMail(
                 "applicantemail@hmcts.net",
                 "test-template-no-fee-claimant-id",
-                getNotificationNoFeeDataMap(caseData),
+                getNotificationNoFeeDataMap(caseData, true),
                 "notification-of-hearing-000HN001"
             );
         }
@@ -554,7 +560,7 @@ class NotificationClaimantOfHearingHandlerTest {
             verify(notificationService).sendMail(
                 "applicantemail@hmcts.net",
                 "test-template-no-fee-claimant-id",
-                getNotificationNoFeeDataMap(caseData),
+                getNotificationNoFeeDataMap(caseData, false),
                 "notification-of-hearing-000HN001"
             );
         }
@@ -651,85 +657,117 @@ class NotificationClaimantOfHearingHandlerTest {
     }
 
     @NotNull
-    private Map<String, String> getNotificationFeeDataMap(CaseData caseData) {
+    private Map<String, String> getNotificationFeeDataMap(CaseData caseData, boolean is1v2) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             "claimantReferenceNumber", "12345", "hearingFee", "£300.00",
-            "hearingDate", "07-10-2022", "hearingTime", "03:30pm", "hearingDueDate", "23-11-2022"
+            "hearingDate", "07-10-2022", "hearingTime", "03:30pm", "hearingDueDate", "23-11-2022",
+            CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
+            PARTY_REFERENCES, is1v2 ? "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided"
+                : "Claimant reference: 12345 - Defendant reference: 6789",
+            CASEMAN_REF, "000DC001"
         );
     }
 
     @NotNull
     private Map<String, String> getNotificationFeeDataMapHMC(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(), "hearingFee", "£300.00",
-            "hearingDate", "07-10-2022", "hearingTime", "03:30pm", "hearingDueDate", "06-10-2022"
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(), "hearingFee", "£300.00",
+            "hearingDate", "07-10-2022", "hearingTime", "03:30pm", "hearingDueDate", "06-10-2022",
+            CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
+            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+            CASEMAN_REF, "000DC001"
         );
     }
 
     @NotNull
-    private Map<String, String> getNotificationNoFeeDataMap(CaseData caseData) {
+    private Map<String, String> getNotificationNoFeeDataMap(CaseData caseData, boolean is1v2) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            "claimantReferenceNumber", "12345", "hearingDate", "07-10-2022", "hearingTime", "08:30am"
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            "claimantReferenceNumber", "12345", "hearingDate", "07-10-2022", "hearingTime", "08:30am",
+            CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
+            PARTY_REFERENCES, is1v2 ? "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided"
+                : "Claimant reference: 12345 - Defendant reference: 6789",
+            CASEMAN_REF, "000DC001"
         );
     }
 
     @NotNull
     private Map<String, String> getNotificationNoFeeOtherHearingTypeDataMap(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(), "hearingFee", "£0.00",
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(), "hearingFee", "£0.00",
             "claimantReferenceNumber", "12345", "hearingDate", "07-10-2022",
-            "hearingTime", "08:30am", "hearingDueDate", ""
+            "hearingTime", "08:30am", "hearingDueDate", "",
+            CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
+            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+            CASEMAN_REF, "000DC001"
         );
     }
 
     @NotNull
     private Map<String, String> getNotificationNoFeeDataMapHMC(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(), "hearingFee", "£0.00",
-            "hearingDate", "07-10-2022", "hearingTime", "08:30am", "hearingDueDate", "06-10-2022"
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(), "hearingFee", "£0.00",
+            "hearingDate", "07-10-2022", "hearingTime", "08:30am", "hearingDueDate", "06-10-2022",
+            CLAIM_LEGAL_ORG_NAME_SPEC, caseData.getApplicant1().getPartyName(),
+            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+            CASEMAN_REF, "000DC001"
         );
     }
 
     @NotNull
     private Map<String, String> getNotificationFeeDatePMDataMap(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             "claimantReferenceNumber", "", "hearingFee", "£300.00",
-            "hearingDate", "07-10-2022", "hearingTime", "03:30pm", "hearingDueDate", "06-10-2022"
+            "hearingDate", "07-10-2022", "hearingTime", "03:30pm", "hearingDueDate", "06-10-2022",
+            CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
+            PARTY_REFERENCES, "Claimant reference: Not provided - Defendant reference: Not provided",
+            CASEMAN_REF, "000DC001"
         );
     }
 
     @NotNull
     private Map<String, String> getNotificationNoFeeDatePMDataMap(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            "claimantReferenceNumber", "", "hearingDate", "07-10-2022", "hearingTime", "03:30pm"
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            "claimantReferenceNumber", "", "hearingDate", "07-10-2022", "hearingTime", "03:30pm",
+            CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
+            PARTY_REFERENCES, "Claimant reference: Not provided - Defendant reference: Not provided",
+            CASEMAN_REF, "000DC001"
         );
     }
 
     @NotNull
     private Map<String, String> getNotificationNoFeeDateHearingOtherDataMap(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            "claimantReferenceNumber", "", "hearingDate", "07-10-2022", "hearingTime", "03:30pm"
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            "claimantReferenceNumber", "", "hearingDate", "07-10-2022", "hearingTime", "03:30pm",
+            CLAIM_LEGAL_ORG_NAME_SPEC, caseData.getApplicant1().getPartyName(),
+            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+            CASEMAN_REF, "000DC001"
         );
     }
 
     @NotNull
     private Map<String, String> getNotificationLipDataMap(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            "hearingDate", "17-05-2023", "hearingTime", "10:30am"
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            "hearingDate", "17-05-2023", "hearingTime", "10:30am",
+            CLAIM_LEGAL_ORG_NAME_SPEC, caseData.getApplicant1().getPartyName(),
+            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+            CASEMAN_REF, "000DC001"
         );
     }
 
     @NotNull
     private Map<String, String> getNotificationNoFeeDatePMDataMapHMC(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(), "hearingFee", "£0.00",
-            "hearingDate", "07-10-2022", "hearingTime", "03:30pm", "hearingDueDate", "06-10-2022"
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(), "hearingFee", "£0.00",
+            "hearingDate", "07-10-2022", "hearingTime", "03:30pm", "hearingDueDate", "06-10-2022",
+            CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
+            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+            CASEMAN_REF, "000DC001"
         );
     }
 
