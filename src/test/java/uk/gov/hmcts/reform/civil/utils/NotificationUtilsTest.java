@@ -27,6 +27,67 @@ class NotificationUtilsTest {
     private OrganisationService organisationService = mock(OrganisationService.class);
 
     @Test
+    void shouldReturnReferences_when1v1NoReferencesProvided() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build().toBuilder()
+            .solicitorReferences(null).build();
+
+        String actual = NotificationUtils.buildPartiesReferencesEmailSubject(caseData);
+
+        assertThat(actual).isEqualTo("Claimant reference: Not provided - Defendant reference: Not provided");
+    }
+
+    @Test
+    void shouldReturnReferences_when1v1BothReferencesProvided() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build();
+
+        String actual = NotificationUtils.buildPartiesReferencesEmailSubject(caseData);
+
+        assertThat(actual).isEqualTo("Claimant reference: 12345 - Defendant reference: 6789");
+    }
+
+    @Test
+    void shouldReturnReferences_when1v2SSBothReferencesProvided() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .multiPartyClaimOneDefendantSolicitor()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build();
+
+        String actual = NotificationUtils.buildPartiesReferencesEmailSubject(caseData);
+
+        assertThat(actual).isEqualTo("Claimant reference: 12345 - Defendant reference: 6789");
+    }
+
+    @Test
+    void shouldReturnReferences_when1v2DSBothReferencesProvided() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .multiPartyClaimTwoDefendantSolicitors()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build();
+
+        String actual = NotificationUtils.buildPartiesReferencesEmailSubject(caseData);
+
+        assertThat(actual).isEqualTo("Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: 01234");
+    }
+
+    @Test
+    void shouldReturnReferences_when1v2DSNoReferencesProvided() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .multiPartyClaimTwoDefendantSolicitors()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build().toBuilder()
+            .respondentSolicitor2Reference(null)
+            .solicitorReferences(null).build();
+
+        String actual = NotificationUtils.buildPartiesReferencesEmailSubject(caseData);
+
+        assertThat(actual).isEqualTo("Claimant reference: Not provided - Defendant 1 reference: Not provided - Defendant 2 reference: Not provided");
+    }
+
+    @Test
     void shouldReturnTrue_whenRespondent1RepresentedApplicantProceedsCarm1v1() {
         CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
             .build();
