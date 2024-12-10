@@ -24,6 +24,7 @@ import java.util.Optional;
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_INTERIM_JUDGMENT_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service
 @RequiredArgsConstructor
@@ -105,16 +106,20 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
     public Map<String, String> addProperties(final CaseData caseData) {
         return Map.of(
             LEGAL_ORG_DEF, getLegalOrganizationName(caseData),
-            CLAIM_NUMBER_INTERIM, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME_INTERIM, caseData.getRespondent1().getPartyName()
+            CLAIM_NUMBER_INTERIM, caseData.getCcdCaseReference().toString(),
+            DEFENDANT_NAME_INTERIM, caseData.getRespondent1().getPartyName(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
     public Map<String, String> addPropertiesDefendant2(final CaseData caseData) {
         return Map.of(
             LEGAL_ORG_DEF, getLegalOrganizationNameDefendant2(caseData),
-            CLAIM_NUMBER_INTERIM, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME_INTERIM, caseData.getRespondent2().getPartyName()
+            CLAIM_NUMBER_INTERIM, caseData.getCcdCaseReference().toString(),
+            DEFENDANT_NAME_INTERIM, caseData.getRespondent2().getPartyName(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
