@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.enums;
+package uk.gov.hmcts.reform.civil.enums.cosc;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
