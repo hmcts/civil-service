@@ -264,9 +264,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
             }
         }
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicantDJ(caseDataBuilder,
-                                                                         featureToggleService.isUpdateContactDetailsEnabled());
-
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicantDJ(caseDataBuilder);
         caseDataBuilder.setRequestDJDamagesFlagForWA(YesOrNo.YES).build();
         caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT));
 
