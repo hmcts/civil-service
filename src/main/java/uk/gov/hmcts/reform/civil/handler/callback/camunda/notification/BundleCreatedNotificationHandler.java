@@ -197,7 +197,7 @@ public class BundleCreatedNotificationHandler extends CallbackHandler implements
                 caseData.getRespondent2OrganisationPolicy(),
                 organisationService
             );
-            default -> throw new IllegalArgumentException("Invalid track type in " + caseEvent);
+            default -> throw new IllegalArgumentException("Invalid case event in " + caseEvent);
         };
     }
 }
