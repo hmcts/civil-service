@@ -39,9 +39,9 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
     private final SetAsideJudgmentOnlineMapper setAsideJudgmentOnlineMapper;
     private static final String ERROR_MESSAGE_DATE_ORDER_MUST_BE_IN_PAST = "Date must be in the past";
     private static final String ERROR_MESSAGE_APPLICATION_DATE =
-        "Application date to set aside judgment must be on or before the date of the order setting aside Judgment";
+        "Application date to set aside judgment must be on or before the date of the order setting aside judgment";
     private static final String ERROR_MESSAGE_DEFENCE_DATE =
-        "Date the defence was received must be on or before the date of the order setting aside Judgment";
+        "Date the defence was received must be on or before the date of the order setting aside judgment";
 
     @Override
     protected Map<String, Callback> callbacks() {
