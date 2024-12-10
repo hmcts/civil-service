@@ -40,6 +40,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseCaseHandedOfflineRespondentNotificationHandler.TASK_ID_RESPONDENT1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseCaseHandedOfflineRespondentNotificationHandler.TASK_ID_RESPONDENT2;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
@@ -475,6 +476,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     "respondentsolicitor2@example.com",
                     "template-id-multiparty",
                     Map.of("legalOrgName", r2Org.getName(),
+                           CASEMAN_REF, "000DC001",
                            "partyReferences", "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided",
                         "claimReferenceNumber", caseData.getCcdCaseReference().toString()),
                     "defendant-response-case-handed-offline-respondent-notification-000DC001"
@@ -616,7 +618,8 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
+                CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
+                CASEMAN_REF, "000DC001"
             );
         } else if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
             return Map.of(
@@ -626,7 +629,8 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     .concat(" and " + caseData.getRespondent1ClaimResponseTypeToApplicant2())
                     .concat(" against " + caseData.getApplicant2().getPartyName()),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
+                CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
+                CASEMAN_REF, "000DC001"
             );
         } else {
             //1v2 template is used and expects different data
@@ -637,7 +641,8 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                 RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
                 RESPONDENT_ONE_RESPONSE, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
                 RESPONDENT_TWO_RESPONSE, caseData.getRespondent2ClaimResponseType().getDisplayedValue(),
-                CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
+                CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
+                CASEMAN_REF, "000DC001"
             );
         }
     }
@@ -646,7 +651,8 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
         return Map.of(
             "defendantLR", "Signer Name",
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+            CASEMAN_REF, "000DC001"
         );
     }
 
