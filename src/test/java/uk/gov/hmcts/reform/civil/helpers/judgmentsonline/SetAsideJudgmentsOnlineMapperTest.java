@@ -149,19 +149,21 @@ class SetAsideJudgmentsOnlineMapperTest {
     void testIfSetAsideApplicationDateUpdatedCorrectly() {
 
         CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
-        caseData.setActiveJudgment(recordJudgmentMapper.addUpdateActiveJudgment(caseData));
+        CaseData updatedCaseData = caseData.toBuilder()
+            .activeJudgment(recordJudgmentMapper.addUpdateActiveJudgment(caseData))
+            .joSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER)
+            .joSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION)
+            .joSetAsideOrderDate(LocalDate.of(2024, 11, 12))
+            .joSetAsideApplicationDate(LocalDate.of(2024, 11, 12))
+            .build();
 
         //SET ASIDE
-        caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
-        caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
-        caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
-        caseData.setJoSetAsideApplicationDate(LocalDate.of(2022, 12, 11));
-        judgmentOnlineMapper.moveToHistoricJudgment(caseData);
+        judgmentOnlineMapper.moveToHistoricJudgment(updatedCaseData);
 
-        assertNull(caseData.getActiveJudgment());
-        assertNotNull(caseData.getHistoricJudgment());
-        JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
+        assertNull(updatedCaseData.getActiveJudgment());
+        assertNotNull(updatedCaseData.getHistoricJudgment());
+        JudgmentDetails historicJudgment = updatedCaseData.getHistoricJudgment().get(0).getValue();
         assertEquals(JudgmentState.SET_ASIDE, historicJudgment.getState());
-        assertEquals(LocalDate.of(2022, 12, 11), historicJudgment.getSetAsideApplicationDate());
+        assertEquals(LocalDate.of(2024, 11, 12), historicJudgment.getSetAsideApplicationDate());
     }
 }

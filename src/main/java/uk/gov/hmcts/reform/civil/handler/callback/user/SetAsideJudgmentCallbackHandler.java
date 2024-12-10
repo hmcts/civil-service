@@ -65,11 +65,11 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
         if (JudgmentsOnlineHelper.validateIfFutureDate(caseData.getJoSetAsideOrderDate())) {
             errors.add(ERROR_MESSAGE_DATE_ORDER_MUST_BE_IN_PAST);
         }
-        if (caseData.getJoSetAsideOrderType().equals(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION)
+        if (JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION.equals(caseData.getJoSetAsideOrderType())
             && caseData.getJoSetAsideApplicationDate().isAfter(caseData.getJoSetAsideOrderDate())) {
             errors.add(ERROR_MESSAGE_APPLICATION_DATE);
         }
-        if (caseData.getJoSetAsideOrderType().equals(JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE)
+        if (JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE.equals(caseData.getJoSetAsideOrderType())
             && caseData.getJoSetAsideDefenceReceivedDate().isAfter(caseData.getJoSetAsideOrderDate())) {
             errors.add(ERROR_MESSAGE_DEFENCE_DATE);
         }
