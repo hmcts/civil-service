@@ -7897,6 +7897,7 @@ class EventHistoryMapperTest {
 
     @Nested
     class SetAsideJudgment {
+
         @Test
         public void shouldGenerateRPAFeedfor_SetAside() {
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
@@ -7904,12 +7905,75 @@ class EventHistoryMapperTest {
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
             caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
             caseData.setJoSetAsideApplicationDate(LocalDate.of(2022, 11, 11));
-            caseData.setJoSetAsideCreatedDate(LocalDateTime.now());
+            caseData.setJoSetAsideCreatedDate(LocalDateTime.of(2022, 11, 11,10,10));
             caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
             when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("setAsideJudgment").asList()
                 .extracting("eventCode").asString().contains("[170]");
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventDetails").asList()
+                .extracting("applicant").contains("PARTY AGAINST");
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventDetails").asList()
+                .extracting("result").contains("GRANTED");
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventDetails").asList()
+                .extracting("resultDate").asString().contains("2022-12-12");
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventDetails").asList()
+                .extracting("applicationDate").asString().contains("2022-11-11");
+        }
+
+        @Test
+        public void shouldGenerateRPAFeedfor_SetAsideDefence() {
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
+            caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE);
+            caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
+            caseData.setJoSetAsideDefenceReceivedDate(LocalDate.of(2022, 11, 11));
+            caseData.setJoSetAsideCreatedDate(LocalDateTime.of(2022, 11, 11,10,10));
+            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
+            when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventCode").asString().contains("[170]");
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventDetails").asList()
+                .extracting("applicant").contains("PARTY AGAINST");
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventDetails").asList()
+                .extracting("result").contains("GRANTED");
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventDetails").asList()
+                .extracting("resultDate").asString().contains("2022-12-12");
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventDetails").asList()
+                .extracting("applicationDate").asString().contains("2022-11-11");
+        }
+
+        @Test
+        public void shouldGenerateRPAFeedfor_SetAside_Error() {
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR);
+            caseData.setJoSetAsideCreatedDate(LocalDateTime.of(2022, 11, 11,10,10));
+            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
+            when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventCode").asString().contains("[170]");
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventDetails").asList()
+                .extracting("applicant").contains("PROPER OFFICER");
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventDetails").asList()
+                .extracting("result").contains("GRANTED");
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventDetails").asList()
+                .extracting("resultDate").asString().contains("null");
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventDetails").asList()
+                .extracting("applicationDate").asString().contains("null");
         }
 
         @Test
