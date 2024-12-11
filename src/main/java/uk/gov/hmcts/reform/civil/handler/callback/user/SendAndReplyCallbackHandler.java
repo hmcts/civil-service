@@ -32,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_AND_REPLY;
 import static uk.gov.hmcts.reform.civil.enums.sendandreply.SendAndReplyOption.REPLY;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
@@ -130,9 +131,11 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
                 .messageHistory(null);
         }
 
-        Message lastMessage = messagesNew.stream()
-            .max(Comparator.comparing(message -> message.getValue().getUpdatedTime()))
-            .get().getValue();
+        Element<Message> lastMessageElement = messagesNew.stream()
+                .max(Comparator.comparing(message -> message.getValue().getUpdatedTime()))
+                .orElse(element(Message.builder().build()));
+        Message lastMessage = lastMessageElement.getValue();
+
         builder.lastMessage(lastMessage);
 
         AllocatedTrack allocatedTrack;
