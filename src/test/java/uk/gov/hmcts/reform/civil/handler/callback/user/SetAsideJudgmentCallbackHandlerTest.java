@@ -7,13 +7,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.SetAsideJudgmentOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -22,7 +20,6 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,7 +27,6 @@ import java.time.LocalDateTime;
 import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SET_ASIDE_JUDGMENT;
@@ -42,8 +38,6 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private SetAsideJudgmentOnlineMapper setAsideJudgmentOnlineMapper;
 
-    @Mock
-    private DeadlinesCalculator deadlinesCalculator;
     private static final String ERROR_MESSAGE_SET_ASIDE_APPLICATION_DATE =
         "Application date to set aside judgment must be on or before the date of the order setting aside judgment";
     private static final String ERROR_MESSAGE_SET_ASIDE_DEFENCE_DATE =
@@ -53,7 +47,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     void setup() {
         ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
         setAsideJudgmentOnlineMapper = new SetAsideJudgmentOnlineMapper();
-        handler = new SetAsideJudgmentCallbackHandler(objectMapper, setAsideJudgmentOnlineMapper, deadlinesCalculator);
+        handler = new SetAsideJudgmentCallbackHandler(objectMapper, setAsideJudgmentOnlineMapper);
     }
 
     @Test
@@ -70,7 +64,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         void setup() {
             ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
             objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-            handler = new SetAsideJudgmentCallbackHandler(objectMapper, setAsideJudgmentOnlineMapper, deadlinesCalculator);
+            handler = new SetAsideJudgmentCallbackHandler(objectMapper, setAsideJudgmentOnlineMapper);
             timeExtensionDate = LocalDateTime.of(2020, 1, 1, 12, 0, 0);
             respondent1ResponseDeadline = now().plusDays(28);
         }
@@ -121,8 +115,6 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
             assertEquals(JudgmentState.SET_ASIDE, historicJudgment.getState());
             assertEquals(caseData.getJoSetAsideDefenceReceivedDate(), historicJudgment.getSetAsideDate());
-            //and the caseState should not be updated
-            assertEquals(response.getState(), CaseState.All_FINAL_ORDERS_ISSUED.name());
             assertThat(response.getData()).extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(SET_ASIDE_JUDGMENT.name(), "READY");
@@ -147,8 +139,6 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
             assertEquals(JudgmentState.SET_ASIDE_ERROR, historicJudgment.getState());
             assertEquals(LocalDate.now(), historicJudgment.getSetAsideDate());
-            //and the caseState should not be updated
-            assertEquals(response.getState(), CaseState.All_FINAL_ORDERS_ISSUED.name());
             assertThat(response.getData()).extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(SET_ASIDE_JUDGMENT.name(), "READY");
@@ -158,8 +148,6 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPopulateOrderType() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
             LocalDateTime nextDeadline = respondent1ResponseDeadline.atTime(16, 0);
-            when(deadlinesCalculator.plus28DaysAt4pmDeadline(now().atStartOfDay()))
-                .thenReturn(nextDeadline);
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
@@ -173,8 +161,6 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             //Then: setAsideDate should be set correctly
             assertThat(response.getData()).extracting("joSetAsideOrderType").isNotNull();
-            //and the caseState should be updated
-            assertEquals(response.getState(), CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name());
             assertThat(response.getData()).extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(SET_ASIDE_JUDGMENT.name(), "READY");
