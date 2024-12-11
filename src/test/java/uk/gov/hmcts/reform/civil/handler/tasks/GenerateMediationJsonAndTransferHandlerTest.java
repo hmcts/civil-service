@@ -79,7 +79,6 @@ class GenerateMediationJsonAndTransferHandlerTest {
         caseDetailsWithInMediationStateNotToProcess = getCaseDetails(2L, claimNotToBeProcessed);
         caseDataInMediation = getCaseData(1L, claimToBeProcessed);
         caseDataInMediationNotToProcess = getCaseData(2L, claimNotToBeProcessed);
-        when(featureToggleService.isFeatureEnabled("carm")).thenReturn(true);
     }
 
     @Test
@@ -99,7 +98,7 @@ class GenerateMediationJsonAndTransferHandlerTest {
     void shouldNotGenerateJsonAndSendEmail() {
         List<CaseDetails> cases = new ArrayList<>();
         String date = (claimNotToBeProcessed.format(DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.UK)));
-        when(externalTask.getVariable(any())).thenReturn(date);
+        when(externalTask.getVariable(eq("claimMovedDate"))).thenReturn(date);
         when(searchService.getInMediationCases(any(), anyBoolean())).thenReturn(cases);
 
         mediationJsonHandler.execute(externalTask, externalTaskService);
@@ -109,19 +108,9 @@ class GenerateMediationJsonAndTransferHandlerTest {
     }
 
     @Test
-    void shouldNotGenerateJsonAndSendEmailCarmToggleOff() {
-        when(featureToggleService.isFeatureEnabled("carm")).thenReturn(false);
-
-        mediationJsonHandler.execute(externalTask, externalTaskService);
-        verify(searchService, times(0)).getInMediationCases(eq(claimNotToBeProcessed), anyBoolean());
-        verify(sendGridClient, times(0)).sendEmail(anyString(), any());
-        verify(externalTaskService).complete(externalTask, null);
-    }
-
-    @Test
     void should_handle_task_from_external_variable() {
         String date = (claimNotToBeProcessed.format(DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.UK)));
-        when(externalTask.getVariable(any())).thenReturn(date);
+        when(externalTask.getVariable(eq("claimMovedDate"))).thenReturn(date);
         when(searchService.getInMediationCases(any(), anyBoolean())).thenReturn(List.of(caseDetailsWithInMediationState, caseDetailsWithInMediationStateNotToProcess));
         when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationState)).thenReturn(caseDataInMediation);
         when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationStateNotToProcess)).thenReturn(caseDataInMediationNotToProcess);

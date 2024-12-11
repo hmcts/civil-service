@@ -72,7 +72,6 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.InitiateGeneralApplicationHandler.NOT_IN_EA_REGION;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_SETTLE_BY_CONSENT;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_TRIAL_DATE_RANGE;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_UNAVAILABILITY_RANGE;
@@ -166,21 +165,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldThrowError_whenEpimsIdIsNotAValidRegionPostSdoNationalRollout() {
-        // National rollout applies to all courts post sdo, except Birmingham
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .ccdState(CASE_PROGRESSION)
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation("231596")
-                                        .region("2").build()).build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-        when(featureToggleService.isPartOfNationalRollout(any())).thenReturn(false);
-
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        assertThat(response.getErrors().get(0)).isEqualTo(NOT_IN_EA_REGION);
-    }
-
-    @Test
     void shouldNotThrowError_whenEpimsIdIsValidRegionPostSdoNationalRollout() {
         // National rollout applies to all courts  post sdo, except Birmingham
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
@@ -189,7 +173,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                         .baseLocation("45678")
                                         .region("4").build()).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-        when(featureToggleService.isPartOfNationalRollout(any())).thenReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1150,7 +1133,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldWithNotice_whenVaryApplicationIsUnConsented() {
+        void shouldWithNotice_whenVaryApplicationIsUnConsentedLiP() {
             GAPbaDetails generalAppPBADetails = GAPbaDetails.builder().fee(feeFromFeeService).build();
 
             List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
@@ -1166,6 +1149,36 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                     .email(APPLICANT_EMAIL_ID_CONSTANT)
                     .build());
+
+            when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
+                    any(CaseData.class), any(UserDetails.class), anyString(), any(GeneralAppFeesService.class))).thenAnswer((Answer) invocation -> invocation.getArguments()[1]
+            );
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(response.getErrors()).isNull();
+            assertThat(data.getGeneralAppInformOtherParty().getIsWithNotice()).isEqualTo(YES);
+        }
+
+        @Test
+        void shouldWithNotice_whenVaryApplicationIsUnConsentedLR() {
+            GAPbaDetails generalAppPBADetails = GAPbaDetails.builder().fee(feeFromFeeService).build();
+
+            List<GeneralApplicationTypesLR> types = List.of(GeneralApplicationTypesLR.VARY_PAYMENT_TERMS_OF_JUDGMENT);
+            CaseData caseData = CaseDataBuilder
+                .builder().generalAppTypeLR(GAApplicationTypeLR.builder().types(types).build())
+                .build()
+                .toBuilder()
+                .ccdCaseReference(1234L)
+                .generalAppPBADetails(generalAppPBADetails)
+                .generalAppHearingDetails(GAHearingDetails.builder().build())
+                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
+                .build();
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+                                                                            .email(APPLICANT_EMAIL_ID_CONSTANT)
+                                                                            .build());
 
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
                     any(CaseData.class), any(UserDetails.class), anyString(), any(GeneralAppFeesService.class))).thenAnswer((Answer) invocation -> invocation.getArguments()[1]

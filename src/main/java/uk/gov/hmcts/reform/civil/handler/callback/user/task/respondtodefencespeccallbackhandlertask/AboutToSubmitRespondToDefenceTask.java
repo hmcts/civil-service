@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
@@ -69,7 +70,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     private final FrcDocumentsUtils frcDocumentsUtils;
     private final DQResponseDocumentUtils dqResponseDocumentUtils;
     private final DetermineNextState determineNextState;
-
+    private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
     @Value("${court-location.specified-claim.epimms-id}") String cnbcEpimsId;
 
     public CallbackResponse execute(CallbackParams callbackParams) {
@@ -82,35 +83,27 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             .applicant1ResponseDate(time.now());
 
         persistFlagsForParties(oldCaseData, caseData, builder);
-
         setResponseDocumentNull(builder);
-
         updateCaselocationDetails(callbackParams, caseData, builder);
-
         updateApplicant1DQ(callbackParams, caseData, builder);
-
         assignApplicant1DQExpertsIfPresent(caseData, builder);
-
         assignApplicant2DQExpertsIfPresent(caseData, builder);
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder,
-                                                                       featureToggleService.isUpdateContactDetailsEnabled());
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(
+            builder, featureToggleService.isUpdateContactDetailsEnabled());
 
         if (featureToggleService.isUpdateContactDetailsEnabled()) {
             addEventAndDateAddedToApplicantExperts(builder);
             addEventAndDateAddedToApplicantWitnesses(builder);
         }
 
-        if (featureToggleService.isHmcEnabled()) {
-            populateDQPartyIds(builder);
-        }
+        populateDQPartyIds(builder);
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, builder);
         moveClaimToMediation(callbackParams, caseData, builder);
 
         String nextState = putCaseStateInJudicialReferral(caseData);
         BusinessProcess businessProcess = BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC);
-
         nextState = determineNextState.determineNextState(caseData, callbackParams, builder, nextState, businessProcess);
 
         frcDocumentsUtils.assembleClaimantsFRCDocuments(caseData);
@@ -119,6 +112,13 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             dqResponseDocumentUtils.buildClaimantResponseDocuments(builder.build()));
 
         clearTempDocuments(builder);
+
+        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+            updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
+                callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
+                builder
+            ));
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))

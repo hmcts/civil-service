@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
@@ -91,6 +92,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     private final CaseDetailsConverter caseDetailsConverter;
     private final FrcDocumentsUtils frcDocumentsUtils;
     @Value("${court-location.unspecified-claim.epimms-id}") String ccmccEpimsId;
+    private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -282,9 +284,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             addEventAndDateAddedToApplicantWitnesses(builder);
         }
 
-        if (featureToggleService.isHmcEnabled()) {
-            populateDQPartyIds(builder);
-        }
+        populateDQPartyIds(builder);
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE, builder);
 
@@ -307,6 +307,13 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         if (caseData.getApplicant2DQ() != null
             && builder.build().getApplicant2DQ() != null) {
             builder.applicant2DQ(builder.build().getApplicant2DQ().toBuilder().applicant2DQDraftDirections(null).build());
+        }
+
+        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+            updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
+                callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
+                builder
+            ));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -360,6 +367,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                 () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
                     CallbackParams.Params.BEARER_TOKEN).toString())
             ));
+
         if (log.isDebugEnabled()) {
             log.debug("Case management location for {} is {}", caseData.getLegacyCaseReference(), builder.build().getCaseManagementLocation());
         }

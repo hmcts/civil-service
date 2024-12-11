@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsServ
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -78,9 +79,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         CaseData caseData = getUpdatedCaseData(callbackParams);
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
-        if (featureToggleService.isHmcEnabled()) {
-            populateDQPartyIds(builder);
-        }
+        populateDQPartyIds(builder);
 
         if (featureToggleService.isUpdateContactDetailsEnabled()) {
             addEventAndDateAddedToRespondentExperts(builder);
@@ -116,6 +115,14 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
 
     private CaseData getUpdatedCaseData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        final BigDecimal respondToAdmittedClaimOwingAmount = caseData.getRespondToAdmittedClaimOwingAmount();
+        if (respondToAdmittedClaimOwingAmount != null) {
+            log.info(
+                "case id: {}, respondToAdmittedClaimOwingAmount: {}",
+                callbackParams.getRequest().getCaseDetails().getId(),
+                 respondToAdmittedClaimOwingAmount
+            );
+        }
         CaseDocument dummyDocument = new CaseDocument(null, null, null, 0, null, null, null);
         LocalDateTime responseDate = time.now();
         return caseData.toBuilder()

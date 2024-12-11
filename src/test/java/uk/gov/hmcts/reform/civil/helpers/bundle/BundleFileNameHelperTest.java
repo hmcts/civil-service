@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.helpers.bundle;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadFiles;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.TypeOfDocDocumentaryEvidenceOfTrial;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
@@ -76,55 +76,55 @@ public class BundleFileNameHelperTest {
         .build();
 
     @ParameterizedTest
-    @EnumSource(value = BundleRequestMapper.PartyType.class, names = {"CLAIMANT1", "CLAIMANT2", "DEFENDANT1",
+    @EnumSource(value = PartyType.class, names = {"CLAIMANT1", "CLAIMANT2", "DEFENDANT1",
         "DEFENDANT2"}, mode =
         EnumSource.Mode.INCLUDE)
-    public void validateAllWitnessDocs(BundleRequestMapper.PartyType partyType) {
+    public void validateAllWitnessDocs(PartyType partyType) {
 
         assertNotNull(BundleFileNameHelper.getWitnessDocsByPartyAndDocType(partyType,
-                                                             EvidenceUploadFiles.WITNESS_STATEMENT, caseData));
+                                                             EvidenceUploadType.WITNESS_STATEMENT, caseData));
 
         assertNotNull(BundleFileNameHelper.getWitnessDocsByPartyAndDocType(partyType,
-                                                             EvidenceUploadFiles.WITNESS_SUMMARY, caseData));
+                                                             EvidenceUploadType.WITNESS_SUMMARY, caseData));
 
         assertNotNull(BundleFileNameHelper.getWitnessDocsByPartyAndDocType(partyType,
-                                                             EvidenceUploadFiles.NOTICE_OF_INTENTION, caseData));
+                                                             EvidenceUploadType.NOTICE_OF_INTENTION, caseData));
     }
 
     @ParameterizedTest
-    @EnumSource(value = BundleRequestMapper.PartyType.class, names = {"CLAIMANT1", "CLAIMANT2", "DEFENDANT1",
+    @EnumSource(value = PartyType.class, names = {"CLAIMANT1", "CLAIMANT2", "DEFENDANT1",
         "DEFENDANT2"}, mode =
         EnumSource.Mode.INCLUDE)
-    public void validateAllExpertsDocs(BundleRequestMapper.PartyType partyType) {
+    public void validateAllExpertsDocs(PartyType partyType) {
 
         assertNotNull(BundleFileNameHelper.getExpertDocsByPartyAndDocType(partyType,
-                                                                           EvidenceUploadFiles.EXPERT_REPORT, caseData));
+                                                                           EvidenceUploadType.EXPERT_REPORT, caseData));
 
         assertNotNull(BundleFileNameHelper.getExpertDocsByPartyAndDocType(partyType,
-                                                                           EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS, caseData));
+                                                                           EvidenceUploadType.QUESTIONS_FOR_EXPERTS, caseData));
 
         assertNotNull(BundleFileNameHelper.getExpertDocsByPartyAndDocType(partyType,
-                                                                           EvidenceUploadFiles.ANSWERS_FOR_EXPERTS, caseData));
+                                                                           EvidenceUploadType.ANSWERS_FOR_EXPERTS, caseData));
     }
 
     @ParameterizedTest
-    @EnumSource(value = BundleRequestMapper.PartyType.class, names = {"CLAIMANT1", "CLAIMANT2", "DEFENDANT1",
+    @EnumSource(value = PartyType.class, names = {"CLAIMANT1", "CLAIMANT2", "DEFENDANT1",
         "DEFENDANT2"}, mode =
         EnumSource.Mode.INCLUDE)
-    public void validateAllOtherDocs(BundleRequestMapper.PartyType partyType) {
+    public void validateAllOtherDocs(PartyType partyType) {
 
         assertNotNull(BundleFileNameHelper.getEvidenceUploadDocsByPartyAndDocType(partyType,
-                                                                          EvidenceUploadFiles.DOCUMENTS_FOR_DISCLOSURE, caseData));
+                                                                          EvidenceUploadType.DOCUMENTS_FOR_DISCLOSURE, caseData));
 
         assertNotNull(BundleFileNameHelper.getEvidenceUploadDocsByPartyAndDocType(partyType,
-                                                                          EvidenceUploadFiles.DISCLOSURE_LIST, caseData));
+                                                                          EvidenceUploadType.DISCLOSURE_LIST, caseData));
 
         assertNotNull(BundleFileNameHelper.getEvidenceUploadDocsByPartyAndDocType(partyType,
-                                                                          EvidenceUploadFiles.DOCUMENTS_REFERRED, caseData));
+                                                                          EvidenceUploadType.DOCUMENTS_REFERRED, caseData));
         assertNotNull(BundleFileNameHelper.getEvidenceUploadDocsByPartyAndDocType(partyType,
-                                                                                  EvidenceUploadFiles.DOCUMENTARY, caseData));
+                                                                                  EvidenceUploadType.DOCUMENTARY, caseData));
         assertNotNull(BundleFileNameHelper.getEvidenceUploadDocsByPartyAndDocType(partyType,
-                                                                                  EvidenceUploadFiles.CASE_SUMMARY, caseData));
+                                                                                  EvidenceUploadType.CASE_SUMMARY, caseData));
     }
 
     private List<Element<UploadEvidenceDocumentType>> getOtherDocs() {

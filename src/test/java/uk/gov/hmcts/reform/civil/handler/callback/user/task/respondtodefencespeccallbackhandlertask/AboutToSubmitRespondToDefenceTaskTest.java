@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.DocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
@@ -38,6 +39,7 @@ import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import static java.time.LocalDateTime.now;
@@ -46,6 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -92,6 +95,9 @@ class AboutToSubmitRespondToDefenceTaskTest {
     @Mock
     private DQResponseDocumentUtils dqResponseDocumentUtils;
 
+    @Mock
+    private UpdateWaCourtLocationsService updateWaCourtLocationsService;
+
     private final LocalDateTime localDateTime = now();
 
     private ObjectMapper objectMapper;
@@ -105,7 +111,9 @@ class AboutToSubmitRespondToDefenceTaskTest {
                                                      courtLocationUtils, featureToggleService,
                                                      locationHelper, caseFlagsInitialiser,
                                                      caseDetailsConverter, frcDocumentsUtils,
-                                                     dqResponseDocumentUtils, determineNextState);
+                                                     dqResponseDocumentUtils, determineNextState,
+                                                     Optional.of(updateWaCourtLocationsService)
+        );
 
         Address address = Address.builder()
             .postCode("E11 5BB")
@@ -199,7 +207,7 @@ class AboutToSubmitRespondToDefenceTaskTest {
     }
 
     @Test
-    void shouldPopulateDQPartyIdsWhenHmcIsEnabled() {
+    void shouldPopulateDQPartyIds() {
 
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1DQWithExperts()
@@ -207,16 +215,52 @@ class AboutToSubmitRespondToDefenceTaskTest {
             .atState(FULL_DEFENCE_PROCEED)
             .build();
 
-        when(featureToggleService.isHmcEnabled()).thenReturn(true);
-
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) task.execute(callbackParams(caseData));
 
         assertNotNull(response);
         assertThat(getCaseData(response)).extracting("applicant1").hasFieldOrProperty("partyID");
         assertThat(getCaseData(response)).extracting("respondent1").hasFieldOrProperty("partyID");
-        verify(featureToggleService, times(1)).isHmcEnabled();
+    }
 
+    @Test
+    void shouldCallUpdateWaCourtLocationsServiceWhenPresent_AndMintiEnabled() {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1DQWithExperts()
+            .applicant1DQWithWitnesses()
+            .atState(FULL_DEFENCE_PROCEED)
+            .build();
+
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) task.execute(callbackParams(caseData));
+
+        verify(updateWaCourtLocationsService).updateCourtListingWALocations(any(), any());
+    }
+
+    @Test
+    void shouldNotCallUpdateWaCourtLocationsServiceWhenNotPresent_AndMintiEnabled() {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+        task = new AboutToSubmitRespondToDefenceTask(objectMapper, time, locationRefDataService,
+                                                     courtLocationUtils, featureToggleService,
+                                                     locationHelper, caseFlagsInitialiser,
+                                                     caseDetailsConverter, frcDocumentsUtils,
+                                                     dqResponseDocumentUtils, determineNextState,
+                                                     Optional.empty()
+        );
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1DQWithExperts()
+            .applicant1DQWithWitnesses()
+            .atState(FULL_DEFENCE_PROCEED)
+            .build();
+
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) task.execute(callbackParams(caseData));
+
+        verifyNoInteractions(updateWaCourtLocationsService);
     }
 
     private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
