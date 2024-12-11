@@ -35,12 +35,14 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_OTHER_SOLICITO
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ChangeOfRepresentationNotificationHandler.TASK_ID_NOTIFY_FORMER_SOLICITOR;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ChangeOfRepresentationNotificationHandler.TASK_ID_NOTIFY_OTHER_SOLICITOR_1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ChangeOfRepresentationNotificationHandler.TASK_ID_NOTIFY_OTHER_SOLICITOR_2;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASE_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CCD_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.FORMER_SOL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.ISSUE_DATE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.NEW_SOL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OTHER_SOL_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
@@ -110,7 +112,9 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                     CCD_REF, caseData.getCcdCaseReference().toString(),
                     FORMER_SOL, PREVIOUS_SOL,
                     NEW_SOL, NEW_SOLICITOR,
-                    OTHER_SOL_NAME, OTHER_SOLICITOR
+                    OTHER_SOL_NAME, OTHER_SOLICITOR,
+                    PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                    CASEMAN_REF, "000DC001"
                 );
 
                 handler.handle(params);
@@ -168,7 +172,9 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                     CCD_REF, caseData.getCcdCaseReference().toString(),
                     FORMER_SOL, PREVIOUS_SOL,
                     NEW_SOL, NEW_SOLICITOR,
-                    OTHER_SOL_NAME, OTHER_SOLICITOR
+                    OTHER_SOL_NAME, OTHER_SOLICITOR,
+                    PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                    CASEMAN_REF, "000DC001"
                 );
 
                 handler.handle(params);
@@ -204,7 +210,9 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                     CCD_REF, caseData.getCcdCaseReference().toString(),
                     FORMER_SOL, PREVIOUS_SOL,
                     NEW_SOL, NEW_SOLICITOR,
-                    OTHER_SOL_NAME, OTHER_SOLICITOR_2
+                    OTHER_SOL_NAME, OTHER_SOLICITOR_2,
+                    PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                    CASEMAN_REF, "000DC001"
                 );
 
                 handler.handle(params);
