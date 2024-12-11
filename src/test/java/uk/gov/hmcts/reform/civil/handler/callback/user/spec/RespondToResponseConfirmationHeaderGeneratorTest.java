@@ -151,6 +151,9 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             .caseAccessCategory(SPEC_CLAIM)
             .legacyCaseReference("claimNumber")
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
+            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .build();
     }
 

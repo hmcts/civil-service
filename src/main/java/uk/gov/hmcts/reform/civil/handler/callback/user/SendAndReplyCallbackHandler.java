@@ -49,6 +49,7 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
     private final SendAndReplyMessageService messageService;
 
     private final ObjectMapper objectMapper;
+
     private final FeatureToggleService featureToggleService;
 
     @Override
@@ -102,6 +103,7 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
         CaseData caseData = params.getCaseData();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         String userAuth = params.getParams().get(BEARER_TOKEN).toString();
+
         List<Element<Message>> messagesNew;
 
         if (SendAndReplyOption.SEND.equals(caseData.getSendAndReplyOption())) {
