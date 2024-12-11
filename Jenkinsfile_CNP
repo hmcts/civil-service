@@ -9,7 +9,7 @@ def type = "java"
 def product = "civil"
 def component = "service"
 def ccdBranch = "feat/civ-15759"
-def camundaBranch = "feat/civ-15759"
+def camundaBranch = "master"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
 AppPipelineConfig pipelineConf
