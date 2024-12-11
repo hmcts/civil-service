@@ -2,7 +2,7 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA6.CP.Court.Officer.Order.Defendant', '{"Notice.AAA6.CP.Hearing.Scheduled","Notice.AAA6.CP.Trial Arrangements.Required","Notice.AAA6.CP.Trial Arrangements.Finalised"}', '{"Notice.AAA6.CP.Court.Officer.Order.Defendant" : []}'),
+VALUES ('Scenario.AAA6.CP.Court.Officer.Order.Defendant', '{"Notice.AAA6.CP.Hearing.Scheduled","Notice.AAA6.CP.Trial Arrangements.Required","Notice.AAA6.CP.Trial Arrangements.Finalised"}', '{"Notice.AAA6.CP.Court.Officer.Order.Defendant" : []}');
 
 
 /**
