@@ -26,9 +26,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_COURT_OFFICER_ORDER;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.DECISION_OUTCOME;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_DEFENDANT;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,7 +44,7 @@ public class CourtOfficerOrderDefendantNotificationHandlerTest extends BaseCallb
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
-        assertThat(handler.handledEvents()).contains(NOTIFY_RESPONDENT_SOLICITOR1_FOR_COURT_OFFICER_ORDER);
+        assertThat(handler.handledEvents()).contains(CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_DEFENDANT);
     }
 
     @Test
@@ -54,7 +52,7 @@ public class CourtOfficerOrderDefendantNotificationHandlerTest extends BaseCallb
         assertThat(handler.camundaActivityId(
             CallbackParamsBuilder.builder()
                 .request(CallbackRequest.builder()
-                             .eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_COURT_OFFICER_ORDER.name())
+                             .eventId(CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_DEFENDANT.name())
                              .build())
                 .build()))
             .isEqualTo(TASK_ID);
@@ -63,49 +61,19 @@ public class CourtOfficerOrderDefendantNotificationHandlerTest extends BaseCallb
     @Nested
     class AboutToSubmitCallback {
         @Test
-        void shouldRecordScenario_whenInvokedWithoutCaseEventsEnabled() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .applicant1Represented(YesOrNo.NO)
-                .ccdCaseReference(1234L)
-                .previousCCDState(CASE_PROGRESSION).build();
-
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_COURT_OFFICER_ORDER.name()).build()
-            ).build();
-
-            when(toggleService.isCaseEventsEnabled()).thenReturn(true);
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-
-            // When
-            handler.handle(params);
-
-            //then
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_DEFENDANT.getScenario(),
-                "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
-            );
-        }
-
-        @Test
         void shouldRecordScenario_whenInvokedForCaseEventFeatureToggle() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
-                .applicant1Represented(YesOrNo.NO)
                 .ccdCaseReference(1234L)
-                .previousCCDState(DECISION_OUTCOME).build();
+                .build();
 
             when(toggleService.isCaseEventsEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_COURT_OFFICER_ORDER.name()).build()
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_DEFENDANT.name()).build()
             ).build();
             // When
             handler.handle(params);
@@ -119,16 +87,16 @@ public class CourtOfficerOrderDefendantNotificationHandlerTest extends BaseCallb
         }
 
         @Test
-        void shouldNotRecordScenario_whenNotInvoked() {
+        void shouldNotRecordScenario_whenRespondentRepresented() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .applicant1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.YES)
                 .ccdCaseReference(1234L)
                 .build();
 
+            when(toggleService.isCaseEventsEnabled()).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_COURT_OFFICER_ORDER.name()).build()
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_DEFENDANT.name()).build()
             ).build();
             HashMap<String, Object> scenarioParams = new HashMap<>();
 
@@ -145,19 +113,18 @@ public class CourtOfficerOrderDefendantNotificationHandlerTest extends BaseCallb
         }
 
         @Test
-        void shouldNotRecordScenario_whenCaseEventsIsNotEnabledAndIsOnCaseManState() {
+        void shouldNotRecordScenario_whenCaseEventsIsNotEnabled() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
-                .applicant1Represented(YesOrNo.NO)
                 .ccdCaseReference(1234L)
-                .previousCCDState(DECISION_OUTCOME).build();
+                .build();
 
             when(toggleService.isCaseEventsEnabled()).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_COURT_OFFICER_ORDER.name()).build()
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_DEFENDANT.name()).build()
             ).build();
 
             // When
