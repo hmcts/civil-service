@@ -274,7 +274,6 @@ class DefaultJudgmentFormGeneratorTest {
         verify(organisationService, times(2)).findOrganisationById(any());
     }
 
-
     @Test
     void shouldUSeNonImmediateDocmosisTemplate() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N121_SPEC_NON_IMMEDIATE)))
