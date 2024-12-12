@@ -2,7 +2,7 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA6.CP.Court.Officer.Order.Defendant', '{"Notice.AAA6.CP.Hearing.Scheduled","Notice.AAA6.CP.Trial Arrangements.Required","Notice.AAA6.CP.Trial Arrangements.Finalised"}', '{"Notice.AAA6.CP.Court.Officer.Order.Defendant" : []}'),
+VALUES ('Scenario.AAA6.CP.Court.Officer.Order.Defendant', '{"Notice.AAA6.CP.Hearing.Scheduled.Defendant","Notice.AAA6.CP.Trial.Arrangements.Required.Defendant","Notice.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Defendant"}', '{"Notice.AAA6.CP.Court.Officer.Order.Defendant" : []}'),
        ('Scenario.AAA6.CP.Court.Officer.Order.TrialReady.Defendant', '{}', '{}');
 
 
@@ -22,8 +22,6 @@ VALUES ('Notice.AAA6.CP.Court.Officer.Order.Defendant', 'An order has been made'
 INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
                                     scenario_name, task_status_sequence, role, task_order)
 VALUES ('<a>View the hearing</a>', 'Hearing', '<a>Gweld y gwrandawiad</a>',
-        'Gwrandawiad', 'Hearing.View', 'Scenario.AAA6.CP.Court.Officer.Order.Defendant', '{1, 1}', 'CLAIMANT', 8),
-       ('<a href="{UPLOAD_HEARING_DOCUMENTS}" class="govuk-link">Upload hearing documents</a>', 'Hearing',
-        '<a href="{UPLOAD_HEARING_DOCUMENTS}" class="govuk-link">Llwytho dogfennau''r gwrandawiad</a>', 'Gwrandawiad',
-        'Hearing.Document.Upload', 'Scenario.AAA6.CP.Court.Officer.Order.TrialReady.Defendant',
-        '{6, 6}', 'DEFENDANT', 10);
+        'Gwrandawiad', 'Hearing.View', 'Scenario.AAA6.CP.Court.Officer.Order.Defendant', '{1, 1}', 'DEFENDANT', 8),
+       ('<a>Add the trial arrangements</a>', 'Hearing' ,'<a>Ychwanegu trefniadau''r treial</a>',
+        'Gwrandawiad', 'Hearing.Arrangements.Add', 'Scenario.AAA6.CP.Court.Officer.Order.TrialReady.Defendant', '{1, 1}', 'DEFENDANT', 11);
