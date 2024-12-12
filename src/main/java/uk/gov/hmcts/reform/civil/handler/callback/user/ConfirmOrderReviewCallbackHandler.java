@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -92,6 +93,13 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
             .obligationDatePresent(null)
             .courtStaffNextSteps(null)
             .build();
+
+        if (YesOrNo.YES.equals(caseData.getIsFinalOrder())) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(updatedCaseData.toMap(objectMapper))
+                .state(CaseState.All_FINAL_ORDERS_ISSUED.toString())
+                .build();
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
