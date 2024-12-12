@@ -31,6 +31,6 @@ VALUES ('<a>View the hearing</a>', 'Hearing', '<a>Gweld y gwrandawiad</a>',
        ('<a href="{UPLOAD_HEARING_DOCUMENTS}" class="govuk-link">Upload hearing documents</a>', 'Hearing',
         '<a href="{UPLOAD_HEARING_DOCUMENTS}" class="govuk-link">Llwytho dogfennau''r gwrandawiad</a>', 'Gwrandawiad',
         'Hearing.Document.Upload', 'Scenario.AAA6.CP.Court.Officer.Order.TrialReady.Claimant',
-        '{6, 6}', 'CLAIMANT', 10),
+        '{6, 6}', 'CLAIMANT', 10);
 
 
