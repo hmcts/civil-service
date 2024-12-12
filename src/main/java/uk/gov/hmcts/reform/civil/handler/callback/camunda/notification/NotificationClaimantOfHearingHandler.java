@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
@@ -38,6 +39,8 @@ import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateAndApplyFee;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateHearingDueDate;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.hearingFeeRequired;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isEvent;
 
 @Service
@@ -49,6 +52,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
     private final HearingFeesService hearingFeesService;
     private final NotificationsProperties notificationsProperties;
     private final HearingNoticeCamundaService camundaService;
+    private final OrganisationService organisationService;
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIMANT_HEARING, NOTIFY_CLAIMANT_HEARING_HMC);
     private static final String REFERENCE_TEMPLATE_HEARING = "notification-of-hearing-%s";
     private static final String REFERENCE_TEMPLATE_HEARING_LIP = "notification-of-hearing-lip-%s";
@@ -94,7 +98,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
     }
 
     private void sendEmail(CaseData caseData, String recipient, String reference, boolean isApplicantLip, boolean isHmcEvent) {
-        notificationService.sendMail(recipient, getEmailTemplate(caseData, isApplicantLip), addPropertiesHearing(caseData, isHmcEvent), reference);
+        notificationService.sendMail(recipient, getEmailTemplate(caseData, isApplicantLip), addPropertiesHearing(caseData, isHmcEvent, isApplicantLip), reference);
     }
 
     private void sendEmailHMC(CaseData caseData, String recipient) {
@@ -123,9 +127,8 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
         return null;
     }
 
-    public Map<String, String> addPropertiesHearing(final CaseData caseData, boolean isHmcEvent) {
+    public Map<String, String> addPropertiesHearing(final CaseData caseData, boolean isHmcEvent, boolean isApplicantLip) {
         String reference = "";
-        String legacyCaseRef = caseData.getLegacyCaseReference();
         String hearingTime;
         if (!isHmcEvent) {
             hearingTime = NotificationUtils.getFormattedHearingTime(caseData.getHearingTimeHourMinute());
@@ -137,8 +140,12 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
         }
 
         String hearingDate = NotificationUtils.getFormattedHearingDate(caseData.getHearingDate());
-        Map<String, String> map = new HashMap<>(Map.of(CLAIM_REFERENCE_NUMBER, legacyCaseRef,
-            HEARING_DATE, hearingDate, HEARING_TIME, hearingTime));
+        Map<String, String> map = new HashMap<>(Map.of(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            HEARING_DATE, hearingDate, HEARING_TIME, hearingTime,
+                                                       PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                                                       CASEMAN_REF, caseData.getLegacyCaseReference(),
+                                                       CLAIM_LEGAL_ORG_NAME_SPEC, isApplicantLip ? caseData.getApplicant1().getPartyName()
+                                                           : getApplicantLegalOrganizationName(caseData, organisationService)));
         if (!isApplicantLip(caseData)) {
             if (nonNull(caseData.getSolicitorReferences())
                 && nonNull(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())) {
@@ -206,7 +213,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
 
         return Map.of(
             CLAIM_REFERENCE_NUMBER,
-            caseData.getLegacyCaseReference(),
+            caseData.getCcdCaseReference().toString(),
             HEARING_FEE,
             fee == null ? "£0.00" : String.valueOf(fee.formData()),
             HEARING_DATE,
@@ -217,7 +224,10 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
                 "pm"
             ),
             HEARING_DUE_DATE,
-            calculateHearingDueDate(LocalDate.now(), hearingDate).format(DateTimeFormatter.ofPattern(DATE_FORMAT))
+            calculateHearingDueDate(LocalDate.now(), hearingDate).format(DateTimeFormatter.ofPattern(DATE_FORMAT)),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 }

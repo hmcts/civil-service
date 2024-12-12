@@ -105,6 +105,23 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
         return null;
     }
 
+    @Override
+    protected void beforeRecordScenario(CaseData caseData, String authToken) {
+        if (isCaseStateSettled(caseData)) {
+            dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
+                caseData.getCcdCaseReference().toString(),
+                "DEFENDANT",
+                authToken
+            );
+
+            dashboardApiClient.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+                caseData.getCcdCaseReference().toString(),
+                "DEFENDANT",
+                authToken
+            );
+        }
+    }
+
     private String getCaseSettledScenarios(CaseData caseData) {
         if (Objects.nonNull(caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec()) && caseData.isClaimantIntentionSettlePartAdmit()) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario();
