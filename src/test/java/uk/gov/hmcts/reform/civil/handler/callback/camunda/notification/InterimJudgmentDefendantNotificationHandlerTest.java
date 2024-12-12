@@ -7,8 +7,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -22,12 +24,14 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.anyMap;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
@@ -126,6 +130,28 @@ public class InterimJudgmentDefendantNotificationHandlerTest extends BaseCallbac
                 anyString(),
                 eq("template-id-app"), anyMap(),
                 eq("interim-judgment-approval-notification-def-000DC001"));
+        }
+
+        @Test
+        void shouldNotNotify_whenLipDefendant() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("hmcts")
+                                 .individualTitle("Mr.")
+                                 .individualFirstName("Don")
+                                 .individualLastName("Smith")
+                                 .build())
+                .respondent1OrganisationPolicy(null)
+                .legacyCaseReference("12DC910")
+                .respondent2OrganisationPolicy(null).build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .addRespondent2(YesOrNo.NO)
+                .ccdCaseReference(1594901956117591L).build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            verifyNoInteractions(notificationService);
+            assertThat(response.getState()).isEqualTo("JUDICIAL_REFERRAL");
         }
 
         private Map<String, String> getNotificationDataMap() {
