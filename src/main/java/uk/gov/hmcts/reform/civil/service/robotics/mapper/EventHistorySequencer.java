@@ -109,7 +109,7 @@ public class EventHistorySequencer {
                 case CERTIFICATE_OF_SATISFACTION_OR_CANCELLATION:
                     builder.certificateOfSatisfactionOrCancellation(event);
                     break;
-                 default:
+                default:
                     throw new IllegalStateException("Unexpected event type: " + eventType);
             }
         });
