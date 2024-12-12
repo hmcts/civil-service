@@ -3,8 +3,8 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.CP.Court.Officer.Order.Claimant', '{"Notice.AAA6.CP.Hearing.Scheduled","Notice.AAA6.CP.HearingFee.Required","Notice.AAA6.CP.Trial Arrangements.Required","Notice.AAA6.CP.Trial Arrangements.Finalised"}', '{"Notice.AAA6.CP.Court.Officer.Order.Claimant" : []}'),
-       ('Scenario.AAA6.CP.Court.Officer.Order.HearingFee.Claimant', '', ''),
-       ('Scenario.AAA6.CP.Court.Officer.Order.TrialReady.Claimant', '', '');
+       ('Scenario.AAA6.CP.Court.Officer.Order.HearingFee.Claimant', '{}', '{}'),
+       ('Scenario.AAA6.CP.Court.Officer.Order.TrialReady.Claimant', '{}', '{}');
 
 
 /**
