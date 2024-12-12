@@ -34,11 +34,9 @@ public class UnrepresentedLitigantPopulator {
         String mediationContactName = getUnrepresentedLitigantMediationContactName(
             party, originalMediationContactPerson, mediationLiPCarm);
 
-        String mediationEmail = YES.equals(mediationLiPCarm.getIsMediationEmailCorrect())
-            ? party.getPartyEmail() : mediationLiPCarm.getAlternativeMediationEmail();
+        String mediationEmail = getMediationEmail(party, mediationLiPCarm);
 
-        String mediationPhone = YES.equals(mediationLiPCarm.getIsMediationPhoneCorrect())
-            ? party.getPartyPhone() : mediationLiPCarm.getAlternativeMediationTelephone();
+        String mediationPhone = getMediationPhone(party, mediationLiPCarm);
 
         return builder.represented(false)
             .solicitorOrgName(null)
@@ -50,8 +48,24 @@ public class UnrepresentedLitigantPopulator {
             .dateRangeToAvoid(dateRangeToAvoid);
     }
 
+    private static String getMediationPhone(Party party, MediationLiPCarm mediationLiPCarm) {
+        if (mediationLiPCarm == null) {
+            return party.getPartyPhone();
+        }
+        return YES.equals(mediationLiPCarm.getIsMediationPhoneCorrect())
+            ? party.getPartyPhone() : mediationLiPCarm.getAlternativeMediationTelephone();
+    }
+
+    private static String getMediationEmail(Party party, MediationLiPCarm mediationLiPCarm) {
+        if (mediationLiPCarm == null) {
+            return party.getPartyEmail();
+        }
+        return YES.equals(mediationLiPCarm.getIsMediationEmailCorrect())
+            ? party.getPartyEmail() : mediationLiPCarm.getAlternativeMediationEmail();
+    }
+
     private List<MediationUnavailability> getDateRangeToAvoid(MediationLiPCarm mediationLiPCarm) {
-        if (YES.equals(mediationLiPCarm.getHasUnavailabilityNextThreeMonths())) {
+        if (mediationLiPCarm != null && YES.equals(mediationLiPCarm.getHasUnavailabilityNextThreeMonths())) {
             return toMediationUnavailableDates(mediationLiPCarm.getUnavailableDatesForMediation());
         }
         return List.of(MediationUnavailability.builder().build());
@@ -91,6 +105,9 @@ public class UnrepresentedLitigantPopulator {
     }
 
     private String getContactName(MediationLiPCarm mediationLiPCarm, String originalContactName) {
+        if (mediationLiPCarm == null) {
+            return originalContactName;
+        }
         return YES.equals(mediationLiPCarm.getIsMediationContactNameCorrect())
             ? originalContactName
             : mediationLiPCarm.getAlternativeMediationContactPerson();

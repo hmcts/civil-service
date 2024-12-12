@@ -106,7 +106,10 @@ public class EventHistorySequencer {
                 case SET_ASIDE_JUDGMENT:
                     builder.setAsideJudgment(event);
                     break;
-                default:
+                case CERTIFICATE_OF_SATISFACTION_OR_CANCELLATION:
+                    builder.certificateOfSatisfactionOrCancellation(event);
+                    break;
+                 default:
                     throw new IllegalStateException("Unexpected event type: " + eventType);
             }
         });
@@ -167,6 +170,9 @@ public class EventHistorySequencer {
         if (isEmpty(builder.build().getSetAsideJudgment())) {
             builder.setAsideJudgment(List.of(Event.builder().build()));
         }
+        if (isEmpty(builder.build().getCertificateOfSatisfactionOrCancellation())) {
+            builder.certificateOfSatisfactionOrCancellation(List.of(Event.builder().build()));
+        }
         return builder
             .build();
     }
@@ -203,7 +209,8 @@ public class EventHistorySequencer {
             eventHistory.getSetAsideJudgment(),
             eventHistory.getJudgmentByAdmission(),
             eventHistory.getGeneralFormOfApplication(),
-            eventHistory.getDefenceStruckOut()
+            eventHistory.getDefenceStruckOut(),
+            eventHistory.getCertificateOfSatisfactionOrCancellation()
         );
         return eventsList.stream()
             .filter(Objects::nonNull)
