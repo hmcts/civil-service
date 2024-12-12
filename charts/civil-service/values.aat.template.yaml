@@ -61,6 +61,7 @@ idam-pr:
       - https://civil-service-xui-staging.aat.platform.hmcts.net/oauth2/callback
 
 civil-general-applications:
+  enabled: true
   java:
     releaseNameOverride: ${SERVICE_NAME}-ga
     ingressHost: civil-service-ga-staging.aat.platform.hmcts.net
