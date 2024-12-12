@@ -81,6 +81,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE_ENTERED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE_LIFTED;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.CERTIFICATE_OF_SATISFACTION_OR_CANCELLATION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.CONSENT_EXTENSION_FILING_DEFENCE;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFAULT_JUDGMENT_GRANTED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
@@ -285,6 +286,7 @@ public class EventHistoryMapper {
         buildInformAgreedExtensionDateForSpec(builder, caseData);
         buildClaimTakenOfflineAfterDJ(builder, caseData);
         buildCcjEvent(builder, caseData);
+        buildCoscEvent(builder, caseData);
         return eventHistorySequencer.sortEvents(builder.build());
     }
 
@@ -493,6 +495,34 @@ public class EventHistoryMapper {
                 break;
             default:
                 break;
+        }
+    }
+
+    private void buildCoscEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        boolean joMarkedPaidInFullDateExists = caseData.getJoMarkedPaidInFullIssueDate() != null;
+
+        if (featureToggleService.isJOLiveFeedActive()
+            && ((joMarkedPaidInFullDateExists && caseData.getJoDefendantMarkedPaidInFullIssueDate() == null)
+                || caseData.hasCoscCert())
+        ) {
+            // date received when mark paid in full by claimant is issued or when the scheduler runs at the cosc deadline at 4pm
+            LocalDateTime dateReceived = joMarkedPaidInFullDateExists
+                ? caseData.getJoMarkedPaidInFullIssueDate() : caseData.getJoDefendantMarkedPaidInFullIssueDate();
+
+            builder.certificateOfSatisfactionOrCancellation((Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .litigiousPartyID(joMarkedPaidInFullDateExists ? APPLICANT_ID : RESPONDENT_ID)
+                .eventCode(CERTIFICATE_OF_SATISFACTION_OR_CANCELLATION.getCode())
+                .dateReceived(dateReceived)
+                .eventDetails(EventDetails.builder()
+                                  .status(caseData.getJoCoscRpaStatus().toString())
+                                  .datePaidInFull(getCoscDate(caseData))
+                                  .notificationReceiptDate(joMarkedPaidInFullDateExists
+                                                               ? caseData.getJoMarkedPaidInFullIssueDate().toLocalDate()
+                                                               : caseData.getJoDefendantMarkedPaidInFullIssueDate().toLocalDate())
+                                  .build())
+                .eventDetailsText("")
+                .build()));
         }
     }
 
@@ -2422,5 +2452,14 @@ public class EventHistoryMapper {
             applicant1ResponseDate = LocalDateTime.now();
         }
         return applicant1ResponseDate;
+    }
+
+    private LocalDate getCoscDate(CaseData caseData) {
+        if (caseData.getJoFullyPaymentMadeDate() != null) {
+            return caseData.getJoFullyPaymentMadeDate();
+        } else if (caseData.getCertOfSC() != null && caseData.getCertOfSC().getDefendantFinalPaymentDate() != null) {
+            return caseData.getCertOfSC().getDefendantFinalPaymentDate();
+        }
+        throw new IllegalArgumentException("Payment date cannot be null");
     }
 }
