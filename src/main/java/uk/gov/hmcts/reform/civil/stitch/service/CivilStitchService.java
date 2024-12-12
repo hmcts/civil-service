@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
+import uk.gov.hmcts.reform.civil.service.DocumentConversionService;
 import uk.gov.hmcts.reform.civil.stitch.PdfMerger;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
 public class CivilStitchService {
 
     private final DocumentManagementService managementService;
+    private final DocumentConversionService conversionService;
 
     public CaseDocument generateStitchedCaseDocument(List<DocumentMetaData> documents,
                                                      String documentName,
@@ -27,7 +29,7 @@ public class CivilStitchService {
 
         log.info("Generating stitched case document for caseId {} with filename {}", caseId, documentName);
         List<byte[]> docs = documents.stream()
-            .map(doc -> managementService.downloadDocument(authorisation, doc.getDocument().getDocumentUrl())).toList();
+            .map(doc -> conversionService.convertDocumentToPdf(doc.getDocument(), caseId, authorisation)).toList();
 
         byte[] bytes = PdfMerger.mergeDocuments(docs, String.valueOf(caseId));
 
