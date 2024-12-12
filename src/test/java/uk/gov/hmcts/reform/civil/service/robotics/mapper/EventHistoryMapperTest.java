@@ -8737,4 +8737,170 @@ class EventHistoryMapperTest {
             }
         }
     }
+
+    @Nested
+    class Cosc {
+        LocalDate markPaidInFullDate = LocalDate.of(2024, 1, 1);
+        LocalDate defendantFinalPaymentDate = LocalDate.of(2024, 1, 4);
+        LocalDateTime markPaidInFullIssueDate = LocalDateTime.of(2024, 1, 2,  9, 0, 0);
+        LocalDateTime schedulerDeadline = LocalDateTime.of(2024, 2, 2,  16, 0, 0);
+        LocalDateTime joDefendantMarkedPaidInFullIssueDate = LocalDateTime.of(2024, 1, 3, 16, 0, 0);
+        CaseDocument caseDocument = CaseDocument.builder()
+            .documentType(DocumentType.CERTIFICATE_OF_DEBT_PAYMENT)
+            .build();
+
+        @BeforeEach
+        void setup() {
+            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
+            when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
+        }
+
+        @Nested
+        class CancelledStatus {
+            @Test
+            public void shouldGenerateRPA_Cancelled_MarkPaidInFull_CoscApplied() {
+                CertOfSC certOfSC = CertOfSC.builder()
+                    .defendantFinalPaymentDate(LocalDate.now())
+                    .debtPaymentEvidence(DebtPaymentEvidence.builder()
+                                             .debtPaymentOption(DebtPaymentOptions.MADE_FULL_PAYMENT_TO_COURT).build()).build();
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().toBuilder()
+                    .certOfSC(certOfSC)
+                    .systemGeneratedCaseDocuments(wrapElements(caseDocument))
+                    .joMarkedPaidInFullIssueDate(markPaidInFullIssueDate)
+                    .joCoscRpaStatus(CANCELLED)
+                    .joFullyPaymentMadeDate(markPaidInFullDate)
+                    .build();
+
+                Event expectedEvent = Event.builder()
+                    .eventSequence(1)
+                    .eventCode("600")
+                    .dateReceived(markPaidInFullIssueDate)
+                    .litigiousPartyID("001")
+                    .eventDetailsText("")
+                    .eventDetails(EventDetails.builder()
+                                      .status(String.valueOf(CANCELLED))
+                                      .datePaidInFull(markPaidInFullDate)
+                                      .notificationReceiptDate(markPaidInFullIssueDate.toLocalDate())
+                                      .build())
+                    .build();
+
+                EventHistory eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+
+                assertThat(eventHistory).extracting("certificateOfSatisfactionOrCancellation").asList()
+                    .extracting("eventCode").asString().contains("600");
+                assertThat(eventHistory).extracting("certificateOfSatisfactionOrCancellation")
+                    .asList().containsExactly(expectedEvent);
+            }
+
+            @Test
+            public void shouldGenerateRPA_Cancelled_MarkPaidInFull_NoCoscApplied() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().toBuilder()
+                    .joMarkedPaidInFullIssueDate(markPaidInFullIssueDate)
+                    .joCoscRpaStatus(CANCELLED)
+                    .joFullyPaymentMadeDate(markPaidInFullDate)
+                    .build();
+
+                Event expectedEvent = Event.builder()
+                    .eventSequence(1)
+                    .eventCode("600")
+                    .dateReceived(markPaidInFullIssueDate)
+                    .eventDetailsText("")
+                    .litigiousPartyID("001")
+                    .eventDetails(EventDetails.builder()
+                                      .status(String.valueOf(CANCELLED))
+                                      .datePaidInFull(markPaidInFullDate)
+                                      .notificationReceiptDate(markPaidInFullIssueDate.toLocalDate())
+                                      .build())
+                    .build();
+
+                EventHistory eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+
+                assertThat(eventHistory).extracting("certificateOfSatisfactionOrCancellation").asList()
+                    .extracting("eventCode").asString().contains("600");
+                assertThat(eventHistory).extracting("certificateOfSatisfactionOrCancellation")
+                    .asList().containsExactly(expectedEvent);
+            }
+
+            @Test
+            public void shouldGenerateRPA_Cancelled_NotMarkPaidInFull_CoscApplied() {
+                CertOfSC certOfSC = CertOfSC.builder()
+                    .defendantFinalPaymentDate(defendantFinalPaymentDate)
+                    .debtPaymentEvidence(DebtPaymentEvidence.builder()
+                                             .debtPaymentOption(DebtPaymentOptions.MADE_FULL_PAYMENT_TO_COURT).build()).build();
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().toBuilder()
+                    .certOfSC(certOfSC)
+                    .joDefendantMarkedPaidInFullIssueDate(joDefendantMarkedPaidInFullIssueDate)
+                    .systemGeneratedCaseDocuments(wrapElements(caseDocument))
+                    .joMarkedPaidInFullIssueDate(null)
+                    .joCoscRpaStatus(CANCELLED)
+                    .joFullyPaymentMadeDate(null)
+                    .build();
+
+                Event expectedEvent = Event.builder()
+                    .eventSequence(1)
+                    .eventCode("600")
+                    .litigiousPartyID("002")
+                    .dateReceived(joDefendantMarkedPaidInFullIssueDate)
+                    .eventDetailsText("")
+                    .eventDetails(EventDetails.builder()
+                                      .status(String.valueOf(CANCELLED))
+                                      .datePaidInFull(defendantFinalPaymentDate)
+                                      .notificationReceiptDate(joDefendantMarkedPaidInFullIssueDate.toLocalDate())
+                                      .build())
+                    .build();
+
+                EventHistory eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+
+                assertThat(eventHistory).extracting("certificateOfSatisfactionOrCancellation").asList()
+                    .extracting("eventCode").asString().contains("600");
+                assertThat(eventHistory).extracting("certificateOfSatisfactionOrCancellation")
+                    .asList().containsExactly(expectedEvent);
+            }
+        }
+
+        @Nested
+        class SatisfiedStatus {
+            @Test
+            public void shouldGenerateRPA_MarkedPaidInFull_CoscApplied() {
+                CertOfSC certOfSC = CertOfSC.builder()
+                    .defendantFinalPaymentDate(LocalDate.now())
+                    .debtPaymentEvidence(DebtPaymentEvidence.builder()
+                                             .debtPaymentOption(DebtPaymentOptions.MADE_FULL_PAYMENT_TO_COURT).build()).build();
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().toBuilder()
+                    .certOfSC(certOfSC)
+                    .systemGeneratedCaseDocuments(wrapElements(caseDocument))
+                    .joMarkedPaidInFullIssueDate(markPaidInFullIssueDate)
+                    .joCoscRpaStatus(SATISFIED)
+                    .joFullyPaymentMadeDate(markPaidInFullDate)
+                    .build();
+
+                Event expectedEvent = Event.builder()
+                    .eventSequence(1)
+                    .eventCode("600")
+                    .dateReceived(markPaidInFullIssueDate)
+                    .eventDetailsText("")
+                    .litigiousPartyID("001")
+                    .eventDetails(EventDetails.builder()
+                                      .status(String.valueOf(SATISFIED))
+                                      .datePaidInFull(markPaidInFullDate)
+                                      .notificationReceiptDate(markPaidInFullIssueDate.toLocalDate())
+                                      .build())
+                    .build();
+
+                EventHistory eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+
+                assertThat(eventHistory).extracting("certificateOfSatisfactionOrCancellation").asList()
+                    .extracting("eventCode").asString().contains("600");
+                assertThat(eventHistory).extracting("certificateOfSatisfactionOrCancellation")
+                    .asList().containsExactly(expectedEvent);
+            }
+        }
+    }
 }
