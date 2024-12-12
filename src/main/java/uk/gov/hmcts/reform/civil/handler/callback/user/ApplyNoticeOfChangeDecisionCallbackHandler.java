@@ -3,6 +3,9 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -21,11 +24,18 @@ import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.cas.model.DecisionRequest;
+import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.List;
 import java.util.Map;
 
+import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -44,10 +54,12 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
     private final CaseAssignmentApi caseAssignmentApi;
     private final ObjectMapper objectMapper;
     private final FeatureToggleService featureToggleService;
+    private final UserService userService;
 
     private static final String CHANGE_ORGANISATION_REQUEST = "changeOrganisationRequestField";
     private static final String ORG_ID_FOR_AUTO_APPROVAL =
         "org id to persist updated change organisation request field";
+    private final IdamClient idamClient;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -62,9 +74,14 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
         CaseData preDecisionCaseData = objectMapper.convertValue(caseDetails.getData(), CaseData.class);
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         String caseRole = callbackParams.getCaseData().getChangeOrganisationRequestField().getCaseRoleId().getValue().getCode();
-
+        UserInfo userInfo = userService.getUserInfo(authToken);
         updateOrgPoliciesForLiP(callbackParams.getRequest().getCaseDetails());
+        String solEmailId = callbackParams.getCaseData().getChangeOrganisationRequestField().getCreatedBy();
 
+        BoolQueryBuilder query1 = boolQuery()
+            .must(QueryBuilders.termQuery("email", solEmailId));
+
+        List<UserDetails> solicitorDetails = idamClient.searchUsers(authToken, query1.toString());
         AboutToStartOrSubmitCallbackResponse applyDecision = caseAssignmentApi.applyDecision(
             authToken,
             authTokenGenerator.generate(),
@@ -119,7 +136,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
      * <p>This value will be deleted in the next callback UpdateCaseDetailsAfterNoCHandler</p>
      *
      * @param updatedCaseDataBuilder updatedcaseDataBuilder
-     * @param changeOrganisationRequest preDecisionCor
+     * @param  preDecisionCor
      */
     private void updateChangeOrganisationRequestFieldAfterNoCDecisionApplied(
         CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder,
