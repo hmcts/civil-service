@@ -5,14 +5,18 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.CaseEventsDashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_HEARING_FEE_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_TRIAL_READY_CLAIMANT;
 
 @Service
 public class CourtOfficerOrderClaimantNotificationHandler extends CaseEventsDashboardCallbackHandler {
@@ -34,7 +38,14 @@ public class CourtOfficerOrderClaimantNotificationHandler extends CaseEventsDash
 
     @Override
     public String getScenario(CaseData caseData) {
-        return SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_CLAIMANT.getScenario();
+        return caseData.isHearingFeePaid()
+            ? SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_CLAIMANT.getScenario()
+            : SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_HEARING_FEE_CLAIMANT.getScenario();
+    }
+
+    @Override
+    public String getExtraScenario() {
+        return SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_TRIAL_READY_CLAIMANT.getScenario();
     }
 
     @Override
@@ -47,4 +58,11 @@ public class CourtOfficerOrderClaimantNotificationHandler extends CaseEventsDash
         return featureToggleService.isCaseEventsEnabled() && caseData.isApplicantLiP();
     }
 
+    @Override
+    public boolean shouldRecordExtraScenario(CaseData caseData) {
+        return featureToggleService.isCaseEventsEnabled()
+            && caseData.isApplicantLiP()
+            && AllocatedTrack.FAST_CLAIM.name().equals(caseData.getAssignedTrack())
+            && Objects.isNull(caseData.getTrialReadyApplicant());
+    }
 }

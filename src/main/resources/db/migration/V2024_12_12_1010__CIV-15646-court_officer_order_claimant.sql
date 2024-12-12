@@ -2,7 +2,9 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA6.CP.Court.Officer.Order.Claimant', '{"Notice.AAA6.CP.Hearing.Scheduled","Notice.AAA6.CP.HearingFee.Required","Notice.AAA6.CP.Trial Arrangements.Required","Notice.AAA6.CP.Trial Arrangements.Finalised"}', '{"Notice.AAA6.CP.Court.Officer.Order.Claimant" : []}');
+VALUES ('Scenario.AAA6.CP.Court.Officer.Order.Claimant', '{"Notice.AAA6.CP.Hearing.Scheduled","Notice.AAA6.CP.HearingFee.Required","Notice.AAA6.CP.Trial Arrangements.Required","Notice.AAA6.CP.Trial Arrangements.Finalised"}', '{"Notice.AAA6.CP.Court.Officer.Order.Claimant" : []}'),
+       ('Scenario.AAA6.CP.Court.Officer.Order.HearingFee.Claimant', '', ''),
+       ('Scenario.AAA6.CP.Court.Officer.Order.TrialReady.Claimant', '', '');
 
 
 /**
@@ -14,5 +16,21 @@ VALUES ('Notice.AAA6.CP.Court.Officer.Order.Claimant', 'An order has been made',
   '<p class="govuk-body">The Court has made an order on your claim.</p><p class="govuk-body"><a href="{VIEW_ORDERS_AND_NOTICES}" rel="noopener noreferrer" target="_blank" class="govuk-link">View the order</a></p>',
   '<p class="govuk-body">Mae’r Llys wedi gwneud gorchymyn ar eich hawliad.</p><p class="govuk-body"><a href="{VIEW_ORDERS_AND_NOTICES}" rel="noopener noreferrer" target="_blank" class="govuk-link">Gweld y gorchymyn</a></p>',
   'CLAIMANT');
+
+/**
+ * Add task list changes
+ */
+INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
+                                    scenario_name, task_status_sequence, role, task_order)
+VALUES ('<a>View the hearing</a>', 'Hearing', '<a>Gweld y gwrandawiad</a>',
+        'Gwrandawiad', 'Hearing.View', 'Scenario.AAA6.CP.Court.Officer.Order.Claimant', '{1, 1}', 'CLAIMANT', 8),
+       ('<a>View the hearing</a>', 'Hearing', '<a>Gweld y gwrandawiad</a>',
+        'Gwrandawiad', 'Hearing.View', 'Scenario.AAA6.CP.Court.Officer.Order.HearingFee.Claimant', '{1, 1}', 'CLAIMANT', 8),
+       ('<a>Pay the hearing fee</a>', 'Hearing', '<a>Talu ffi''r gwrandawiad</a>',
+        'Gwrandawiad', 'Hearing.Fee.Pay', 'Scenario.AAA6.CP.Court.Officer.Order.HearingFee.Claimant', '{2, 2}', 'CLAIMANT', 9),
+       ('<a href="{UPLOAD_HEARING_DOCUMENTS}" class="govuk-link">Upload hearing documents</a>', 'Hearing',
+        '<a href="{UPLOAD_HEARING_DOCUMENTS}" class="govuk-link">Llwytho dogfennau''r gwrandawiad</a>', 'Gwrandawiad',
+        'Hearing.Document.Upload', 'Scenario.AAA6.CP.Court.Officer.Order.TrialReady.Claimant',
+        '{6, 6}', 'CLAIMANT', 10),
 
 
