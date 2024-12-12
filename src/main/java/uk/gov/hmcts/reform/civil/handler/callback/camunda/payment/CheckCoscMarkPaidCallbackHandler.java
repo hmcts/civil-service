@@ -20,7 +20,7 @@ import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHECK_PAID_IN_FULL_SCHED_DEADLINE;
-import static uk.gov.hmcts.reform.civil.enums.CoscApplicationStatus.ACTIVE;
+import static uk.gov.hmcts.reform.civil.enums.cosc.CoscApplicationStatus.ACTIVE;
 
 @Slf4j
 @Service
