@@ -17,8 +17,8 @@ import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.ManageStayUpdateRequestedSearchService;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -74,7 +74,7 @@ class ManageStayWATaskSchedulerHandlerTest {
     void shouldEmitManageStayWATaskEventEvent_whenCasesFound() {
         long caseId = 1L;
         Map<String, Object> data = Map.of("data", "some data");
-        List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
+        Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
 
         when(searchService.getCases()).thenReturn(caseDetails);
 
@@ -86,7 +86,7 @@ class ManageStayWATaskSchedulerHandlerTest {
 
     @Test
     void shouldNotEmitManageStayWATaskEvent_WhenNoCasesFound() {
-        when(searchService.getCases()).thenReturn(List.of());
+        when(searchService.getCases()).thenReturn(Set.of());
 
         handler.execute(mockTask, externalTaskService);
 
@@ -137,7 +137,7 @@ class ManageStayWATaskSchedulerHandlerTest {
         long caseId = 1L;
         long otherId = 2L;
         Map<String, Object> data = Map.of("data", "some data");
-        List<CaseDetails> caseDetails = List.of(
+        Set<CaseDetails> caseDetails = Set.of(
             CaseDetails.builder().id(caseId).data(data).build(),
             CaseDetails.builder().id(otherId).data(data).build());
 
