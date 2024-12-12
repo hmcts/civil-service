@@ -30,6 +30,14 @@ public abstract class BaseCallbackHandlerTest {
         return callbackParamsOf(data, state, type, null, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
     }
 
+    public CallbackParams callbackParamsOf(Map<String, Object> data, CaseData caseData, CallbackType type, CaseState state) {
+        return callbackParamsOf(data, state, type, null, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"), caseData);
+    }
+
+    public CallbackParams callbackParamsOf(Map<String, Object> data, CaseData caseData, CallbackType type, String pageId, CaseState state) {
+        return callbackParamsOf(data, state, type, null, pageId, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"), caseData);
+    }
+
     public CallbackParams callbackParamsOf(Map<String, Object> data, CallbackType type) {
         return callbackParamsOf(
             data,
@@ -233,6 +241,24 @@ public abstract class BaseCallbackHandlerTest {
             .request(toCallbackRequest(data, state.name()))
             .version(version)
             .params(params)
+            .build();
+    }
+
+    public CallbackParams callbackParamsOf(Map<String, Object> data,
+                                           CaseState state,
+                                           CallbackType type,
+                                           CallbackVersion version,
+                                           String pageId,
+                                           Map<Params, Object> params,
+                                           CaseData caseData
+    ) {
+        return CallbackParams.builder()
+            .type(type)
+            .pageId(pageId)
+            .request(toCallbackRequest(data, state.name()))
+            .version(version)
+            .params(params)
+            .caseData(caseData)
             .build();
     }
 
