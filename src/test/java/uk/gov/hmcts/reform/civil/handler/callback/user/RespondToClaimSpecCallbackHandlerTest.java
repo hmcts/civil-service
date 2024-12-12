@@ -827,6 +827,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
                 when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
                 when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+                when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
 
                 ExpertDetails experts = ExpertDetails.builder()
                     .expertName("Mr Expert Defendant")
@@ -895,6 +896,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
                 when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
                 when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+                when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
+                when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
 
                 ExpertDetails experts = ExpertDetails.builder()
                     .expertName("Mr Expert Defendant")
@@ -908,6 +911,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .respondent2(PartyBuilder.builder().individual().build())
+                    .multiPartyClaimTwoDefendantSolicitors()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .respondent2DQSmallClaimExperts(experts, YES)
                     .atSpecAoSApplicantCorrespondenceAddressRequired(NO)

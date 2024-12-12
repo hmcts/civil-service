@@ -76,11 +76,8 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     public CallbackResponse execute(CallbackParams callbackParams) {
 
         CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
-
         CaseData caseData = persistPartyAddress(oldCaseData, callbackParams.getCaseData());
-
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-            .applicant1ResponseDate(time.now());
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder().applicant1ResponseDate(time.now());
 
         persistFlagsForParties(oldCaseData, caseData, builder);
         setResponseDocumentNull(builder);
@@ -89,14 +86,10 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         assignApplicant1DQExpertsIfPresent(caseData, builder);
         assignApplicant2DQExpertsIfPresent(caseData, builder);
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(
-            builder, featureToggleService.isUpdateContactDetailsEnabled());
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
 
-        if (featureToggleService.isUpdateContactDetailsEnabled()) {
-            addEventAndDateAddedToApplicantExperts(builder);
-            addEventAndDateAddedToApplicantWitnesses(builder);
-        }
-
+        addEventAndDateAddedToApplicantExperts(builder);
+        addEventAndDateAddedToApplicantWitnesses(builder);
         populateDQPartyIds(builder);
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, builder);
