@@ -41,3 +41,14 @@ infrastructure/override.tf
 ### aat env file ###
 .aat-env
 /java_pid*.hprof
+
+### mirrord extras ####
+.env.local
+codecept.conf.js
+e2e/
+package.json
+playwright-e2e/
+playwright.config.ts
+plugins/
+saucelabs.conf.js
+yarn.lock
