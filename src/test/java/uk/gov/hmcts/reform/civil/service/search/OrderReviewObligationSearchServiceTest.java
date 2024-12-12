@@ -51,8 +51,8 @@ class OrderReviewObligationSearchServiceTest extends ElasticSearchServiceTest {
                                 .should(beState(DECISION_OUTCOME))
                                 .should(beState(IN_MEDIATION))
                                 .should(beState(All_FINAL_ORDERS_ISSUED))
-                                .should(beState(JUDICIAL_REFERRAL))
                                 .should(beState(CASE_STAYED))
+                                .should(beState(JUDICIAL_REFERRAL))
                                 .should(beState(CASE_PROGRESSION))
                       ));
 
