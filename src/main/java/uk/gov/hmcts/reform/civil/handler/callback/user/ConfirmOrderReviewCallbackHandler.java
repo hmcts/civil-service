@@ -102,7 +102,7 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
                 .map(Element::getValue)
                 .filter(data -> data.getObligationDate() == null || !data.getObligationDate().isAfter(
                     LocalDate.now()))
-                .map(data -> "The obligation date must be in the future").collect(Collectors.toList());
+                .map(data -> OBLIGATION_DATE_ERROR).collect(Collectors.toList());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
