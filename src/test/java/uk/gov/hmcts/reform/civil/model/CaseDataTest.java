@@ -1160,6 +1160,26 @@ public class CaseDataTest {
     }
 
     @Nested
+    class CoSC {
+        @Test
+        void shouldReturnTrue_CoscCertExists() {
+            CaseDocument caseDocument = CaseDocument.builder()
+                .documentType(DocumentType.CERTIFICATE_OF_DEBT_PAYMENT)
+                .build();
+            CaseData caseData = CaseData.builder()
+                .systemGeneratedCaseDocuments(wrapElements(caseDocument))
+                .build();
+            assertTrue(caseData.hasCoscCert());
+        }
+
+        @Test
+        void shouldReturnFalse_CoscCertDoesntExists() {
+            CaseData caseData = CaseData.builder().build();
+            assertFalse(caseData.hasCoscCert());
+        }
+    }
+
+    @Nested
     class AlreadyPaidAmountCheck {
         @Test
         void shouldReturnTrueIfPaidLessFullDefence() {
