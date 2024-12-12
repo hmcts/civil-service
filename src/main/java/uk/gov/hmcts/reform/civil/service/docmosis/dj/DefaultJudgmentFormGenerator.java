@@ -20,6 +20,7 @@ import java.util.List;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DJ_FORM_SPEC;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC_NON_IMMEDIATE;
 
 @Service
 @Slf4j
@@ -80,6 +81,9 @@ public class DefaultJudgmentFormGenerator {
 
     private DocmosisTemplates getDocmosisTemplate(String event, CaseData caseData) {
         if (event.equals(GENERATE_DJ_FORM_SPEC.name())) {
+            if (!caseData.getPaymentTypeSelection().equals(DJPaymentTypeSelection.IMMEDIATELY)) {
+                return N121_SPEC_NON_IMMEDIATE;
+            }
             return N121_SPEC;
         } else {
             return N121;
@@ -89,9 +93,9 @@ public class DefaultJudgmentFormGenerator {
     private StandardDefaultJudgmentBuilder getDefaultJudgmentBuilder(String event, CaseData caseData) {
         if (event.equals(GENERATE_DJ_FORM_SPEC.name())) {
             if (!caseData.getPaymentTypeSelection().equals(DJPaymentTypeSelection.IMMEDIATELY)) {
-                return defaultJudgmentFormBuilder;
+                return nonImmediatePaymentTypeDefaultJudgmentFormBuilder;
             }
         }
-        return nonImmediatePaymentTypeDefaultJudgmentFormBuilder;
+        return defaultJudgmentFormBuilder;
     }
 }

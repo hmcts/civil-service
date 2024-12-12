@@ -40,6 +40,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DJ_FORM_SPEC;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFAULT_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC_NON_IMMEDIATE;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
@@ -273,4 +274,27 @@ class DefaultJudgmentFormGeneratorTest {
         verify(organisationService, times(2)).findOrganisationById(any());
     }
 
+
+    @Test
+    void shouldUSeNonImmediateDocmosisTemplate() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N121_SPEC_NON_IMMEDIATE)))
+            .thenReturn(new DocmosisDocument(N121_SPEC_NON_IMMEDIATE.getDocumentTitle(), bytes));
+
+        when(documentManagementService
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT)))
+            .thenReturn(CASE_DOCUMENT);
+
+        when(interestCalculator.calculateInterest(any(CaseData.class)))
+            .thenReturn(new BigDecimal(10));
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors()
+            .totalClaimAmount(new BigDecimal(2000))
+            .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
+            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build())
+            .build();
+        List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN, GENERATE_DJ_FORM_SPEC.name());
+
+        assertThat(caseDocuments).hasSize(2);
+        verify(organisationService, times(2)).findOrganisationById(any());
+    }
 }
