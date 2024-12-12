@@ -45,6 +45,7 @@ public class DocumentConversionService {
         if (PDF_MIME_TYPE.equalsIgnoreCase(tika.detect(sourceDocument.getDocumentFileName()))) {
             return documentManagementService.downloadDocument(auth, sourceDocument.getDocumentUrl());
         }
+        log.info("Converting document to pdf for caseId {}", caseId);
         return convert(sourceDocument, caseId, auth);
     }
 
