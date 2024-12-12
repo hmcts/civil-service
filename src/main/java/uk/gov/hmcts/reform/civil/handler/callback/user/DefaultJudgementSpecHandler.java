@@ -487,6 +487,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             caseData.setActiveJudgment(activeJudgment);
             caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment));
             caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
+        } else {
+            caseData.setJoIsLiveJudgmentExists(YesOrNo.NO);
         }
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
