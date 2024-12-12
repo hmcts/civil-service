@@ -13,10 +13,12 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ObligationData;
+import uk.gov.hmcts.reform.civil.model.ObligationWAFlag;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -41,28 +43,48 @@ public class OrderReviewObligationCheckCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse orderReviewObligationCheck(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData().toBuilder()
-            .build();
-
+        CaseData caseData = callbackParams.getCaseData();
         LocalDate currentDate = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
+
+        caseData.setObligationWAFlag(null);
+
         caseData.getStoredObligationData().stream()
             .map(Element::getValue)
             .filter(data -> !data.getObligationDate().isAfter(currentDate) && YesOrNo.NO.equals(data.getObligationWATaskRaised()))
-            .forEach(data -> {
+            .findFirst()
+            .ifPresent(data -> {
+                ObligationWAFlag.ObligationWAFlagBuilder obligationWAFlagBuilder = ObligationWAFlag.builder();
+                updateObligationWAFlag(obligationWAFlagBuilder, data);
+                obligationWAFlagBuilder.currentDate(currentDate.format(formatter));
+                obligationWAFlagBuilder.obligationReason(data.getObligationReason().name());
+                obligationWAFlagBuilder.obligationReasonDisplayValue(data.getObligationReason().getDisplayedValue());
                 data.setObligationWATaskRaised(YesOrNo.YES);
-                // TODO: add logic here to trigger WA tasks for obligations that are due
+                caseData.setObligationWAFlag(obligationWAFlagBuilder.build());
             });
 
-        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
-
-        List<Element<ObligationData>> storedObligationDataList = caseData.getStoredObligationData();
-
-        updatedCaseData.storedObligationData(storedObligationDataList);
-
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.build().toMap(mapper))
+            .data(caseData.toBuilder()
+                      .storedObligationData(caseData.getStoredObligationData())
+                      .obligationWAFlag(caseData.getObligationWAFlag())
+                      .build().toMap(mapper))
             .build();
+    }
 
+    private void updateObligationWAFlag(ObligationWAFlag.ObligationWAFlagBuilder obligationWAFlagBuilder, ObligationData data) {
+        switch (data.getObligationReason()) {
+            case UNLESS_ORDER -> obligationWAFlagBuilder.unlessOrder(YesOrNo.YES);
+            case STAY_A_CASE -> obligationWAFlagBuilder.stayACase(YesOrNo.YES);
+            case LIFT_A_STAY -> obligationWAFlagBuilder.liftAStay(YesOrNo.YES);
+            case DISMISS_CASE -> obligationWAFlagBuilder.dismissCase(YesOrNo.YES);
+            case PRE_TRIAL_CHECKLIST -> obligationWAFlagBuilder.preTrialChecklist(YesOrNo.YES);
+            case GENERAL_ORDER -> obligationWAFlagBuilder.generalOrder(YesOrNo.YES);
+            case RESERVE_JUDGMENT -> obligationWAFlagBuilder.reserveJudgment(YesOrNo.YES);
+            case OTHER -> obligationWAFlagBuilder.other(YesOrNo.YES);
+            default -> {
+                log.info("Obligation reason {} not found", data.getObligationReason());
+            }
+        }
     }
 
     @Override

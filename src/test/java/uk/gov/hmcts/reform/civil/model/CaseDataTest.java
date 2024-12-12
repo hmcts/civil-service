@@ -1304,6 +1304,33 @@ public class CaseDataTest {
             )
         );
     }
+
+    @Test
+    void shouldReturnNullForDefaultObligationWAFlag() {
+        // Given
+        CaseData caseData = CaseData.builder().build();
+
+        // When
+        ObligationWAFlag obligationWAFlag = caseData.getObligationWAFlag();
+
+        // Then
+        assertNull(obligationWAFlag);
+    }
+
+    @Test
+    void shouldSetAndReturnObligationWAFlag() {
+        // Given
+        ObligationWAFlag expectedFlag = new ObligationWAFlag(YesOrNo.NO, YesOrNo.NO,
+                                                             YesOrNo.NO, YesOrNo.NO, YesOrNo.NO, YesOrNo.NO,
+                                                             YesOrNo.NO, YesOrNo.NO, "Test", "Test", "1 January 2024");
+        CaseData caseData = CaseData.builder().obligationWAFlag(expectedFlag).build();
+
+        // When
+        ObligationWAFlag obligationWAFlag = caseData.getObligationWAFlag();
+
+        // Then
+        assertEquals(expectedFlag, obligationWAFlag);
+    }
 }
 
 
