@@ -62,6 +62,7 @@ idam-pr:
 
 civil-general-applications:
   java:
+    enabled: true
     releaseNameOverride: ${SERVICE_NAME}-ga
     ingressHost: civil-service-ga-staging.aat.platform.hmcts.net
     keyVaults:
