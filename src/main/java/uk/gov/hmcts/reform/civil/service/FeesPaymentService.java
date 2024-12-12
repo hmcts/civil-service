@@ -29,7 +29,7 @@ public class FeesPaymentService {
     private final CoreCaseDataService coreCaseDataService;
     private final PinInPostConfiguration pinInPostConfiguration;
     private final PaymentStatusService paymentStatusService;
-    private final UpdatePaymentStatusService updatePaymentStatusService;
+    private final PaymentRequestUpdateCallbackService paymentRequestUpdateCallbackService;
 
     public CardPaymentStatusResponse createGovPaymentRequest(
         FeeType feeType, String caseReference, String authorization) {
@@ -85,7 +85,7 @@ public class FeesPaymentService {
         }
 
         try {
-            updatePaymentStatusService.updatePaymentStatus(feeType, caseReference, response.build());
+            paymentRequestUpdateCallbackService.updatePaymentStatus(feeType, caseReference, response.build());
 
         } catch (Exception e) {
 
