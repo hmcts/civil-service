@@ -11,7 +11,10 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ObligationData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.ArrayList;
@@ -19,8 +22,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.lang.String.format;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -51,7 +56,7 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
 
         if (featureToggleService.isCaseEventsEnabled()) {
             return Map.of(
-                callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+                callbackKey(ABOUT_TO_START), this::cleanObligationData,
                 callbackKey(MID, "validate-tasks-left"), this:: validateTasksLeft,
                 callbackKey(ABOUT_TO_SUBMIT), this::confirmOrderReview,
                 callbackKey(SUBMITTED), this::fillConfirmationScreen
@@ -68,6 +73,19 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    private CallbackResponse cleanObligationData(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        caseDataBuilder
+            .obligationDatePresent(null)
+            .courtStaffNextSteps(null);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
     }
 
     private CallbackResponse validateTasksLeft(CallbackParams callbackParams) {
@@ -87,14 +105,27 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
 
     private CallbackResponse confirmOrderReview(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
 
-        CaseData updatedCaseData = caseData.toBuilder()
-            .obligationDatePresent(null)
-            .courtStaffNextSteps(null)
-            .build();
+        if (YesOrNo.YES.equals(caseData.getObligationDatePresent())) {
+            updatedCaseData.businessProcess(BusinessProcess.ready(CONFIRM_ORDER_REVIEW));
+        }
+
+        if (nonNull(caseData.getObligationData())) {
+
+            List<Element<ObligationData>> storedObligationData = Optional.ofNullable(caseData.getStoredObligationData())
+                .orElse(Collections.emptyList());
+
+            List<Element<ObligationData>> combinedData = new ArrayList<>();
+            combinedData.addAll(storedObligationData);
+            combinedData.addAll(caseData.getObligationData());
+
+            updatedCaseData.obligationData(null)
+                .storedObligationData(combinedData);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
+            .data(updatedCaseData.build().toMap(objectMapper))
             .build();
     }
 
