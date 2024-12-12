@@ -108,6 +108,7 @@ idam-pr:
       - https://xui-${SERVICE_NAME}.preview.platform.hmcts.net/oauth2/callback
 
 civil-general-applications:
+  enabled: true
   java:
     image: 'hmctspublic.azurecr.io/civil/general-applications:latest'
     imagePullPolicy: Always
