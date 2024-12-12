@@ -449,6 +449,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private List<Element<UnavailableDate>> respondent1UnavailableDatesForTab;
     private List<Element<UnavailableDate>> respondent2UnavailableDatesForTab;
     private String pcqId;
+    private String respondentResponsePcqId;
 
     // Transfer a Case Online
     private String reasonForTransfer;
