@@ -8,10 +8,24 @@ xui-webapp:
 camunda-bpm:
   enabled: false
 
+civil-general-applications:
+  enabled: false
+
 aac-manage-case-assignment:
   enabled: false
+
 ccd:
   enabled: false
+
+ccd-case-document-am-api:
+  enabled: false
+
+em-ccdorc:
+  enabled: false
+
+em-stitching:
+  enabled: false
+
 java:
   applicationPort: 4000
   image: 'hmctspublic.azurecr.io/civil/service:latest'
@@ -73,6 +87,7 @@ java:
     CIVIL_S2S_AUTHORISED_SERVICES: payment_app,ccd_data,civil_service,civil-citizen-ui
     OCMC_CLIENT_ID: cmc_citizen
     CONSOLE_LOG_PATTERN: '%d{${LOGBACK_DATE_FORMAT}} %-5level [%thread] %logger{${LOGGER_LENGTH}}%ex{${EXCEPTION_LENGTH}} %mdc %msg%n}'
+    COURT_LOCATION_WA_DMN_ENABLED: false
 
   keyVaults:
     civil:
