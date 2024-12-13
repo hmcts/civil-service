@@ -160,8 +160,6 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
             builder.lastMessageJudgeLabel(isRecipientCircuitJudge ? "CJ" : "DJ");
         } else if (isJudge) {
             builder.lastMessageJudgeLabel("Judge");
-        } else {
-            builder.lastMessageJudgeLabel(null);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
