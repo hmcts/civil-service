@@ -45,7 +45,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
                     JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive(),
                     IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive(),
-                    DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnline(),
+                    DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)
                     CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)
                 )), transitions)
             .moveTo(CLAIM_SUBMITTED, transitions)
@@ -64,7 +64,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
                     JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive(),
                     IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive(),
-                    DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnline(),
+                    DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)
                     CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)
                 )), transitions)
             // Only one unrepresented defendant
@@ -79,7 +79,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
                     JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive(),
                     IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive(),
-                    DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnline(),
+                    DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)
                     CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)
                 )), transitions)
             // Unrepresented defendant 1
@@ -97,7 +97,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
                     JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive(),
                     IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive(),
-                    DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnline(),
+                    DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)
                     CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)
                 )), transitions)
             // Unrepresented defendant 2
@@ -114,7 +114,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
                     JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive(),
                     IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive(),
-                    DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnline(),
+                    DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)
                     CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)
                 )), transitions)
             // Unrepresented defendants
@@ -131,7 +131,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
                     JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive(),
                     IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive(),
-                    DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnline(),
+                    DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)
                     CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)
                 )), transitions);
     }
