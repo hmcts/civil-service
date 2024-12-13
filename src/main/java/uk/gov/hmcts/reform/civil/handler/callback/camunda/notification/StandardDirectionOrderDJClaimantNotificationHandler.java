@@ -23,6 +23,7 @@ import java.util.Optional;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DIRECTION_ORDER_DJ_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service
 @RequiredArgsConstructor
@@ -73,7 +74,9 @@ public class StandardDirectionOrderDJClaimantNotificationHandler extends Callbac
     public Map<String, String> addProperties(final CaseData caseData) {
         return new HashMap<>(Map.of(
             LEGAL_ORG_NAME, getLegalOrganizationName(caseData),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference()
+            CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
     }
 

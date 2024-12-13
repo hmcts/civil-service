@@ -19,13 +19,17 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -36,9 +40,12 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.BundleCreatedNotificationHandler.TASK_ID_APPLICANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.BundleCreatedNotificationHandler.TASK_ID_DEFENDANT1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.BundleCreatedNotificationHandler.TASK_ID_DEFENDANT2;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 
 @ExtendWith(MockitoExtension.class)
 class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -48,6 +55,9 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
     private NotificationsProperties notificationsProperties;
+
+    @Mock
+    private OrganisationService organisationService;
 
     @InjectMocks
     private BundleCreatedNotificationHandler handler;
@@ -61,6 +71,8 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked() {
             when(notificationsProperties.getBundleCreationTemplate()).thenReturn(TEMPLATE_ID);
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
 
             //Given: Case data at hearing scheduled state and callback param with Notify applicant event
             CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
@@ -83,6 +95,8 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotifyRespondentSolicitorOne_whenInvoked() {
             when(notificationsProperties.getBundleCreationTemplate()).thenReturn(TEMPLATE_ID);
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
 
             //Given: Case data at hearing scheduled state and callback param with Notify respondent1 event
             CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
@@ -105,6 +119,8 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotifyRespondentSolicitorTwo_whenInvokedWithDiffSol() {
             when(notificationsProperties.getBundleCreationTemplate()).thenReturn(TEMPLATE_ID);
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
 
             //Given: Case data at hearing scheduled state and callback param with Notify respondent2 event and
             // different solicitor for respondent2
@@ -236,8 +252,11 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
+                CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData),
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
+                CASEMAN_REF, "000DC001"
             );
         }
 

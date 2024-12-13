@@ -107,6 +107,19 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
+            if (caseState.equals(CaseState.CASE_SETTLED)) {
+                verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
+                    caseData.getCcdCaseReference().toString(),
+                    "CLAIMANT",
+                    "BEARER_TOKEN"
+                );
+
+                verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+                    caseData.getCcdCaseReference().toString(),
+                    "CLAIMANT",
+                    "BEARER_TOKEN"
+                );
+            }
         }
 
         private static Stream<Arguments> provideCaseStateAndScenarioArguments() {

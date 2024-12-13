@@ -15,14 +15,18 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -30,10 +34,12 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_TRIAL_READY;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_TRIAL_READY;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HEARING_DATE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.TrialReadyRespondentNotificationHandler.TASK_ID_RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.TrialReadyRespondentNotificationHandler.TASK_ID_RESPONDENT_TWO;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -52,6 +58,9 @@ class TrialReadyRespondentNotificationHandlerTest extends BaseCallbackHandlerTes
     @Mock
     private NotificationsProperties notificationsProperties;
 
+    @Mock
+    private OrganisationService organisationService;
+
     private boolean isRespondentSolicitor1;
 
     @Nested
@@ -60,6 +69,8 @@ class TrialReadyRespondentNotificationHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldNotifyRespondentSolicitorOne_whenInvoked() {
             when(notificationsProperties.getSolicitorTrialReady()).thenReturn("template-id");
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
 
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -80,6 +91,8 @@ class TrialReadyRespondentNotificationHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldNotifyRespondentSolicitorTwo_whenInvokedWithDiffSol() {
             when(notificationsProperties.getSolicitorTrialReady()).thenReturn("template-id");
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTrialReadyCheck(ONE_V_TWO_TWO_LEGAL_REP)
@@ -159,12 +172,18 @@ class TrialReadyRespondentNotificationHandlerTest extends BaseCallbackHandlerTes
             if (isRespondentSolicitor1 == false) {
                 return Map.of(
                     HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
-                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+                    "legalOrgName", "Test Org Name",
+                    "claimReferenceNumber", "1594901956117591",
+                    PARTY_REFERENCES, "Claimant reference: 123456 - Defendant 1 reference: 123456 - Defendant 2 reference: Not provided",
+                    CASEMAN_REF, "000DC001"
                 );
             } else {
                 return Map.of(
                     HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
-                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+                    "legalOrgName", "Test Org Name",
+                    "claimReferenceNumber", "1594901956117591",
+                    PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                    CASEMAN_REF, "000DC001"
                 );
             }
         }
@@ -174,7 +193,8 @@ class TrialReadyRespondentNotificationHandlerTest extends BaseCallbackHandlerTes
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 PARTY_NAME, caseData.getRespondent1().getPartyName(),
-                CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
+                CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
+                CASEMAN_REF, "000DC001"
             );
         }
     }

@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -35,6 +36,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Long.parseLong;
 import static java.util.Objects.isNull;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @RequiredArgsConstructor
 @Component
@@ -282,6 +284,13 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
 
     protected boolean canViewClaimant(CaseData civilCaseData, CaseData generalAppCaseData) {
         List<Element<GeneralApplicationsDetails>> gaAppDetails = civilCaseData.getClaimantGaAppDetails();
+
+        if (generalAppCaseData.getParentClaimantIsApplicant() == YesOrNo.NO
+            && ((generalAppCaseData.getGeneralAppInformOtherParty()) != null && YES.equals(generalAppCaseData.getGeneralAppInformOtherParty().getIsWithNotice())
+                || (generalAppCaseData.getGeneralAppRespondentAgreement() != null && generalAppCaseData.getGeneralAppRespondentAgreement().getHasAgreed().equals(YES)))) {
+            return true;
+        }
+
         if (isNull(gaAppDetails)) {
             return false;
         }
@@ -298,6 +307,13 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
         } else {
             gaAppDetails = civilCaseData.getRespondentSolGaAppDetails();
         }
+
+        if (generalAppCaseData.getParentClaimantIsApplicant() == YesOrNo.YES
+            && ((generalAppCaseData.getGeneralAppInformOtherParty()) != null && YES.equals(generalAppCaseData.getGeneralAppInformOtherParty().getIsWithNotice())
+                || (generalAppCaseData.getGeneralAppRespondentAgreement() != null && generalAppCaseData.getGeneralAppRespondentAgreement().getHasAgreed().equals(YES)))) {
+            return true;
+        }
+
         if (isNull(gaAppDetails)) {
             return false;
         }
