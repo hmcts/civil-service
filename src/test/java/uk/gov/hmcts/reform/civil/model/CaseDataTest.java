@@ -1340,9 +1340,7 @@ public class CaseDataTest {
     @Test
     void shouldSetAndReturnObligationWAFlag() {
         // Given
-        ObligationWAFlag expectedFlag = new ObligationWAFlag(YesOrNo.NO, YesOrNo.NO,
-                                                             YesOrNo.NO, YesOrNo.NO, YesOrNo.NO, YesOrNo.NO,
-                                                             YesOrNo.NO, YesOrNo.NO, "Test", "Test", "1 January 2024");
+        ObligationWAFlag expectedFlag = new ObligationWAFlag("Test", "Test", "1 January 2024");
         CaseData caseData = CaseData.builder().obligationWAFlag(expectedFlag).build();
 
         // When

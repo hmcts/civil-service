@@ -10,9 +10,10 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.ObligationReason;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.ObligationData;
 import uk.gov.hmcts.reform.civil.model.ObligationWAFlag;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -55,10 +56,17 @@ public class OrderReviewObligationCheckCallbackHandler extends CallbackHandler {
             .findFirst()
             .ifPresent(data -> {
                 ObligationWAFlag.ObligationWAFlagBuilder obligationWAFlagBuilder = ObligationWAFlag.builder();
-                updateObligationWAFlag(obligationWAFlagBuilder, data);
-                obligationWAFlagBuilder.currentDate(currentDate.format(formatter));
-                obligationWAFlagBuilder.obligationReason(data.getObligationReason().name());
-                obligationWAFlagBuilder.obligationReasonDisplayValue(data.getObligationReason().getDisplayedValue());
+                boolean isLiftAStay = ObligationReason.LIFT_A_STAY.equals(data.getObligationReason());
+                boolean isDismissCase = ObligationReason.DISMISS_CASE.equals(data.getObligationReason());
+                boolean isCaseStayed = CaseState.CASE_STAYED.equals(caseData.getCcdState());
+                boolean isCaseDismissed = CaseState.CASE_DISMISSED.equals(caseData.getCcdState());
+
+                if ((!isLiftAStay && !isDismissCase) || (isLiftAStay && isCaseStayed) || (isDismissCase && !isCaseDismissed)) {
+                    obligationWAFlagBuilder.currentDate(currentDate.format(formatter))
+                        .obligationReason(data.getObligationReason().name())
+                        .obligationReasonDisplayValue(data.getObligationReason().getDisplayedValue());
+                }
+
                 data.setObligationWATaskRaised(YesOrNo.YES);
                 caseData.setObligationWAFlag(obligationWAFlagBuilder.build());
             });
@@ -69,22 +77,6 @@ public class OrderReviewObligationCheckCallbackHandler extends CallbackHandler {
                       .obligationWAFlag(caseData.getObligationWAFlag())
                       .build().toMap(mapper))
             .build();
-    }
-
-    private void updateObligationWAFlag(ObligationWAFlag.ObligationWAFlagBuilder obligationWAFlagBuilder, ObligationData data) {
-        switch (data.getObligationReason()) {
-            case UNLESS_ORDER -> obligationWAFlagBuilder.unlessOrder(YesOrNo.YES);
-            case STAY_A_CASE -> obligationWAFlagBuilder.stayACase(YesOrNo.YES);
-            case LIFT_A_STAY -> obligationWAFlagBuilder.liftAStay(YesOrNo.YES);
-            case DISMISS_CASE -> obligationWAFlagBuilder.dismissCase(YesOrNo.YES);
-            case PRE_TRIAL_CHECKLIST -> obligationWAFlagBuilder.preTrialChecklist(YesOrNo.YES);
-            case GENERAL_ORDER -> obligationWAFlagBuilder.generalOrder(YesOrNo.YES);
-            case RESERVE_JUDGMENT -> obligationWAFlagBuilder.reserveJudgment(YesOrNo.YES);
-            case OTHER -> obligationWAFlagBuilder.other(YesOrNo.YES);
-            default -> {
-                log.info("Obligation reason {} not found", data.getObligationReason());
-            }
-        }
     }
 
     @Override
