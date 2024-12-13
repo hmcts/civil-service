@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
-import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
+import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -38,7 +38,7 @@ import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.respondent2Pre
 @Service
 public class DefaultJudgmentCoverLetterGenerator {
 
-    private final CivilDocumentStitchingService civilDocumentStitchingService;
+    private final CivilStitchService civilStitchService;
     private final OrganisationService organisationService;
     private final DocumentGeneratorService documentGeneratorService;
     private final DocumentManagementService documentManagementService;
@@ -51,6 +51,8 @@ public class DefaultJudgmentCoverLetterGenerator {
     private boolean stitchEnabled;
 
     public byte[] generateAndPrintDjCoverLettersPlusDocument(CaseData caseData, String authorisation, boolean toSecondLegalOrg) {
+        Long caseId = caseData.getCcdCaseReference();
+        log.info("Generating default judgement cover letter with documents for caseId{}", caseId);
         byte[] letterContent = new byte[0];
         if (stitchEnabled) {
             DocmosisDocument coverLetter = generateCoverLetter(caseData, toSecondLegalOrg);
@@ -69,24 +71,26 @@ public class DefaultJudgmentCoverLetterGenerator {
                 toSecondLegalOrg ? DocumentType.DEFAULT_JUDGMENT_DEFENDANT2 : DocumentType.DEFAULT_JUDGMENT_DEFENDANT1
             );
 
-            CaseDocument stitchedDocuments = civilDocumentStitchingService.bundle(
-                letterAndDocumentMetaDataList,
-                authorisation,
-                coverLetterCaseDocument.getDocumentName(),
-                coverLetterCaseDocument.getDocumentName(),
-                caseData
-            );
+            log.info("Calling civil stitch service from judgement cover letter for caseId {}", caseId);
+            CaseDocument stitchedDocuments =
+                civilStitchService.generateStitchedCaseDocument(letterAndDocumentMetaDataList,
+                                                                coverLetterCaseDocument.getDocumentName(),
+                                                                caseId,
+                                                                toSecondLegalOrg ? DocumentType.DEFAULT_JUDGMENT_DEFENDANT2
+                                                                    : DocumentType.DEFAULT_JUDGMENT_DEFENDANT1,
+                                                                authorisation);
 
-            String documentUrl = stitchedDocuments.getDocumentLink().getDocumentUrl();
-            String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
+            log.info("Response judgement cover letter {} for caseId {}", stitchedDocuments, caseId);
 
             try {
+                String documentUrl = stitchedDocuments.getDocumentLink().getDocumentUrl();
+                String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
                 letterContent = documentDownloadService.downloadDocument(
                     authorisation,
                     documentId
                 ).file().getInputStream().readAllBytes();
             } catch (IOException e) {
-                log.error("Failed getting letter content for Default Judgment Cover Letter ");
+                log.error("Failed getting letter content for Default Judgment Cover Letter for caseId {}", caseId, e);
                 throw new DocumentDownloadException(coverLetterCaseDocument.getDocumentLink().getDocumentFileName(), e);
             }
 
@@ -95,7 +99,7 @@ public class DefaultJudgmentCoverLetterGenerator {
                                          caseData.getLegacyCaseReference(), DEFAULT_JUDGMENT_COVER_LETTER, recipients
             );
         } else {
-            log.error("Failed generating Cover Letter for Default Judgment - stitch disabled");
+            log.error("Failed generating Cover Letter for Default Judgment - stitch disabled for caseId {}", caseId);
         }
         return letterContent;
     }
