@@ -135,6 +135,7 @@ class DetermineNextStateTest {
         assertEquals(All_FINAL_ORDERS_ISSUED.name(), resultState);
         verify(builder).activeJudgment(activeJudgment);
         verify(builder).joIsLiveJudgmentExists(YesOrNo.YES);
+        verify(builder).joIsTakenOffline(NO);
     }
 
     @Test

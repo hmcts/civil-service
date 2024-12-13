@@ -130,6 +130,7 @@ public class DetermineNextState  {
             builder.activeJudgment(activeJudgment);
             builder.joIsLiveJudgmentExists(YesOrNo.YES);
             builder.joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment));
+            builder.joIsTakenOffline(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name().equals(nextState) ? YesOrNo.YES : YesOrNo.NO);
         }
 
         return Pair.of(nextState, businessProcess);

@@ -682,6 +682,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo joShowRegisteredWithRTLOption;
     private JudgmentDetails activeJudgment;
     private List<Element<JudgmentDetails>> historicJudgment;
+    private YesOrNo joIsTakenOffline;
 
     private String joDefendantName1;
     private String joDefendantName2;
