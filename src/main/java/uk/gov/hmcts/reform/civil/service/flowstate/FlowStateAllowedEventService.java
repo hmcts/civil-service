@@ -660,7 +660,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                NOC_REQUEST
             )
         ),
 
@@ -690,7 +691,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                NOC_REQUEST
             )
         ),
 
@@ -1418,7 +1420,8 @@ public class FlowStateAllowedEventService {
                 DISMISS_CASE,
                 MANAGE_STAY,
                 ADD_CASE_NOTE,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                NOC_REQUEST
             )
         ),
         entry(
@@ -1461,7 +1464,8 @@ public class FlowStateAllowedEventService {
                 UPDATE_HELP_WITH_FEE_NUMBER,
                 INVALID_HWF_REFERENCE,
                 ADD_CASE_NOTE,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                NOC_REQUEST
             )
         ),
 

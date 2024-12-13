@@ -95,7 +95,8 @@ class PaymentTaskHandlerTest {
                                                   FlowFlag.BULK_CLAIM_ENABLED.name(), false,
                                                   FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false,
                                                   FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false,
-                                                  FlowFlag.DEFENDANT_NOC_ONLINE.name(), false)
+                                                  FlowFlag.DEFENDANT_NOC_ONLINE.name(), false,
+                                                  FlowFlag.CLAIM_STATE_DURING_NOC.name(), false)
             );
 
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
