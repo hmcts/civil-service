@@ -177,6 +177,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final YesOrNo generalAppVaryJudgementType;
     private final YesOrNo generalAppParentClaimantIsApplicant;
+    private final YesOrNo parentClaimantIsApplicant;
     private final GAHearingDateGAspec generalAppHearingDate;
     private final Document generalAppN245FormUpload;
 
@@ -752,6 +753,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     //Caseworker events
     private YesOrNo obligationDatePresent;
     private CourtStaffNextSteps courtStaffNextSteps;
+    private List<Element<ObligationData>> obligationData;
+    private List<Element<ObligationData>> storedObligationData;
+    private YesOrNo isFinalOrder;
+
     private SendAndReplyOption sendAndReplyOption;
     private SendMessageMetadata sendMessageMetadata;
     private String sendMessageContent;
