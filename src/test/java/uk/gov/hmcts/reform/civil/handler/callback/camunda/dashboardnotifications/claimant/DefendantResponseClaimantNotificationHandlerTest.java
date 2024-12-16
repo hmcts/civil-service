@@ -519,6 +519,7 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
     @Test
     void willNotConfigureDashboardNotificationsForDefendantResponseWhenRespondent1ClaimResponseTypeForSpecIsNull() {
         //given
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         LocalDate paymentDate = OffsetDateTime.now().toLocalDate().minusDays(5);
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
             .toBuilder()
@@ -526,6 +527,7 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
             .ccdCaseReference(12345673L)
             .applicant1Represented(YesOrNo.NO)
             .responseClaimTrack(SMALL_CLAIM.name())
+            .respondent1ClaimResponseTypeForSpec(null)
             .respondToClaim(RespondToClaim.builder()
                                 .howMuchWasPaid(new BigDecimal(1000))
                                 .whenWasThisAmountPaid(paymentDate)
