@@ -660,8 +660,7 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                CONFIRM_ORDER_REVIEW,
-                NOC_REQUEST
+                CONFIRM_ORDER_REVIEW
             )
         ),
 
@@ -691,8 +690,7 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                CONFIRM_ORDER_REVIEW,
-                NOC_REQUEST
+                CONFIRM_ORDER_REVIEW
             )
         ),
 
@@ -782,9 +780,7 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                CONFIRM_ORDER_REVIEW,
-                MEDIATION_UNSUCCESSFUL,
-                MEDIATION_SUCCESSFUL
+                CONFIRM_ORDER_REVIEW
             )
         ),
 
