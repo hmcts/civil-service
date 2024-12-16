@@ -168,11 +168,4 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
                                   : BODY_CONFIRMATION_NO_OBLIGATION)
             .build();
     }
-
-    private List<String> checkTrueOrElseAddError(boolean condition, String error) {
-        if (!condition) {
-            return List.of(error);
-        }
-        return Collections.emptyList();
-    }
 }
