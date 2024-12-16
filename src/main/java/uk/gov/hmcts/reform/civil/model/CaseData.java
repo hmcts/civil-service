@@ -754,6 +754,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     //Caseworker events
     private YesOrNo obligationDatePresent;
     private CourtStaffNextSteps courtStaffNextSteps;
+    private YesOrNo isFinalOrder;
+
     private SendAndReplyOption sendAndReplyOption;
     private SendMessageMetadata sendMessageMetadata;
     private String sendMessageContent;
