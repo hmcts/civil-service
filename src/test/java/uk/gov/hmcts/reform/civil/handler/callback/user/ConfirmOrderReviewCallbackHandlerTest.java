@@ -11,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.CourtStaffNextSteps;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -164,6 +165,20 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response).isEqualTo(AboutToStartOrSubmitCallbackResponse.builder().build());
+        }
+
+        @Test
+        void shouldSetAllFinalOrdersIssuedState_whenIsFinalOrder() {
+            Mockito.when(toggleService.isCaseEventsEnabled()).thenReturn(true);
+            CaseData caseData = CaseData.builder()
+                .isFinalOrder(YesOrNo.YES)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
         }
     }
 

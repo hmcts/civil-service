@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -102,7 +103,7 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
                 .map(Element::getValue)
                 .filter(data -> data.getObligationDate() == null || !data.getObligationDate().isAfter(
                     LocalDate.now()))
-                .map(data -> "The obligation date must be in the future").collect(Collectors.toList());
+                .map(data -> OBLIGATION_DATE_ERROR).collect(Collectors.toList());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -140,12 +141,18 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
             List<Element<ObligationData>> combinedData = new ArrayList<>();
             combinedData.addAll(storedObligationData);
             caseData.getObligationData().forEach(element ->
-                                                     element.getValue().setObligationWATaskRaised(YesOrNo.NO)
-            );
+                                                     element.getValue().setObligationWATaskRaised(YesOrNo.NO));
             combinedData.addAll(caseData.getObligationData());
 
             updatedCaseData.obligationData(null)
                 .storedObligationData(combinedData);
+        }
+
+        if (YesOrNo.YES.equals(caseData.getIsFinalOrder())) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(updatedCaseData.build().toMap(objectMapper))
+                .state(CaseState.All_FINAL_ORDERS_ISSUED.toString())
+                .build();
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -162,12 +169,5 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
                                   ? BODY_CONFIRMATION_OBLIGATION
                                   : BODY_CONFIRMATION_NO_OBLIGATION)
             .build();
-    }
-
-    private List<String> checkTrueOrElseAddError(boolean condition, String error) {
-        if (!condition) {
-            return List.of(error);
-        }
-        return Collections.emptyList();
     }
 }
