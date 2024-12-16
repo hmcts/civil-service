@@ -3191,7 +3191,8 @@ class SimpleStateFlowEngineTest {
                 .extracting(State::getName)
                 .isNotNull()
                 .isEqualTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA.fullName());
-            assertThat(stateFlow.getStateHistory()).hasSize(8)
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(8)
                 .extracting(State::getName)
                 .containsExactly(
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
