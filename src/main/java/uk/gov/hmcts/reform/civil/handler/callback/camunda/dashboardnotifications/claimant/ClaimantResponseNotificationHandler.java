@@ -87,6 +87,23 @@ public class ClaimantResponseNotificationHandler extends DashboardCallbackHandle
         return null;
     }
 
+    @Override
+    protected void beforeRecordScenario(CaseData caseData, String authToken) {
+        if (caseData.getCcdState() == CASE_SETTLED) {
+            dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
+                caseData.getCcdCaseReference().toString(),
+                "CLAIMANT",
+                authToken
+            );
+
+            dashboardApiClient.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+                caseData.getCcdCaseReference().toString(),
+                "CLAIMANT",
+                authToken
+            );
+        }
+    }
+
     private boolean hasClaimantRejectedCourtDecision(CaseData caseData) {
         return
             Optional.ofNullable(caseData)
