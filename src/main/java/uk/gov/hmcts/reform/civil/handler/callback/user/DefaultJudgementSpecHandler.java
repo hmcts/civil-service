@@ -489,6 +489,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
         } else {
             caseData.setJoIsLiveJudgmentExists(YesOrNo.NO);
+            caseData.setJoIsDisplayInJudgmentTab(YesOrNo.YES);
         }
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
