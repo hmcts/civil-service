@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
 import uk.gov.hmcts.reform.civil.enums.ConfirmationToggle;
-import uk.gov.hmcts.reform.civil.enums.CoscApplicationStatus;
+import uk.gov.hmcts.reform.civil.enums.cosc.CoscApplicationStatus;
 import uk.gov.hmcts.reform.civil.enums.CourtStaffNextSteps;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
@@ -41,6 +41,7 @@ import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.SendAndReplyOption;
+import uk.gov.hmcts.reform.civil.enums.cosc.CoscRPAStatus;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.ConfirmOrderGivesPermission;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.MarkPaidConsentList;
@@ -176,6 +177,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final YesOrNo generalAppVaryJudgementType;
     private final YesOrNo generalAppParentClaimantIsApplicant;
+    private final YesOrNo parentClaimantIsApplicant;
     private final GAHearingDateGAspec generalAppHearingDate;
     private final Document generalAppN245FormUpload;
 
@@ -691,6 +693,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private LocalDate joIssueDate;
     private JudgmentState joState;
     private LocalDate joFullyPaymentMadeDate;
+    private LocalDateTime joMarkedPaidInFullIssueDate;
+    private LocalDateTime joDefendantMarkedPaidInFullIssueDate;
+    private CoscRPAStatus joCoscRpaStatus;
     private String joOrderedAmount;
     private String joCosts;
     private String joTotalAmount;
@@ -744,10 +749,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
     private LocalDate coscSchedulerDeadline;
     private CoscApplicationStatus coSCApplicationStatus;
-  
+
     //Caseworker events
     private YesOrNo obligationDatePresent;
     private CourtStaffNextSteps courtStaffNextSteps;
+    private List<Element<ObligationData>> obligationData;
+    private List<Element<ObligationData>> storedObligationData;
+    private YesOrNo isFinalOrder;
+
     private SendAndReplyOption sendAndReplyOption;
     private SendMessageMetadata sendMessageMetadata;
     private String sendMessageContent;
@@ -1249,6 +1258,16 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isCcjRequestJudgmentByAdmission() {
         return getCcjPaymentDetails() != null
             && getCcjPaymentDetails().getCcjPaymentPaidSomeOption() != null;
+    }
+
+    @JsonIgnore
+    public boolean hasCoscCert() {
+        if (getSystemGeneratedCaseDocuments() != null) {
+            return getSystemGeneratedCaseDocuments().stream()
+                .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
+                    .getDocumentType().equals(DocumentType.CERTIFICATE_OF_DEBT_PAYMENT)).findAny().isPresent();
+        }
+        return false;
     }
 
     @JsonIgnore

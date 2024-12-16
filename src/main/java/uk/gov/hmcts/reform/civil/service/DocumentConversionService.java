@@ -41,24 +41,22 @@ public class DocumentConversionService {
 
     private final DocumentManagementService documentManagementService;
 
-    public byte[] convertDocumentToPdf(Document sourceDocument, String auth) {
+    public byte[] convertDocumentToPdf(Document sourceDocument, Long caseId, String auth) {
         if (PDF_MIME_TYPE.equalsIgnoreCase(tika.detect(sourceDocument.getDocumentFileName()))) {
-            throw new DocumentConversionException(
-                "Document already is a pdf",
-                null
-            );
+            return documentManagementService.downloadDocument(auth, sourceDocument.getDocumentUrl());
         }
-        return convert(sourceDocument, auth);
+        log.info("Converting document to pdf for caseId {}", caseId);
+        return convert(sourceDocument, caseId, auth);
     }
 
     public String getConvertedFilename(String filename) {
         return FilenameUtils.getBaseName(filename) + ".pdf";
     }
 
-    public byte[] convert(Document sourceDocument, String auth) {
+    public byte[] convert(Document sourceDocument, Long caseId, String auth) {
         try {
             String filename = getConvertedFilename(sourceDocument.getDocumentFileName());
-            byte[] docInBytes = documentManagementService.downloadDocument(auth, sourceDocument.getDocumentBinaryUrl());
+            byte[] docInBytes = documentManagementService.downloadDocument(auth, sourceDocument.getDocumentUrl());
             File file = new File(filename);
             Files.write(docInBytes, file);
 
@@ -70,14 +68,15 @@ public class DocumentConversionService {
                 );
 
         } catch (HttpClientErrorException clientEx) {
-
+            log.error("failed to convert document to pdf for caseId {}", caseId, clientEx);
             throw new DocumentConversionException(
-                "Error converting document to pdf",
+                "Error converting document to pdf for caseId " + caseId,
                 clientEx
             );
         } catch (IOException ex) {
+            log.error("Error creating temp file while converting for caseId {}", caseId, ex);
             throw new DocumentConversionException(
-                "Error creating temp file",
+                "Error creating temp file for caseId " + caseId,
                 ex
             );
         }
