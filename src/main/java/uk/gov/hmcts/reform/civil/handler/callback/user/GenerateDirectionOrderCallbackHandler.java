@@ -611,14 +611,14 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         }
         nullPreviousSelections(caseDataBuilder);
 
-        if (featureToggleService.isCaseEventsEnabled()) {
-            if ((ASSISTED_ORDER.equals(caseData.getFinalOrderSelection()) && isNull(caseData.getFinalOrderFurtherHearingToggle()))
-                || FREE_FORM_ORDER.equals(caseData.getFinalOrderSelection())) {
+        if (featureToggleService.isCaseEventsEnabled()
+            && ((ASSISTED_ORDER.equals(caseData.getFinalOrderSelection())
+            && isNull(caseData.getFinalOrderFurtherHearingToggle()))
+            || FREE_FORM_ORDER.equals(caseData.getFinalOrderSelection()))) {
 
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .data(caseDataBuilder.build().toMap(objectMapper))
-                    .build();
-            }
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseDataBuilder.build().toMap(objectMapper))
+                .build();
         }
         CaseState state = All_FINAL_ORDERS_ISSUED;
         if (caseData.getFinalOrderFurtherHearingToggle() != null || isJudicialReferral(callbackParams)) {

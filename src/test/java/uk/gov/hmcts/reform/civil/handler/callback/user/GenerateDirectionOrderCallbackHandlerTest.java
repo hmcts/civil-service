@@ -1562,6 +1562,30 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Then
             assertThat(response.getState()).isEqualTo(null);
         }
+
+        @Test
+        void shouldNotChangeState_onAboutToSubmitAndAssistedOrderWithNoFurtherHearingWithCaseEventsEnabledFreeForm() {
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                            .forename("Judge")
+                                                                            .surname("Judy")
+                                                                            .roles(Collections.emptyList()).build());
+            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+            // Given
+            List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
+            finalCaseDocuments.add(element(finalOrder));
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
+                .finalOrderFurtherHearingToggle(null)
+                .finalOrderDocumentCollection(finalCaseDocuments)
+                .finalOrderDocument(finalOrder)
+                .ccdState(PREPARE_FOR_HEARING_CONDUCT_HEARING)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getState()).isEqualTo(null);
+        }
     }
 
     @Nested
