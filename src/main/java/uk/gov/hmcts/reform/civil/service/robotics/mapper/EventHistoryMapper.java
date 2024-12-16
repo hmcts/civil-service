@@ -537,7 +537,7 @@ public class EventHistoryMapper {
             if (featureToggleService.isJOLiveFeedActive()) {
                 miscTextRequested = RECORD_JUDGMENT;
                 detailsTextRequested = RPA_RECORD_JUDGMENT_REASON;
-                if (Objects.nonNull(caseData.getJoIsTakenOffline()) && YesOrNo.YES.equals(caseData.getJoIsTakenOffline())) {
+                if (Objects.nonNull(caseData.getIsTakenOfflineAfterJBA()) && YesOrNo.YES.equals(caseData.getIsTakenOfflineAfterJBA())) {
                     detailsTextRequested = RPA_RECORD_JUDGMENT_OFFLINE;
                 }
             }

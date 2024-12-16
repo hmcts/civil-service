@@ -8523,7 +8523,7 @@ class EventHistoryMapperTest {
                 .respondent1Represented(YesOrNo.YES)
                 .specRespondent1Represented(YesOrNo.YES)
                 .applicant1Represented(YesOrNo.YES)
-                .joIsTakenOffline(YesOrNo.YES)
+                .isTakenOfflineAfterJBA(YesOrNo.YES)
                 .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
                 .build();
             when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
