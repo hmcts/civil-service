@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
@@ -74,7 +75,8 @@ public class HearingScheduledDefendantNotificationHandler extends CallbackHandle
                                               ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
             );
 
-            if (isNull(caseData.getTrialReadyRespondent1())) {
+            if (AllocatedTrack.FAST_CLAIM.name().equals(caseData.getAssignedTrack())
+                && isNull(caseData.getTrialReadyRespondent1())) {
                 dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
                                                   SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_DEFENDANT.getScenario(), authToken,
                                                   ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()

@@ -130,6 +130,7 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
             .applicant1Represented(YesOrNo.NO)
+            .responseClaimTrack("FAST_CLAIM")
             .build().toBuilder().hearingLocation(list).build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -295,6 +296,7 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
             .applicant1Represented(YesOrNo.NO)
+            .responseClaimTrack("FAST_CLAIM")
             .hearingFeePaymentDetails(PaymentDetails.builder().status(PaymentStatus.SUCCESS).build())
             .businessProcess(BusinessProcess.builder().processInstanceId("").build())
             .build();
@@ -330,6 +332,7 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
             .applicant1Represented(YesOrNo.NO)
+            .responseClaimTrack("FAST_CLAIM")
             .businessProcess(BusinessProcess.builder().processInstanceId("").build())
             .build();
 
@@ -365,6 +368,7 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
             .ccdCaseReference(1234L)
             .respondent1Represented(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)
+            .responseClaimTrack("FAST_CLAIM")
             .hearingHelpFeesReferenceNumber("123")
             .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder().hwfFullRemissionGrantedForHearingFee(YesOrNo.YES).build())
             .businessProcess(BusinessProcess.builder().processInstanceId("").build())
@@ -467,6 +471,7 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
             .respondent1Represented(respondent1Represented)
             .hearingFeePaymentDetails(hearingFeePaymentDetails)
             .hearingHelpFeesReferenceNumber("123")
+            .responseClaimTrack("FAST_CLAIM")
             .feePaymentOutcomeDetails(feePaymentOutcomeDetails)
             .build();
 
