@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
-import uk.gov.hmcts.reform.civil.model.ObligationData;
+import uk.gov.hmcts.reform.civil.model.StoredObligationData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 
@@ -99,7 +99,7 @@ public class ConfirmOrderReviewTaskHandler extends BaseExternalTaskHandler {
             .orElse(Collections.emptyList())
             .stream()
             .map(element -> {
-                ObligationData data = element.getValue();
+                StoredObligationData data = element.getValue();
                 ObligationReason reason = data.getObligationReason();
 
                 if (reason == ObligationReason.OTHER) {
