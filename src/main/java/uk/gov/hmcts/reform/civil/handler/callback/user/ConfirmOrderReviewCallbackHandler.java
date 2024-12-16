@@ -148,7 +148,7 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
 
         if (YesOrNo.YES.equals(caseData.getIsFinalOrder())) {
             return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedCaseData.toMap(objectMapper))
+                .data(updatedCaseData.build().toMap(objectMapper))
                 .state(CaseState.All_FINAL_ORDERS_ISSUED.toString())
                 .build();
         }
