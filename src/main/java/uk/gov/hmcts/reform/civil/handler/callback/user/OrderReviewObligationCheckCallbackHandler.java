@@ -35,6 +35,8 @@ public class OrderReviewObligationCheckCallbackHandler extends CallbackHandler {
     private final ObjectMapper mapper;
     private final FeatureToggleService featureToggleService;
 
+    private static final String REQUEST_UPDATE = "REQUEST_UPDATE";
+
     @Override
     protected Map<String, Callback> callbacks() {
         Callback callback = featureToggleService.isCaseEventsEnabled()
@@ -60,8 +62,11 @@ public class OrderReviewObligationCheckCallbackHandler extends CallbackHandler {
                 boolean isDismissCase = ObligationReason.DISMISS_CASE.equals(data.getObligationReason());
                 boolean isCaseStayed = CaseState.CASE_STAYED.equals(caseData.getCcdState());
                 boolean isCaseDismissed = CaseState.CASE_DISMISSED.equals(caseData.getCcdState());
+                String manageStayOption = caseData.getManageStayOption();
 
-                if ((!isLiftAStay && !isDismissCase) || (isLiftAStay && isCaseStayed) || (isDismissCase && !isCaseDismissed)) {
+                if ((!isLiftAStay && !isDismissCase) || (isLiftAStay && isCaseStayed && REQUEST_UPDATE.equals(
+                    manageStayOption))
+                    || (isDismissCase && !isCaseDismissed)) {
                     obligationWAFlagBuilder.currentDate(currentDate.format(formatter))
                         .obligationReason(data.getObligationReason().name())
                         .obligationReasonDisplayValue(data.getObligationReason().getDisplayedValue());
