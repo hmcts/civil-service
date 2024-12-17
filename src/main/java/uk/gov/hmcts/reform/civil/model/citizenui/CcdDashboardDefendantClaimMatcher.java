@@ -305,7 +305,8 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     public boolean isClaimantDefaultJudgement() {
         return caseData.getRespondent1ResponseDeadline() != null
             && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
-            && caseData.getPaymentTypeSelection() != null;
+            && caseData.getPaymentTypeSelection() != null
+            && caseData.getRespondent1ResponseDate() != null;
     }
 
     @Override
