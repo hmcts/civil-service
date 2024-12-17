@@ -23,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ORDER_REVIEW_OBLIGATION_CHECK;
 
@@ -34,8 +35,6 @@ public class OrderReviewObligationCheckCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = List.of(ORDER_REVIEW_OBLIGATION_CHECK);
     private final ObjectMapper mapper;
     private final FeatureToggleService featureToggleService;
-
-    private static final String REQUEST_UPDATE = "REQUEST_UPDATE";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -60,12 +59,10 @@ public class OrderReviewObligationCheckCallbackHandler extends CallbackHandler {
                 ObligationWAFlag.ObligationWAFlagBuilder obligationWAFlagBuilder = ObligationWAFlag.builder();
                 boolean isLiftAStay = ObligationReason.LIFT_A_STAY.equals(data.getObligationReason());
                 boolean isDismissCase = ObligationReason.DISMISS_CASE.equals(data.getObligationReason());
-                boolean isCaseStayed = CaseState.CASE_STAYED.equals(caseData.getCcdState());
                 boolean isCaseDismissed = CaseState.CASE_DISMISSED.equals(caseData.getCcdState());
                 String manageStayOption = caseData.getManageStayOption();
 
-                if ((!isLiftAStay && !isDismissCase) || (isLiftAStay && isCaseStayed && REQUEST_UPDATE.equals(
-                    manageStayOption))
+                if ((!isLiftAStay && !isDismissCase) || (isLiftAStay && isNull(manageStayOption))
                     || (isDismissCase && !isCaseDismissed)) {
                     obligationWAFlagBuilder.currentDate(currentDate.format(formatter))
                         .obligationReason(data.getObligationReason().name())

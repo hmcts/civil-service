@@ -179,14 +179,14 @@ class OrderReviewObligationCheckCallbackHandlerTest extends BaseCallbackHandlerT
 
             return Stream.of(
                 // Case 1: Obligation date is before current date, task not raised, reason is LIFT_A_STAY, case state is CASE_STAYED
-                arguments(currentDate.minusDays(1), YesOrNo.NO, ObligationReason.LIFT_A_STAY, CaseState.CASE_STAYED, "REQUEST_UPDATE", YesOrNo.YES,
+                arguments(currentDate.minusDays(1), YesOrNo.NO, ObligationReason.LIFT_A_STAY, CaseState.CASE_STAYED, null, YesOrNo.YES,
                           ObligationWAFlag.builder()
                               .currentDate(currentDate.format(formatter))
                               .obligationReason(ObligationReason.LIFT_A_STAY.name())
                               .obligationReasonDisplayValue(ObligationReason.LIFT_A_STAY.getDisplayedValue())
                               .build()),
 
-                arguments(currentDate.minusDays(1), YesOrNo.NO, ObligationReason.LIFT_A_STAY, CaseState.CASE_STAYED, "LIFT_STAY", YesOrNo.YES,
+                arguments(currentDate.minusDays(1), YesOrNo.NO, ObligationReason.LIFT_A_STAY, CaseState.CASE_STAYED, "REQUEST_UPDATE", YesOrNo.YES,
                           ObligationWAFlag.builder()
                               .currentDate(null)
                               .obligationReason(null)
