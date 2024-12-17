@@ -26,7 +26,7 @@ def versions = [
   lombok            : '1.18.36',
   springSecurity    : '5.8.15',
   camunda           : '7.20.0',
-  jackson           : '2.18.0',
+  jackson           : '2.18.2',
   testcontainers    : '1.20.3',
   pdfbox            : '3.0.2',
   tika              : '2.9.2'
@@ -435,8 +435,8 @@ dependencies {
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.15.10'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.15.10'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.15.11'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.15.11'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
