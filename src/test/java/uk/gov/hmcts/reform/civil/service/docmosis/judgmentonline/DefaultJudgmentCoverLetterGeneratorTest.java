@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
-import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
@@ -32,23 +31,25 @@ import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
-import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
+import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFAULT_JUDGMENT_DEFENDANT1;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LEGAL_ORG;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -62,16 +63,9 @@ class DefaultJudgmentCoverLetterGeneratorTest {
         .documentType(DocumentType.DEFAULT_JUDGMENT_COVER_LETTER)
         .build();
 
-    private static final CaseDocument STITCHED_DOC = CaseDocumentBuilder.builder()
-        .documentName("stitched doc")
-        .documentType(DocumentType.DEFAULT_JUDGMENT_COVER_LETTER)
-        .build();
-
     @Mock
     private DocumentDownloadService documentDownloadService;
 
-    @Mock
-    private DownloadedDocumentResponse downloadedDocumentResponse;
     @Mock
     private DocumentGeneratorService documentGeneratorService;
     @Mock
@@ -81,7 +75,7 @@ class DefaultJudgmentCoverLetterGeneratorTest {
     @Mock
     private OrganisationService organisationService;
     @Mock
-    private CivilDocumentStitchingService civilDocumentStitchingService;
+    private CivilStitchService civilStitchService;
 
     @InjectMocks
     private DefaultJudgmentCoverLetterGenerator defaultJudgmentCoverLetterGenerator;
@@ -100,28 +94,6 @@ class DefaultJudgmentCoverLetterGeneratorTest {
         .postCode("Org2PostCode").build();
 
     private final List<Element<CaseDocument>> claimantResponseDocuments = new ArrayList<>();
-
-    private final DocumentMetaData coverLetterMetaData = new DocumentMetaData(
-        COVER_LETTER.getDocumentLink(),
-            "Cover Letter",
-                LocalDate.now().toString()
-        );
-    private final List<DocumentMetaData> documentsOrg1 = Arrays.asList(
-        coverLetterMetaData,
-        new DocumentMetaData(
-            Document.builder().documentUrl("URL1").build(),
-            "Default Judgment Defendant document",
-            LocalDate.now().toString()
-        )
-    );
-    private final List<DocumentMetaData> documentsOrg2 = Arrays.asList(
-        coverLetterMetaData,
-        new DocumentMetaData(
-            Document.builder().documentUrl("URL2").build(),
-            "Default Judgment Defendant document",
-            LocalDate.now().toString()
-        )
-    );
 
     @BeforeEach
     void setup() {
@@ -143,9 +115,6 @@ class DefaultJudgmentCoverLetterGeneratorTest {
             any(),
             any()
         )).thenReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), TEST, TEST));
-
-        lenient().when(civilDocumentStitchingService.bundle(any(), any(), any(), any(), any()))
-            .thenReturn(STITCHED_DOC);
 
         uk.gov.hmcts.reform.civil.prd.model.Organisation testOrg1 = uk.gov.hmcts.reform.civil.prd.model.Organisation.builder().organisationIdentifier("123").build();
         uk.gov.hmcts.reform.civil.prd.model.Organisation testOrg2 = uk.gov.hmcts.reform.civil.prd.model.Organisation.builder().organisationIdentifier("123").build();
@@ -177,7 +146,7 @@ class DefaultJudgmentCoverLetterGeneratorTest {
     void shouldReturnEmptyIfStitchingIsDisabled() {
         // given
         ReflectionTestUtils.setField(defaultJudgmentCoverLetterGenerator, "stitchEnabled", false);
-        CaseData caseData = CaseDataBuilder.builder()
+        CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(1L)
             .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment().build();
 
         // when
@@ -189,7 +158,7 @@ class DefaultJudgmentCoverLetterGeneratorTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldDownloadDocumentAndPrintLetterSuccessfully(boolean toSecondDefendantLegalOrg) throws java.io.IOException {
+    void shouldDownloadDocumentAndPrintLetterSuccessfully(boolean toSecondDefendantLegalOrg) {
         // given
         ReflectionTestUtils.setField(defaultJudgmentCoverLetterGenerator, "stitchEnabled", true);
 
@@ -203,7 +172,7 @@ class DefaultJudgmentCoverLetterGeneratorTest {
                 .documentName(format(
                         DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LEGAL_ORG.getDocumentTitle(),
                         "default-judgment-cover-letter",
-                        "CaseReference")).documentType(DocumentType.DEFAULT_JUDGMENT_DEFENDANT1)
+                        "CaseReference")).documentType(DEFAULT_JUDGMENT_DEFENDANT1)
                                                   .documentLink(Document.builder().documentUrl("URL1").build())
                                                   .build()));
         claimantResponseDocuments.add(element(CaseDocument.builder()
@@ -215,6 +184,7 @@ class DefaultJudgmentCoverLetterGeneratorTest {
                              .documentLink(Document.builder().documentUrl("URL2").build()).build()));
 
         CaseData caseData = CaseDataBuilder.builder()
+            .ccdCaseReference(1L)
             .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
             .legacyCaseReference("100DC001")
             .respondent1Represented(YesOrNo.YES)
@@ -229,17 +199,16 @@ class DefaultJudgmentCoverLetterGeneratorTest {
             .defaultJudgmentDocuments(claimantResponseDocuments)
             .build();
 
+        DocumentType documentType = toSecondDefendantLegalOrg ? DocumentType.DEFAULT_JUDGMENT_DEFENDANT2 : DEFAULT_JUDGMENT_DEFENDANT1;
+        lenient().when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(documentType),
+                                                                       anyString())).thenReturn(buildStitchedDocument());
+
         // when
         defaultJudgmentCoverLetterGenerator.generateAndPrintDjCoverLettersPlusDocument(caseData, BEARER_TOKEN, toSecondDefendantLegalOrg);
 
         // then
-        verify(civilDocumentStitchingService, times(1)).bundle(
-            eq(toSecondDefendantLegalOrg ? documentsOrg2 : documentsOrg1),
-            eq("BEARER_TOKEN"),
-            eq("cover letter"),
-            eq("cover letter"),
-            eq(caseData)
-        );
+        verify(civilStitchService).generateStitchedCaseDocument(anyList(), anyString(), anyLong(),
+                                                                any(DocumentType.class), anyString());
 
         verify(bulkPrintService, times(1))
             .printLetter(
@@ -249,5 +218,20 @@ class DefaultJudgmentCoverLetterGeneratorTest {
                 DEFAULT_JUDGMENT_COVER_LETTER,
                 List.of(toSecondDefendantLegalOrg ? "Org2Name" : "Org1Name")
             );
+    }
+
+    private CaseDocument buildStitchedDocument() {
+        return CaseDocument.builder()
+            .createdBy("John")
+            .documentName("stitched doc")
+            .documentSize(0L)
+            .documentType(DocumentType.DEFAULT_JUDGMENT_COVER_LETTER)
+            .createdDatetime(LocalDateTime.now())
+            .documentLink(Document.builder()
+                              .documentUrl("http://local/fake-url")
+                              .documentFileName("file-name")
+                              .documentBinaryUrl("http://local/fake-url/binary-url")
+                              .build())
+            .build();
     }
 }
