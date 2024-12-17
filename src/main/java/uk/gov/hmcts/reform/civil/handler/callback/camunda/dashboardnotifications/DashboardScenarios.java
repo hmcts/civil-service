@@ -134,8 +134,6 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_HEARING_FEE_HWF_PART_REMISSION("Scenario.AAA6.CP.HearingFee.HWF.PartRemission"),
     SCENARIO_AAA6_HEARING_FEE_HWF_NO_REMISSION("Scenario.AAA6.CP.HearingFee.HWF.Rejected"),
     SCENARIO_AAA6_HEARING_FEE_HWF_FULL_REMISSION("Scenario.AAA6.CP.HearingFee.HWF.FullRemission"),
-    SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_CLAIMANT("Scenario.AAA6.CP.Bundle.Ready.TrialReady.Claimant"),
-    SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_DEFENDANT("Scenario.AAA6.CP.Bundle.Ready.TrialReady.Defendant"),
     SCENARIO_AAA6_CP_HEARING_FEE_HELP_WITH_FEE_APPLIED_CLAIMANT("Scenario.AAA6.CP.HearingFee.HWF.AppliedFor.Claimant"),
     SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_CLAIMANT("Scenario.AAA6.ClaimIssue.Claimant.FastTrack"),
     SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT("Scenario.AAA6.ClaimIssue.Defendant.FastTrack"),
@@ -217,7 +215,9 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT("Scenario.AAA6.Update.CaseProceedsInCaseman.Defendant"),
     SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK("Scenario.AAA6.Update.CaseProceedsInCaseman.Defendant.FastTrack"),
     SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_CLAIMANT("Scenario.AAA6.CP.Trial.Arrangements.Relist.Hearing.Claimant"),
-    SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_DEFENDANT("Scenario.AAA6.CP.Trial.Arrangements.Relist.Hearing.Defendant");
+    SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_DEFENDANT("Scenario.AAA6.CP.Trial.Arrangements.Relist.Hearing.Defendant"),
+    SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_CHECK_CLAIMANT("Scenario.AAA6.CP.TrialReady.Check.Claimant"),
+    SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_CHECK_DEFENDANT("Scenario.AAA6.CP.TrialReady.Check.Defendant");
 
     private final String scenario;
 
