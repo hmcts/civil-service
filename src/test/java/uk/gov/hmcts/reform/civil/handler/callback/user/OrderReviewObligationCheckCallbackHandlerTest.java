@@ -137,8 +137,9 @@ class OrderReviewObligationCheckCallbackHandlerTest extends BaseCallbackHandlerT
         @ParameterizedTest
         @MethodSource("provideObligationDataForAllScenarios")
         void shouldHandleAllIfScenarios(LocalDate obligationDate, YesOrNo initialTaskRaised, ObligationReason obligationReason,
-                                        CaseState caseState, YesOrNo expectedTaskRaised, ObligationWAFlag expectedFlag) {
+                                        CaseState caseState, String manageStayOption, YesOrNo expectedTaskRaised, ObligationWAFlag expectedFlag) {
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build().builder()
+                .manageStayOption(manageStayOption)
                 .storedObligationData(List.of(
                     Element.<ObligationData>builder()
                         .value(ObligationData.builder()
@@ -178,21 +179,28 @@ class OrderReviewObligationCheckCallbackHandlerTest extends BaseCallbackHandlerT
 
             return Stream.of(
                 // Case 1: Obligation date is before current date, task not raised, reason is LIFT_A_STAY, case state is CASE_STAYED
-                arguments(currentDate.minusDays(1), YesOrNo.NO, ObligationReason.LIFT_A_STAY, CaseState.CASE_STAYED, YesOrNo.YES,
+                arguments(currentDate.minusDays(1), YesOrNo.NO, ObligationReason.LIFT_A_STAY, CaseState.CASE_STAYED, "REQUEST_UPDATE", YesOrNo.YES,
                           ObligationWAFlag.builder()
                               .currentDate(currentDate.format(formatter))
                               .obligationReason(ObligationReason.LIFT_A_STAY.name())
                               .obligationReasonDisplayValue(ObligationReason.LIFT_A_STAY.getDisplayedValue())
                               .build()),
 
+                arguments(currentDate.minusDays(1), YesOrNo.NO, ObligationReason.LIFT_A_STAY, CaseState.CASE_STAYED, "LIFT_STAY", YesOrNo.YES,
+                          ObligationWAFlag.builder()
+                              .currentDate(null)
+                              .obligationReason(null)
+                              .obligationReasonDisplayValue(null)
+                              .build()),
+
                 // Case 2: Obligation date is after current date, task not raised, reason is DISMISS_CASE, case state is CASE_DISMISSED
-                arguments(currentDate.plusDays(1), YesOrNo.NO, ObligationReason.DISMISS_CASE, CaseState.CASE_DISMISSED, YesOrNo.NO, null),
+                arguments(currentDate.plusDays(1), YesOrNo.NO, ObligationReason.DISMISS_CASE, CaseState.CASE_DISMISSED, null, YesOrNo.NO, null),
 
                 // Case 3: Obligation date is before current date, task already raised, reason is UNLESS_ORDER, case state is CASE_STAYED
-                arguments(currentDate.minusDays(1), YesOrNo.YES, ObligationReason.UNLESS_ORDER, CaseState.CASE_STAYED, YesOrNo.YES, null),
+                arguments(currentDate.minusDays(1), YesOrNo.YES, ObligationReason.UNLESS_ORDER, CaseState.CASE_STAYED, null, YesOrNo.YES, null),
 
                 // Case 4: Obligation date is before current date, task not raised, reason is UNLESS_ORDER, case state is CASE_DISMISSED
-                arguments(currentDate.minusDays(1), YesOrNo.NO, ObligationReason.UNLESS_ORDER, CaseState.CASE_DISMISSED, YesOrNo.YES,
+                arguments(currentDate.minusDays(1), YesOrNo.NO, ObligationReason.UNLESS_ORDER, CaseState.CASE_DISMISSED, null, YesOrNo.YES,
                           ObligationWAFlag.builder()
                               .currentDate(currentDate.format(formatter))
                               .obligationReason(ObligationReason.UNLESS_ORDER.name())

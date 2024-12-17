@@ -74,12 +74,12 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
         Map<String, Object> notificationTemplateMapping = setNotificationMapping(caseData, caseEvent);
         if (!notificationTemplateMapping.isEmpty() && notificationTemplateMapping.get(EMAIL_MAP_ID) != null
             && isNotEmpty(notificationTemplateMapping.get(EMAIL_MAP_ID).toString())) {
-//            notificationService.sendMail(
-//                notificationTemplateMapping.get(EMAIL_MAP_ID).toString(),
-//                notificationTemplateMapping.get(TEMPLATE_MAP_ID).toString(),
-//                setNotificationProperties(caseData, caseEvent),
-//                String.format(notificationTemplateMapping.get(REFERENCE_MAP_ID).toString(), caseData.getLegacyCaseReference())
-//            );
+            notificationService.sendMail(
+                notificationTemplateMapping.get(EMAIL_MAP_ID).toString(),
+                notificationTemplateMapping.get(TEMPLATE_MAP_ID).toString(),
+                setNotificationProperties(caseData, caseEvent),
+                String.format(notificationTemplateMapping.get(REFERENCE_MAP_ID).toString(), caseData.getLegacyCaseReference())
+            );
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
