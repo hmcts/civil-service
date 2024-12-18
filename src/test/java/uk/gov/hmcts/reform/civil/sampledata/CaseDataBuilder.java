@@ -6309,7 +6309,7 @@ public class CaseDataBuilder {
             .defendant1Name("Test name")
             .defendant1Address(JudgmentAddress.builder().build())
             .fullyPaymentMadeDate(LocalDate.now().plusDays(15))
-            .state(JudgmentState.CANCELLED)
+            .state(JudgmentState.SATISFIED)
             .totalAmount("90000")
             .issueDate(LocalDate.now())
             .issueDate(LocalDate.now()).build();
@@ -6322,7 +6322,7 @@ public class CaseDataBuilder {
         JudgmentDetails activeJudgment = JudgmentDetails.builder()
             .defendant1Name("Test name")
             .defendant1Address(JudgmentAddress.builder().build())
-            .fullyPaymentMadeDate(LocalDate.now().plusDays(15))
+            .fullyPaymentMadeDate(null)
             .state(JudgmentState.CANCELLED)
             .totalAmount("90000")
             .issueDate(LocalDate.now()).build();

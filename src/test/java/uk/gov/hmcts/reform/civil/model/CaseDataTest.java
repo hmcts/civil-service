@@ -816,6 +816,56 @@ public class CaseDataTest {
     }
 
     @Test
+    void shouldReturnNull_whenNoClaimFeePresent() {
+        //Given
+        CaseData caseData = CaseData.builder().build();
+        //When
+        BigDecimal claimAmount = caseData.getClaimAmountInPounds();
+        //Then
+        assertThat(claimAmount).isNull();
+    }
+
+    @Test
+    void shouldReturnClaimValueInPounds_whenClaimValuePresent() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .claimValue(ClaimValue
+                            .builder()
+                            .statementOfValueInPennies(new BigDecimal(1000))
+                            .build())
+            .build();
+        //When
+        BigDecimal claimAmount = caseData.getClaimAmountInPounds();
+        //Then
+        assertThat(claimAmount).isEqualTo(new BigDecimal(10).setScale(2));
+    }
+
+    @Test
+    void shouldReturnClaimValueInPounds_whenTotalClaimAmountPresent() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .totalClaimAmount(new BigDecimal(1000))
+            .build();
+        //When
+        BigDecimal claimAmount = caseData.getClaimAmountInPounds();
+        //Then
+        assertThat(claimAmount).isEqualTo(new BigDecimal(1000).setScale(2));
+    }
+
+    @Test
+    void shouldReturnClaimValueInPounds_whenTotalClaimAmountAndInterestPresent() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .totalClaimAmount(new BigDecimal(1000))
+            .totalInterest(new BigDecimal(10))
+            .build();
+        //When
+        BigDecimal claimAmount = caseData.getClaimAmountInPounds();
+        //Then
+        assertThat(claimAmount).isEqualTo(new BigDecimal(1010).setScale(2));
+    }
+
+    @Test
     void shouldReturnTrue_whenRespondent2NotRespresentedUnspec() {
         //Given
         CaseData caseData = CaseData.builder()
@@ -1156,6 +1206,26 @@ public class CaseDataTest {
             boolean isHWFTypeClaimIssued = caseData.isHWFTypeClaimIssued();
             //Then
             assertFalse(isHWFTypeClaimIssued);
+        }
+    }
+
+    @Nested
+    class CoSC {
+        @Test
+        void shouldReturnTrue_CoscCertExists() {
+            CaseDocument caseDocument = CaseDocument.builder()
+                .documentType(DocumentType.CERTIFICATE_OF_DEBT_PAYMENT)
+                .build();
+            CaseData caseData = CaseData.builder()
+                .systemGeneratedCaseDocuments(wrapElements(caseDocument))
+                .build();
+            assertTrue(caseData.hasCoscCert());
+        }
+
+        @Test
+        void shouldReturnFalse_CoscCertDoesntExists() {
+            CaseData caseData = CaseData.builder().build();
+            assertFalse(caseData.hasCoscCert());
         }
     }
 
