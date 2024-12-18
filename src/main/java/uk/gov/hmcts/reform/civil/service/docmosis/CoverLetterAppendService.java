@@ -9,12 +9,12 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.CoverLetter;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
-import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
+import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.COVER
 public class CoverLetterAppendService {
 
     private final DocumentGeneratorService documentGeneratorService;
-    private final CivilStitchService civilStitchService;
+    private final CivilDocumentStitchingService civilDocumentStitchingService;
     private final DocumentManagementService documentManagementService;
     private final DocumentDownloadService documentDownloadService;
 
@@ -40,11 +40,7 @@ public class CoverLetterAppendService {
         );
     }
 
-    public byte[] makeDocumentMailable(CaseData caseData, String authorisation,
-                                       Party recipient, DocumentType documentType, CaseDocument... caseDocuments) {
-        Long caseId = caseData.getCcdCaseReference();
-        log.info("Generating mailable document for caseId {}", caseId);
-
+    public byte[] makeDocumentMailable(CaseData caseData, String authorisation, Party recipient, CaseDocument... caseDocuments) {
         DocmosisDocument coverLetter = generate(recipient);
         CaseDocument coverLetterCaseDocument =  documentManagementService.uploadDocument(
             authorisation,
@@ -58,24 +54,22 @@ public class CoverLetterAppendService {
         List<DocumentMetaData> documentMetaDataList = appendCoverToDocument(coverLetterCaseDocument, caseDocuments);
         String bundleFileName = Arrays.stream(caseDocuments).findFirst().get().getDocumentName().replace('/', '-').replace(' ', '-');
 
-        log.info("Calling civil stitch service from cover letter for caseId {}", caseId);
-        CaseDocument mailableDocument =
-            civilStitchService.generateStitchedCaseDocument(documentMetaDataList,
-                                                            bundleFileName,
-                                                            caseId,
-                                                            documentType,
-                                                            authorisation);
+        CaseDocument mailableDocument = civilDocumentStitchingService.bundle(
+            documentMetaDataList,
+            authorisation,
+            bundleFileName,
+            bundleFileName,
+            caseData
+        );
 
-        log.info("Civil stitch service cover letter response {} for caseId {}", mailableDocument, caseId);
-
+        String documentUrl = mailableDocument.getDocumentLink().getDocumentUrl();
+        String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
         byte[] letterContent;
 
         try {
-            String documentUrl = mailableDocument.getDocumentLink().getDocumentUrl();
-            String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
             letterContent = documentDownloadService.downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
         } catch (Exception e) {
-            log.error("Failed getting letter content for document to mail for caseId {}", caseId, e);
+            log.error("Failed getting letter content for document to mail ");
             throw new DocumentDownloadException(mailableDocument.getDocumentLink().getDocumentFileName(), e);
         }
         return letterContent;
