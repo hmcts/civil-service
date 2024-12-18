@@ -1,6 +1,3 @@
-tags:
-  civil-ccd-stack: true
-
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_NAME}.preview.platform.hmcts.net
@@ -203,6 +200,7 @@ xui-webapp:
       SERVICES_CCD_CASE_ASSIGNMENT_API: http://${SERVICE_NAME}-aac-manage-case-assignment
 
 ccd:
+  enabled: true
   ccd:
     adminWeb:
       enabled: false
