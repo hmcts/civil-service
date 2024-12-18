@@ -436,7 +436,7 @@ dependencies {
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
   testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.15.11'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.15.10'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.15.11'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -448,7 +448,7 @@ dependencies {
   testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.26.3'
 
   testImplementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
-  testImplementation 'com.github.hmcts:fortify-client:1.4.5:all'
+  testImplementation 'com.github.hmcts:fortify-client:1.4.6:all'
   //pact contract testing
   contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.5'
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
