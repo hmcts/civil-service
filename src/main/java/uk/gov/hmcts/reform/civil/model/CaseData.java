@@ -763,6 +763,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private String messageHistory;
     private DynamicList messagesToReplyTo;
     private List<Element<Message>> messages;
+    private ObligationWAFlag obligationWAFlag;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
