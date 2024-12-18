@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_RESPONSE_CUI_SEALED;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DIRECTIONS_QUESTIONNAIRE;
 
 @Slf4j
 @Service
@@ -72,15 +73,15 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        log.info("isLipvLipOneVOne {} isLipVLipEnabled {} for case {}", caseData.isLipvLipOneVOne(),
-                 featureToggleService.isLipVLipEnabled(), caseId);
+        log.info("stitchEnabled {}, isLipvLipOneVOne {} isLipVLipEnabled {} for case {}", stitchEnabled,
+                 caseData.isLipvLipOneVOne(), featureToggleService.isLipVLipEnabled(), caseId);
 
         if (stitchEnabled && caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
             log.info("if condition for case {}", caseId);
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
+            log.info("no of document sending for stitch {} for caseId {}", documentMetaDataList.size(), caseId);
             if (documentMetaDataList.size() > 1) {
                 log.info("Calling civil stitch service from response cui sealed form for caseId {}", caseId);
-
                 CaseDocument stitchedDocument =
                     civilStitchService.generateStitchedCaseDocument(documentMetaDataList,
                                                                     sealedForm.getDocumentName(),
@@ -92,7 +93,6 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                 caseDataBuilder.respondent1ClaimResponseDocumentSpec(stitchedDocument)
                     .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
                         stitchedDocument,  caseData));
-
                 assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.DEF1_DEFENSE_DQ.getValue());
             } else {
                 log.info("Inner else condition for case {}", caseData.getCcdCaseReference());
@@ -125,7 +125,7 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                 LocalDate.now().toString()
         ));
         ElementUtils.unwrapElements(caseData.getSystemGeneratedCaseDocuments()).stream()
-                .filter(cd -> DocumentType.DIRECTIONS_QUESTIONNAIRE.equals(cd.getDocumentType()))
+                .filter(cd -> DIRECTIONS_QUESTIONNAIRE.equals(cd.getDocumentType()))
                 .map(cd ->
                         new DocumentMetaData(
                                 cd.getDocumentLink(),
