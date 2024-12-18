@@ -205,6 +205,18 @@ class OrderReviewObligationCheckCallbackHandlerTest extends BaseCallbackHandlerT
                               .currentDate(currentDate.format(formatter))
                               .obligationReason(ObligationReason.UNLESS_ORDER.name())
                               .obligationReasonDisplayValue(ObligationReason.UNLESS_ORDER.getDisplayedValue())
+                              .build()),
+                arguments(currentDate.minusDays(1), YesOrNo.NO, ObligationReason.STAY_A_CASE, CaseState.CASE_STAYED, null, YesOrNo.YES,
+                          ObligationWAFlag.builder()
+                              .currentDate(null)
+                              .obligationReason(null)
+                              .obligationReasonDisplayValue(null)
+                              .build()),
+                arguments(currentDate.minusDays(1), YesOrNo.NO, ObligationReason.STAY_A_CASE, CaseState.JUDICIAL_REFERRAL, null, YesOrNo.YES,
+                          ObligationWAFlag.builder()
+                              .currentDate(currentDate.format(formatter))
+                              .obligationReason(ObligationReason.STAY_A_CASE.name())
+                              .obligationReasonDisplayValue(ObligationReason.STAY_A_CASE.getDisplayedValue())
                               .build())
             );
         }

@@ -59,11 +59,13 @@ public class OrderReviewObligationCheckCallbackHandler extends CallbackHandler {
                 ObligationWAFlag.ObligationWAFlagBuilder obligationWAFlagBuilder = ObligationWAFlag.builder();
                 boolean isLiftAStay = ObligationReason.LIFT_A_STAY.equals(data.getObligationReason());
                 boolean isDismissCase = ObligationReason.DISMISS_CASE.equals(data.getObligationReason());
+                boolean isStayACase = ObligationReason.STAY_A_CASE.equals(data.getObligationReason());
                 boolean isCaseDismissed = CaseState.CASE_DISMISSED.equals(caseData.getCcdState());
+                boolean isCaseStayed = CaseState.CASE_STAYED.equals(caseData.getCcdState());
                 String manageStayOption = caseData.getManageStayOption();
 
-                if ((!isLiftAStay && !isDismissCase) || (isLiftAStay && isNull(manageStayOption))
-                    || (isDismissCase && !isCaseDismissed)) {
+                if ((!isLiftAStay && !isDismissCase && !isStayACase) || (isLiftAStay && isNull(manageStayOption))
+                    || (isDismissCase && !isCaseDismissed) || (isStayACase && !isCaseStayed)) {
                     obligationWAFlagBuilder.currentDate(currentDate.format(formatter))
                         .obligationReason(data.getObligationReason().name())
                         .obligationReasonDisplayValue(data.getObligationReason().getDisplayedValue());
