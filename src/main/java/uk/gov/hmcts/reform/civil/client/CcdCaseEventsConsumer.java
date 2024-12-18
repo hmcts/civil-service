@@ -4,7 +4,7 @@ import com.azure.messaging.servicebus.ServiceBusException;
 import com.azure.messaging.servicebus.ServiceBusReceiverClient;
 import com.azure.messaging.servicebus.ServiceBusSessionReceiverClient;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -13,8 +13,7 @@ import uk.gov.hmcts.reform.civil.service.servicebus.CcdEventMessageReceiverServi
 
 @Slf4j
 @Component
-@Scope("prototype")
-@ConditionalOnProperty("azure.servicebus.enableASB-DLQ")
+@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Profile("!functional & !local")
 @SuppressWarnings("PMD.DoNotUseThreads")
 public class CcdCaseEventsConsumer implements Runnable {
@@ -30,7 +29,6 @@ public class CcdCaseEventsConsumer implements Runnable {
     }
 
     @Override
-    @SuppressWarnings("squid:S2189")
     public void run() {
         try (ServiceBusSessionReceiverClient sessionReceiver =
                  ccdEventServiceBusConfiguration.createCcdCaseEventsSessionReceiver()) {
@@ -40,14 +38,12 @@ public class CcdCaseEventsConsumer implements Runnable {
         }
     }
 
-    @SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
     protected void consumeMessage(ServiceBusSessionReceiverClient sessionReceiver) {
         try (ServiceBusReceiverClient receiver = sessionReceiver.acceptNextSession()) {
 
             if (receiver == null) {
                 log.warn("ServiceBusReceiverClient receiver was null.");
                 return;
-
             }
 
             receiver.receiveMessages(1).forEach(
@@ -58,7 +54,8 @@ public class CcdCaseEventsConsumer implements Runnable {
                         log.info("Received CCD Case Event message with id '{}' and case id '{}'",
                                  messageId, sessionId);
 
-                        eventMessageReceiverService.handleCcdCaseEventAsbMessage(messageId, sessionId,
+                        eventMessageReceiverService.handleCcdCaseEventAsbMessage(messageId,
+                                                                                 sessionId,
                                                                                  new String(message.getBody().toBytes()));
                         receiver.complete(message);
 

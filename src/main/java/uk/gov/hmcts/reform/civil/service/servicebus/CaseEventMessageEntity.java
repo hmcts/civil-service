@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 
 @EqualsAndHashCode
 @ToString
-@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 public class CaseEventMessageEntity implements Serializable {
 
     private static final String MESSAGE_ID = "message_id";

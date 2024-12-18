@@ -522,6 +522,12 @@ azure:
       username: ${HMC_HEARINGS_TOPIC_POLICY_NAME:}
       password: ${HMC_HEARINGS_TOPIC_ACCESS_KEY:}
       enabled: ${HMC_HEARINGS_SUBSCRIPTION_ENABLED:false}
+    ccd-events-topic:
+      connection-string: ${CCD_EVENTS_TOPIC_CONNECTION_STRING:}
+      topic-name: ${CCD_EVENTS_TOPIC_NAME:}
+      civil-ccd-events-subscription-name: ${CCD_EVENTS_SUBSCRIPTION_NAME:}
+      retry-duration: ${CCD_EVENTS_SUBSCRIPTION_RETRY_DURATION:}
+      enabled: ${CCD_EVENTS_SUBSCRIPTION_ENABLED}
 
 async:
   handler:

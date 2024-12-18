@@ -20,13 +20,13 @@ import java.time.Duration;
 @ConditionalOnExpression("${azure.servicebus.enableASB-DLQ:true}")
 public class CcdEventServiceBusConfiguration {
 
-    @Value("${azure.servicebus.connection-string}")
+    @Value("${azure.servicebus.ccd-events-topic.connection-string}")
     private String connectionString;
-    @Value("${azure.servicebus.topic-name}")
+    @Value("${azure.servicebus.ccd-events-topic.topic-name}")
     private String topicName;
-    @Value("${azure.servicebus.ccd-case-events-subscription-name}")
+    @Value("${azure.servicebus.ccd-events-topic.civil-ccd-case-events-subscription-name}")
     private String ccdCaseEventsSubscriptionName;
-    @Value("${azure.servicebus.retry-duration}")
+    @Value("${azure.servicebus.ccd-events-topic.retry-duration}")
     private int retryTime;
 
     public ServiceBusSessionReceiverClient createCcdCaseEventsSessionReceiver() {
@@ -39,7 +39,7 @@ public class CcdEventServiceBusConfiguration {
             .subscriptionName(ccdCaseEventsSubscriptionName)
             .buildClient();
 
-        log.info("CCD Case Events Session receiver created, successfully");
+        log.info("CCD Case Events Session receiver created successfully");
         return client;
     }
 
@@ -54,13 +54,13 @@ public class CcdEventServiceBusConfiguration {
             .subscriptionName(ccdCaseEventsSubscriptionName)
             .buildClient();
 
-        log.info("CCD Case Events Dead Letter Queue Session receiver created, successfully");
+        log.info("CCD Case Events Dead Letter Queue Session receiver created successfully");
         return client;
     }
 
     private AmqpRetryOptions retryOptions() {
         AmqpRetryOptions retryOptions = new AmqpRetryOptions();
-        retryOptions.setTryTimeout(Duration.ofSeconds(Integer.valueOf(retryTime)));
+        retryOptions.setTryTimeout(Duration.ofSeconds(retryTime));
         return retryOptions;
     }
 }
