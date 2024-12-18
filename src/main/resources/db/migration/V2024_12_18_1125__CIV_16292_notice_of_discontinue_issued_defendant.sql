@@ -9,8 +9,8 @@ VALUES ('Scenario.AAA6.Discontinue.NoticeOfDiscontinuanceIssued.Defendant',
 /**
  * Add notification template
  */
-INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
-                                                  , notification_role)
+INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy,
+                                                   notification_role)
 VALUES ('Notice.AAA6.Discontinue.NoticeOfDiscontinuanceIssued.Defendant',
         'A notice of discontinuance has been created and sent to all parties',
         'MMae hysbysiad o ddirwyn i ben wedi’i greu a’i anfon at yr holl bartïon',
