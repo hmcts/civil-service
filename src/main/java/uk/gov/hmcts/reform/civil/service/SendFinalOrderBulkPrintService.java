@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.CoverLetterAppendService;
 import java.util.List;
 
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.ORDER_NOTICE_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.SendFinalOrderToLiPCallbackHandler.TASK_ID_DEFENDANT;
 
@@ -47,7 +46,7 @@ public class SendFinalOrderBulkPrintService {
         byte[] letterContent;
         Party recipient = isDefendantPrint(task) ? caseData.getRespondent1() : caseData.getApplicant1();
 
-        letterContent = coverLetterAppendService.makeDocumentMailable(caseData, authorisation, recipient, JUDGE_FINAL_ORDER, caseDocument);
+        letterContent = coverLetterAppendService.makeDocumentMailable(caseData, authorisation, recipient, caseDocument);
 
         List<String> recipients = List.of(recipient.getPartyName());
         bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
