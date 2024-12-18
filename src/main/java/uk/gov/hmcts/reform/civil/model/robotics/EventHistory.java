@@ -44,6 +44,8 @@ public class EventHistory {
     private List<Event> interlocutoryJudgment;
     @Singular("defaultJudgment")
     private List<Event> defaultJudgment;
+    @Singular("setAsideJudgment")
+    private List<Event> setAsideJudgment;
     @Singular("statesPaid")
     private List<Event> statesPaid;
     @Singular("judgmentByAdmission")
@@ -52,6 +54,8 @@ public class EventHistory {
     private List<Event> generalFormOfApplication;
     @Singular("defenceStruckOut")
     private List<Event> defenceStruckOut;
+    @Singular("certificateOfSatisfactionOrCancellation")
+    private List<Event> certificateOfSatisfactionOrCancellation;
 
     @JsonIgnore
     public List<Event> flatEvents() {
@@ -71,10 +75,12 @@ public class EventHistory {
             breathingSpaceMentalHealthLifted,
             interlocutoryJudgment,
             defaultJudgment,
+            setAsideJudgment,
             statesPaid,
             judgmentByAdmission,
             generalFormOfApplication,
-            defenceStruckOut
+            defenceStruckOut,
+            certificateOfSatisfactionOrCancellation
         );
         return eventsList.stream()
             .filter(Objects::nonNull)

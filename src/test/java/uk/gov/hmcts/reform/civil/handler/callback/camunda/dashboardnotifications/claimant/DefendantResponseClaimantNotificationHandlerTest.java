@@ -44,6 +44,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE;
@@ -54,13 +55,13 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_ADMIT_PAY_IMMEDIATELY_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_CLAIMANT_CARM;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_MEDIATION_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULLDISPUTE_MULTI_INT_FAST_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_ALREADY_PAID_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_CLAIMANT_CARM;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_MEDIATION_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
-public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
+class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
     private DefendantResponseClaimantNotificationHandler handler;
@@ -155,7 +156,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
                 .toBuilder()
                 .legacyCaseReference("reference")
-                .ccdCaseReference(Long.valueOf(23055L))
+                .ccdCaseReference(23055L)
                 .applicant1Represented(YesOrNo.NO)
                 .respondent1(Party.builder()
                                  .type(Party.Type.valueOf(partyType.name())).build())
@@ -192,7 +193,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
                 .toBuilder()
                 .legacyCaseReference("reference")
-                .ccdCaseReference(Long.valueOf(1234L))
+                .ccdCaseReference(1234L)
                 .applicant1Represented(YesOrNo.NO)
                 .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
                                                    .builder()
@@ -486,7 +487,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
             .toBuilder()
             .legacyCaseReference("reference")
-            .ccdCaseReference(Long.valueOf(1234L))
+            .ccdCaseReference(1234L)
             .applicant1Represented(YesOrNo.NO)
             .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
@@ -513,5 +514,33 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );
+    }
+
+    @Test
+    void willNotConfigureDashboardNotificationsForDefendantResponseWhenRespondent1ClaimResponseTypeForSpecIsNull() {
+        //given
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        LocalDate paymentDate = OffsetDateTime.now().toLocalDate().minusDays(5);
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
+            .toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(12345673L)
+            .applicant1Represented(YesOrNo.NO)
+            .responseClaimTrack(SMALL_CLAIM.name())
+            .respondent1ClaimResponseTypeForSpec(null)
+            .respondToClaim(RespondToClaim.builder()
+                                .howMuchWasPaid(new BigDecimal(1000))
+                                .whenWasThisAmountPaid(paymentDate)
+                                .build())
+            .totalClaimAmount(new BigDecimal(1500))
+            .build();
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+        //when
+        handler.handle(callbackParams);
+        //then
+        verifyNoInteractions(dashboardApiClient);
     }
 }
