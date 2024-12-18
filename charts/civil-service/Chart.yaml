@@ -44,10 +44,10 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: ccd-case-document-am-api.enabled
   - name: em-ccdorc
-    version: 2.0.25
+    version: 2.0.26
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: em-ccdorc.enabled
   - name: em-stitching
-    version: 1.0.55
+    version: 1.0.56
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: em-stitching.enabled
