@@ -18,7 +18,9 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import java.time.LocalDate;
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingDetailsMapper.getHearingInWelshFlag;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.NOTICE_OF_DISCONTINUANCE_PDF;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.NOTICE_OF_DISCONTINUANCE_WELSH_PDF;
 
 @Slf4j
 @Service
@@ -30,7 +32,7 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
 
     public CaseDocument generateDocs(CaseData caseData, Party party, String authorisation) {
         NoticeOfDiscontinuanceForm templateData = getNoticeOfDiscontinueData(caseData, party);
-        DocmosisTemplates docmosisTemplate = NOTICE_OF_DISCONTINUANCE_PDF;
+        DocmosisTemplates docmosisTemplate = getHearingInWelshFlag(caseData) ? NOTICE_OF_DISCONTINUANCE_WELSH_PDF : NOTICE_OF_DISCONTINUANCE_PDF;
         DocmosisDocument docmosisDocument =
                 documentGeneratorService.generateDocmosisDocument(templateData, docmosisTemplate);
 
