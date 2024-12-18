@@ -15,42 +15,42 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class TrialArrangementsCheckDefendantScenarioTest extends CaseProgressionDashboardBaseIntegrationTest {
 
-        @Autowired
-        private TrialReadyCheckDefendantNotificationHandler handler;
+    @Autowired
+    private TrialReadyCheckDefendantNotificationHandler handler;
 
-        @Test
-        void should_close_defendant_trial_arrangements_when_trial_arrangements_not_finalised() throws Exception {
+    @Test
+    void should_close_defendant_trial_arrangements_when_trial_arrangements_not_finalised() throws Exception {
 
-            String caseId = "10002348";
-            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingResponseNotFullDefenceReceived().build()
-                .toBuilder()
-                .legacyCaseReference("reference")
-                .ccdCaseReference(Long.valueOf(caseId))
-                .respondent1Represented(YesOrNo.NO)
-                .build();
+        String caseId = "10002348";
+        CaseData caseData = CaseDataBuilder.builder().atStateAwaitingResponseNotFullDefenceReceived().build()
+            .toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(Long.valueOf(caseId))
+            .respondent1Represented(YesOrNo.NO)
+            .build();
 
-            handler.handle(callbackParams(caseData));
+        handler.handle(callbackParams(caseData));
 
-            //Verify Notification is created
-            doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
-                .andExpect(status().isOk())
-                .andExpectAll(
-                    status().is(HttpStatus.OK.value()),
-                    jsonPath("$[0]").doesNotExist()
-                );
+        //Verify Notification is created
+        doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
+            .andExpect(status().isOk())
+            .andExpectAll(
+                status().is(HttpStatus.OK.value()),
+                jsonPath("$[0]").doesNotExist()
+            );
 
-            doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "DEFENDANT")
-                .andExpectAll(
-                    status().is(HttpStatus.OK.value()),
-                    jsonPath("$[0].reference").value(caseId.toString()),
-                    jsonPath("$[0].taskNameEn").value(
-                        "<a>Add the trial arrangements</a>"),
-                    jsonPath("$[0].currentStatusEn").value(TaskStatus.INACTIVE.getName()),
-                    jsonPath("$[0].taskNameCy").value(
-                        "<a>Ychwanegu trefniadau'r treial</a>"),
-                    jsonPath("$[0].currentStatusCy").value(TaskStatus.INACTIVE.getWelshName())
-                );
-        }
+        doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "DEFENDANT")
+            .andExpectAll(
+                status().is(HttpStatus.OK.value()),
+                jsonPath("$[0].reference").value(caseId.toString()),
+                jsonPath("$[0].taskNameEn").value(
+                    "<a>Add the trial arrangements</a>"),
+                jsonPath("$[0].currentStatusEn").value(TaskStatus.INACTIVE.getName()),
+                jsonPath("$[0].taskNameCy").value(
+                    "<a>Ychwanegu trefniadau'r treial</a>"),
+                jsonPath("$[0].currentStatusCy").value(TaskStatus.INACTIVE.getWelshName())
+            );
+    }
 
     @Test
     void should_not_do_anything_for_defendant_when_trial_arrangements_finalised() throws Exception {
