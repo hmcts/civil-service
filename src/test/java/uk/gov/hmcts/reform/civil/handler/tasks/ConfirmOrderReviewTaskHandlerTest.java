@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.civil.enums.ObligationReason;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.ObligationData;
+import uk.gov.hmcts.reform.civil.model.StoredObligationData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -81,7 +81,7 @@ class ConfirmOrderReviewTaskHandlerTest {
     @Test
     void shouldHaveCorrectEventDetails_whenObligationDataIsProvided() {
         CaseData caseData = CaseData.builder()
-            .storedObligationData(List.of(Element.<ObligationData>builder().id(UUID.randomUUID()).value(ObligationData.builder().obligationReason(
+            .storedObligationData(List.of(Element.<StoredObligationData>builder().id(UUID.randomUUID()).value(StoredObligationData.builder().obligationReason(
                 ObligationReason.DISMISS_CASE).obligationDate(
                 null).obligationAction("action").build()).build()))
             .businessProcess(
