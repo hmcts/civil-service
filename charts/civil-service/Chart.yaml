@@ -40,7 +40,7 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: civil-general-applications.enabled
   - name: ccd-case-document-am-api
-    version: 1.7.15
+    version: 1.7.14
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: ccd-case-document-am-api.enabled
   - name: em-ccdorc
