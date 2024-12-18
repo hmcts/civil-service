@@ -103,10 +103,12 @@ public class EventHistorySequencer {
                 case DEFENCE_STRUCK_OUT:
                     builder.defenceStruckOut(event);
                     break;
+                case SET_ASIDE_JUDGMENT:
+                    builder.setAsideJudgment(event);
+                    break;
                 case CERTIFICATE_OF_SATISFACTION_OR_CANCELLATION:
                     builder.certificateOfSatisfactionOrCancellation(event);
                     break;
-
                 default:
                     throw new IllegalStateException("Unexpected event type: " + eventType);
             }
@@ -165,6 +167,9 @@ public class EventHistorySequencer {
         if (isEmpty(builder.build().getDefenceStruckOut())) {
             builder.defenceStruckOut(List.of(Event.builder().build()));
         }
+        if (isEmpty(builder.build().getSetAsideJudgment())) {
+            builder.setAsideJudgment(List.of(Event.builder().build()));
+        }
         if (isEmpty(builder.build().getCertificateOfSatisfactionOrCancellation())) {
             builder.certificateOfSatisfactionOrCancellation(List.of(Event.builder().build()));
         }
@@ -201,6 +206,7 @@ public class EventHistorySequencer {
             eventHistory.getBreathingSpaceMentalHealthLifted(),
             eventHistory.getInterlocutoryJudgment(),
             eventHistory.getDefaultJudgment(),
+            eventHistory.getSetAsideJudgment(),
             eventHistory.getJudgmentByAdmission(),
             eventHistory.getGeneralFormOfApplication(),
             eventHistory.getDefenceStruckOut(),

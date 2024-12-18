@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadServ
 import java.util.List;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_NOTICE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.SendHearingToLiPCallbackHandler.TASK_ID_DEFENDANT;
 
 @Service
@@ -30,7 +31,7 @@ public class SendHearingBulkPrintService {
             byte[] letterContent;
             Party recipient = isDefendantPrint(task) ? caseData.getRespondent1() : caseData.getApplicant1();
 
-            letterContent = coverLetterAppendService.makeDocumentMailable(caseData, authorisation, recipient, caseDocument);
+            letterContent = coverLetterAppendService.makeDocumentMailable(caseData, authorisation, recipient, HEARING_NOTICE, caseDocument);
             List<String> recipients = List.of(recipient.getPartyName());
             bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
                                          caseData.getLegacyCaseReference(), HEARING_PACK_LETTER_TYPE, recipients);
