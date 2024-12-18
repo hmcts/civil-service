@@ -32,7 +32,7 @@ import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_BUNDLE_CREATED_FOR_CLAIMANT1;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_BUNDLE_CREATED_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
 public class BundleCreationClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -78,7 +78,7 @@ public class BundleCreationClaimantNotificationHandlerTest extends BaseCallbackH
 
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_BUNDLE_CREATED_CLAIMANT.getScenario(),
+                SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_CLAIMANT.getScenario(),
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
@@ -100,7 +100,7 @@ public class BundleCreationClaimantNotificationHandlerTest extends BaseCallbackH
 
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_BUNDLE_CREATED_CLAIMANT.getScenario(),
+                SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_CLAIMANT.getScenario(),
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
@@ -127,7 +127,7 @@ public class BundleCreationClaimantNotificationHandlerTest extends BaseCallbackH
 
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_BUNDLE_CREATED_CLAIMANT.getScenario(),
+                SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_CLAIMANT.getScenario(),
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );

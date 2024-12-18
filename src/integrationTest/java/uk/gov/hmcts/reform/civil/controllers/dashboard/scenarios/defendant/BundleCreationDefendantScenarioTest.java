@@ -126,10 +126,8 @@ public class BundleCreationDefendantScenarioTest extends CaseProgressionDashboar
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "DEFENDANT")
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].taskNameEn").value("<a>Add the trial arrangements</a>"),
-                jsonPath("$[0].currentStatusEn").value(TaskStatus.INACTIVE.getName()),
-                jsonPath("$[1].reference").value(caseId.toString()),
-                jsonPath("$[1].taskNameEn").value(
+                jsonPath("$[0].reference").value(caseId.toString()),
+                jsonPath("$[0].taskNameEn").value(
                     "<a href={VIEW_BUNDLE} class=\"govuk-link\">View the bundle</a>")
             );
     }

@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_BUNDLE_CREATED_FOR_DEFENDANT1;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_BUNDLE_CREATED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_DEFENDANT;
 
 @Service
 public class BundleCreationDefendantNotificationHandler extends CaseProgressionDashboardCallbackHandler {
@@ -39,7 +39,7 @@ public class BundleCreationDefendantNotificationHandler extends CaseProgressionD
 
     @Override
     public String getScenario(CaseData caseData) {
-        return SCENARIO_AAA6_BUNDLE_CREATED_DEFENDANT.getScenario();
+        return SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_DEFENDANT.getScenario();
     }
 
     @Override
