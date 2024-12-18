@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -71,8 +70,9 @@ class SendFinalOrderBulkPrintServiceTest {
         return caseDataBuilder.build();
     }
 
-    private CaseData buildCaseDataForTranslatedOrder(Party party, DocumentType documentType) {
-        CaseDocument translatedDocument = CaseDocument.builder().documentType(documentType).documentLink(DOCUMENT_LINK).build();
+    private CaseData buildCaseDataForTranslatedOrder(Party party) {
+        CaseDocument translatedDocument = CaseDocument.builder()
+            .documentType(DocumentType.ORDER_NOTICE_TRANSLATED_DOCUMENT).documentLink(DOCUMENT_LINK).build();
         CaseDataBuilder caseDataBuilder =
             CaseDataBuilder.builder().caseDataLip(
                 CaseDataLiP.builder()
@@ -112,7 +112,7 @@ class SendFinalOrderBulkPrintServiceTest {
         // given
         Party respondent1 = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = buildCaseData(respondent1, JUDGE_FINAL_ORDER, true);
-        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any()))
+        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         // when
@@ -127,7 +127,7 @@ class SendFinalOrderBulkPrintServiceTest {
         // given
         Party claimant = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, JUDGE_FINAL_ORDER, true);
-        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any()))
+        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         // when
@@ -195,7 +195,7 @@ class SendFinalOrderBulkPrintServiceTest {
     void shouldNotDownloadDocument_whenSystemGeneratedCaseDocumentsIsEmpty() {
         // given
         CaseData caseData = CaseDataBuilder.builder()
-            .systemGeneratedCaseDocuments(Lists.emptyList()).build();
+            .systemGeneratedCaseDocuments(List.of()).build();
 
         // when
         sendFinalOrderBulkPrintService.sendFinalOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
@@ -208,8 +208,8 @@ class SendFinalOrderBulkPrintServiceTest {
     void shouldDownloadDocumentAndPrintTranslatedLetterToClaimantLiPSuccessfully() {
         // given
         Party claimant = PartyBuilder.builder().individual().build();
-        CaseData caseData = buildCaseDataForTranslatedOrder(claimant, DocumentType.ORDER_NOTICE_TRANSLATED_DOCUMENT);
-        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any()))
+        CaseData caseData = buildCaseDataForTranslatedOrder(claimant);
+        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
         given(featureToggleService.isCaseProgressionEnabled()).willReturn(true);
 
@@ -224,8 +224,8 @@ class SendFinalOrderBulkPrintServiceTest {
     void shouldDownloadDocumentAndPrintTranslatedLetterToDefendantLiPSuccessfully() {
         // given
         Party defendant = PartyBuilder.builder().individual().build();
-        CaseData caseData = buildCaseDataForTranslatedOrder(defendant, DocumentType.ORDER_NOTICE_TRANSLATED_DOCUMENT);
-        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any()))
+        CaseData caseData = buildCaseDataForTranslatedOrder(defendant);
+        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
         given(featureToggleService.isCaseProgressionEnabled()).willReturn(true);
 
