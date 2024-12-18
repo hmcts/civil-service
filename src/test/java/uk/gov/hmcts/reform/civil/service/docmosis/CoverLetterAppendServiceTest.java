@@ -22,28 +22,27 @@ import uk.gov.hmcts.reform.civil.model.docmosis.CoverLetter;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
-import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
+import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.COVER_LETTER;
 
 @ExtendWith(MockitoExtension.class)
-class CoverLetterAppendServiceTest {
+public class CoverLetterAppendServiceTest {
 
     @InjectMocks
     private CoverLetterAppendService coverLetterAppendService;
@@ -52,7 +51,7 @@ class CoverLetterAppendServiceTest {
     private DocumentGeneratorService documentGeneratorService;
 
     @Mock
-    private CivilStitchService civilStitchService;
+    private CivilDocumentStitchingService civilDocumentStitchingService;
 
     @Mock
     private DocumentManagementService documentManagementService;
@@ -61,6 +60,7 @@ class CoverLetterAppendServiceTest {
     private DocumentDownloadService documentDownloadService;
 
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
+    private static final LocalDateTime RESPONSE_DEADLINE = LocalDateTime.now();
     private static final Address APPLICANT_ADDRESS = Address.builder()
         .addressLine1("123 road")
         .postTown("London")
@@ -71,6 +71,7 @@ class CoverLetterAppendServiceTest {
         .postTown("London")
         .postCode("EX12RT")
         .build();
+    private static final String CLAIM_REFERENCE = "ABC";
 
     private static final Party CLAIMANT = Party.builder()
         .primaryAddress(APPLICANT_ADDRESS)
@@ -87,12 +88,23 @@ class CoverLetterAppendServiceTest {
         .individualFirstName("Indent")
         .individualLastName("Dave")
         .build();
-
+    private static final BigDecimal TOTAL_CLAIM_AMOUNT = new BigDecimal("1000");
+    private static final String PIN = "1234789";
+    private static final String CUI_URL = "CUI response url";
     private static final CoverLetter CLAIMANT_LETTER_TEMPLATE_DATA = CoverLetter.builder()
         .party(CLAIMANT)
         .build();
     private static final CoverLetter DEFENDANT_LETTER_TEMPLATE_DATA = CoverLetter.builder()
         .party(DEFENDANT)
+        .build();
+
+    private static final CaseDocument coverLetter = CaseDocument.builder()
+        .documentType(DocumentType.COVER_LETTER)
+        .documentSize(5L)
+        .documentName("Cover letter.pdf")
+        .createdBy("CIVIL")
+        .createdDatetime(LocalDateTime.of(2024,  1, 2,  3,  4))
+        .documentLink(Document.builder().documentFileName("Cover letter.pdf").documentBinaryUrl("Binary/url").documentUrl("url").build())
         .build();
 
     private static final CaseDocument caseDocument = CaseDocument.builder()
@@ -112,9 +124,8 @@ class CoverLetterAppendServiceTest {
         given(documentManagementService.uploadDocument(any(), any(PDF.class))).willReturn(caseDocument);
         given(documentDownloadService.downloadDocument(any(), any()))
             .willReturn(new DownloadedDocumentResponse(new ByteArrayResource(STITCHED_DOC_BYTES), "test", "test"));
-        when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(SEALED_CLAIM),
-                                                             anyString())).thenReturn(buildStitchedDocument());
-
+        given(civilDocumentStitchingService.bundle(anyList(), anyString(), anyString(), anyString(), any(CaseData.class)))
+            .willReturn(buildStitchedDocument());
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
             .willReturn(DocmosisDocument.builder().bytes(new byte[]{1, 2, 3, 4, 5, 6}).build());
 
@@ -127,37 +138,37 @@ class CoverLetterAppendServiceTest {
     @Test
     void shouldGenerateMailableLetterSuccessfullyForClaimant() {
         // Given
-        CaseData caseData = CaseData.builder().ccdCaseReference(1L).build();
+        CaseData caseData = CaseData.builder().build();
 
         // When
-        byte[] mailableLetter = coverLetterAppendService.makeDocumentMailable(caseData, BEARER_TOKEN, CLAIMANT, SEALED_CLAIM,
-                                                                              caseDocument
+        byte[] mailableLetter = coverLetterAppendService.makeDocumentMailable(caseData, BEARER_TOKEN, CLAIMANT,
+                                                                                caseDocument
         );
 
         // Then
         assertThat(mailableLetter).isEqualTo(STITCHED_DOC_BYTES);
-        verify(documentGeneratorService).generateDocmosisDocument(CLAIMANT_LETTER_TEMPLATE_DATA, COVER_LETTER);
-        verify(civilStitchService).generateStitchedCaseDocument(specClaimTimelineDocuments, "DocumentName.pdf", 1L,
-                                                                SEALED_CLAIM, BEARER_TOKEN);
+        verify(documentGeneratorService).generateDocmosisDocument(refEq(CLAIMANT_LETTER_TEMPLATE_DATA), refEq(COVER_LETTER));
+        verify(civilDocumentStitchingService).bundle(specClaimTimelineDocuments, BEARER_TOKEN, "DocumentName.pdf",
+                                                     "DocumentName.pdf", caseData);
     }
 
     @Test
     void shouldGenerateMailableLetterSuccessfullyForDefendant_forMultipleDocuments() {
         // Given
-        CaseData caseData = CaseData.builder().ccdCaseReference(1L).build();
+        CaseData caseData = CaseData.builder().build();
 
         // When
-        byte[] downloadedLetter = coverLetterAppendService.makeDocumentMailable(caseData, BEARER_TOKEN, DEFENDANT, SEALED_CLAIM,
+        byte[] downloadedLetter = coverLetterAppendService.makeDocumentMailable(caseData, BEARER_TOKEN, DEFENDANT,
                                                                                 caseDocument, caseDocument
         );
 
         // Then
         assertThat(downloadedLetter).isEqualTo(STITCHED_DOC_BYTES);
-        verify(documentGeneratorService).generateDocmosisDocument(DEFENDANT_LETTER_TEMPLATE_DATA, COVER_LETTER);
-        List<DocumentMetaData> documentMetaDataList = new ArrayList<>(specClaimTimelineDocuments);
+        verify(documentGeneratorService).generateDocmosisDocument(refEq(DEFENDANT_LETTER_TEMPLATE_DATA), refEq(COVER_LETTER));
+        List<DocumentMetaData> documentMetaDataList = specClaimTimelineDocuments.stream().collect(Collectors.toList());
         documentMetaDataList.add(new DocumentMetaData(caseDocument.getDocumentLink(), "Document to attach", LocalDate.now().toString()));
-        verify(civilStitchService).generateStitchedCaseDocument(documentMetaDataList, "DocumentName.pdf", 1L,
-                                                                SEALED_CLAIM, BEARER_TOKEN);
+        verify(civilDocumentStitchingService).bundle(documentMetaDataList, BEARER_TOKEN, "DocumentName.pdf",
+                                                     "DocumentName.pdf", caseData);
     }
 
     @Test
@@ -165,11 +176,11 @@ class CoverLetterAppendServiceTest {
         // Given
         given(documentDownloadService.downloadDocument(any(), any()))
             .willReturn(new DownloadedDocumentResponse(null, null, null));
-        CaseData caseData = CaseData.builder().ccdCaseReference(1L).build();
+        CaseData caseData = CaseData.builder().build();
 
         // Then
         assertThrows(DocumentDownloadException.class, () ->
-            coverLetterAppendService.makeDocumentMailable(caseData, BEARER_TOKEN, CLAIMANT, SEALED_CLAIM,
+            coverLetterAppendService.makeDocumentMailable(caseData, BEARER_TOKEN, CLAIMANT,
                                                           caseDocument));
     }
 
