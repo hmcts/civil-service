@@ -255,6 +255,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
             && hearingDate.isPresent()
             && YesOrNo.YES.equals(caseData.getTrialReadyNotified())
             && isHearingLessThanDaysAway(DAY_LIMIT)
+            && Objects.isNull(caseData.getTrialReadyChecked())
             && !isBundleCreatedStatusActive()) {
             Optional<LocalDateTime> lastOrder = getTimeOfLastNonSDOOrder();
             return lastOrder.isEmpty()
