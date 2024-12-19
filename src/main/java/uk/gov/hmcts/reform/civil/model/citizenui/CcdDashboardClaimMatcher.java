@@ -140,7 +140,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
         Optional<LocalDateTime> lastNonSdoOrderTime = getTimeOfLastNonSDOOrder();
 
         return isCaseProgression && isBaseLocationValid && (!isFeatureToggleEnabled || (isSDOTimeBeforeCPRelease
-            && (lastNonSdoOrderTime.isEmpty() || sdoTime.isPresent() && sdoTime.get().isAfter(lastNonSdoOrderTime.get()))));
+            && (lastNonSdoOrderTime.isEmpty() || (sdoTime.isPresent() && sdoTime.get().isAfter(lastNonSdoOrderTime.get())))));
     }
 
     @Override
