@@ -128,9 +128,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         if (initiateGeneralApplicationService.caseContainsLiP(caseData)) {
             if (!featureToggleService.isGaForLipsEnabled()) {
                 errors.add(LR_VS_LIP);
-            } else if (!(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData
-                                                              .getCaseManagementLocation().getBaseLocation()))) {
-                errors.add(NOT_IN_EA_REGION);
             } else {
                 /*
                  * General Application can only be initiated if Defendant is assigned to the case
