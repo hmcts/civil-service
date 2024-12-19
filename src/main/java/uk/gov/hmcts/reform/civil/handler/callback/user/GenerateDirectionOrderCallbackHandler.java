@@ -135,7 +135,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     public static final String JUDGE_HEARD_FROM_EMPTY = "Judge Heard from: 'Claimant(s) and defendant(s)' section for %s, requires a selection to be made";
     public static final String FURTHER_HEARING_OTHER_EMPTY = "Further hearing, Length of new hearing, Other is empty";
     public static final String FURTHER_HEARING_OTHER_ALT_LOCATION = "Further hearing alternative location required.";
-    public static final String NOT_ALLOWED_FOR_CITIZEN = "This claim involves a citizen. To allocate to Small Claims or Fast Track you must use the"
+    public static final String NOT_ALLOWED_FOR_CITIZEN = "This claim involves a LiP. To allocate to Small Claims or Fast Track you must use the"
         + " Standard Direction Order (SDO) otherwise use Not suitable for SDO.";
     public static final String NOT_ALLOWED_FOR_TRACK = "The Make an order event is not available for Small Claims and Fast Track cases until the track has"
         + " been allocated. You must use the Standard Direction Order (SDO) to proceed.";
