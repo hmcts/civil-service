@@ -836,4 +836,52 @@ class DashboardClaimStatusFactoryTest {
         argumentList.add(Arguments.arguments(defendant, DashboardClaimStatus.CASE_DISMISSED));
         argumentList.add(Arguments.arguments(claimant, DashboardClaimStatus.CASE_DISMISSED));
     }
+
+    @ParameterizedTest
+    @MethodSource("provideSDOOrderCreatedPreCPScenarios")
+    void shouldTestIsSDOOrderCreatedPreCP(CaseData caseData, boolean featureToggle, boolean expectedResult) {
+        Mockito.when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(featureToggle);
+        CcdDashboardClaimMatcher matcher = new CcdDashboardClaimantClaimMatcher(caseData, toggleService, Collections.emptyList()) {};
+
+        boolean result = matcher.isSDOOrderCreatedPreCP();
+
+        assertEquals(expectedResult, result);
+    }
+
+    private static Stream<Arguments> provideSDOOrderCreatedPreCPScenarios() {
+        LocalDateTime beforeTargetDate = LocalDateTime.of(2024, 12, 4, 23, 59);
+        LocalDateTime afterTargetDate = LocalDateTime.of(2024, 12, 5, 0, 1);
+        CaseDocument sdoDocumentBefore = CaseDocument.builder()
+            .documentType(DocumentType.SDO_ORDER)
+            .createdDatetime(beforeTargetDate)
+            .build();
+        CaseDocument sdoDocumentAfter = CaseDocument.builder()
+            .documentType(DocumentType.SDO_ORDER)
+            .createdDatetime(afterTargetDate)
+            .build();
+
+        DynamicListElement selectedCourt = DynamicListElement.builder()
+            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+
+
+        CaseData caseData1 = CaseData.builder()
+            .ccdState(CaseState.CASE_PROGRESSION)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+            .systemGeneratedCaseDocuments(List.of(Element.<CaseDocument>builder()
+                                                 .value(sdoDocumentBefore).build()))
+            .build();
+
+        CaseData caseData2 = CaseData.builder()
+            .ccdState(CaseState.CASE_PROGRESSION)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+            .systemGeneratedCaseDocuments(List.of(Element.<CaseDocument>builder()
+                                                      .value(sdoDocumentAfter).build()))
+            .build();
+
+
+        return Stream.of(
+            Arguments.arguments(caseData1, true, true),
+            Arguments.arguments(caseData2, false, true)
+        );
+    }
 }
