@@ -31,11 +31,6 @@ public class ConfirmOrderReviewDefendantNotificationHandler extends CaseEventsDa
     }
 
     @Override
-    public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
-    }
-
-    @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
     }
@@ -43,6 +38,11 @@ public class ConfirmOrderReviewDefendantNotificationHandler extends CaseEventsDa
     @Override
     public String getScenario(CaseData caseData) {
         return null;
+    }
+
+    @Override
+    public String camundaActivityId(CallbackParams callbackParams) {
+        return TASK_ID;
     }
 
     @Override

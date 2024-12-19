@@ -36,11 +36,6 @@ public class ConfirmOrderReviewClaimantNotificationHandler extends CaseEventsDas
     }
 
     @Override
-    public List<CaseEvent> handledEvents() {
-        return EVENTS;
-    }
-
-    @Override
     public String getScenario(CaseData caseData) {
         return null;
     }
@@ -49,6 +44,11 @@ public class ConfirmOrderReviewClaimantNotificationHandler extends CaseEventsDas
     public boolean shouldRecordScenario(CaseData caseData) {
         return YesOrNo.NO.equals(caseData.getApplicant1Represented())
             && YesOrNo.YES.equals(caseData.getIsFinalOrder());
+    }
+
+    @Override
+    public List<CaseEvent> handledEvents() {
+        return EVENTS;
     }
 
     @Override
