@@ -90,7 +90,7 @@ public class DefendantNotifyDiscontinuanceDashboardNotificationHandlerTest exten
     }
 
     @Test
-    void shouldNotCreateDashboardNotifications_whenDefendantIsLiPAndDiscontinuedClaim() {
+    void shouldNotCreateDashboardNotifications_whenDefendantIsNotLiPAndDiscontinuedClaim() {
         params.put("ccdCaseReference", "123");
 
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
