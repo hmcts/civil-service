@@ -17,12 +17,12 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimLipResponseFormGenerator;
-import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
+import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -30,9 +30,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_RESPONSE_CUI_SEALED;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENDANT_DEFENCE;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DIRECTIONS_QUESTIONNAIRE;
 
 @Slf4j
 @Service
@@ -45,7 +44,7 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
     private final SealedClaimLipResponseFormGenerator formGenerator;
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
     private final AssignCategoryId assignCategoryId;
-    private final CivilDocumentStitchingService civilDocumentStitchingService;
+    private final CivilStitchService civilStitchService;
     private final FeatureToggleService featureToggleService;
     @Value("${stitching.enabled}")
     private boolean stitchEnabled;
@@ -66,34 +65,34 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
 
     private CallbackResponse prepareSealedForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        log.info("GENERATE_RESPONSE_CUI_SEALED for case {}", caseData.getCcdCaseReference());
-        CaseDocument sealedForm = formGenerator.generate(
-            caseData,
-            callbackParams.getParams().get(BEARER_TOKEN).toString()
-        );
-        log.info("sealedForm for case {}", caseData.getCcdCaseReference());
+        Long caseId = caseData.getCcdCaseReference();
+
+        log.info("Generating response cui sealed form for case {}", caseId);
+        String authToken = callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString();
+        CaseDocument sealedForm = formGenerator.generate(caseData, authToken);
+
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        log.info("isLipvLipOneVOne {} isLipVLipEnabled {} for case {}", caseData.isLipvLipOneVOne(),
-                 featureToggleService.isLipVLipEnabled(), caseData.getCcdCaseReference());
+
+        log.info("stitchEnabled {}, isLipvLipOneVOne {} isLipVLipEnabled {} for case {}", stitchEnabled,
+                 caseData.isLipvLipOneVOne(), featureToggleService.isLipVLipEnabled(), caseId);
+
         if (stitchEnabled && caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
-            log.info("if condition for case {}", caseData.getCcdCaseReference());
+            log.info("if condition for case {}", caseId);
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
+            log.info("no of document sending for stitch {} for caseId {}", documentMetaDataList.size(), caseId);
             if (documentMetaDataList.size() > 1) {
-                log.info("documentMetaDataList {} for case {}", documentMetaDataList.size(), caseData.getCcdCaseReference());
-                CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
-                        documentMetaDataList,
-                        callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                        sealedForm.getDocumentName(),
-                        sealedForm.getDocumentName(),
-                        caseData
-                );
-                log.info("stitched complete for case {}", caseData.getCcdCaseReference());
-                CaseDocument updatedStitchedDoc = stitchedDocument.toBuilder().documentType(DEFENDANT_DEFENCE).build();
-                caseDataBuilder.respondent1ClaimResponseDocumentSpec(updatedStitchedDoc)
-                        .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
-                                updatedStitchedDoc,
-                                caseData
-                        ));
+                log.info("Calling civil stitch service from response cui sealed form for caseId {}", caseId);
+                CaseDocument stitchedDocument =
+                    civilStitchService.generateStitchedCaseDocument(documentMetaDataList,
+                                                                    sealedForm.getDocumentName(),
+                                                                    caseId,
+                                                                    DocumentType.DEFENDANT_DEFENCE,
+                                                                    authToken);
+                log.info("Civil stitch service for response cui sealed form {} for caseId {}", stitchedDocument, caseId);
+
+                caseDataBuilder.respondent1ClaimResponseDocumentSpec(stitchedDocument)
+                    .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
+                        stitchedDocument,  caseData));
                 assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.DEF1_DEFENSE_DQ.getValue());
             } else {
                 log.info("Inner else condition for case {}", caseData.getCcdCaseReference());
@@ -126,7 +125,7 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                 LocalDate.now().toString()
         ));
         ElementUtils.unwrapElements(caseData.getSystemGeneratedCaseDocuments()).stream()
-                .filter(cd -> DocumentType.DIRECTIONS_QUESTIONNAIRE.equals(cd.getDocumentType()))
+                .filter(cd -> DIRECTIONS_QUESTIONNAIRE.equals(cd.getDocumentType()))
                 .map(cd ->
                         new DocumentMetaData(
                                 cd.getDocumentLink(),
