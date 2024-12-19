@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import java.util.List;
 
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
 @EqualsAndHashCode
 public class DefaultJudgmentForm implements MappableObject {
