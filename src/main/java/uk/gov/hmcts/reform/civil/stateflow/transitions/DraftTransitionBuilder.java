@@ -43,7 +43,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
                     JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive(),
                     IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive(),
-                    DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnline()
+                    DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)
                 )), transitions)
             .moveTo(CLAIM_SUBMITTED, transitions)
             .onlyWhen(claimSubmittedTwoRegisteredRespondentRepresentatives
@@ -61,7 +61,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
                     JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive(),
                     IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive(),
-                    DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnline()
+                    DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)
                 )), transitions)
             // Only one unrepresented defendant
             .moveTo(CLAIM_SUBMITTED, transitions)
@@ -75,7 +75,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
                     JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive(),
                     IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive(),
-                    DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnline()
+                    DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)
                 )), transitions)
             // Unrepresented defendant 1
             .moveTo(CLAIM_SUBMITTED, transitions)
@@ -92,7 +92,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
                     JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive(),
                     IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive(),
-                    DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnline()
+                    DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)
                 )), transitions)
             // Unrepresented defendant 2
             .moveTo(CLAIM_SUBMITTED, transitions)
@@ -108,7 +108,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
                     JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive(),
                     IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive(),
-                    DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnline()
+                    DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)
                 )), transitions)
             // Unrepresented defendants
             .moveTo(CLAIM_SUBMITTED, transitions)
@@ -124,7 +124,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled(),
                     JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive(),
                     IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive(),
-                    DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnline()
+                    DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)
                 )), transitions);
     }
 

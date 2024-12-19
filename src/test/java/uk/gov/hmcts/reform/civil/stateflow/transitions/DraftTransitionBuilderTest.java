@@ -194,7 +194,7 @@ public class DraftTransitionBuilderTest {
             .respondent2Represented(NO)
             .build();
         when(mockFeatureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
-        when(mockFeatureToggleService.isDefendantNoCOnline()).thenReturn(true);
+        when(mockFeatureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
 
         assertFalse(claimSubmittedTwoRegisteredRespondentRepresentatives.test(caseData));
         assertTrue(claimSubmittedRespondent1Unrepresented.test(caseData));
@@ -241,7 +241,7 @@ public class DraftTransitionBuilderTest {
     void shouldResolve_whenOnlyOneUnrepresentedDefendant() {
         when(mockFeatureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
         when(mockFeatureToggleService.isGaForLipsEnabled()).thenReturn(true);
-        when(mockFeatureToggleService.isDefendantNoCOnline()).thenReturn(true);
+        when(mockFeatureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendant()
             .defendant1LIPAtClaimIssued(YES).build();
 
