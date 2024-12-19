@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.MarkPaidConsentList;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -666,6 +667,24 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo(DateUtils.formatDate(fullPaymentDate));
         assertThat(result).extracting("coscNotificationDateCy")
             .isEqualTo(DateUtils.formatDateInWelsh(fullPaymentDate));
+    }
+
+    @Test
+    void shouldMapParameters_whenClaimantMarkedPaidInFull() {
+        LocalDate markedPaidInFullDate = LocalDate.now();
+         caseData = caseData.toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .respondent1Represented(YesOrNo.NO)
+            .markPaidConsent(MarkPaidConsentList.YES)
+            .build();
+
+        Map<String, Object> result =
+            mapper.mapCaseDataToParams(caseData, null);
+        assertThat(result).extracting("settleClaimPaidInFullDateEn")
+            .isEqualTo(DateUtils.formatDate(markedPaidInFullDate));
+        assertThat(result).extracting("settleClaimPaidInFullDateCy")
+            .isEqualTo(DateUtils.formatDateInWelsh(markedPaidInFullDate));
     }
 }
 
