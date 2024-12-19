@@ -125,14 +125,25 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
         return caseData.getHearingDate() != null;
     }
 
-    @Override
     public boolean isSDOOrderCreatedPreCP() {
         String baseLocation = Optional.ofNullable(caseData.getCaseManagementLocation())
             .map(location -> location.getBaseLocation())
             .orElse(null);
-        return CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
-            && baseLocation != null
-            && !featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(baseLocation);
+
+        boolean isCaseProgression = CaseState.CASE_PROGRESSION.equals(caseData.getCcdState());
+        boolean isBaseLocationValid = baseLocation != null;
+        boolean isFeatureToggleEnabled = featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(
+            baseLocation);
+        Optional<LocalDateTime> sdoTime = getSDOTime();
+        boolean isSDOTimeBeforeCPRelease = sdoTime.isPresent()
+            && sdoTime.get().isBefore(LocalDateTime.of(2024, 12, 5, 0, 0));
+        Optional<LocalDateTime> lastNonSdoOrderTime = getTimeOfLastNonSDOOrder();
+
+        boolean isSDOTimeAfterLastNonSdoOrder = lastNonSdoOrderTime.isEmpty()
+            || (sdoTime.isPresent() && sdoTime.get().isAfter(lastNonSdoOrderTime.get()));
+
+        return isCaseProgression && isBaseLocationValid && (!isFeatureToggleEnabled
+            || (isSDOTimeBeforeCPRelease && isSDOTimeAfterLastNonSdoOrder));
     }
 
     @Override
