@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.ManageStayUpdateRequestedSearchService;
 
-import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -26,7 +26,7 @@ public class ManageStayWATaskSchedulerHandler extends BaseExternalTaskHandler {
     public ExternalTaskData handleTask(ExternalTask externalTask) {
         if (featureToggleService.isCaseEventsEnabled()) {
 
-            List<CaseDetails> cases = caseSearchService.getCases();
+            Set<CaseDetails> cases = caseSearchService.getCases();
             log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
             cases.forEach(caseDetails -> {
