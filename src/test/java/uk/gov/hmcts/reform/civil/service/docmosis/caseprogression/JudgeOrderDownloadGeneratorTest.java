@@ -43,7 +43,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
@@ -56,10 +55,6 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FIX_D
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FIX_DATE_CMC_DOCX;
 import static uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeOrderDownloadGenerator.BLANK_TEMPLATE_TO_BE_USED_AFTER_A_HEARING;
 import static uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeOrderDownloadGenerator.BLANK_TEMPLATE_TO_BE_USED_BEFORE_A_HEARING_BOX_WORK;
-import static uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeOrderDownloadGenerator.FAST_NO_BAND_NO_REASON;
-import static uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeOrderDownloadGenerator.FAST_NO_BAND_WITH_REASON;
-import static uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeOrderDownloadGenerator.FAST_WITH_BAND_NO_REASON;
-import static uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeOrderDownloadGenerator.FAST_WITH_BAND_WITH_REASON;
 import static uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeOrderDownloadGenerator.FIX_A_DATE_FOR_CCMC;
 import static uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeOrderDownloadGenerator.FIX_A_DATE_FOR_CMC;
 import static uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeOrderDownloadGenerator.INTERMEDIATE_NO_BAND_NO_REASON;
@@ -168,13 +163,6 @@ class JudgeOrderDownloadGeneratorTest {
             Arguments.of(
                 CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                     .finalOrderAllocateToTrack(YES)
-                    .finalOrderTrackAllocation(SMALL_CLAIM)
-                    .build(),
-                "This case is allocated to the Small Claims."
-            ),
-            Arguments.of(
-                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                    .finalOrderAllocateToTrack(YES)
                     .finalOrderTrackAllocation(MULTI_CLAIM)
                     .build(),
                 "This case is allocated to the Multi Track."
@@ -222,52 +210,11 @@ class JudgeOrderDownloadGeneratorTest {
             ),
             Arguments.of(
                 CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                    .finalOrderAllocateToTrack(YES)
-                    .finalOrderTrackAllocation(FAST_CLAIM)
-                    .finalOrderFastTrackComplexityBand(FinalOrdersComplexityBand.builder()
-                                                           .assignComplexityBand(NO)
-                                                           .build())
-                    .build(),
-                format(FAST_NO_BAND_NO_REASON)
-            ),
-            Arguments.of(
-                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                    .finalOrderAllocateToTrack(YES)
-                    .finalOrderTrackAllocation(FAST_CLAIM)
-                    .finalOrderFastTrackComplexityBand(FinalOrdersComplexityBand.builder()
-                                                           .assignComplexityBand(NO)
-                                                           .reasons("reasons").build())
-                    .build(),
-                format(FAST_NO_BAND_WITH_REASON, "reasons")
-            ),
-            Arguments.of(
-                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                    .finalOrderAllocateToTrack(YES)
-                    .finalOrderTrackAllocation(FAST_CLAIM)
-                    .finalOrderFastTrackComplexityBand(FinalOrdersComplexityBand.builder()
-                                                           .assignComplexityBand(YES)
-                                                           .band(ComplexityBand.BAND_1).build())
-                    .build(),
-                format(FAST_WITH_BAND_NO_REASON, "1")
-            ),
-            Arguments.of(
-                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                    .finalOrderAllocateToTrack(YES)
-                    .finalOrderTrackAllocation(FAST_CLAIM)
-                    .finalOrderFastTrackComplexityBand(FinalOrdersComplexityBand.builder()
-                                                           .assignComplexityBand(YES)
-                                                           .band(ComplexityBand.BAND_2)
-                                                           .reasons("reasons").build())
-                    .build(),
-                format(FAST_WITH_BAND_WITH_REASON, "2", "reasons")
-            ),
-            Arguments.of(
-                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                     .finalOrderAllocateToTrack(NO)
                     .build(),
                 null
             )
-            );
+        );
     }
 
     @ParameterizedTest
@@ -281,39 +228,6 @@ class JudgeOrderDownloadGeneratorTest {
         ComplexityBand band = ComplexityBand.valueOf(bandToUse);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .finalOrderIntermediateTrackComplexityBand(FinalOrdersComplexityBand.builder()
-                                                           .assignComplexityBand(YES)
-                                                           .band(band).build())
-            .build();
-        String response = judgeOrderDownloadGenerator.getComplexityBand(caseData);
-
-        switch (band) {
-            case BAND_1:
-                assertEquals("1", response);
-                break;
-            case BAND_2:
-                assertEquals("2", response);
-                break;
-            case BAND_3:
-                assertEquals("3", response);
-                break;
-            case BAND_4:
-                assertEquals("4", response);
-                break;
-            default: // do nothing
-        }
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {
-        "BAND_1",
-        "BAND_2",
-        "BAND_3",
-        "BAND_4"
-    })
-    void getComplexityBandFast(String bandToUse) {
-        ComplexityBand band = ComplexityBand.valueOf(bandToUse);
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .finalOrderFastTrackComplexityBand(FinalOrdersComplexityBand.builder()
                                                            .assignComplexityBand(YES)
                                                            .band(band).build())
             .build();
