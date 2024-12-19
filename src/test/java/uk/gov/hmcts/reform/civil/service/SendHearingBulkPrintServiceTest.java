@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -9,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ByteArrayResource;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -75,7 +75,7 @@ class SendHearingBulkPrintServiceTest {
         // given
         Party respondent1 = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = buildCaseData(respondent1, HEARING_FORM, true);
-        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any()))
+        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         // when
@@ -90,7 +90,7 @@ class SendHearingBulkPrintServiceTest {
         // given
         Party claimant = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, HEARING_FORM, true);
-        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any()))
+        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         // when
@@ -158,7 +158,7 @@ class SendHearingBulkPrintServiceTest {
     void shouldNotDownloadDocument_whenSystemGeneratedCaseDocumentsIsEmpty() {
         // given
         CaseData caseData = CaseDataBuilder.builder()
-            .systemGeneratedCaseDocuments(Lists.emptyList()).build();
+            .systemGeneratedCaseDocuments(List.of()).build();
 
         // when
         sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);

@@ -12,7 +12,10 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.sendandreply.RolePool;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -21,8 +24,10 @@ import uk.gov.hmcts.reform.civil.model.sendandreply.MessageReply;
 import uk.gov.hmcts.reform.civil.model.sendandreply.SendMessageMetadata;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SendAndReplyMessageService;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,10 +54,12 @@ class SendAndReplyCallbackHandlerTest {
     SendAndReplyMessageService messageService;
     @InjectMocks
     private SendAndReplyCallbackHandler handler;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @BeforeEach
     void  setup() {
-        handler = new SendAndReplyCallbackHandler(messageService, new ObjectMapper());
+        handler = new SendAndReplyCallbackHandler(messageService, new ObjectMapper(), featureToggleService);
     }
 
     @Test
@@ -172,14 +179,19 @@ class SendAndReplyCallbackHandlerTest {
     class AboutToSubmit {
 
         @Test
-        void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_andSendAndReplyOptionIsSend() {
+        void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_MessageIsSentToNonJudge_Small_Claim_allocatedTrack() {
             String messageContent = "Message Content";
             SendMessageMetadata messageMetaData = SendMessageMetadata.builder().build();
 
-            List<Message> expectedMessages = List.of(Message.builder().messageContent(messageContent).build());
+            Message expectedMessage = Message.builder()
+                .messageContent(messageContent)
+                .recipientRoleType(RolePool.ADMIN)
+                .build();
+            List<Message> expectedMessages = List.of(expectedMessage);
 
             CaseData caseData = CaseData.builder()
                 .sendAndReplyOption(SEND)
+                .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                 .sendMessageMetadata(messageMetaData)
                 .sendMessageContent(messageContent)
                 .build();
@@ -198,55 +210,179 @@ class SendAndReplyCallbackHandlerTest {
             assertThat(responseCaseData.getSendMessageMetadata()).isNull();
             assertThat(responseCaseData.getSendMessageContent()).isNull();
             assertThat(unwrapElements(responseCaseData.getMessages())).isEqualTo(expectedMessages);
+            assertThat(responseCaseData.getLastMessage()).isEqualTo(expectedMessage);
+            assertThat(responseCaseData.getLastMessageAllocatedTrack()).isEqualTo("Small claim");
+            assertThat(responseCaseData.getLastMessageJudgeLabel()).isNull();
 
             verify(messageService, times(1))
                 .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
         }
-    }
 
-    @Test
-    void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_andSendAndReplyOptionIsReply() {
-        Element<Message> message = element(Message.builder().messageContent("Original Message").build());
-        MessageReply messageReply = MessageReply.builder().messageContent("Reply to message").build();
-        List<Element<Message>> messages = List.of(message);
+        @Test
+        void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_MessageIsSentToJudge_Fasttrack_responseClaimTrack() {
+            String messageContent = "Message Content";
+            SendMessageMetadata messageMetaData = SendMessageMetadata.builder().build();
 
-        List<Element<Message>> updatedMessages = List.of(
-            Element.<Message>builder()
-                .id(message.getId())
-                .value(
-                    message.getValue().toBuilder()
-                        .history(List.of(element(messageService.buildReplyOutOfMessage(message.getValue()))))
-                        .build())
-                .build());
+            Message expectedMessage = Message.builder()
+                .messageContent(messageContent)
+                .recipientRoleType(RolePool.JUDICIAL)
+                .build();
+            List<Message> expectedMessages = List.of(expectedMessage);
 
-        DynamicListElement replyList = DynamicListElement.dynamicElement("mock");
+            CaseData caseData = CaseData.builder()
+                .sendAndReplyOption(SEND)
+                .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
+                .sendMessageMetadata(messageMetaData)
+                .sendMessageContent(messageContent)
+                .build();
 
-        CaseData caseData = CaseData.builder()
-            .sendAndReplyOption(REPLY)
-            .messages(messages)
-            .messagesToReplyTo(DynamicList.builder().value(replyList).build())
-            .messageReplyMetadata(messageReply)
-            .messageHistory("message history markup")
-            .build();
+            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN))
+                .thenReturn(wrapElements(expectedMessages));
 
-        when(messageService.addReplyToMessage(messages, replyList.getCode(), messageReply, AUTH_TOKEN)).thenReturn(
-            updatedMessages);
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
 
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-            .handle(params);
+            CaseData responseCaseData = new ObjectMapper().convertValue(response.getData(), CaseData.class);
 
-        CaseData responseCaseData = new ObjectMapper().convertValue(response.getData(), CaseData.class);
+            assertThat(response.getErrors()).isNull();
+            assertThat(responseCaseData.getSendMessageMetadata()).isNull();
+            assertThat(responseCaseData.getSendMessageContent()).isNull();
+            assertThat(unwrapElements(responseCaseData.getMessages())).isEqualTo(expectedMessages);
+            assertThat(responseCaseData.getLastMessage()).isEqualTo(expectedMessage);
+            assertThat(responseCaseData.getLastMessageAllocatedTrack()).isEqualTo("Fast track");
+            assertThat(responseCaseData.getLastMessageJudgeLabel()).isEqualTo("Judge");
 
-        assertThat(response.getErrors()).isNull();
-        assertThat(responseCaseData.getMessageReplyMetadata()).isNull();
-        assertThat(responseCaseData.getMessageHistory()).isNull();
-        assertThat(responseCaseData.getMessagesToReplyTo()).isNull();
-        assertThat(responseCaseData.getMessages()).isEqualTo(updatedMessages);
+            verify(messageService, times(1))
+                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
+        }
 
-        verify(messageService, times(1))
-            .addReplyToMessage(messages, replyList.getCode(), messageReply, AUTH_TOKEN);
+        @Test
+        void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_MessageIsSentToCircuitJudge_Fast_Track_ClaimValue() {
+            String messageContent = "Message Content";
+            SendMessageMetadata messageMetaData = SendMessageMetadata.builder().build();
+
+            Message expectedMessage = Message.builder()
+                .messageContent(messageContent)
+                .recipientRoleType(RolePool.JUDICIAL_CIRCUIT)
+                .build();
+            List<Message> expectedMessages = List.of(expectedMessage);
+
+            CaseData caseData = CaseData.builder()
+                .sendAndReplyOption(SEND)
+                .claimValue(ClaimValue.builder().statementOfValueInPennies(BigDecimal.valueOf(1000001)).build())
+                .sendMessageMetadata(messageMetaData)
+                .sendMessageContent(messageContent)
+                .build();
+
+            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN))
+                .thenReturn(wrapElements(expectedMessages));
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData responseCaseData = new ObjectMapper().convertValue(response.getData(), CaseData.class);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(responseCaseData.getSendMessageMetadata()).isNull();
+            assertThat(responseCaseData.getSendMessageContent()).isNull();
+            assertThat(unwrapElements(responseCaseData.getMessages())).isEqualTo(expectedMessages);
+            assertThat(responseCaseData.getLastMessage()).isEqualTo(expectedMessage);
+            assertThat(responseCaseData.getLastMessageAllocatedTrack()).isEqualTo("Fast track");
+            assertThat(responseCaseData.getLastMessageJudgeLabel()).isEqualTo("CJ");
+
+            verify(messageService, times(1))
+                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
+        }
+
+        @Test
+        void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_MessageIsSentToDistrictJudge_SmallClaim_TotalClaimAmount() {
+            String messageContent = "Message Content";
+            SendMessageMetadata messageMetaData = SendMessageMetadata.builder().build();
+
+            Message expectedMessage = Message.builder()
+                .messageContent(messageContent)
+                .recipientRoleType(RolePool.JUDICIAL_DISTRICT)
+                .build();
+            List<Message> expectedMessages = List.of(expectedMessage);
+
+            CaseData caseData = CaseData.builder()
+                .sendAndReplyOption(SEND)
+                .totalClaimAmount(BigDecimal.valueOf(9999))
+                .sendMessageMetadata(messageMetaData)
+                .sendMessageContent(messageContent)
+                .build();
+
+            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN))
+                .thenReturn(wrapElements(expectedMessages));
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData responseCaseData = new ObjectMapper().convertValue(response.getData(), CaseData.class);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(responseCaseData.getSendMessageMetadata()).isNull();
+            assertThat(responseCaseData.getSendMessageContent()).isNull();
+            assertThat(unwrapElements(responseCaseData.getMessages())).isEqualTo(expectedMessages);
+            assertThat(responseCaseData.getLastMessage()).isEqualTo(expectedMessage);
+            assertThat(responseCaseData.getLastMessageAllocatedTrack()).isEqualTo("Small claim");
+            assertThat(responseCaseData.getLastMessageJudgeLabel()).isEqualTo("DJ");
+
+            verify(messageService, times(1))
+                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
+        }
+
+        @Test
+        void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_andSendAndReplyOptionIsReply() {
+            Element<Message> message = element(Message.builder().messageContent("Original Message").build());
+            MessageReply messageReply = MessageReply.builder().messageContent("Reply to message").build();
+            List<Element<Message>> messages = List.of(message);
+
+            List<Element<Message>> updatedMessages = List.of(
+                Element.<Message>builder()
+                    .id(message.getId())
+                    .value(
+                        message.getValue().toBuilder()
+                            .history(List.of(element(messageService.buildReplyOutOfMessage(message.getValue()))))
+                            .build())
+                    .build());
+
+            DynamicListElement replyList = DynamicListElement.dynamicElement("mock");
+
+            CaseData caseData = CaseData.builder()
+                .sendAndReplyOption(REPLY)
+                .allocatedTrack(AllocatedTrack.FAST_CLAIM)
+                .messages(messages)
+                .messagesToReplyTo(DynamicList.builder().value(replyList).build())
+                .messageReplyMetadata(messageReply)
+                .messageHistory("message history markup")
+                .build();
+
+            when(messageService.addReplyToMessage(messages, replyList.getCode(), messageReply, AUTH_TOKEN)).thenReturn(
+                updatedMessages);
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData responseCaseData = new ObjectMapper().convertValue(response.getData(), CaseData.class);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(responseCaseData.getMessageReplyMetadata()).isNull();
+            assertThat(responseCaseData.getMessageHistory()).isNull();
+            assertThat(responseCaseData.getMessagesToReplyTo()).isNull();
+            assertThat(responseCaseData.getMessages()).isEqualTo(updatedMessages);
+
+            verify(messageService, times(1))
+                .addReplyToMessage(messages, replyList.getCode(), messageReply, AUTH_TOKEN);
+        }
     }
 
     @Nested
