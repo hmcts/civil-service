@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.dmnacourttasklocation.TaskManagementLocationTab;
 import uk.gov.hmcts.reform.civil.model.dmnacourttasklocation.TaskManagementLocationTypes;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderReasons;
@@ -232,6 +233,8 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private YesOrNo requestAnotherHearing;
     private final List<ConfirmListingTickBox> confirmListingTickBox;
     private TaskManagementLocationTypes taskManagementLocations;
+    private TaskManagementLocationTab taskManagementLocationsTab;
+    private TaskManagementLocationTab caseManagementLocationTab;
 
     /**
      * Claimant has requested a reconsideration of the SDO.
