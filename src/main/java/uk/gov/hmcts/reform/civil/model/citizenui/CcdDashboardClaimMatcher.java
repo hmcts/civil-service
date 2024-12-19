@@ -139,8 +139,9 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
             && sdoTime.get().isBefore(LocalDateTime.of(2024, 12, 5, 0, 0));
         Optional<LocalDateTime> lastNonSdoOrderTime = getTimeOfLastNonSDOOrder();
 
-        return isCaseProgression && isBaseLocationValid && (!isFeatureToggleEnabled || (isSDOTimeBeforeCPRelease
-            && (lastNonSdoOrderTime.isEmpty() || (sdoTime.isPresent() && sdoTime.get().isAfter(lastNonSdoOrderTime.get())))));
+        boolean isSDOTimeAfterLastNonSdoOrder = lastNonSdoOrderTime.isEmpty() || sdoTime.get().isAfter(lastNonSdoOrderTime.get());
+
+        return isCaseProgression && isBaseLocationValid && (!isFeatureToggleEnabled || (isSDOTimeBeforeCPRelease && isSDOTimeAfterLastNonSdoOrder));
     }
 
     @Override
