@@ -863,7 +863,6 @@ class DashboardClaimStatusFactoryTest {
         DynamicListElement selectedCourt = DynamicListElement.builder()
             .code("00002").label("court 2 - 2 address - Y02 7RB").build();
 
-
         CaseData caseData1 = CaseData.builder()
             .ccdState(CaseState.CASE_PROGRESSION)
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
@@ -877,7 +876,6 @@ class DashboardClaimStatusFactoryTest {
             .systemGeneratedCaseDocuments(List.of(Element.<CaseDocument>builder()
                                                       .value(sdoDocumentAfter).build()))
             .build();
-
 
         return Stream.of(
             Arguments.arguments(caseData1, true, true),

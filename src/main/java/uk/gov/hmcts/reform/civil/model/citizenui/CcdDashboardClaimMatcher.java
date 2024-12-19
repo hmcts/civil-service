@@ -134,8 +134,8 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
         boolean isBaseLocationValid = baseLocation != null;
         boolean isFeatureToggleEnabled = featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(
             baseLocation);
-        boolean isSDOTimeBeforeCPRelease = getSDOTime().isPresent() &&
-            getSDOTime().get().isBefore(LocalDateTime.of(2024, 12, 5, 0, 0));
+        boolean isSDOTimeBeforeCPRelease = getSDOTime().isPresent()
+            && getSDOTime().get().isBefore(LocalDateTime.of(2024, 12, 5, 0, 0));
         Optional<LocalDateTime> lastNonSdoOrderTime = getTimeOfLastNonSDOOrder();
 
         return isCaseProgression && isBaseLocationValid && (!isFeatureToggleEnabled || (isSDOTimeBeforeCPRelease
