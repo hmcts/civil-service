@@ -107,7 +107,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService.findLatestEventTriggerReason;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_REASON_JUDGMENT_BY_ADMISSION;
-import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_RECORD_JUDGMENT;
+import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RECORD_JUDGMENT;
+import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_RECORD_JUDGMENT_REASON;
+import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_RECORD_JUDGMENT_OFFLINE;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_REASON_MANUAL_DETERMINATION;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -8601,7 +8603,43 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
-                .extracting("eventDetailsText").asString().contains(RPA_RECORD_JUDGMENT);
+                .extracting("eventDetailsText").asString().contains(RPA_RECORD_JUDGMENT_REASON);
+        }
+
+        @Test
+        void shouldGenerateRPA_WhenLrvLrClaimPayImmediately() {
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            CCJPaymentDetails ccjPaymentDetails = buildCcjPaymentDetails();
+            RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
+                .whenWillThisAmountBePaid(whenWillPay)
+                .build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .setClaimTypeToSpecClaim()
+                .atStateSpec1v1ClaimSubmitted()
+                .atStateRespondent1v1FullAdmissionSpec().build().toBuilder()
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .respondToClaimAdmitPartLRspec(paymentDetails)
+                .totalInterest(BigDecimal.ZERO)
+                .applicant1ResponseDate(LocalDateTime.now())
+                .respondent1Represented(YesOrNo.YES)
+                .specRespondent1Represented(YesOrNo.YES)
+                .applicant1Represented(YesOrNo.YES)
+                .isTakenOfflineAfterJBA(YesOrNo.YES)
+                .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+                .build();
+            when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("eventCode").asString().contains("240");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventCode").asString().contains("999");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventDetails").extracting("miscText").asString().contains(RECORD_JUDGMENT);
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventDetailsText").asString().contains(RPA_RECORD_JUDGMENT_OFFLINE);
         }
 
         @Test
@@ -8630,7 +8668,9 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
-                .extracting("eventDetailsText").asString().contains(RPA_RECORD_JUDGMENT);
+                .extracting("eventDetails").extracting("miscText").asString().contains(RECORD_JUDGMENT);
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventDetailsText").asString().contains(RPA_RECORD_JUDGMENT_REASON);
         }
 
         @Test
@@ -8660,7 +8700,9 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
-                .extracting("eventDetailsText").asString().contains(RPA_RECORD_JUDGMENT);
+                .extracting("eventDetails").extracting("miscText").asString().contains(RECORD_JUDGMENT);
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventDetailsText").asString().contains(RPA_RECORD_JUDGMENT_REASON);
         }
 
         private CCJPaymentDetails buildCcjPaymentDetails() {
