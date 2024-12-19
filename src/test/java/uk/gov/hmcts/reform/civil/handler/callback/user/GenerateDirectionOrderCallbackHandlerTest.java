@@ -139,7 +139,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
     private static final String WITHOUT_NOTICE_SELECTION_TEXT = "If you were not notified of the application before "
         + "this order was made, you may apply to set aside, vary or stay the order. Any such application must be made "
         + "by 4pm on";
-    public static final String NOT_ALLOWED_FOR_CITIZEN = "This claim involves a citizen. To allocate to Small Claims or Fast Track you must use the"
+    public static final String NOT_ALLOWED_FOR_CITIZEN = "This claim involves a LiP. To allocate to Small Claims or Fast Track you must use the"
         + " Standard Direction Order (SDO) otherwise use Not suitable for SDO.";
     public static final String NOT_ALLOWED_FOR_TRACK = "The Make an order event is not available for Small Claims and Fast Track cases until the track has"
         + " been allocated. You must use the Standard Direction Order (SDO) to proceed.";
