@@ -33,6 +33,10 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.SetAsideApplicantTypeForRPA;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.SetAsideResultTypeForRPA;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -95,6 +99,7 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MENTAL_HEALTH_B
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.SET_ASIDE_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.STATES_PAID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
@@ -288,6 +293,7 @@ public class EventHistoryMapper {
         buildInformAgreedExtensionDateForSpec(builder, caseData);
         buildClaimTakenOfflineAfterDJ(builder, caseData);
         buildCcjEvent(builder, caseData);
+        buildSetAsideJudgment(builder, caseData);
         buildCoscEvent(builder, caseData);
         return eventHistorySequencer.sortEvents(builder.build());
     }
@@ -552,6 +558,52 @@ public class EventHistoryMapper {
                                   .build())
                 .build()));
         }
+    }
+
+    private void buildSetAsideJudgment(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        if (featureToggleService.isJOLiveFeedActive() && caseData.getJoSetAsideReason() != null) {
+            List<Event> events = new ArrayList<>();
+            events.add(buildSetAsideJudgmentEvent(builder, caseData, RESPONDENT_ID));
+            if (null != caseData.getRespondent2()) {
+                events.add(buildSetAsideJudgmentEvent(builder, caseData, RESPONDENT2_ID));
+            }
+            builder.setAsideJudgment(events);
+        }
+    }
+
+    private Event buildSetAsideJudgmentEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData, String litigiousPartyID) {
+        return Event.builder()
+            .eventSequence(prepareEventSequence(builder.build()))
+            .litigiousPartyID(litigiousPartyID)
+            .eventCode(SET_ASIDE_JUDGMENT.getCode())
+            .dateReceived(caseData.getJoSetAsideCreatedDate())
+            .eventDetails(getSetAsideEventDetails(caseData))
+            .eventDetailsText("")
+            .build();
+    }
+
+    private EventDetails getSetAsideEventDetails(CaseData caseData) {
+        String applicant = null;
+        LocalDate appDate = null;
+        LocalDate resultDate = null;
+        if (JudgmentSetAsideReason.JUDGE_ORDER.equals(caseData.getJoSetAsideReason())) {
+            if (JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION.equals(caseData.getJoSetAsideOrderType())) {
+                appDate = caseData.getJoSetAsideApplicationDate();
+            } else if (JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE.equals(caseData.getJoSetAsideOrderType())) {
+                appDate = caseData.getJoSetAsideDefenceReceivedDate();
+            }
+            applicant = SetAsideApplicantTypeForRPA.PARTY_AGAINST.getValue();
+            resultDate = caseData.getJoSetAsideOrderDate();
+
+        } else if (JudgmentSetAsideReason.JUDGMENT_ERROR.equals(caseData.getJoSetAsideReason())) {
+            applicant = SetAsideApplicantTypeForRPA.PROPER_OFFICER.getValue();
+        }
+        return EventDetails.builder()
+            .result(SetAsideResultTypeForRPA.GRANTED.name())
+            .applicant(applicant)
+            .applicationDate(appDate)
+            .resultDate(resultDate)
+            .build();
     }
 
     private void buildJudgmentByAdmissionEventDetails(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
