@@ -46,6 +46,7 @@ import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.FeeType.CLAIMISSUED;
@@ -5198,7 +5199,7 @@ class SimpleStateFlowEngineTest {
     }
 
     @Nested
-    class TakenOfflineByDefendantNoc {
+    class DefendantNoc {
 
         @Test
         void beforeTakenOffline_whenNOCSubmittedForLipDefendant() {
@@ -5228,6 +5229,7 @@ class SimpleStateFlowEngineTest {
                 .caseAccessCategory(SPEC_CLAIM).build();
 
             // When
+            when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
             // Then
@@ -5271,6 +5273,7 @@ class SimpleStateFlowEngineTest {
                 .caseAccessCategory(SPEC_CLAIM).build();
 
             // When
+            when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
             // Then
@@ -5278,6 +5281,44 @@ class SimpleStateFlowEngineTest {
                 .extracting(State::getName)
                 .isNotNull()
                 .isEqualTo(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC.fullName());
+        }
+
+        @Test
+        void shouldRemainOnline_whenNOCSubmittedForLipDefendant() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued1v1UnrepresentedDefendantSpec()
+                .applicant1Represented(NO)
+                .respondent1Represented(YES)
+                .build().toBuilder()
+                .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode("Temp").build())
+                .paymentSuccessfulDate(null)
+                .claimIssuedPaymentDetails(null)
+                .changeOfRepresentation(ChangeOfRepresentation.builder().caseRole("RESPONDENTSOLICITORONE")
+                                            .timestamp(LocalDateTime.now())
+                                            .organisationToAddID("HA160")
+                                            .build())
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .helpWithFees(HelpWithFees.builder()
+                                                   .helpWithFeesReferenceNumber("Test")
+                                                   .build())
+                                 .build())
+                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
+                                              .hwfFullRemissionGrantedForClaimIssue(YES)
+                                              .build())
+                .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
+                .claimNotificationDeadline(LocalDateTime.now().plusDays(2))
+                .caseAccessCategory(SPEC_CLAIM).build();
+
+            // When
+            when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(CLAIM_ISSUED.fullName());
         }
 
         @Test
