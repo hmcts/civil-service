@@ -65,7 +65,7 @@ public class HearingDetailsMapper {
         }
     }
 
-    private static boolean isWelshHearingSelected(CaseData caseData) {
+    public static boolean isWelshHearingSelected(CaseData caseData) {
         List<Language> welshLanguageRequirements = getWelshLanguageRequirements(caseData);
 
         return (welshLanguageRequirements.contains(Language.WELSH) || welshLanguageRequirements.contains(Language.BOTH));
