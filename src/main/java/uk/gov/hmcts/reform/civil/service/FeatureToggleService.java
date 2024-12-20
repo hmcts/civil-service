@@ -157,7 +157,14 @@ public class FeatureToggleService {
             && featureToggleApi.isFeatureEnabled("isJOLiveFeedActive");
     }
 
-    public boolean isDefendantNoCOnline()  {
-        return featureToggleApi.isFeatureEnabled("isDefendantNoCOnline");
+    public boolean isDefendantNoCOnlineForCase(CaseData caseData)  {
+        ZoneId zoneId = ZoneId.systemDefault();
+        long epoch;
+        if (caseData.getSubmittedDate() == null) {
+            epoch = LocalDateTime.now().atZone(zoneId).toEpochSecond();
+        } else {
+            epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
+        }
+        return featureToggleApi.isFeatureEnabledForDate("is-defendant-noc-online-for-case", epoch, false);
     }
 }
