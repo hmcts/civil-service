@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.MarkPaidConsentList;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -275,6 +276,10 @@ public class DashboardNotificationsParamsMapper {
             params.put("coscNotificationDateCy", DateUtils.formatDateInWelsh(LocalDate.now()));
         }
 
+        if (nonNull(caseData.getMarkPaidConsent()) && MarkPaidConsentList.YES == caseData.getMarkPaidConsent()) {
+            params.put("settleClaimPaidInFullDateEn", DateUtils.formatDate(LocalDate.now()));
+            params.put("settleClaimPaidInFullDateCy", DateUtils.formatDateInWelsh(LocalDate.now()));
+        }
         return params;
     }
 
