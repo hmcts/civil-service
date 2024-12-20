@@ -672,19 +672,14 @@ public class DashboardNotificationsParamsMapperTest {
     @Test
     void shouldMapParameters_whenClaimantMarkedPaidInFull() {
         LocalDate markedPaidInFullDate = LocalDate.now();
-         caseData = caseData.toBuilder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .respondent1Represented(YesOrNo.NO)
-            .markPaidConsent(MarkPaidConsentList.YES)
-            .build();
+        caseData = caseData.toBuilder().legacyCaseReference("reference")
+            .ccdCaseReference(1234L).respondent1Represented(YesOrNo.NO)
+            .markPaidConsent(MarkPaidConsentList.YES).build();
 
-        Map<String, Object> result =
-            mapper.mapCaseDataToParams(caseData, null);
-        assertThat(result).extracting("settleClaimPaidInFullDateEn")
-            .isEqualTo(DateUtils.formatDate(markedPaidInFullDate));
-        assertThat(result).extracting("settleClaimPaidInFullDateCy")
-            .isEqualTo(DateUtils.formatDateInWelsh(markedPaidInFullDate));
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData, null);
+        assertThat(result).extracting("settleClaimPaidInFullDateEn").isEqualTo(DateUtils.formatDate(markedPaidInFullDate));
+        assertThat(result).extracting("settleClaimPaidInFullDateCy").isEqualTo(DateUtils.formatDateInWelsh(
+            markedPaidInFullDate));
     }
 }
 

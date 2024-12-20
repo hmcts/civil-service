@@ -44,8 +44,7 @@ public class SettleClaimMarkedPaidInFullDefendantScenarioTest extends DashboardB
                 jsonPath("$[0].descriptionEn").value("<p class=\"govuk-body\">This claim has been marked as paid in full as of " + DateUtils.formatDate(paidInFullDate) + ".<br>" +
                                "You do not need to attend court and any hearings scheduled will not go ahead.</p>"),
                 jsonPath("$[0].titleCy").value("Hawliad wedi’i nodi fel wedi ei dalu’n llawn"),
-                jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Mae’r hawliad hwn wedi’i farcio fel un a dalwyd yn llawn ers "+ DateUtils.formatDateInWelsh(paidInFullDate) + ".<br>" +
+                jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">Mae’r hawliad hwn wedi’i farcio fel un a dalwyd yn llawn ers "+ DateUtils.formatDateInWelsh(paidInFullDate) + ".<br>" +
                                      "Nid oes angen i chi fynychu'r llys ac ni fydd unrhyw wrandawiadau a drefnwyd yn cael eu cynnal.</p>")
             );
     }

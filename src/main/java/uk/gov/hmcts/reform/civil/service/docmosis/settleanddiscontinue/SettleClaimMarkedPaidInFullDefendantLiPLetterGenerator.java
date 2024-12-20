@@ -55,9 +55,9 @@ public class SettleClaimMarkedPaidInFullDefendantLiPLetterGenerator {
         }
 
         List<String> recipients = getRecipientsList(caseData);
-      /*  bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
+        bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
                                      caseData.getLegacyCaseReference(), SETTLE_CLAIM_PAID_IN_FULL_LETTER, recipients);
-   */     return letterContent;
+        return letterContent;
     }
 
     private List<String> getRecipientsList(CaseData caseData) {
