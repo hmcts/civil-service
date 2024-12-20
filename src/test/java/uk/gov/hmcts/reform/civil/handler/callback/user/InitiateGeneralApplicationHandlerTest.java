@@ -135,17 +135,78 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldThrowError_whenLRVsLiP() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued1v1LiP()
+            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isNotNull();
+    }
+
+    @Test
+    void shouldThrowError_whenLRVsLiPCourtIsNotWhitelisted() {
+
         CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued1v1LiP()
-                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .caseManagementLocation(CaseLocationCivil.builder()
                         .baseLocation("45678")
                         .region("4").build())
                 .build();
+
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(false);
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isNotNull();
+    }
 
+    @Test
+    void shouldThrowError_whenLRVsLiPAndLipsNotEnabled() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued1v1LiP()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabled()).willReturn(false);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isNotNull();
+    }
+
+    @Test
+    void shouldThrowError_whenLRVsLiPAndLipsNotEnabledAndWhiteListed() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued1v1LiP()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(true);
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(false);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isNotNull();
     }
 
