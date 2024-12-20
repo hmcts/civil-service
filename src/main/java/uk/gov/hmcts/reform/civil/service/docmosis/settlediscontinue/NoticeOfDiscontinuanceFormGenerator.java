@@ -22,6 +22,7 @@ import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingDetailsM
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.NOTICE_OF_DISCONTINUANCE_PDF;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.NOTICE_OF_DISCONTINUANCE_WELSH_PDF;
 import static uk.gov.hmcts.reform.civil.utils.DateUtils.formatDateInWelsh;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
