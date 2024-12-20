@@ -326,11 +326,16 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsDefendantNoCOnline(Boolean toggleStat) {
-        var isDefendantNoCOnline = "isDefendantNoCOnline";
-        givenToggle(isDefendantNoCOnline, toggleStat);
+    void shouldReturnCorrectValue_whenIsDefendantNoCOnlineForCase(Boolean toggleStat) {
+        var nocOnlineKey = "is-defendant-noc-online-for-case";
 
-        assertThat(featureToggleService.isDefendantNoCOnline()).isEqualTo(toggleStat);
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+            .setClaimTypeToSpecClaim()
+            .build();
 
+        when(featureToggleApi.isFeatureEnabledForDate(eq(nocOnlineKey), anyLong(), eq(false)))
+            .thenReturn(toggleStat);
+
+        assertThat(featureToggleService.isDefendantNoCOnlineForCase(caseData)).isEqualTo(toggleStat);
     }
 }
