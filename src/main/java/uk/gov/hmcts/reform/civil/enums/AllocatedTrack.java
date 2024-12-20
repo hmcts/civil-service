@@ -115,6 +115,17 @@ public enum AllocatedTrack {
         }
     }
 
+    public static String toStringValueForMessage(AllocatedTrack allocatedTrack) {
+        switch (allocatedTrack) {
+            case FAST_CLAIM:
+                return "Fast track";
+            case SMALL_CLAIM:
+                return "Small claim";
+            default:
+                throw new IllegalArgumentException("Invalid track type in " + allocatedTrack);
+        }
+    }
+
     private static boolean isIntermediateOrMultiTrack(BigDecimal statementOfValueInPounds) {
         return isValueSmallerThanOrEqualTo(statementOfValueInPounds, 100000);
     }
