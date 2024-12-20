@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.CoscApplicationSearchService;
 
-import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,7 +27,7 @@ public class CoscApplicationProcessorHandler extends BaseExternalTaskHandler {
             return ExternalTaskData.builder().build();
         }
 
-        List<CaseDetails> cases = coscApplicationSearchService.getCases();
+        Set<CaseDetails> cases = coscApplicationSearchService.getCases();
         log.info("COSC Application Processor Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
         cases.forEach(caseDetails -> {
