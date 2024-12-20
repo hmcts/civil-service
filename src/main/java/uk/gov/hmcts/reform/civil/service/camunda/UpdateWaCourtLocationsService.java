@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataServ
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
@@ -31,30 +32,35 @@ public class UpdateWaCourtLocationsService {
     private final ObjectMapper objectMapper;
     private final LocationReferenceDataService locationRefDataService;
     @Value("${court-location.specified-claim.epimms-id}") private String cnbcEpimmId;
+    @Value("${court-location.unspecified-claim.epimms-id}") private String ccmccEpimmId;
 
     public void updateCourtListingWALocations(String authorisation, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         CaseData caseData = caseDataBuilder.build();
+        List<LocationRefData> locationRefDataList = locationRefDataService.getHearingCourtLocations(authorisation);
 
         String claimTrack = getClaimTrack(caseData);
         if ("FAST_CLAIM".equals(claimTrack) || "SMALL_CLAIM".equals(claimTrack)) {
             // when track is small or fast do not evaluate DMN, and also if claim was changed to small or fast
             // remove any previously evaluated and populate locations from taskManagementLocations
+            LocationRefData caseManagementLocationName = courtLocationDetails(locationRefDataList,
+                                                                              caseData.getCaseManagementLocation().getBaseLocation(),
+                                                                              "CML location");
+            caseDataBuilder.caseManagementLocationTab(TaskManagementLocationTab.builder()
+                                                          .caseManagementLocation(caseManagementLocationName.getSiteName())
+                                                          .build());
             caseDataBuilder.taskManagementLocations(null);
             return;
         }
 
-//        Map<String, Object> evaluatedCourtMap = camundaRuntimeClient
-//            .getEvaluatedDmnCourtLocations(caseDataBuilder.build().getCaseManagementLocation().getBaseLocation(), claimTrack);
-//        DmnListingLocations dmnListingLocations = objectMapper.convertValue(evaluatedCourtMap, DmnListingLocations.class);
-        DmnListingLocations dmnListingLocations = DmnListingLocations.builder()
-            .cmcListingLocation(DmnListingLocationsModel.builder().type("String").value("000000").valueInfo(null).build())
-            .ccmcListingLocation(DmnListingLocationsModel.builder().type("String").value("000000").valueInfo(null).build())
-            .ptrListingLocation(DmnListingLocationsModel.builder().type("String").value("000000").valueInfo(null).build())
-            .trialListingLocation(DmnListingLocationsModel.builder().type("String").value("000000").valueInfo(null).build())
-            .build();
-
-
-        List<LocationRefData> locationRefDataList = locationRefDataService.getHearingCourtLocations(authorisation);
+        Map<String, Object> evaluatedCourtMap = camundaRuntimeClient
+            .getEvaluatedDmnCourtLocations(caseDataBuilder.build().getCaseManagementLocation().getBaseLocation(), claimTrack);
+        DmnListingLocations dmnListingLocations = objectMapper.convertValue(evaluatedCourtMap, DmnListingLocations.class);
+//        DmnListingLocations dmnListingLocations = DmnListingLocations.builder()
+//            .cmcListingLocation(DmnListingLocationsModel.builder().type("String").value("000000").valueInfo(null).build())
+//            .ccmcListingLocation(DmnListingLocationsModel.builder().type("String").value("000000").valueInfo(null).build())
+//            .ptrListingLocation(DmnListingLocationsModel.builder().type("String").value("000000").valueInfo(null).build())
+//            .trialListingLocation(DmnListingLocationsModel.builder().type("String").value("000000").valueInfo(null).build())
+//            .build();
 
         try {
             LocationRefData cmcListing = courtLocationDetails(locationRefDataList,
@@ -135,6 +141,15 @@ public class UpdateWaCourtLocationsService {
                 .epimmsId(cnbcEpimmId)
                 .siteName("Civil National Business Centre").build();
             return cnbcDetails;
+        }
+        // ccmcc no longer exists, temporary solution till usage is removed
+        if (court.equals(ccmccEpimmId)) {
+            LocationRefData ccmccDetails = LocationRefData.builder()
+                .region("-")
+                .regionId("-")
+                .epimmsId("-")
+                .siteName("-").build();
+            return ccmccDetails;
         }
 
         LocationRefData courtTypeLocationDetails;
