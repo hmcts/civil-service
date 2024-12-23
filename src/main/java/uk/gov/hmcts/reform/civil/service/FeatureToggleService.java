@@ -141,6 +141,12 @@ public class FeatureToggleService {
             && isCaseProgressionEnabled();
     }
 
+    public boolean isGaForLipsEnabledAndLocationWhiteListed(String location) {
+        return location != null
+            && featureToggleApi.isFeatureEnabledForLocation("ea-courts-whitelisted-for-ga-lips", location, false)
+            && isGaForLipsEnabled();
+    }
+
     public boolean isHmcNroEnabled() {
         return featureToggleApi.isFeatureEnabled("hmc-nro");
 
