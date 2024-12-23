@@ -20,7 +20,7 @@ import java.time.LocalDate;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingDetailsMapper.isWelshHearingSelected;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.NOTICE_OF_DISCONTINUANCE_PDF;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.NOTICE_OF_DISCONTINUANCE_WELSH_PDF;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.NOTICE_OF_DISCONTINUANCE_BILINGUAL_PDF;
 import static uk.gov.hmcts.reform.civil.utils.DateUtils.formatDateInWelsh;
 
 @Slf4j
@@ -33,7 +33,7 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
 
     public CaseDocument generateDocs(CaseData caseData, Party party, String authorisation) {
         NoticeOfDiscontinuanceForm templateData = getNoticeOfDiscontinueData(caseData, party);
-        DocmosisTemplates docmosisTemplate = isWelshHearingSelected(caseData) ? NOTICE_OF_DISCONTINUANCE_WELSH_PDF : NOTICE_OF_DISCONTINUANCE_PDF;
+        DocmosisTemplates docmosisTemplate = isBilingual(caseData) ? NOTICE_OF_DISCONTINUANCE_BILINGUAL_PDF : NOTICE_OF_DISCONTINUANCE_PDF;
         DocmosisDocument docmosisDocument =
                 documentGeneratorService.generateDocmosisDocument(templateData, docmosisTemplate);
 
@@ -115,5 +115,9 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
     private boolean isCourtPermissionGranted(CaseData caseData) {
         return nonNull(caseData.getIsPermissionGranted())
                 && SettleDiscontinueYesOrNoList.YES.equals(caseData.getIsPermissionGranted());
+    }
+
+    private boolean isBilingual(CaseData caseData) {
+        return isWelshHearingSelected(caseData) || caseData.isRespondentResponseBilingual();
     }
 }
