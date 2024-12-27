@@ -12,14 +12,17 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.settleanddiscontinue.SettleClaimMarkedPaidInFullDefendantLiPLetter;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
+import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
-
+import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingDetailsMapper.isWelshHearingSelected;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER_BILINGUAL;
+import static uk.gov.hmcts.reform.civil.utils.DateUtils.formatDateInWelsh;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -65,10 +68,11 @@ public class SettleClaimMarkedPaidInFullDefendantLiPLetterGenerator {
     }
 
     private DocmosisDocument generate(CaseData caseData) {
-        return documentGeneratorService.generateDocmosisDocument(
-            getTemplateData(caseData),
-            SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER
-        );
+        DocmosisTemplates template = isBilingual(caseData)
+            ? SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER_BILINGUAL
+            : SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER;
+
+        return documentGeneratorService.generateDocmosisDocument(getTemplateData(caseData), template);
     }
 
     public SettleClaimMarkedPaidInFullDefendantLiPLetter getTemplateData(CaseData caseData) {
@@ -76,12 +80,18 @@ public class SettleClaimMarkedPaidInFullDefendantLiPLetterGenerator {
             .builder()
             .claimReferenceNumber(caseData.getLegacyCaseReference())
             .letterIssueDate(LocalDate.now())
+            .letterIssueDateWelsh(formatDateInWelsh(LocalDate.now()))
             .defendantLipName(caseData.getRespondent1().getPartyName())
             .addressLine1(caseData.getRespondent1().getPrimaryAddress().getAddressLine1())
             .addressLine2(caseData.getRespondent1().getPrimaryAddress().getAddressLine2())
             .addressLine3(caseData.getRespondent1().getPrimaryAddress().getAddressLine3())
             .postCode(caseData.getRespondent1().getPrimaryAddress().getPostCode())
             .dateOfEvent(LocalDate.now())
+            .dateOfEventWelsh(formatDateInWelsh(LocalDate.now()))
             .build();
+    }
+
+    private boolean isBilingual(CaseData caseData) {
+        return isWelshHearingSelected(caseData) || caseData.isRespondentResponseBilingual();
     }
 }

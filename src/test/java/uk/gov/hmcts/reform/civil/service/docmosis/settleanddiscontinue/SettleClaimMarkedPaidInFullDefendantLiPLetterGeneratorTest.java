@@ -13,10 +13,13 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -32,6 +35,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER_BILINGUAL;
 
 @SpringBootTest(classes = {
     SettleClaimMarkedPaidInFullDefendantLiPLetterGenerator.class,
@@ -94,6 +98,58 @@ class SettleClaimMarkedPaidInFullDefendantLiPLetterGeneratorTest {
             .applicant1(applicant)
             .respondent1(defendant)
             .legacyCaseReference("100DC001")
+            .build();
+
+        //When
+        settleClaimMarkedPaidInFullDefendantLiPLetterGenerator.generateAndPrintSettleClaimPaidInFullLetter(caseData, BEARER_TOKEN);
+
+        //Then
+        verify(bulkPrintService)
+            .printLetter(
+                LETTER_CONTENT,
+                caseData.getLegacyCaseReference(),
+                caseData.getLegacyCaseReference(),
+                SETTLE_CLAIM_PAID_IN_FULL_LETTER,
+                List.of(caseData.getRespondent1().getPartyName())
+            );
+    }
+
+    @Test
+    void shouldDownloadDocumentAndPrintBilingualLetterSuccessfully() {
+        //Given
+        when(documentGeneratorService.generateDocmosisDocument(
+            any(MappableObject.class),
+            eq(SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER_BILINGUAL)
+        ))
+            .thenReturn(new DocmosisDocument(
+                SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER_BILINGUAL.getDocumentTitle(),
+                LETTER_CONTENT
+            ));
+        when(documentManagementService
+                 .uploadDocument(
+                     BEARER_TOKEN,
+                     new PDF(SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER_BILINGUAL.getDocumentTitle(),
+                             LETTER_CONTENT,
+                             DocumentType.SETTLE_CLAIM_PAID_IN_FULL_LETTER
+                     )
+                 ))
+            .thenReturn(SETTLE_CLAIM);
+
+        given(documentDownloadService.downloadDocument(
+            any(),
+            any()
+        )).willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
+
+        Party applicant = PartyBuilder.builder().soleTrader().build();
+        Party defendant = PartyBuilder.builder().soleTrader().build();
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent1Represented(YesOrNo.NO)
+            .applicant1(applicant)
+            .respondent1(defendant)
+            .legacyCaseReference("100DC001")
+            .respondent1DQ(Respondent1DQ.builder().respondent1DQLanguage(WelshLanguageRequirements.builder()
+                                                                             .court(Language.WELSH)
+                                                                             .build()).build())
             .build();
 
         //When
