@@ -27,7 +27,7 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(queryManagementRaiseQuery);
 
-    private final ObjectMapper mapper;
+    protected final ObjectMapper objectMapper;
     private final Time time;
 
     @Override
@@ -51,7 +51,7 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(mapper))
+            .data(caseData.toMap(objectMapper))
             .build();
 
     }
