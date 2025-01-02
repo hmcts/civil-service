@@ -44,17 +44,6 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
-//    private CallbackResponse initializeQueriesCollection(CallbackParams callbackParams) {
-//
-//        var caseData = callbackParams.getCaseData();
-//        var updatedCaseData = caseData.toBuilder()
-//            .qmApplicantSolicitorQueries(CaseQueriesCollection.builder().build());
-//
-//        return AboutToStartOrSubmitCallbackResponse.builder()
-//            .data(updatedCaseData.build().toMap(objectMapper))
-//            .build();
-//
-//  }
     private CallbackResponse setManagementQuery(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData().toBuilder()
             .businessProcess(BusinessProcess.ready(queryManagementRaiseQuery))
@@ -63,6 +52,6 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
-
     }
+
 }

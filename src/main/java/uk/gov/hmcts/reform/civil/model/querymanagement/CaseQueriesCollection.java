@@ -13,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CaseQueriesCollection {
+
     private String partyName;
     private String roleOnCase;
     private List<Element<CaseMessage>> caseMessageCollection;
