@@ -98,6 +98,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
+import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
 import uk.gov.hmcts.reform.civil.model.sendandreply.MessageReply;
@@ -770,6 +771,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private Message lastMessage;
     private String lastMessageAllocatedTrack;
     private String lastMessageJudgeLabel;
+
+    //QueryManagement
+    private final CaseQueriesCollection qmApplicantSolicitorQueries;
+    private final CaseQueriesCollection qmRespondentSolicitor1Queries;
+    private final CaseQueriesCollection qmRespondentSolicitor2Queries;
 
 
     /**
