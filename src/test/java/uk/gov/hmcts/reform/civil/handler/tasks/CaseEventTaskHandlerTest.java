@@ -663,15 +663,36 @@ class CaseEventTaskHandlerTest {
                               FlowFlag.BULK_CLAIM_ENABLED.name(), false,
                               FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false,
                               FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false,
-                              FlowFlag.DEFENDANT_NOC_ONLINE.name(), false
+                              FlowFlag.DEFENDANT_NOC_ONLINE.name(), false,
+                              FlowFlag.CLAIM_STATE_DURING_NOC.name(), false
                 );
             } else if (state.equals(TAKEN_OFFLINE_BY_STAFF)
-                || state.equals(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT)
-                || state.equals(FULL_ADMISSION)
+                || state.equals(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT)) {
+                return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
+                              FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
+                              FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false,
+                              FlowFlag.CASE_PROGRESSION_ENABLED.name(), false,
+                              FlowFlag.BULK_CLAIM_ENABLED.name(), false,
+                              FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false,
+                              FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false,
+                              FlowFlag.DEFENDANT_NOC_ONLINE.name(), false,
+                              FlowFlag.CLAIM_STATE_DURING_NOC.name(), false
+                );
+            } else if (state.equals(FULL_ADMISSION)
                 || state.equals(PART_ADMISSION)
                 || state.equals(COUNTER_CLAIM)
-                || state.equals(FULL_DEFENCE_NOT_PROCEED)
-                || state.equals(CLAIM_DETAILS_NOTIFIED)
+                || state.equals(FULL_DEFENCE_NOT_PROCEED)) {
+                return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
+                              FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
+                              FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false,
+                              FlowFlag.CASE_PROGRESSION_ENABLED.name(), false,
+                              FlowFlag.BULK_CLAIM_ENABLED.name(), false,
+                              FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false,
+                              FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false,
+                              FlowFlag.DEFENDANT_NOC_ONLINE.name(), false,
+                              FlowFlag.CLAIM_STATE_DURING_NOC.name(), true
+                );
+            } else if (state.equals(CLAIM_DETAILS_NOTIFIED)
                 || state.equals(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION)) {
                 return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
                               FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
@@ -680,8 +701,10 @@ class CaseEventTaskHandlerTest {
                               FlowFlag.BULK_CLAIM_ENABLED.name(), false,
                               FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false,
                               FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false,
-                              FlowFlag.DEFENDANT_NOC_ONLINE.name(), false
+                              FlowFlag.DEFENDANT_NOC_ONLINE.name(), false,
+                              FlowFlag.CLAIM_STATE_DURING_NOC.name(), false
                 );
+
             } else if (state.equals(FULL_DEFENCE_PROCEED)) {
                 return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
                               FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
@@ -691,7 +714,8 @@ class CaseEventTaskHandlerTest {
                               FlowFlag.MINTI_ENABLED.name(), false,
                               FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false,
                               FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false,
-                              FlowFlag.DEFENDANT_NOC_ONLINE.name(), false
+                              FlowFlag.DEFENDANT_NOC_ONLINE.name(), false,
+                              FlowFlag.CLAIM_STATE_DURING_NOC.name(), true
                 );
             }
             return Map.of(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
