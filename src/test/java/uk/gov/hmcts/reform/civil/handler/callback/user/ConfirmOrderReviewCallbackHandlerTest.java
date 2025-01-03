@@ -11,19 +11,27 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.CourtStaffNextSteps;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ObligationData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW;
 
 @SpringBootTest(classes = {
     ConfirmOrderReviewCallbackHandler.class,
@@ -45,6 +53,7 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
     private static final String TASKS_LEFT_ERROR_1 = "Order review not completed.";
     private static final String TASKS_LEFT_ERROR_2 = "You must complete the tasks in the order before you can submit your order review.";
     private static final String TASKS_LEFT_ERROR_3 = "Once you have completed the task you can submit your order review by clicking on the link on your task list.";
+    private static final String OBLIGATION_DATE_ERROR = "The obligation date must be in the future";
 
     @BeforeEach
     void caseEventsEnabled() {
@@ -62,7 +71,27 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
+            assertThat(response.getData()).extracting("obligationDatePresent").isNull();
+            assertThat(response.getData()).extracting("courtStaffNextSteps").isNull();
             assertThat(response.getErrors()).isNull();
+        }
+    }
+
+    @Nested
+    class MidValidateDate {
+        private final String eventName = "validate-obligation-date";
+
+        @Test
+        void shouldThrowError_ifObligationDateIsNotInTheFuture() {
+            CaseData caseData = CaseData.builder().obligationData(
+                List.of(Element.<ObligationData>builder().id(UUID.randomUUID()).value(
+                ObligationData.builder().obligationDate(LocalDate.now().minusDays(1)).build()).build())).build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, eventName);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors().get(0))
+                .isEqualTo(OBLIGATION_DATE_ERROR);
         }
     }
 
@@ -119,8 +148,10 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData()).extracting("obligationDatePresent").isNull();
-            assertThat(response.getData()).extracting("courtStaffNextSteps").isNull();
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(CONFIRM_ORDER_REVIEW.name(), "READY");
         }
 
         @Test
@@ -134,6 +165,20 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response).isEqualTo(AboutToStartOrSubmitCallbackResponse.builder().build());
+        }
+
+        @Test
+        void shouldSetAllFinalOrdersIssuedState_whenIsFinalOrder() {
+            Mockito.when(toggleService.isCaseEventsEnabled()).thenReturn(true);
+            CaseData caseData = CaseData.builder()
+                .isFinalOrder(YesOrNo.YES)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
         }
     }
 
