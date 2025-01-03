@@ -43,7 +43,7 @@ public class GeneralApplicationApplicantRequestsHwfScenarioTest extends BaseInte
                     "<p class=\"govuk-body\">You’ve applied for help with the ${applicationFeeTypeEn} fee. "
                     + "You’ll receive an update in 5 to 10 working days.</p>"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Fe wnaethoch gais am help i dalu’r ffi gwneud "
+                    "<p class=\"govuk-body\">Fe wnaethoch gais am help i dalu’r ffi sef "
                     + "${applicationFeeTypeCy}. Byddwch yn cael diweddariad mewn 5 i 10 diwrnod gwaith.</p>")
             );
     }

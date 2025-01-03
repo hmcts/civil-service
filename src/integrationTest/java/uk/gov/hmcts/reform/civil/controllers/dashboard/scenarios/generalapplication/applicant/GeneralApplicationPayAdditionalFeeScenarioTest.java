@@ -38,7 +38,7 @@ public class GeneralApplicationPayAdditionalFeeScenarioTest extends BaseIntegrat
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("You must pay an additional application fee"),
-                jsonPath("$[0].titleCy").value("Rhaid i chi dalu ffi gwneud cais ychwanegol"),
+                jsonPath("$[0].titleCy").value("Rhaid i chi dalu ffi ychwanegol i wneud cais"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">The court requires you to pay an additional fee before your application can progress further. " +
                         "<a href=\"{GA_VIEW_APPLICATION_URL}\" class=\"govuk-link\">Pay the additional application fee</a></p>"),

@@ -45,7 +45,7 @@ public class GaProcessedApplicantNotificationTest extends BaseIntegrationTest {
                         "<p class=\"govuk-body\"> You’ll receive an update with information about next steps.</p>"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\"> Bydd barnwr yn ystyried y cais. </p>" +
-                        "<p class=\"govuk-body\">Fe gewch diweddariad gyda gwybodaeth am y camau nesaf.</p>")
+                        "<p class=\"govuk-body\">Fe gewch ddiweddariad gyda gwybodaeth am y camau nesaf.</p>")
             );
     }
 }
