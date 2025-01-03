@@ -333,7 +333,7 @@ class UpdateWaCourtLocationsServiceTest {
         Map<String, Object> testCnbcMap = new HashMap<>();
         testCnbcMap.put("Trial", Map.of(
             "type", "String",
-            "value",ccmccEpimmId,
+            "value", ccmccEpimmId,
             "valueInfo", Map.of()));
         testCnbcMap.put("CMC", Map.of(
             "type", "String",
