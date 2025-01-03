@@ -434,7 +434,7 @@ notifications:
   notifyLrRecordJudgmentDeterminationMeansTemplate: "5f28a959-9827-484c-af43-ea058b08b4b0"
   notifyClaimantLipForDefendantRepresentedTemplate: "54e7d60b-6319-4852-a9e2-711478401eb5"
   notifyDefendantLipForNoLongerAccessTemplate: "e9c3426a-7888-420f-816e-c74217264111"
-  notifyDefendantLrAfterNoticeOfChangeTemplate: "421711bb-c113-4a2f-8f2a-6d93510c0e8f"
+  notifyDefendantLrAfterNoticeOfChangeTemplate: "632b8aa4-8de2-4abc-b4f5-126f325a31f5"
   notifyClaimantLipBilingualAfterDefendantNOC: "cecae355-dc00-4a8d-8d64-576c79518d88"
   notifyDefendantLipBilingualAfterDefendantNOC: "36cd9c65-b979-45ba-b7ff-9061e03ce51e"
 
@@ -776,4 +776,4 @@ caseFlags:
 ---
 
 court_location_dmn:
-  enabled: ${COURT_LOCATION_WA_DMN_ENABLED:true}
+  enabled: ${COURT_LOCATION_WA_DMN_ENABLED:false}

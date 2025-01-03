@@ -19,7 +19,7 @@ public class FeatureToggleService {
     private final FeatureToggleApi featureToggleApi;
 
     public boolean isFeatureEnabled(String feature) {
-        return true;
+        return this.featureToggleApi.isFeatureEnabled(feature);
     }
 
     public boolean isGeneralApplicationsEnabled() {
@@ -79,7 +79,7 @@ public class FeatureToggleService {
     }
 
     public boolean isMintiEnabled() {
-        return true;
+        return featureToggleApi.isFeatureEnabled("minti");
     }
 
     public boolean isCjesServiceAvailable() {
@@ -107,7 +107,8 @@ public class FeatureToggleService {
         } else {
             epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         }
-        return true;
+        return featureToggleApi.isFeatureEnabled("minti")
+            && featureToggleApi.isFeatureEnabledForDate("multi-or-intermediate-track", epoch, false);
     }
 
     public boolean isDashboardEnabledForCase(CaseData caseData) {
@@ -140,6 +141,12 @@ public class FeatureToggleService {
             && isCaseProgressionEnabled();
     }
 
+    public boolean isGaForLipsEnabledAndLocationWhiteListed(String location) {
+        return location != null
+            && featureToggleApi.isFeatureEnabledForLocation("ea-courts-whitelisted-for-ga-lips", location, false)
+            && isGaForLipsEnabled();
+    }
+
     public boolean isHmcNroEnabled() {
         return featureToggleApi.isFeatureEnabled("hmc-nro");
 
@@ -150,7 +157,14 @@ public class FeatureToggleService {
             && featureToggleApi.isFeatureEnabled("isJOLiveFeedActive");
     }
 
-    public boolean isDefendantNoCOnline()  {
-        return featureToggleApi.isFeatureEnabled("isDefendantNoCOnline");
+    public boolean isDefendantNoCOnlineForCase(CaseData caseData)  {
+        ZoneId zoneId = ZoneId.systemDefault();
+        long epoch;
+        if (caseData.getSubmittedDate() == null) {
+            epoch = LocalDateTime.now().atZone(zoneId).toEpochSecond();
+        } else {
+            epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
+        }
+        return featureToggleApi.isFeatureEnabledForDate("is-defendant-noc-online-for-case", epoch, false);
     }
 }
