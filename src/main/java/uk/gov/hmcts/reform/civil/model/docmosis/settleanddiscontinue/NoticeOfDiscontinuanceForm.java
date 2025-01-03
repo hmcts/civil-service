@@ -24,6 +24,8 @@ public class NoticeOfDiscontinuanceForm implements MappableObject {
     private final String defendant2Name;
     private final String claimantNum;
     private final String defendantNum;
+    private final String claimantNumWelsh;
+    private final String defendantNumWelsh;
     private String claimantWhoIsDiscontinue;
     private String claimantsConsentToDiscontinuance;
     private String courtPermission;
@@ -32,6 +34,7 @@ public class NoticeOfDiscontinuanceForm implements MappableObject {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate judgementDate;
+    private final String judgementDateWelsh;
     private String discontinuingAgainstBothDefendants;
     private String discontinuingAgainstOneDefendant;
     private String typeOfDiscontinuance;
@@ -49,4 +52,5 @@ public class NoticeOfDiscontinuanceForm implements MappableObject {
     private final String addressLine3;
     private final String postCode;
     private final String claimReferenceNumber;
+    private final String welshDate;
 }

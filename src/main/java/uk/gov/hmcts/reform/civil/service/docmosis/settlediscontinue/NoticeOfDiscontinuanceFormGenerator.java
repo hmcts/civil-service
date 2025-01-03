@@ -18,7 +18,10 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import java.time.LocalDate;
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingDetailsMapper.isWelshHearingSelected;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.NOTICE_OF_DISCONTINUANCE_PDF;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.NOTICE_OF_DISCONTINUANCE_BILINGUAL_PDF;
+import static uk.gov.hmcts.reform.civil.utils.DateUtils.formatDateInWelsh;
 
 @Slf4j
 @Service
@@ -30,7 +33,7 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
 
     public CaseDocument generateDocs(CaseData caseData, Party party, String authorisation) {
         NoticeOfDiscontinuanceForm templateData = getNoticeOfDiscontinueData(caseData, party);
-        DocmosisTemplates docmosisTemplate = NOTICE_OF_DISCONTINUANCE_PDF;
+        DocmosisTemplates docmosisTemplate = isBilingual(caseData) ? NOTICE_OF_DISCONTINUANCE_BILINGUAL_PDF : NOTICE_OF_DISCONTINUANCE_PDF;
         DocmosisDocument docmosisDocument =
                 documentGeneratorService.generateDocmosisDocument(templateData, docmosisTemplate);
 
@@ -65,6 +68,8 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
                 .defendant2Name(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
                 .claimantNum(nonNull(caseData.getApplicant2()) ? "Claimant 1" : "Claimant")
                 .defendantNum(nonNull(caseData.getRespondent2()) ? "Defendant 1" : "Defendant")
+                .claimantNumWelsh(nonNull(caseData.getApplicant2()) ? "Hawlydd 1" : "Hawlydd")
+                .defendantNumWelsh(nonNull(caseData.getRespondent2()) ? "Diffynnydd 1" : "Diffynnydd")
                 .claimantWhoIsDiscontinue(getClaimantWhoIsDiscontinue(caseData))
                 .claimantsConsentToDiscontinuance(nonNull(caseData.getClaimantsConsentToDiscontinuance())
                         ? getConsentToDiscontinue(caseData) : null)
@@ -76,12 +81,15 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
                         ? caseData.getPermissionGrantedComplex().getPermissionGrantedJudge() : null)
                 .judgementDate(isCourtPermissionGranted(caseData)
                         ? caseData.getPermissionGrantedComplex().getPermissionGrantedDate() : null)
+                .judgementDateWelsh(isCourtPermissionGranted(caseData)
+                        ? formatDateInWelsh(caseData.getPermissionGrantedComplex().getPermissionGrantedDate()) : null)
                 .typeOfDiscontinuance(caseData.getTypeOfDiscontinuance().toString())
                 .typeOfDiscontinuanceTxt(caseData.getTypeOfDiscontinuance().getType())
                 .partOfDiscontinuanceTxt(caseData.getPartDiscontinuanceDetails())
                 .discontinuingAgainstOneDefendant(getDiscontinueAgainstOneDefendant(caseData))
                 .discontinuingAgainstBothDefendants(nonNull(caseData.getIsDiscontinuingAgainstBothDefendants())
-                        ? caseData.getIsDiscontinuingAgainstBothDefendants().getDisplayedValue() : null);
+                        ? caseData.getIsDiscontinuingAgainstBothDefendants().getDisplayedValue() : null)
+                .welshDate(formatDateInWelsh(LocalDate.now()));
         return noticeOfDiscontinueBuilder.build();
     }
 
@@ -107,5 +115,9 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
     private boolean isCourtPermissionGranted(CaseData caseData) {
         return nonNull(caseData.getIsPermissionGranted())
                 && SettleDiscontinueYesOrNoList.YES.equals(caseData.getIsPermissionGranted());
+    }
+
+    private boolean isBilingual(CaseData caseData) {
+        return isWelshHearingSelected(caseData) || caseData.isRespondentResponseBilingual();
     }
 }
