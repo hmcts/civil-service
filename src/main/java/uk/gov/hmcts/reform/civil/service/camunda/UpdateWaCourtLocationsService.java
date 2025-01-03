@@ -109,7 +109,7 @@ public class UpdateWaCourtLocationsService {
             .build();
 
         String claimTrack = getClaimTrack(caseData);
-        if("MULTI_CLAIM".equals(claimTrack)) {
+        if ("MULTI_CLAIM".equals(claimTrack)) {
             tabContent.setCcmcListingLocation(caseData.getTaskManagementLocations().getCcmcListingLocation().getLocationName());
         }
 
