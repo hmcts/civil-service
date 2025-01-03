@@ -58,6 +58,7 @@ class UpdateWaCourtLocationsServiceTest {
     private FeatureToggleService featureToggleService;
 
     String cnbcEpimmId = "420219";
+    String ccmccEpimmId = "192280";
     private final TaskManagementLocationTypes testTaskManagementLocations = TaskManagementLocationTypes.builder()
         .cmcListingLocation(TaskManagementLocationsModel.builder()
                                 .locationName("london somewhere")
@@ -112,6 +113,33 @@ class UpdateWaCourtLocationsServiceTest {
                                       .build())
         .build();
 
+    private final TaskManagementLocationTypes testCcmcTaskManagementLocations = TaskManagementLocationTypes.builder()
+        .cmcListingLocation(TaskManagementLocationsModel.builder()
+                                .locationName("-")
+                                .location("-")
+                                .region("-")
+                                .regionName("-")
+                                .build())
+        .ccmcListingLocation(TaskManagementLocationsModel.builder()
+                                 .locationName("-")
+                                 .location("-")
+                                 .region("-")
+                                 .regionName("-")
+                                 .build())
+        .ptrListingLocation(TaskManagementLocationsModel.builder()
+                                .locationName("-")
+                                .location("-")
+                                .region("-")
+                                .regionName("-")
+                                .build())
+        .trialListingLocation(TaskManagementLocationsModel.builder()
+                                  .locationName("-")
+                                  .location("-")
+                                  .region("-")
+                                  .regionName("-")
+                                  .build())
+        .build();
+
     @BeforeEach
     void setUp()  throws Exception {
 
@@ -149,9 +177,12 @@ class UpdateWaCourtLocationsServiceTest {
         when(camundaClient.getEvaluatedDmnCourtLocations(anyString(), anyString())).thenReturn(testMap);
         when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
         when(objectMapper.convertValue(testMap, DmnListingLocations.class)).thenReturn(dmnListingLocations);
-        Field field = UpdateWaCourtLocationsService.class.getDeclaredField("cnbcEpimmId");
-        field.setAccessible(true);
-        field.set(updateWaCourtLocationsService, "420219");
+        Field fieldcnbc = UpdateWaCourtLocationsService.class.getDeclaredField("cnbcEpimmId");
+        fieldcnbc.setAccessible(true);
+        fieldcnbc.set(updateWaCourtLocationsService, "420219");
+        Field fieldccmcc = UpdateWaCourtLocationsService.class.getDeclaredField("ccmccEpimmId");
+        fieldccmcc.setAccessible(true);
+        fieldccmcc.set(updateWaCourtLocationsService, "192280");
     }
 
     @ParameterizedTest
@@ -291,9 +322,59 @@ class UpdateWaCourtLocationsServiceTest {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         updateWaCourtLocationsService.updateCourtListingWALocations("auth", caseDataBuilder);
         CaseData updatedCaseData = caseDataBuilder.build();
-        System.out.println("bananana " + updatedCaseData.getTaskManagementLocations());
 
         assertEquals(updatedCaseData.getTaskManagementLocations(), testCnbcTaskManagementLocations);
+    }
+
+    @Test
+    void shouldPopulateCcmccDetails_whenCourtFoundIsCcmcc() {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+        Map<String, Object> testCnbcMap = new HashMap<>();
+        testCnbcMap.put("Trial", Map.of(
+            "type", "String",
+            "value",ccmccEpimmId,
+            "valueInfo", Map.of()));
+        testCnbcMap.put("CMC", Map.of(
+            "type", "String",
+            "value", ccmccEpimmId,
+            "valueInfo", Map.of()));
+        testCnbcMap.put("CCMC", Map.of(
+            "type", "String",
+            "value", ccmccEpimmId,
+            "valueInfo", Map.of()));
+        testCnbcMap.put("PTR", Map.of(
+            "type", "String",
+            "value", ccmccEpimmId,
+            "valueInfo", Map.of()));
+
+        List<LocationRefData> locations = List.of(
+            LocationRefData.builder().epimmsId("123456").region("south").regionId("1").siteName("london somewhere").build(),
+            LocationRefData.builder().epimmsId("654321").region("north").regionId("2").siteName("liverpool somewhere").build(),
+            LocationRefData.builder().epimmsId("789654").region("west").regionId("3").siteName("stoke somewhere").build()
+        );
+
+        DmnListingLocations dmnListingLocations = DmnListingLocations.builder()
+            .cmcListingLocation(DmnListingLocationsModel.builder().type("String").value(ccmccEpimmId).valueInfo(null).build())
+            .ccmcListingLocation(DmnListingLocationsModel.builder().type("String").value(ccmccEpimmId).valueInfo(null).build())
+            .ptrListingLocation(DmnListingLocationsModel.builder().type("String").value(ccmccEpimmId).valueInfo(null).build())
+            .trialListingLocation(DmnListingLocationsModel.builder().type("String").value(ccmccEpimmId).valueInfo(null).build())
+            .build();
+
+        when(camundaClient.getEvaluatedDmnCourtLocations(anyString(), anyString())).thenReturn(testCnbcMap);
+        when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
+        when(objectMapper.convertValue(testCnbcMap, DmnListingLocations.class)).thenReturn(dmnListingLocations);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(ccmccEpimmId).region("4").build())
+            .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
+            .build();
+
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        updateWaCourtLocationsService.updateCourtListingWALocations("auth", caseDataBuilder);
+        CaseData updatedCaseData = caseDataBuilder.build();
+
+        assertEquals(updatedCaseData.getTaskManagementLocations(), testCcmcTaskManagementLocations);
     }
 
 }
