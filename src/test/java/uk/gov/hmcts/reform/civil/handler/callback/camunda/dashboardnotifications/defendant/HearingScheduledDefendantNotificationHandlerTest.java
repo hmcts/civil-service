@@ -100,6 +100,7 @@ public class HearingScheduledDefendantNotificationHandlerTest extends BaseCallba
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
+            .responseClaimTrack("FAST_CLAIM")
             .respondent1Represented(YesOrNo.NO)
             .build().toBuilder().hearingLocation(list).build();
 
