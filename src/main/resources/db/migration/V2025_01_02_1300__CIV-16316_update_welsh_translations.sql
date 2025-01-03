@@ -9,15 +9,16 @@ UPDATE dbs.dashboard_notifications_templates SET description_Cy = replace(descri
 /**
  * Dashboard notification 8
  */
-UPDATE dbs.dashboard_notifications_templates SET description_Cy = replace(description_Cy, 'Rhaid i chi dalu ffi gwneud cais ychwanegol', 'Rhaid i chi dalu ffi ychwanegol i wneud cais') WHERE template_name  = 'Notice.AAA6.GeneralApps.AdditionalApplicationFeeRequired.Applicant' ;
+UPDATE dbs.dashboard_notifications_templates SET title_cy = replace(title_cy, 'Rhaid i chi dalu ffi gwneud cais ychwanegol', 'Rhaid i chi dalu ffi ychwanegol i wneud cais') WHERE template_name  = 'Notice.AAA6.GeneralApps.AdditionalApplicationFeeRequired.Applicant' ;
 
 /**
  * Dashboard notification 9
  */
+UPDATE dbs.dashboard_notifications_templates SET description_Cy = replace(description_Cy, 'Byddwch yn cael help gyda’r ffi gwneud', 'Byddwch yn cael help i dalu’r') WHERE template_name  = 'Notice.AAA6.GeneralApps.HwF.PartRemission.Applicant' ;
 
 
 /**
  * Dashboard notification 14
  */
-UPDATE dbs.dashboard_notifications_templates SET description_Cy = replace(description_Cy, 'weddill o', 'weddill sef') WHERE template_name  = 'Notice.AAA6.GeneralApps.HwF.PartRemission.Applicant' ;
+UPDATE dbs.dashboard_notifications_templates SET description_Cy = replace(description_Cy, 'rhaid i chi dal dalu’r ffi sy’n weddill o', 'rhaid i chi dalu’r ffi sy’ weddill sef') WHERE template_name  = 'Notice.AAA6.GeneralApps.HwF.PartRemission.Applicant' ;
 
