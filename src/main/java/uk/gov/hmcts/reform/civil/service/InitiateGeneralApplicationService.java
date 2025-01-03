@@ -64,6 +64,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service
 @RequiredArgsConstructor
@@ -155,7 +156,7 @@ public class InitiateGeneralApplicationService {
         if (YES.equals(caseData.getAddRespondent2())) {
             applicationBuilder.defendant2PartyName(getPartyNameBasedOnType(caseData.getRespondent2()));
         }
-
+        applicationBuilder.emailPartyReference(buildPartiesReferencesEmailSubject(caseData));
         final var caseType = SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             ? CaseCategory.SPEC_CLAIM
             : CaseCategory.UNSPEC_CLAIM;
