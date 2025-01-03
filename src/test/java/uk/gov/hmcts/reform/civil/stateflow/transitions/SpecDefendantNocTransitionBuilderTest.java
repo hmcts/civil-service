@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.stateflow.transitions;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -11,7 +12,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class SpecDefendantNocTransitionBuilderTest {
@@ -21,25 +21,18 @@ public class SpecDefendantNocTransitionBuilderTest {
 
     private List<Transition> result;
 
-    @Test
-    void shouldSetUpTransitions_withExpectedSizeAndStates() {
-        when(mockFeatureToggleService.isDefendantNoCOnline()).thenReturn(false);
+    @BeforeEach
+    void setUp() {
         SpecDefendantNocTransitionBuilder builder = new SpecDefendantNocTransitionBuilder(
             mockFeatureToggleService);
         result = builder.buildTransitions();
         assertNotNull(result);
-        assertThat(result).hasSize(1);
-        assertTransition(result.get(0), "MAIN.SPEC_DEFENDANT_NOC", "MAIN.TAKEN_OFFLINE_SPEC_DEFENDANT_NOC");
     }
 
     @Test
-    void shouldStay_withDefendantNoCOnline() {
-        when(mockFeatureToggleService.isDefendantNoCOnline()).thenReturn(true);
-        SpecDefendantNocTransitionBuilder builder = new SpecDefendantNocTransitionBuilder(
-            mockFeatureToggleService);
-        result = builder.buildTransitions();
-        assertNotNull(result);
-        assertThat(result).hasSize(0);
+    void shouldSetUpTransitions_withExpectedSizeAndStates() {
+        assertThat(result).hasSize(1);
+        assertTransition(result.get(0), "MAIN.SPEC_DEFENDANT_NOC", "MAIN.TAKEN_OFFLINE_SPEC_DEFENDANT_NOC");
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {

@@ -171,8 +171,8 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private YesOrNo finalOrderGiveReasonsYesNo;
     private AssistedOrderReasons finalOrderGiveReasonsComplex;
     private YesOrNo finalOrderAllocateToTrack;
+    private YesOrNo allowOrderTrackAllocation;
     private AllocatedTrack finalOrderTrackAllocation;
-    private FinalOrdersComplexityBand finalOrderFastTrackComplexityBand;
     private FinalOrdersComplexityBand finalOrderIntermediateTrackComplexityBand;
     private DynamicList finalOrderDownloadTemplateOptions;
     private CaseDocument finalOrderDownloadTemplateDocument;

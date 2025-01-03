@@ -118,7 +118,8 @@ public class DetermineNextState  {
                                                BusinessProcess businessProcess) {
         String nextState;
         if (featureToggleService.isJudgmentOnlineLive()
-            && (caseData.isPayByInstallment() || caseData.isPayBySetDate())) {
+            && (caseData.isPayByInstallment() || caseData.isPayBySetDate())
+            && caseData.isLRvLipOneVOne()) {
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             businessProcess = BusinessProcess.ready(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC);
         } else {
@@ -129,6 +130,7 @@ public class DetermineNextState  {
             builder.activeJudgment(activeJudgment);
             builder.joIsLiveJudgmentExists(YesOrNo.YES);
             builder.joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment));
+            builder.isTakenOfflineAfterJBA(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name().equals(nextState) ? YesOrNo.YES : YesOrNo.NO);
         }
 
         return Pair.of(nextState, businessProcess);
