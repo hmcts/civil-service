@@ -1495,7 +1495,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         ADD_CASE_NOTE,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        NOC_REQUEST
                     }
                 ),
                 of(
@@ -1538,7 +1539,8 @@ class FlowStateAllowedEventServiceTest {
                         UPDATE_HELP_WITH_FEE_NUMBER,
                         INVALID_HWF_REFERENCE,
                         ADD_CASE_NOTE,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        NOC_REQUEST
                     }
                 ),
                 of(
@@ -1708,7 +1710,9 @@ class FlowStateAllowedEventServiceTest {
                         FULL_REMISSION_HWF,
                         UPDATE_HELP_WITH_FEE_NUMBER,
                         INVALID_HWF_REFERENCE,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        MEDIATION_UNSUCCESSFUL,
+                        MEDIATION_SUCCESSFUL
                     }
                 ),
                 of(
