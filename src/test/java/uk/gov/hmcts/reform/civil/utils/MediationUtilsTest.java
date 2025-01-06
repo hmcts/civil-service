@@ -44,4 +44,13 @@ class MediationUtilsTest {
 
         assertThat(findMediationUnsuccessfulReason(caseData, List.of(PARTY_WITHDRAWS, APPOINTMENT_NO_AGREEMENT, APPOINTMENT_NOT_ASSIGNED))).isTrue();
     }
+
+    @Test
+    void shouldReturnFalse_whenMediationIsNull() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .mediation(null)
+            .build();
+
+        assertThat(findMediationUnsuccessfulReason(caseData, List.of(PARTY_WITHDRAWS, APPOINTMENT_NO_AGREEMENT, APPOINTMENT_NOT_ASSIGNED))).isFalse();
+    }
 }

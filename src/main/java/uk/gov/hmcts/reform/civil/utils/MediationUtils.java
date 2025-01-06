@@ -12,6 +12,9 @@ public class MediationUtils {
 
     public static boolean findMediationUnsuccessfulReason(CaseData caseData,
                                                     List<MediationUnsuccessfulReason> listOfReasons) {
+        if(caseData.getMediation() == null || caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect() == null) {
+            return false;
+        }
         return caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect()
             .stream().anyMatch(listOfReasons::contains);
     }
