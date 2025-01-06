@@ -90,7 +90,9 @@ public class HearingValuesService {
             isEarlyAdopter(caseData);
         }
 
-        isLrVLr(caseData);
+        if (!featuretoggleService.isHmcForLipEnabled()) {
+            isLrVLr(caseData);
+        }
 
         String baseUrl = manageCaseBaseUrlConfiguration.getManageCaseBaseUrl();
         String hmctsServiceID = getHmctsServiceID(caseData, paymentsConfiguration);

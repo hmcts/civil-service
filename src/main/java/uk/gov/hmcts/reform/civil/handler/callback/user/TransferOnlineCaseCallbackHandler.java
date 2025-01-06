@@ -136,12 +136,13 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
 
         if (nonNull(newCourtLocation)) {
             boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
+            boolean isHmcLipEnabled = featureToggleService.isHmcForLipEnabled();
             boolean isLocationWhiteListed = featureToggleService.isLocationWhiteListedForCaseProgression(newCourtLocation.getEpimmsId());
 
-            if (!isLipCase) {
+            if (!isLipCase || isHmcLipEnabled) {
                 log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
                 caseDataBuilder.eaCourtLocation(YES);
-                caseDataBuilder.hmcEaCourtLocation(!isLipCase && isLocationWhiteListed ? YES : NO);
+                caseDataBuilder.hmcEaCourtLocation(isLocationWhiteListed ? YES : NO);
             } else if (isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData, newCourtLocation.getEpimmsId())) {
                 caseDataBuilder.eaCourtLocation(YES);
             } else {
