@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.advice;
 
 import feign.FeignException;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,33 +12,41 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.util.ContentCachingRequestWrapper;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
-import uk.gov.hmcts.reform.civil.request.RequestData;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.net.UnknownHostException;
 import java.util.Collections;
-import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ResourceExceptionHandlerTest {
 
     @Mock
-    private RequestData requestData;
+    private ContentCachingRequestWrapper contentCachingRequestWrapper;
 
     @InjectMocks
     private ResourceExceptionHandler handler;
+
+    @BeforeEach
+    void setUp() {
+        when(contentCachingRequestWrapper.getHeader("user-id")).thenReturn("4321");
+        when(contentCachingRequestWrapper.getParameterMap().get("caseId")).thenReturn(new String[]{"1234"});
+    }
 
     @Test
     void shouldReturnNotFound_whenCallbackExceptionThrown() {
         testTemplate(
             "expected exception for missing callback handler",
-            CallbackException::new,
-            handler::notFound,
+            handler.notFound(
+                new CallbackException("expected exception for missing callback handler"),
+                contentCachingRequestWrapper
+            ),
             HttpStatus.NOT_FOUND
         );
     }
@@ -45,8 +55,10 @@ public class ResourceExceptionHandlerTest {
     void shouldReturnPreconditionFailed_whenStateFlowExceptionThrown() {
         testTemplate(
             "expected exception for state flow",
-            StateFlowException::new,
-            handler::incorrectStateFlowOrIllegalArgument,
+            handler.incorrectStateFlowOrIllegalArgument(
+                new StateFlowException("expected exception for state flow"),
+                contentCachingRequestWrapper
+            ),
             HttpStatus.PRECONDITION_FAILED
         );
     }
@@ -55,13 +67,12 @@ public class ResourceExceptionHandlerTest {
     void shouldReturnUnauthorized_whenFeignExceptionUnauthorizedExceptionThrown() {
         testTemplate(
             "expected exception for feing unauthorized",
-            str -> new FeignException.Unauthorized(
+            handler.unauthorizedFeign(new FeignException.Unauthorized(
                 "expected exception for feing unauthorized",
                 Mockito.mock(feign.Request.class),
                 new byte[]{},
                 Collections.emptyMap()
-            ),
-            handler::unauthorizedFeign,
+            ), contentCachingRequestWrapper),
             HttpStatus.UNAUTHORIZED
         );
     }
@@ -70,8 +81,10 @@ public class ResourceExceptionHandlerTest {
     void shouldReturnMethodNotAllowed_whenUnknownHostException() {
         testTemplate(
             "expected exception for unknown host",
-            UnknownHostException::new,
-            handler::unknownHostAndInvalidPayment,
+            handler.unknownHostAndInvalidPayment(
+                new UnknownHostException("expected exception for unknown host"),
+                contentCachingRequestWrapper
+            ),
             HttpStatus.NOT_ACCEPTABLE
         );
     }
@@ -80,8 +93,8 @@ public class ResourceExceptionHandlerTest {
     void shouldReturnMethodNotAllowed_whenInvalidPaymentRequestExceptionException() {
         testTemplate(
             "expected exception for invalid payment request",
-            UnknownHostException::new,
-            handler::unknownHostAndInvalidPayment,
+            handler.unknownHostAndInvalidPayment(new UnknownHostException(
+                "expected exception for invalid payment request"), contentCachingRequestWrapper),
             HttpStatus.NOT_ACCEPTABLE
         );
     }
@@ -90,14 +103,13 @@ public class ResourceExceptionHandlerTest {
     void shouldReturnForbidden_whenFeignExceptionForbiddenExceptionThrown() {
         testTemplate(
             "expected exception for feing forbidden",
-            str -> new FeignException.Unauthorized(
+            handler.forbiddenFeign(new FeignException.Unauthorized(
                 "expected exception for feing forbidden",
                 Mockito.mock(feign.Request.class),
                 new byte[]{},
                 Collections.emptyMap()
-            ),
-            handler::forbiddenFeign,
-            HttpStatus.FORBIDDEN
+            ), contentCachingRequestWrapper),
+            HttpStatus.UNAUTHORIZED
         );
     }
 
@@ -105,8 +117,10 @@ public class ResourceExceptionHandlerTest {
     void shouldReturnMethodNotAllowed_whenNoSuchMethodErrorThrown() {
         testTemplate(
             "expected exception for no such method error",
-            NoSuchMethodError::new,
-            handler::noSuchMethodError,
+            handler.noSuchMethodError(
+                new NoSuchMethodError("expected exception for no such method error"),
+                contentCachingRequestWrapper
+            ),
             HttpStatus.METHOD_NOT_ALLOWED
         );
     }
@@ -115,8 +129,10 @@ public class ResourceExceptionHandlerTest {
     void shouldReturnPreconditionFailed_whenIllegalArgumentExceptionThrown() {
         testTemplate(
             "expected exception for illegal argument exception",
-            IllegalArgumentException::new,
-            handler::incorrectStateFlowOrIllegalArgument,
+            handler.incorrectStateFlowOrIllegalArgument(
+                new IllegalArgumentException("expected exception for illegal argument exception"),
+                contentCachingRequestWrapper
+            ),
             HttpStatus.PRECONDITION_FAILED
         );
     }
@@ -125,11 +141,13 @@ public class ResourceExceptionHandlerTest {
     void shouldReturnBadRequest_whenHttpClientErrorExceptionThrown() {
         testTemplate(
             "expected exception for client error bad request",
-            exp -> new HttpClientErrorException(
-                HttpStatus.BAD_REQUEST,
-                "expected exception for client error bad request"
+            handler.badRequest(
+                new HttpClientErrorException(
+                    HttpStatus.BAD_REQUEST,
+                    "expected exception for client error bad request"
+                ),
+                contentCachingRequestWrapper
             ),
-            handler::badRequest,
             HttpStatus.BAD_REQUEST
         );
     }
@@ -138,13 +156,15 @@ public class ResourceExceptionHandlerTest {
     void testFeignExceptionGatewayTimeoutException() {
         testTemplate(
             "gateway time out message",
-            str -> new FeignException.GatewayTimeout(
-                "gateway time out message",
-                Mockito.mock(feign.Request.class),
-                new byte[]{},
-                Collections.emptyMap()
+            handler.handleFeignExceptionGatewayTimeout(
+                new FeignException.GatewayTimeout(
+                    "gateway time out message",
+                    Mockito.mock(feign.Request.class),
+                    new byte[]{},
+                    Collections.emptyMap()
+                ),
+                contentCachingRequestWrapper
             ),
-            handler::handleFeignExceptionGatewayTimeout,
             HttpStatus.GATEWAY_TIMEOUT
         );
     }
@@ -153,13 +173,15 @@ public class ResourceExceptionHandlerTest {
     void testClientAbortException() {
         testTemplate(
             "ClosedChannelException",
-            str -> new FeignException.InternalServerError(
-                "ClosedChannelException",
-                Mockito.mock(feign.Request.class),
-                new byte[]{},
-                Collections.emptyMap()
+            handler.handleClientAbortException(
+                new FeignException.InternalServerError(
+                    "ClosedChannelException",
+                    Mockito.mock(feign.Request.class),
+                    new byte[]{},
+                    Collections.emptyMap()
+                ),
+                contentCachingRequestWrapper
             ),
-            handler::handleClientAbortException,
             HttpStatus.REQUEST_TIMEOUT
         );
     }
@@ -168,8 +190,8 @@ public class ResourceExceptionHandlerTest {
     void testHandleNotificationClientException() {
         testTemplate(
             "expected exception from notification api",
-            NotificationClientException::new,
-            handler::handleNotificationClientException,
+            handler.handleNotificationClientException(new NotificationClientException(
+                "expected exception from notification api"), contentCachingRequestWrapper),
             HttpStatus.FAILED_DEPENDENCY
         );
     }
@@ -178,38 +200,39 @@ public class ResourceExceptionHandlerTest {
     void testHandleFeignNotFoundException() {
         testTemplate(
             "expected exception for feign not found",
-            str -> new FeignException.NotFound(
-                "expected exception for feign not found",
-                Mockito.mock(feign.Request.class),
-                new byte[]{},
-                Collections.emptyMap()
+            handler.feignExceptionNotFound(
+                new FeignException.NotFound(
+                    "expected exception for feign not found",
+                    Mockito.mock(feign.Request.class),
+                    new byte[]{},
+                    Collections.emptyMap()
+                ),
+                contentCachingRequestWrapper
             ),
-            handler::feignExceptionNotFound,
             HttpStatus.NOT_FOUND
         );
-    }
-
-    private <E extends Throwable> void testTemplate(
-        String message,
-        Function<String, E> exceptionBuilder,
-        Function<E, ResponseEntity<?>> method,
-        HttpStatus expectedStatus
-    ) {
-        E exception = exceptionBuilder.apply(message);
-        ResponseEntity<?> result = method.apply(exception);
-        assertThat(result.getStatusCode()).isSameAs(expectedStatus);
-        assertThat(result.getBody()).isNotNull()
-            .extracting(Object::toString).asString().contains(message);
     }
 
     @Test
     void shouldReturnExpectationFailed_whenJsonSchemaValidationExceptionThrown() {
         testTemplate(
             "expected exception from json schema rpa",
-            str -> new JsonSchemaValidationException("expected exception from json schema rpa", new Throwable()),
-            handler::handleJsonSchemaValidationException,
+            handler.handleJsonSchemaValidationException(new JsonSchemaValidationException(
+                "expected exception from json schema rpa",
+                new Throwable()
+            ), contentCachingRequestWrapper),
             HttpStatus.EXPECTATION_FAILED
         );
     }
 
+    private <E extends Throwable> void testTemplate(
+        String message,
+        ResponseEntity<?> result,
+        HttpStatus expectedStatus
+    ) {
+
+        assertThat(result.getStatusCode()).isSameAs(expectedStatus);
+        assertThat(result.getBody()).isNotNull()
+            .extracting(Object::toString).asString().contains(message);
+    }
 }

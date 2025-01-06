@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.request.servlet;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -22,8 +23,8 @@ public class CachedBodyRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NotNull HttpServletRequest request,
                                     @NotNull HttpServletResponse response,
                                     @NotNull FilterChain filterChain) throws ServletException, IOException {
-        CachedBodyHttpServletRequest cachedBodyHttpServletRequest =
-            new CachedBodyHttpServletRequest(request);
+        ContentCachingRequestWrapper cachedBodyHttpServletRequest =
+            new ContentCachingRequestWrapper(request);
         filterChain.doFilter(cachedBodyHttpServletRequest, response);
     }
 }

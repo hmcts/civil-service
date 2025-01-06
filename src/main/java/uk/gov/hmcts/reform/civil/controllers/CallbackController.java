@@ -22,9 +22,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 import java.util.Optional;
-import javax.validation.constraints.NotNull;
 
 @Tag(name = "Callback Controller")
 @Slf4j
