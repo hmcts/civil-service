@@ -140,6 +140,10 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
     private static final String WITHOUT_NOTICE_SELECTION_TEXT = "If you were not notified of the application before "
         + "this order was made, you may apply to set aside, vary or stay the order. Any such application must be made "
         + "by 4pm on";
+    public static final String NOT_ALLOWED_FOR_CITIZEN = "This claim involves a LiP. To allocate to Small Claims or Fast Track you must use the"
+        + " Standard Direction Order (SDO) otherwise use Not suitable for SDO.";
+    public static final String NOT_ALLOWED_FOR_TRACK = "The Make an order event is not available for Small Claims and Fast Track cases until the track has"
+        + " been allocated. You must use the Standard Direction Order (SDO) to proceed.";
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
     private static final byte[] bytes = {116, 101, 115, 116};
     private static final CaseDocumentBuilder CASE_DOCUMENT = CaseDocumentBuilder.builder()
@@ -202,10 +206,183 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldReturnNoError_WhenAboutToStartIsInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateSdoDisposal()
+                .build().toBuilder()
+                .allocatedTrack(AllocatedTrack.SMALL_CLAIM).build();
+            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        void shouldReturnError_WhenAboutToStartIsInvokedWithClaimantLip() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .applicant1Represented(NO).build();
+            when(featureToggleService.isMintiEnabled()).thenReturn(true);
+            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).hasSize(1);
+            assertThat(response.getErrors()).containsExactlyInAnyOrder(NOT_ALLOWED_FOR_CITIZEN);
+        }
+
+        @Test
+        void shouldReturnError_WhenAboutToStartIsInvokedWithRespondentLip() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .applicant1Represented(NO).build();
+            when(featureToggleService.isMintiEnabled()).thenReturn(true);
+            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).hasSize(1);
+            assertThat(response.getErrors()).containsExactlyInAnyOrder(NOT_ALLOWED_FOR_CITIZEN);
+        }
+
+        @Test
+        void shouldNotReturnError_WhenAboutToStartIsInvokedNotInJudicialReferral() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                .applicant1Represented(NO)
+                .build().toBuilder()
+                .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
+                .finalOrderAllocateToTrack(YES)
+                .finalOrderIntermediateTrackComplexityBand(FinalOrdersComplexityBand.builder()
+                                                               .assignComplexityBand(YES)
+                                                               .band(ComplexityBand.BAND_1)
+                                                               .build())
+                .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                       .value(DynamicListElement.builder()
+                                                                  .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
+                                                                  .build()).build()).build();
+            when(featureToggleService.isMintiEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("allowOrderTrackAllocation")).isEqualTo("No");
+        }
+
+        @Test
+        void shouldNotReturnError_WhenAboutToStartIsInvokedWhenNoLips() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
+                .finalOrderAllocateToTrack(YES)
+                .finalOrderIntermediateTrackComplexityBand(FinalOrdersComplexityBand.builder()
+                                                               .assignComplexityBand(YES)
+                                                               .band(ComplexityBand.BAND_1)
+                                                               .build())
+                .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                       .value(DynamicListElement.builder()
+                                                                  .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
+                                                                  .build()).build()).build();
+            when(featureToggleService.isMintiEnabled()).thenReturn(true);
+            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("allowOrderTrackAllocation")).isEqualTo("Yes");
+            assertThat(response.getData().get("finalOrderTrackToggle")).isNull();
+        }
+
+        @Test
+        void shouldNotReturnError_WhenAboutToStartIsInvokedMintiNotJudicialReferralNotMintiTrack() {
+            when(featureToggleService.isMintiEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
+                .applicant1Represented(NO)
+                .finalOrderAllocateToTrack(YES)
+                .finalOrderIntermediateTrackComplexityBand(FinalOrdersComplexityBand.builder()
+                                                               .assignComplexityBand(YES)
+                                                               .band(ComplexityBand.BAND_1)
+                                                               .build())
+                .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                       .value(DynamicListElement.builder()
+                                                                  .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
+                                                                  .build()).build()).build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("allowOrderTrackAllocation")).isEqualTo("No");
+        }
+
+        @Test
+        void shouldNotReturnError_WhenMintiNotEnabledMintiNotJudicialReferralNotMintiTrack() {
+            when(featureToggleService.isMintiEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
+                .finalOrderAllocateToTrack(YES)
+                .finalOrderIntermediateTrackComplexityBand(FinalOrdersComplexityBand.builder()
+                                                               .assignComplexityBand(YES)
+                                                               .band(ComplexityBand.BAND_1)
+                                                               .build())
+                .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                       .value(DynamicListElement.builder()
+                                                                  .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
+                                                                  .build()).build()).build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("allowOrderTrackAllocation")).isEqualTo("No");
+        }
+
+        @Test
+        void shouldNotReturnError_WhenMintiEnabledNoJudicialReferralApplicantLip() {
+            when(featureToggleService.isMintiEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
+                .applicant1Represented(NO)
+                .finalOrderAllocateToTrack(YES)
+                .finalOrderIntermediateTrackComplexityBand(FinalOrdersComplexityBand.builder()
+                                                               .assignComplexityBand(YES)
+                                                               .band(ComplexityBand.BAND_1)
+                                                               .build())
+                .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                       .value(DynamicListElement.builder()
+                                                                  .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
+                                                                  .build()).build()).build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("allowOrderTrackAllocation")).isEqualTo("No");
+        }
+
+        @Test
+        void shouldNotReturnError_WhenMintiEnabledNoJudicialReferralNoLips() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
+                .finalOrderAllocateToTrack(YES)
+                .finalOrderIntermediateTrackComplexityBand(FinalOrdersComplexityBand.builder()
+                                                               .assignComplexityBand(YES)
+                                                               .band(ComplexityBand.BAND_1)
+                                                               .build())
+                .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                       .value(DynamicListElement.builder()
+                                                                  .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
+                                                                  .build()).build()).build();
+            when(featureToggleService.isMintiEnabled()).thenReturn(true);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("allowOrderTrackAllocation")).isEqualTo("No");
+        }
+
+        @Test
+        void shouldShowTrackAllocationPage_WhenMultiTrack() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
+                .finalOrderAllocateToTrack(YES)
+                .finalOrderIntermediateTrackComplexityBand(FinalOrdersComplexityBand.builder()
+                                                               .assignComplexityBand(YES)
+                                                               .band(ComplexityBand.BAND_1)
+                                                               .build())
+                .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                       .value(DynamicListElement.builder()
+                                                                  .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
+                                                                  .build()).build()).build();
+            when(featureToggleService.isMintiEnabled()).thenReturn(true);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("allowOrderTrackAllocation")).isEqualTo("Yes");
+            assertThat(response.getData().get("finalOrderTrackToggle")).isNull();
         }
 
         @Test
@@ -459,6 +636,187 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
     class MidEventPopulateTrackToggleAndPopulateDownloadTemplateOptions {
         private static final String PAGE_ID = "assign-track-toggle";
 
+        @Test
+        void shouldThrowError_whenFastTrackNotBeingReallocatedToMintiTrack() {
+            when(featureToggleService.isMintiEnabled()).thenReturn(true);
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                .build().toBuilder()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .allocatedTrack(AllocatedTrack.FAST_CLAIM)
+                .finalOrderAllocateToTrack(NO).build();
+            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, MID, PAGE_ID, JUDICIAL_REFERRAL);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).hasSize(1);
+            assertThat(response.getErrors()).containsExactlyInAnyOrder(NOT_ALLOWED_FOR_TRACK);
+        }
+
+        @Test
+        void shouldThrowError_whenSmallTrackNotBeingReallocatedToMintiTrack() {
+            when(featureToggleService.isMintiEnabled()).thenReturn(true);
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                .build().toBuilder()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+                .finalOrderAllocateToTrack(NO).build();
+            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, MID, PAGE_ID, JUDICIAL_REFERRAL);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).hasSize(1);
+            assertThat(response.getErrors()).containsExactlyInAnyOrder(NOT_ALLOWED_FOR_TRACK);
+        }
+
+        @Test
+        void shouldNotThrowError_whenSmallTrackNotBeingReallocatedToMintiTrackMintiNotEnabled() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                .build().toBuilder()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+                .finalOrderAllocateToTrack(NO).build();
+            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, MID, PAGE_ID, JUDICIAL_REFERRAL);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        void shouldNotThrowError_whenSmallTrackBeingReallocatedToMintiTrack() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                .build().toBuilder()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+                .finalOrderTrackAllocation(AllocatedTrack.INTERMEDIATE_CLAIM)
+                .finalOrderAllocateToTrack(YES).build();
+            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, MID, PAGE_ID, JUDICIAL_REFERRAL);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        void shouldNotThrowError_whenSmallTrackNotInJudicialReferral() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                .build().toBuilder()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+                .finalOrderAllocateToTrack(NO).build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        void shouldNotThrowError_whenFastTrackBeingReallocatedToMintiTrack() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                .build().toBuilder()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .allocatedTrack(AllocatedTrack.FAST_CLAIM)
+                .finalOrderTrackAllocation(AllocatedTrack.INTERMEDIATE_CLAIM)
+                .finalOrderAllocateToTrack(YES).build();
+            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, MID, PAGE_ID, JUDICIAL_REFERRAL);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        void shouldNotThrowError_whenFastTrackBeingReallocatedToMintiTrackMintiEnabledJudicialReferral() {
+            when(featureToggleService.isMintiEnabled()).thenReturn(true);
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                .build().toBuilder()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .allocatedTrack(AllocatedTrack.FAST_CLAIM)
+                .finalOrderTrackAllocation(AllocatedTrack.INTERMEDIATE_CLAIM)
+                .finalOrderAllocateToTrack(YES).build();
+            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, MID, PAGE_ID, JUDICIAL_REFERRAL);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        void shouldNotThrowError_whenFastTrackBeingReallocatedToMintiTrackNoMintiNoJudicialReferral() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                .build().toBuilder()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .allocatedTrack(AllocatedTrack.FAST_CLAIM)
+                .finalOrderTrackAllocation(AllocatedTrack.INTERMEDIATE_CLAIM)
+                .finalOrderAllocateToTrack(YES).build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        void shouldNotThrowError_whenFastTrackBeingReallocatedToMintiTrackMintiEnabledNotJudicialReferral() {
+            when(featureToggleService.isMintiEnabled()).thenReturn(true);
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                .build().toBuilder()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .allocatedTrack(AllocatedTrack.FAST_CLAIM)
+                .finalOrderTrackAllocation(AllocatedTrack.INTERMEDIATE_CLAIM)
+                .finalOrderAllocateToTrack(YES).build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        void shouldNotThrowError_whenFastTrackNotInJudicialReferral() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                .build().toBuilder()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .allocatedTrack(AllocatedTrack.FAST_CLAIM)
+                .finalOrderAllocateToTrack(NO).build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        void shouldNotThrowError_whenMultiTrackInJudicialReferral() {
+            when(featureToggleService.isMintiEnabled()).thenReturn(true);
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                .build().toBuilder()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
+                .finalOrderAllocateToTrack(NO).build();
+            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, MID, PAGE_ID, JUDICIAL_REFERRAL);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        void shouldNotThrowError_whenMultiTrackAllocateToTrackNoMintiNoJudicialReferral() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                .build().toBuilder()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
+                .finalOrderTrackAllocation(AllocatedTrack.INTERMEDIATE_CLAIM)
+                .finalOrderAllocateToTrack(YES).build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+        }
+
         @Nested
         class FinalOrderTrackNotAllocated {
 
@@ -654,6 +1012,30 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems().get(3).getLabel())
                     .isEqualTo(MULTI_OPTIONS.getListItems().get(3).getLabel());
             }
+        }
+
+    }
+
+    @Nested
+    class MidEventGenerateTemplatesMinti {
+        private static final String PAGE_ID = "create-download-template-document";
+
+        @Test
+        void shouldGenerateFreeFormOrder_onMidEventCallback() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                       .value(DynamicListElement.builder()
+                                                                  .label("Blank template to be used after a hearing")
+                                                                  .build())
+                                                       .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When
+            when(judgeOrderDownloadGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("finalOrderDownloadTemplateDocument").isNotNull();
         }
 
     }
