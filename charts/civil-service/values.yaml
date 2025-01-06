@@ -1,3 +1,4 @@
+
 idam-pr:
   enabled: false
 
@@ -23,9 +24,6 @@ em-ccdorc:
   enabled: false
 
 em-stitching:
-  enabled: false
-
-civil-ccd-stack:
   enabled: false
 
 java:
