@@ -12,16 +12,26 @@ import org.junit.jupiter.api.BeforeEach;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
+import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
+import uk.gov.hmcts.reform.civil.prd.model.DxAddress;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
@@ -44,13 +54,31 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
 
     @Mock
     private FeatureToggleService featureToggleService;
+    @Mock
+    private OrganisationService organisationService;
+    @Mock
+    OrganisationApi organisationApi;
 
     private static final String NEW_ORG_ID = "1234";
+    private static final ContactInformation CONTACT_INFORMATION = ContactInformation.builder()
+        .addressLine1("line 1")
+        .addressLine2("line 2")
+        .postCode("AB1 2XY")
+        .county("My county")
+        .dxAddress(List.of(DxAddress.builder()
+                               .dxNumber("DX 12345")
+                               .build()))
+        .build();
+    private static final Organisation ORGANISATION = Organisation.builder()
+        .organisationIdentifier("QWERTY R")
+        .name("Org Name")
+        .contactInformation(List.of(CONTACT_INFORMATION))
+        .build();
 
     @BeforeEach
     void setUp() {
         mapper = new ObjectMapper();
-        handler = new UpdateCaseDetailsAfterNoCHandler(mapper, coreCaseUserService, featureToggleService);
+        handler = new UpdateCaseDetailsAfterNoCHandler(mapper, coreCaseUserService, featureToggleService, organisationService);
         mapper.registerModule(new JavaTimeModule());
     }
 
@@ -650,6 +678,41 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(NO);
             }
         }
+
+        @Test
+        void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor1v1LiPSpecForLiPNoC() {
+            when(featureToggleService.isCaseEventsEnabled()).thenReturn(false);
+            when(featureToggleService.isDefendantNoCOnline()).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .changeOfRepresentation(false, false, NEW_ORG_ID, null, null)
+                .changeOrganisationRequestField(false, false, null, null, "requester@example.com")
+                .updateOrgPolicyAfterNoC(true, false, NEW_ORG_ID)
+                .anyRepresented(NO)
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID("QWERTY R").build())
+                                                    .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
+                                                    .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(updatedCaseData.getChangeOrganisationRequestField()).isNull();
+            assertThat(updatedCaseData.getSpecAoSRespondentCorrespondenceAddressdetails()).isNull();
+            assertThat(updatedCaseData.getSpecRespondent1Represented()).isEqualTo(YES);
+            assertThat(updatedCaseData.getRespondentSolicitor1OrganisationDetails()).isNull();
+            assertThat(updatedCaseData.getRespondent1OrgRegistered()).isEqualTo(YES);
+            assertThat(updatedCaseData.getRespondentSolicitor1EmailAddress())
+                .isEqualTo("requester@example.com");
+            assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(NO);
+        }
+
 
         @Test
         void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor2In1v2DiffSolicitorToDiffSolicitorSpec() {
