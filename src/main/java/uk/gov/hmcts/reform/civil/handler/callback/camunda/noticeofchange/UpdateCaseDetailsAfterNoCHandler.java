@@ -282,7 +282,9 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         }
 
         String organisationId = OrgPolicyUtils.getRespondent1SolicitorOrgId(caseData);
-        if (organisationId != null && featureToggleService.isDefendantNoCOnline() && isOneVOne(caseData)) {
+        if (organisationId != null
+            && featureToggleService.isDefendantNoCOnlineForCase(caseData)
+            && isOneVOne(caseData)) {
             try {
                 organisationService.findOrganisationById(organisationId)
                     .ifPresent(setRespondentSolicitorDetails(caseDataBuilder));

@@ -682,7 +682,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor1v1LiPSpecForLiPNoC() {
             when(featureToggleService.isCaseEventsEnabled()).thenReturn(false);
-            when(featureToggleService.isDefendantNoCOnline()).thenReturn(true);
+            when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
             when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(ORGANISATION));
 
             CaseData caseData = CaseDataBuilder.builder()
