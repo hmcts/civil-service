@@ -141,11 +141,12 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
 
     private Consumer<Organisation> setRespondentSolicitorDetails(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         return organisation -> {
-                    List<ContactInformation> contactInformation = organisation.getContactInformation();
-                    caseDataBuilder.respondentSolicitorDetails(RespondentSolicitorDetails.builder().orgName(organisation.getName())
-                        .address(Address.fromContactInformation(contactInformation.get(0))).build());
-                };
-
+            List<ContactInformation> contactInformation = organisation.getContactInformation();
+            caseDataBuilder.respondentSolicitorDetails(RespondentSolicitorDetails.builder()
+                                                           .orgName(organisation.getName())
+                                                           .address(Address.fromContactInformation(
+                                                               contactInformation.get(0))).build());
+        };
     }
 
     private void unassignCaseFromDefendantLip(CaseData caseData) {

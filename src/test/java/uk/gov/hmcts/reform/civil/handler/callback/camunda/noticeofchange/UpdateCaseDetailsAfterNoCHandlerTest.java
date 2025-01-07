@@ -28,10 +28,10 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
@@ -683,6 +683,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
         void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor1v1LiPSpecForLiPNoC() {
             when(featureToggleService.isCaseEventsEnabled()).thenReturn(false);
             when(featureToggleService.isDefendantNoCOnline()).thenReturn(true);
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(ORGANISATION));
 
             CaseData caseData = CaseDataBuilder.builder()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
@@ -711,8 +712,13 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getRespondentSolicitor1EmailAddress())
                 .isEqualTo("requester@example.com");
             assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(NO);
+            assertThat(updatedCaseData.getRespondentSolicitorDetails().getOrgName()).isEqualTo(ORGANISATION.getName());
+            assertThat(updatedCaseData.getRespondentSolicitorDetails().getAddress().getAddressLine1()).isEqualTo(ORGANISATION.getContactInformation().get(0).getAddressLine1());
+            assertThat(updatedCaseData.getRespondentSolicitorDetails().getAddress().getAddressLine2()).isEqualTo(ORGANISATION.getContactInformation().get(0).getAddressLine2());
+            assertThat(updatedCaseData.getRespondentSolicitorDetails().getAddress().getAddressLine2()).isEqualTo(ORGANISATION.getContactInformation().get(0).getAddressLine2());
+            assertThat(updatedCaseData.getRespondentSolicitorDetails().getAddress().getPostCode()).isEqualTo(ORGANISATION.getContactInformation().get(0).getPostCode());
+            assertThat(updatedCaseData.getRespondentSolicitorDetails().getAddress().getCounty()).isEqualTo(ORGANISATION.getContactInformation().get(0).getCounty());
         }
-
 
         @Test
         void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor2In1v2DiffSolicitorToDiffSolicitorSpec() {
