@@ -636,6 +636,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         nullPreviousSelections(caseDataBuilder);
 
         if (featureToggleService.isCaseEventsEnabled()
+            && !JUDICIAL_REFERRAL.toString().equals(callbackParams.getRequest().getCaseDetails().getState())
             && ((ASSISTED_ORDER.equals(caseData.getFinalOrderSelection())
             && isNull(caseData.getFinalOrderFurtherHearingToggle()))
             || FREE_FORM_ORDER.equals(caseData.getFinalOrderSelection())
