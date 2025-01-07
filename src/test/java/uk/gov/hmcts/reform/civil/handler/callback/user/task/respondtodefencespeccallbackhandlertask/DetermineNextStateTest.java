@@ -328,6 +328,28 @@ class DetermineNextStateTest {
         assertEquals(AWAITING_APPLICANT_INTENTION.name(), resultState);
     }
 
+    @Test
+    void shouldSetAwaitingApplicantIntentionWhenApplicantWantToProceedImmediatePaymentPlanFor1V1() {
+
+        CaseData.CaseDataBuilder<?, ?> builder = mock(CaseData.CaseDataBuilder.class);
+        BusinessProcess businessProcess = BusinessProcess.builder().build();
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1AcceptAdmitAmountPaidSpec(NO)
+            .respondent1Represented(YES)
+            .applicant1Represented(YES)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
+            .build();
+
+        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+        String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
+                                                                   builder, "", businessProcess);
+        assertNotNull(resultState);
+        assertEquals(All_FINAL_ORDERS_ISSUED.name(), resultState);
+    }
+
     private CallbackParams callbackParams(CaseData caseData) {
 
         return CallbackParams.builder()

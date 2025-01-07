@@ -57,8 +57,7 @@ public class PayImmediatelyConfText implements RespondToResponseConfirmationText
             && IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
             && ((RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
             && null == caseData.getApplicant1ProceedWithClaim())
-            || (RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            && YES == caseData.getApplicant1AcceptAdmitAmountPaidSpec()
+            || (caseData.isPartAdmitImmediatePaymentClaimSettled()
             && YES == caseData.getRespondForImmediateOption()));
     }
 }

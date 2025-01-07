@@ -287,7 +287,32 @@ class AboutToSubmitRespondToDefenceTaskTest {
             (AboutToStartOrSubmitCallbackResponse) task.execute(callbackParams(caseData));
 
         assertNotNull(response);
-        assertThat(getCaseData(response)).extracting("respondForImmediateOption").asString().isEqualTo("YES");;
+        assertThat(getCaseData(response)).extracting("respondForImmediateOption").asString().isEqualTo("YES");
+    }
+
+    @Test
+    void shouldSetRespondOptionWhenImmediatePartPaymentPlanSelected_ApplicantConfirmsNotToProceed1v1() {
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .applicant1AcceptAdmitAmountPaidSpec(YES)
+            .applicant1DQWithExperts()
+            .applicant1DQWithWitnesses()
+            .respondent1Represented(NO)
+            .respondent1(PartyBuilder.builder().individual().build())
+            .specRespondent1Represented(NO)
+            .applicant1Represented(YES)
+            .applicant1(PartyBuilder.builder().individual().build())
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .build();
+
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) task.execute(callbackParams(caseData));
+
+        assertNotNull(response);
+        assertThat(getCaseData(response)).extracting("respondForImmediateOption").asString().isEqualTo("YES");
     }
 
     private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {

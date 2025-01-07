@@ -101,7 +101,8 @@ public class DetermineNextState  {
     }
 
     private String getNextState(CaseData caseData) {
-        if (caseData.getApplicant1ProceedWithClaim() == null || YesOrNo.YES == caseData.getApplicant1AcceptAdmitAmountPaidSpec()) {
+        if ((caseData.isFullAdmitClaimSpec() && caseData.getApplicant1ProceedWithClaim() == null)
+            || (caseData.isPartAdmitImmediatePaymentClaimSettled())) {
             return CaseState.AWAITING_APPLICANT_INTENTION.name();
         }
         return CaseState.All_FINAL_ORDERS_ISSUED.name();

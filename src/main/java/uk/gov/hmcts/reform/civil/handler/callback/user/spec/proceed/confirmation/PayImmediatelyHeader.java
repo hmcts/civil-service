@@ -30,8 +30,7 @@ public class PayImmediatelyHeader implements RespondToResponseConfirmationHeader
         return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
             &&  caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
             && ((RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
-            || (RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            && YES == caseData.getApplicant1AcceptAdmitAmountPaidSpec()
+            || (caseData.isPartAdmitImmediatePaymentClaimSettled()
             && YES == caseData.getRespondForImmediateOption()));
     }
 }
