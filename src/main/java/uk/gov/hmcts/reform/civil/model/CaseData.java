@@ -684,6 +684,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo joShowRegisteredWithRTLOption;
     private JudgmentDetails activeJudgment;
     private List<Element<JudgmentDetails>> historicJudgment;
+    private YesOrNo isTakenOfflineAfterJBA;
     private LocalDateTime joSetAsideCreatedDate;
 
     private String joDefendantName1;
@@ -758,7 +759,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private List<Element<ObligationData>> obligationData;
     private List<Element<ObligationData>> storedObligationData;
     private YesOrNo isFinalOrder;
-
     private SendAndReplyOption sendAndReplyOption;
     private SendMessageMetadata sendMessageMetadata;
     private String sendMessageContent;
