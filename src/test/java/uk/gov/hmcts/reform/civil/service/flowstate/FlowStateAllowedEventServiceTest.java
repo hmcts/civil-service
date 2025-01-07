@@ -1607,7 +1607,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         ADD_CASE_NOTE,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        REQUEST_JUDGEMENT_ADMISSION_SPEC
                     }
                 ),
                 of(
@@ -1621,7 +1622,8 @@ class FlowStateAllowedEventServiceTest {
                     FULL_ADMIT_PAY_IMMEDIATELY,
                     new CaseEvent[] {
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        REQUEST_JUDGEMENT_ADMISSION_SPEC
                     }
                 ),
                 of(

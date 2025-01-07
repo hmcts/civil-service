@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.PaymentDateService;
@@ -54,7 +55,10 @@ public class PayImmediatelyConfText implements RespondToResponseConfirmationText
     private boolean isDefendantFullAdmitPayImmediately(CaseData caseData) {
         return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
             && IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
-            && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
-            && null == caseData.getApplicant1ProceedWithClaim();
+            && ((RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            && null == caseData.getApplicant1ProceedWithClaim())
+            || (RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            && YES == caseData.getApplicant1AcceptAdmitAmountPaidSpec()
+            && YES == caseData.getRespondForImmediateOption()));
     }
 }

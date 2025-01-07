@@ -51,7 +51,7 @@ public class DetermineNextState  {
                 nextState = result.getLeft();
                 businessProcess = result.getRight();
             } else if (isDefenceAdmitPayImmediately(caseData)) {
-                nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
+                nextState = getNextState(caseData);
             } else if (caseData.hasApplicantRejectedRepaymentPlan()) {
                 nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
             } else if (isClaimNotSettled(caseData)) {
@@ -98,6 +98,13 @@ public class DetermineNextState  {
     private boolean isDefenceAdmitPayImmediately(CaseData caseData) {
         return featureToggleService.isJudgmentOnlineLive()
             && IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
+      }
+
+    private String getNextState(CaseData caseData) {
+        if (caseData.getApplicant1ProceedWithClaim() == null || YesOrNo.YES == caseData.getApplicant1AcceptAdmitAmountPaidSpec()) {
+            return CaseState.AWAITING_APPLICANT_INTENTION.name();
+        }
+        return CaseState.All_FINAL_ORDERS_ISSUED.name();
     }
 
     private static boolean isClaimNotSettled(CaseData caseData) {
