@@ -44,6 +44,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 @ExtendWith(MockitoExtension.class)
 class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -121,7 +122,7 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldThrowError_ifStillTasksLeft() {
             CaseData caseData = CaseData.builder()
-                .obligationDatePresent(YesOrNo.NO)
+                .obligationDatePresent(NO)
                 .courtStaffNextSteps(CourtStaffNextSteps.STILL_TASKS)
                 .build();
 
@@ -140,7 +141,7 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldThrowNoError_ifNoTasksLeft() {
             CaseData caseData = CaseData.builder()
-                .obligationDatePresent(YesOrNo.NO)
+                .obligationDatePresent(NO)
                 .courtStaffNextSteps(CourtStaffNextSteps.NO_TASKS)
                 .build();
 
@@ -236,6 +237,7 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                   .obligationReason(ObligationReason.STAY_A_CASE)
                                                   .reasonText(ObligationReason.STAY_A_CASE
                                                                   .getDisplayedValue())
+                                                  .obligationWATaskRaised(NO)
                                                   .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -285,6 +287,7 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .otherObligationReason("Reason for othering")
                 .reasonText(ObligationReason.OTHER
                                 .getDisplayedValue() + ": Reason for othering")
+                .obligationWATaskRaised(NO)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -304,7 +307,7 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
             Mockito.when(toggleService.isCaseEventsEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
                 .build();
-            caseData.builder().obligationDatePresent(YesOrNo.NO).build();
+            caseData.builder().obligationDatePresent(NO).build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
