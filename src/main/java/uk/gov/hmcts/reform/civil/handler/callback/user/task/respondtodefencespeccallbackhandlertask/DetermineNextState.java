@@ -98,7 +98,7 @@ public class DetermineNextState  {
     private boolean isDefenceAdmitPayImmediately(CaseData caseData) {
         return featureToggleService.isJudgmentOnlineLive()
             && IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
-      }
+    }
 
     private String getNextState(CaseData caseData) {
         if (caseData.getApplicant1ProceedWithClaim() == null || YesOrNo.YES == caseData.getApplicant1AcceptAdmitAmountPaidSpec()) {
