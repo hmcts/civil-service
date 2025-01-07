@@ -329,8 +329,8 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     private void is1v1RespondImmediately(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
         if (featureToggleService.isJudgmentOnlineLive()
             && isOneVOne(caseData)
-            && ((caseData.isFullAdmitPayImmediatelyClaimSpec()
-            && caseData.getApplicant1ProceedWithClaim() == null)
+            && caseData.isPayImmediately()
+            && ((caseData.isFullAdmitClaimSpec() && caseData.getApplicant1ProceedWithClaim() == null)
             || caseData.isPartAdmitImmediatePaymentClaimSettled())) {
             builder.respondForImmediateOption(YesOrNo.YES);
         }
