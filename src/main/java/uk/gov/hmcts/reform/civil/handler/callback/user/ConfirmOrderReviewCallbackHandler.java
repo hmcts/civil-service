@@ -162,13 +162,11 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
                                     ? ObligationReason.OTHER.getDisplayedValue() + ": " + obligation.getValue().getOtherObligationReason()
                                     : obligation.getValue().getObligationReason().getDisplayedValue())
                     .obligationAction(obligation.getValue().getObligationAction())
+                    .obligationWATaskRaised(YesOrNo.NO)
                     .build();
 
                 combinedData.add(element(storedObligation));
             });
-
-            caseData.getObligationData().forEach(element ->
-                                                     element.getValue().setObligationWATaskRaised(YesOrNo.NO));
 
             updatedCaseData.obligationData(null)
                 .storedObligationData(combinedData);

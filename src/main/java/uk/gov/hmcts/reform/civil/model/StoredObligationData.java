@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.ObligationReason;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,4 +23,5 @@ public class StoredObligationData {
     private String otherObligationReason;
     private String reasonText;
     private String obligationAction;
+    private YesOrNo obligationWATaskRaised;
 }
