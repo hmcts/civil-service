@@ -639,7 +639,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             && ((ASSISTED_ORDER.equals(caseData.getFinalOrderSelection())
             && isNull(caseData.getFinalOrderFurtherHearingToggle()))
             || FREE_FORM_ORDER.equals(caseData.getFinalOrderSelection())
-            || featureToggleService.isMintiEnabled() && isMultiOrIntTrack(caseData))) {
+            || (featureToggleService.isMintiEnabled() && isMultiOrIntTrack(caseData)))) {
 
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseDataBuilder.build().toMap(objectMapper))
