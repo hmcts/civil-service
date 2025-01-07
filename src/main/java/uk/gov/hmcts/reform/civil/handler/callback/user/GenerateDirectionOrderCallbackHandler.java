@@ -638,7 +638,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         if (featureToggleService.isCaseEventsEnabled()
             && ((ASSISTED_ORDER.equals(caseData.getFinalOrderSelection())
             && isNull(caseData.getFinalOrderFurtherHearingToggle()))
-            || FREE_FORM_ORDER.equals(caseData.getFinalOrderSelection()))) {
+            || FREE_FORM_ORDER.equals(caseData.getFinalOrderSelection())
+            || featureToggleService.isMintiEnabled() && isMultiOrIntTrack(caseData))) {
 
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseDataBuilder.build().toMap(objectMapper))

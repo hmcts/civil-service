@@ -1968,6 +1968,32 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Then
             assertThat(response.getState()).isEqualTo(null);
         }
+
+        @Test
+        void shouldNotChangeState_onAboutToSubmitAndMintiClaimMultiClaim() {
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                            .forename("Judge")
+                                                                            .surname("Judy")
+                                                                            .roles(Collections.emptyList()).build());
+            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+            when(featureToggleService.isMintiEnabled()).thenReturn(true);
+            // Given
+            List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
+            finalCaseDocuments.add(element(finalOrder));
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW))
+                .finalOrderDocumentCollection(finalCaseDocuments)
+                .finalOrderDocument(finalOrder)
+                .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
+                .ccdState(PREPARE_FOR_HEARING_CONDUCT_HEARING)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getState()).isEqualTo(null);
+        }
     }
 
     @Nested
