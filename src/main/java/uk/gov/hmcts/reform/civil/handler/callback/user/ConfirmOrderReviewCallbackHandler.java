@@ -143,6 +143,8 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
 
             List<Element<ObligationData>> combinedData = new ArrayList<>();
             combinedData.addAll(storedObligationData);
+            caseData.getObligationData().forEach(element ->
+                                                     element.getValue().setObligationWATaskRaised(YesOrNo.NO));
             combinedData.addAll(caseData.getObligationData());
 
             updatedCaseData.obligationData(null)
