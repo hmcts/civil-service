@@ -287,7 +287,7 @@ class AboutToSubmitRespondToDefenceTaskTest {
             (AboutToStartOrSubmitCallbackResponse) task.execute(callbackParams(caseData));
 
         assertNotNull(response);
-        assertThat(getCaseData(response)).extracting("respondForImmediateOption").asString().isEqualTo("YES");;
+        assertThat(getCaseData(response)).extracting("respondForImmediateOption").asString().isEqualTo("YES");
     }
 
     private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
