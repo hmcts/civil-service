@@ -1976,7 +1976,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                             .surname("Judy")
                                                                             .roles(Collections.emptyList()).build());
             when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
-            when(featureToggleService.isMintiEnabled()).thenReturn(true);
             // Given
             List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
             finalCaseDocuments.add(element(finalOrder));
