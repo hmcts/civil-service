@@ -1488,6 +1488,7 @@ class FlowStateAllowedEventServiceTest {
                         MANAGE_STAY,
                         ADD_CASE_NOTE,
                         CONFIRM_ORDER_REVIEW,
+                        NOC_REQUEST,
                         ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
@@ -1532,6 +1533,7 @@ class FlowStateAllowedEventServiceTest {
                         INVALID_HWF_REFERENCE,
                         ADD_CASE_NOTE,
                         CONFIRM_ORDER_REVIEW,
+                        NOC_REQUEST,
                         ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
@@ -1705,6 +1707,8 @@ class FlowStateAllowedEventServiceTest {
                         UPDATE_HELP_WITH_FEE_NUMBER,
                         INVALID_HWF_REFERENCE,
                         CONFIRM_ORDER_REVIEW,
+                        MEDIATION_UNSUCCESSFUL,
+                        MEDIATION_SUCCESSFUL,
                         ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
