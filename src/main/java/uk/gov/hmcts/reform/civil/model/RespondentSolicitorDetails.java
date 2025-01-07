@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RespondentSolicitorDetails {
+
     private String orgName;
     private Address address;
 }
