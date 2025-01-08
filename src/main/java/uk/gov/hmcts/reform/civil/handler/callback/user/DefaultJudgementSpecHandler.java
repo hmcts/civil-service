@@ -288,7 +288,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         // otherwise show new dj fixed costs screen if judgment amount is more
         // than 25. judgment amount = claim amount + interest - partial amount
         if (caseData.getFixedCosts() != null) {
-            BigDecimal judgmentAmount = JudgmentsOnlineHelper.getJudgmentAmount(caseData, interestCalculator);
+            BigDecimal judgmentAmount = JudgmentsOnlineHelper.getDebtAmount(caseData, interestCalculator);
             if (YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
                 if (judgmentAmount.compareTo(BigDecimal.valueOf(25)) > 0) {
                     caseDataBuilder.showDJFixedCostsScreen(YesOrNo.YES);

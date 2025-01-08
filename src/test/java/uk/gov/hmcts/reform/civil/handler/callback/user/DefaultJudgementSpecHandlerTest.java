@@ -606,12 +606,12 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .totalClaimAmount(claimAmount)
                 .totalInterest(interestAmount)
                 .claimFee(Fee.builder()
-                              .calculatedAmountInPence(BigDecimal.valueOf(1))
-                              .build())
+                    .calculatedAmountInPence(BigDecimal.valueOf(1))
+                    .build())
                 .fixedCosts(FixedCosts.builder()
-                                .claimFixedCosts(YES)
-                                .fixedCostAmount("10000")
-                                .build())
+                    .claimFixedCosts(YES)
+                    .fixedCostAmount("10000")
+                    .build())
                 .partialPaymentAmount("3000")
                 .build();
 
@@ -624,42 +624,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void  shouldNotShowNewFixedCostsPage_whenJudgmentAmountLessThan25AndYesClaimIssueFixedCostsAndShouldNotCalculateRepaymentBreakdown() {
-            BigDecimal claimAmount = new BigDecimal(2000);
-            BigDecimal interestAmount = new BigDecimal(100);
-            when(interestCalculator.calculateInterest(any()))
-                .thenReturn(BigDecimal.valueOf(1));
-
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YES)
-                .totalClaimAmount(claimAmount)
-                .totalInterest(interestAmount)
-                .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Test User")
-                                                     .build())
-                                          .build())
-                .claimFee(Fee.builder()
-                              .calculatedAmountInPence(BigDecimal.valueOf(1))
-                              .build())
-                .fixedCosts(FixedCosts.builder()
-                                .claimFixedCosts(YES)
-                                .fixedCostAmount("10")
-                                .build())
-                .partialPaymentAmount("199500")
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData().get("showOldDJFixedCostsScreen")).isNull();
-            assertThat(response.getData().get("showDJFixedCostsScreen")).isEqualTo("No");
-            assertThat(response.getData().get("repaymentSummaryObject")).isNotNull();
-        }
-
-        @Test
-        void  shouldShowNewFixedCostsPage_whenJudgmentAmountMoreThan25AndYesClaimIssueFixedCostsAndCalculateRepaymentBreakdown() {
+        void shouldNotShowNewFixedCostsPage_whenJudgmentAmountLessThan25AndYesClaimIssueFixedCostsAndShouldNotCalculateRepaymentBreakdown() {
             BigDecimal claimAmount = new BigDecimal(2000);
             BigDecimal interestAmount = new BigDecimal(100);
             when(interestCalculator.calculateInterest(any()))
@@ -680,7 +645,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                     .build())
                 .fixedCosts(FixedCosts.builder()
                     .claimFixedCosts(YES)
-                    .fixedCostAmount("10000")
+                    .fixedCostAmount("10")
                     .build())
                 .partialPaymentAmount("199500")
                 .build();
@@ -689,12 +654,12 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData().get("showOldDJFixedCostsScreen")).isNull();
-            assertThat(response.getData().get("showDJFixedCostsScreen")).isEqualTo("Yes");
-            assertThat(response.getData().get("repaymentSummaryObject")).isNull();
+            assertThat(response.getData().get("showDJFixedCostsScreen")).isEqualTo("No");
+            assertThat(response.getData().get("repaymentSummaryObject")).isNotNull();
         }
 
         @Test
-        void  shouldShowNewFixedCostsPage_whenJudgmentAmountMoreThan25WithFeeAndNoClaimIssueFixedCosts() {
+        void shouldShowNewFixedCostsPage_whenJudgmentAmountWithInterestMoreThan25() {
             BigDecimal claimAmount = new BigDecimal(2000);
             BigDecimal interestAmount = new BigDecimal(100);
             when(interestCalculator.calculateInterest(any()))
@@ -717,7 +682,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                     .claimFixedCosts(YES)
                     .fixedCostAmount("100")
                     .build())
-                .partialPaymentAmount("199400")
+                .partialPaymentAmount("197400")
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -741,16 +706,16 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .totalClaimAmount(claimAmount)
                 .totalInterest(interestAmount)
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Test User")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("Test User")
+                        .build())
+                    .build())
                 .claimFee(Fee.builder()
-                              .calculatedAmountInPence(BigDecimal.valueOf(1))
-                              .build())
+                    .calculatedAmountInPence(BigDecimal.valueOf(1))
+                    .build())
                 .fixedCosts(FixedCosts.builder()
-                                .claimFixedCosts(NO)
-                                .build())
+                    .claimFixedCosts(NO)
+                    .build())
                 .partialPaymentAmount("2090")
                 .build();
 
@@ -893,15 +858,15 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .partialPaymentAmount("100")
                 .totalClaimAmount(BigDecimal.valueOf(5002))
                 .fixedCosts(FixedCosts.builder()
-                                .claimFixedCosts(YES)
-                                .fixedCostAmount("10000")
-                                .build())
+                    .claimFixedCosts(YES)
+                    .fixedCostAmount("10000")
+                    .build())
                 .claimFixedCostsOnEntryDJ(YES)
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Test User")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("Test User")
+                        .build())
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -937,15 +902,15 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .partialPaymentAmount("100")
                 .totalClaimAmount(BigDecimal.valueOf(5001))
                 .fixedCosts(FixedCosts.builder()
-                                .claimFixedCosts(YES)
-                                .fixedCostAmount("10000")
-                                .build())
+                    .claimFixedCosts(YES)
+                    .fixedCostAmount("10000")
+                    .build())
                 .claimFixedCostsOnEntryDJ(NO)
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Test User")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("Test User")
+                        .build())
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -981,15 +946,15 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .partialPaymentAmount("100")
                 .totalClaimAmount(BigDecimal.valueOf(3001))
                 .fixedCosts(FixedCosts.builder()
-                                .claimFixedCosts(YES)
-                                .fixedCostAmount("10000")
-                                .build())
+                    .claimFixedCosts(YES)
+                    .fixedCostAmount("10000")
+                    .build())
                 .claimFixedCostsOnEntryDJ(YES)
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Test User")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("Test User")
+                        .build())
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1025,15 +990,15 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .partialPaymentAmount("100")
                 .totalClaimAmount(BigDecimal.valueOf(3001))
                 .fixedCosts(FixedCosts.builder()
-                                .claimFixedCosts(YES)
-                                .fixedCostAmount("10000")
-                                .build())
+                    .claimFixedCosts(YES)
+                    .fixedCostAmount("10000")
+                    .build())
                 .claimFixedCostsOnEntryDJ(NO)
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Test User")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("Test User")
+                        .build())
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1069,14 +1034,14 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .partialPaymentAmount("299500")
                 .totalClaimAmount(BigDecimal.valueOf(3000))
                 .fixedCosts(FixedCosts.builder()
-                                .claimFixedCosts(YES)
-                                .fixedCostAmount("10000")
-                                .build())
+                    .claimFixedCosts(YES)
+                    .fixedCostAmount("10000")
+                    .build())
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Test User")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("Test User")
+                        .build())
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1112,13 +1077,13 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .partialPaymentAmount("299500")
                 .totalClaimAmount(BigDecimal.valueOf(3000))
                 .fixedCosts(FixedCosts.builder()
-                                .claimFixedCosts(NO)
-                                .build())
+                    .claimFixedCosts(NO)
+                    .build())
                 .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Test User")
-                                                     .build())
-                                          .build())
+                    .value(DynamicListElement.builder()
+                        .label("Test User")
+                        .build())
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
