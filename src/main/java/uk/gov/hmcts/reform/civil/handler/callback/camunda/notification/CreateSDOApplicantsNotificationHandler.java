@@ -94,13 +94,6 @@ public class CreateSDOApplicantsNotificationHandler extends CallbackHandler impl
     }
 
     private String getNotificationTemplate(CaseData caseData) {
-
-        String unspecTemplate = featureToggleService.isEarlyAdoptersEnabled()
-            ? notificationsProperties.getSdoOrderedEA() : notificationsProperties.getSdoOrdered();
-
-        String specTemplate = featureToggleService.isEarlyAdoptersEnabled()
-            ? notificationsProperties.getSdoOrderedSpecEA() : notificationsProperties.getSdoOrderedSpec();
-
         if (caseData.isApplicantLiP()) {
             if (caseData.isClaimantBilingual()) {
                 return notificationsProperties.getNotifyLipUpdateTemplateBilingual();
@@ -109,9 +102,9 @@ public class CreateSDOApplicantsNotificationHandler extends CallbackHandler impl
             }
         } else {
             if (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM) {
-                return specTemplate;
+                return notificationsProperties.getSdoOrderedSpec();
             } else {
-                return unspecTemplate;
+                return notificationsProperties.getSdoOrdered();
             }
         }
     }

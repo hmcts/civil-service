@@ -25,6 +25,7 @@ import java.time.LocalDate;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
+import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CMC_CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.GENERALAPPLICATION_CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
 import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataContentFromStartEventResponse;
@@ -143,6 +144,20 @@ public class CoreCaseDataService {
         String searchString = query.toString();
         log.info("Searching Elasticsearch with query: " + searchString);
         return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CASE_TYPE, searchString);
+    }
+
+    public SearchResult searchMediationCases(Query query) {
+        String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+        String searchString = query.toMediationQueryString();
+        log.info("Searching Elasticsearch with mediation query: " + searchString);
+        return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CASE_TYPE, searchString);
+    }
+
+    public SearchResult searchCMCCases(Query query) {
+        String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+        String searchString = query.toString();
+        log.info("Searching Elasticsearch with query: " + searchString);
+        return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CMC_CASE_TYPE, searchString);
     }
 
     public CaseDetails getCase(Long caseId) {

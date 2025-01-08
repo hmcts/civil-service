@@ -5,6 +5,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
+
+import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineBySystem;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
@@ -19,7 +22,7 @@ public class PendingClaimIssuedUnregisteredDefendantTransitionBuilder extends Mi
     }
 
     @Override
-    void setUpTransitions() {
-        this.moveTo(TAKEN_OFFLINE_UNREGISTERED_DEFENDANT).onlyWhen(takenOfflineBySystem);
+    void setUpTransitions(List<Transition> transitions) {
+        this.moveTo(TAKEN_OFFLINE_UNREGISTERED_DEFENDANT, transitions).onlyWhen(takenOfflineBySystem, transitions);
     }
 }

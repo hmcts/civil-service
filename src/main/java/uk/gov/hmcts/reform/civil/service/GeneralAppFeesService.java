@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.FeeLookupResponseDto;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -34,13 +35,6 @@ public class GeneralAppFeesService {
 
     private final FeesApiClient feesApiClient;
     private final GeneralAppFeesConfiguration feesConfiguration;
-
-    private static final String CHANNEL = "channel";
-    private static final String EVENT = "event";
-    private static final String JURISDICTION1 = "jurisdiction1";
-    private static final String JURISDICTION2 = "jurisdiction2";
-    private static final String SERVICE = "service";
-    private static final String KEYWORD = "keyword";
     public static final String FREE_REF = "FREE";
     private static final Fee FREE_FEE = Fee.builder()
         .calculatedAmountInPence(BigDecimal.ZERO).code(FREE_REF).version("1").build();
@@ -49,8 +43,7 @@ public class GeneralAppFeesService {
 
     protected static final List<GeneralApplicationTypes> VARY_TYPES
         = Arrays.asList(
-        GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT,
-        GeneralApplicationTypes.VARY_ORDER
+        GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT
     );
     protected static final List<GeneralApplicationTypes> SET_ASIDE
         = List.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT);
@@ -81,6 +74,15 @@ public class GeneralAppFeesService {
             getRespondentAgreed(caseData),
             getInformOtherParty(caseData),
             getHearingDate(caseData)
+        );
+    }
+
+    public Fee getFeeForGA(GeneralApplication generalApplication, LocalDate hearingScheduledDate) {
+        return getFeeForGA(
+            generalApplication.getGeneralAppType().getTypes(),
+            getRespondentAgreed(generalApplication),
+            getInformOtherParty(generalApplication),
+            hearingScheduledDate
         );
     }
 
@@ -202,8 +204,22 @@ public class GeneralAppFeesService {
             .orElse(null);
     }
 
+    protected Boolean getRespondentAgreed(GeneralApplication generalApplication) {
+        return Optional.ofNullable(generalApplication.getGeneralAppRespondentAgreement())
+            .map(GARespondentOrderAgreement::getHasAgreed)
+            .map(hasAgreed -> hasAgreed == YES)
+            .orElse(null);
+    }
+
     protected Boolean getInformOtherParty(CaseData caseData) {
         return Optional.ofNullable(caseData.getGeneralAppInformOtherParty())
+            .map(GAInformOtherParty::getIsWithNotice)
+            .map(isWithNotice -> isWithNotice == YES)
+            .orElse(null);
+    }
+
+    protected Boolean getInformOtherParty(GeneralApplication generalApplication) {
+        return Optional.ofNullable(generalApplication.getGeneralAppInformOtherParty())
             .map(GAInformOtherParty::getIsWithNotice)
             .map(isWithNotice -> isWithNotice == YES)
             .orElse(null);

@@ -55,15 +55,42 @@ public class UpdateVisibilityNoticeOfDiscontinuanceHandler extends CallbackHandl
         updateCamundaVars(caseData);
         if (ConfirmOrderGivesPermission.YES.equals(caseData.getConfirmOrderGivesPermission())) {
             CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.noticeOfDiscontinueAllParitiesDoc(caseData.getNoticeOfDiscontinueCWDoc());
-            caseDataBuilder.noticeOfDiscontinueCWDoc(null);
+
+            updateVisibilityForAllParties(caseData, caseDataBuilder);
+            removeCaseWorkerViewDocuments(caseDataBuilder);
+
             CaseData updatedData = caseDataBuilder.build();
-            assignCategoryId.assignCategoryIdToCaseDocument(updatedData.getNoticeOfDiscontinueAllParitiesDoc(), DocCategory.NOTICE_OF_DISCONTINUE.getValue());
+            assignCategoryIdForAllParties(updatedData);
+
             return AboutToStartOrSubmitCallbackResponse.builder()
                     .data(updatedData.toMap(objectMapper))
                     .build();
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private void updateVisibilityForAllParties(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+        caseDataBuilder
+            .applicant1NoticeOfDiscontinueAllPartyViewDoc(caseData.getApplicant1NoticeOfDiscontinueCWViewDoc())
+            .respondent1NoticeOfDiscontinueAllPartyViewDoc(caseData.getRespondent1NoticeOfDiscontinueCWViewDoc());
+
+        if (caseData.getRespondent2NoticeOfDiscontinueCWViewDoc() != null) {
+            caseDataBuilder
+                .respondent2NoticeOfDiscontinueAllPartyViewDoc(caseData.getRespondent2NoticeOfDiscontinueCWViewDoc());
+        }
+    }
+
+    private void removeCaseWorkerViewDocuments(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+        caseDataBuilder
+            .applicant1NoticeOfDiscontinueCWViewDoc(null)
+            .respondent1NoticeOfDiscontinueCWViewDoc(null)
+            .respondent2NoticeOfDiscontinueCWViewDoc(null);
+    }
+
+    private void assignCategoryIdForAllParties(CaseData caseData) {
+        assignCategoryId.assignCategoryIdToCaseDocument(caseData.getApplicant1NoticeOfDiscontinueAllPartyViewDoc(), DocCategory.NOTICE_OF_DISCONTINUE.getValue());
+        assignCategoryId.assignCategoryIdToCaseDocument(caseData.getRespondent1NoticeOfDiscontinueAllPartyViewDoc(), DocCategory.NOTICE_OF_DISCONTINUE.getValue());
+        assignCategoryId.assignCategoryIdToCaseDocument(caseData.getRespondent2NoticeOfDiscontinueAllPartyViewDoc(), DocCategory.NOTICE_OF_DISCONTINUE.getValue());
     }
 
     private void updateCamundaVars(CaseData caseData) {

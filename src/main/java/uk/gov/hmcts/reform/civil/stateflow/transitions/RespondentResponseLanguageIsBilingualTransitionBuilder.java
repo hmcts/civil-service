@@ -5,6 +5,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
+
+import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isTranslatedDocumentUploaded;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaimSpec;
@@ -25,11 +28,11 @@ public class RespondentResponseLanguageIsBilingualTransitionBuilder extends MidT
     }
 
     @Override
-    void setUpTransitions() {
-        this.moveTo(FULL_DEFENCE).onlyWhen(fullDefenceSpec.and(isTranslatedDocumentUploaded))
-            .moveTo(PART_ADMISSION).onlyWhen(partAdmissionSpec.and(isTranslatedDocumentUploaded))
-            .moveTo(FULL_ADMISSION).onlyWhen(fullAdmissionSpec.and(isTranslatedDocumentUploaded))
-            .moveTo(COUNTER_CLAIM).onlyWhen(counterClaimSpec.and(isTranslatedDocumentUploaded));
+    void setUpTransitions(List<Transition> transitions) {
+        this.moveTo(FULL_DEFENCE, transitions).onlyWhen(fullDefenceSpec.and(isTranslatedDocumentUploaded), transitions)
+            .moveTo(PART_ADMISSION, transitions).onlyWhen(partAdmissionSpec.and(isTranslatedDocumentUploaded), transitions)
+            .moveTo(FULL_ADMISSION, transitions).onlyWhen(fullAdmissionSpec.and(isTranslatedDocumentUploaded), transitions)
+            .moveTo(COUNTER_CLAIM, transitions).onlyWhen(counterClaimSpec.and(isTranslatedDocumentUploaded), transitions);
     }
 
 }

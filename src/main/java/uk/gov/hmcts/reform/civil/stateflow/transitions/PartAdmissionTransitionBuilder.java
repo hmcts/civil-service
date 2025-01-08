@@ -7,15 +7,17 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 import uk.gov.hmcts.reform.civil.utils.JudgmentAdmissionUtils;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.agreedToMediation;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.acceptRepaymentPlan;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTime;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeNotBeingTakenOffline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceNotProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.rejectRepaymentPlan;
@@ -40,25 +42,26 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
     }
 
     @Override
-    void setUpTransitions() {
-        this.moveTo(IN_MEDIATION).onlyWhen(agreedToMediation.and(not(takenOfflineByStaff)))
-            .moveTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION)
-            .onlyWhen(isClaimantNotSettlePartAdmitClaim.and(not(agreedToMediation)).and(not(takenOfflineByStaff)))
+    void setUpTransitions(List<Transition> transitions) {
+        this.moveTo(IN_MEDIATION, transitions).onlyWhen(agreedToMediation.and(not(takenOfflineByStaff)), transitions)
+            .moveTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION, transitions)
+            .onlyWhen(isClaimantNotSettlePartAdmitClaim.and(not(agreedToMediation)).and(not(takenOfflineByStaff)), transitions)
             .set((c, flags) -> {
-                flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
+                flags.put(FlowFlag.SDO_ENABLED.name(),
+                    JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
                 flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
-            })
-            .moveTo(PART_ADMIT_PROCEED).onlyWhen(fullDefenceProceed)
-            .moveTo(PART_ADMIT_NOT_PROCEED).onlyWhen(fullDefenceNotProceed)
-            .moveTo(PART_ADMIT_PAY_IMMEDIATELY).onlyWhen(partAdmitPayImmediately)
-            .moveTo(PART_ADMIT_AGREE_SETTLE).onlyWhen(agreePartAdmitSettle)
-            .moveTo(PART_ADMIT_AGREE_REPAYMENT).onlyWhen(acceptRepaymentPlan)
-            .set((c, flags) -> flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)))
-            .moveTo(PART_ADMIT_REJECT_REPAYMENT).onlyWhen(rejectRepaymentPlan)
-            .set((c, flags) -> flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)))
-            .moveTo(TAKEN_OFFLINE_BY_STAFF).onlyWhen(takenOfflineByStaff)
-            .moveTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
-            .onlyWhen(applicantOutOfTime);
+            }, transitions)
+            .moveTo(PART_ADMIT_PROCEED, transitions).onlyWhen(fullDefenceProceed, transitions)
+            .moveTo(PART_ADMIT_NOT_PROCEED, transitions).onlyWhen(fullDefenceNotProceed, transitions)
+            .moveTo(PART_ADMIT_PAY_IMMEDIATELY, transitions).onlyWhen(partAdmitPayImmediately, transitions)
+            .moveTo(PART_ADMIT_AGREE_SETTLE, transitions).onlyWhen(agreePartAdmitSettle, transitions)
+            .moveTo(PART_ADMIT_AGREE_REPAYMENT, transitions).onlyWhen(acceptRepaymentPlan, transitions)
+            .set((c, flags) -> flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)), transitions)
+            .moveTo(PART_ADMIT_REJECT_REPAYMENT, transitions).onlyWhen(rejectRepaymentPlan, transitions)
+            .set((c, flags) -> flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)), transitions)
+            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaff, transitions)
+            .moveTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA, transitions)
+            .onlyWhen(applicantOutOfTimeNotBeingTakenOffline, transitions);
     }
 
     public static final Predicate<CaseData> agreePartAdmitSettle = CaseData::isPartAdmitClaimSettled;

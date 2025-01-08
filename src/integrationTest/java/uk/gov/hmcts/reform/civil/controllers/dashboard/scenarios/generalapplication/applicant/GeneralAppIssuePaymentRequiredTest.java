@@ -39,10 +39,10 @@ public class GeneralAppIssuePaymentRequiredTest extends BaseIntegrationTest {
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Pay application fee"),
                 jsonPath("$[0].descriptionEn")
-                    .value("<p class=\"govuk-body\">To finish making your application, you must pay the application fee of ${applicationFee} as soon as possible. Your application will be paused and will not be sent to the other parties or considered by a judge until you’ve paid the fee. <a href={GA_VIEW_APPLICATION_URL} rel=\"noopener noreferrer\" class=\"govuk-link\">Pay application fee.</a></p>"),
+                    .value("<p class=\"govuk-body\">To finish making your application, you must pay the application fee of ${applicationFee} as soon as possible. Your application will be paused and will not be sent to the other parties or considered by a judge until you’ve paid the fee. <a href={GA_VIEW_APPLICATION_URL} rel=\"noopener noreferrer\" class=\"govuk-link\">Pay application fee</a></p>"),
                 jsonPath("$[0].titleCy").value("Talu ffi gwneud cais"),
                 jsonPath("$[0].descriptionCy")
-                    .value("<p class=\"govuk-body\">I orffen gwneud eich cais, rhaid i chi dalu’r ffi gwneud cais o ${applicationFee} cyn gynted â phosib. Bydd eich cais yn cael ei oedi ac ni chaiff ei anfon at y partïon eraill na’i ystyried gan farnwr nes i chi dalu’r ffi. <a href={GA_VIEW_APPLICATION_URL} rel=\"noopener noreferrer\" class=\"govuk-link\">Talu’r ffi gwneud cais.</a></p>")
+                    .value("<p class=\"govuk-body\">I orffen gwneud eich cais, rhaid i chi dalu’r ffi gwneud cais o ${applicationFee} cyn gynted â phosib. Bydd eich cais yn cael ei oedi ac ni chaiff ei anfon at y partïon eraill na’i ystyried gan farnwr nes i chi dalu’r ffi. <a href={GA_VIEW_APPLICATION_URL} rel=\"noopener noreferrer\" class=\"govuk-link\">Talu’r ffi gwneud cais</a></p>")
 
             );
     }

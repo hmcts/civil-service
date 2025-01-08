@@ -174,60 +174,6 @@ class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHandlerTest
         }
     }
 
-    @Nested
-    class AboutToSubmitCallbackEA {
-
-        @Test
-        void shouldNotifyApplicantSolicitor_whenInvoked() {
-            when(notificationsProperties.getSdoOrderedEA()).thenReturn("template-id-EA");
-            when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
-
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
-            handler.handle(params);
-
-            verify(notificationService).sendMail(
-                "applicantsolicitor@example.com",
-                "template-id-EA",
-                getNotificationDataMap(),
-                "create-sdo-applicants-notification-000DC001"
-            );
-        }
-
-        @Test
-        void shouldNotifyApplicantSolicitorSpec_whenInvoked() {
-            when(notificationsProperties.getSdoOrderedSpecEA()).thenReturn("template-id-spec-EA");
-            when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
-
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .setClaimTypeToSpecClaim().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
-            handler.handle(params);
-
-            verify(notificationService).sendMail(
-                "applicantsolicitor@example.com",
-                "template-id-spec-EA",
-                getNotificationDataMap(),
-                "create-sdo-applicants-notification-000DC001"
-            );
-        }
-
-        @NotNull
-        private Map<String, String> getNotificationDataMap() {
-            return Map.of(
-                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
-            );
-        }
-    }
-
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(

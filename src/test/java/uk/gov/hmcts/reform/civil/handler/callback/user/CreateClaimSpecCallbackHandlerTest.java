@@ -94,7 +94,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -2184,8 +2183,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAddPartyIdsToPartyFields_whenInvoked() {
-            when(toggleService.isHmcEnabled()).thenReturn(true);
-
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("applicant1").hasFieldOrProperty("partyID");
@@ -2196,18 +2193,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPopulateCasenamePublic_whenInvoked() {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("caseNamePublic").isEqualTo("'John Rambo' v 'Sole Trader'");
-        }
-
-        @Test
-        void shouldNotAddPartyIdsToPartyFields_whenInvokedWithHMCToggleOff() {
-            when(toggleService.isHmcEnabled()).thenReturn(false);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("applicant1")
-                .isEqualTo(objMapper.convertValue(caseData.getApplicant1(), HashMap.class));
-            assertThat(response.getData()).extracting("respondent1")
-                .isEqualTo(objMapper.convertValue(caseData.getRespondent1(), HashMap.class));
         }
 
         @Test

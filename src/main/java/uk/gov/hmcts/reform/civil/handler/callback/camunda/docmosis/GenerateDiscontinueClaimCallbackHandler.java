@@ -13,16 +13,17 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.service.docmosis.settlediscontinue.NoticeOfDiscontinuanceFormGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_NOTICE_OF_DISCONTINUANCE;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Service
 @RequiredArgsConstructor
@@ -57,29 +58,50 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         updateCamundaVars(caseData);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        buildDocument(callbackParams, caseDataBuilder);
-        CaseData updatedData = caseDataBuilder.build();
+        buildDocuments(callbackParams, caseDataBuilder);
 
-        if (nonNull(updatedData.getNoticeOfDiscontinueCWDoc())) {
-            assignDiscontinuanceCategoryId(updatedData.getNoticeOfDiscontinueCWDoc());
-        } else {
-            assignDiscontinuanceCategoryId(updatedData.getNoticeOfDiscontinueAllParitiesDoc());
-        }
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedData.toMap(objectMapper))
+                .data(caseDataBuilder.build().toMap(objectMapper))
                 .build();
     }
 
-    private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+    private void buildDocuments(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseDocument caseDocument = formGenerator.generateDocs(
-                callbackParams.getCaseData(),
-                callbackParams.getParams().get(BEARER_TOKEN).toString());
-        if (caseData.isJudgeOrderVerificationRequired()) {
-            caseDataBuilder.noticeOfDiscontinueCWDoc(caseDocument);
-        } else {
-            caseDataBuilder.noticeOfDiscontinueAllParitiesDoc(caseDocument);
+
+        CaseDocument applicant1DiscontinueDoc = generateForm(caseData.getApplicant1(), callbackParams);
+        CaseDocument respondent1DiscontinueDoc = generateForm(caseData.getRespondent1(), callbackParams);
+        CaseDocument respondent2DiscontinueDoc = null;
+
+        if (YES.equals(caseData.getAddRespondent2()) && caseData.getRespondent2() != null) {
+            respondent2DiscontinueDoc = generateForm(caseData.getRespondent2(), callbackParams);
         }
+
+        if (caseData.isJudgeOrderVerificationRequired()) {
+            caseDataBuilder.applicant1NoticeOfDiscontinueCWViewDoc(applicant1DiscontinueDoc);
+            caseDataBuilder.respondent1NoticeOfDiscontinueCWViewDoc(respondent1DiscontinueDoc);
+            assignDiscontinuanceCategoryId(caseDataBuilder.build().getApplicant1NoticeOfDiscontinueCWViewDoc());
+            assignDiscontinuanceCategoryId(caseDataBuilder.build().getRespondent1NoticeOfDiscontinueCWViewDoc());
+
+            if (respondent2DiscontinueDoc != null) {
+                caseDataBuilder.respondent2NoticeOfDiscontinueCWViewDoc(respondent2DiscontinueDoc);
+                assignDiscontinuanceCategoryId(caseDataBuilder.build().getRespondent2NoticeOfDiscontinueCWViewDoc());
+            }
+        } else {
+            caseDataBuilder.applicant1NoticeOfDiscontinueAllPartyViewDoc(applicant1DiscontinueDoc);
+            caseDataBuilder.respondent1NoticeOfDiscontinueAllPartyViewDoc(respondent1DiscontinueDoc);
+            assignDiscontinuanceCategoryId(caseDataBuilder.build().getApplicant1NoticeOfDiscontinueAllPartyViewDoc());
+            assignDiscontinuanceCategoryId(caseDataBuilder.build().getRespondent1NoticeOfDiscontinueAllPartyViewDoc());
+
+            if (respondent2DiscontinueDoc != null) {
+                caseDataBuilder.respondent2NoticeOfDiscontinueAllPartyViewDoc(respondent2DiscontinueDoc);
+                assignDiscontinuanceCategoryId(caseDataBuilder.build().getRespondent2NoticeOfDiscontinueAllPartyViewDoc());
+            }
+        }
+    }
+
+    private CaseDocument generateForm(Party party, CallbackParams callbackParams) {
+        return formGenerator.generateDocs(
+            callbackParams.getCaseData(), party, callbackParams.getParams().get(BEARER_TOKEN).toString());
     }
 
     private void assignDiscontinuanceCategoryId(CaseDocument caseDocument) {

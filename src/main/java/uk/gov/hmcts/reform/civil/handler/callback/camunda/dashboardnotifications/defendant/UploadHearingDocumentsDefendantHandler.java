@@ -45,6 +45,6 @@ public class UploadHearingDocumentsDefendantHandler extends CaseProgressionDashb
     public boolean shouldRecordScenario(CaseData caseData) {
         return caseData.isRespondent1NotRepresented()
             && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
-            && featureToggleService.isCaseProgressionEnabled();
+            && featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation());
     }
 }

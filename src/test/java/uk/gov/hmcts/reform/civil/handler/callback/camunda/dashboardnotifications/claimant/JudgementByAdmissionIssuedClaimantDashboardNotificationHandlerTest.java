@@ -33,7 +33,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_JUDGEMENT_BY_ADMISSION_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_JUDGEMENTS_ONLINE_ISSUED_CCJ_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_JUDGEMENTS_ONLINE_ISSUED_CCJ_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
 class JudgementByAdmissionIssuedClaimantDashboardNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -104,7 +104,7 @@ class JudgementByAdmissionIssuedClaimantDashboardNotificationHandlerTest extends
         handler.handle(callbackParams);
         verify(dashboardApiClient, times(1)).recordScenario(
             caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_JUDGEMENTS_ONLINE_ISSUED_CCJ_CLAIMANT.getScenario(),
+            SCENARIO_AAA6_UPDATE_JUDGEMENTS_ONLINE_ISSUED_CCJ_CLAIMANT.getScenario(),
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );
@@ -143,7 +143,7 @@ class JudgementByAdmissionIssuedClaimantDashboardNotificationHandlerTest extends
         handler.handle(callbackParams);
         verify(dashboardApiClient, times(1)).recordScenario(
             caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_JUDGEMENTS_ONLINE_ISSUED_CCJ_CLAIMANT.getScenario(),
+            SCENARIO_AAA6_UPDATE_JUDGEMENTS_ONLINE_ISSUED_CCJ_CLAIMANT.getScenario(),
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );
@@ -176,7 +176,7 @@ class JudgementByAdmissionIssuedClaimantDashboardNotificationHandlerTest extends
         handler.handle(callbackParams);
         verify(dashboardApiClient, times(0)).recordScenario(
             caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_JUDGEMENTS_ONLINE_ISSUED_CCJ_CLAIMANT.getScenario(),
+            SCENARIO_AAA6_UPDATE_JUDGEMENTS_ONLINE_ISSUED_CCJ_CLAIMANT.getScenario(),
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );

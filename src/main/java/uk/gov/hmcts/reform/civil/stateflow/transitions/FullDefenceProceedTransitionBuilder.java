@@ -7,20 +7,18 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
-import java.time.LocalDate;
+import java.util.List;
 import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedPastHearingFeeDue;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isInHearingReadiness;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterSDO;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineSDONotDrawn;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_HEARING_READINESS;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_SDO;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SDO_NOT_DRAWN;
@@ -34,29 +32,15 @@ public class FullDefenceProceedTransitionBuilder extends MidTransitionBuilder {
     }
 
     @Override
-    void setUpTransitions() {
-        this.moveTo(IN_HEARING_READINESS).onlyWhen(isInHearingReadiness)
-            .moveTo(CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE).onlyWhen(caseDismissedPastHearingFeeDue)
-            .moveTo(TAKEN_OFFLINE_BY_STAFF).onlyWhen((takenOfflineByStaffAfterClaimantResponseBeforeSDO
+    void setUpTransitions(List<Transition> transitions) {
+        this.moveTo(IN_HEARING_READINESS, transitions).onlyWhen(isInHearingReadiness, transitions)
+            .moveTo(CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE, transitions).onlyWhen(caseDismissedPastHearingFeeDue, transitions)
+            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen((takenOfflineByStaffAfterClaimantResponseBeforeSDO
                 .or(takenOfflineByStaffAfterSDO)
                 .or(takenOfflineAfterNotSuitableForSdo))
-                .and(not(caseDismissedPastHearingFeeDue)))
-            .moveTo(TAKEN_OFFLINE_AFTER_SDO).onlyWhen(takenOfflineAfterSDO)
-            .moveTo(TAKEN_OFFLINE_SDO_NOT_DRAWN).onlyWhen(takenOfflineSDONotDrawn)
-            .moveTo(IN_MEDIATION).onlyWhen(specSmallClaimCarm);
-    }
-
-    public static final Predicate<CaseData> specSmallClaimCarm = caseData ->
-        isSpecSmallClaim(caseData) && getCarmEnabledForDate(caseData);
-
-    private static boolean isSpecSmallClaim(CaseData caseData) {
-        return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack());
-    }
-
-    private static boolean getCarmEnabledForDate(CaseData caseData) {
-        // Date of go live is  5th november , as we use "isAfter" we compare with 4th november
-        return caseData.getSubmittedDate().toLocalDate().isAfter(LocalDate.of(2024, 11, 4));
+                .and(not(caseDismissedPastHearingFeeDue)), transitions)
+            .moveTo(TAKEN_OFFLINE_AFTER_SDO, transitions).onlyWhen(takenOfflineAfterSDO, transitions)
+            .moveTo(TAKEN_OFFLINE_SDO_NOT_DRAWN, transitions).onlyWhen(takenOfflineSDONotDrawn, transitions);
     }
 
     public static final Predicate<CaseData> takenOfflineByStaffAfterClaimantResponseBeforeSDO = caseData ->

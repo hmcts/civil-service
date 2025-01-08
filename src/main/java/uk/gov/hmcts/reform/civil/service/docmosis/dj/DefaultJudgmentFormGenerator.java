@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
+import uk.gov.hmcts.reform.civil.utils.DefaultJudgmentUtils;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -284,8 +285,21 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
             claimFeePounds = caseData.getOutstandingFeeInPounds();
         }
 
-        if (caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.YES) {
+        if (caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.YES
+            && caseData.getFixedCosts() == null) {
             claimFeePounds = claimFeePounds.add(calculateFixedCosts(caseData));
+        } else if (caseData.getFixedCosts() != null) {
+            // if new mandatory fixed costs question was answered at claim issue
+            if (YesOrNo.YES.equals(caseData.getClaimFixedCostsOnEntryDJ())) {
+                // if new fixed costs was chosen in DJ
+                claimFeePounds = claimFeePounds.add(DefaultJudgmentUtils.calculateFixedCostsOnEntry(
+                    caseData, JudgmentsOnlineHelper.getDebtAmount(caseData, interestCalculator)));
+            } else if (YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
+                // only claimed new fixed costs at claim issue
+                claimFeePounds = claimFeePounds.add(MonetaryConversions.penniesToPounds(
+                    BigDecimal.valueOf(Integer.parseInt(
+                        caseData.getFixedCosts().getFixedCostAmount()))));
+            }
         }
         return claimFeePounds.equals(BigDecimal.ZERO) ? BigDecimal.ZERO : claimFeePounds.setScale(2);
     }

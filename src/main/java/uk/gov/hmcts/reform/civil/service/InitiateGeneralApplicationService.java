@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.DebtPaymentOptions;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -45,12 +46,14 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRANSFER_ONLINE_CASE;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
@@ -102,11 +105,15 @@ public class InitiateGeneralApplicationService {
     private static final List<CaseState> statesBeforeSDO = Arrays.asList(PENDING_CASE_ISSUED, CASE_ISSUED,
             AWAITING_CASE_DETAILS_NOTIFICATION, AWAITING_RESPONDENT_ACKNOWLEDGEMENT, IN_MEDIATION,
             AWAITING_APPLICANT_INTENTION);
+    public static final String MULTI_CLAIM_TRACK = " - Multi Track";
+    public static final String INTERMEDIATE_CLAIM_TRACK = " - Intermediate Track";
+    public static final String SMALL_CLAIM_TRACK = " - Small Claims";
+    public static final String FAST_CLAIM_TRACK = " - Fast Track";
 
     public CaseData buildCaseData(CaseData.CaseDataBuilder dataBuilder, CaseData caseData, UserDetails userDetails,
-                                  String authToken) {
+                                  String authToken, GeneralAppFeesService feesService) {
         List<Element<GeneralApplication>> applications =
-            addApplication(buildApplication(caseData, userDetails, authToken), caseData.getGeneralApplications());
+            addApplication(buildApplication(caseData, userDetails, authToken, feesService), caseData.getGeneralApplications());
 
         return dataBuilder
             .generalApplications(applications)
@@ -125,10 +132,11 @@ public class InitiateGeneralApplicationService {
             .generalAppHearingDetails(GAHearingDetails.builder().build())
             .generalAppEvidenceDocument(java.util.Collections.emptyList())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().build())
+            .gaWaTrackLabel(null)
             .build();
     }
 
-    private GeneralApplication buildApplication(CaseData caseData, UserDetails userDetails, String authToken) {
+    private GeneralApplication buildApplication(CaseData caseData, UserDetails userDetails, String authToken, GeneralAppFeesService feesService) {
 
         GeneralApplication.GeneralApplicationBuilder applicationBuilder = GeneralApplication.builder();
         if (caseData.getGeneralAppEvidenceDocument() != null) {
@@ -234,7 +242,9 @@ public class InitiateGeneralApplicationService {
             .generalAppRespondentAgreement(caseData.getGeneralAppRespondentAgreement())
             .generalAppUrgencyRequirement(caseData.getGeneralAppUrgencyRequirement())
             .generalAppDetailsOfOrder(caseData.getGeneralAppDetailsOfOrder())
+            .generalAppDetailsOfOrderColl(caseData.getGeneralAppDetailsOfOrderColl())
             .generalAppReasonsOfOrder(caseData.getGeneralAppReasonsOfOrder())
+            .generalAppReasonsOfOrderColl(caseData.getGeneralAppReasonsOfOrderColl())
             .generalAppHearingDetails(caseData.getGeneralAppHearingDetails())
             .generalAppHelpWithFees(caseData.getGeneralAppHelpWithFees())
             .generalAppPBADetails(caseData.getGeneralAppPBADetails())
@@ -256,10 +266,23 @@ public class InitiateGeneralApplicationService {
         }
         if (featureToggleService.isCoSCEnabled()
             && caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID)) {
+            if (Objects.nonNull(caseData.getCertOfSC().getDebtPaymentEvidence())
+                && Objects.nonNull(caseData.getCertOfSC().getDebtPaymentEvidence().getDebtPaymentOption())) {
+                DebtPaymentOptions deptPaymentOption = caseData.getCertOfSC().getDebtPaymentEvidence().getDebtPaymentOption();
+                if (DebtPaymentOptions.MADE_FULL_PAYMENT_TO_COURT.equals(deptPaymentOption)
+                    || DebtPaymentOptions.UPLOAD_EVIDENCE_DEBT_PAID_IN_FULL.equals(deptPaymentOption)) {
+                    caseData.getCertOfSC().setProofOfDebtDoc(caseData.getGeneralAppEvidenceDocument());
+                } else {
+                    caseData.getCertOfSC().setProofOfDebtDoc(java.util.Collections.emptyList());
+                }
+            }
             applicationBuilder.certOfSC(caseData.getCertOfSC());
         }
         applicationBuilder.caseNameGaInternal(caseData.getCaseNameHmctsInternal());
-        return helper.setRespondentDetailsIfPresent(applicationBuilder.build(), caseData, userDetails);
+        if (featureToggleService.isMintiEnabled()) {
+            applicationBuilder.gaWaTrackLabel(setClaimTrackForTaskName(caseData));
+        }
+        return helper.setRespondentDetailsIfPresent(applicationBuilder.build(), caseData, userDetails, feesService);
     }
 
     private List<Element<GeneralApplication>> addApplication(GeneralApplication application,
@@ -454,5 +477,21 @@ public class InitiateGeneralApplicationService {
             .postcode(caseManagementLocationDetails.getPostcode())
             .build();
         return courtLocation;
+    }
+
+    private String setClaimTrackForTaskName(CaseData caseData) {
+        String taskTrackName = "";
+        if (caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM) && nonNull(caseData.getAllocatedTrack())) {
+            taskTrackName =  caseData.getAllocatedTrack().name();
+        } else if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM) && nonNull(caseData.getResponseClaimTrack())) {
+            taskTrackName =  caseData.getResponseClaimTrack();
+        }
+        return switch (taskTrackName) {
+            case "MULTI_CLAIM" -> MULTI_CLAIM_TRACK;
+            case "INTERMEDIATE_CLAIM" -> INTERMEDIATE_CLAIM_TRACK;
+            case "SMALL_CLAIM" -> SMALL_CLAIM_TRACK;
+            case "FAST_CLAIM" -> FAST_CLAIM_TRACK;
+            default -> (" ");
+        };
     }
 }

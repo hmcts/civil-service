@@ -8,8 +8,10 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
@@ -37,23 +39,23 @@ public class NotificationAcknowledgedTransitionBuilder extends MidTransitionBuil
     }
 
     @Override
-    void setUpTransitions() {
-        this.moveTo(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION)
-            .onlyWhen(notificationAcknowledged.and(respondentTimeExtension))
-            .moveTo(ALL_RESPONSES_RECEIVED)
-            .onlyWhen(notificationAcknowledged.and(not(respondentTimeExtension)).and(allResponsesReceived))
-            .moveTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
+    void setUpTransitions(List<Transition> transitions) {
+        this.moveTo(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION, transitions)
+            .onlyWhen(notificationAcknowledged.and(respondentTimeExtension), transitions)
+            .moveTo(ALL_RESPONSES_RECEIVED, transitions)
+            .onlyWhen(notificationAcknowledged.and(not(respondentTimeExtension)).and(allResponsesReceived), transitions)
+            .moveTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED, transitions)
             .onlyWhen(notificationAcknowledged.and(not(respondentTimeExtension))
                 .and(awaitingResponsesFullDefenceReceived)
-                .and(not(caseDismissedAfterClaimAcknowledged)))
-            .moveTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED)
+                .and(not(caseDismissedAfterClaimAcknowledged)), transitions)
+            .moveTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED, transitions)
             .onlyWhen(notificationAcknowledged.and(not(respondentTimeExtension))
-                .and(awaitingResponsesNonFullDefenceReceived))
-            .moveTo(TAKEN_OFFLINE_BY_STAFF)
-            .onlyWhen(takenOfflineByStaffAfterNotificationAcknowledged)
-            .moveTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
-            .onlyWhen(caseDismissedAfterClaimAcknowledged.and(reasonNotSuitableForSdo.negate()))
-            .moveTo(TAKEN_OFFLINE_SDO_NOT_DRAWN).onlyWhen(takenOfflineSDONotDrawnAfterNotificationAcknowledged);
+                .and(awaitingResponsesNonFullDefenceReceived), transitions)
+            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions)
+            .onlyWhen(takenOfflineByStaffAfterNotificationAcknowledged, transitions)
+            .moveTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA, transitions)
+            .onlyWhen(caseDismissedAfterClaimAcknowledged.and(reasonNotSuitableForSdo.negate()), transitions)
+            .moveTo(TAKEN_OFFLINE_SDO_NOT_DRAWN, transitions).onlyWhen(takenOfflineSDONotDrawnAfterNotificationAcknowledged, transitions);
     }
 
     public static final Predicate<CaseData> takenOfflineSDONotDrawnAfterNotificationAcknowledged =
@@ -104,11 +106,13 @@ public class NotificationAcknowledgedTransitionBuilder extends MidTransitionBuil
                     && caseData.getRespondent2AcknowledgeNotificationDate() != null
                     && caseData.getRespondent1TimeExtensionDate() == null
                     && caseData.getRespondent2TimeExtensionDate() == null
-                    && (caseData.getRespondent1ResponseDate() == null || caseData.getRespondent2ResponseDate() == null);
+                    && (caseData.getRespondent1ResponseDate() == null || caseData.getRespondent2ResponseDate() == null)
+                    && caseData.getTakenOfflineByStaffDate() == null;
             }
             return caseData.getRespondent1AcknowledgeNotificationDate() != null
                 && caseData.getRespondent1TimeExtensionDate() == null
-                && caseData.getRespondent1ResponseDate() == null;
+                && caseData.getRespondent1ResponseDate() == null
+                && caseData.getTakenOfflineByStaffDate() == null;
         }
         return false;
     };

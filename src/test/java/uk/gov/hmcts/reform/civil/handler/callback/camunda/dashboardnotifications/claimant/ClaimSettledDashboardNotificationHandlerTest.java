@@ -83,6 +83,15 @@ public class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackH
             ).build();
 
             handler.handle(params);
+            verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
+                caseData.getCcdCaseReference().toString(),
+                "CLAIMANT",
+                "BEARER_TOKEN");
+            verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+                caseData.getCcdCaseReference().toString(),
+                "CLAIMANT",
+                "BEARER_TOKEN");
+
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA6.ClaimantIntent.ClaimSettledEvent.Claimant",

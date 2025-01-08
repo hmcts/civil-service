@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -23,13 +24,14 @@ public class UpdateClaimStateService {
     private final FeatureToggleService featureToggleService;
 
     public String setUpCaseState(CaseData updatedData) {
-        if (shouldMoveToInMediationState(updatedData,
-                                         featureToggleService.isCarmEnabledForCase(updatedData))) {
+        if (shouldNotChangeStateMinti(updatedData)) {
+            return updatedData.getCcdState().name();
+        } else if (shouldMoveToInMediationState(updatedData,
+                                         featureToggleService.isCarmEnabledForCase(updatedData))
+            || (updatedData.hasDefendantAgreedToFreeMediation() && updatedData.hasClaimantAgreedToFreeMediation())) {
             return CaseState.IN_MEDIATION.name();
         } else if (isJudicialReferralAllowed(updatedData)) {
             return CaseState.JUDICIAL_REFERRAL.name();
-        } else if (updatedData.hasDefendantAgreedToFreeMediation() && updatedData.hasClaimantAgreedToFreeMediation()) {
-            return CaseState.IN_MEDIATION.name();
         } else if (isCaseSettledAllowed(updatedData)) {
             return CaseState.CASE_SETTLED.name();
         } else if (updatedData.hasApplicantNotProceededWithClaim()) {
@@ -90,5 +92,22 @@ public class UpdateClaimStateService {
 
     private boolean hasJudgmentByAdmission(CaseData caseData, boolean judgmentOnlineLive) {
         return judgmentOnlineLive && JudgmentAdmissionUtils.getLIPJudgmentAdmission(caseData);
+    }
+
+    private boolean shouldNotChangeStateMinti(CaseData caseData) {
+        return featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
+            && CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && isMultiOrIntermediateSpecClaim(caseData)
+            && isLipCase(caseData)
+            && isProceedOrNotSettleClaim(caseData);
+    }
+
+    private boolean isMultiOrIntermediateSpecClaim(CaseData caseData) {
+        return INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
+            || MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack());
+    }
+
+    private boolean isLipCase(CaseData caseData) {
+        return caseData.isApplicantLiP() || caseData.isRespondent1LiP();
     }
 }

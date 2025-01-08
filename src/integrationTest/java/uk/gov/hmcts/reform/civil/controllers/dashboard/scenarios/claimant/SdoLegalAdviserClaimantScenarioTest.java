@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.OrderMadeClaimantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
@@ -22,6 +24,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -36,6 +39,12 @@ public class SdoLegalAdviserClaimantScenarioTest extends CaseProgressionDashboar
     void should_create_order_made_claimant_scenario() throws Exception {
 
         String caseId = "72014112265";
+        DynamicListElement selectedCourt = DynamicListElement.builder()
+            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
             .toBuilder()
@@ -44,11 +53,11 @@ public class SdoLegalAdviserClaimantScenarioTest extends CaseProgressionDashboar
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
             .finalOrderDocumentCollection(List.of(ElementUtils.element(
                 CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
             .build();
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+
         handler.handle(callbackParamsTestSDO(caseData));
 
         String requestForReconsiderationDeadlineEn = DateUtils.formatDate(LocalDate.now().plusDays(7));

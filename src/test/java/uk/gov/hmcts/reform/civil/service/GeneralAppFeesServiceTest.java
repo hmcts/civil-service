@@ -1,10 +1,13 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -21,27 +24,21 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.ADJOURN_HEARING;
-import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SET_ASIDE_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_ORDER;
@@ -49,41 +46,26 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_OR
 @ExtendWith(MockitoExtension.class)
 class GeneralAppFeesServiceTest {
 
-    private static final BigDecimal TEST_FEE_AMOUNT_POUNDS_108 = new BigDecimal("108.00");
-    private static final BigDecimal TEST_FEE_AMOUNT_PENCE_108 = new BigDecimal("10800");
-    private static final BigDecimal TEST_FEE_AMOUNT_POUNDS_275 = new BigDecimal("275.00");
-    private static final BigDecimal TEST_FEE_AMOUNT_PENCE_275 = new BigDecimal("27500");
-
-    private static final BigDecimal TEST_FEE_AMOUNT_POUNDS_14 = new BigDecimal("14.00");
-    private static final BigDecimal TEST_FEE_AMOUNT_PENCE_14 = new BigDecimal("1400");
-    private static final BigDecimal TEST_FEE_AMOUNT_POUNDS_15 = new BigDecimal("15.00");
-    private static final BigDecimal TEST_FEE_AMOUNT_PENCE_15 = new BigDecimal("1500");
-    private static final String AppnToVaryOrSuspend = "AppnToVaryOrSuspend";
+    private static final String APPLICATION_TO_VARY_OR_SUSPEND = "AppnToVaryOrSuspend";
     private static final String CERT_OF_SATISFACTION_OR_CANCEL = "CertificateOfSorC";
-    private static final String WithoutNotice = "GeneralAppWithoutNotice";
-    private static final String GAOnNotice = "GAOnNotice";
-    private static final String CoS = "CoS";
-    private static final FeeLookupResponseDto FEE_POUNDS_108 = FeeLookupResponseDto.builder()
-        .feeAmount(TEST_FEE_AMOUNT_POUNDS_108).code("test_fee_code").version(1).build();
-    private static final Fee FEE_PENCE_108 = Fee.builder()
-        .calculatedAmountInPence(TEST_FEE_AMOUNT_PENCE_108).code("test_fee_code").version("1").build();
-    private static final FeeLookupResponseDto FEE_POUNDS_275 = FeeLookupResponseDto.builder()
-        .feeAmount(TEST_FEE_AMOUNT_POUNDS_275).code("test_fee_code").version(1).build();
-    private static final Fee FEE_PENCE_275 = Fee.builder()
-        .calculatedAmountInPence(TEST_FEE_AMOUNT_PENCE_275).code("test_fee_code").version("1").build();
-    private static final FeeLookupResponseDto FEE_POUNDS_14 = FeeLookupResponseDto.builder()
-        .feeAmount(TEST_FEE_AMOUNT_POUNDS_14).code("test_fee_code").version(2).build();
-    private static final Fee FEE_PENCE_14 = Fee.builder()
-        .calculatedAmountInPence(TEST_FEE_AMOUNT_PENCE_14).code("test_fee_code").version("2").build();
-    private static final FeeLookupResponseDto FEE_POUNDS_0 = FeeLookupResponseDto.builder()
-        .feeAmount(BigDecimal.ZERO).code("test_fee_code").version(2).build();
-    private static final FeeLookupResponseDto FEE_POUNDS_15 = FeeLookupResponseDto.builder()
-        .feeAmount(TEST_FEE_AMOUNT_POUNDS_15).code("test_fee_code").version(1).build();
-    private static final Fee FEE_PENCE_15 = Fee.builder()
-        .calculatedAmountInPence(TEST_FEE_AMOUNT_PENCE_15).code("test_fee_code").version("1").build();
+    private static final String GENERAL_APP_WITHOUT_NOTICE = "GeneralAppWithoutNotice";
+    private static final String GENERAL_APPLICATION_WITH_NOTICE = "GAOnNotice";
+    private static final String CERTIFICATE_OF_SATISFACTION = "CoS";
+    public static final String DEFAULT_CHANNEL = "default";
+    public static final String CIVIL_JURISDICTION = "civil";
+    public static final String TEST_FEE_CODE = "test_fee_code";
+
+    private static final BigDecimal TEST_FEE_AMOUNT_POUNDS = new BigDecimal("108.00");
+    private static final BigDecimal TEST_FEE_AMOUNT_PENCE = new BigDecimal(TEST_FEE_AMOUNT_POUNDS.intValue() * 100);
+    private static final FeeLookupResponseDto FEE_POUNDS = FeeLookupResponseDto.builder()
+        .feeAmount(TEST_FEE_AMOUNT_POUNDS).code(TEST_FEE_CODE).version(1).build();
+    private static final Fee FEE_PENCE = Fee.builder()
+        .calculatedAmountInPence(TEST_FEE_AMOUNT_PENCE).code(TEST_FEE_CODE).version("1").build();
     public static final String FREE_REF = "FREE";
     private static final Fee FEE_PENCE_0 = Fee.builder()
         .calculatedAmountInPence(BigDecimal.ZERO).code(FREE_REF).version("1").build();
+    public static final String GENERAL_APPLICATION = "general application";
+    public static final String GENERAL_SERVICE = "general";
 
     @Captor
     private ArgumentCaptor<String> keywordCaptor;
@@ -95,15 +77,162 @@ class GeneralAppFeesServiceTest {
     private GeneralAppFeesConfiguration feesConfiguration;
 
     @InjectMocks
-    private GeneralAppFeesService feesService;
+    private GeneralAppFeesService generalAppFeesService;
+
+    @Nested
+    class FeeForJOWithApplicationType {
+        @ParameterizedTest
+        @CsvSource({
+            "STRIKE_OUT",
+            "SUMMARY_JUDGEMENT",
+            "STAY_THE_CLAIM",
+            "EXTEND_TIME",
+            "AMEND_A_STMT_OF_CASE",
+            "RELIEF_FROM_SANCTIONS",
+            "PROCEEDS_IN_HERITAGE",
+            "UNLESS_ORDER",
+            "VARY_PAYMENT_TERMS_OF_JUDGMENT",
+            "CONFIRM_CCJ_DEBT_PAID",
+            "ADJOURN_HEARING"
+        })
+        void shouldReturnNullForUnmatchedApplicationType(GeneralApplicationTypes applicationType) {
+            Fee fee = generalAppFeesService.getFeeForJOWithApplicationType(applicationType);
+            assertThat(fee).isNull();
+            verify(feesConfiguration, times(0)).getChannel();
+            verify(feesConfiguration, times(0)).getJurisdiction1();
+            verify(feesConfiguration, times(0)).getJurisdiction2();
+            verify(feesConfiguration, times(0)).getWithNoticeKeyword();
+            verify(feesApiClient, times(0)).lookupFee(
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString()
+            );
+        }
+
+        @Test
+        void shouldThrowsExceptionWhenFeeAmountReturnedIsNull() {
+            when(feesConfiguration.getChannel()).thenReturn(DEFAULT_CHANNEL);
+            when(feesConfiguration.getJurisdiction1()).thenReturn(CIVIL_JURISDICTION);
+            when(feesConfiguration.getJurisdiction2()).thenReturn(CIVIL_JURISDICTION);
+            when(feesConfiguration.getWithNoticeKeyword()).thenReturn(GENERAL_APPLICATION_WITH_NOTICE);
+            when(feesApiClient.lookupFee(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
+                .thenReturn(FeeLookupResponseDto.builder().code(TEST_FEE_CODE).version(1).build());
+
+            RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                generalAppFeesService.getFeeForJOWithApplicationType(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT)
+            );
+            assertThat(exception.getMessage()).isEqualTo(
+                "No Fees returned by fee-service while creating General Application");
+        }
+
+        @Test
+        void shouldThrowsExceptionWhenFeeServiceReturnsNull() {
+            when(feesConfiguration.getChannel()).thenReturn(DEFAULT_CHANNEL);
+            when(feesConfiguration.getJurisdiction1()).thenReturn(CIVIL_JURISDICTION);
+            when(feesConfiguration.getJurisdiction2()).thenReturn(CIVIL_JURISDICTION);
+            when(feesConfiguration.getWithNoticeKeyword()).thenReturn(GENERAL_APPLICATION_WITH_NOTICE);
+            when(feesApiClient.lookupFee(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
+                .thenReturn(null);
+
+            RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                generalAppFeesService.getFeeForJOWithApplicationType(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT)
+            );
+            assertThat(exception.getMessage()).isEqualTo(
+                "No Fees returned by fee-service while creating General Application");
+        }
+
+        static Stream<Arguments> joWithApplicationTypedData() {
+            return Stream.of(
+                Arguments.of(GeneralApplicationTypes.VARY_ORDER, APPLICATION_TO_VARY_OR_SUSPEND, FEE_PENCE),
+                Arguments.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT, GENERAL_APPLICATION_WITH_NOTICE, FEE_PENCE),
+                Arguments.of(GeneralApplicationTypes.OTHER, CERTIFICATE_OF_SATISFACTION, FEE_PENCE)
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource(
+            "joWithApplicationTypedData"
+        )
+        void shouldReturnFeeForCorrectApplicationType(GeneralApplicationTypes generalApplicationTypes, String keyword, Fee expectedFee) {
+            //Given
+            when(feesConfiguration.getChannel()).thenReturn(DEFAULT_CHANNEL);
+            when(feesConfiguration.getJurisdiction1()).thenReturn(CIVIL_JURISDICTION);
+            when(feesConfiguration.getJurisdiction2()).thenReturn(CIVIL_JURISDICTION);
+
+            if (Objects.requireNonNull(generalApplicationTypes) == VARY_ORDER) {
+                when(feesConfiguration.getAppnToVaryOrSuspend()).thenReturn(APPLICATION_TO_VARY_OR_SUSPEND);
+            } else if (generalApplicationTypes == SET_ASIDE_JUDGEMENT) {
+                when(feesConfiguration.getWithNoticeKeyword()).thenReturn(GENERAL_APPLICATION_WITH_NOTICE);
+            } else if (generalApplicationTypes == OTHER) {
+                when(feesConfiguration.getCertificateOfSatisfaction()).thenReturn(CERTIFICATE_OF_SATISFACTION);
+            }
+
+            when(feesApiClient.lookupFee(
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                eq(keyword)
+            )).thenReturn(FEE_POUNDS);
+            //When
+            Fee feeForVaryOrder = generalAppFeesService.getFeeForJOWithApplicationType(generalApplicationTypes);
+            //Then
+            assertThat(feeForVaryOrder).isEqualTo(expectedFee);
+        }
+    }
+
+    @Nested
+    class FeeForGALiP {
+
+        @BeforeEach
+        void setup() {
+            when(feesApiClient.lookupFee(
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                keywordCaptor.capture()
+            )).thenReturn(FEE_POUNDS);
+            when(feesConfiguration.getService()).thenReturn(GENERAL_SERVICE);
+            when(feesConfiguration.getChannel()).thenReturn(DEFAULT_CHANNEL);
+            when(feesConfiguration.getJurisdiction1()).thenReturn(CIVIL_JURISDICTION);
+            when(feesConfiguration.getJurisdiction2()).thenReturn(CIVIL_JURISDICTION);
+            when(feesConfiguration.getEvent()).thenReturn(GENERAL_APPLICATION);
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+            "false, false",
+            "false, true",
+        })
+        void default_types_should_pay_ForGALiP(Boolean isWithConsent, Boolean isWithNotice) {
+
+            if (isWithNotice) {
+                when(feesConfiguration.getWithNoticeKeyword()).thenReturn(GENERAL_APPLICATION_WITH_NOTICE);
+            } else {
+                when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn(GENERAL_APP_WITHOUT_NOTICE);
+            }
+
+            List<GeneralApplicationTypes> allTypes = getGADefaultTypes();
+
+            //single
+            for (GeneralApplicationTypes generalApplicationType : allTypes) {
+                Fee feeDto = generalAppFeesService.getFeeForGALiP(List.of(generalApplicationType), isWithConsent, isWithNotice, null);
+                assertThat(feeDto).isEqualTo(FEE_PENCE);
+            }
+            //mix
+            Fee feeDto = generalAppFeesService.getFeeForGALiP(allTypes, isWithConsent, isWithNotice, null);
+            assertThat(feeDto).isEqualTo(FEE_PENCE);
+        }
+    }
 
     @Test
-    void shouldReturnFeeData_whenConsentedApplicationIsBeingMadeForVaryAppln() {
-        when(feesConfiguration.getChannel()).thenReturn("default");
-        when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
-        when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
-        when(feesConfiguration.getAppnToVaryOrSuspend()).thenReturn("AppnToVaryOrSuspend");
-
+    void shouldReturnFeeData_whenCertificateOfSatisfactionOrCancelRequested() {
         when(feesApiClient.lookupFee(
             anyString(),
             anyString(),
@@ -111,180 +240,211 @@ class GeneralAppFeesServiceTest {
             anyString(),
             anyString(),
             keywordCaptor.capture()
-        ))
-            .thenReturn(FEE_POUNDS_108);
+        )).thenReturn(FEE_POUNDS);
+        when(feesConfiguration.getChannel()).thenReturn(DEFAULT_CHANNEL);
+        when(feesConfiguration.getJurisdiction1()).thenReturn(CIVIL_JURISDICTION);
+        when(feesConfiguration.getJurisdiction2()).thenReturn(CIVIL_JURISDICTION);
 
-        Fee feeDto = feesService.getFeeForGA(feesConfiguration.getAppnToVaryOrSuspend(), "miscellaneous", "other");
+        when(feesConfiguration.getCertificateOfSatisfaction()).thenReturn(CERT_OF_SATISFACTION_OR_CANCEL);
 
-        assertThat(feeDto).isEqualTo(FEE_PENCE_108);
-        assertThat(keywordCaptor.getValue())
-            .hasToString(AppnToVaryOrSuspend);
-    }
-
-    @Test
-    void shouldReturnFeeData_whenConsentedApplicationIsBeingMade() {
-        when(feesConfiguration.getService()).thenReturn("general");
-        when(feesConfiguration.getChannel()).thenReturn("default");
-        when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
-        when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
-        when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn("GeneralAppWithoutNotice");
-        when(feesConfiguration.getEvent()).thenReturn("general application");
-
-        when(feesApiClient.lookupFee(
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
-            keywordCaptor.capture()
-        ))
-            .thenReturn(FEE_POUNDS_108);
-
-        Fee feeDto = feesService.getFeeForGA(feesConfiguration.getConsentedOrWithoutNoticeKeyword(), null, null);
-
-        assertThat(feeDto).isEqualTo(FEE_PENCE_108);
-        assertThat(keywordCaptor.getValue())
-            .hasToString(WithoutNotice);
-    }
-
-    @Test
-    void shouldReturnFeeData_whenUnonsentedWithoutNoticeApplicationIsBeingMade() {
-        when(feesConfiguration.getService()).thenReturn("general");
-        when(feesConfiguration.getChannel()).thenReturn("default");
-        when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
-        when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
-        when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn("GeneralAppWithoutNotice");
-        when(feesConfiguration.getEvent()).thenReturn("general application");
-
-        when(feesApiClient.lookupFee(
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
-            keywordCaptor.capture()
-        ))
-            .thenReturn(FEE_POUNDS_108);
-
-        Fee feeDto = feesService.getFeeForGA(feesConfiguration.getConsentedOrWithoutNoticeKeyword(), null, null);
-
-        assertThat(feeDto).isEqualTo(FEE_PENCE_108);
-        assertThat(keywordCaptor.getValue())
-            .hasToString(WithoutNotice);
-    }
-
-    @Test
-    void shouldReturnFeeData_whenUnconsentedNotifiedApplicationIsBeingMade() {
-        when(feesConfiguration.getService()).thenReturn("general");
-        when(feesConfiguration.getChannel()).thenReturn("default");
-        when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
-        when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
-        when(feesConfiguration.getWithNoticeKeyword()).thenReturn("GAOnNotice");
-        when(feesConfiguration.getEvent()).thenReturn("general application");
-
-        when(feesApiClient.lookupFee(
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
-            keywordCaptor.capture()
-        ))
-            .thenReturn(FEE_POUNDS_275);
-
-        Fee feeDto = feesService.getFeeForGA(feesConfiguration.getWithNoticeKeyword(), null, null);
-
-        assertThat(feeDto).isEqualTo(FEE_PENCE_275);
-        verify(feesConfiguration, times(1)).getWithNoticeKeyword();
-        verify(feesConfiguration, never()).getConsentedOrWithoutNoticeKeyword();
-        assertThat(keywordCaptor.getValue())
-            .hasToString(GAOnNotice);
-    }
-
-    @Test
-    void shouldPay_whenIsNotAdjournVacateApplication() {
-        CaseData caseData = getFeeCase(
-            List.of(EXTEND_TIME),
-            YesOrNo.YES, YesOrNo.YES, LocalDate.now().plusDays(15)
+        Fee feeDto = generalAppFeesService.getFeeForGALiP(
+            GeneralAppFeesService.CONFIRM_YOU_PAID_CCJ_DEBT,
+            false,
+            false,
+            null
         );
 
-        assertThat(feesService.isFreeApplication(
-            caseData.getGeneralAppType().getTypes(), feesService.getRespondentAgreed(caseData),
-            feesService.getHearingDate(caseData)
-        )).isFalse();
+        assertThat(feeDto).isEqualTo(FEE_PENCE);
+        assertThat(keywordCaptor.getValue())
+            .hasToString(CERT_OF_SATISFACTION_OR_CANCEL);
     }
 
-    @Test
-    void shouldPay_whenConsentedWithin14DaysAdjournVacateApplicationIsBeingMade() {
-        CaseData caseData = getFeeCase(
-            List.of(ADJOURN_HEARING),
-            YesOrNo.YES, YesOrNo.YES, LocalDate.now().plusDays(14)
-        );
+    @Nested
+    class FeeForGA {
 
-        assertThat(feesService.isFreeApplication(
-            caseData.getGeneralAppType().getTypes(), feesService.getRespondentAgreed(caseData),
-            feesService.getHearingDate(caseData)
-        )).isFalse();
-    }
+        @ParameterizedTest
+        @CsvSource({
+            "GAOnNotice, NO, YES",
+            "GeneralAppWithoutNotice, NO, NO"
+        })
+        void default_types_should_pay_ForGA(String noticeType, YesOrNo hasAgreed, YesOrNo isWithNotice) {
+            when(feesApiClient.lookupFee(
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                keywordCaptor.capture()
+            )).thenReturn(FEE_POUNDS);
+            when(feesConfiguration.getService()).thenReturn(GENERAL_SERVICE);
+            when(feesConfiguration.getChannel()).thenReturn(DEFAULT_CHANNEL);
+            when(feesConfiguration.getJurisdiction1()).thenReturn(CIVIL_JURISDICTION);
+            when(feesConfiguration.getJurisdiction2()).thenReturn(CIVIL_JURISDICTION);
+            when(feesConfiguration.getEvent()).thenReturn(GENERAL_APPLICATION);
 
-    @Test
-    void shouldBeFree_whenConsentedLateThan14DaysAdjournVacateApplicationIsBeingMade() {
-        CaseData caseData = getFeeCase(
-            List.of(ADJOURN_HEARING),
-            YesOrNo.YES, YesOrNo.YES, LocalDate.now().plusDays(15)
-        );
+            if (GENERAL_APPLICATION_WITH_NOTICE.equals(noticeType)) {
+                when(feesConfiguration.getWithNoticeKeyword()).thenReturn(GENERAL_APPLICATION_WITH_NOTICE);
+            } else {
+                when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn(GENERAL_APP_WITHOUT_NOTICE);
+            }
+            List<GeneralApplicationTypes> allTypes = getGADefaultTypes();
+            //single
+            for (GeneralApplicationTypes generalApplicationType : allTypes) {
+                CaseData caseData = getFeeCase(
+                    List.of(generalApplicationType), hasAgreed, isWithNotice, null);
+                Fee feeDto = generalAppFeesService.getFeeForGA(caseData);
+                assertThat(feeDto).isEqualTo(FEE_PENCE);
+            }
+            //mix
+            CaseData caseData = getFeeCase(
+                allTypes, hasAgreed, isWithNotice, null);
+            Fee feeDto = generalAppFeesService.getFeeForGA(caseData);
+            assertThat(feeDto).isEqualTo(FEE_PENCE);
+            assertThat(keywordCaptor.getValue())
+                .hasToString(noticeType);
+        }
 
-        assertThat(feesService.isFreeApplication(
-            caseData.getGeneralAppType().getTypes(), feesService.getRespondentAgreed(caseData),
-            feesService.getHearingDate(caseData)
-        )).isTrue();
-    }
+        static Stream<Arguments> adjourn_with_hearingScheduledDate_outside_14daysData() {
+            return Stream.of(
+                Arguments.of(GeneralApplicationTypes.ADJOURN_HEARING, YesOrNo.YES, YesOrNo.YES, 15, FEE_PENCE_0),
+                Arguments.of(GeneralApplicationTypes.ADJOURN_HEARING, YesOrNo.YES, YesOrNo.NO, 15, FEE_PENCE_0)
+            );
+        }
 
-    @Test
-    void throwRuntimeException_whenFeeServiceThrowsException() {
-        when(feesApiClient.lookupFee(any(), any(), any(), any(), any(), any()))
-            .thenThrow(new RuntimeException("Some Exception"));
+        @ParameterizedTest
+        @MethodSource(
+            "adjourn_with_hearingScheduledDate_outside_14daysData"
+        )
+        void adjourn_with_hearingScheduledDate_outside_14days_should_pay_no_fee(GeneralApplicationTypes generalApplicationTypes,
+                                                                                YesOrNo hasAgreed,
+                                                                                YesOrNo isWithNotice,
+                                                                                Integer daysToAdd,
+                                                                                Fee expectedFee) {
 
-        String keyword = feesConfiguration.getWithNoticeKeyword();
-        Exception exception = assertThrows(RuntimeException.class, () -> feesService
-            .getFeeForGA(keyword, null, null));
+            CaseData caseData = getFeeCase(
+                List.of(generalApplicationTypes),
+                hasAgreed, isWithNotice, LocalDate.now().plusDays(daysToAdd)
+            );
+            Fee feeForGA = generalAppFeesService.getFeeForGA(caseData);
+            assertThat(feeForGA)
+                .isEqualTo(expectedFee);
+        }
 
-        assertThat(exception.getMessage()).isEqualTo("java.lang.RuntimeException: Some Exception");
-    }
+        static Stream<Arguments> generateDefaultTypesData() {
+            return Stream.of(
+                Arguments.of(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT, YesOrNo.YES, YesOrNo.YES, -1, FEE_PENCE),
+                Arguments.of(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT, YesOrNo.NO, YesOrNo.NO, -1, FEE_PENCE),
+                Arguments.of(GeneralApplicationTypes.SETTLE_BY_CONSENT, YesOrNo.YES, YesOrNo.YES, -1, FEE_PENCE),
+                Arguments.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT, YesOrNo.YES, YesOrNo.YES, -1, FEE_PENCE),
+                Arguments.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT, YesOrNo.NO, YesOrNo.NO, -1, FEE_PENCE),
+                Arguments.of(GeneralApplicationTypes.ADJOURN_HEARING, YesOrNo.NO, YesOrNo.YES, 1, FEE_PENCE),
+                Arguments.of(GeneralApplicationTypes.ADJOURN_HEARING, YesOrNo.NO, YesOrNo.NO, 1, FEE_PENCE),
+                Arguments.of(GeneralApplicationTypes.ADJOURN_HEARING, YesOrNo.NO, YesOrNo.NO, 15, FEE_PENCE)
+            );
+        }
 
-    @Test
-    void throwRuntimeException_whenNoFeeIsReturnedByFeeService() {
-        when(feesApiClient.lookupFee(any(), any(), any(), any(), any(), any()))
-            .thenReturn(null);
-        String keyword = feesConfiguration.getWithNoticeKeyword();
-        Exception exception = assertThrows(RuntimeException.class, () -> feesService
-            .getFeeForGA(keyword, null, null));
+        @ParameterizedTest
+        @MethodSource(
+            "generateDefaultTypesData"
+        )
+        void default_types_should_pay(GeneralApplicationTypes generalApplicationTypes, YesOrNo hasAgreed, YesOrNo isWithNotice, Integer daysToAdd, Fee expectedFee) {
+            when(feesApiClient.lookupFee(
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                keywordCaptor.capture()
+            )).thenReturn(FEE_POUNDS);
 
-        assertThat(exception.getMessage())
-            .isEqualTo("No Fees returned by fee-service while creating General Application");
-    }
+            when(feesConfiguration.getChannel()).thenReturn(DEFAULT_CHANNEL);
+            when(feesConfiguration.getJurisdiction1()).thenReturn(CIVIL_JURISDICTION);
+            when(feesConfiguration.getJurisdiction2()).thenReturn(CIVIL_JURISDICTION);
 
-    @Test
-    void throwRuntimeException_whenNoFeeAmountIsReturnedByFeeService() {
-        when(feesConfiguration.getService()).thenReturn("general");
-        when(feesConfiguration.getChannel()).thenReturn("default");
-        when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
-        when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
-        when(feesConfiguration.getWithNoticeKeyword()).thenReturn("GAOnNotice");
-        when(feesConfiguration.getEvent()).thenReturn("general application");
+            if (generalApplicationTypes == GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT) {
+                when(feesConfiguration.getAppnToVaryOrSuspend()).thenReturn(APPLICATION_TO_VARY_OR_SUSPEND);
+            } else {
+                when(feesConfiguration.getService()).thenReturn(GENERAL_SERVICE);
+                when(feesConfiguration.getEvent()).thenReturn(GENERAL_APPLICATION);
+            }
 
-        when(feesApiClient.lookupFee(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
-            .thenReturn(FeeLookupResponseDto.builder()
-                            .code("test_fee_code")
-                            .version(1)
-                            .build());
+            if (generalApplicationTypes == GeneralApplicationTypes.SETTLE_BY_CONSENT) {
+                when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn(GENERAL_APP_WITHOUT_NOTICE);
+            } else if (generalApplicationTypes == GeneralApplicationTypes.SET_ASIDE_JUDGEMENT) {
+                when(feesConfiguration.getWithNoticeKeyword()).thenReturn(GENERAL_APPLICATION_WITH_NOTICE);
+            } else if (generalApplicationTypes == GeneralApplicationTypes.ADJOURN_HEARING) {
+                if (isWithNotice == YesOrNo.YES) {
+                    when(feesConfiguration.getWithNoticeKeyword()).thenReturn(GENERAL_APPLICATION_WITH_NOTICE);
+                } else if (isWithNotice == YesOrNo.NO) {
+                    when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn(GENERAL_APP_WITHOUT_NOTICE);
+                }
+            }
 
-        String keyword = feesConfiguration.getWithNoticeKeyword();
-        Exception exception = assertThrows(RuntimeException.class, () -> feesService
-            .getFeeForGA(keyword, null, null));
+            LocalDate noOfDays = daysToAdd > 0 ? LocalDate.now().plusDays(daysToAdd) : null;
+            CaseData caseDataWithNotice = getFeeCase(
+                List.of(generalApplicationTypes),
+                hasAgreed, isWithNotice, noOfDays
+            );
+            Fee feeDto = generalAppFeesService.getFeeForGA(caseDataWithNotice);
+            assertThat(feeDto).isEqualTo(expectedFee);
+        }
 
-        assertThat(exception.getMessage())
-            .isEqualTo("No Fees returned by fee-service while creating General Application");
+        static Stream<Arguments> mixDefaultTypesData() {
+            return Stream.of(
+                Arguments.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT, YesOrNo.YES, YesOrNo.YES, 15, FEE_PENCE),
+                Arguments.of(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT, YesOrNo.YES, YesOrNo.YES, 15, FEE_PENCE)
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource(
+            "mixDefaultTypesData"
+        )
+        void mix_default_types_should_be_charged_a_fee(GeneralApplicationTypes generalApplicationTypes,
+                                                       YesOrNo hasAgreed,
+                                                       YesOrNo isWithNotice,
+                                                       Integer daysToAdd,
+                                                       Fee expectedFee) {
+
+            when(feesApiClient.lookupFee(
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                keywordCaptor.capture()
+            ))
+                .thenReturn(FEE_POUNDS);
+            when(feesConfiguration.getService()).thenReturn(GENERAL_SERVICE);
+            when(feesConfiguration.getChannel()).thenReturn(DEFAULT_CHANNEL);
+            when(feesConfiguration.getJurisdiction1()).thenReturn(CIVIL_JURISDICTION);
+            when(feesConfiguration.getJurisdiction2()).thenReturn(CIVIL_JURISDICTION);
+            when(feesConfiguration.getEvent()).thenReturn(GENERAL_APPLICATION);
+            when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn(GENERAL_APP_WITHOUT_NOTICE);
+
+            if (generalApplicationTypes == GeneralApplicationTypes.SET_ASIDE_JUDGEMENT) {
+                when(feesConfiguration.getWithNoticeKeyword()).thenReturn(GENERAL_APPLICATION_WITH_NOTICE);
+            } else if (generalApplicationTypes == GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT) {
+                when(feesConfiguration.getAppnToVaryOrSuspend()).thenReturn(APPLICATION_TO_VARY_OR_SUSPEND);
+            }
+
+            LocalDate noOfDays = daysToAdd > 0 ? LocalDate.now().plusDays(daysToAdd) : null;
+            List<GeneralApplicationTypes> randomList = getGADefaultTypes();
+            randomList.add(generalApplicationTypes);
+            CaseData caseDataOutside14Days = getFeeCase(
+                randomList,
+                hasAgreed, isWithNotice, noOfDays
+            );
+            assertThat(generalAppFeesService.getFeeForGA(caseDataOutside14Days))
+                .isEqualTo(expectedFee);
+            List<String> keywords = keywordCaptor.getAllValues();
+            assertThat(keywords).contains(GENERAL_APP_WITHOUT_NOTICE);
+            if (generalApplicationTypes == GeneralApplicationTypes.SET_ASIDE_JUDGEMENT) {
+                assertThat(keywords).contains(GENERAL_APPLICATION_WITH_NOTICE);
+            } else if (generalApplicationTypes == GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT) {
+                assertThat(keywords).contains(APPLICATION_TO_VARY_OR_SUSPEND);
+            }
+        }
     }
 
     private CaseData getFeeCase(List<GeneralApplicationTypes> types, YesOrNo hasAgreed,
@@ -306,534 +466,15 @@ class GeneralAppFeesServiceTest {
         return builder.build();
     }
 
-    @Nested
-    class LowestFee {
-
-        @Test
-        void default_types_with_notice_should_pay_275() {
-            when(feesApiClient.lookupFee(
-                anyString(),
-                anyString(),
-                anyString(),
-                anyString(),
-                anyString(),
-                eq(GAOnNotice)
-            )).thenReturn(FEE_POUNDS_275);
-            when(feesConfiguration.getService()).thenReturn("general");
-            when(feesConfiguration.getChannel()).thenReturn("default");
-            when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
-            when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
-            when(feesConfiguration.getWithNoticeKeyword()).thenReturn("GAOnNotice");
-            when(feesConfiguration.getEvent()).thenReturn("general application");
-
-            List<GeneralApplicationTypes> allTypes =
-                Stream.of(GeneralApplicationTypes.values()).collect(Collectors.toList());
-            allTypes.removeAll(GeneralAppFeesService.VARY_TYPES);
-            allTypes.removeAll(GeneralAppFeesService.SET_ASIDE);
-            allTypes.removeAll(GeneralAppFeesService.ADJOURN_TYPES);
-            allTypes.removeAll(GeneralAppFeesService.SD_CONSENT_TYPES);
-            allTypes.removeAll(GeneralAppFeesService.CONFIRM_YOU_PAID_CCJ_DEBT);
-            //single
-            for (GeneralApplicationTypes generalApplicationType : allTypes) {
-                CaseData caseData = getFeeCase(
-                    List.of(generalApplicationType), YesOrNo.NO, YesOrNo.YES, null);
-                Fee feeDto = feesService.getFeeForGA(caseData);
-                assertThat(feeDto).isEqualTo(FEE_PENCE_275);
-            }
-            //mix
-            CaseData caseData = getFeeCase(
-                allTypes, YesOrNo.NO, YesOrNo.YES, null);
-            Fee feeDto = feesService.getFeeForGA(caseData);
-            assertThat(feeDto).isEqualTo(FEE_PENCE_275);
-        }
-
-        @Test
-        void default_types_with_notice_should_pay_275_forGALiP() {
-
-            when(feesApiClient.lookupFee(
-                anyString(),
-                anyString(),
-                anyString(),
-                anyString(),
-                anyString(),
-                eq(GAOnNotice)
-            )).thenReturn(FEE_POUNDS_275);
-            when(feesConfiguration.getService()).thenReturn("general");
-            when(feesConfiguration.getChannel()).thenReturn("default");
-            when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
-            when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
-            when(feesConfiguration.getWithNoticeKeyword()).thenReturn("GAOnNotice");
-            when(feesConfiguration.getEvent()).thenReturn("general application");
-
-            List<GeneralApplicationTypes> allTypes =
-                Stream.of(GeneralApplicationTypes.values()).collect(Collectors.toList());
-            allTypes.removeAll(GeneralAppFeesService.VARY_TYPES);
-            allTypes.removeAll(GeneralAppFeesService.SET_ASIDE);
-            allTypes.removeAll(GeneralAppFeesService.ADJOURN_TYPES);
-            allTypes.removeAll(GeneralAppFeesService.SD_CONSENT_TYPES);
-            allTypes.removeAll(GeneralAppFeesService.CONFIRM_YOU_PAID_CCJ_DEBT);
-            //single
-            for (GeneralApplicationTypes generalApplicationType : allTypes) {
-                Fee feeDto = feesService.getFeeForGALiP(List.of(generalApplicationType), false, true, null);
-                assertThat(feeDto).isEqualTo(FEE_PENCE_275);
-            }
-            //mix
-            Fee feeDto = feesService.getFeeForGALiP(allTypes, false, true, null);
-            assertThat(feeDto).isEqualTo(FEE_PENCE_275);
-        }
-
-        @Test
-        void default_types_without_notice_should_pay_108() {
-            when(feesApiClient.lookupFee(
-                anyString(),
-                anyString(),
-                anyString(),
-                anyString(),
-                anyString(),
-                eq(WithoutNotice)
-            )).thenReturn(FEE_POUNDS_108);
-            when(feesConfiguration.getService()).thenReturn("general");
-            when(feesConfiguration.getChannel()).thenReturn("default");
-            when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
-            when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
-            when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn("GeneralAppWithoutNotice");
-            when(feesConfiguration.getEvent()).thenReturn("general application");
-
-            List<GeneralApplicationTypes> allTypes =
-                Stream.of(GeneralApplicationTypes.values()).collect(Collectors.toList());
-            allTypes.removeAll(GeneralAppFeesService.VARY_TYPES);
-            allTypes.removeAll(GeneralAppFeesService.SET_ASIDE);
-            allTypes.removeAll(GeneralAppFeesService.ADJOURN_TYPES);
-            allTypes.removeAll(GeneralAppFeesService.SD_CONSENT_TYPES);
-            allTypes.removeAll(GeneralAppFeesService.CONFIRM_YOU_PAID_CCJ_DEBT);
-            //single
-            for (GeneralApplicationTypes generalApplicationType : allTypes) {
-                CaseData caseData = getFeeCase(
-                    List.of(generalApplicationType), YesOrNo.NO, YesOrNo.NO, null);
-                Fee feeDto = feesService.getFeeForGA(caseData);
-                assertThat(feeDto).isEqualTo(FEE_PENCE_108);
-            }
-            //mix
-            CaseData caseData = getFeeCase(
-                allTypes, YesOrNo.NO, YesOrNo.NO, null);
-            Fee feeDto = feesService.getFeeForGA(caseData);
-            assertThat(feeDto).isEqualTo(FEE_PENCE_108);
-        }
-
-        @Test
-        void default_types_without_notice_should_pay_108_forGALiP() {
-            when(feesApiClient.lookupFee(
-                anyString(),
-                anyString(),
-                anyString(),
-                anyString(),
-                anyString(),
-                eq(WithoutNotice)
-            )).thenReturn(FEE_POUNDS_108);
-            when(feesConfiguration.getService()).thenReturn("general");
-            when(feesConfiguration.getChannel()).thenReturn("default");
-            when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
-            when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
-            when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn("GeneralAppWithoutNotice");
-            when(feesConfiguration.getEvent()).thenReturn("general application");
-
-            List<GeneralApplicationTypes> allTypes =
-                Stream.of(GeneralApplicationTypes.values()).collect(Collectors.toList());
-            allTypes.removeAll(GeneralAppFeesService.VARY_TYPES);
-            allTypes.removeAll(GeneralAppFeesService.SET_ASIDE);
-            allTypes.removeAll(GeneralAppFeesService.ADJOURN_TYPES);
-            allTypes.removeAll(GeneralAppFeesService.SD_CONSENT_TYPES);
-            allTypes.removeAll(GeneralAppFeesService.CONFIRM_YOU_PAID_CCJ_DEBT);
-            //single
-            for (GeneralApplicationTypes generalApplicationType : allTypes) {
-                Fee feeDto = feesService.getFeeForGALiP(List.of(generalApplicationType), false, false, null);
-                assertThat(feeDto).isEqualTo(FEE_PENCE_108);
-            }
-            //mix
-            Fee feeDto = feesService.getFeeForGALiP(allTypes, false, false, null);
-            assertThat(feeDto).isEqualTo(FEE_PENCE_108);
-        }
-
-        @Test
-        void adjourn_should_pay_default_or_free_fee() {
-            when(feesApiClient.lookupFee(
-                anyString(),
-                anyString(),
-                anyString(),
-                anyString(),
-                anyString(),
-                eq(WithoutNotice)
-            )).thenReturn(FEE_POUNDS_108);
-            when(feesApiClient.lookupFee(
-                anyString(),
-                anyString(),
-                anyString(),
-                anyString(),
-                anyString(),
-                eq(GAOnNotice)
-            )).thenReturn(FEE_POUNDS_275);
-            when(feesConfiguration.getService()).thenReturn("general");
-            when(feesConfiguration.getChannel()).thenReturn("default");
-            when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
-            when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
-            when(feesConfiguration.getWithNoticeKeyword()).thenReturn("GAOnNotice");
-            when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn("GeneralAppWithoutNotice");
-            when(feesConfiguration.getEvent()).thenReturn("general application");
-            CaseData caseDataWithin14DaysWithNotice = getFeeCase(
-                List.of(GeneralApplicationTypes.ADJOURN_HEARING),
-                YesOrNo.NO, YesOrNo.YES, LocalDate.now().plusDays(1)
-            );
-            assertThat(feesService.getFeeForGA(caseDataWithin14DaysWithNotice))
-                .isEqualTo(FEE_PENCE_275);
-            CaseData caseDataWithin14DaysWithoutNotice = getFeeCase(
-                List.of(GeneralApplicationTypes.ADJOURN_HEARING),
-                YesOrNo.NO, YesOrNo.NO, LocalDate.now().plusDays(1)
-            );
-            assertThat(feesService.getFeeForGA(caseDataWithin14DaysWithoutNotice))
-                .isEqualTo(FEE_PENCE_108);
-            CaseData caseDataOutside14Days = getFeeCase(
-                List.of(GeneralApplicationTypes.ADJOURN_HEARING),
-                YesOrNo.YES, YesOrNo.NO, LocalDate.now().plusDays(15)
-            );
-            assertThat(feesService.getFeeForGA(caseDataOutside14Days))
-                .isEqualTo(FEE_PENCE_0);
-        }
-
-        @Test
-        void vary_types_should_be_14() {
-            when(feesApiClient.lookupFee(anyString(),
-                                         anyString(),
-                                         anyString(),
-                                         anyString(),
-                                         anyString(),
-                                         eq(AppnToVaryOrSuspend))).thenReturn(FEE_POUNDS_14);
-            when(feesConfiguration.getChannel()).thenReturn("default");
-            when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
-            when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
-            when(feesConfiguration.getAppnToVaryOrSuspend()).thenReturn("AppnToVaryOrSuspend");
-
-            for (GeneralApplicationTypes type : GeneralAppFeesService.VARY_TYPES) {
-                CaseData caseDataWithNotice = getFeeCase(
-                    List.of(type),
-                    YesOrNo.YES, YesOrNo.YES, null
-                );
-                Fee feeDto = feesService.getFeeForGA(caseDataWithNotice);
-                assertThat(feeDto).isEqualTo(FEE_PENCE_14);
-                CaseData caseDataWithoutNotice = getFeeCase(
-                    List.of(type),
-                    YesOrNo.NO, YesOrNo.NO, null
-                );
-                feeDto = feesService.getFeeForGA(caseDataWithoutNotice);
-                assertThat(feeDto).isEqualTo(FEE_PENCE_14);
-            }
-        }
-
-        @Test
-        void settle_should_be_108() {
-            when(feesApiClient.lookupFee(
-                anyString(),
-                anyString(),
-                anyString(),
-                anyString(),
-                anyString(),
-                eq(WithoutNotice)
-            )).thenReturn(FEE_POUNDS_108);
-            when(feesConfiguration.getService()).thenReturn("general");
-            when(feesConfiguration.getChannel()).thenReturn("default");
-            when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
-            when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
-            when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn("GeneralAppWithoutNotice");
-            when(feesConfiguration.getEvent()).thenReturn("general application");
-
-            CaseData caseDataWithNotice = getFeeCase(
-                List.of(GeneralApplicationTypes.SETTLE_BY_CONSENT),
-                YesOrNo.YES, YesOrNo.YES, null
-            );
-            Fee feeDto = feesService.getFeeForGA(caseDataWithNotice);
-            assertThat(feeDto).isEqualTo(FEE_PENCE_108);
-        }
-
-        @Test
-        void setAside_should_be_275() {
-            when(feesApiClient.lookupFee(
-                anyString(),
-                anyString(),
-                anyString(),
-                anyString(),
-                anyString(),
-                eq(GAOnNotice)
-            )).thenReturn(FEE_POUNDS_275);
-            when(feesConfiguration.getService()).thenReturn("general");
-            when(feesConfiguration.getChannel()).thenReturn("default");
-            when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
-            when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
-            when(feesConfiguration.getWithNoticeKeyword()).thenReturn("GAOnNotice");
-            when(feesConfiguration.getEvent()).thenReturn("general application");
-            CaseData caseDataWithNotice = getFeeCase(
-                List.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT),
-                YesOrNo.YES, YesOrNo.YES, null
-            );
-            Fee feeDto = feesService.getFeeForGA(caseDataWithNotice);
-            assertThat(feeDto).isEqualTo(FEE_PENCE_275);
-            CaseData caseDataWithoutNotice = getFeeCase(
-                List.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT),
-                YesOrNo.NO, YesOrNo.NO, null
-            );
-            feeDto = feesService.getFeeForGA(caseDataWithoutNotice);
-            assertThat(feeDto).isEqualTo(FEE_PENCE_275);
-        }
-
-        @Test
-        void mix_default_adjourn_should_not_free() {
-            when(feesApiClient.lookupFee(
-                anyString(),
-                anyString(),
-                anyString(),
-                anyString(),
-                anyString(),
-                eq(WithoutNotice)
-            )).thenReturn(FEE_POUNDS_108);
-            when(feesConfiguration.getService()).thenReturn("general");
-            when(feesConfiguration.getChannel()).thenReturn("default");
-            when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
-            when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
-            when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn("GeneralAppWithoutNotice");
-            when(feesConfiguration.getEvent()).thenReturn("general application");
-
-            List<GeneralApplicationTypes> randomList = getRandomDefaultTypes();
-            randomList.add(GeneralApplicationTypes.ADJOURN_HEARING);
-            CaseData caseDataOutside14Days = getFeeCase(
-                randomList,
-                YesOrNo.YES, YesOrNo.YES, LocalDate.now().plusDays(15)
-            );
-            assertThat(feesService.getFeeForGA(caseDataOutside14Days))
-                .isEqualTo(FEE_PENCE_108);
-        }
-
-        @Test
-        void mix_default_set_aside_should_be_108() {
-            when(feesApiClient.lookupFee(anyString(), anyString(), anyString(), anyString(), anyString(), eq(WithoutNotice)))
-                .thenReturn(FEE_POUNDS_108);
-            when(feesApiClient.lookupFee(anyString(), anyString(), anyString(), anyString(), anyString(), eq(GAOnNotice)))
-                .thenReturn(FEE_POUNDS_275);
-            when(feesConfiguration.getService()).thenReturn("general");
-            when(feesConfiguration.getChannel()).thenReturn("default");
-            when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
-            when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
-            when(feesConfiguration.getWithNoticeKeyword()).thenReturn("GAOnNotice");
-            when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn("GeneralAppWithoutNotice");
-            when(feesConfiguration.getEvent()).thenReturn("general application");
-
-            List<GeneralApplicationTypes> randomList = getRandomDefaultTypes();
-            randomList.add(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT);
-            CaseData caseDataOutside14Days = getFeeCase(
-                randomList,
-                YesOrNo.YES, YesOrNo.YES, LocalDate.now().plusDays(15)
-            );
-            assertThat(feesService.getFeeForGA(caseDataOutside14Days))
-                .isEqualTo(FEE_PENCE_108);
-        }
-
-        @Test
-        void mix_default_vary_should_be_14() {
-            when(feesApiClient.lookupFee(
-                anyString(),
-                anyString(),
-                anyString(),
-                anyString(),
-                anyString(),
-                eq(WithoutNotice)
-            )).thenReturn(FEE_POUNDS_108);
-            when(feesApiClient.lookupFee(anyString(),
-                                         anyString(),
-                                         anyString(),
-                                         anyString(),
-                                         anyString(),
-                                         eq(AppnToVaryOrSuspend))).thenReturn(FEE_POUNDS_14);
-            when(feesConfiguration.getService()).thenReturn("general");
-            when(feesConfiguration.getChannel()).thenReturn("default");
-            when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
-            when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
-            when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn("GeneralAppWithoutNotice");
-            when(feesConfiguration.getAppnToVaryOrSuspend()).thenReturn("AppnToVaryOrSuspend");
-            when(feesConfiguration.getEvent()).thenReturn("general application");
-
-            List<GeneralApplicationTypes> randomList = getRandomDefaultTypes();
-            randomList.add(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT);
-            CaseData caseDataOutside14Days = getFeeCase(
-                randomList,
-                YesOrNo.YES, YesOrNo.YES, LocalDate.now().plusDays(15)
-            );
-            assertThat(feesService.getFeeForGA(caseDataOutside14Days))
-                .isEqualTo(FEE_PENCE_14);
-            randomList.remove(randomList.size() - 1);
-            randomList.add(GeneralApplicationTypes.VARY_ORDER);
-            caseDataOutside14Days = getFeeCase(
-                randomList,
-                YesOrNo.YES, YesOrNo.YES, LocalDate.now().plusDays(15)
-            );
-            assertThat(feesService.getFeeForGA(caseDataOutside14Days))
-                .isEqualTo(FEE_PENCE_14);
-            randomList.remove(randomList.size() - 1);
-        }
-
-        @Test
-        void mix_default_vary_set_aside_should_be_14() {
-            when(feesApiClient.lookupFee(
-                anyString(),
-                anyString(),
-                anyString(),
-                anyString(),
-                anyString(),
-                eq(WithoutNotice)
-            )).thenReturn(FEE_POUNDS_108);
-            when(feesApiClient.lookupFee(
-                anyString(),
-                anyString(),
-                anyString(),
-                anyString(),
-                anyString(),
-                eq(GAOnNotice)
-            )).thenReturn(FEE_POUNDS_275);
-            when(feesApiClient.lookupFee(anyString(),
-                                         anyString(),
-                                         anyString(),
-                                         anyString(),
-                                         anyString(),
-                                         eq(AppnToVaryOrSuspend))).thenReturn(FEE_POUNDS_14);
-            when(feesConfiguration.getService()).thenReturn("general");
-            when(feesConfiguration.getChannel()).thenReturn("default");
-            when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
-            when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
-            when(feesConfiguration.getWithNoticeKeyword()).thenReturn("GAOnNotice");
-            when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn("GeneralAppWithoutNotice");
-            when(feesConfiguration.getAppnToVaryOrSuspend()).thenReturn("AppnToVaryOrSuspend");
-            when(feesConfiguration.getEvent()).thenReturn("general application");
-
-            List<GeneralApplicationTypes> randomList = getRandomDefaultTypes();
-            randomList.add(GeneralApplicationTypes.VARY_ORDER);
-            randomList.add(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT);
-            CaseData caseDataOutside14Days = getFeeCase(
-                randomList,
-                YesOrNo.YES, YesOrNo.YES, LocalDate.now().plusDays(15)
-            );
-            assertThat(feesService.getFeeForGA(caseDataOutside14Days))
-                .isEqualTo(FEE_PENCE_14);
-        }
-
-        @ParameterizedTest
-        @EnumSource(
-            value = GeneralApplicationTypes.class,
-            names = {"VARY_ORDER", "SET_ASIDE_JUDGEMENT", "OTHER"})
-        void shouldReturnFeeDataForJO_whenApplicationTypeIsProvided(GeneralApplicationTypes generalApplicationTypes) {
-            //Given
-            when(feesConfiguration.getChannel()).thenReturn("default");
-            when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
-            when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
-
-            if (Objects.requireNonNull(generalApplicationTypes) == VARY_ORDER) {
-                when(feesConfiguration.getAppnToVaryOrSuspend()).thenReturn("AppnToVaryOrSuspend");
-                when(feesApiClient.lookupFee(
-                        anyString(),
-                        anyString(),
-                        anyString(),
-                        anyString(),
-                        anyString(),
-                        eq(AppnToVaryOrSuspend)
-                )).thenReturn(FEE_POUNDS_14);
-                //When
-                Fee feeForVaryOrder = feesService.getFeeForJOWithApplicationType(VARY_ORDER);
-                //Then
-                assertThat(feeForVaryOrder).isEqualTo(FEE_PENCE_14);
-            } else if (generalApplicationTypes == SET_ASIDE_JUDGEMENT) {
-                when(feesConfiguration.getWithNoticeKeyword()).thenReturn("GAOnNotice");
-
-                when(feesApiClient.lookupFee(
-                        anyString(),
-                        anyString(),
-                        anyString(),
-                        anyString(),
-                        anyString(),
-                        eq(GAOnNotice)
-                )).thenReturn(FEE_POUNDS_14);
-                //When
-                Fee feeForSetAside = feesService.getFeeForJOWithApplicationType(SET_ASIDE_JUDGEMENT);
-                //Then
-                assertThat(feeForSetAside).isEqualTo(FEE_PENCE_14);
-            } else if (generalApplicationTypes == OTHER) {
-                when(feesConfiguration.getCertificateOfSatisfaction()).thenReturn("CoS");
-
-                when(feesApiClient.lookupFee(
-                        anyString(),
-                        anyString(),
-                        anyString(),
-                        anyString(),
-                        anyString(),
-                        eq(CoS)
-                )).thenReturn(FEE_POUNDS_14);
-                //When
-                Fee feeForCertSatisfaction = feesService.getFeeForJOWithApplicationType(OTHER);
-                //Then
-                assertThat(feeForCertSatisfaction).isEqualTo(FEE_PENCE_14);
-            }
-        }
-
-        private List<GeneralApplicationTypes> getRandomDefaultTypes() {
-            List<GeneralApplicationTypes> allTypes =
-                Stream.of(GeneralApplicationTypes.values()).collect(Collectors.toList());
-            allTypes.removeAll(GeneralAppFeesService.VARY_TYPES);
-            allTypes.removeAll(GeneralAppFeesService.SET_ASIDE);
-            allTypes.removeAll(GeneralAppFeesService.ADJOURN_TYPES);
-            allTypes.removeAll(GeneralAppFeesService.SD_CONSENT_TYPES);
-            allTypes.removeAll(GeneralAppFeesService.CONFIRM_YOU_PAID_CCJ_DEBT);
-            Collections.shuffle(allTypes);
-            Random rand = new Random();
-            int min = 1;
-            int max = allTypes.size();
-            return allTypes.subList(0, rand.nextInt(min, max));
-        }
-
-        private CaseData getFeeCase(List<GeneralApplicationTypes> types, YesOrNo hasAgreed,
-                                    YesOrNo isWithNotice, LocalDate hearingScheduledDate) {
-            CaseData.CaseDataBuilder builder = CaseData.builder();
-            builder.generalAppType(GAApplicationType.builder().types(types).build());
-            if (Objects.nonNull(hasAgreed)) {
-                builder.generalAppRespondentAgreement(GARespondentOrderAgreement
-                                                          .builder().hasAgreed(hasAgreed).build());
-            }
-            if (Objects.nonNull(isWithNotice)) {
-                builder.generalAppInformOtherParty(
-                    GAInformOtherParty.builder().isWithNotice(isWithNotice).build());
-            }
-            if (Objects.nonNull(hearingScheduledDate)) {
-                builder.generalAppHearingDate(GAHearingDateGAspec.builder()
-                                                  .hearingScheduledDate(hearingScheduledDate).build());
-            }
-            return builder.build();
-        }
-    }
-
-    @Test
-    void shouldReturnFeeData_whenCertificateOfSatisfactionOrCancelRequested() {
-        when(feesConfiguration.getChannel()).thenReturn("default");
-        when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
-        when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
-        when(feesConfiguration.getCertificateOfSatisfaction()).thenReturn("CertificateOfSorC");
-
-        when(feesApiClient.lookupFee(
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
-            keywordCaptor.capture()
-        ))
-            .thenReturn(FEE_POUNDS_15);
-
-        Fee feeDto = feesService.getFeeForGALiP(GeneralAppFeesService.CONFIRM_YOU_PAID_CCJ_DEBT, false, false, null);
-
-        assertThat(feeDto).isEqualTo(FEE_PENCE_15);
-        assertThat(keywordCaptor.getValue())
-            .hasToString(CERT_OF_SATISFACTION_OR_CANCEL);
+    private List<GeneralApplicationTypes> getGADefaultTypes() {
+        List<GeneralApplicationTypes> allTypes =
+            Stream.of(GeneralApplicationTypes.values()).collect(Collectors.toList());
+        allTypes.removeAll(GeneralAppFeesService.VARY_TYPES);
+        allTypes.removeAll(GeneralAppFeesService.SET_ASIDE);
+        allTypes.removeAll(GeneralAppFeesService.ADJOURN_TYPES);
+        allTypes.removeAll(GeneralAppFeesService.SD_CONSENT_TYPES);
+        allTypes.removeAll(GeneralAppFeesService.CONFIRM_YOU_PAID_CCJ_DEBT);
+        Collections.shuffle(allTypes);
+        return allTypes;
     }
 }

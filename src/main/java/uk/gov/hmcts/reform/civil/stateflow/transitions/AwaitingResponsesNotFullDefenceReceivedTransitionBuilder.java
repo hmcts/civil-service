@@ -5,6 +5,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
+
+import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allResponsesReceived;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pastClaimDetailsNotificationDeadline;
@@ -24,11 +27,11 @@ public class AwaitingResponsesNotFullDefenceReceivedTransitionBuilder extends Mi
     }
 
     @Override
-    void setUpTransitions() {
-        this.moveTo(ALL_RESPONSES_RECEIVED).onlyWhen(allResponsesReceived)
-            .moveTo(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED).onlyWhen(takenOfflineAfterClaimDetailsNotified)
-            .moveTo(TAKEN_OFFLINE_BY_STAFF).onlyWhen(takenOfflineByStaffAfterClaimNotified)
-            .moveTo(PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA)
-            .onlyWhen(pastClaimDetailsNotificationDeadline);
+    void setUpTransitions(List<Transition> transitions) {
+        this.moveTo(ALL_RESPONSES_RECEIVED, transitions).onlyWhen(allResponsesReceived, transitions)
+            .moveTo(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED, transitions).onlyWhen(takenOfflineAfterClaimDetailsNotified, transitions)
+            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaffAfterClaimNotified, transitions)
+            .moveTo(PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA, transitions)
+            .onlyWhen(pastClaimDetailsNotificationDeadline, transitions);
     }
 }

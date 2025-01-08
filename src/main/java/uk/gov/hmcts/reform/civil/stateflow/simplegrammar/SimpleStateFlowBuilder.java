@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.stateflow.simplegrammar;
 
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.config.StateMachineBuilder;
 import org.springframework.statemachine.config.configurers.ExternalTransitionConfigurer;
@@ -34,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STAT
  * - return the internal state engine for further processing
  */
 @Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @AllArgsConstructor
 public class SimpleStateFlowBuilder {
 

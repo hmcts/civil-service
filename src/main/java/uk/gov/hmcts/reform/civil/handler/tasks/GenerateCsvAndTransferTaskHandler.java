@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
-import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.stereotype.Component;
@@ -15,7 +14,6 @@ import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCSVService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCsvServiceFactory;
 import uk.gov.hmcts.reform.civil.service.search.MediationCasesSearchService;
@@ -39,13 +37,9 @@ public class GenerateCsvAndTransferTaskHandler extends BaseExternalTaskHandler {
     private static final String SUBJECT = "OCMC Mediation Data";
     private static final String FILENAME = "ocmc_mediation_data.csv";
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-    private final FeatureToggleService toggleService;
-    private final RuntimeService runtimeService;
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-
-        List<CaseData> inMediationCases;
         LocalDate claimMovedDate;
         if (externalTask.getVariable("claimMovedDate") != null) {
             claimMovedDate = LocalDate.parse(externalTask.getVariable("claimMovedDate").toString(), DATE_FORMATTER);
@@ -53,14 +47,20 @@ public class GenerateCsvAndTransferTaskHandler extends BaseExternalTaskHandler {
             claimMovedDate = LocalDate.now().minusDays(1);
         }
         List<CaseDetails> cases = caseSearchService.getInMediationCases(claimMovedDate, false);
-        inMediationCases = cases.stream()
+        log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
+        if (!cases.isEmpty()) {
+            StringBuilder sb = new StringBuilder().append("CSV case IDs: ");
+            for (CaseDetails caseDetail : cases) {
+                sb.append(caseDetail.getId());
+                sb.append("\n");
+            }
+            log.info(sb.toString());
+        }
+        List<CaseData> inMediationCases = cases.stream()
             .map(caseDetailsConverter::toCaseData)
             .toList();
-        log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), inMediationCases.size());
         String[] headers = getCSVHeaders();
         StringBuilder csvColContent = new StringBuilder();
-        runtimeService.setVariable(externalTask.getProcessInstanceId(), "carmFeatureEnabled",
-                                   toggleService.isFeatureEnabled("carm"));
         try {
             if (!inMediationCases.isEmpty()) {
                 inMediationCases.forEach(caseData ->
@@ -69,7 +69,9 @@ public class GenerateCsvAndTransferTaskHandler extends BaseExternalTaskHandler {
                 String generateCsvData = generateCSVRow(headers) + csvColContent;
                 Optional<EmailData> emailData = prepareEmail(generateCsvData);
 
-                emailData.ifPresent(data -> sendGridClient.sendEmail(mediationCSVEmailConfiguration.getSender(), data));
+                if (externalTask.getVariable("dontSendEmail") == null) {
+                    emailData.ifPresent(data -> sendGridClient.sendEmail(mediationCSVEmailConfiguration.getSender(), data));
+                }
             }
         } catch (Exception e) {
             log.error(e.getMessage());

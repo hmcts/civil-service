@@ -87,6 +87,15 @@ public class ClaimSettledDefendantDashboardNotificationHandlerTest extends BaseC
             ).build();
 
             handler.handle(params);
+            verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
+                caseData.getCcdCaseReference().toString(),
+                "DEFENDANT",
+                "BEARER_TOKEN");
+            verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+                caseData.getCcdCaseReference().toString(),
+                "DEFENDANT",
+                "BEARER_TOKEN");
+
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLE_EVENT_DEFENDANT.getScenario(),

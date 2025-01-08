@@ -5,6 +5,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
+
+import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.ccjRequestJudgmentByAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_JUDGMENT_ADMISSION;
@@ -18,7 +21,7 @@ public class SignSettlementAgreementTransitionBuilder extends MidTransitionBuild
     }
 
     @Override
-    void setUpTransitions() {
-        this.moveTo(FULL_ADMIT_JUDGMENT_ADMISSION).onlyWhen(ccjRequestJudgmentByAdmission);
+    void setUpTransitions(List<Transition> transitions) {
+        this.moveTo(FULL_ADMIT_JUDGMENT_ADMISSION, transitions).onlyWhen(ccjRequestJudgmentByAdmission, transitions);
     }
 }

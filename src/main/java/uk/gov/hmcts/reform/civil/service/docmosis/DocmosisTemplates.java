@@ -39,10 +39,6 @@ public enum DocmosisTemplates {
     SDO_FAST_FAST_TRACK_INT("CV-UNS-STD-ENG-01378.docx", "fast_track_sdo_%s.pdf"),
     SDO_FAST_FAST_TRACK_INT_R2("CV-UNS-STD-ENG-01378_13066.docx", "fast_track_sdo_%s.pdf"),
     DEFENDANT_RESPONSE_LIP_SPEC("CV-SPC-CLM-ENG-01065-LIP.docx", "response_sealed_form_%s.pdf"),
-    HEARING_SMALL_CLAIMS("CV-UNS-HNO-ENG-01197.docx", "hearing_small_claim_%s.pdf"),
-    HEARING_TRIAL("CV-UNS-HNO-ENG-01198.docx", "trial_%s.pdf"),
-    HEARING_APPLICATION("CV-UNS-HNO-ENG-01199.docx", "hearing_application_%s.pdf"),
-    HEARING_OTHER("CV-UNS-HNO-ENG-01196.docx", "hearing_other_claim_%s.pdf"),
     PIN_IN_THE_POST_LETTER("CV-CMC-LET-ENG-PIP0001.docx", "PIP_letter.pdf"),
     SET_ASIDE_JUDGMENT_IN_ERROR_LIP_DEFENDANT_LETTER("CV-CMC-LET-ENG-LIP-JO0001.docx", "set_aside_letter.pdf"),
     JUDGMENT_BY_ADMISSION_PIN_IN_POST_LIP_DEFENDANT_LETTER("CV-CMC-LET-ENG-PIP-0002.docx", "judgment_by_admission_non_divergent_spec_pip_letter.pdf"),
@@ -99,8 +95,10 @@ public enum DocmosisTemplates {
     JUDGMENT_BY_ADMISSION_DEFENDANT("CV-SPC-DEC-ENG-00915.docx", "Judgment_by_admission_defendant.pdf"),
     JUDGMENT_BY_DETERMINATION_CLAIMANT("CV-SPC-DEC-ENG-00982.docx", "Judgment_by_determination_claimant.pdf"),
     JUDGMENT_BY_DETERMINATION_DEFENDANT("CV-SPC-DEC-ENG-00981.docx", "Judgment_by_determination_defendant.pdf"),
-    NOTICE_OF_DISCONTINUANCE_PDF("CV-SPC-GNO-ENG-SD0001.docx", "notice_of_discontinuance_%s.pdf"),
-    CERTIFICATE_OF_DEBT_PAYMENT("CV-SPC-STD-ENG-N441A.docx", "Certificate_of_debt_payment_%s.pdf");
+    NOTICE_OF_DISCONTINUANCE_PDF("CV-SPC-GNO-ENG-SD0002.docx", "notice_of_discontinuance_%s.pdf"),
+    NOTICE_OF_DISCONTINUANCE_BILINGUAL_PDF("CV-SPC-GNO-WEL-SD0001.docx", "notice_of_discontinuance_%s.pdf"),
+    CERTIFICATE_OF_DEBT_PAYMENT("CV-SPC-STD-ENG-N441A.docx", "Certificate_of_debt_payment_%s.pdf"),
+    COVER_LETTER("CV-SPC-LET-ENG-COVER-LETTER.docx", "cover_letter.pdf");
 
     private final String template;
     private final String documentTitle;

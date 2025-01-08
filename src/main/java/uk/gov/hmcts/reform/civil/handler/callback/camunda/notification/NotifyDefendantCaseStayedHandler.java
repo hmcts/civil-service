@@ -14,13 +14,15 @@ import java.util.Map;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_STAY_CASE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_TWO_STAY_CASE;
 
 @Service
 public class NotifyDefendantCaseStayedHandler extends AbstractNotifyCaseStayedHandler {
 
-    private static final String TASK_ID = "NotifyDefendantStayCase";
+    private static final String TASK_ID_DEF_ONE = "NotifyDefendantStayCase";
+    private static final String TASK_ID_DEF_TWO = "NotifyDefendant2StayCase";
     private static final String REFERENCE_TEMPLATE = "case-stayed-defendant-notification-%s";
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_DEFENDANT_STAY_CASE);
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_DEFENDANT_STAY_CASE, NOTIFY_DEFENDANT_TWO_STAY_CASE);
 
     public NotifyDefendantCaseStayedHandler(NotificationService notificationService, NotificationsProperties notificationsProperties) {
         super(notificationService, notificationsProperties);
@@ -32,11 +34,14 @@ public class NotifyDefendantCaseStayedHandler extends AbstractNotifyCaseStayedHa
     }
 
     @Override
-    protected String getRecipient(CaseData caseData) {
+    protected String getRecipient(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
         if (caseData.isRespondent1LiP() && nonNull(caseData.getRespondent1().getPartyEmail())) {
             return caseData.getRespondent1().getPartyEmail();
         } else {
-            return caseData.getRespondentSolicitor1EmailAddress();
+            return isForRespondent1(callbackParams)
+                ? caseData.getRespondentSolicitor1EmailAddress()
+                : caseData.getRespondentSolicitor2EmailAddress();
         }
     }
 
@@ -51,8 +56,11 @@ public class NotifyDefendantCaseStayedHandler extends AbstractNotifyCaseStayedHa
     }
 
     @Override
-    protected String getPartyName(CaseData caseData) {
-        return caseData.getRespondent1().getPartyName();
+    protected String getPartyName(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        return isForRespondent1(callbackParams)
+            ? caseData.getRespondent1().getPartyName()
+            : caseData.getRespondent2().getPartyName();
     }
 
     @Override
@@ -62,11 +70,17 @@ public class NotifyDefendantCaseStayedHandler extends AbstractNotifyCaseStayedHa
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+        return callbackParams.getRequest().getEventId().equals(NOTIFY_DEFENDANT_STAY_CASE.name())
+            ? TASK_ID_DEF_ONE : TASK_ID_DEF_TWO;
     }
 
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    private boolean isForRespondent1(CallbackParams callbackParams) {
+        return callbackParams.getRequest().getEventId()
+            .equals(NOTIFY_DEFENDANT_STAY_CASE.name());
     }
 }

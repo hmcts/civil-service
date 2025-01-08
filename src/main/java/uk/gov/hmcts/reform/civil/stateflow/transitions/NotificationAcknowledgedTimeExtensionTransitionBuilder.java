@@ -6,8 +6,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
@@ -35,22 +37,23 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilder extends MidT
     }
 
     @Override
-    void setUpTransitions() {
-        this.moveTo(ALL_RESPONSES_RECEIVED)
+    void setUpTransitions(List<Transition> transitions) {
+        this.moveTo(ALL_RESPONSES_RECEIVED, transitions)
             .onlyWhen(notificationAcknowledged.and(respondentTimeExtension).and(allResponsesReceived).and(claimDismissalOutOfTime.negate())
-                .and(takenOfflineByStaff.negate()))
-            .moveTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
+                .and(takenOfflineByStaff.negate()), transitions)
+            .moveTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED, transitions)
             .onlyWhen(notificationAcknowledged.and(respondentTimeExtension)
                 .and(awaitingResponsesFullDefenceReceived)
-                .and(not(caseDismissedAfterClaimAcknowledgedExtension)))
-            .moveTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED)
+                .and(not(caseDismissedAfterClaimAcknowledgedExtension)), transitions)
+            .moveTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED, transitions)
             .onlyWhen(notificationAcknowledged.and(respondentTimeExtension)
-                .and(awaitingResponsesNonFullDefenceReceived))
-            .moveTo(TAKEN_OFFLINE_BY_STAFF)
-            .onlyWhen(takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension)
-            .moveTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
-            .onlyWhen(caseDismissedAfterClaimAcknowledgedExtension)
-            .moveTo(TAKEN_OFFLINE_SDO_NOT_DRAWN).onlyWhen(takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension);
+                .and(awaitingResponsesNonFullDefenceReceived), transitions)
+            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions)
+            .onlyWhen(takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension, transitions)
+            .moveTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA, transitions)
+            .onlyWhen(caseDismissedAfterClaimAcknowledgedExtension, transitions)
+            .moveTo(TAKEN_OFFLINE_SDO_NOT_DRAWN, transitions)
+            .onlyWhen(takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension, transitions);
     }
 
     public static final Predicate<CaseData> takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension =

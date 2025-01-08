@@ -10,7 +10,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
 import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
+import uk.gov.hmcts.reform.dashboard.entities.TaskItemTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
+import uk.gov.hmcts.reform.dashboard.repositories.TaskItemTemplateRepository;
 import uk.gov.hmcts.reform.dashboard.repositories.TaskListRepository;
 
 import java.util.ArrayList;
@@ -34,6 +36,9 @@ class TaskListServiceTest {
 
     @Mock
     private TaskListRepository taskListRepository;
+
+    @Mock
+    private TaskItemTemplateRepository taskItemTemplateRepository;
 
     @InjectMocks
     private TaskListService taskListService;
@@ -160,17 +165,110 @@ class TaskListServiceTest {
 
         when(taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotIn(
             "123", "Claimant",
-            List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue())
+            List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(), TaskStatus.NOT_AVAILABLE_YET.getPlaceValue())
         ))
             .thenReturn(tasks);
 
         //when
-        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant");
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant", null);
 
         //then
         verify(taskListRepository).findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotIn(
             "123", "Claimant",
-            List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue())
+            List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(), TaskStatus.NOT_AVAILABLE_YET.getPlaceValue())
+        );
+
+        verify(taskListRepository, atLeast(4)).save(ArgumentMatchers.argThat(
+            a -> {
+                Assertions.assertEquals(
+                    a.getCurrentStatus(),
+                    TaskStatus.INACTIVE.getPlaceValue()
+                );
+                Assertions.assertEquals(
+                    a.getNextStatus(),
+                    TaskStatus.INACTIVE.getPlaceValue()
+                );
+                Assertions.assertTrue(StringUtils.isBlank(a.getHintTextCy()));
+                Assertions.assertTrue(StringUtils.isBlank(a.getHintTextEn()));
+                Assertions.assertEquals("Link name", a.getTaskNameEn());
+                Assertions.assertEquals("Link name Welsh", a.getTaskNameCy());
+                return true;
+            }
+        ));
+    }
+
+    @Test
+    void shouldMakeProgressAbleTaskListInactive_Except_Ga_whenTaskListIsPresent() {
+
+        //given
+        List<TaskListEntity> tasks = new ArrayList<>();
+        tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
+                      .taskNameEn("<a href=\"somewhere\">Link name</A >")
+                      .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>")
+                      .currentStatus(TaskStatus.NOT_AVAILABLE_YET.getPlaceValue())
+                      .build());
+        tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
+                      .currentStatus(TaskStatus.INACTIVE.getPlaceValue())
+                      .taskNameEn("<a href=\"somewhere\">Link name</A >")
+                      .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>").build());
+        tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
+                      .currentStatus(TaskStatus.AVAILABLE.getPlaceValue())
+                      .taskNameEn("<a href=\"somewhere\">Link name</A >")
+                      .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>").build());
+        tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
+                      .currentStatus(TaskStatus.OPTIONAL.getPlaceValue())
+                      .taskNameEn("<a href=\"somewhere\">Link name</A >")
+                      .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>").build());
+        tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
+                      .currentStatus(TaskStatus.ACTION_NEEDED.getPlaceValue())
+                      .taskNameEn("<a href=\"somewhere\">Link name</A >")
+                      .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>")
+                      .build());
+        tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
+                      .currentStatus(TaskStatus.IN_PROGRESS.getPlaceValue())
+                      .taskNameEn("<a href=\"somewhere\">Link name</A >")
+                      .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>")
+                      .build());
+        tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
+                      .currentStatus(TaskStatus.DONE.getPlaceValue())
+                      .taskNameEn("<a href=\"somewhere\">Link name</A >")
+                      .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>")
+                      .build());
+
+        when(taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplate_IdNotIn(
+            "123", "Claimant",
+            List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(),
+                    TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()),
+            List.of(Long.valueOf(123))
+        ))
+            .thenReturn(tasks);
+
+        List<TaskItemTemplateEntity> categories = new ArrayList<>();
+        categories.add(TaskItemTemplateEntity.builder()
+                           .id(Long.valueOf(123)).taskNameCy("TaskNameCy")
+                           .taskNameEn("TaskNameEn")
+                           .scenarioName("Scenario.hearing")
+                           .templateName("Hearing.view")
+                           .taskOrder(1).hintTextCy("HintCY")
+                           .hintTextEn("HintEn").role("Claimant")
+                           .categoryCy("CategoryCy").categoryEn("CategoryEn")
+                           .build());
+
+        when(taskItemTemplateRepository.findByCategoryEnAndRole(
+            "CategoryEn", "Claimant"))
+            .thenReturn(categories);
+
+        //when
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant", "CategoryEn");
+
+        //then
+        verify(taskItemTemplateRepository).findByCategoryEnAndRole(
+            "CategoryEn", "Claimant");
+        verify(taskListRepository).findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplate_IdNotIn(
+            "123", "Claimant",
+            List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(),
+                    TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()),
+            List.of(Long.valueOf(123))
         );
 
         verify(taskListRepository, atLeast(5)).save(ArgumentMatchers.argThat(

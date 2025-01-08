@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
+import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypesLR;
 import uk.gov.hmcts.reform.civil.helpers.GATypeHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -119,14 +120,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
         CaseData caseData = callbackParams.getCaseData();
 
-        // If Pre SDO allow GA in all locations.
-        // If Post SDO including JUDICIAL REFERRAL, allow GA in all locations, except Birmingham
-        if (inStateAfterJudicialReferral(caseData.getCcdState())
-            && !featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
-            log.info("Gen apps for case {} not part of national rollout, post SDO", caseData.getCcdCaseReference());
-            errors.add(NOT_IN_EA_REGION);
-        }
-
         if (!initiateGeneralApplicationService.respondentAssigned(caseData)) {
             errors.add(RESP_NOT_ASSIGNED_ERROR);
         }
@@ -135,6 +128,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         if (initiateGeneralApplicationService.caseContainsLiP(caseData)) {
             if (!featureToggleService.isGaForLipsEnabled()) {
                 errors.add(LR_VS_LIP);
+            } else if (!(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData
+                                                              .getCaseManagementLocation().getBaseLocation()))) {
+                errors.add(NOT_IN_EA_REGION);
             } else {
                 /*
                  * General Application can only be initiated if Defendant is assigned to the case
@@ -365,7 +361,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
         Map<String, Object> data = initiateGeneralApplicationService
                 .buildCaseData(dataBuilder, caseData, userDetails, callbackParams.getParams().get(BEARER_TOKEN)
-                        .toString()).toMap(objectMapper);
+                        .toString(), feesService).toMap(objectMapper);
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(data).build();
     }
@@ -383,14 +379,22 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     }
 
     private CaseData setWithNoticeByType(CaseData caseData) {
-        if (Objects.nonNull(caseData.getGeneralAppType())
-                && caseData.getGeneralAppType().getTypes().size() == 1
-                && caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {
+        if (isSingleAppTypeVaryJudgment(caseData)) {
             caseData = caseData.toBuilder()
                     .generalAppInformOtherParty(
                             GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build()).build();
         }
         return caseData;
+    }
+
+    private boolean isSingleAppTypeVaryJudgment(CaseData caseData) {
+        if (Objects.nonNull(caseData.getGeneralAppType())) {
+            return caseData.getGeneralAppType().getTypes().size() == 1
+                && caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT);
+        }
+        return Objects.nonNull(caseData.getGeneralAppTypeLR())
+            && caseData.getGeneralAppTypeLR().getTypes().size() == 1
+            && caseData.getGeneralAppTypeLR().getTypes().contains(GeneralApplicationTypesLR.VARY_PAYMENT_TERMS_OF_JUDGMENT);
     }
 
     private boolean inStateAfterJudicialReferral(CaseState state) {

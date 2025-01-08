@@ -14,6 +14,10 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
+import uk.gov.hmcts.reform.civil.model.citizenui.MediationLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.MediationLiPCarm;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
@@ -38,6 +42,7 @@ import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceTransit
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceTransitionBuilder.declinedMediation;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceTransitionBuilder.demageMultiClaim;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceTransitionBuilder.getPredicateTakenOfflineByStaffAfterDefendantResponseBeforeClaimantResponse;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceTransitionBuilder.isCarmApplicableCase;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceTransitionBuilder.isCarmApplicableLipCase;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceTransitionBuilder.isClaimantNotSettleFullDefenceClaim;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceTransitionBuilder.isDefendantNotPaidFullDefenceClaim;
@@ -61,17 +66,18 @@ public class FullDefenceTransitionBuilderTest {
 
     @Test
     void shouldSetUpTransitions_withExpectedSizeAndStates() {
-        assertThat(result).hasSize(9);
+        assertThat(result).hasSize(10);
 
         assertTransition(result.get(0), "MAIN.FULL_DEFENCE", "MAIN.IN_MEDIATION");
-        assertTransition(result.get(1), "MAIN.FULL_DEFENCE", "MAIN.FULL_DEFENCE_PROCEED");
+        assertTransition(result.get(1), "MAIN.FULL_DEFENCE", "MAIN.IN_MEDIATION");
         assertTransition(result.get(2), "MAIN.FULL_DEFENCE", "MAIN.FULL_DEFENCE_PROCEED");
         assertTransition(result.get(3), "MAIN.FULL_DEFENCE", "MAIN.FULL_DEFENCE_PROCEED");
         assertTransition(result.get(4), "MAIN.FULL_DEFENCE", "MAIN.FULL_DEFENCE_PROCEED");
         assertTransition(result.get(5), "MAIN.FULL_DEFENCE", "MAIN.FULL_DEFENCE_PROCEED");
-        assertTransition(result.get(6), "MAIN.FULL_DEFENCE", "MAIN.FULL_DEFENCE_NOT_PROCEED");
-        assertTransition(result.get(7), "MAIN.FULL_DEFENCE", "MAIN.TAKEN_OFFLINE_BY_STAFF");
-        assertTransition(result.get(8), "MAIN.FULL_DEFENCE", "MAIN.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA");
+        assertTransition(result.get(6), "MAIN.FULL_DEFENCE", "MAIN.FULL_DEFENCE_PROCEED");
+        assertTransition(result.get(7), "MAIN.FULL_DEFENCE", "MAIN.FULL_DEFENCE_NOT_PROCEED");
+        assertTransition(result.get(8), "MAIN.FULL_DEFENCE", "MAIN.TAKEN_OFFLINE_BY_STAFF");
+        assertTransition(result.get(9), "MAIN.FULL_DEFENCE", "MAIN.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA");
     }
 
     @Test
@@ -93,7 +99,11 @@ public class FullDefenceTransitionBuilderTest {
             .setClaimTypeToSpecClaim()
             .build().toBuilder()
             .responseClaimTrack(SMALL_CLAIM.name())
-            .submittedDate(LocalDateTime.of(2028, 6, 1, 1, 1))
+            .caseDataLiP(CaseDataLiP.builder()
+                             .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
+                                                            .isMediationContactNameCorrect(YES)
+                                                            .build())
+                             .build())
             .build();
 
         assertTrue(isCarmApplicableLipCase.test(caseData));
@@ -106,8 +116,12 @@ public class FullDefenceTransitionBuilderTest {
             .setClaimTypeToSpecClaim()
             .build().toBuilder()
             .responseClaimTrack(SMALL_CLAIM.name())
-            .submittedDate(LocalDateTime.of(2000, 6, 1, 1, 1))
-            .build();
+            .caseDataLiP(CaseDataLiP.builder()
+                             .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                         .respondent1MediationLiPResponse(MediationLiP.builder()
+                                                                                              .canWeUseMediationLiP(YES)
+                                                                                              .build())
+                                                         .build()).build()).build();
 
         assertFalse(isCarmApplicableLipCase.test(caseData));
     }
@@ -119,7 +133,11 @@ public class FullDefenceTransitionBuilderTest {
             .setClaimTypeToSpecClaim()
             .build().toBuilder()
             .responseClaimTrack(FAST_CLAIM.name())
-            .submittedDate(LocalDateTime.of(2028, 6, 1, 1, 1))
+            .caseDataLiP(CaseDataLiP.builder()
+                             .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
+                                                                      .isMediationContactNameCorrect(YES)
+                                                                      .build())
+                             .build())
             .build();
 
         assertFalse(isCarmApplicableLipCase.test(caseData));
@@ -132,7 +150,11 @@ public class FullDefenceTransitionBuilderTest {
             .setClaimTypeToSpecClaim()
             .build().toBuilder()
             .responseClaimTrack(SMALL_CLAIM.name())
-            .submittedDate(LocalDateTime.of(2028, 6, 1, 1, 1))
+            .caseDataLiP(CaseDataLiP.builder()
+                             .applicant1LiPResponseCarm(MediationLiPCarm.builder()
+                                                                      .isMediationContactNameCorrect(YES)
+                                                                      .build())
+                             .build())
             .build();
 
         assertTrue(isCarmApplicableLipCase.test(caseData));
@@ -145,7 +167,9 @@ public class FullDefenceTransitionBuilderTest {
             .setClaimTypeToSpecClaim()
             .build().toBuilder()
             .responseClaimTrack(SMALL_CLAIM.name())
-            .submittedDate(LocalDateTime.of(2000, 6, 1, 1, 1))
+            .caseDataLiP(CaseDataLiP.builder()
+                             .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().build())
+                             .build())
             .build();
 
         assertFalse(isCarmApplicableLipCase.test(caseData));
@@ -157,10 +181,88 @@ public class FullDefenceTransitionBuilderTest {
             .applicant1Represented(NO)
             .build().toBuilder()
             .responseClaimTrack(SMALL_CLAIM.name())
-            .submittedDate(LocalDateTime.of(2028, 6, 1, 1, 1))
+            .caseDataLiP(CaseDataLiP.builder()
+                             .applicant1LiPResponseCarm(MediationLiPCarm.builder()
+                                                            .isMediationContactNameCorrect(YES)
+                                                            .build())
+                             .build())
             .build();
 
         assertFalse(isCarmApplicableLipCase.test(caseData));
+    }
+
+    @Test
+    void shouldReturnTrue_whenCarmApplicableForClaimantFullDefenceProceed() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .setClaimTypeToSpecClaim()
+            .build().toBuilder()
+            .responseClaimTrack(SMALL_CLAIM.name())
+            .app1MediationContactInfo(MediationContactInformation.builder()
+                                          .firstName("name")
+                                          .build())
+            .build();
+
+        assertTrue(isCarmApplicableCase.test(caseData));
+    }
+
+    @Test
+    void shouldReturnTrue_whenCarmApplicableForDefendantFullDefenceProceed() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .setClaimTypeToSpecClaim()
+            .build().toBuilder()
+            .responseClaimTrack(SMALL_CLAIM.name())
+            .resp1MediationContactInfo(MediationContactInformation.builder()
+                                          .firstName("name")
+                                          .build())
+            .build();
+
+        assertTrue(isCarmApplicableCase.test(caseData));
+    }
+
+    @Test
+    void shouldReturnTrue_whenCarmApplicableForDefendant2FullDefenceProceed() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .setClaimTypeToSpecClaim()
+            .build().toBuilder()
+            .responseClaimTrack(SMALL_CLAIM.name())
+            .resp2MediationContactInfo(MediationContactInformation.builder()
+                                           .firstName("name")
+                                           .build())
+            .build();
+
+        assertTrue(isCarmApplicableCase.test(caseData));
+    }
+
+    @Test
+    void shouldReturnFalse_whenCarmApplicableFastClaim() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atState2v1Applicant1NotProceedApplicant2Proceeds()
+            .setClaimTypeToSpecClaim()
+            .build().toBuilder()
+            .responseClaimTrack(FAST_CLAIM.name())
+            .resp1MediationContactInfo(MediationContactInformation.builder()
+                                           .firstName("name")
+                                           .build())
+            .build();
+
+        assertFalse(isCarmApplicableCase.test(caseData));
+    }
+
+    @Test
+    void shouldReturnFalse_whenCarmApplicableUnspecClaim() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atState2v1Applicant1NotProceedApplicant2Proceeds()
+            .build().toBuilder()
+            .responseClaimTrack(FAST_CLAIM.name())
+            .resp1MediationContactInfo(MediationContactInformation.builder()
+                                           .firstName("name")
+                                           .build())
+            .build();
+
+        assertFalse(isCarmApplicableCase.test(caseData));
     }
 
     @Test
@@ -589,34 +691,6 @@ public class FullDefenceTransitionBuilderTest {
     }
 
     @Test
-    void shouldReturnTrue_whenIsCarmApplicableLipCase() {
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(SPEC_CLAIM)
-            .responseClaimTrack(SMALL_CLAIM.name())
-            .respondent2(null)
-            .applicant1Represented(NO)
-            .respondent1Represented(NO)
-            .submittedDate(LocalDateTime.of(2024, 11, 5, 0, 0))
-            .build();
-
-        assertTrue(isCarmApplicableLipCase.test(caseData));
-    }
-
-    @Test
-    void shouldReturnFalse_whenIsCarmApplicableLipCase() {
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(UNSPEC_CLAIM)
-            .responseClaimTrack(SMALL_CLAIM.name())
-            .respondent2(null)
-            .applicant1Represented(NO)
-            .respondent1Represented(NO)
-            .submittedDate(LocalDateTime.of(2024, 8, 1, 0, 0))
-            .build();
-
-        assertFalse(isCarmApplicableLipCase.test(caseData));
-    }
-
-    @Test
     void shouldReturnTrue_whenIsSpecSmallClaim() {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
@@ -637,21 +711,68 @@ public class FullDefenceTransitionBuilderTest {
     }
 
     @Test
-    void shouldReturnTrue_whenGetCarmEnabledForDate() {
+    void shouldReturnTrue_whenGetCarmEnabledForLipCase() {
         CaseData caseData = CaseData.builder()
-            .submittedDate(LocalDateTime.of(2024, 11, 5, 0, 0))
+            .caseDataLiP(CaseDataLiP.builder()
+                             .applicant1LiPResponseCarm(MediationLiPCarm.builder()
+                                                            .isMediationContactNameCorrect(YES)
+                                                            .build())
+                             .build())
             .build();
 
-        assertTrue(FullDefenceTransitionBuilder.getCarmEnabledForDate(caseData));
+        assertTrue(FullDefenceTransitionBuilder.getCarmEnabledForLipCase(caseData));
     }
 
     @Test
-    void shouldReturnFalse_whenGetCarmEnabledForDate() {
+    void shouldReturnFalse_whenGetCarmEnabledForLipCase() {
         CaseData caseData = CaseData.builder()
-            .submittedDate(LocalDateTime.of(2024, 7, 31, 0, 0))
+            .caseDataLiP(CaseDataLiP.builder()
+                             .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().build())
+                             .build())
             .build();
 
-        assertFalse(FullDefenceTransitionBuilder.getCarmEnabledForDate(caseData));
+        assertFalse(FullDefenceTransitionBuilder.getCarmEnabledForLipCase(caseData));
+    }
+
+    @Test
+    void shouldReturnTrue_whenGetCarmEnabledForCase() {
+        CaseData caseData = CaseData.builder()
+            .app1MediationContactInfo(MediationContactInformation.builder()
+                                          .firstName("name")
+                                          .build())
+            .build();
+
+        assertTrue(FullDefenceTransitionBuilder.getCarmEnabledForCase(caseData));
+    }
+
+    @Test
+    void shouldReturnTrue_whenGetCarmEnabledForCaseDefendant1() {
+        CaseData caseData = CaseData.builder()
+            .resp1MediationContactInfo(MediationContactInformation.builder()
+                                          .firstName("name")
+                                          .build())
+            .build();
+
+        assertTrue(FullDefenceTransitionBuilder.getCarmEnabledForCase(caseData));
+    }
+
+    @Test
+    void shouldReturnTrue_whenGetCarmEnabledForCaseDefendant2() {
+        CaseData caseData = CaseData.builder()
+            .resp2MediationContactInfo(MediationContactInformation.builder()
+                                          .firstName("name")
+                                          .build())
+            .build();
+
+        assertTrue(FullDefenceTransitionBuilder.getCarmEnabledForCase(caseData));
+    }
+
+    @Test
+    void shouldReturnFalse_whenGetCarmEnabledForCase() {
+        CaseData caseData = CaseData.builder()
+            .build();
+
+        assertFalse(FullDefenceTransitionBuilder.getCarmEnabledForCase(caseData));
     }
 
     @Test

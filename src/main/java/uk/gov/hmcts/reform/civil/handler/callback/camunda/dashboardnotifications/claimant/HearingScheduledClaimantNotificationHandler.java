@@ -34,8 +34,10 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTI
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting.LISTING;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.DefaultJudgementHandler.checkLocation;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.hearingFeeRequired;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isEvent;
@@ -56,7 +58,7 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
     private final HearingFeesService hearingFeesService;
 
     @Override
-    protected Map<String, Callback> callbacks() { 
+    protected Map<String, Callback> callbacks() {
         return toggleService.isCaseProgressionEnabled()
             ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForHearingScheduled)
             : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
@@ -80,7 +82,7 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<LocationRefData> locations = (locationRefDataService
-            .getCourtLocationsForDefaultJudgments(authToken));
+                .getHearingCourtLocations(authToken));
         LocationRefData locationRefData = fillPreferredLocationData(locations, caseData.getHearingLocation());
         if (nonNull(locationRefData)) {
             caseData = caseData.toBuilder().hearingLocationCourtName(locationRefData.getSiteName()).build();
@@ -88,33 +90,49 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
 
         if (caseData.isApplicant1NotRepresented()) {
             dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
-                                              SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario(), authToken,
-                                              ScenarioRequestParams.builder().params(
-                                                  mapper.mapCaseDataToParams(caseData)).build()
+                    SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario(), authToken,
+                    ScenarioRequestParams.builder().params(
+                            mapper.mapCaseDataToParams(caseData)).build()
             );
         }
 
         boolean isAutoHearingNotice = isEvent(callbackParams, CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC);
-        boolean requiresHearingFee = false;
-        boolean hasPaidFee = false;
+        boolean hasPaidFee = (caseData.getHearingFeePaymentDetails() != null
+            && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus())) || caseData.hearingFeePaymentDoneWithHWF();
 
-        if (isAutoHearingNotice) {
-            HearingNoticeVariables camundaVars = camundaService.getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId());
-            requiresHearingFee = hearingFeeRequired(camundaVars.getHearingType());
-            hasPaidFee = (caseData.getHearingFeePaymentDetails() != null
-                && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus())) || caseData.hearingFeePaymentDoneWithHWF();
-            if (requiresHearingFee && !hasPaidFee) {
-                caseData.setHearingFee(HearingFeeUtils.calculateAndApplyFee(hearingFeesService, caseData, caseData.getAssignedTrack()));
-            }
+        HearingNoticeVariables camundaVars = isAutoHearingNotice
+            ? camundaService.getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId())
+            : null;
+
+        if (isAutoHearingNotice && hearingFeeRequired(camundaVars.getHearingType()) && !hasPaidFee) {
+            caseData.setHearingFee(HearingFeeUtils.calculateAndApplyFee(hearingFeesService, caseData, caseData.getAssignedTrack()));
         }
 
-        if (caseData.isApplicant1NotRepresented() && ((!isAutoHearingNotice && caseData.getCcdState() == HEARING_READINESS && caseData.getListingOrRelisting() == LISTING)
-            || (isAutoHearingNotice && requiresHearingFee && !hasPaidFee))) {
+        boolean shouldRecordFeeScenario = caseData.isApplicant1NotRepresented() && !hasPaidFee
+            && ((!isAutoHearingNotice && caseData.getCcdState() == HEARING_READINESS && caseData.getListingOrRelisting() == LISTING)
+                || (isAutoHearingNotice && hearingFeeRequired(camundaVars.getHearingType())));
+
+        if (shouldRecordFeeScenario) {
             dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
                                               SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT.getScenario(), authToken,
                                               ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
             );
         }
+
+        if (caseData.isApplicant1NotRepresented()) {
+            if (isNull(caseData.getTrialReadyApplicant())) {
+                dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
+                                                  SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_CLAIMANT.getScenario(), authToken,
+                                                  ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
+                );
+            }
+
+            dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
+                                              SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT.getScenario(), authToken,
+                                              ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
+            );
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 

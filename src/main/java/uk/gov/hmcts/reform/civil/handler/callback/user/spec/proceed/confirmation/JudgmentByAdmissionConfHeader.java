@@ -14,7 +14,8 @@ public class JudgmentByAdmissionConfHeader implements RespondToResponseConfirmat
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        if (CaseState.All_FINAL_ORDERS_ISSUED == caseData.getCcdState()) {
+        if (CaseState.All_FINAL_ORDERS_ISSUED == caseData.getCcdState()
+            && (caseData.isPayBySetDate() || caseData.isPayByInstallment())) {
             String claimNumber = caseData.getLegacyCaseReference();
             return Optional.of(format(
                 "# Judgment Submitted %n## A county court judgment(CCJ) has been submitted for case %s",

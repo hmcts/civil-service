@@ -45,4 +45,19 @@ public class ClaimSettledDashboardNotificationHandler extends DashboardCallbackH
     public String getScenario(CaseData caseData) {
         return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_EVENT_CLAIMANT.getScenario();
     }
+
+    @Override
+    protected void beforeRecordScenario(CaseData caseData, String authToken) {
+        dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "CLAIMANT",
+            authToken
+        );
+
+        dashboardApiClient.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "CLAIMANT",
+            authToken
+        );
+    }
 }

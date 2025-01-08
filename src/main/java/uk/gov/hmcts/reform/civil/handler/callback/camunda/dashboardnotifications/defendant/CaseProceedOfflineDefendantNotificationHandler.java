@@ -13,8 +13,10 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_WITHOUT_TASK_CHANGES;
 
 @Service
 public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCallbackHandler {
@@ -43,16 +45,22 @@ public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCal
     }
 
     @Override
-    public List<CaseEvent> handledEvents() {
-        return EVENTS;
+    public String getScenario(CaseData caseData) {
+        if (featureToggleService.isCoSCEnabled() && caseData.getActiveJudgment() != null) {
+            if (caseData.isFastTrackClaim()) {
+                return SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK.getScenario();
+            }
+            return SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario();
+        }
+        if (featureToggleService.isCaseProgressionEnabled()) {
+            return SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_WITHOUT_TASK_CHANGES.getScenario();
+        }
+        return SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario();
     }
 
     @Override
-    public String getScenario(CaseData caseData) {
-        if (featureToggleService.isCaseProgressionEnabled() && caseData.isFastTrackClaim()) {
-            return SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK.getScenario();
-        }
-        return SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario();
+    public List<CaseEvent> handledEvents() {
+        return EVENTS;
     }
 
     @Override
@@ -81,5 +89,15 @@ public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCal
             "DEFENDANT",
             authToken
         );
+
+        if (caseData.getGeneralApplications() != null && !caseData.getGeneralApplications().isEmpty()) {
+            caseData.getGeneralApplications()
+                .forEach(application ->
+                             dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
+                                 (application.getValue().getCaseLink().getCaseReference()).toString(),
+                                 "APPLICANT",
+                                 authToken
+                ));
+        }
     }
 }

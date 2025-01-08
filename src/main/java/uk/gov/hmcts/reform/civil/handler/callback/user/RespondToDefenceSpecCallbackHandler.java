@@ -227,7 +227,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
      */
     private boolean shouldVulnerabilityAppear(CaseData caseData) {
         return (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
-            && caseData.getApplicant1ProceedWithClaim() == YES)
+            && caseData.getApplicant1ProceedWithClaim() == YES || YES == caseData.getApplicant1ProceedWithClaimSpec2v1())
             || caseData.getApplicant1AcceptAdmitAmountPaidSpec() == NO;
     }
 

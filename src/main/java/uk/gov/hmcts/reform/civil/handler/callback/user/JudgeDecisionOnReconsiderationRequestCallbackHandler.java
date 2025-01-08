@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.UpholdingPreviousOrderReason;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.RequestReconsiderationGeneratorService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
@@ -45,6 +46,7 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
     protected final ObjectMapper objectMapper;
     private final RequestReconsiderationGeneratorService requestReconsiderationGeneratorService;
     private final AssignCategoryId assignCategoryId;
+    private final FeatureToggleService featureToggleService;
     private static final String CONFIRMATION_HEADER = "# Response has been submitted";
     private static final String CONFIRMATION_BODY_YES = "### Upholding previous order \n" +
         "A notification will be sent to the party applying for the request for reconsideration.";
@@ -55,6 +57,12 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
         "general order" +
         " \n" +
         "To make a bespoke order in this claim, select 'General order' from the dropdown menu on the right of the " +
+        "screen on your dashboard.";
+
+    private static final String CONFIRMATION_BODY_CREATE_MAKE_AN_ORDER = "### Amend previous order and create a " +
+        "general order" +
+        " \n" +
+        "To make a bespoke order in this claim, select 'Make an order' from the dropdown menu on the right of the " +
         "screen on your dashboard.";
     private static final String UPHOLDING_PREVIOUS_ORDER_REASON = "Having read the application for reconsideration of" +
         " " +
@@ -149,12 +157,15 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
     }
 
     private String getBody(DecisionOnRequestReconsiderationOptions decisionOnRequestReconsiderationOptions) {
-        if (decisionOnRequestReconsiderationOptions.equals(DecisionOnRequestReconsiderationOptions.YES)) {
-            return CONFIRMATION_BODY_YES;
-        } else if (decisionOnRequestReconsiderationOptions.equals(DecisionOnRequestReconsiderationOptions.CREATE_SDO)) {
-            return CONFIRMATION_BODY_CREATE_SDO;
-        } else {
-            return CONFIRMATION_BODY_CREATE_GENERAL_ORDER;
+        switch (decisionOnRequestReconsiderationOptions) {
+            case YES:
+                return CONFIRMATION_BODY_YES;
+            case CREATE_SDO:
+                return CONFIRMATION_BODY_CREATE_SDO;
+            default:
+                return featureToggleService.isCaseProgressionEnabled()
+                    ? CONFIRMATION_BODY_CREATE_MAKE_AN_ORDER
+                    : CONFIRMATION_BODY_CREATE_GENERAL_ORDER;
         }
     }
 

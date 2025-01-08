@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.ConfirmListingTickBox;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadDisclosure;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
@@ -34,6 +35,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.dmnacourttasklocation.TaskManagementLocationTypes;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderReasons;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderAppeal;
@@ -168,8 +170,8 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private YesOrNo finalOrderGiveReasonsYesNo;
     private AssistedOrderReasons finalOrderGiveReasonsComplex;
     private YesOrNo finalOrderAllocateToTrack;
+    private YesOrNo allowOrderTrackAllocation;
     private AllocatedTrack finalOrderTrackAllocation;
-    private FinalOrdersComplexityBand finalOrderFastTrackComplexityBand;
     private FinalOrdersComplexityBand finalOrderIntermediateTrackComplexityBand;
     private DynamicList finalOrderDownloadTemplateOptions;
     private CaseDocument finalOrderDownloadTemplateDocument;
@@ -224,6 +226,12 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private HearingOtherComments respondent2HearingOtherComments;
     @Builder.Default
     private final List<Element<CaseDocument>> trialReadyDocuments = new ArrayList<>();
+
+    // // MINTI case prog
+    private DynamicList requestHearingNoticeDynamic;
+    private YesOrNo requestAnotherHearing;
+    private final List<ConfirmListingTickBox> confirmListingTickBox;
+    private TaskManagementLocationTypes taskManagementLocations;
 
     /**
      * Claimant has requested a reconsideration of the SDO.

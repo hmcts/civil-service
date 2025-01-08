@@ -76,10 +76,10 @@ public class BundleFileNameHelperTest {
         .build();
 
     @ParameterizedTest
-    @EnumSource(value = BundleRequestMapper.PartyType.class, names = {"CLAIMANT1", "CLAIMANT2", "DEFENDANT1",
+    @EnumSource(value = PartyType.class, names = {"CLAIMANT1", "CLAIMANT2", "DEFENDANT1",
         "DEFENDANT2"}, mode =
         EnumSource.Mode.INCLUDE)
-    public void validateAllWitnessDocs(BundleRequestMapper.PartyType partyType) {
+    public void validateAllWitnessDocs(PartyType partyType) {
 
         assertNotNull(BundleFileNameHelper.getWitnessDocsByPartyAndDocType(partyType,
                                                              EvidenceUploadType.WITNESS_STATEMENT, caseData));
@@ -92,10 +92,10 @@ public class BundleFileNameHelperTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = BundleRequestMapper.PartyType.class, names = {"CLAIMANT1", "CLAIMANT2", "DEFENDANT1",
+    @EnumSource(value = PartyType.class, names = {"CLAIMANT1", "CLAIMANT2", "DEFENDANT1",
         "DEFENDANT2"}, mode =
         EnumSource.Mode.INCLUDE)
-    public void validateAllExpertsDocs(BundleRequestMapper.PartyType partyType) {
+    public void validateAllExpertsDocs(PartyType partyType) {
 
         assertNotNull(BundleFileNameHelper.getExpertDocsByPartyAndDocType(partyType,
                                                                            EvidenceUploadType.EXPERT_REPORT, caseData));
@@ -108,10 +108,10 @@ public class BundleFileNameHelperTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = BundleRequestMapper.PartyType.class, names = {"CLAIMANT1", "CLAIMANT2", "DEFENDANT1",
+    @EnumSource(value = PartyType.class, names = {"CLAIMANT1", "CLAIMANT2", "DEFENDANT1",
         "DEFENDANT2"}, mode =
         EnumSource.Mode.INCLUDE)
-    public void validateAllOtherDocs(BundleRequestMapper.PartyType partyType) {
+    public void validateAllOtherDocs(PartyType partyType) {
 
         assertNotNull(BundleFileNameHelper.getEvidenceUploadDocsByPartyAndDocType(partyType,
                                                                           EvidenceUploadType.DOCUMENTS_FOR_DISCLOSURE, caseData));

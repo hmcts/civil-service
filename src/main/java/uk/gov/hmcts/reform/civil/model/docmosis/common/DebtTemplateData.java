@@ -36,22 +36,30 @@ public class DebtTemplateData {
             .debtOwedTo(debtLRspec.getDebtType().getLabel());
         switch (debtLRspec.getPaymentFrequency()) {
             case ONCE_THREE_WEEKS:
-                builder.paidPerMonth((MonetaryConversions.penniesToPounds(debtLRspec.getPaymentAmount()
+                builder.paidPerMonth(debtLRspec.getPaymentAmount() != null
+                                         ? (MonetaryConversions.penniesToPounds(debtLRspec.getPaymentAmount()
                                          .multiply(BigDecimal.valueOf(4))
                                          .divide(BigDecimal.valueOf(3), RoundingMode.CEILING)))
-                                         .setScale(2, RoundingMode.CEILING));
+                                         .setScale(2, RoundingMode.CEILING) : new BigDecimal(0)
+                    .setScale(2, RoundingMode.CEILING));
                 break;
             case ONCE_TWO_WEEKS:
-                builder.paidPerMonth((MonetaryConversions.penniesToPounds(debtLRspec.getPaymentAmount().multiply(BigDecimal.valueOf(2))))
-                                         .setScale(2, RoundingMode.CEILING));
+                builder.paidPerMonth(debtLRspec.getPaymentAmount() != null
+                                         ? (MonetaryConversions.penniesToPounds(debtLRspec.getPaymentAmount().multiply(BigDecimal.valueOf(2))))
+                                         .setScale(2, RoundingMode.CEILING) : new BigDecimal(0)
+                    .setScale(2, RoundingMode.CEILING));
                 break;
             case ONCE_ONE_WEEK:
-                builder.paidPerMonth((MonetaryConversions.penniesToPounds(debtLRspec.getPaymentAmount().multiply(BigDecimal.valueOf(4))))
-                                         .setScale(2, RoundingMode.CEILING));
+                builder.paidPerMonth(debtLRspec.getPaymentAmount() != null
+                                         ? (MonetaryConversions.penniesToPounds(debtLRspec.getPaymentAmount().multiply(BigDecimal.valueOf(4))))
+                                         .setScale(2, RoundingMode.CEILING) : new BigDecimal(0)
+                    .setScale(2, RoundingMode.CEILING));
                 break;
             default:
-                builder.paidPerMonth((MonetaryConversions.penniesToPounds(debtLRspec.getPaymentAmount()))
-                                         .setScale(2, RoundingMode.CEILING));
+                builder.paidPerMonth(debtLRspec.getPaymentAmount() != null
+                                         ? (MonetaryConversions.penniesToPounds(debtLRspec.getPaymentAmount()))
+                                         .setScale(2, RoundingMode.CEILING) : new BigDecimal(0)
+                    .setScale(2, RoundingMode.CEILING));
                 break;
         }
         return builder.build();

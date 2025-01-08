@@ -37,10 +37,10 @@ public class GeneralApplicationHwfFeePaidTest extends BaseIntegrationTest {
             .andExpect(status().isOk())
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].titleEn").value("The ${applicationFeeTypeEn} has been paid"),
+                jsonPath("$[0].titleEn").value("The ${applicationFeeTypeEn} fee has been paid"),
                 jsonPath("$[0].titleCy").value("Mae’r ffi gwneud ${applicationFeeTypeCy} wedi cael ei thalu"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">The ${applicationFeeTypeEn} has been paid in full.</p>"),
+                    "<p class=\"govuk-body\">The ${applicationFeeTypeEn} fee has been paid in full.</p>"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae‘r ffi gwneud ${applicationFeeTypeCy} wedi cael ei thalu’n llawn.</p>")
             );

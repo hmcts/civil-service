@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.CaseProgressionDashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -21,6 +22,7 @@ public class DefendantDecisionOutcomeDashboardHandler extends CaseProgressionDas
 
     private static final List<CaseEvent> EVENTS = List.of(UPDATE_DASHBOARD_TASK_LIST_DEFENDANT_DECISION_OUTCOME);
     public static final String TASK_ID = "GenerateDashboardDefendantDecisionOutcome";
+    private static final String DEFENDANT_ROLE = "DEFENDANT";
 
     public DefendantDecisionOutcomeDashboardHandler(DashboardApiClient dashboardApiClient,
                                                     DashboardNotificationsParamsMapper mapper,
@@ -44,8 +46,25 @@ public class DefendantDecisionOutcomeDashboardHandler extends CaseProgressionDas
     }
 
     @Override
+    protected void beforeRecordScenario(CaseData caseData, String authToken) {
+        dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            DEFENDANT_ROLE,
+            authToken
+        );
+
+        dashboardApiClient.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            DEFENDANT_ROLE,
+            authToken
+        );
+    }
+
+    @Override
     public String getScenario(CaseData caseData) {
-        return caseData.getResponseClaimTrack().equals("SMALL_CLAIM") || Objects.nonNull(caseData.getTrialReadyRespondent1())
-            ? SCENARIO_AAA6_DEFENDANT_TRIAL_READY_DECISION_OUTCOME.getScenario() : SCENARIO_AAA6_DEFENDANT_DECISION_OUTCOME.getScenario();
+        return AllocatedTrack.SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
+            || Objects.nonNull(caseData.getTrialReadyRespondent1())
+            ? SCENARIO_AAA6_DEFENDANT_TRIAL_READY_DECISION_OUTCOME.getScenario()
+            : SCENARIO_AAA6_DEFENDANT_DECISION_OUTCOME.getScenario();
     }
 }

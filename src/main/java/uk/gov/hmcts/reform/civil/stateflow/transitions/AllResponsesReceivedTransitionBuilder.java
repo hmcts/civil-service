@@ -7,7 +7,9 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
@@ -42,21 +44,21 @@ public class AllResponsesReceivedTransitionBuilder extends MidTransitionBuilder 
     }
 
     @Override
-    void setUpTransitions() {
-        this.moveTo(FULL_DEFENCE).onlyWhen(fullDefence)
-            .moveTo(FULL_DEFENCE).onlyWhen(fullDefenceSpec)
-            .moveTo(FULL_ADMISSION).onlyWhen(fullAdmission.and(not(divergentRespondGoOffline)))
-            .moveTo(PART_ADMISSION).onlyWhen(partAdmission.and(not(divergentRespondGoOffline)))
-            .moveTo(COUNTER_CLAIM).onlyWhen(counterClaim.and(not(divergentRespondGoOffline)))
-            .moveTo(DIVERGENT_RESPOND_GO_OFFLINE).onlyWhen(divergentRespondGoOffline)
-            .moveTo(DIVERGENT_RESPOND_GO_OFFLINE).onlyWhen(divergentRespondGoOfflineSpec)
-            .moveTo(DIVERGENT_RESPOND_GO_OFFLINE).onlyWhen(fullAdmissionSpec)
-            .moveTo(DIVERGENT_RESPOND_GO_OFFLINE).onlyWhen(partAdmissionSpec)
-            .moveTo(DIVERGENT_RESPOND_GO_OFFLINE).onlyWhen(counterClaimSpec)
-            .moveTo(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE).onlyWhen(divergentRespondWithDQAndGoOffline)
-            .moveTo(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE).onlyWhen(divergentRespondWithDQAndGoOfflineSpec)
-            .moveTo(TAKEN_OFFLINE_BY_STAFF).onlyWhen(takenOfflineByStaffAfterClaimDetailsNotified)
-            .moveTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA).onlyWhen(caseDismissedAfterDetailNotified);
+    void setUpTransitions(List<Transition> transitions) {
+        this.moveTo(FULL_DEFENCE, transitions).onlyWhen(fullDefence, transitions)
+            .moveTo(FULL_DEFENCE, transitions).onlyWhen(fullDefenceSpec, transitions)
+            .moveTo(FULL_ADMISSION, transitions).onlyWhen(fullAdmission.and(not(divergentRespondGoOffline)), transitions)
+            .moveTo(PART_ADMISSION, transitions).onlyWhen(partAdmission.and(not(divergentRespondGoOffline)), transitions)
+            .moveTo(COUNTER_CLAIM, transitions).onlyWhen(counterClaim.and(not(divergentRespondGoOffline)), transitions)
+            .moveTo(DIVERGENT_RESPOND_GO_OFFLINE, transitions).onlyWhen(divergentRespondGoOffline, transitions)
+            .moveTo(DIVERGENT_RESPOND_GO_OFFLINE, transitions).onlyWhen(divergentRespondGoOfflineSpec, transitions)
+            .moveTo(DIVERGENT_RESPOND_GO_OFFLINE, transitions).onlyWhen(fullAdmissionSpec, transitions)
+            .moveTo(DIVERGENT_RESPOND_GO_OFFLINE, transitions).onlyWhen(partAdmissionSpec, transitions)
+            .moveTo(DIVERGENT_RESPOND_GO_OFFLINE, transitions).onlyWhen(counterClaimSpec, transitions)
+            .moveTo(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE, transitions).onlyWhen(divergentRespondWithDQAndGoOffline, transitions)
+            .moveTo(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE, transitions).onlyWhen(divergentRespondWithDQAndGoOfflineSpec, transitions)
+            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaffAfterClaimDetailsNotified, transitions)
+            .moveTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA, transitions).onlyWhen(caseDismissedAfterDetailNotified, transitions);
     }
 
     public static final Predicate<CaseData> fullDefence = caseData ->

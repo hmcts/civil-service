@@ -35,7 +35,7 @@ public class HearingScheduledDefendantScenarioTest extends CaseProgressionDashbo
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(LocationRefData.builder().siteName("Name").courtAddress("Loc").postcode("1").build());
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
 
         DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();
         DynamicList list = DynamicList.builder().value(location).listItems(List.of(location)).build();
@@ -61,15 +61,15 @@ public class HearingScheduledDefendantScenarioTest extends CaseProgressionDashbo
             .andExpect(status().isOk())
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].titleEn").value("A hearing has been scheduled"),
-                jsonPath("$[0].descriptionEn").value(
+                jsonPath("$[1].titleEn").value("A hearing has been scheduled"),
+                jsonPath("$[1].descriptionEn").value(
                     "<p class=\"govuk-body\">Your hearing has been scheduled for 1 April 2024 at "
                         + "Name. Please keep your contact details and anyone you wish to rely on in court up" +
                         " to date. You can update contact details by telephoning the court at 0300 123 7050.</p>" +
                         "<p class=\"govuk-body\"><a href=\"{VIEW_HEARING_NOTICE_CLICK}\" rel=\"noopener noreferrer\" " +
                         "target=\"_blank\" class=\"govuk-link\">View the hearing notice</a></p>"),
-                jsonPath("$[0].titleCy").value("Mae gwrandawiad wedi'i drefnu"),
-                jsonPath("$[0].descriptionCy").value(
+                jsonPath("$[1].titleCy").value("Mae gwrandawiad wedi'i drefnu"),
+                jsonPath("$[1].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae eich gwrandawiad wedi'i drefnu ar gyfer 1 Ebrill 2024 yn "
                         + "Name. Cadwch eich manylion cyswllt chi a manylion cyswllt unrhyw un yr hoffech ddibynnu arnynt yn y llys yn gyfredol." +
                         " Gallwch ddiweddaru manylion cyswllt drwy ffonio'r llys ar 0300 303 5174.</p>" +
@@ -88,13 +88,13 @@ public class HearingScheduledDefendantScenarioTest extends CaseProgressionDashbo
                 jsonPath("$[0].taskNameCy").value(
                     "<a href={VIEW_HEARINGS}  rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld y gwrandawiad</a>"),
                 jsonPath("$[0].currentStatusCy").value(TaskStatus.AVAILABLE.getWelshName()),
-                jsonPath("$[1].reference").value(caseId.toString()),
-                jsonPath("$[1].taskNameEn").value(
+                jsonPath("$[3].reference").value(caseId.toString()),
+                jsonPath("$[3].taskNameEn").value(
                     "<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
-                jsonPath("$[1].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
-                jsonPath("$[1].taskNameCy").value(
+                jsonPath("$[3].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
+                jsonPath("$[3].taskNameCy").value(
                     "<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld gorchmynion a rhybuddion</a>"),
-                jsonPath("$[1].currentStatusCy").value(TaskStatus.AVAILABLE.getWelshName())
+                jsonPath("$[3].currentStatusCy").value(TaskStatus.AVAILABLE.getWelshName())
 
             );
     }

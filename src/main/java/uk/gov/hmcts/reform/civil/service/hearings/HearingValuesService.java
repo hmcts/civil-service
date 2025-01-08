@@ -85,7 +85,11 @@ public class HearingValuesService {
     public ServiceHearingValuesModel getValues(Long caseId, String authToken) throws Exception {
         CaseData caseData = retrieveCaseData(caseId);
         populateMissingFields(caseId, caseData);
-        isEarlyAdopter(caseData);
+
+        if (!featuretoggleService.isHmcNroEnabled()) {
+            isEarlyAdopter(caseData);
+        }
+
         isLrVLr(caseData);
 
         String baseUrl = manageCaseBaseUrlConfiguration.getManageCaseBaseUrl();

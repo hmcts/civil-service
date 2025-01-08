@@ -71,11 +71,17 @@ class LipDefendantCaseAssignmentServiceTest {
         //Given
         given(featureToggleService.isLipVLipEnabled()).willReturn(true);
         given(userService.getUserDetails(anyString())).willReturn(UserDetails.builder().id(USER_ID).email(EMAIL).build());
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        Party respondent1 = caseData.getRespondent1()
+            .toBuilder().partyEmail(EMAIL).build();
         IdamUserDetails defendantUserDetails = IdamUserDetails.builder()
             .id(USER_ID)
             .email(EMAIL)
             .build();
-        Map<String, Object> data = Map.of("defendantUserDetails", defendantUserDetails);
+        Map<String, Object> data = Map.of("defendantUserDetails", defendantUserDetails,
+                                          "respondent1", respondent1);
+
+        when(caseDetailsConverter.toCaseData((CaseDetails) any())).thenReturn(caseData);
         EventSubmissionParams params = EventSubmissionParams.builder()
             .caseId(CASE_ID)
             .userId(USER_ID)
@@ -88,7 +94,9 @@ class LipDefendantCaseAssignmentServiceTest {
             AUTHORIZATION,
             CASE_ID,
             Optional.empty(),
-            Optional.empty()
+            Optional.of(CaseDetailsBuilder.builder()
+                            .data(caseData)
+                            .build())
         );
         //Then
         verify(userService).getUserDetails(AUTHORIZATION);
@@ -122,13 +130,14 @@ class LipDefendantCaseAssignmentServiceTest {
                              .type(Party.Type.INDIVIDUAL)
                              .build())
             .build();
-        Optional<CaseDetails> caseDetails = Optional.of(CaseDetailsBuilder.builder().data(caseData).build());
         IdamUserDetails defendantUserDetails = IdamUserDetails.builder()
             .id(USER_ID)
             .email(EMAIL)
             .build();
         data.put("defendantUserDetails", defendantUserDetails);
+        data.put("respondent1", caseData.getRespondent1().toBuilder().partyEmail(EMAIL).build());
         ReflectionTestUtils.setField(lipDefendantCaseAssignmentService, "caseFlagsLoggingEnabled", true);
+        Optional<CaseDetails> caseDetails = Optional.of(CaseDetailsBuilder.builder().data(caseData).build());
         when(caseDetailsConverter.toCaseData(caseDetails.get())).thenReturn(caseData);
         EventSubmissionParams params = EventSubmissionParams.builder()
             .caseId(CASE_ID)

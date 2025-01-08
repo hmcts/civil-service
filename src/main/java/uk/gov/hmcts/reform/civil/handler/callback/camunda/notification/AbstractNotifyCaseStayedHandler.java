@@ -22,9 +22,9 @@ public abstract class AbstractNotifyCaseStayedHandler extends CallbackHandler im
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
-            getRecipient(caseData),
+            getRecipient(callbackParams),
             getNotificationTemplate(caseData),
-            addProperties(caseData),
+            addPropertiesAll(callbackParams),
             String.format(getReferenceTemplate(), caseData.getCcdCaseReference())
         );
         return AboutToStartOrSubmitCallbackResponse.builder().build();
@@ -32,7 +32,7 @@ public abstract class AbstractNotifyCaseStayedHandler extends CallbackHandler im
 
     protected abstract String getReferenceTemplate();
 
-    protected abstract String getRecipient(CaseData caseData);
+    protected abstract String getRecipient(CallbackParams callbackParams);
 
     protected String getNotificationTemplate(CaseData caseData) {
         if (isLiP(caseData)) {
@@ -50,12 +50,17 @@ public abstract class AbstractNotifyCaseStayedHandler extends CallbackHandler im
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
+        return null;
+    }
+
+    public Map<String, String> addPropertiesAll(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            PARTY_NAME, getPartyName(caseData),
+            PARTY_NAME, getPartyName(callbackParams),
             CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
         );
     }
 
-    protected abstract String getPartyName(CaseData caseData);
+    protected abstract String getPartyName(CallbackParams callbackParams);
 }

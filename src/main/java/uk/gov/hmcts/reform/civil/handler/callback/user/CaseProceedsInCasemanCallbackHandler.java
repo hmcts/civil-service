@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.cosc.CoscApplicationStatus;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -68,6 +69,7 @@ public class CaseProceedsInCasemanCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData().toBuilder()
             .businessProcess(BusinessProcess.ready(CASE_PROCEEDS_IN_CASEMAN))
             .takenOfflineByStaffDate(time.now())
+            .coSCApplicationStatus(updateCoScApplicationStatus(callbackParams))
             .previousCCDState(getPreviousCaseSate(callbackParams))
             .build();
 
@@ -82,6 +84,16 @@ public class CaseProceedsInCasemanCallbackHandler extends CallbackHandler {
             return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne())
                     ? CaseState.valueOf(callbackParams.getRequest().getCaseDetailsBefore().getState())
                     : null;
+        }
+        return null;
+    }
+
+    private CoscApplicationStatus updateCoScApplicationStatus(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        if (featureToggleService.isCoSCEnabled() && (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne())) {
+            return CoscApplicationStatus.ACTIVE.equals(caseData.getCoSCApplicationStatus())
+                ? CoscApplicationStatus.INACTIVE
+                : caseData.getCoSCApplicationStatus();
         }
         return null;
     }

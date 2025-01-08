@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.FixedCosts;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
@@ -249,6 +250,10 @@ public class SealedClaimFormGeneratorForSpecTest {
                                            .differentRate(new BigDecimal(100)).differentRateReason("test").build())
             .interestFromSpecificDate(LocalDate.now())
             .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
+            .fixedCosts(FixedCosts.builder()
+                            .claimFixedCosts(YesOrNo.YES)
+                            .fixedCostAmount("2000")
+                            .build())
             .breakDownInterestDescription("test breakdown desc");
     }
 

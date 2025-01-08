@@ -42,7 +42,7 @@ public class SetApplicantsForDQGenerator {
         var litigationFriend = caseData.getApplicant2LitigationFriend();
         var applicant2PartyBuilder = Party.builder()
             .name(applicant.getPartyName())
-            .primaryAddress(caseData.getApplicant1().getPrimaryAddress())
+            .primaryAddress(applicant.getPrimaryAddress())
             .emailAddress(applicant.getPartyEmail())
             .phoneNumber(applicant.getPartyPhone())
             .representative(representativeService

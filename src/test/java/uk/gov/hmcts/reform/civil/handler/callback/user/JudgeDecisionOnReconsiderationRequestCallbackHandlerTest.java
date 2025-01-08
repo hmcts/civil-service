@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.UpholdingPreviousOrderReason;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.RequestReconsiderationGeneratorService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
@@ -51,6 +52,9 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
     @Mock
     private RequestReconsiderationGeneratorService requestReconsiderationGeneratorService;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     private static final String CONFIRMATION_HEADER = "# Response has been submitted";
     private static final String CONFIRMATION_BODY_YES = "### Upholding previous order \n" +
         "A notification will be sent to the party applying for the request for reconsideration.";
@@ -61,6 +65,11 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         "general order" +
         " \n" +
         "To make a bespoke order in this claim, select 'General order' from the dropdown menu on the right of the " +
+        "screen on your dashboard.";
+    private static final String CONFIRMATION_BODY_CREATE_MAKE_AN_ORDER = "### Amend previous order and create a " +
+        "general order" +
+        " \n" +
+        "To make a bespoke order in this claim, select 'Make an order' from the dropdown menu on the right of the " +
         "screen on your dashboard.";
     private static final String UPHOLDING_PREVIOUS_ORDER_REASON = "Having read the application for reconsideration of " +
         "the Legal Advisor's order dated %s and the court file \n 1.The application for reconsideration of the order " +
@@ -91,7 +100,7 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         mapper.registerModule(new JavaTimeModule());
         AssignCategoryId assignCategoryId = new AssignCategoryId();
         handler = new JudgeDecisionOnReconsiderationRequestCallbackHandler(mapper, requestReconsiderationGeneratorService,
-                                                                           assignCategoryId
+                                                                           assignCategoryId, featureToggleService
         );
         sdoDocList = new ArrayList<>();
         CaseDocument sdoDoc =
@@ -254,9 +263,11 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         @Test
         void whenSubmittedWithCreateGeneralOrder_thenIncludeHeader() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .build().toBuilder().systemGeneratedCaseDocuments(sdoDocList).upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
-                                                                      .reasonForReconsiderationTxtYes("Reason1").build()).decisionOnRequestReconsiderationOptions(
+                .build().toBuilder().systemGeneratedCaseDocuments(sdoDocList).upholdingPreviousOrderReason(
+                    UpholdingPreviousOrderReason.builder()
+                        .reasonForReconsiderationTxtYes("Reason1").build()).decisionOnRequestReconsiderationOptions(
                     DecisionOnRequestReconsiderationOptions.CREATE_GENERAL_ORDER).build();
+            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
             CallbackParams params = CallbackParams.builder()
                 .caseData(caseData)
                 .type(CallbackType.SUBMITTED)
@@ -265,6 +276,24 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
                 (SubmittedCallbackResponse) handler.handle(params);
             assertThat(response.getConfirmationHeader()).isEqualTo(CONFIRMATION_HEADER);
             assertThat(response.getConfirmationBody()).isEqualTo(CONFIRMATION_BODY_CREATE_GENERAL_ORDER);
+        }
+
+        @Test
+        void whenSubmittedWithCreateGeneralOrderCP_thenIncludeHeader() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .build().toBuilder().systemGeneratedCaseDocuments(sdoDocList).upholdingPreviousOrderReason(
+                    UpholdingPreviousOrderReason.builder()
+                        .reasonForReconsiderationTxtYes("Reason1").build()).decisionOnRequestReconsiderationOptions(
+                    DecisionOnRequestReconsiderationOptions.CREATE_GENERAL_ORDER).build();
+            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+            CallbackParams params = CallbackParams.builder()
+                .caseData(caseData)
+                .type(CallbackType.SUBMITTED)
+                .build();
+            SubmittedCallbackResponse response =
+                (SubmittedCallbackResponse) handler.handle(params);
+            assertThat(response.getConfirmationHeader()).isEqualTo(CONFIRMATION_HEADER);
+            assertThat(response.getConfirmationBody()).isEqualTo(CONFIRMATION_BODY_CREATE_MAKE_AN_ORDER);
         }
     }
 

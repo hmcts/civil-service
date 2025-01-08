@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -17,6 +18,8 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.settleanddiscontinue.NoticeOfDiscontinuanceForm;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -30,6 +33,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.NOTICE_OF_DISCONTINUANCE;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.NOTICE_OF_DISCONTINUANCE_BILINGUAL_PDF;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.NOTICE_OF_DISCONTINUANCE_PDF;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,7 +50,7 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
     private NoticeOfDiscontinuanceFormGenerator formGenerator;
 
     @Test
-    void shouldGenerateNoticeOfDiscontinuanceDoc_whenValidDataIsProvided() {
+    void shouldGenerateRespondent1NoticeOfDiscontinuanceDoc_whenValidDataIsProvided() {
         String fileName = String.format(
                 NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), REFERENCE_NUMBER);
 
@@ -64,7 +68,89 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
 
         CaseData caseData = getCaseData();
 
-        CaseDocument caseDoc = formGenerator.generateDocs(caseData, BEARER_TOKEN);
+        CaseDocument caseDoc = formGenerator.generateDocs(caseData, caseData.getRespondent1(), BEARER_TOKEN);
+        assertThat(caseDoc).isNotNull();
+
+        verify(documentManagementService)
+                .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, NOTICE_OF_DISCONTINUANCE));
+    }
+
+    @Test
+    void shouldGenerateWelshDiscontinuanceDoc_whenValidDataIsProvided() {
+        String fileName = String.format(
+            NOTICE_OF_DISCONTINUANCE_BILINGUAL_PDF.getDocumentTitle(), REFERENCE_NUMBER);
+
+        CaseDocument caseDocument = CaseDocumentBuilder.builder()
+                .documentName(fileName)
+                .documentType(NOTICE_OF_DISCONTINUANCE)
+                .build();
+
+        when(documentGeneratorService.generateDocmosisDocument(any(NoticeOfDiscontinuanceForm.class), eq(NOTICE_OF_DISCONTINUANCE_BILINGUAL_PDF)))
+                .thenReturn(new DocmosisDocument(NOTICE_OF_DISCONTINUANCE_BILINGUAL_PDF.getDocumentTitle(), bytes));
+
+        when(documentManagementService
+                .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, NOTICE_OF_DISCONTINUANCE)))
+                .thenReturn(caseDocument);
+
+        CaseData caseData = getCaseData().toBuilder()
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQLanguage(WelshLanguageRequirements.builder().court(Language.WELSH).build())
+                               .build())
+            .build();
+
+        CaseDocument caseDoc = formGenerator.generateDocs(caseData, caseData.getRespondent1(), BEARER_TOKEN);
+        assertThat(caseDoc).isNotNull();
+
+        verify(documentManagementService)
+                .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, NOTICE_OF_DISCONTINUANCE));
+    }
+
+    @Test
+    void shouldGenerateApplicant1NoticeOfDiscontinuanceDoc_whenValidDataIsProvided() {
+        String fileName = String.format(
+                NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), REFERENCE_NUMBER);
+
+        CaseDocument caseDocument = CaseDocumentBuilder.builder()
+                .documentName(fileName)
+                .documentType(NOTICE_OF_DISCONTINUANCE)
+                .build();
+
+        when(documentGeneratorService.generateDocmosisDocument(any(NoticeOfDiscontinuanceForm.class), eq(NOTICE_OF_DISCONTINUANCE_PDF)))
+                .thenReturn(new DocmosisDocument(NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), bytes));
+
+        when(documentManagementService
+                .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, NOTICE_OF_DISCONTINUANCE)))
+                .thenReturn(caseDocument);
+
+        CaseData caseData = getCaseData();
+
+        CaseDocument caseDoc = formGenerator.generateDocs(caseData, caseData.getApplicant1(), BEARER_TOKEN);
+        assertThat(caseDoc).isNotNull();
+
+        verify(documentManagementService)
+                .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, NOTICE_OF_DISCONTINUANCE));
+    }
+
+    @Test
+    void shouldGenerateRespondent2NoticeOfDiscontinuanceDoc_whenValidDataIsProvided() {
+        String fileName = String.format(
+                NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), REFERENCE_NUMBER);
+
+        CaseDocument caseDocument = CaseDocumentBuilder.builder()
+                .documentName(fileName)
+                .documentType(NOTICE_OF_DISCONTINUANCE)
+                .build();
+
+        when(documentGeneratorService.generateDocmosisDocument(any(NoticeOfDiscontinuanceForm.class), eq(NOTICE_OF_DISCONTINUANCE_PDF)))
+                .thenReturn(new DocmosisDocument(NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), bytes));
+
+        when(documentManagementService
+                .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, NOTICE_OF_DISCONTINUANCE)))
+                .thenReturn(caseDocument);
+
+        CaseData caseData = getCaseData();
+
+        CaseDocument caseDoc = formGenerator.generateDocs(caseData, caseData.getRespondent2(), BEARER_TOKEN);
         assertThat(caseDoc).isNotNull();
 
         verify(documentManagementService)
@@ -75,6 +161,7 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
         return CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
                 .legacyCaseReference(REFERENCE_NUMBER)
                 .respondent1(PartyBuilder.builder().individual().build().toBuilder().individualFirstName("John").individualLastName("Doe").build())
+                .respondent2(PartyBuilder.builder().individual().build().toBuilder().individualFirstName("Lily").individualLastName("Potter").build())
                 .applicant1(PartyBuilder.builder().individual().build().toBuilder().individualFirstName("James").individualLastName("White").build())
                 .applicant2(PartyBuilder.builder().individual().build().toBuilder().individualFirstName("Jan").individualLastName("Black").build())
                 .claimantWhoIsDiscontinuing(DynamicList.builder()
