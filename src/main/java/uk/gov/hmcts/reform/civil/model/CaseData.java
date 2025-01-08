@@ -684,6 +684,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo joShowRegisteredWithRTLOption;
     private JudgmentDetails activeJudgment;
     private List<Element<JudgmentDetails>> historicJudgment;
+    private YesOrNo isTakenOfflineAfterJBA;
     private LocalDateTime joSetAsideCreatedDate;
 
     private String joDefendantName1;
@@ -756,9 +757,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo obligationDatePresent;
     private CourtStaffNextSteps courtStaffNextSteps;
     private List<Element<ObligationData>> obligationData;
-    private List<Element<ObligationData>> storedObligationData;
+    private List<Element<StoredObligationData>> storedObligationData;
     private YesOrNo isFinalOrder;
-
     private SendAndReplyOption sendAndReplyOption;
     private SendMessageMetadata sendMessageMetadata;
     private String sendMessageContent;
@@ -766,10 +766,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private String messageHistory;
     private DynamicList messagesToReplyTo;
     private List<Element<Message>> messages;
+    private ObligationWAFlag obligationWAFlag;
     private Message lastMessage;
     private String lastMessageAllocatedTrack;
     private String lastMessageJudgeLabel;
-
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
