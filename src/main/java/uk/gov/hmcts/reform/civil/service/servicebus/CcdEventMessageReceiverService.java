@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.handler.message.CcdEventMessageHandler;
 import uk.gov.hmcts.reform.civil.model.message.CcdEventMessage;
+import uk.gov.hmcts.reform.civil.model.message.CcdServiceBusMessage;
 
 import java.util.List;
 
@@ -21,17 +22,17 @@ public class CcdEventMessageReceiverService {
     private final List<CcdEventMessageHandler> messageHandlers;
 
     public void handleAsbMessage(String messageId,
-                                            String sessionId,
-                                            String message) throws JsonProcessingException {
+                                 String sessionId,
+                                 String message) throws JsonProcessingException {
         log.info("Received ASB message with id '{}'", messageId);
         handleMessage(messageId, sessionId, message, false);
     }
 
     public void handleCcdCaseEventAsbMessage(String messageId,
-                                                        String sessionId,
-                                                        String message) throws JsonProcessingException {
+                                             String sessionId,
+                                             String message) throws JsonProcessingException {
         log.debug("Received CCD Case Events ASB message with id '{}'", messageId);
-
+        CcdServiceBusMessage serviceBusMessage = objectMapper.readValue(message, CcdServiceBusMessage.class);
         handleMessage(messageId, sessionId, message, false);
     }
 
