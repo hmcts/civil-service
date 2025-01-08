@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
+import java.nio.charset.StandardCharsets;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -26,8 +28,9 @@ class UncaughtExceptionHandlerTest {
 
     @BeforeEach
     void setUp() {
+        String jsonString = "{ \"case_details\" : {\"id\" : \"1234\"}}";
         when(contentCachingRequestWrapper.getHeader("user-id")).thenReturn("4321");
-        when(contentCachingRequestWrapper.getParameterMap().get("caseId")).thenReturn(new String[]{"1234"});
+        when(contentCachingRequestWrapper.getContentAsByteArray()).thenReturn(jsonString.getBytes(StandardCharsets.UTF_8));
     }
 
     @Test
