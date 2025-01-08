@@ -11,12 +11,16 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.ObligationReason;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.ObligationData;
+import uk.gov.hmcts.reform.civil.model.StoredObligationData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -29,12 +33,14 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW;
 import static uk.gov.hmcts.reform.civil.enums.CourtStaffNextSteps.STILL_TASKS;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +50,8 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
 
     private final FeatureToggleService featureToggleService;
     private final ObjectMapper objectMapper;
+    private final UserService userService;
+    private final Time time;
     private static final String HEADER_CONFIRMATION = "# The order review has been completed";
     private static final String BODY_CONFIRMATION_NO_OBLIGATION = "&nbsp;";
     private static final String BODY_CONFIRMATION_OBLIGATION = "### What happens next \n\n" +
@@ -134,15 +142,31 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
         }
 
         if (nonNull(caseData.getObligationData())) {
+            UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+            String officerName = userDetails.getFullName();
 
-            List<Element<ObligationData>> storedObligationData = Optional.ofNullable(caseData.getStoredObligationData())
+            List<Element<StoredObligationData>> storedObligationData = Optional.ofNullable(caseData.getStoredObligationData())
                 .orElse(Collections.emptyList());
 
-            List<Element<ObligationData>> combinedData = new ArrayList<>();
+            List<Element<StoredObligationData>> combinedData = new ArrayList<>();
             combinedData.addAll(storedObligationData);
-            caseData.getObligationData().forEach(element ->
-                                                     element.getValue().setObligationWATaskRaised(YesOrNo.NO));
-            combinedData.addAll(caseData.getObligationData());
+
+            caseData.getObligationData().forEach(obligation -> {
+                StoredObligationData storedObligation = StoredObligationData.builder()
+                    .createdBy(officerName)
+                    .createdOn(time.now())
+                    .obligationDate(obligation.getValue().getObligationDate())
+                    .obligationReason(obligation.getValue().getObligationReason())
+                    .otherObligationReason(obligation.getValue().getOtherObligationReason())
+                    .reasonText(obligation.getValue().getObligationReason().equals(ObligationReason.OTHER)
+                                    ? ObligationReason.OTHER.getDisplayedValue() + ": " + obligation.getValue().getOtherObligationReason()
+                                    : obligation.getValue().getObligationReason().getDisplayedValue())
+                    .obligationAction(obligation.getValue().getObligationAction())
+                    .obligationWATaskRaised(YesOrNo.NO)
+                    .build();
+
+                combinedData.add(element(storedObligation));
+            });
 
             updatedCaseData.obligationData(null)
                 .storedObligationData(combinedData);
