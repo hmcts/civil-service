@@ -44,8 +44,8 @@ public class GeneralApplicationHwfPartialRemittanceScenarioTest extends BaseInte
                         "<p class=\"govuk-body\">To progress your application, you must  still pay the remaining fee of ${outstandingFeeInPounds}.</p>" +
                         "<p class=\"govuk-body\">You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Byddwch yn cael help gyda’r ffi gwneud ${applicationFeeTypeCy}. Bydd ${remissionAmount} o’r ffi yn cael ei ddileu.</p>" +
-                        "<p class=\"govuk-body\">I symud eich cais yn ei flaen, rhaid i chi dal dalu’r ffi sy’n weddill o ${outstandingFeeInPounds}.</p>" +
+                    "<p class=\"govuk-body\">Byddwch yn cael help i dalu’r ${applicationFeeTypeCy}. Bydd ${remissionAmount} o’r ffi yn cael ei ddileu.</p>" +
+                        "<p class=\"govuk-body\">I symud eich cais yn ei flaen, rhaid i chi dalu’r ffi sy’ weddill sef ${outstandingFeeInPounds}.</p>" +
                         "<p class=\"govuk-body\">Gallwch dalu dros y ffôn drwy ffonio {civilMoneyClaimsTelephone}.</p>")
             );
     }
