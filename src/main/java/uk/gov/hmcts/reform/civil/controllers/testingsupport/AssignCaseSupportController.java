@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.controllers.testingsupport.model.UnassignUserFromCasesRequestBody;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
@@ -53,7 +54,7 @@ public class AssignCaseSupportController {
                 authorisation,
                 caseId,
                 caseRole,
-                Optional.empty()
+                Optional.of(CaseDetails.builder().build())
             );
         }
     }
