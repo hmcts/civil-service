@@ -7050,6 +7050,13 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder specClaim1v1LipvLr() {
+        this.caseAccessCategory = SPEC_CLAIM;
+        this.respondent1Represented = YES;
+        this.applicant1Represented = NO;
+        return this;
+    }
+
     public CaseDataBuilder enableRespondent2ResponseFlag() {
         this.claimant2ResponseFlag = YES;
         return this;
