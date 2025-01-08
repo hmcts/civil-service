@@ -19,11 +19,14 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_SCHEDULED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.HearingScheduledClaimantNotificationHandler.fillPreferredLocationData;
 
 @Service
@@ -68,6 +71,18 @@ public class HearingScheduledDefendantNotificationHandler extends CallbackHandle
         if (caseData.isRespondent1NotRepresented()) {
             dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
                                               SCENARIO_AAA6_CP_HEARING_SCHEDULED_DEFENDANT.getScenario(), authToken,
+                                              ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
+            );
+
+            if (isNull(caseData.getTrialReadyRespondent1())) {
+                dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
+                                                  SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_DEFENDANT.getScenario(), authToken,
+                                                  ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
+                );
+            }
+
+            dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
+                                              SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_DEFENDANT.getScenario(), authToken,
                                               ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
             );
         }

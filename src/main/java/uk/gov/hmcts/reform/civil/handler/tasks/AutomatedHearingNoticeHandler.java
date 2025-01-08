@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.event.HearingNoticeSchedulerTaskEvent;
 import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeSchedulerVars;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.UnNotifiedHearingResponse;
@@ -32,7 +31,6 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
     private final SystemUpdateUserConfiguration userConfig;
     private final HearingsService hearingsService;
     private final RuntimeService runtimeService;
-    private final FeatureToggleService featureToggleService;
     private final ObjectMapper mapper;
 
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -40,15 +38,6 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
     @Override
     @SuppressWarnings("unchecked")
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        if (!featureToggleService.isAutomatedHearingNoticeEnabled()) {
-            runtimeService.setVariables(
-                externalTask.getProcessInstanceId(),
-                HearingNoticeSchedulerVars.builder()
-                    .totalNumberOfUnnotifiedHearings(0)
-                    .build().toMap(mapper)
-            );
-            return ExternalTaskData.builder().build();
-        }
 
         HearingNoticeSchedulerVars schedulerVars = mapper.convertValue(externalTask.getAllVariables(), HearingNoticeSchedulerVars.class);
         List<String> dispatchedHearingIds = getDispatchedHearingIds(schedulerVars);

@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
@@ -41,6 +40,7 @@ import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetailsOrderWithou
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeFinalOrderGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeOrderDownloadGenerator;
@@ -76,6 +76,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderDownloadTemplateOptions.BLANK_TEMPLATE_AFTER_HEARING;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderDownloadTemplateOptions.BLANK_TEMPLATE_BEFORE_HEARING;
@@ -134,6 +135,10 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     public static final String JUDGE_HEARD_FROM_EMPTY = "Judge Heard from: 'Claimant(s) and defendant(s)' section for %s, requires a selection to be made";
     public static final String FURTHER_HEARING_OTHER_EMPTY = "Further hearing, Length of new hearing, Other is empty";
     public static final String FURTHER_HEARING_OTHER_ALT_LOCATION = "Further hearing alternative location required.";
+    public static final String NOT_ALLOWED_FOR_CITIZEN = "This claim involves a LiP. To allocate to Small Claims or Fast Track you must use the"
+        + " Standard Direction Order (SDO) otherwise use Not suitable for SDO.";
+    public static final String NOT_ALLOWED_FOR_TRACK = "The Make an order event is not available for Small Claims and Fast Track cases until the track has"
+        + " been allocated. You must use the Standard Direction Order (SDO) to proceed.";
     private String defendantTwoPartyName;
     private String claimantTwoPartyName;
     public static final String APPEAL_NOTICE_DATE = "Appeal notice date";
@@ -146,6 +151,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private final UserService userService;
     private final WorkingDayIndicator workingDayIndicator;
     private final FeatureToggleService featureToggleService;
+    private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -171,6 +177,23 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private CallbackResponse nullPreviousSelections(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        if (featureToggleService.isMintiEnabled()
+            && isJudicialReferral(callbackParams)
+            && caseData.isLipCase()) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(NOT_ALLOWED_FOR_CITIZEN))
+                .build();
+        }
+
+        if (featureToggleService.isMintiEnabled()) {
+            if (isJudicialReferral(callbackParams) || isMultiOrIntTrack(caseData)) {
+                caseDataBuilder.allowOrderTrackAllocation(YES).finalOrderTrackToggle(null);
+            } else {
+                caseDataBuilder.allowOrderTrackAllocation(NO);
+                populateTrackToggle(caseData, caseDataBuilder);
+            }
+        }
+
         return nullPreviousSelections(caseDataBuilder);
     }
 
@@ -199,9 +222,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         caseDataBuilder.finalOrderTrackAllocation(null)
             .finalOrderAllocateToTrack(null)
             .finalOrderIntermediateTrackComplexityBand(null)
-            .finalOrderFastTrackComplexityBand(null)
-            .finalOrderDownloadTemplateOptions(null)
-            .finalOrderTrackToggle(null);
+            .finalOrderDownloadTemplateOptions(null);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -223,18 +244,22 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private CallbackResponse assignTrackToggle(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        if (featureToggleService.isMintiEnabled()
+            && caseData.getFinalOrderAllocateToTrack().equals(NO)
+            && isJudicialReferral(callbackParams)
+            && isSmallOrFastTrack(caseData)) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(NOT_ALLOWED_FOR_TRACK))
+                .build();
+        }
+
         caseDataBuilder = populateDownloadTemplateOptions(caseDataBuilder);
 
         if (caseData.getFinalOrderAllocateToTrack().equals(YES)) {
             caseDataBuilder.finalOrderTrackToggle(caseData.getFinalOrderTrackAllocation().name());
         } else {
-            if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
-                caseDataBuilder.finalOrderTrackToggle(caseData.getResponseClaimTrack());
-
-            }
-            if (caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
-                caseDataBuilder.finalOrderTrackToggle(caseData.getAllocatedTrack().name());
-            }
+            populateTrackToggle(caseData, caseDataBuilder);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -412,13 +437,13 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                                                                            .getNextWorkingDay(LocalDate.now().plusDays(14)))
                                                   .assistedOrderAssessmentThirdDropdownDate(workingDayIndicator
                                                                                                 .getNextWorkingDay(LocalDate.now().plusDays(14)))
-                                                  .makeAnOrderForCostsYesOrNo(YesOrNo.NO)
+                                                  .makeAnOrderForCostsYesOrNo(NO)
                                                   .makeAnOrderForCostsList(CLAIMANT)
                                                   .assistedOrderClaimantDefendantFirstDropdown(SUBJECT_DETAILED_ASSESSMENT)
                                                   .assistedOrderAssessmentSecondDropdownList1(STANDARD_BASIS)
                                                   .assistedOrderAssessmentSecondDropdownList2(CostEnums.NO)
                                                   .build())
-            .publicFundingCostsProtection(YesOrNo.NO)
+            .publicFundingCostsProtection(NO)
             .finalOrderAppealComplex(FinalOrderAppeal.builder()
                                          .appealGrantedDropdown(AppealGrantedRefused.builder()
                                                                            .appealChoiceSecondDropdownA(
@@ -445,7 +470,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                                                             .build())
 
                                                                     .build()).build())
-            .finalOrderGiveReasonsYesNo(YesOrNo.NO);
+            .finalOrderGiveReasonsYesNo(NO);
     }
 
     private void populateClaimant2Defendant2PartyNames(CaseData caseData) {
@@ -568,6 +593,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         caseDataBuilder.finalOrderDocument(null);
         caseDataBuilder.uploadOrderDocumentFromTemplate(null);
         caseDataBuilder.finalOrderDownloadTemplateDocument(null);
+        caseDataBuilder.allowOrderTrackAllocation(null);
 
         if (featureToggleService.isMintiEnabled()) {
             if (YES.equals(caseData.getFinalOrderAllocateToTrack())) {
@@ -602,6 +628,13 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                                  .notes(caseData.getFreeFormHearingNotes())
                                                  .build());
             }
+        }
+
+        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+            updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
+                callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
+                caseDataBuilder
+            ));
         }
 
         nullPreviousSelections(caseDataBuilder);
@@ -639,6 +672,36 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private boolean isJudicialReferral(CallbackParams callbackParams) {
         return JUDICIAL_REFERRAL.toString().equals(callbackParams.getRequest().getCaseDetails().getState())
             && featureToggleService.isMintiEnabled();
+    }
+
+    private void populateTrackToggle(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+        if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
+            caseDataBuilder.finalOrderTrackToggle(caseData.getResponseClaimTrack());
+
+        }
+        if (caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
+            caseDataBuilder.finalOrderTrackToggle(caseData.getAllocatedTrack().name());
+        }
+    }
+
+    private boolean isSmallOrFastTrack(CaseData caseData) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return AllocatedTrack.SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
+                || AllocatedTrack.FAST_CLAIM.name().equals(caseData.getResponseClaimTrack());
+        } else {
+            return AllocatedTrack.SMALL_CLAIM.equals(caseData.getAllocatedTrack())
+                || AllocatedTrack.FAST_CLAIM.equals(caseData.getAllocatedTrack());
+        }
+    }
+
+    private boolean isMultiOrIntTrack(CaseData caseData) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
+                || AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack());
+        } else {
+            return AllocatedTrack.INTERMEDIATE_CLAIM.equals(caseData.getAllocatedTrack())
+                || AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack());
+        }
     }
 
     private boolean isTrack(AllocatedTrack track, CaseData caseData) {

@@ -28,16 +28,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_GENERATE_ORDER;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_GENERATE_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_GENERATE_ORDER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.GenerateOrderNotificationHandler.TASK_ID_APPLICANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.GenerateOrderNotificationHandler.TASK_ID_RESPONDENT1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.GenerateOrderNotificationHandler.TASK_ID_RESPONDENT2;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @ExtendWith(MockitoExtension.class)
@@ -164,6 +168,33 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
         }
 
         @Test
+        void shouldNotifyCOORespondent1Lip_whenInvokedBilingual() {
+            when(notificationsProperties.getNotifyLipUpdateTemplateBilingual())
+                .thenReturn("template-id-lip-translate");
+
+            //given: case where respondent1 Lip has email and callback for notify respondent1 is triggered
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                             .respondent1ResponseLanguage(Language.BOTH.toString())
+                                                             .build())
+                                 .build())
+                .respondent1Represented(YesOrNo.NO).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_COURT_OFFICER_ORDER.name()).build()
+            ).build();
+            //when: handler is called
+            handler.handle(params);
+            //then: email should be sent to respondent1
+            verify(notificationService).sendMail(
+                "sole.trader@email.com",
+                "template-id-lip-translate",
+                getRespondentNotificationDataMapLip(caseData),
+                "generate-order-notification-000DC001"
+            );
+        }
+
+        @Test
         void shouldNotifyRespondent2Lip_whenInvoked() {
             when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id-lip");
 
@@ -269,6 +300,29 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
         }
 
         @Test
+        void shouldNotifyCOOApplicantLip_whenInvokedBilingual() {
+            when(notificationsProperties.getNotifyLipUpdateTemplateBilingual())
+                .thenReturn("template-id-lip-translate");
+
+            //given: case where applicant Lip has email & bilingual flag is on and notify for applicant is called
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .applicant1Represented(YesOrNo.NO)
+                .claimantBilingualLanguagePreference("BOTH").build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_APPLICANT_SOLICITOR1_FOR_COURT_OFFICER_ORDER.name()).build()
+            ).build();
+            //when: handler is called
+            handler.handle(params);
+            //then: email should be sent to applicant
+            verify(notificationService).sendMail(
+                "rambo@email.com",
+                "template-id-lip-translate",
+                getApplicantNotificationDataMapLip(caseData),
+                "generate-order-notification-000DC001"
+            );
+        }
+
+        @Test
         void shouldReturnCorrectCamundaActivityId_whenInvoked() {
             assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(
                 CallbackRequest.builder().eventId(
@@ -290,7 +344,9 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, handler.getLegalOrganizationName(caseData),
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                CASEMAN_REF, "000DC001"
             );
         }
 

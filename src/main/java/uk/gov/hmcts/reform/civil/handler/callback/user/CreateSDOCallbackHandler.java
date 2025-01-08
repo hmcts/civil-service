@@ -128,6 +128,7 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -231,6 +232,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     BigDecimal ccmccAmount;
     @Value("${court-location.unspecified-claim.epimms-id}")
     String ccmccEpimsId;
+    private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -1588,13 +1590,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         // LiP check ensures any LiP cases will always create takeCaseOffline WA task until CP goes live
         boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
-        boolean isHmcEnabled = featureToggleService.isHmcEnabled();
         boolean isLocationWhiteListed = featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation());
 
         if (!isLipCase) {
             log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
             dataBuilder.eaCourtLocation(YES);
-            dataBuilder.hmcEaCourtLocation(isHmcEnabled && !isLipCase && isLocationWhiteListed ? YES : NO);
+            dataBuilder.hmcEaCourtLocation(!isLipCase && isLocationWhiteListed ? YES : NO);
         } else if (isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData)) {
             dataBuilder.eaCourtLocation(YesOrNo.YES);
         } else {
@@ -1626,6 +1627,13 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                     caseData.getSdoR2Trial().getAltHearingCourtLocationList().getValue()).build());
             }
             dataBuilder.sdoR2Trial(sdoR2Trial);
+        }
+
+        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+            updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
+                callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
+                dataBuilder
+            ));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

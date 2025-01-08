@@ -30,6 +30,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_DEF;
 
 @ExtendWith(MockitoExtension.class)
@@ -81,7 +82,8 @@ public class InterimJudgmentDefendantNotificationHandlerTest extends BaseCallbac
                                  .build())
                 .respondent1OrganisationPolicy(null)
                 .legacyCaseReference("12DC910")
-                .respondent2OrganisationPolicy(null).build();
+                .respondent2OrganisationPolicy(null).build().toBuilder()
+                .ccdCaseReference(1594901956117591L).build();
 
             Map<String, String> propertyMap = handler.addProperties(caseData);
             assertEquals("Mr. Don Smith", propertyMap.get(LEGAL_ORG_DEF));
@@ -100,7 +102,8 @@ public class InterimJudgmentDefendantNotificationHandlerTest extends BaseCallbac
                                                    .organisation(uk.gov.hmcts.reform.ccd.model
                                                                      .Organisation.builder().build()).build())
                 .legacyCaseReference("12DC910")
-                .respondent2OrganisationPolicy(null).build();
+                .respondent2OrganisationPolicy(null).build().toBuilder()
+                .ccdCaseReference(1594901956117591L).build();
 
             Map<String, String> propertyMap = handler.addProperties(caseData);
             assertEquals("Mr. Don Smith", propertyMap.get(LEGAL_ORG_DEF));
@@ -128,8 +131,10 @@ public class InterimJudgmentDefendantNotificationHandlerTest extends BaseCallbac
         private Map<String, String> getNotificationDataMap() {
             return Map.of(
                 "Defendant LegalOrg Name", "Test Org Name",
-                "Claim number", "000DC001",
-                "Defendant Name", "Mr. Sole Trader"
+                "Claim number", "1594901956117591",
+                "Defendant Name", "Mr. Sole Trader",
+                "partyReferences", "Claimant reference: 12345 - Defendant reference: 6789",
+                CASEMAN_REF, "000DC001"
             );
         }
     }

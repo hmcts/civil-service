@@ -61,7 +61,7 @@ public class ClaimDetailsNotifiedTransitionBuilder extends MidTransitionBuilder 
                 .and(not(notificationAcknowledged)).and(not(respondentTimeExtension)), transitions)
             .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaffAfterClaimDetailsNotified, transitions)
             .moveTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA, transitions)
-            .onlyWhen(caseDismissedAfterDetailNotified, transitions)
+            .onlyWhen(caseDismissedAfterDetailNotified.and(not(isInHearingReadiness)), transitions)
             .moveTo(IN_HEARING_READINESS, transitions).onlyWhen(isInHearingReadiness, transitions)
             .moveTo(TAKEN_OFFLINE_SDO_NOT_DRAWN, transitions).onlyWhen(takenOfflineSDONotDrawnAfterClaimDetailsNotified, transitions);
     }

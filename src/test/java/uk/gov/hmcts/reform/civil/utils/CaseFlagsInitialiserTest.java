@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.List;
@@ -48,16 +47,12 @@ class CaseFlagsInitialiserTest {
 
     private CaseFlagsInitialiser caseFlagsInitialiser;
 
-    private FeatureToggleService featureToggleService;
-
     private OrganisationService organisationService;
 
     @BeforeEach
     void setup() {
-        featureToggleService = mock(FeatureToggleService.class);
         organisationService = mock(OrganisationService.class);
-        caseFlagsInitialiser = new CaseFlagsInitialiser(featureToggleService, organisationService);
-        when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
+        caseFlagsInitialiser = new CaseFlagsInitialiser(organisationService);
         when(organisationService.findOrganisationById(anyString()))
             .thenReturn(Optional.of(Organisation.builder().name("Civil - Organisation 1").build()));
     }
@@ -154,39 +149,6 @@ class CaseFlagsInitialiserTest {
             .respondent2LitigationFriend(respondent2LitFriend);
 
         caseFlagsInitialiser.initialiseCaseFlags(CaseEvent.ADD_DEFENDANT_LITIGATION_FRIEND, actual);
-
-        assertEquals(expected, actual.build());
-    }
-
-    @Test
-    void shouldNotInitialiseCaseFlagsWhenCaseFlagsToggleIsOff() {
-        var applicant1 = PartyBuilder.builder().individual().build();
-        var applicant2 = PartyBuilder.builder().company().build();
-        var respondent1 = PartyBuilder.builder().soleTrader().build();
-        var respondent2 = PartyBuilder.builder().organisation().build();
-        var applicant1LitFriend = LitigationFriend.builder().firstName("Jason").lastName("Wilson").build();
-        var applicant2LitFriend = LitigationFriend.builder().firstName("Jenny").lastName("Carter").build();
-
-        var expected = CaseData.builder()
-            .applicant1(applicant1)
-            .applicant2(applicant2)
-            .applicant1LitigationFriend(applicant1LitFriend)
-            .applicant2LitigationFriend(applicant2LitFriend)
-            .respondent1(respondent1)
-            .respondent2(respondent2)
-            .build();
-
-        var actual = CaseData.builder()
-            .applicant1(applicant1)
-            .applicant1LitigationFriend(applicant1LitFriend)
-            .applicant2(applicant2)
-            .applicant2LitigationFriend(applicant2LitFriend)
-            .respondent1(respondent1)
-            .respondent2(respondent2);
-
-        when(featureToggleService.isCaseFlagsEnabled()).thenReturn(false);
-
-        caseFlagsInitialiser.initialiseCaseFlags(CaseEvent.CREATE_CLAIM, actual);
 
         assertEquals(expected, actual.build());
     }

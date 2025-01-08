@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOne
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
+import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -49,6 +50,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENCE_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
+import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -813,6 +816,56 @@ public class CaseDataTest {
     }
 
     @Test
+    void shouldReturnNull_whenNoClaimFeePresent() {
+        //Given
+        CaseData caseData = CaseData.builder().build();
+        //When
+        BigDecimal claimAmount = caseData.getClaimAmountInPounds();
+        //Then
+        assertThat(claimAmount).isNull();
+    }
+
+    @Test
+    void shouldReturnClaimValueInPounds_whenClaimValuePresent() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .claimValue(ClaimValue
+                            .builder()
+                            .statementOfValueInPennies(new BigDecimal(1000))
+                            .build())
+            .build();
+        //When
+        BigDecimal claimAmount = caseData.getClaimAmountInPounds();
+        //Then
+        assertThat(claimAmount).isEqualTo(new BigDecimal(10).setScale(2));
+    }
+
+    @Test
+    void shouldReturnClaimValueInPounds_whenTotalClaimAmountPresent() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .totalClaimAmount(new BigDecimal(1000))
+            .build();
+        //When
+        BigDecimal claimAmount = caseData.getClaimAmountInPounds();
+        //Then
+        assertThat(claimAmount).isEqualTo(new BigDecimal(1000).setScale(2));
+    }
+
+    @Test
+    void shouldReturnClaimValueInPounds_whenTotalClaimAmountAndInterestPresent() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .totalClaimAmount(new BigDecimal(1000))
+            .totalInterest(new BigDecimal(10))
+            .build();
+        //When
+        BigDecimal claimAmount = caseData.getClaimAmountInPounds();
+        //Then
+        assertThat(claimAmount).isEqualTo(new BigDecimal(1010).setScale(2));
+    }
+
+    @Test
     void shouldReturnTrue_whenRespondent2NotRespresentedUnspec() {
         //Given
         CaseData caseData = CaseData.builder()
@@ -1157,6 +1210,26 @@ public class CaseDataTest {
     }
 
     @Nested
+    class CoSC {
+        @Test
+        void shouldReturnTrue_CoscCertExists() {
+            CaseDocument caseDocument = CaseDocument.builder()
+                .documentType(DocumentType.CERTIFICATE_OF_DEBT_PAYMENT)
+                .build();
+            CaseData caseData = CaseData.builder()
+                .systemGeneratedCaseDocuments(wrapElements(caseDocument))
+                .build();
+            assertTrue(caseData.hasCoscCert());
+        }
+
+        @Test
+        void shouldReturnFalse_CoscCertDoesntExists() {
+            CaseData caseData = CaseData.builder().build();
+            assertFalse(caseData.hasCoscCert());
+        }
+    }
+
+    @Nested
     class AlreadyPaidAmountCheck {
         @Test
         void shouldReturnTrueIfPaidLessFullDefence() {
@@ -1201,6 +1274,58 @@ public class CaseDataTest {
             boolean isPaidLessThanClaimAmount = caseData.isPaidLessThanClaimAmount();
             //Then
             assertFalse(isPaidLessThanClaimAmount);
+        }
+
+        @Test
+        void shouldReturnTrueIfHearingFeePaymentStatusSuccess() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .hearingFeePaymentDetails(PaymentDetails.builder().status(SUCCESS).build())
+                .build();
+            //When
+            boolean isHearingFeePaid = caseData.isHearingFeePaid();
+            //Then
+            assertTrue(isHearingFeePaid);
+        }
+
+        @Test
+        void shouldReturnTrueIfHearingFeePaidWithHWF() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .hearingHelpFeesReferenceNumber("hwf-ref")
+                .feePaymentOutcomeDetails(
+                    FeePaymentOutcomeDetails.builder()
+                        .hwfFullRemissionGrantedForHearingFee(YES)
+                        .build())
+                .applicant1Represented(NO)
+                .respondent1Represented(NO)
+                .build();
+            //When
+            boolean isHearingFeePaid = caseData.isHearingFeePaid();
+            //Then
+            assertTrue(isHearingFeePaid);
+        }
+
+        @Test
+        void shouldReturnFalseIfHearingPaymentIsNotSuccess() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .hearingFeePaymentDetails(PaymentDetails.builder().status(FAILED).build())
+                .build();
+            //When
+            boolean isHearingFeePaid = caseData.isHearingFeePaid();
+            //Then
+            assertFalse(isHearingFeePaid);
+        }
+
+        @Test
+        void shouldReturnFalseIfHearingPaymentIsNullAndNoHWF() {
+            //Given
+            CaseData caseData = CaseData.builder().build();
+            //When
+            boolean isHearingFeePaid = caseData.isHearingFeePaid();
+            //Then
+            assertFalse(isHearingFeePaid);
         }
     }
 
@@ -1248,6 +1373,31 @@ public class CaseDataTest {
                          Optional.of(List.of(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build()))
             )
         );
+    }
+
+    @Test
+    void shouldReturnNullForDefaultObligationWAFlag() {
+        // Given
+        CaseData caseData = CaseData.builder().build();
+
+        // When
+        ObligationWAFlag obligationWAFlag = caseData.getObligationWAFlag();
+
+        // Then
+        assertNull(obligationWAFlag);
+    }
+
+    @Test
+    void shouldSetAndReturnObligationWAFlag() {
+        // Given
+        ObligationWAFlag expectedFlag = new ObligationWAFlag("Test", "Test", "1 January 2024");
+        CaseData caseData = CaseData.builder().obligationWAFlag(expectedFlag).build();
+
+        // When
+        ObligationWAFlag obligationWAFlag = caseData.getObligationWAFlag();
+
+        // Then
+        assertEquals(expectedFlag, obligationWAFlag);
     }
 }
 

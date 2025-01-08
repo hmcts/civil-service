@@ -47,7 +47,8 @@ public class TrialReadyNotificationSearchService extends ElasticSearchService {
     }
 
     @Override
-    Query queryInMediationCases(int startIndex, LocalDate claimMovedDate, boolean carmEnabled) {
+    Query queryInMediationCases(int startIndex, LocalDate claimMovedDate, boolean carmEnabled, boolean initialSearch,
+                                String searchAfterValue) {
         return null;
     }
 

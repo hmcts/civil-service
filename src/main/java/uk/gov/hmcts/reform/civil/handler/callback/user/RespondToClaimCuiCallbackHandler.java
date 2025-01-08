@@ -79,9 +79,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         CaseData caseData = getUpdatedCaseData(callbackParams);
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
-        if (featureToggleService.isHmcEnabled()) {
-            populateDQPartyIds(builder);
-        }
+        populateDQPartyIds(builder);
 
         if (featureToggleService.isUpdateContactDetailsEnabled()) {
             addEventAndDateAddedToRespondentExperts(builder);

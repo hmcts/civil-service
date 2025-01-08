@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -23,6 +24,7 @@ public class FeeVersionDto {
     public static final String STATUS_PENDING = "pending_approval";
     public static final String STATUS_DISCONTINUED = "discontinued";
 
+    @JsonProperty("approvedBy")
     private String approvedBy;
     private String author;
     private String description;

@@ -8,6 +8,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -91,6 +93,8 @@ class BuildConfirmationTaskTest {
     void shouldGenerateConfirmationTextAndHeaderWhenAllFinalOrderIssued() {
         CaseData caseData = CaseDataBuilder.builder()
             .buildJudmentOnlineCaseDataWithPaymentByInstalment().toBuilder()
+            .applicant1ProceedWithClaim(YesOrNo.NO)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .build();
 
         SubmittedCallbackResponse response = buildConfirmationTask.execute(callbackParams(caseData));

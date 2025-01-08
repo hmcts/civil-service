@@ -20,10 +20,8 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-
 import java.time.LocalDate;
 import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -73,6 +71,9 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("activeJudgment")).isNotNull();
             assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("SATISFIED");
             assertThat(response.getData().get("activeJudgment")).extracting("fullyPaymentMadeDate").isEqualTo(LocalDate.now().plusDays(35).toString());
+
+            assertThat(response.getData().get("joCoscRpaStatus")).isEqualTo("SATISFIED");
+            assertThat(response.getData().get("joMarkedPaidInFullIssueDate")).isNotNull();
         }
 
         @Test
@@ -96,6 +97,8 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("confirmFullPaymentMade").isEqualTo(List.of("CONFIRMED"));
             assertThat(response.getData().get("joIsLiveJudgmentExists")).isEqualTo("Yes");
 
+            assertThat(response.getData().get("joCoscRpaStatus")).isEqualTo("SATISFIED");
+            assertThat(response.getData().get("joMarkedPaidInFullIssueDate")).isNotNull();
         }
 
         @Test
@@ -122,6 +125,9 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData().get("activeJudgment")).isNotNull();
             assertThat(response.getData().get("historicJudgment")).isNull();
+
+            assertThat(response.getData().get("joCoscRpaStatus")).isEqualTo("CANCELLED");
+            assertThat(response.getData().get("joMarkedPaidInFullIssueDate")).isNotNull();
         }
 
         @Test
@@ -145,6 +151,9 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("joIsLiveJudgmentExists")).isEqualTo("Yes");
             assertThat(response.getData().get("activeJudgment")).isNotNull();
             assertThat(response.getData().get("historicJudgment")).isNull();
+
+            assertThat(response.getData().get("joCoscRpaStatus")).isEqualTo("CANCELLED");
+            assertThat(response.getData().get("joMarkedPaidInFullIssueDate")).isNotNull();
         }
     }
 

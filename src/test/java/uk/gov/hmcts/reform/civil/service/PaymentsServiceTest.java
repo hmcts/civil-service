@@ -46,7 +46,6 @@ class PaymentsServiceTest {
 
     private static final String SERVICE = "service";
     private static final String SITE_ID = "site_id";
-    private static final String SPEC_SERVICE = "spec_service";
     private static final String SPEC_SITE_ID = "spec_site_id";
     private static final String AUTH_TOKEN = "Bearer token";
     private static final PBAServiceRequestResponse PAYMENT_DTO = PBAServiceRequestResponse.builder()
