@@ -21,7 +21,8 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 import static org.springframework.http.HttpStatus.FAILED_DEPENDENCY;
-import static uk.gov.hmcts.reform.civil.utils.CaseDataRequestUtil.getCaseId;
+import static uk.gov.hmcts.reform.civil.utils.ContentCachingRequestWrapperUtil.getCaseId;
+import static uk.gov.hmcts.reform.civil.utils.ContentCachingRequestWrapperUtil.getUserId;
 
 @Slf4j
 @ControllerAdvice
@@ -34,7 +35,7 @@ public class ResourceExceptionHandler {
         log.debug(exception.getMessage(), exception);
         String errorMessage = "Not found error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
-                                         contentCachingRequestWrapper.getHeader("user-id")));
+                                         getUserId(contentCachingRequestWrapper)));
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 
@@ -44,7 +45,7 @@ public class ResourceExceptionHandler {
         log.debug(exception.getMessage(), exception);
         String errorMessage = "Request aborted error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
-                                         contentCachingRequestWrapper.getHeader("user-id")));
+                                         getUserId(contentCachingRequestWrapper)));
         return new ResponseEntity<>(exception.getMessage(),
                                     new HttpHeaders(), HttpStatus.REQUEST_TIMEOUT
         );
@@ -59,7 +60,7 @@ public class ResourceExceptionHandler {
         log.debug(exception.getMessage(), exception);
         String errorMessage = "Illegal flow state / illegal arg error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
-                                         contentCachingRequestWrapper.getHeader("user-id")));
+                                         getUserId(contentCachingRequestWrapper)));
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.PRECONDITION_FAILED);
     }
 
@@ -69,7 +70,7 @@ public class ResourceExceptionHandler {
         log.debug(exception.getMessage(), exception);
         String errorMessage = "Bad request error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
-                                         contentCachingRequestWrapper.getHeader("user-id")));
+                                         getUserId(contentCachingRequestWrapper)));
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
@@ -82,7 +83,7 @@ public class ResourceExceptionHandler {
         log.debug(exception.getMessage(), exception);
         String errorMessage = "Unknown host / invalid payment error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
-                                         contentCachingRequestWrapper.getHeader("user-id")));
+                                         getUserId(contentCachingRequestWrapper)));
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.NOT_ACCEPTABLE);
     }
 
@@ -92,7 +93,7 @@ public class ResourceExceptionHandler {
         log.debug(exception.getMessage(), exception);
         String errorMessage = "Unauthorized feign error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
-                                         contentCachingRequestWrapper.getHeader("user-id")));
+                                         getUserId(contentCachingRequestWrapper)));
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
     }
 
@@ -102,7 +103,7 @@ public class ResourceExceptionHandler {
         log.debug(exception.getMessage(), exception);
         String errorMessage = "Forbidden feign error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
-                                         contentCachingRequestWrapper.getHeader("user-id")));
+                                         getUserId(contentCachingRequestWrapper)));
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN);
     }
 
@@ -112,7 +113,7 @@ public class ResourceExceptionHandler {
         log.debug(exception.getMessage(), exception);
         String errorMessage = "Not found feign error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
-                                         contentCachingRequestWrapper.getHeader("user-id")));
+                                         getUserId(contentCachingRequestWrapper)));
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 
@@ -122,7 +123,7 @@ public class ResourceExceptionHandler {
         log.debug(error.getMessage(), error);
         String errorMessage = "No such method error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(error.getMessage(), getCaseId(contentCachingRequestWrapper),
-                                         contentCachingRequestWrapper.getHeader("user-id")));
+                                         getUserId(contentCachingRequestWrapper)));
         return new ResponseEntity<>(error.getMessage(), new HttpHeaders(), HttpStatus.METHOD_NOT_ALLOWED);
     }
 
@@ -132,7 +133,7 @@ public class ResourceExceptionHandler {
         log.debug(exception.getMessage(), exception);
         String errorMessage = "Feign gateway timeout error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
-                                         contentCachingRequestWrapper.getHeader("user-id")));
+                                         getUserId(contentCachingRequestWrapper)));
         return new ResponseEntity<>(exception.getMessage(),
                                     new HttpHeaders(), HttpStatus.GATEWAY_TIMEOUT
         );
@@ -144,7 +145,7 @@ public class ResourceExceptionHandler {
         log.debug(exception.getMessage(), exception);
         String errorMessage = "Notification client error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
-                                         contentCachingRequestWrapper.getHeader("user-id")));
+                                         getUserId(contentCachingRequestWrapper)));
         return ResponseEntity
             .status(FAILED_DEPENDENCY)
             .body(exception.getMessage());
@@ -158,7 +159,7 @@ public class ResourceExceptionHandler {
         log.debug(exception.getMessage(), exception);
         String errorMessage = "JSON validation error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
-                                         contentCachingRequestWrapper.getHeader("user-id")));
+                                         getUserId(contentCachingRequestWrapper)));
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.EXPECTATION_FAILED);
     }
 }
