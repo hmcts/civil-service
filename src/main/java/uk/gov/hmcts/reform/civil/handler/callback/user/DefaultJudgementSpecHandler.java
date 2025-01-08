@@ -286,7 +286,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         }
 
         // otherwise show new dj fixed costs screen if judgment amount is more
-        // than 25. judgment amount = claim amount + interest + fixed commencent costs + claim fee  - partial amount
+        // than 25. judgment amount = claim amount + interest - partial amount
         if (caseData.getFixedCosts() != null) {
             BigDecimal judgmentAmount = JudgmentsOnlineHelper.getJudgmentAmount(caseData, interestCalculator);
             if (YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
