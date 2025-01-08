@@ -35,7 +35,7 @@ public class ResourceExceptionHandlerTest {
 
     @BeforeEach
     void setUp() {
-        String jsonString = "{ \"case_details\" : [{\"case_data\" : {\"array\" : [{\"key\" : \"value\"}]}, \"id\" : \"1234\"}]}";
+        String jsonString = "{ \"case_details\" : {\"case_data\" : {\"array\" : [{\"key\" : \"value\"}]}, \"id\" : \"1234\"}}";
         when(contentCachingRequestWrapper.getHeader("user-id")).thenReturn("4321");
         when(contentCachingRequestWrapper.getContentAsByteArray()).thenReturn(jsonString.getBytes(StandardCharsets.UTF_8));
     }
