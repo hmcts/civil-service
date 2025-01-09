@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLE
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISPATCH_BUSINESS_PROCESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REMOVE_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARK_PAID_FULL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM_CLAIMANT;
@@ -189,7 +190,8 @@ public class FlowStateAllowedEventService {
         CASE_PROCEEDS_IN_CASEMAN,
         UpdateNextHearingInfo,
         UPDATE_NEXT_HEARING_DETAILS,
-        DISPATCH_BUSINESS_PROCESS
+        DISPATCH_BUSINESS_PROCESS,
+        REMOVE_DOCUMENT
     );
 
     private static final Map<String, List<CaseEvent>> ALLOWED_EVENTS_ON_FLOW_STATE = Map.ofEntries(

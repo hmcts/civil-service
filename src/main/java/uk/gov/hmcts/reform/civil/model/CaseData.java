@@ -58,6 +58,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
+import uk.gov.hmcts.reform.civil.model.documentremoval.DocumentToKeepCollection;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentAndNote;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentWithName;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
@@ -740,6 +741,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo obligationDatePresent;
     private CourtStaffNextSteps courtStaffNextSteps;
 
+    private List<DocumentToKeepCollection> documentToKeepCollection;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
