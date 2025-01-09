@@ -20,6 +20,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTEN
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.DECISION_OUTCOME;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
@@ -50,6 +51,7 @@ public class OrderReviewObligationSearchService extends ElasticSearchService {
                                     .should(beState(DECISION_OUTCOME))
                                     .should(beState(IN_MEDIATION))
                                     .should(beState(All_FINAL_ORDERS_ISSUED))
+                                    .should(beState(CASE_STAYED))
                                     .should(beState(JUDICIAL_REFERRAL))
                                     .should(beState(CASE_PROGRESSION))
                           )
