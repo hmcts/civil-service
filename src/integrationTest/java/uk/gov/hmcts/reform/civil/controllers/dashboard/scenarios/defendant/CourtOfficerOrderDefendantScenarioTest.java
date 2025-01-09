@@ -22,6 +22,8 @@ public class CourtOfficerOrderDefendantScenarioTest extends DashboardBaseIntegra
     @Test
     void should_create_court_officer_order_defendant_scenario() throws Exception {
 
+        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+
         String caseId = "72016577145";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
@@ -43,12 +45,12 @@ public class CourtOfficerOrderDefendantScenarioTest extends DashboardBaseIntegra
                         jsonPath("$[0].titleEn").value("An order has been made"),
                         jsonPath("$[0].descriptionEn").value(
                             "<p class=\"govuk-body\">The Court has made an order on your claim.</p>" +
-                                "<p class=\"govuk-body\"><a href=\"{VIEW_FINAL_ORDER}\" rel=\"noopener noreferrer\" target=\"_blank\" " +
+                                "<p class=\"govuk-body\"><a href=\"{VIEW_ORDERS_AND_NOTICES}\" rel=\"noopener noreferrer\" target=\"_blank\" " +
                                 "class=\"govuk-link\">View the order</a></p>"),
                         jsonPath("$[0].titleCy").value("Mae gorchymyn wedi’i wneud"),
                         jsonPath("$[0].descriptionCy").value(
                             "<p class=\"govuk-body\">Mae’r Llys wedi gwneud gorchymyn ar eich hawliad.</p>" +
-                                "<p class=\"govuk-body\"><a href=\"{VIEW_FINAL_ORDER}\" rel=\"noopener noreferrer\" target=\"_blank\" " +
+                                "<p class=\"govuk-body\"><a href=\"{VIEW_ORDERS_AND_NOTICES}\" rel=\"noopener noreferrer\" target=\"_blank\" " +
                                 "class=\"govuk-link\">Gweld y gorchymyn</a></p>"));
     }
 
@@ -78,12 +80,12 @@ public class CourtOfficerOrderDefendantScenarioTest extends DashboardBaseIntegra
                 jsonPath("$[0].titleEn").value("An order has been made"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">The Court has made an order on your claim.</p>" +
-                        "<p class=\"govuk-body\"><a href=\"{VIEW_FINAL_ORDER}\" rel=\"noopener noreferrer\" target=\"_blank\" " +
+                        "<p class=\"govuk-body\"><a href=\"{VIEW_ORDERS_AND_NOTICES}\" rel=\"noopener noreferrer\" target=\"_blank\" " +
                         "class=\"govuk-link\">View the order</a></p>"),
                 jsonPath("$[0].titleCy").value("Mae gorchymyn wedi’i wneud"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae’r Llys wedi gwneud gorchymyn ar eich hawliad.</p>" +
-                        "<p class=\"govuk-body\"><a href=\"{VIEW_FINAL_ORDER}\" rel=\"noopener noreferrer\" target=\"_blank\" " +
+                        "<p class=\"govuk-body\"><a href=\"{VIEW_ORDERS_AND_NOTICES}\" rel=\"noopener noreferrer\" target=\"_blank\" " +
                         "class=\"govuk-link\">Gweld y gorchymyn</a></p>"));
 
     }
