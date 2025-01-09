@@ -47,8 +47,8 @@ public class FullDefenceApplicantSolicitorOneSpecNotifier extends FullDefenceSol
         } else {
             if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)) {
                 emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponse1v2DSForSpec();
-            } else if (caseData.isApplicant1NotRepresented() &&
-                RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+            } else if (caseData.isApplicant1NotRepresented()
+                && RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
                 if (caseData.isClaimantBilingual()) {
                     emailTemplate =
                         notificationsProperties.getClaimantLipClaimUpdatedTemplate();
