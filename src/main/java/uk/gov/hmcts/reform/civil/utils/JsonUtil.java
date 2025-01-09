@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonUtil {
@@ -9,7 +10,14 @@ public class JsonUtil {
     }
 
     public static String getValueByKey(String jsonString, String key) {
-        JSONObject jsonObject = new JSONObject(jsonString);
+
+        JSONObject jsonObject;
+        try {
+            jsonObject = new JSONObject(jsonString);
+        } catch (JSONException e) {
+            return null;
+        }
+
         Object value = getValueByKey(jsonObject, key);
         return value != null ? value.toString() : null;
     }
