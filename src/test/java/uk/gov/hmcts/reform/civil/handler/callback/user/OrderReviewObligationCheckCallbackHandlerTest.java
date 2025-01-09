@@ -20,8 +20,8 @@ import uk.gov.hmcts.reform.civil.enums.ObligationReason;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.ObligationData;
 import uk.gov.hmcts.reform.civil.model.ObligationWAFlag;
+import uk.gov.hmcts.reform.civil.model.StoredObligationData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -59,8 +59,8 @@ class OrderReviewObligationCheckCallbackHandlerTest extends BaseCallbackHandlerT
         void shouldHandleObligationWATaskRaised(LocalDate obligationDate, YesOrNo initialTaskRaised, YesOrNo expectedTaskRaised) {
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build().builder()
                 .storedObligationData(List.of(
-                    Element.<ObligationData>builder()
-                        .value(ObligationData.builder()
+                    Element.<StoredObligationData>builder()
+                        .value(StoredObligationData.builder()
                                    .obligationDate(obligationDate)
                                    .obligationWATaskRaised(initialTaskRaised)
                                    .obligationReason(ObligationReason.UNLESS_ORDER)
@@ -72,14 +72,14 @@ class OrderReviewObligationCheckCallbackHandlerTest extends BaseCallbackHandlerT
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            List<Element<ObligationData>> storedObligationData = mapper.convertValue(
+            List<Element<StoredObligationData>> storedObligationData = mapper.convertValue(
                 response.getData().get("storedObligationData"),
                 new TypeReference<>() {}
             );
 
             assertThat(storedObligationData)
                 .extracting(Element::getValue)
-                .extracting(ObligationData::getObligationWATaskRaised)
+                .extracting(StoredObligationData::getObligationWATaskRaised)
                 .contains(expectedTaskRaised);
         }
 
@@ -95,8 +95,8 @@ class OrderReviewObligationCheckCallbackHandlerTest extends BaseCallbackHandlerT
         void shouldHandleEmptyObligationDataList() {
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build()
                 .builder().storedObligationData(List.of(
-                Element.<ObligationData>builder()
-                    .value(ObligationData.builder()
+                Element.<StoredObligationData>builder()
+                    .value(StoredObligationData.builder()
                                .obligationDate(LocalDate.now().minusDays(1))
                                .obligationWATaskRaised(YesOrNo.NO)
                                .obligationReason(ObligationReason.UNLESS_ORDER)
@@ -114,8 +114,8 @@ class OrderReviewObligationCheckCallbackHandlerTest extends BaseCallbackHandlerT
         void shouldNotSetObligationWAFlagWhenNoMatchingDataFound() {
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build().builder()
                 .storedObligationData(List.of(
-                    Element.<ObligationData>builder()
-                        .value(ObligationData.builder()
+                    Element.<StoredObligationData>builder()
+                        .value(StoredObligationData.builder()
                                    .obligationDate(LocalDate.now().plusDays(1))
                                    .obligationWATaskRaised(YesOrNo.NO)
                                    .build())
@@ -141,8 +141,8 @@ class OrderReviewObligationCheckCallbackHandlerTest extends BaseCallbackHandlerT
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build().builder()
                 .manageStayOption(manageStayOption)
                 .storedObligationData(List.of(
-                    Element.<ObligationData>builder()
-                        .value(ObligationData.builder()
+                    Element.<StoredObligationData>builder()
+                        .value(StoredObligationData.builder()
                                    .obligationDate(obligationDate)
                                    .obligationWATaskRaised(initialTaskRaised)
                                    .obligationReason(obligationReason)
@@ -155,14 +155,14 @@ class OrderReviewObligationCheckCallbackHandlerTest extends BaseCallbackHandlerT
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            List<Element<ObligationData>> storedObligationData = mapper.convertValue(
+            List<Element<StoredObligationData>> storedObligationData = mapper.convertValue(
                 response.getData().get("storedObligationData"),
                 new TypeReference<>() {}
             );
 
             assertThat(storedObligationData)
                 .extracting(Element::getValue)
-                .extracting(ObligationData::getObligationWATaskRaised)
+                .extracting(StoredObligationData::getObligationWATaskRaised)
                 .contains(expectedTaskRaised);
 
             ObligationWAFlag obligationWAFlag = mapper.convertValue(
