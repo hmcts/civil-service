@@ -32,7 +32,7 @@ public class FullDefenceApplicantSolicitorOneSpecNotifier extends FullDefenceSol
     @Override
     protected String getRecipient(CaseData caseData) {
         YesOrNo applicant1Represented = caseData.getApplicant1Represented();
-        return NO.equals(applicant1Represented) ? caseData.getApplicant1().getPartyEmail()
+        return NO.equals(applicant1Represented) ? caseData.getApplicant1Email()
             : caseData.getApplicantSolicitor1UserDetails().getEmail();
     }
 
@@ -47,6 +47,14 @@ public class FullDefenceApplicantSolicitorOneSpecNotifier extends FullDefenceSol
         } else {
             if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)) {
                 emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponse1v2DSForSpec();
+            } else if (caseData.isApplicant1NotRepresented() &&
+                RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+                if (caseData.isClaimantBilingual()) {
+                    emailTemplate =
+                        notificationsProperties.getClaimantLipClaimUpdatedTemplate();
+                } else {
+                    emailTemplate = notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate();
+                }
             } else {
                 emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
             }
@@ -82,7 +90,8 @@ public class FullDefenceApplicantSolicitorOneSpecNotifier extends FullDefenceSol
                 CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData),
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
             );
         }
     }
