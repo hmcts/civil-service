@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
-
 public class CaseQueriesUtuil {
 
     private CaseQueriesUtuil() {
@@ -20,11 +18,7 @@ public class CaseQueriesUtuil {
 
     public static CaseQueriesCollection createCaseQueries(String partyName, String roleOnCase) {
         List<Element<CaseMessage>> caseMessageCollection = new ArrayList<>();
-        //caseMessageCollection.add(element(createCaseMessage()));
         return CaseQueriesCollection.builder()
-//            .partyName(partyName)
-//            .roleOnCase(roleOnCase)
-//            .caseMessageCollection(caseMessageCollection)
             .build();
     }
 
