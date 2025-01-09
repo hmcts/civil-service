@@ -51,9 +51,9 @@ public class FullDefenceApplicantSolicitorOneSpecNotifier extends FullDefenceSol
                 && RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
                 if (caseData.isClaimantBilingual()) {
                     emailTemplate =
-                        notificationsProperties.getClaimantLipClaimUpdatedTemplate();
+                        notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate();
                 } else {
-                    emailTemplate = notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate();
+                    emailTemplate = notificationsProperties.getClaimantLipClaimUpdatedTemplate();
                 }
             } else {
                 emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
