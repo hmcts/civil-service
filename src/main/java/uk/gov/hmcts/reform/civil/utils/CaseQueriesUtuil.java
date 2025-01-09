@@ -18,13 +18,13 @@ public class CaseQueriesUtuil {
         //NO-OP
     }
 
-    public static CaseQueriesCollection createCaseQueries(String flagsPartyName, String roleOnCase) {
+    public static CaseQueriesCollection createCaseQueries(String partyName, String roleOnCase) {
         List<Element<CaseMessage>> caseMessageCollection = new ArrayList<>();
-        caseMessageCollection.add(element(createCaseMessage()));
+        //caseMessageCollection.add(element(createCaseMessage()));
         return CaseQueriesCollection.builder()
-            .partyName(flagsPartyName)
-            .roleOnCase(roleOnCase)
-            .caseMessageCollection(caseMessageCollection)
+//            .partyName(partyName)
+//            .roleOnCase(roleOnCase)
+//            .caseMessageCollection(caseMessageCollection)
             .build();
     }
 

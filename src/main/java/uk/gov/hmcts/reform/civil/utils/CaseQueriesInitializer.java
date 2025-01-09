@@ -21,7 +21,7 @@ public class CaseQueriesInitializer {
     private void initialiseQueriesCollection(CaseData.CaseDataBuilder dataBuilder, CaseData caseData) {
         dataBuilder.qmApplicantSolicitorQueries(
                 CaseQueriesUtuil.createCaseQueries(APPLICANT_ONE, caseData.getApplicant1().getPartyName()))
-            .qmApplicantSolicitorQueries(
+            .qmRespondentSolicitor1Queries(
                 CaseQueriesUtuil.createCaseQueries(RESPONDENT_ONE, caseData.getRespondent1().getPartyName()));
     }
 
