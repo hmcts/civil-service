@@ -52,8 +52,10 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CASEWORKER_TO_
     private com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
     private static final String authToken = "Bearer TestAuthToken";
+
     @Nested
     class AboutToSubmitCallback {
+
         @BeforeEach
         public void before() {
             when(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(true);

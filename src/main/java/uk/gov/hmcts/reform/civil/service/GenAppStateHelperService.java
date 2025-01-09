@@ -63,13 +63,6 @@ public class GenAppStateHelperService {
         coreCaseDataService.triggerGeneralApplicationEvent(caseId, event);
     }
 
-    public void triggerCivilSeriviceEvent(CaseData caseData, CaseEvent event) {
-        log.info("Triggering {} event on case: [{}]",
-                 event,
-                 caseData.getCcdCaseReference());
-        coreCaseDataService.triggerEvent(caseData.getCcdCaseReference(), event);
-    }
-
     public boolean triggerEvent(CaseData caseData, CaseEvent event) {
         if (Objects.isNull(caseData.getGeneralApplications())) {
             return false;
@@ -80,6 +73,13 @@ public class GenAppStateHelperService {
                                 parseLong(application.getValue().getCaseLink().getCaseReference()),
                                 event));
         return true;
+    }
+
+    public void triggerCivilSeriviceEvent(CaseData caseData, CaseEvent event) {
+        log.info("Triggering {} event on case: [{}]",
+                 event,
+                 caseData.getCcdCaseReference());
+        coreCaseDataService.triggerEvent(caseData.getCcdCaseReference(), event);
     }
 
     public CaseData updateApplicationLocationDetailsInClaim(CaseData caseData, String authToken) {
