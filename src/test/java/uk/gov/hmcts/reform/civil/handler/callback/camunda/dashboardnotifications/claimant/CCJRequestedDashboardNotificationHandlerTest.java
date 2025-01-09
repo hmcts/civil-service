@@ -115,6 +115,40 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
     }
 
     @Test
+    void createDashboardNotificationsWhenDJSubmittedForLipvLR() {
+
+        params.put("ccdCaseReference", "123");
+        params.put("defaultRespondTime", "4pm");
+        params.put("responseDeadline", "11 March 2024");
+
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+
+        LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
+
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1ResponseDeadline(dateTime)
+            .repaymentSummaryObject("Test String")
+            .build();
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+
+        handler.handle(callbackParams);
+        verify(dashboardApiClient).recordScenario(
+            caseData.getCcdCaseReference().toString(),
+            SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT.getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(params).build()
+        );
+    }
+
+
+    @Test
     void createDashboardNotificationsWhenJBASubmitted() {
 
         params.put("ccdCaseReference", "123");

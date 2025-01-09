@@ -1059,6 +1059,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean isApplicantLipOneVOne() {
+        return isApplicant1NotRepresented() && isOneVOne(this);
+    }
+
+    @JsonIgnore
     public boolean isJudgementDateNotPermitted() {
         LocalDate whenWillThisAmountBePaid = null;
         LocalDate firstRepaymentDate;
