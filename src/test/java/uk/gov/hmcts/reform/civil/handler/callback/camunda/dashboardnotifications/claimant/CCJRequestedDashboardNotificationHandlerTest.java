@@ -147,7 +147,6 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         );
     }
 
-
     @Test
     void createDashboardNotificationsWhenJBASubmitted() {
 
