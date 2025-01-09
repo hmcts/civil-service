@@ -43,9 +43,10 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> caseNotFoundUnauthorised(SearchServiceCaseNotFoundException searchServiceCaseNotFoundException,
                                                            ContentCachingRequestWrapper contentCachingRequestWrapper) {
         String errorMessage = "Search service case not found with message: %s for case %s run by user %s";
-        log.error(errorMessage.formatted(searchServiceCaseNotFoundException.getMessage(),
-                                         getCaseId(contentCachingRequestWrapper),
-                                         getUserId(contentCachingRequestWrapper)
+        log.error(errorMessage.formatted(
+            searchServiceCaseNotFoundException.getMessage(),
+            getCaseId(contentCachingRequestWrapper),
+            getUserId(contentCachingRequestWrapper)
         ));
         return new ResponseEntity<>("UNAUTHORIZED", new HttpHeaders(), HttpStatus.UNAUTHORIZED);
     }
@@ -74,9 +75,10 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> documentUploadException(MaxUploadSizeExceededException maxUploadSizeExceededException,
                                                           ContentCachingRequestWrapper contentCachingRequestWrapper) {
         String errorMessage = "Max upload size exceeded error with message: %s for case %s run by user %s";
-        log.error(errorMessage.formatted(maxUploadSizeExceededException.getMessage(),
-                                         getCaseId(contentCachingRequestWrapper),
-                                         getUserId(contentCachingRequestWrapper)
+        log.error(errorMessage.formatted(
+            maxUploadSizeExceededException.getMessage(),
+            getCaseId(contentCachingRequestWrapper),
+            getUserId(contentCachingRequestWrapper)
         ));
         return new ResponseEntity<>("Document upload unsuccessful", new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
@@ -85,9 +87,10 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> partyIdsUpdatedException(MissingFieldsUpdatedException missingFieldsUpdatedException,
                                                            ContentCachingRequestWrapper contentCachingRequestWrapper) {
         String errorMessage = "Error when attempting to update missing hearing values fields with message: %s for case %s run by user %s";
-        log.error(errorMessage.formatted(missingFieldsUpdatedException.getMessage(),
-                                         getCaseId(contentCachingRequestWrapper),
-                                         getUserId(contentCachingRequestWrapper)
+        log.error(errorMessage.formatted(
+            missingFieldsUpdatedException.getMessage(),
+            getCaseId(contentCachingRequestWrapper),
+            getUserId(contentCachingRequestWrapper)
         ));
         return new ResponseEntity<>("Missing fields updated", new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
@@ -110,9 +113,10 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> userNotFoundOnCaseException(UserNotFoundOnCaseException userNotFoundOnCaseException,
                                                               ContentCachingRequestWrapper contentCachingRequestWrapper) {
         String errorMessage = "User not found error with message: %s for case %s run by user %s";
-        log.error(errorMessage.formatted(userNotFoundOnCaseException.getMessage(),
-                                         getCaseId(contentCachingRequestWrapper),
-                                         getUserId(contentCachingRequestWrapper)
+        log.error(errorMessage.formatted(
+            userNotFoundOnCaseException.getMessage(),
+            getCaseId(contentCachingRequestWrapper),
+            getUserId(contentCachingRequestWrapper)
         ));
         return new ResponseEntity<>(userNotFoundOnCaseException.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
@@ -121,9 +125,10 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> litigantInPersonException(IncludesLitigantInPersonException includesLitigantInPersonException,
                                                             ContentCachingRequestWrapper contentCachingRequestWrapper) {
         String errorMessage = "Action not accepted on case with message: %s for case %s run by user %s";
-        log.error(errorMessage.formatted(includesLitigantInPersonException.getMessage(),
-                                         getCaseId(contentCachingRequestWrapper),
-                                         getUserId(contentCachingRequestWrapper)
+        log.error(errorMessage.formatted(
+            includesLitigantInPersonException.getMessage(),
+            getCaseId(contentCachingRequestWrapper),
+            getUserId(contentCachingRequestWrapper)
         ));
         return new ResponseEntity<>(
             includesLitigantInPersonException.getMessage(),

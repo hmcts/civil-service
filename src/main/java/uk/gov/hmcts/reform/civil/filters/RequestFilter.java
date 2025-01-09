@@ -1,6 +1,7 @@
-package uk.gov.hmcts.reform.civil.request.servlet;
+package uk.gov.hmcts.reform.civil.filters;
 
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
@@ -11,13 +12,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-/**
- * We need this filter to map the servlet request to our new cached body servlet request, which allows us to read
- * the request body as many times as we like. Its usual accessors (getInputStream and getReader) are consumed after
- * one use so extending the class and instantiating our own stream readers gets around this.
- * **/
+import static uk.gov.hmcts.reform.civil.utils.ContentCachingRequestWrapperUtil.getCaseId;
+import static uk.gov.hmcts.reform.civil.utils.ContentCachingRequestWrapperUtil.getUserId;
+
 @Component
-public class CachedBodyRequestFilter extends OncePerRequestFilter {
+public class RequestFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@NotNull HttpServletRequest request,
@@ -25,6 +24,9 @@ public class CachedBodyRequestFilter extends OncePerRequestFilter {
                                     @NotNull FilterChain filterChain) throws ServletException, IOException {
         ContentCachingRequestWrapper cachedBodyHttpServletRequest =
             new ContentCachingRequestWrapper(request);
+        MDC.put("caseId", getCaseId(cachedBodyHttpServletRequest));
+        MDC.put("userId", getUserId(cachedBodyHttpServletRequest));
+
         filterChain.doFilter(cachedBodyHttpServletRequest, response);
     }
 }

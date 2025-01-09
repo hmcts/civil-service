@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.controllers;
+package uk.gov.hmcts.reform.civil.interceptors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,5 +13,6 @@ public class RequestInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)  {
         MDC.remove("caseId");
+        MDC.remove("userId");
     }
 }
