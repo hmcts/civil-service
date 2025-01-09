@@ -35,10 +35,13 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DJApplicantReceivedNotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.APPLICANT_ONE_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_APPLICANT1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_SPECIFIED;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CASE_ID;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -207,8 +210,10 @@ class DJApplicantReceivedNotificationHandlerTest {
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
                 LEGAL_ORG_SPECIFIED, "Test Org Name",
-                CLAIM_NUMBER, LEGACY_CASE_REFERENCE,
-                DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+                CLAIM_NUMBER, CASE_ID.toString(),
+                DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                CASEMAN_REF, "000DC001"
             );
         }
 
@@ -216,8 +221,10 @@ class DJApplicantReceivedNotificationHandlerTest {
         private Map<String, String> getNotificationDataMapForRequested() {
             return Map.of(
                 LEGAL_ORG_APPLICANT1, "Test Org Name",
-                CLAIM_NUMBER, LEGACY_CASE_REFERENCE,
-                DEFENDANT_NAME, "David"
+                CLAIM_NUMBER, CASE_ID.toString(),
+                DEFENDANT_NAME, "David",
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                CASEMAN_REF, "000DC001"
             );
         }
 

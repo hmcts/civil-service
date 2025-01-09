@@ -131,6 +131,29 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
+    @CsvSource({
+        "someLocation, true, true",
+        "someLocation, false, false",
+        ", true, false",
+        ", false, false"
+    })
+    void shouldReturnCorrectValueBasedOnLocationAndFeatureToggleForGaLips(String location, boolean isFeatureEnabled, boolean expected) {
+
+        if (isFeatureEnabled && location != null) {
+            when(featureToggleApi.isFeatureEnabledForLocation(
+                "ea-courts-whitelisted-for-ga-lips",
+                location,
+                false
+            )).thenReturn(isFeatureEnabled);
+            when(featureToggleService.isGaForLipsEnabled()).thenReturn(isFeatureEnabled);
+        }
+
+        boolean result = featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(location);
+
+        assertEquals(expected, result);
+    }
+
+    @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsTransferCaseOnlineEnabled(Boolean toggleStat) {
         var transferCaseOnlineKey = "isTransferOnlineCaseEnabled";
@@ -294,11 +317,16 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsDefendantNoCOnline(Boolean toggleStat) {
-        var isDefendantNoCOnline = "isDefendantNoCOnline";
-        givenToggle(isDefendantNoCOnline, toggleStat);
+    void shouldReturnCorrectValue_whenIsDefendantNoCOnlineForCase(Boolean toggleStat) {
+        var nocOnlineKey = "is-defendant-noc-online-for-case";
 
-        assertThat(featureToggleService.isDefendantNoCOnline()).isEqualTo(toggleStat);
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+            .setClaimTypeToSpecClaim()
+            .build();
 
+        when(featureToggleApi.isFeatureEnabledForDate(eq(nocOnlineKey), anyLong(), eq(false)))
+            .thenReturn(toggleStat);
+
+        assertThat(featureToggleService.isDefendantNoCOnlineForCase(caseData)).isEqualTo(toggleStat);
     }
 }

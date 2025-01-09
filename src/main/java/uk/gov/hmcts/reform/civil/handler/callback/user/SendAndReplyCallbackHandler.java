@@ -10,14 +10,19 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.sendandreply.RolePool;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.SendAndReplyOption;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.sendandreply.Message;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SendAndReplyMessageService;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -27,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_AND_REPLY;
 import static uk.gov.hmcts.reform.civil.enums.sendandreply.SendAndReplyOption.REPLY;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +50,8 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
     private final SendAndReplyMessageService messageService;
 
     private final ObjectMapper objectMapper;
+
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -97,28 +105,61 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         String userAuth = params.getParams().get(BEARER_TOKEN).toString();
 
+        List<Element<Message>> messagesNew;
+
         if (SendAndReplyOption.SEND.equals(caseData.getSendAndReplyOption())) {
-            builder.messages(
-                    messageService.addMessage(
-                        caseData.getMessages(),
-                        caseData.getSendMessageMetadata(),
-                        caseData.getSendMessageContent(),
-                        userAuth
-                    )
-                ).sendMessageMetadata(null)
-                .sendMessageContent(null)
-            ;
+            messagesNew = messageService.addMessage(
+                caseData.getMessages(),
+                caseData.getSendMessageMetadata(),
+                caseData.getSendMessageContent(),
+                userAuth
+            );
+
+            builder.messages(messagesNew)
+                .sendMessageMetadata(null)
+                .sendMessageContent(null);
         } else {
-            builder.messages(
-                    messageService.addReplyToMessage(
-                        caseData.getMessages(),
-                        caseData.getMessagesToReplyTo().getValue().getCode(),
-                        caseData.getMessageReplyMetadata(),
-                        userAuth
-                    )
-                ).messagesToReplyTo(null)
+            messagesNew = messageService.addReplyToMessage(
+                caseData.getMessages(),
+                caseData.getMessagesToReplyTo().getValue().getCode(),
+                caseData.getMessageReplyMetadata(),
+                userAuth
+            );
+            builder.messages(messagesNew)
+                .messagesToReplyTo(null)
                 .messageReplyMetadata(null)
                 .messageHistory(null);
+        }
+
+        Element<Message> lastMessageElement = messagesNew.stream()
+                .max(Comparator.comparing(message -> message.getValue().getUpdatedTime()))
+                .orElse(element(Message.builder().build()));
+        Message lastMessage = lastMessageElement.getValue();
+
+        builder.lastMessage(lastMessage);
+
+        AllocatedTrack allocatedTrack;
+        if (Objects.nonNull(caseData.getAssignedTrackType())) {
+            allocatedTrack = caseData.getAssignedTrackType();
+        } else {
+            allocatedTrack = AllocatedTrack.getAllocatedTrack(
+                caseData.getClaimAmountInPounds(),
+                caseData.getClaimType(),
+                caseData.getPersonalInjuryType(),
+                featureToggleService,
+                caseData
+            );
+        }
+        builder.lastMessageAllocatedTrack(AllocatedTrack.toStringValueForMessage(allocatedTrack));
+
+        boolean isRecipientCircuitJudge = RolePool.JUDICIAL_CIRCUIT.equals(lastMessage.getRecipientRoleType());
+        boolean isRecipientDistrictJudge = RolePool.JUDICIAL_DISTRICT.equals(lastMessage.getRecipientRoleType());
+        boolean isJudge = RolePool.JUDICIAL.equals(lastMessage.getRecipientRoleType());
+
+        if (isRecipientCircuitJudge || isRecipientDistrictJudge) {
+            builder.lastMessageJudgeLabel(isRecipientCircuitJudge ? "CJ" : "DJ");
+        } else if (isJudge) {
+            builder.lastMessageJudgeLabel("Judge");
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

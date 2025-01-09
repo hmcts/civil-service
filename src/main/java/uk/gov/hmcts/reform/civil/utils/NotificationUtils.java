@@ -23,6 +23,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
@@ -67,7 +68,8 @@ public class NotificationUtils {
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(organisationPolicy, organisationService)
+                CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(organisationPolicy, organisationService),
+                CASEMAN_REF, caseData.getLegacyCaseReference()
             );
         } else if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
             String responseTypeToApplicant2 = SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
@@ -82,7 +84,8 @@ public class NotificationUtils {
                     .concat(" and " + responseTypeToApplicant2)
                     .concat(" against " + caseData.getApplicant2().getPartyName()),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(organisationPolicy, organisationService)
+                CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(organisationPolicy, organisationService),
+                CASEMAN_REF, caseData.getLegacyCaseReference()
             );
         } else {
             //1v2 template is used and expects different data
@@ -97,7 +100,8 @@ public class NotificationUtils {
                     ? caseData.getRespondent2ClaimResponseTypeForSpec().getDisplayedValue()
                     : caseData.getRespondent2ClaimResponseType().getDisplayedValue(),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(organisationPolicy, organisationService)
+                CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(organisationPolicy, organisationService),
+                CASEMAN_REF, caseData.getLegacyCaseReference()
             );
         }
     }
@@ -226,15 +230,18 @@ public class NotificationUtils {
         boolean addRespondent2Reference = ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData));
 
         stringBuilder.append(buildClaimantReferenceEmailSubject(caseData));
+        if (stringBuilder.length() > 0) {
+            stringBuilder.append(" - ");
+        }
 
         Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor1Reference)
             .ifPresentOrElse(ref -> {
-                if (stringBuilder.length() > 0) {
-                    stringBuilder.append(" - ");
-                }
                 stringBuilder.append(addRespondent2Reference ? "Defendant 1 reference: " : "Defendant reference: ");
                 stringBuilder.append(solicitorReferences.getRespondentSolicitor1Reference());
-            }, () -> stringBuilder.append(REFERENCE_NOT_PROVIDED));
+            }, () -> {
+                stringBuilder.append(addRespondent2Reference ? "Defendant 1 reference: " : "Defendant reference: ");
+                stringBuilder.append(REFERENCE_NOT_PROVIDED);
+            });
 
         if (addRespondent2Reference) {
             if (stringBuilder.length() > 0) {

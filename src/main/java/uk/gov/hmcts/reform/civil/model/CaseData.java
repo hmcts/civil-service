@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
 import uk.gov.hmcts.reform.civil.enums.ConfirmationToggle;
-import uk.gov.hmcts.reform.civil.enums.CoscApplicationStatus;
+import uk.gov.hmcts.reform.civil.enums.cosc.CoscApplicationStatus;
 import uk.gov.hmcts.reform.civil.enums.CourtStaffNextSteps;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
@@ -41,6 +41,7 @@ import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.SendAndReplyOption;
+import uk.gov.hmcts.reform.civil.enums.cosc.CoscRPAStatus;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.ConfirmOrderGivesPermission;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.MarkPaidConsentList;
@@ -108,6 +109,7 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -176,6 +178,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final YesOrNo generalAppVaryJudgementType;
     private final YesOrNo generalAppParentClaimantIsApplicant;
+    private final YesOrNo parentClaimantIsApplicant;
     private final GAHearingDateGAspec generalAppHearingDate;
     private final Document generalAppN245FormUpload;
 
@@ -676,10 +679,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private String joSetAsideJudgmentErrorText;
     private JudgmentSetAsideOrderType joSetAsideOrderType;
     private LocalDate joSetAsideOrderDate;
+    private LocalDate joSetAsideApplicationDate;
     private LocalDate joSetAsideDefenceReceivedDate;
     private YesOrNo joShowRegisteredWithRTLOption;
     private JudgmentDetails activeJudgment;
     private List<Element<JudgmentDetails>> historicJudgment;
+    private YesOrNo isTakenOfflineAfterJBA;
+    private LocalDateTime joSetAsideCreatedDate;
 
     private String joDefendantName1;
     private String joDefendantName2;
@@ -690,6 +696,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private LocalDate joIssueDate;
     private JudgmentState joState;
     private LocalDate joFullyPaymentMadeDate;
+    private LocalDateTime joMarkedPaidInFullIssueDate;
+    private LocalDateTime joDefendantMarkedPaidInFullIssueDate;
+    private CoscRPAStatus joCoscRpaStatus;
     private String joOrderedAmount;
     private String joCosts;
     private String joTotalAmount;
@@ -743,10 +752,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
     private LocalDate coscSchedulerDeadline;
     private CoscApplicationStatus coSCApplicationStatus;
-  
+
     //Caseworker events
     private YesOrNo obligationDatePresent;
     private CourtStaffNextSteps courtStaffNextSteps;
+    private List<Element<ObligationData>> obligationData;
+    private List<Element<StoredObligationData>> storedObligationData;
+    private YesOrNo isFinalOrder;
     private SendAndReplyOption sendAndReplyOption;
     private SendMessageMetadata sendMessageMetadata;
     private String sendMessageContent;
@@ -754,6 +766,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private String messageHistory;
     private DynamicList messagesToReplyTo;
     private List<Element<Message>> messages;
+    private ObligationWAFlag obligationWAFlag;
+    private Message lastMessage;
+    private String lastMessageAllocatedTrack;
+    private String lastMessageJudgeLabel;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
@@ -1251,6 +1267,16 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean hasCoscCert() {
+        if (getSystemGeneratedCaseDocuments() != null) {
+            return getSystemGeneratedCaseDocuments().stream()
+                .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
+                    .getDocumentType().equals(DocumentType.CERTIFICATE_OF_DEBT_PAYMENT)).findAny().isPresent();
+        }
+        return false;
+    }
+
+    @JsonIgnore
     public Address getRespondent1CorrespondanceAddress() {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getRespondent1LiPResponse)
@@ -1398,6 +1424,20 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public BigDecimal getClaimAmountInPounds() {
+        if (nonNull(getClaimValue())) {
+            return getClaimValue().toPounds();
+        } else if (nonNull(getTotalInterest())) {
+            return getTotalClaimAmount()
+                .add(getTotalInterest())
+                .setScale(2, RoundingMode.UNNECESSARY);
+        } else if (nonNull(getTotalClaimAmount())) {
+            return getTotalClaimAmount().setScale(2, RoundingMode.UNNECESSARY);
+        }
+        return null;
+    }
+
+    @JsonIgnore
     public BigDecimal getClaimIssueRemissionAmount() {
         return Optional.ofNullable(getClaimIssuedHwfDetails())
             .map(HelpWithFeesDetails::getRemissionAmount)
@@ -1523,7 +1563,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public AllocatedTrack getAssignedTrackType() {
-        return AllocatedTrack.valueOf(getAssignedTrack());
+        return nonNull(getAssignedTrack()) ? AllocatedTrack.valueOf(getAssignedTrack()) : null;
     }
 
     @JsonIgnore

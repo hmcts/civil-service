@@ -27,13 +27,14 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class DocumentConversionServiceTest {
+class DocumentConversionServiceTest {
 
-    public static final byte[] CONVERTED_BINARY = "converted".getBytes();
-    public static final String AUTH = "auth";
+    private static final byte[] CONVERTED_BINARY = "converted".getBytes();
+    private static final String AUTH = "auth";
+    private static final Long CASE_ID = 1L;
     private static final String PDF_MIME_TYPE = "application/pdf";
     private static final String WORD_MIME_TYPE = "application/msword";
-    
+
     @InjectMocks
     private DocumentConversionService documentConversionService;
     @Mock
@@ -56,28 +57,29 @@ public class DocumentConversionServiceTest {
 
     @Test
     void testConvertDocumentToPdf_ConvertSuccessfullyWhenDocumentIsNotPdf() {
-        when(service.downloadDocument(AUTH, documentToConvert.getDocumentBinaryUrl())).thenReturn("bytes".getBytes());
+        when(service.downloadDocument(AUTH, documentToConvert.getDocumentUrl())).thenReturn("bytes".getBytes());
         when(tika.detect(documentToConvert.getDocumentFileName())).thenReturn(WORD_MIME_TYPE);
         when(restTemplate.postForObject(anyString(), any(HttpEntity.class), eq(byte[].class))).thenReturn(CONVERTED_BINARY);
 
-        byte[] result = documentConversionService.convertDocumentToPdf(documentToConvert, AUTH);
-        assertEquals(CONVERTED_BINARY, result);
+        byte[] result = documentConversionService.convertDocumentToPdf(documentToConvert, CASE_ID, AUTH);
 
         assertNotNull(result, "The returned byte array should not be null.");
         assertArrayEquals(CONVERTED_BINARY, result);
         verify(tika, times(1)).detect(documentToConvert.getDocumentFileName());
-        verify(service, times(1)).downloadDocument(AUTH, documentToConvert.getDocumentBinaryUrl());
+        verify(service, times(1)).downloadDocument(AUTH, documentToConvert.getDocumentUrl());
         verify(restTemplate, times(1)).postForObject(anyString(), any(HttpEntity.class), eq(byte[].class));
     }
 
     @Test
-    void convertDocumentToPdf_ThrowsExceptionWhenDocumentIsAlreadyPdf() {
+    void convertDocumentToPdf_ShouldReturnDocumentIsAlreadyPdf() {
+        byte[] bytes = "bytes".getBytes();
+        when(service.downloadDocument(AUTH, documentToConvert.getDocumentUrl())).thenReturn(bytes);
         when(tika.detect(documentToConvert.getDocumentFileName())).thenReturn(PDF_MIME_TYPE);
 
-        DocumentConversionException exception = assertThrows(DocumentConversionException.class,
-                () -> documentConversionService.convertDocumentToPdf(documentToConvert, AUTH));
+        byte[] result = documentConversionService.convertDocumentToPdf(documentToConvert, CASE_ID, AUTH);
 
-        assertEquals("Document already is a pdf", exception.getMessage());
+        assertNotNull(result, "The returned byte array should not be null.");
+        assertArrayEquals(bytes, result);
         verify(tika, times(1)).detect(documentToConvert.getDocumentFileName());
         verifyNoInteractions(restTemplate);
     }
@@ -87,17 +89,16 @@ public class DocumentConversionServiceTest {
 
         byte[] mockFileBytes = "dummy content".getBytes();
         when(tika.detect(documentToConvert.getDocumentFileName())).thenReturn(WORD_MIME_TYPE);
-        when(service.downloadDocument(AUTH, documentToConvert.getDocumentBinaryUrl())).thenReturn(mockFileBytes);
+        when(service.downloadDocument(AUTH, documentToConvert.getDocumentUrl())).thenReturn(mockFileBytes);
         when(restTemplate.postForObject(anyString(), any(HttpEntity.class), eq(byte[].class)))
                 .thenThrow(new HttpClientErrorException(org.springframework.http.HttpStatus.BAD_REQUEST));
 
-        DocumentConversionException exception = assertThrows(DocumentConversionException.class, () -> {
-            documentConversionService.convertDocumentToPdf(documentToConvert, AUTH);
-        });
+        DocumentConversionException exception = assertThrows(DocumentConversionException.class, () ->
+            documentConversionService.convertDocumentToPdf(documentToConvert, CASE_ID, AUTH));
 
-        assertEquals("Error converting document to pdf", exception.getMessage());
+        assertEquals("Error converting document to pdf for caseId 1", exception.getMessage());
         verify(tika, times(1)).detect(documentToConvert.getDocumentFileName());
-        verify(service, times(1)).downloadDocument(AUTH, documentToConvert.getDocumentBinaryUrl());
+        verify(service, times(1)).downloadDocument(AUTH, documentToConvert.getDocumentUrl());
         verify(restTemplate, times(1)).postForObject(anyString(), any(HttpEntity.class), eq(byte[].class));
     }
 }
