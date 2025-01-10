@@ -8,12 +8,12 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocumentToKeep;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documentremoval.DocumentToKeep;
 import uk.gov.hmcts.reform.civil.model.documentremoval.DocumentToKeepCollection;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -73,12 +73,12 @@ public class DocumentRemovalService {
         return buildAmendedCaseDataFromRootNode(caseDataJson, caseId);
     }
 
-    private String getUploadTimestampFromDocumentNode(JsonNode documentNode) {
-        String documentNodeUploadTimestamp;
+    private LocalDateTime getUploadTimestampFromDocumentNode(JsonNode documentNode) {
+        LocalDateTime documentNodeUploadTimestamp;
         try {
             documentNodeUploadTimestamp =
                 Objects.isNull(documentNode.get(DOCUMENT_UPLOAD_TIMESTAMP)) ? null :
-                    documentNode.get(DOCUMENT_UPLOAD_TIMESTAMP).asText();
+                    LocalDateTime.parse(documentNode.get(DOCUMENT_UPLOAD_TIMESTAMP).asText());
         } catch (Exception e) {
             log.error(format(
                 "Error getting upload timestamp for document url: %s.",
@@ -101,25 +101,22 @@ public class DocumentRemovalService {
                 DocumentToKeepCollection.builder()
                     .value(DocumentToKeep.builder()
                         .documentId(docId)
-                        .caseDocument(CaseDocument.builder()
-                            .documentLink(Document.builder()
-                                .documentFileName(documentNode.get(DOCUMENT_FILENAME).asText())
+                        .caseDocumentToKeep(CaseDocumentToKeep.builder()
+                                .documentFilename(documentNode.get(DOCUMENT_FILENAME).asText())
                                 .documentUrl(documentNode.get(DOCUMENT_URL).asText())
                                 .documentBinaryUrl(documentNode.get(DOCUMENT_BINARY_URL).asText())
                                 .uploadTimestamp(getUploadTimestampFromDocumentNode(documentNode))
                                 .build())
                             .build())
-                        .build())
                     .build());
         }
 
         documentsCollection.sort(Comparator.comparing(
             DocumentToKeepCollection::getValue,
-            Comparator.comparing(DocumentToKeep::getCaseDocument,
-                Comparator.comparing(CaseDocument::getDocumentLink,
-                    Comparator.comparing(Document::getUploadTimestamp,
-                        Comparator.nullsLast(
-                            Comparator.reverseOrder()))))));
+            Comparator.comparing(DocumentToKeep::getCaseDocumentToKeep,
+                Comparator.comparing(CaseDocumentToKeep::getUploadTimestamp,
+                    Comparator.nullsLast(
+                        Comparator.reverseOrder())))));
 
         return documentsCollection.stream().distinct().toList();
     }
@@ -156,9 +153,9 @@ public class DocumentRemovalService {
                 JsonNode fieldValue = root.get(fieldName);
 
                 if (shouldRemoveDocument(fieldValue,
-                    documentToDelete.getCaseDocument().getDocumentLink().getDocumentUrl())) {
+                    documentToDelete.getCaseDocumentToKeep().getDocumentUrl())) {
                     log.info(String.format("Deleting doc with url %s",
-                        documentToDelete.getCaseDocument().getDocumentLink().getDocumentUrl()));
+                        documentToDelete.getCaseDocumentToKeep().getDocumentUrl()));
                     fieldsToRemove.add(fieldName);
                 } else {
                     removeDocumentFromJson(fieldValue, documentToDelete);
@@ -185,7 +182,7 @@ public class DocumentRemovalService {
                     String fieldName = fieldNames.next();
                     JsonNode fieldValue = valueObject.get(fieldName);
 
-                    final String documentUrl = documentToDelete.getCaseDocument().getDocumentLink().getDocumentUrl();
+                    final String documentUrl = documentToDelete.getCaseDocumentToKeep().getDocumentUrl();
                     if (fieldValue.asText().equals(
                         documentUrl)
                         || shouldRemoveDocument(fieldValue,
@@ -205,7 +202,7 @@ public class DocumentRemovalService {
     }
 
     private void deleteDocument(DocumentToKeep documentToKeep, String authorisationToken) {
-        String documentUrl = documentToKeep.getCaseDocument().getDocumentLink().getDocumentUrl();
+        String documentUrl = documentToKeep.getCaseDocumentToKeep().getDocumentUrl();
         try {
             log.info(String.format("Deleting doc from DocStore with url %s",
                 documentUrl));

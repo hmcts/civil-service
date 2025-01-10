@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocumentToKeep;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
@@ -17,5 +17,5 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 public class DocumentToKeep {
 
     private String documentId;
-    private CaseDocument caseDocument;
+    private CaseDocumentToKeep caseDocumentToKeep;
 }

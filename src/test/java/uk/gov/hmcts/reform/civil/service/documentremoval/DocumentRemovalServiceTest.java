@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocumentToKeep;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseNoteType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -24,6 +25,8 @@ import uk.gov.hmcts.reform.civil.model.documentremoval.DocumentToKeepCollection;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentWithName;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +44,8 @@ class DocumentRemovalServiceTest {
     private final String secondDate = "2024-01-02T00:00:00.000000";
     private final String thirdDate = "2024-01-03T00:00:00.000000";
     private final String fourthDate = "2024-01-04T00:00:00.000000";
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
+
     private DocumentRemovalService documentRemovalService;
     @Mock
     private DocumentManagementService documentManagementService;
@@ -66,6 +71,15 @@ class DocumentRemovalServiceTest {
                 .documentBinaryUrl(binaryUrl)
                 .uploadTimestamp(uploadTimeStamp)
                 .build())
+            .build();
+    }
+
+    private CaseDocumentToKeep buildCaseDocumentToKeep(String url, String fileName, String binaryUrl, LocalDateTime uploadTimeStamp) {
+        return CaseDocumentToKeep.builder()
+            .documentUrl(url)
+            .documentFilename(fileName)
+            .documentBinaryUrl(binaryUrl)
+            .uploadTimestamp(uploadTimeStamp)
             .build();
     }
 
@@ -99,9 +113,9 @@ class DocumentRemovalServiceTest {
                 .build());
 
             assertEquals(1, result.size());
-            assertEquals("https://example.com/123", result.get(0).getValue().getCaseDocument().getDocumentLink().getDocumentUrl());
-            assertEquals("Form-C.pdf", result.get(0).getValue().getCaseDocument().getDocumentLink().getDocumentFileName());
-            assertEquals("https://example.com/binary", result.get(0).getValue().getCaseDocument().getDocumentLink().getDocumentBinaryUrl());
+            assertEquals("https://example.com/123", result.get(0).getValue().getCaseDocumentToKeep().getDocumentUrl());
+            assertEquals("Form-C.pdf", result.get(0).getValue().getCaseDocumentToKeep().getDocumentFilename());
+            assertEquals("https://example.com/binary", result.get(0).getValue().getCaseDocumentToKeep().getDocumentBinaryUrl());
             assertEquals("123", result.get(0).getValue().getDocumentId());
         }
 
@@ -116,9 +130,9 @@ class DocumentRemovalServiceTest {
                 .build());
 
             assertEquals(1, result.size());
-            assertEquals("https://example.com/123", result.get(0).getValue().getCaseDocument().getDocumentLink().getDocumentUrl());
-            assertEquals("Form-C.pdf", result.get(0).getValue().getCaseDocument().getDocumentLink().getDocumentFileName());
-            assertEquals("https://example.com/binary", result.get(0).getValue().getCaseDocument().getDocumentLink().getDocumentBinaryUrl());
+            assertEquals("https://example.com/123", result.get(0).getValue().getCaseDocumentToKeep().getDocumentUrl());
+            assertEquals("Form-C.pdf", result.get(0).getValue().getCaseDocumentToKeep().getDocumentFilename());
+            assertEquals("https://example.com/binary", result.get(0).getValue().getCaseDocumentToKeep().getDocumentBinaryUrl());
             assertEquals("123", result.get(0).getValue().getDocumentId());
         }
 
@@ -138,14 +152,14 @@ class DocumentRemovalServiceTest {
 
             assertEquals(2, result.size());
 
-            assertEquals("https://example1.com/123", result.get(0).getValue().getCaseDocument().getDocumentLink().getDocumentUrl());
-            assertEquals("Form-C.pdf", result.get(0).getValue().getCaseDocument().getDocumentLink().getDocumentFileName());
-            assertEquals("https://example1.com/binary", result.get(0).getValue().getCaseDocument().getDocumentLink().getDocumentBinaryUrl());
+            assertEquals("https://example1.com/123", result.get(0).getValue().getCaseDocumentToKeep().getDocumentUrl());
+            assertEquals("Form-C.pdf", result.get(0).getValue().getCaseDocumentToKeep().getDocumentFilename());
+            assertEquals("https://example1.com/binary", result.get(0).getValue().getCaseDocumentToKeep().getDocumentBinaryUrl());
             assertEquals("123", result.get(0).getValue().getDocumentId());
 
-            assertEquals("https://example2.com/456", result.get(1).getValue().getCaseDocument().getDocumentLink().getDocumentUrl());
-            assertEquals("Form-D.pdf", result.get(1).getValue().getCaseDocument().getDocumentLink().getDocumentFileName());
-            assertEquals("https://example2.com/binary", result.get(1).getValue().getCaseDocument().getDocumentLink().getDocumentBinaryUrl());
+            assertEquals("https://example2.com/456", result.get(1).getValue().getCaseDocumentToKeep().getDocumentUrl());
+            assertEquals("Form-D.pdf", result.get(1).getValue().getCaseDocumentToKeep().getDocumentFilename());
+            assertEquals("https://example2.com/binary", result.get(1).getValue().getCaseDocumentToKeep().getDocumentBinaryUrl());
             assertEquals("456", result.get(1).getValue().getDocumentId());
         }
 
@@ -174,19 +188,19 @@ class DocumentRemovalServiceTest {
 
             assertEquals(3, result.size());
 
-            assertEquals("https://example1.com/123", result.get(0).getValue().getCaseDocument().getDocumentLink().getDocumentUrl());
-            assertEquals("Form-A.pdf", result.get(0).getValue().getCaseDocument().getDocumentLink().getDocumentFileName());
-            assertEquals("https://example1.com/binary", result.get(0).getValue().getCaseDocument().getDocumentLink().getDocumentBinaryUrl());
+            assertEquals("https://example1.com/123", result.get(0).getValue().getCaseDocumentToKeep().getDocumentUrl());
+            assertEquals("Form-A.pdf", result.get(0).getValue().getCaseDocumentToKeep().getDocumentFilename());
+            assertEquals("https://example1.com/binary", result.get(0).getValue().getCaseDocumentToKeep().getDocumentBinaryUrl());
             assertEquals("123", result.get(0).getValue().getDocumentId());
 
-            assertEquals("https://example2.com/456", result.get(1).getValue().getCaseDocument().getDocumentLink().getDocumentUrl());
-            assertEquals("Form-B.pdf", result.get(1).getValue().getCaseDocument().getDocumentLink().getDocumentFileName());
-            assertEquals("https://example2.com/binary", result.get(1).getValue().getCaseDocument().getDocumentLink().getDocumentBinaryUrl());
+            assertEquals("https://example2.com/456", result.get(1).getValue().getCaseDocumentToKeep().getDocumentUrl());
+            assertEquals("Form-B.pdf", result.get(1).getValue().getCaseDocumentToKeep().getDocumentFilename());
+            assertEquals("https://example2.com/binary", result.get(1).getValue().getCaseDocumentToKeep().getDocumentBinaryUrl());
             assertEquals("456", result.get(1).getValue().getDocumentId());
 
-            assertEquals("https://example3.com/789", result.get(2).getValue().getCaseDocument().getDocumentLink().getDocumentUrl());
-            assertEquals("Form-C.pdf", result.get(2).getValue().getCaseDocument().getDocumentLink().getDocumentFileName());
-            assertEquals("https://example3.com/binary", result.get(2).getValue().getCaseDocument().getDocumentLink().getDocumentBinaryUrl());
+            assertEquals("https://example3.com/789", result.get(2).getValue().getCaseDocumentToKeep().getDocumentUrl());
+            assertEquals("Form-C.pdf", result.get(2).getValue().getCaseDocumentToKeep().getDocumentFilename());
+            assertEquals("https://example3.com/binary", result.get(2).getValue().getCaseDocumentToKeep().getDocumentBinaryUrl());
             assertEquals("789", result.get(2).getValue().getDocumentId());
         }
 
@@ -219,20 +233,20 @@ class DocumentRemovalServiceTest {
 
             assertEquals(5, result.size());
 
-            assertEquals("https://example4.com/101112", result.get(0).getValue().getCaseDocument().getDocumentLink().getDocumentUrl());
-            assertEquals("FourthDoc.pdf", result.get(0).getValue().getCaseDocument().getDocumentLink().getDocumentFileName());
+            assertEquals("https://example4.com/101112", result.get(0).getValue().getCaseDocumentToKeep().getDocumentUrl());
+            assertEquals("FourthDoc.pdf", result.get(0).getValue().getCaseDocumentToKeep().getDocumentFilename());
 
-            assertEquals("https://example3.com/789", result.get(1).getValue().getCaseDocument().getDocumentLink().getDocumentUrl());
-            assertEquals("ThirdDoc.pdf", result.get(1).getValue().getCaseDocument().getDocumentLink().getDocumentFileName());
+            assertEquals("https://example3.com/789", result.get(1).getValue().getCaseDocumentToKeep().getDocumentUrl());
+            assertEquals("ThirdDoc.pdf", result.get(1).getValue().getCaseDocumentToKeep().getDocumentFilename());
 
-            assertEquals("https://example2.com/456", result.get(2).getValue().getCaseDocument().getDocumentLink().getDocumentUrl());
-            assertEquals("SecondDoc.pdf", result.get(2).getValue().getCaseDocument().getDocumentLink().getDocumentFileName());
+            assertEquals("https://example2.com/456", result.get(2).getValue().getCaseDocumentToKeep().getDocumentUrl());
+            assertEquals("SecondDoc.pdf", result.get(2).getValue().getCaseDocumentToKeep().getDocumentFilename());
 
-            assertEquals("https://example1.com/123", result.get(3).getValue().getCaseDocument().getDocumentLink().getDocumentUrl());
-            assertEquals("FirstDoc.pdf", result.get(3).getValue().getCaseDocument().getDocumentLink().getDocumentFileName());
+            assertEquals("https://example1.com/123", result.get(3).getValue().getCaseDocumentToKeep().getDocumentUrl());
+            assertEquals("FirstDoc.pdf", result.get(3).getValue().getCaseDocumentToKeep().getDocumentFilename());
 
-            assertEquals("https://example5.com/131415", result.get(4).getValue().getCaseDocument().getDocumentLink().getDocumentUrl());
-            assertEquals("NullDoc.pdf", result.get(4).getValue().getCaseDocument().getDocumentLink().getDocumentFileName());
+            assertEquals("https://example5.com/131415", result.get(4).getValue().getCaseDocumentToKeep().getDocumentUrl());
+            assertEquals("NullDoc.pdf", result.get(4).getValue().getCaseDocumentToKeep().getDocumentFilename());
         }
     }
 
@@ -260,7 +274,7 @@ class DocumentRemovalServiceTest {
                 .documentToKeepCollection(List.of(DocumentToKeepCollection.builder()
                     .value(DocumentToKeep.builder()
                         .documentId("456")
-                        .caseDocument(buildCaseDocument(
+                        .caseDocumentToKeep(buildCaseDocumentToKeep(
                             "https://example2.com/456", "Respondent1 Generated Response Doc.pdf", "https://example2.com/binary", null))
                         .build())
                     .build()))
@@ -289,18 +303,14 @@ class DocumentRemovalServiceTest {
                 .documentToKeepCollection(List.of(DocumentToKeepCollection.builder()
                         .value(DocumentToKeep.builder()
                             .documentId("123")
-                            .caseDocument(CaseDocument.builder()
-                                .documentLink(buildDocument("https://example1.com/123", "Form-C.pdf", "https://example1.com/binary", null))
-                                .build())
+                            .caseDocumentToKeep(buildCaseDocumentToKeep("https://example1.com/123", "Form-C.pdf", "https://example1.com/binary", null))
                             .build())
                         .build(),
                     DocumentToKeepCollection.builder()
                         .value(DocumentToKeep.builder()
                             .documentId("456")
-                            .caseDocument(CaseDocument.builder()
-                                .documentLink(buildDocument("https://example2.com/456", "Form-D.pdf", "https://example2.com/binary", null))
+                            .caseDocumentToKeep(buildCaseDocumentToKeep("https://example2.com/456", "Form-D.pdf", "https://example2.com/binary", null))
                                 .build())
-                            .build())
                         .build()))
                 .build();
 
@@ -321,12 +331,11 @@ class DocumentRemovalServiceTest {
             CaseData caseData = CaseData.builder()
                 .ccdCaseReference(CASE_ID)
                 .claimantResponseDocuments(claimantResponseDocuments)
-                .documentToKeepCollection(List.of(DocumentToKeepCollection.builder()
+                .documentToKeepCollection(
+                    List.of(DocumentToKeepCollection.builder()
                         .value(DocumentToKeep.builder()
                             .documentId("123")
-                            .caseDocument(CaseDocument.builder()
-                                .documentLink(buildDocument("https://example1.com/123", "Form-C.pdf", "https://example1.com/binary", null))
-                                .build())
+                            .caseDocumentToKeep(buildCaseDocumentToKeep("https://example1.com/123", "Form-C.pdf", "https://example1.com/binary", null))
                             .build())
                         .build()))
                 .build();
@@ -356,9 +365,7 @@ class DocumentRemovalServiceTest {
                 .documentToKeepCollection(List.of(DocumentToKeepCollection.builder()
                     .value(DocumentToKeep.builder()
                         .documentId("456")
-                        .caseDocument(CaseDocument.builder()
-                            .documentLink(buildDocument("https://example2.com/456", "Additional Hearing Doc.pdf", "https://example2.com/binary", null))
-                            .build())
+                        .caseDocumentToKeep(buildCaseDocumentToKeep("https://example2.com/456", "Additional Hearing Doc.pdf", "https://example2.com/binary", null))
                         .build())
                     .build()))
                 .build();

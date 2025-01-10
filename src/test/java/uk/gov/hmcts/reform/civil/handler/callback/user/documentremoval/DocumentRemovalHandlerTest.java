@@ -11,8 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocumentToKeep;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -78,11 +77,13 @@ class DocumentRemovalHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void testHandleWithValidDocumentsToRemove() {
             DocumentToKeep docToRemove = DocumentToKeep.builder()
-                .caseDocument(CaseDocument.builder().documentLink(Document.builder()
-                    .documentFileName("example.pdf")
+                .caseDocumentToKeep(CaseDocumentToKeep.builder()
+                    .documentUrl("http://example.com/doc/123")
+                    .documentFilename("example.pdf")
                     .documentBinaryUrl("http://example.com/doc/123/binary")
-                    .build()).build())
-                .documentId(documentId).build();
+                    .build())
+                .documentId(documentId)
+                .build();
 
             DocumentToKeepCollection docsToRemoveCollection = DocumentToKeepCollection.builder()
                 .value(docToRemove).build();
@@ -137,21 +138,23 @@ class DocumentRemovalHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void testHandleWithValidDocumentsToRemove() {
-            DocumentToKeep docToRemove = DocumentToKeep.builder()
-                .caseDocument(CaseDocument.builder().documentLink(Document.builder()
-                    .documentFileName("example.pdf")
+            DocumentToKeep docToKeep = DocumentToKeep.builder()
+                .caseDocumentToKeep(CaseDocumentToKeep.builder()
+                    .documentFilename("example.pdf")
+                    .documentUrl("http://example.com/doc/123")
                     .documentBinaryUrl("http://example.com/doc/123/binary")
-                    .build()).build())
-                .documentId(documentId).build();
+                    .build())
+                .documentId(documentId)
+                .build();
 
-            DocumentToKeepCollection docsToRemoveCollection = DocumentToKeepCollection.builder()
-                .value(docToRemove).build();
+            DocumentToKeepCollection docsToKeepCollection = DocumentToKeepCollection.builder()
+                .value(docToKeep).build();
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
                 .toBuilder()
                 .ccdCaseReference(Long.valueOf(caseId))
                 .applicant1Represented(YesOrNo.NO)
-                .documentToKeepCollection(List.of(docsToRemoveCollection))
+                .documentToKeepCollection(List.of(docsToKeepCollection))
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
