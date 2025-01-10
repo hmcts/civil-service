@@ -34,7 +34,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_LOCATION_UPDA
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_TASK_RECONFIG;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_TASK_RECONFIG_GA;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_UPDATE_GA_LOCATION;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CASEWORKER_TO_TAKE_CASE_OFFLINE;
 
 @ExtendWith(MockitoExtension.class)
 
@@ -108,7 +107,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CASEWORKER_TO_
             when(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(false);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            verify(helperService, times(1)).triggerCivilSeriviceEvent(caseData, NOTIFY_CASEWORKER_TO_TAKE_CASE_OFFLINE);
             assertThat(response.getErrors()).isNull();
         }
 

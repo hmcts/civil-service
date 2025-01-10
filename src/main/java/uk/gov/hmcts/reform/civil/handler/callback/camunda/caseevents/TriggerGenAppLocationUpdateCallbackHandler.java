@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
@@ -23,7 +24,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_LOCATION_UPDA
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_TASK_RECONFIG;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_TASK_RECONFIG_GA;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_UPDATE_GA_LOCATION;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CASEWORKER_TO_TAKE_CASE_OFFLINE;
 
 @Slf4j
 @Service
@@ -51,11 +51,13 @@ public class TriggerGenAppLocationUpdateCallbackHandler extends CallbackHandler 
 
     private CallbackResponse triggerGaEvent(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         try {
             if (!(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData
                                                                                    .getCaseManagementLocation().getBaseLocation()))) {
-                helperService.triggerCivilSeriviceEvent(caseData, NOTIFY_CASEWORKER_TO_TAKE_CASE_OFFLINE);
+                caseDataBuilder.gaEaCourtLocation(YesOrNo.YES);
             }
             if (caseData.getGeneralApplications() != null && !caseData.getGeneralApplications().isEmpty()) {
                 caseData = helperService.updateApplicationLocationDetailsInClaim(caseData, authToken);
@@ -72,7 +74,7 @@ public class TriggerGenAppLocationUpdateCallbackHandler extends CallbackHandler 
             return AboutToStartOrSubmitCallbackResponse.builder().errors(List.of(errorMessage)).build();
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toBuilder().build().toMap(objectMapper))
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 

@@ -75,13 +75,6 @@ public class GenAppStateHelperService {
         return true;
     }
 
-    public void triggerCivilSeriviceEvent(CaseData caseData, CaseEvent event) {
-        log.info("Triggering {} event on case: [{}]",
-                 event,
-                 caseData.getCcdCaseReference());
-        coreCaseDataService.triggerEvent(caseData.getCcdCaseReference(), event);
-    }
-
     public CaseData updateApplicationLocationDetailsInClaim(CaseData caseData, String authToken) {
 
         if (!Collections.isEmpty(caseData.getGeneralApplications())) {

@@ -37,7 +37,6 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MAIN_CASE_CLOSED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CASEWORKER_TO_TAKE_CASE_OFFLINE;
 import static uk.gov.hmcts.reform.civil.service.GenAppStateHelperService.RequiredState.APPLICATION_CLOSED;
 import static uk.gov.hmcts.reform.civil.service.GenAppStateHelperService.RequiredState.APPLICATION_PROCEEDS_OFFLINE;
 
@@ -506,14 +505,5 @@ class GenAppStateHelperServiceTest {
             return latestStatus;
         }
 
-        @Test
-        void shouldTriggerCivilServiceEvent_whenCaseLocationIsNotEa() {
-            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnrepresentedDefendant().build();
-
-            service.triggerCivilSeriviceEvent(caseData, NOTIFY_CASEWORKER_TO_TAKE_CASE_OFFLINE);
-
-            verify(coreCaseDataService, times(1))
-                .triggerEvent(1594901956117591L, NOTIFY_CASEWORKER_TO_TAKE_CASE_OFFLINE);
-        }
     }
 }
