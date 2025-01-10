@@ -23,6 +23,7 @@ public class ConfirmOrderReviewDefendantNotificationHandler extends CaseEventsDa
     private static final List<CaseEvent> EVENTS =
         List.of(UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_DEFENDANT);
     public static final String TASK_ID = "UpdateTaskListConfirmOrderReviewDefendant";
+    public static final String GA = "Applications";
 
     public ConfirmOrderReviewDefendantNotificationHandler(DashboardApiClient dashboardApiClient,
                                                           DashboardNotificationsParamsMapper mapper,
@@ -60,6 +61,7 @@ public class ConfirmOrderReviewDefendantNotificationHandler extends CaseEventsDa
             dashboardApiClient.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
                 caseData.getCcdCaseReference().toString(),
                 "DEFENDANT",
+                GA,
                 authToken
             );
         }

@@ -20,6 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.ConfirmOrderReviewClaimantNotificationHandler.GA;
 
 @ExtendWith(MockitoExtension.class)
 public class ConfirmOrderReviewClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -70,6 +71,7 @@ public class ConfirmOrderReviewClaimantNotificationHandlerTest extends BaseCallb
         verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseData.getCcdCaseReference().toString(),
             "CLAIMANT",
+            GA,
             "BEARER_TOKEN"
         );
     }
