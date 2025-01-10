@@ -35,7 +35,7 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.ServiceOfDateValidationMessageUtils;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ParticularsOfClaimValidator;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -346,19 +346,19 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         CaseAssignmentUserRolesResource userRoles = getUserRolesOnCase(caseId);
         log.info("CASE ROLES  {}", userRoles.getCaseAssignmentUserRoles());
 
-        log.info("GET ROLES as logged in ");
-        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        var roleAssignmentResponse = roleAssignmentsService.getRoleAssignments(userInfo.getUid(), callbackParams.getParams().get(BEARER_TOKEN).toString());
-        log.info("GET ROLES roleAssignmentResponse:  {}", roleAssignmentResponse.getRoleAssignmentResponse());
-
+        log.info("GET ROLES cross user1");
         String accessToken = userService.getAccessToken(
             crossAccessUserConfiguration.getUserName(),
             crossAccessUserConfiguration.getPassword()
         );
-        log.info("GET ROLES cross user");
-        var roleAssignmentResponse2 = roleAssignmentsService.getRoleAssignments(accessToken, callbackParams.getParams().get(BEARER_TOKEN).toString());
+        log.info("GET ROLES cross user2");
+        UserDetails userDetails = userService.getUserDetails(accessToken);
+        log.info("GET ROLES cross user3");
+        userDetails.getId();
+        log.info("GET ROLES cross user4");
+        var roleAssignmentResponse2 = roleAssignmentsService.getRoleAssignments(userDetails.getId(), callbackParams.getParams().get(BEARER_TOKEN).toString());
         log.info("GET ROLES cross user roleAssignmentResponse:  {}", roleAssignmentResponse2.getRoleAssignmentResponse());
-        
+
         List<String> dynamicListOptions = new ArrayList<>();
         dynamicListOptions.add("Both");
         dynamicListOptions.add("Defendant One: " + caseData.getRespondent1().getPartyName());
