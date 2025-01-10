@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,8 +22,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 
-import javax.validation.constraints.NotNull;
+import java.util.Objects;
 import java.util.Optional;
+import javax.validation.constraints.NotNull;
 
 @Tag(name = "Callback Controller")
 @Slf4j
@@ -54,9 +56,9 @@ public class CallbackController {
     ) {
         final CaseDetails caseDetails = callback.getCaseDetails();
         final CaseDetails caseDetailsBefore = callback.getCaseDetailsBefore();
-
+        MDC.put("caseId", Objects.toString(caseDetails.getId(), ""));
         log.info("Received callback from CCD, eventId: {}, callback type: {}, page id: {}, version: {}",
-                 callback.getEventId(), callbackType, pageId, version
+            callback.getEventId(), callbackType, pageId, version
         );
 
         CallbackParams callbackParams = CallbackParams.builder()

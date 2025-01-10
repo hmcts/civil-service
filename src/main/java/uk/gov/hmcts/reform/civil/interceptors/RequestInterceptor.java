@@ -13,6 +13,5 @@ public class RequestInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)  {
         MDC.remove("caseId");
-        MDC.remove("userId");
     }
 }
