@@ -88,6 +88,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_O
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderDownloadTemplateOptions.BLANK_TEMPLATE_AFTER_HEARING;
@@ -1918,6 +1919,79 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verifyNoInteractions(updateWaCourtLocationsService);
+        }
+
+        @Test
+        void shouldNotChangeState_onAboutToSubmitAndAssistedOrderWithNoFurtherHearingWithCaseEventsEnabled() {
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                            .forename("Judge")
+                                                                            .surname("Judy")
+                                                                            .roles(Collections.emptyList()).build());
+            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+            // Given
+            List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
+            finalCaseDocuments.add(element(finalOrder));
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderFurtherHearingToggle(null)
+                .finalOrderDocumentCollection(finalCaseDocuments)
+                .finalOrderDocument(finalOrder)
+                .ccdState(PREPARE_FOR_HEARING_CONDUCT_HEARING)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getState()).isEqualTo(null);
+        }
+
+        @Test
+        void shouldNotChangeState_onAboutToSubmitAndAssistedOrderWithNoFurtherHearingWithCaseEventsEnabledFreeForm() {
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                            .forename("Judge")
+                                                                            .surname("Judy")
+                                                                            .roles(Collections.emptyList()).build());
+            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+            // Given
+            List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
+            finalCaseDocuments.add(element(finalOrder));
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
+                .finalOrderFurtherHearingToggle(null)
+                .finalOrderDocumentCollection(finalCaseDocuments)
+                .finalOrderDocument(finalOrder)
+                .ccdState(PREPARE_FOR_HEARING_CONDUCT_HEARING)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getState()).isEqualTo(null);
+        }
+
+        @Test
+        void shouldNotChangeState_onAboutToSubmitAndMintiClaimMultiClaim() {
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                            .forename("Judge")
+                                                                            .surname("Judy")
+                                                                            .roles(Collections.emptyList()).build());
+            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+            // Given
+            List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
+            finalCaseDocuments.add(element(finalOrder));
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW))
+                .finalOrderDocumentCollection(finalCaseDocuments)
+                .finalOrderDocument(finalOrder)
+                .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
+                .ccdState(PREPARE_FOR_HEARING_CONDUCT_HEARING)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getState()).isEqualTo(null);
         }
     }
 
