@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.service.validation.GeneralApplicationValidator;
 import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -73,14 +74,14 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_SETTLE_BY_CONSENT;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_TRIAL_DATE_RANGE;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_UNAVAILABILITY_RANGE;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.TRIAL_DATE_FROM_REQUIRED;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.UNAVAILABLE_DATE_RANGE_MISSING;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.UNAVAILABLE_FROM_MUST_BE_PROVIDED;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.URGENCY_DATE_CANNOT_BE_IN_PAST;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.URGENCY_DATE_REQUIRED;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.URGENCY_DATE_SHOULD_NOT_BE_PROVIDED;
+import static uk.gov.hmcts.reform.civil.service.validation.GeneralApplicationValidatorConstants.INVALID_TRIAL_DATE_RANGE;
+import static uk.gov.hmcts.reform.civil.service.validation.GeneralApplicationValidatorConstants.TRIAL_DATE_FROM_REQUIRED;
+import static uk.gov.hmcts.reform.civil.service.validation.GeneralApplicationValidatorConstants.UNAVAILABLE_DATE_RANGE_MISSING;
+import static uk.gov.hmcts.reform.civil.service.validation.GeneralApplicationValidatorConstants.UNAVAILABLE_FROM_MUST_BE_PROVIDED;
+import static uk.gov.hmcts.reform.civil.service.validation.GeneralApplicationValidatorConstants.URGENCY_DATE_CANNOT_BE_IN_PAST;
+import static uk.gov.hmcts.reform.civil.service.validation.GeneralApplicationValidatorConstants.URGENCY_DATE_REQUIRED;
+import static uk.gov.hmcts.reform.civil.service.validation.GeneralApplicationValidatorConstants.URGENCY_DATE_SHOULD_NOT_BE_PROVIDED;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -93,6 +94,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
     private InitiateGeneralApplicationService initiateGeneralAppService;
+
+    @Mock
+    private GeneralApplicationValidator generalApplicationValidator;
 
     @Mock
     protected GeneralAppFeesService feesService;
@@ -128,8 +132,8 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     void setup() {
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        handler = new InitiateGeneralApplicationHandler(initiateGeneralAppService, objectMapper, theUserService,
-                                                        userRoleCaching, feesService, locationRefDataService,
+        handler = new InitiateGeneralApplicationHandler(initiateGeneralAppService, generalApplicationValidator, objectMapper, theUserService,
+                                                        feesService, locationRefDataService,
                                                         featureToggleService, coreCaseUserService);
     }
 
@@ -262,7 +266,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                                         true, null);
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
-            when(initiateGeneralAppService.validateUrgencyDates(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateUrgencyDates(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -277,13 +281,13 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                                         false, LocalDate.now());
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
-            when(initiateGeneralAppService.validateUrgencyDates(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateUrgencyDates(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isNotEmpty();
             assertThat(response.getErrors()).contains(
-                    URGENCY_DATE_SHOULD_NOT_BE_PROVIDED);
+                URGENCY_DATE_SHOULD_NOT_BE_PROVIDED);
         }
 
         @Test
@@ -293,7 +297,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                                         true, LocalDate.now().minusDays(1));
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
-            when(initiateGeneralAppService.validateUrgencyDates(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateUrgencyDates(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -308,7 +312,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                                         true, LocalDate.now());
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
-            when(initiateGeneralAppService.validateUrgencyDates(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateUrgencyDates(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -322,7 +326,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                                         false, null);
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
-            when(initiateGeneralAppService.validateUrgencyDates(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateUrgencyDates(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -636,7 +640,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), true,
                     null, null, true, getValidUnavailableDateList());
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -649,7 +653,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), true,
                     LocalDate.now(), LocalDate.now().minusDays(1), true, getValidUnavailableDateList());
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -662,7 +666,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), true,
                     LocalDate.now(), null, true, getValidUnavailableDateList());
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -674,7 +678,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), true,
                     LocalDate.now(), LocalDate.now().plusDays(1), true, getValidUnavailableDateList());
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -686,7 +690,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), true,
                     LocalDate.now(), LocalDate.now(), true, getValidUnavailableDateList());
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -698,7 +702,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), false,
                     null, null, true, getValidUnavailableDateList());
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -711,7 +715,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), true,
                     LocalDate.now(), null, true, null);
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -729,7 +733,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), true,
                     LocalDate.now(), null, true, wrapElements(range1));
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -747,7 +751,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), true,
                     LocalDate.now(), null, true, wrapElements(range1));
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -760,7 +764,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), false,
                     null, null, false, null);
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -777,7 +781,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), false,
                     null, null, false, wrapElements(range1));
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -794,7 +798,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), false,
                     null, null, false, wrapElements(range1));
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -811,7 +815,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), false,
                     null, null, false, wrapElements(range1));
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -1099,7 +1103,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                                                       .email(APPLICANT_EMAIL_ID_CONSTANT)
                                                                       .build());
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
-                                                         any(CaseData.class), any(UserDetails.class), anyString(), any(GeneralAppFeesService.class)))
+                                                         any(CaseData.class), any(UserDetails.class), anyString()))
                 .thenReturn(caseData);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -1119,7 +1123,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                     .build());
 
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
-                    any(CaseData.class), any(UserDetails.class), anyString(), any(GeneralAppFeesService.class)))
+                    any(CaseData.class), any(UserDetails.class), anyString()))
                     .thenReturn(getMockServiceData(caseData));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1182,7 +1186,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                                                         .email(APPLICANT_EMAIL_ID_CONSTANT)
                                                                         .build());
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
-                                                         any(CaseData.class), any(UserDetails.class), anyString(), any(GeneralAppFeesService.class)))
+                                                         any(CaseData.class), any(UserDetails.class), anyString()))
                 .thenReturn(getMockServiceData(caseData));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1212,7 +1216,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                     .build());
 
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
-                    any(CaseData.class), any(UserDetails.class), anyString(), any(GeneralAppFeesService.class))).thenAnswer((Answer) invocation -> invocation.getArguments()[1]
+                    any(CaseData.class), any(UserDetails.class), anyString())).thenAnswer((Answer) invocation -> invocation.getArguments()[1]
             );
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1242,7 +1246,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                                                             .build());
 
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
-                    any(CaseData.class), any(UserDetails.class), anyString(), any(GeneralAppFeesService.class))).thenAnswer((Answer) invocation -> invocation.getArguments()[1]
+                    any(CaseData.class), any(UserDetails.class), anyString())).thenAnswer((Answer) invocation -> invocation.getArguments()[1]
             );
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
