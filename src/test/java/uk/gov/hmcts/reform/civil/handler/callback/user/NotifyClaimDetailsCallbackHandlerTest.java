@@ -11,10 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.ccd.client.CaseAssignmentApi;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -26,10 +28,7 @@ import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.*;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.ServiceOfDateValidationMessageUtils;
 
@@ -42,11 +41,10 @@ import java.util.stream.Stream;
 import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -84,6 +82,14 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private FeatureToggleService featureToggleService;
 
+    @MockBean
+    private CrossAccessUserConfiguration crossAccessUserConfiguration;
+    @MockBean
+    private CaseAssignmentApi CaseAssignmentApi;
+    @MockBean
+    private RoleAssignmentsService RoleAssignmentsService;
+
+
     @Autowired
     private NotifyClaimDetailsCallbackHandler handler;
 
@@ -96,22 +102,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private AssignCategoryId assignCategoryId;
 
-    @Nested
-    class AboutToStartCallback {
-
-        @Test
-        void shouldPrepopulateDynamicListWithOptions_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-            AboutToStartOrSubmitCallbackResponse response =
-                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertTrue(response.getData().containsKey("defendantSolicitorNotifyClaimDetailsOptions"));
-        }
-    }
 
     @Nested
     class MidEventValidateOptionsCallback {

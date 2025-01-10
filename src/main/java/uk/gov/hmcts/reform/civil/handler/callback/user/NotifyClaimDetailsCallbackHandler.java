@@ -4,13 +4,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.ccd.client.CaseAssignmentApi;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -24,11 +28,14 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.ServiceOfDateValidationMessageUtils;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ParticularsOfClaimValidator;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -42,6 +49,7 @@ import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -98,6 +106,12 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     private final ServiceOfDateValidationMessageUtils serviceOfDateValidationMessageUtils;
     private final FeatureToggleService featureToggleService;
     private final AssignCategoryId assignCategoryId;
+    private final CrossAccessUserConfiguration crossAccessUserConfiguration;
+    private final UserService userService;
+    private final CaseAssignmentApi caseAssignmentApi;
+    private final AuthTokenGenerator authTokenGenerator;
+    private final RoleAssignmentsService roleAssignmentsService;
+
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -329,6 +343,24 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     private CallbackResponse prepareDefendantSolicitorOptions(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
+        String caseId = caseData.getCcdCaseReference().toString();
+        CaseAssignmentUserRolesResource userRoles = getUserRolesOnCase(caseId);
+        log.info("CASE ROLES  {}", userRoles.getCaseAssignmentUserRoles() );
+
+        log.info("GET ROLES as logged in ");
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        var roleAssignmentResponse = roleAssignmentsService.getRoleAssignments(userInfo.getUid(), callbackParams.getParams().get(BEARER_TOKEN).toString());
+        log.info("GET ROLES roleAssignmentResponse:  {}", roleAssignmentResponse.getRoleAssignmentResponse() );
+
+        String accessToken = userService.getAccessToken(
+            crossAccessUserConfiguration.getUserName(),
+            crossAccessUserConfiguration.getPassword()
+        );
+        log.info("GET ROLES cross user");
+        var roleAssignmentResponse2 = roleAssignmentsService.getRoleAssignments(accessToken, callbackParams.getParams().get(BEARER_TOKEN).toString());
+        log.info("GET ROLES cross user roleAssignmentResponse:  {}", roleAssignmentResponse2.getRoleAssignmentResponse() );
+
+
         List<String> dynamicListOptions = new ArrayList<>();
         dynamicListOptions.add("Both");
         dynamicListOptions.add("Defendant One: " + caseData.getRespondent1().getPartyName());
@@ -343,6 +375,18 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseDataBuilder.build().toMap(objectMapper))
                 .build();
+    }
+
+    private CaseAssignmentUserRolesResource getUserRolesOnCase(String caseId) {
+        String accessToken = userService.getAccessToken(
+            crossAccessUserConfiguration.getUserName(),
+            crossAccessUserConfiguration.getPassword()
+        );
+        return caseAssignmentApi.getUserRoles(
+            accessToken,
+            authTokenGenerator.generate(),
+            List.of(caseId)
+        );
     }
 
     private CallbackResponse validateNotificationOption(CallbackParams callbackParams) {
