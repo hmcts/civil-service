@@ -387,7 +387,7 @@ class ClaimFormMapperTest {
         //When
         ClaimForm form = claimFormMapper.toClaimForm(caseData);
         //Then
-        assertThat(form.getTotalClaimAmount()).isEmpty();
+        assertThat(form.getTotalClaimAmount()).isEqualTo("0");
     }
 
     @Test
