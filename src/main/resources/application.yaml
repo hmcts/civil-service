@@ -48,7 +48,7 @@ spring:
             client-id: internal
             client-secret: internal
   flyway:
-    enabled: ${REFERENCE_DATABASE_MIGRATION:false}
+    enabled: ${REFERENCE_DATABASE_MIGRATION:true}
     placeholder-replacement: false
     table: schema_version
     baseline-on-migrate: true
@@ -675,7 +675,7 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQL10Dialect
   flyway:
-    enabled: false
+    enabled: true
     baselineOnMigrate: true
     placeholder-replacement: false
 
