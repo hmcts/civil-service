@@ -115,7 +115,7 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
                 String.format(templateReference, caseData.getLegacyCaseReference())
             );
         }
-        if (ofNullable(caseData.getRespondent2()).isEmpty() && !caseData.isLipvLipOneVOne()) {
+        if (ofNullable(caseData.getRespondent2()).isEmpty() && !caseData.isApplicantLipOneVOne()) {
             notificationService.sendMail(
                 caseData.getApplicantSolicitor1UserDetails().getEmail(),
                 identifyTemplate(caseData),
