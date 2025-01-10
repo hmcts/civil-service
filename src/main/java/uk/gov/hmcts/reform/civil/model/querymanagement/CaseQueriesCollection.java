@@ -16,5 +16,5 @@ public class CaseQueriesCollection {
 
     private String partyName;
     private String roleOnCase;
-    private List<Element<CaseMessage>> caseMessageCollection;
+    private List<Element<CaseMessage>> caseMessages;
 }
