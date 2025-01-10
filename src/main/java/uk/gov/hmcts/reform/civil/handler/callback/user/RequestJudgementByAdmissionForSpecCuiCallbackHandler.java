@@ -37,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 
 @Service
 @RequiredArgsConstructor
@@ -119,7 +120,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             data.getCcjPaymentDetails();
 
         if (featureToggleService.isJudgmentOnlineLive()
-            && (data.isLipvLipOneVOne() || data.isLRvLipOneVOne())
+            && (isOneVOne(data))
             && data.isPayImmediately()) {
 
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
@@ -139,7 +140,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             updatedCaseData.setActiveJudgment(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(updatedCaseData));
             updatedCaseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
             updatedCaseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(updatedCaseData.getActiveJudgment()));
-            updatedCaseData.setIsTakenOfflineAfterJBA(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name().equals(nextState) ? YesOrNo.YES : YesOrNo.NO);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
