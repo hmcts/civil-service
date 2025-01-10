@@ -42,7 +42,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
-import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -304,50 +303,6 @@ class DetermineNextStateTest {
         verify(builder).activeJudgment(activeJudgment);
         verify(builder).joIsLiveJudgmentExists(YesOrNo.YES);
         verify(builder).isTakenOfflineAfterJBA(YES);
-    }
-
-    @Test
-    void shouldSetAwaitingApplicantIntentionWhenApplicantAcceptedImmediatePaymentPlanFor1V1() {
-
-        CaseData.CaseDataBuilder<?, ?> builder = mock(CaseData.CaseDataBuilder.class);
-        BusinessProcess businessProcess = BusinessProcess.builder().build();
-
-        CaseData caseData = CaseDataBuilder.builder()
-            .applicant1AcceptAdmitAmountPaidSpec(YES)
-            .respondent1Represented(YES)
-            .applicant1Represented(YES)
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
-            .build();
-
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-        String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
-                                                                   builder, "", businessProcess);
-        assertNotNull(resultState);
-        assertEquals(AWAITING_APPLICANT_INTENTION.name(), resultState);
-    }
-
-    @Test
-    void shouldSetAwaitingApplicantIntentionWhenApplicantWantToProceedImmediatePaymentPlanFor1V1() {
-
-        CaseData.CaseDataBuilder<?, ?> builder = mock(CaseData.CaseDataBuilder.class);
-        BusinessProcess businessProcess = BusinessProcess.builder().build();
-
-        CaseData caseData = CaseDataBuilder.builder()
-            .applicant1AcceptAdmitAmountPaidSpec(NO)
-            .respondent1Represented(YES)
-            .applicant1Represented(YES)
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
-            .build();
-
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-        String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
-                                                                   builder, "", businessProcess);
-        assertNotNull(resultState);
-        assertEquals(All_FINAL_ORDERS_ISSUED.name(), resultState);
     }
 
     private CallbackParams callbackParams(CaseData caseData) {

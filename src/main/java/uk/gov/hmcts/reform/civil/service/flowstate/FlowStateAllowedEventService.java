@@ -1567,8 +1567,7 @@ public class FlowStateAllowedEventService {
                 CONFIRM_ORDER_REVIEW,
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
-                ORDER_REVIEW_OBLIGATION_CHECK,
-                REQUEST_JUDGEMENT_ADMISSION_SPEC
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
         entry(
@@ -1583,8 +1582,7 @@ public class FlowStateAllowedEventService {
             List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                     ADD_CASE_NOTE,
                     NOC_REQUEST,
-                    APPLY_NOC_DECISION,
-                    REQUEST_JUDGEMENT_ADMISSION_SPEC)
+                    APPLY_NOC_DECISION)
         ),
         entry(
             FULL_ADMIT_PROCEED.fullName(),

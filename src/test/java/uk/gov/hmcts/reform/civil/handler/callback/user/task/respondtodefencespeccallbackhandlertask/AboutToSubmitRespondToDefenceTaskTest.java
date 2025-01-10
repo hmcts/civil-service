@@ -14,8 +14,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnlineMapper;
@@ -23,14 +21,12 @@ import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.DocumentBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
@@ -55,7 +51,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
@@ -266,53 +261,6 @@ class AboutToSubmitRespondToDefenceTaskTest {
             (AboutToStartOrSubmitCallbackResponse) task.execute(callbackParams(caseData));
 
         verifyNoInteractions(updateWaCourtLocationsService);
-    }
-
-    @Test
-    void shouldSetRespondOptionWhenImmediatePaymentPlanSelected_ApplicantConfirmsNotToProceed1v1() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-
-        CaseData caseData = CaseDataBuilder.builder()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .respondent1Represented(NO)
-            .respondent1(PartyBuilder.builder().individual().build())
-            .specRespondent1Represented(NO)
-            .applicant1Represented(YES)
-            .applicant1(PartyBuilder.builder().individual().build())
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
-            .build();
-
-        AboutToStartOrSubmitCallbackResponse response =
-            (AboutToStartOrSubmitCallbackResponse) task.execute(callbackParams(caseData));
-
-        assertNotNull(response);
-        assertThat(getCaseData(response)).extracting("respondForImmediateOption").asString().isEqualTo("YES");
-    }
-
-    @Test
-    void shouldSetRespondOptionWhenImmediatePartPaymentPlanSelected_ApplicantConfirmsNotToProceed1v1() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-
-        CaseData caseData = CaseDataBuilder.builder()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .applicant1AcceptAdmitAmountPaidSpec(YES)
-            .applicant1DQWithExperts()
-            .applicant1DQWithWitnesses()
-            .respondent1Represented(NO)
-            .respondent1(PartyBuilder.builder().individual().build())
-            .specRespondent1Represented(NO)
-            .applicant1Represented(YES)
-            .applicant1(PartyBuilder.builder().individual().build())
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
-            .build();
-
-        AboutToStartOrSubmitCallbackResponse response =
-            (AboutToStartOrSubmitCallbackResponse) task.execute(callbackParams(caseData));
-
-        assertNotNull(response);
-        assertThat(getCaseData(response)).extracting("respondForImmediateOption").asString().isEqualTo("YES");
     }
 
     private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {

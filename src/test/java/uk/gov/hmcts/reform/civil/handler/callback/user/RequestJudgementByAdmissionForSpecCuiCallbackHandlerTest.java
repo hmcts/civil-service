@@ -572,6 +572,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             assertThat(response.getData().get("activeJudgment")).extracting("defendant1Name").isEqualTo("Mr. John Rambo");
             assertThat(response.getData().get("activeJudgment")).extracting("defendant1Address").isNotNull();
             assertThat(response.getData().get("activeJudgment")).extracting("defendant1Dob").isNotNull();
+            assertThat(response.getData()).extracting("isTakenOfflineAfterJBA").isEqualTo("No");
         }
 
         @Test
@@ -614,6 +615,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .extracting("businessProcess")
                 .extracting("camundaEvent")
                 .isEqualTo(REQUEST_JUDGEMENT_ADMISSION_SPEC.name());
+            assertThat(response.getData()).extracting("isTakenOfflineAfterJBA").isEqualTo("Yes");
         }
 
         @Test
@@ -698,39 +700,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             assertThat(stillOwed).isEqualTo(ccjResponseForJudgement.getCcjJudgmentTotalStillOwed());
 
         }
-
-        @Test
-        void shouldSetUpBusinessProcessAndContinueOnlineAndCaseState_whenIsJudgmentOnlineLiveEnabledLRvLR1V1() {
-            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-                .ccjPaymentPaidSomeOption(YesOrNo.YES)
-                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0))
-                .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
-                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
-                .build();
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-                .respondent1Represented(YES)
-                .specRespondent1Represented(YES)
-                .applicant1Represented(YES)
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-                .ccjPaymentDetails(ccjPaymentDetails)
-                .respondent1(PartyBuilder.builder().individual().build())
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-            assertThat(response.getState())
-                .isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
-            assertThat(response.getData())
-                .extracting("businessProcess")
-                .extracting("camundaEvent")
-                .isEqualTo(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC.name());
-        }
-
     }
 
     @Nested

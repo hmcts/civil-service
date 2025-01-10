@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmatio
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
@@ -29,8 +28,6 @@ public class PayImmediatelyHeader implements RespondToResponseConfirmationHeader
     private boolean isDefendantFullAdmitPayImmediately(CaseData caseData) {
         return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
             &&  caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
-            && ((RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
-            || (caseData.isPartAdmitImmediatePaymentClaimSettled()
-            && YES == caseData.getRespondForImmediateOption()));
+            && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()));
     }
 }

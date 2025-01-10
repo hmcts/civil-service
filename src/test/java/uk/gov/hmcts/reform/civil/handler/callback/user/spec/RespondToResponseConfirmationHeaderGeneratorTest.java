@@ -46,7 +46,6 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
         getCasesToExpectedImplementation() {
         return List.of(
             Pair.of(buildFullAdmitPayImmediatelyProceedCaseData(), PayImmediatelyHeader.class),
-            Pair.of(buildPartAdmitPayImmediatelyProceedCaseData(), PayImmediatelyHeader.class),
             Pair.of(buildFullAdmitProceedCaseData(), AdmitProceedConfHeader.class),
             Pair.of(buildFullAdmitNotProceedCaseData(), AdmitNotProceedConfHeader.class),
             Pair.of(buildPartAdmitProceedCaseData(), AdmitProceedConfHeader.class),
@@ -101,19 +100,6 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             .legacyCaseReference("claimNumber")
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                               .whenWillThisAmountBePaid(LocalDate.now().plusDays(5)).build())
-            .build();
-    }
-
-    public static CaseData buildPartAdmitPayImmediatelyProceedCaseData() {
-        return CaseData.builder()
-            .caseAccessCategory(SPEC_CLAIM)
-            .legacyCaseReference("claimNumber")
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
-            .respondForImmediateOption(YesOrNo.YES)
-            .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
                                                .whenWillThisAmountBePaid(LocalDate.now().plusDays(5)).build())
             .build();
