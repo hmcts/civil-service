@@ -285,7 +285,7 @@ class DetermineNextStateTest {
             .applicant1Represented(YES)
             .build();
         JudgmentDetails activeJudgment = mock(JudgmentDetails.class);
-
+        
         when(activeJudgment.getTotalAmount()).thenReturn("1000");
         when(activeJudgment.getOrderedAmount()).thenReturn("500");
         when(activeJudgment.getCosts()).thenReturn("150");
