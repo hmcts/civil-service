@@ -28,7 +28,11 @@ import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.*;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.ServiceOfDateValidationMessageUtils;
 
@@ -85,10 +89,9 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private CrossAccessUserConfiguration crossAccessUserConfiguration;
     @MockBean
-    private CaseAssignmentApi CaseAssignmentApi;
+    private CaseAssignmentApi caseAssignmentApi;
     @MockBean
-    private RoleAssignmentsService RoleAssignmentsService;
-
+    private RoleAssignmentsService roleAssignmentsService;
 
     @Autowired
     private NotifyClaimDetailsCallbackHandler handler;
@@ -101,7 +104,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private AssignCategoryId assignCategoryId;
-
 
     @Nested
     class MidEventValidateOptionsCallback {

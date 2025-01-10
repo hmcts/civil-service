@@ -112,7 +112,6 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     private final AuthTokenGenerator authTokenGenerator;
     private final RoleAssignmentsService roleAssignmentsService;
 
-
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
@@ -345,12 +344,12 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
         String caseId = caseData.getCcdCaseReference().toString();
         CaseAssignmentUserRolesResource userRoles = getUserRolesOnCase(caseId);
-        log.info("CASE ROLES  {}", userRoles.getCaseAssignmentUserRoles() );
+        log.info("CASE ROLES  {}", userRoles.getCaseAssignmentUserRoles());
 
         log.info("GET ROLES as logged in ");
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         var roleAssignmentResponse = roleAssignmentsService.getRoleAssignments(userInfo.getUid(), callbackParams.getParams().get(BEARER_TOKEN).toString());
-        log.info("GET ROLES roleAssignmentResponse:  {}", roleAssignmentResponse.getRoleAssignmentResponse() );
+        log.info("GET ROLES roleAssignmentResponse:  {}", roleAssignmentResponse.getRoleAssignmentResponse());
 
         String accessToken = userService.getAccessToken(
             crossAccessUserConfiguration.getUserName(),
@@ -358,9 +357,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         );
         log.info("GET ROLES cross user");
         var roleAssignmentResponse2 = roleAssignmentsService.getRoleAssignments(accessToken, callbackParams.getParams().get(BEARER_TOKEN).toString());
-        log.info("GET ROLES cross user roleAssignmentResponse:  {}", roleAssignmentResponse2.getRoleAssignmentResponse() );
-
-
+        log.info("GET ROLES cross user roleAssignmentResponse:  {}", roleAssignmentResponse2.getRoleAssignmentResponse());
+        
         List<String> dynamicListOptions = new ArrayList<>();
         dynamicListOptions.add("Both");
         dynamicListOptions.add("Defendant One: " + caseData.getRespondent1().getPartyName());
