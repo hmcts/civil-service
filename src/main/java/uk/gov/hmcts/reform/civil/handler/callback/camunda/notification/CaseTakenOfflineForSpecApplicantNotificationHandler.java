@@ -55,6 +55,10 @@ public class CaseTakenOfflineForSpecApplicantNotificationHandler extends Callbac
     private CallbackResponse notifyApplicantSolicitorForCaseTakenOffline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
+        if (caseData.isApplicantLiP()) {
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
+
         notificationService.sendMail(
             caseData.getApplicantSolicitor1UserDetails().getEmail(),
             notificationsProperties.getSolicitorCaseTakenOfflineForSpec(),

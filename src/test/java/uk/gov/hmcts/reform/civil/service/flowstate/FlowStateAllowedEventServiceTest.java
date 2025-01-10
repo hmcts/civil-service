@@ -47,6 +47,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_LISTING_COMPLETED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
@@ -54,7 +55,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CUI_UPLOAD_MEDIATION_DOCUMENTS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DECISION_ON_RECONSIDERATION_REQUEST;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
@@ -101,6 +101,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_C
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_HEARING_PARTIES;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ORDER_REVIEW_OBLIGATION_CHECK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RECORD_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_JUDGE_DEFENCE_RECEIVED;
@@ -109,6 +110,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDE
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESET_PIN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_AND_REPLY;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARK_PAID_FULL;
@@ -364,7 +366,8 @@ class FlowStateAllowedEventServiceTest {
                         EDIT_JUDGMENT,
                         JUDGMENT_PAID_IN_FULL,
                         SET_ASIDE_JUDGMENT,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -396,7 +399,8 @@ class FlowStateAllowedEventServiceTest {
                         SETTLE_CLAIM_MARK_PAID_FULL,
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -448,7 +452,8 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -489,7 +494,8 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -530,7 +536,8 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -580,7 +587,8 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -612,7 +620,8 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -644,7 +653,8 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -676,7 +686,8 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -705,7 +716,8 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -734,7 +746,8 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -758,7 +771,8 @@ class FlowStateAllowedEventServiceTest {
                         SETTLE_CLAIM_MARK_PAID_FULL,
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -821,7 +835,8 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -848,7 +863,8 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -1036,7 +1052,8 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -1044,7 +1061,8 @@ class FlowStateAllowedEventServiceTest {
                     new CaseEvent[] {
                         INITIATE_GENERAL_APPLICATION,
                         ADD_UNAVAILABLE_DATES,
-                        CHANGE_SOLICITOR_EMAIL
+                        CHANGE_SOLICITOR_EMAIL,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -1093,7 +1111,8 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 )
             );
@@ -1266,7 +1285,8 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -1316,7 +1336,8 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -1347,7 +1368,8 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -1393,7 +1415,8 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -1428,7 +1451,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         ADD_CASE_NOTE,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -1463,7 +1487,9 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         ADD_CASE_NOTE,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        NOC_REQUEST,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -1506,7 +1532,9 @@ class FlowStateAllowedEventServiceTest {
                         UPDATE_HELP_WITH_FEE_NUMBER,
                         INVALID_HWF_REFERENCE,
                         ADD_CASE_NOTE,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        NOC_REQUEST,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -1538,7 +1566,8 @@ class FlowStateAllowedEventServiceTest {
                         SETTLE_CLAIM_MARK_PAID_FULL,
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -1573,7 +1602,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         ADD_CASE_NOTE,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -1676,7 +1706,10 @@ class FlowStateAllowedEventServiceTest {
                         FULL_REMISSION_HWF,
                         UPDATE_HELP_WITH_FEE_NUMBER,
                         INVALID_HWF_REFERENCE,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        MEDIATION_UNSUCCESSFUL,
+                        MEDIATION_SUCCESSFUL,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -1797,7 +1830,8 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -1815,7 +1849,8 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -1836,7 +1871,8 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -1895,7 +1931,8 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -1954,7 +1991,8 @@ class FlowStateAllowedEventServiceTest {
                         UPDATE_HELP_WITH_FEE_NUMBER,
                         INVALID_HWF_REFERENCE,
                         AMEND_RESTITCH_BUNDLE,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -1973,7 +2011,9 @@ class FlowStateAllowedEventServiceTest {
                         MANAGE_STAY,
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        COURT_OFFICER_ORDER,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -2026,7 +2066,8 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -2045,7 +2086,8 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -2159,7 +2201,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         ADD_CASE_NOTE,
-                        CONFIRM_ORDER_REVIEW
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -2183,7 +2226,8 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         ADD_UNAVAILABLE_DATES,
                         CHANGE_SOLICITOR_EMAIL,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
                 of(
@@ -2592,5 +2636,14 @@ class FlowStateAllowedEventServiceTest {
                 .atStateAwaitingCaseDetailsNotification().build();
         assertThat(flowStateAllowedEventService.isAllowed(caseDetails, UPDATE_NEXT_HEARING_DETAILS))
             .isEqualTo(true);
+    }
+
+    @Test
+    void shouldReturnTrue_whenCaseEventIsSendAndReply() {
+        CaseDetails caseDetails =
+            CaseDetailsBuilder.builder()
+                .atStateAwaitingCaseDetailsNotification().build();
+        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, SEND_AND_REPLY))
+            .isTrue();
     }
 }

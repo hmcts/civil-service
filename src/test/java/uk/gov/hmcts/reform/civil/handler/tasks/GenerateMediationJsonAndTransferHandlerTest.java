@@ -79,7 +79,6 @@ class GenerateMediationJsonAndTransferHandlerTest {
         caseDetailsWithInMediationStateNotToProcess = getCaseDetails(2L, claimNotToBeProcessed);
         caseDataInMediation = getCaseData(1L, claimToBeProcessed);
         caseDataInMediationNotToProcess = getCaseData(2L, claimNotToBeProcessed);
-        when(featureToggleService.isFeatureEnabled("carm")).thenReturn(true);
     }
 
     @Test
@@ -104,16 +103,6 @@ class GenerateMediationJsonAndTransferHandlerTest {
 
         mediationJsonHandler.execute(externalTask, externalTaskService);
         verify(searchService).getInMediationCases(claimNotToBeProcessed, true);
-        verify(sendGridClient, times(0)).sendEmail(anyString(), any());
-        verify(externalTaskService).complete(externalTask, null);
-    }
-
-    @Test
-    void shouldNotGenerateJsonAndSendEmailCarmToggleOff() {
-        when(featureToggleService.isFeatureEnabled("carm")).thenReturn(false);
-
-        mediationJsonHandler.execute(externalTask, externalTaskService);
-        verify(searchService, times(0)).getInMediationCases(eq(claimNotToBeProcessed), anyBoolean());
         verify(sendGridClient, times(0)).sendEmail(anyString(), any());
         verify(externalTaskService).complete(externalTask, null);
     }

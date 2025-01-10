@@ -111,6 +111,8 @@ public interface NotificationData {
     String CLAIM_NUMBER_CASE = "ClaimNumber";
     String CLAIM_NAME = "ClaimName";
 
+    String CASEMAN_REF = "casemanRef";
+
     Map<String, String> addProperties(CaseData caseData);
 
 }

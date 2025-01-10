@@ -29,11 +29,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_SCHEDULED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_DEFENDANT;
 
 @ExtendWith(MockitoExtension.class)
 public class HearingScheduledDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -99,6 +100,7 @@ public class HearingScheduledDefendantNotificationHandlerTest extends BaseCallba
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
+            .responseClaimTrack("FAST_CLAIM")
             .respondent1Represented(YesOrNo.NO)
             .build().toBuilder().hearingLocation(list).build();
 
@@ -113,6 +115,7 @@ public class HearingScheduledDefendantNotificationHandlerTest extends BaseCallba
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );
+        recordScenarioForTrialArrangementsAndDocumentsUpload(caseData, "BEARER_TOKEN");
     }
 
     @Test
@@ -135,6 +138,22 @@ public class HearingScheduledDefendantNotificationHandlerTest extends BaseCallba
             .build();
 
         handler.handle(callbackParams);
-        verifyNoInteractions(dashboardApiClient);
+        verify(dashboardApiClient, never())
+            .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
+    }
+
+    private void recordScenarioForTrialArrangementsAndDocumentsUpload(CaseData caseData, String authToken) {
+        verify(dashboardApiClient).recordScenario(
+            caseData.getCcdCaseReference().toString(),
+            SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_DEFENDANT.getScenario(),
+            authToken,
+            ScenarioRequestParams.builder().params(params).build()
+        );
+        verify(dashboardApiClient).recordScenario(
+            caseData.getCcdCaseReference().toString(),
+            SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_DEFENDANT.getScenario(),
+            authToken,
+            ScenarioRequestParams.builder().params(params).build()
+        );
     }
 }
