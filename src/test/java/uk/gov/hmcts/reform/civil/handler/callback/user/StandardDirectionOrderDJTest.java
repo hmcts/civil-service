@@ -1008,7 +1008,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     void shouldPopulateHmcEarlyAdoptersFlag_whenLiPAndHmcLipEnabled() {
 
         when(featureToggleService.isHmcForLipEnabled()).thenReturn(true);
-        when(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).thenReturn(true);
+        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
         DynamicList options = DynamicList.builder()
             .listItems(List.of(
                            DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
@@ -1027,6 +1027,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
         CallbackParams params = callbackParamsOf(caseData.toBuilder()
                                                      .applicant1Represented(YesOrNo.NO)
+                                                     .respondent1Represented(YesOrNo.NO)
                                                      .build(), ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);

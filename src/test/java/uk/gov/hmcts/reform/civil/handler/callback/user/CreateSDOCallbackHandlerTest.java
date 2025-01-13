@@ -1141,6 +1141,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldPopulateHmcEarlyAdoptersFlag_whenLiPAndHmcLipEnabled() {
 
+        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
         when(featureToggleService.isHmcForLipEnabled()).thenReturn(true);
         DynamicList options = DynamicList.builder()
             .listItems(List.of(
@@ -1169,6 +1170,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         CallbackParams params = callbackParamsOf(caseData.toBuilder()
                                                      .applicant1Represented(YesOrNo.NO)
+                                                     .respondent1Represented(YesOrNo.NO)
                                                      .build(), ABOUT_TO_SUBMIT);
         when(locationRefDataService.getLocationMatchingLabel(selectedCourt.getCode(), params.getParams().get(
             CallbackParams.Params.BEARER_TOKEN).toString()))

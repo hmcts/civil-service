@@ -28,7 +28,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_GENERATE_ORDER;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_GENERATE_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_GENERATE_ORDER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.GenerateOrderNotificationHandler.TASK_ID_APPLICANT;
@@ -166,6 +168,33 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
         }
 
         @Test
+        void shouldNotifyCOORespondent1Lip_whenInvokedBilingual() {
+            when(notificationsProperties.getNotifyLipUpdateTemplateBilingual())
+                .thenReturn("template-id-lip-translate");
+
+            //given: case where respondent1 Lip has email and callback for notify respondent1 is triggered
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                             .respondent1ResponseLanguage(Language.BOTH.toString())
+                                                             .build())
+                                 .build())
+                .respondent1Represented(YesOrNo.NO).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_COURT_OFFICER_ORDER.name()).build()
+            ).build();
+            //when: handler is called
+            handler.handle(params);
+            //then: email should be sent to respondent1
+            verify(notificationService).sendMail(
+                "sole.trader@email.com",
+                "template-id-lip-translate",
+                getRespondentNotificationDataMapLip(caseData),
+                "generate-order-notification-000DC001"
+            );
+        }
+
+        @Test
         void shouldNotifyRespondent2Lip_whenInvoked() {
             when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id-lip");
 
@@ -258,6 +287,29 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
                 .claimantBilingualLanguagePreference("BOTH").build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_APPLICANT_SOLICITOR1_FOR_GENERATE_ORDER.name()).build()
+            ).build();
+            //when: handler is called
+            handler.handle(params);
+            //then: email should be sent to applicant
+            verify(notificationService).sendMail(
+                "rambo@email.com",
+                "template-id-lip-translate",
+                getApplicantNotificationDataMapLip(caseData),
+                "generate-order-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyCOOApplicantLip_whenInvokedBilingual() {
+            when(notificationsProperties.getNotifyLipUpdateTemplateBilingual())
+                .thenReturn("template-id-lip-translate");
+
+            //given: case where applicant Lip has email & bilingual flag is on and notify for applicant is called
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .applicant1Represented(YesOrNo.NO)
+                .claimantBilingualLanguagePreference("BOTH").build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_APPLICANT_SOLICITOR1_FOR_COURT_OFFICER_ORDER.name()).build()
             ).build();
             //when: handler is called
             handler.handle(params);
