@@ -219,7 +219,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_CLAIMANT("Scenario.AAA6.CP.Trial.Arrangements.Relist.Hearing.Claimant"),
     SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_DEFENDANT("Scenario.AAA6.CP.Trial.Arrangements.Relist.Hearing.Defendant"),
     SCENARIO_AAA6_SETTLE_CLAIM_PAID_IN_FULL_DEFENDANT("Scenario.AAA6.Settle.ClaimPaidInFull.Defendant"),
-    SCENARIO_AAA6_DISCONTINUE_NOTICE_OF_DISCONTINUE_ISSUED_DEFENDANT("Scenario.AAA6.Discontinue.NoticeOfDiscontinuanceIssued.Defendant");
+    SCENARIO_AAA6_DISCONTINUE_NOTICE_OF_DISCONTINUE_ISSUED_DEFENDANT("Scenario.AAA6.Discontinue.NoticeOfDiscontinuanceIssued.Defendant"),
+    SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT("Scenario.AAA6.DefendantNoticeOfChange.ClaimMovesOffline.Claimant");
 
     private final String scenario;
 
