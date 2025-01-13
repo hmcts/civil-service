@@ -68,25 +68,21 @@ public class ApplicantOneDisclosureDocumentHandlerTest {
     @Test
     void shouldNotRenameDocumentsIndirectlyThroughHandleDocuments() {
         Document document = Document.builder().documentFileName("OriginalName.pdf").build();
-        when(uploadDocumentRetriever.getDocument(any())).thenReturn(document);
 
         CaseData caseData = CaseData.builder()
-                .documentForDisclosure(List.of(
+                .documentForDisclosureRes(List.of(
                         Element.<UploadEvidenceDocumentType>builder()
                                 .value(UploadEvidenceDocumentType.builder()
                                         .documentIssuedDate(LocalDate.of(2022, 2, 10))
-                                        .bundleName("test")
+                                        .typeOfDocument("typeOfDocument")
                                         .documentUpload(document)
                                         .build())
                                 .build()))
                 .build();
 
-        LocalDateTime mockDateTime = LocalDateTime.of(2022, 2, 10, 10, 0);
-        when(uploadDocumentRetriever.getDocumentDateTime(any())).thenReturn(mockDateTime);
-
         StringBuilder notificationBuilder = new StringBuilder();
-        handler.handleDocuments(caseData, "Applicant", notificationBuilder);
+        handler.handleDocuments(caseData, "Respondent", notificationBuilder);
 
-        assertEquals("OriginalName.pdf", caseData.getDocumentForDisclosure().get(0).getValue().getDocumentUpload().getDocumentFileName());
+        assertEquals("OriginalName.pdf", caseData.getDocumentForDisclosureRes().get(0).getValue().getDocumentUpload().getDocumentFileName());
     }
 }

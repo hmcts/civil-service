@@ -77,6 +77,8 @@ public class ApplicantOneExpertAnswersDocumentHandlerTest {
                                 .value(UploadEvidenceExpert.builder()
                                         .expertOptionUploadDate(LocalDate.of(2022, 2, 10))
                                         .expertOptionName("test")
+                                        .expertDocumentAnswer("documentAnswer")
+                                        .expertOptionOtherParty("otherParty")
                                         .expertDocument(document)
                                         .build())
                                 .build()))
@@ -88,7 +90,6 @@ public class ApplicantOneExpertAnswersDocumentHandlerTest {
         StringBuilder notificationBuilder = new StringBuilder();
         handler.handleDocuments(caseData, "Applicant", notificationBuilder);
 
-        String expectedDocumentName = mockDateTime.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "-test.pdf";
-        assertEquals(expectedDocumentName, caseData.getDocumentAnswers().get(0).getValue().getExpertDocument().getDocumentFileName());
+        assertEquals("test otherParty documentAnswer.pdf", caseData.getDocumentAnswers().get(0).getValue().getExpertDocument().getDocumentFileName());
     }
 }
