@@ -779,12 +779,13 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         boolean isHmcLipEnabled = featureToggleService.isHmcForLipEnabled();
         boolean isLocationWhiteListed = featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation());
 
-        if (!isLipCase || isHmcLipEnabled) {
+        if (!isLipCase) {
             log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
             caseDataBuilder.eaCourtLocation(YES);
             caseDataBuilder.hmcEaCourtLocation(isLocationWhiteListed ? YES : NO);
         } else if (isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData)) {
             caseDataBuilder.eaCourtLocation(YesOrNo.YES);
+            caseDataBuilder.hmcEaCourtLocation(isHmcLipEnabled ? YES : NO);
         } else {
             log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
             caseDataBuilder.eaCourtLocation(NO);

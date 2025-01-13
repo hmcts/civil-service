@@ -276,7 +276,7 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPopulateHmcEaCourtLocation_whenLiPAndHmcLipEnabled() {
 
             when(featureToggleService.isHmcForLipEnabled()).thenReturn(true);
-            when(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).thenReturn(true);
+            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
             when(courtLocationUtils.findPreferredLocationData(any(), any()))
                 .thenReturn(LocationRefData.builder().siteName("")
                                 .epimmsId("222")
@@ -292,6 +292,7 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData.toBuilder()
                                                          .applicant1Represented(YesOrNo.NO)
+                                                         .respondent1Represented(YesOrNo.NO)
                                                          .build(), ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
