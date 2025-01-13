@@ -25,7 +25,7 @@ import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 @SpringBootTest(classes = {
     LocationService.class
 })
-public class LocationServiceTest {
+class LocationServiceTest {
 
     @Autowired
     private LocationService service;

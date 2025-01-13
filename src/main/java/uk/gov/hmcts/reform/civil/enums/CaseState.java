@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.enums;
 
-import java.util.EnumSet;
+import java.util.Set;
 
 public enum CaseState {
     PENDING_CASE_ISSUED,
@@ -22,10 +22,10 @@ public enum CaseState {
     CASE_SETTLED,
     CLOSED;
 
-    public static final EnumSet<CaseState> statesBeforeSDO = EnumSet.of(PENDING_CASE_ISSUED, CASE_ISSUED,
-                                                                        AWAITING_CASE_DETAILS_NOTIFICATION,
-                                                                        AWAITING_RESPONDENT_ACKNOWLEDGEMENT,
-                                                                        IN_MEDIATION,
-                                                                        AWAITING_APPLICANT_INTENTION);
+    public static final Set<CaseState> statesBeforeSDO = Set.of(PENDING_CASE_ISSUED, CASE_ISSUED,
+                                                                    AWAITING_CASE_DETAILS_NOTIFICATION,
+                                                                    AWAITING_RESPONDENT_ACKNOWLEDGEMENT,
+                                                                    IN_MEDIATION,
+                                                                    AWAITING_APPLICANT_INTENTION);
 }
 

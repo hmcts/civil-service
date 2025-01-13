@@ -48,14 +48,20 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.FAST_CLAIM_TRACK;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.GA_DOC_CATEGORY_ID;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.INTERMEDIATE_CLAIM_TRACK;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.MULTI_CLAIM_TRACK;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.NUMBER_OF_DEADLINE_DAYS;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.SMALL_CLAIM_TRACK;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.lipCaseRole;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings("unchecked")
-public class InitiateGeneralApplicationService implements InitiateGeneralApplicationServiceConstants {
+public class InitiateGeneralApplicationService {
 
     private final InitiateGeneralApplicationServiceHelper helper;
     private final GeneralAppsDeadlinesCalculator deadlinesCalculator;
@@ -69,14 +75,15 @@ public class InitiateGeneralApplicationService implements InitiateGeneralApplica
 
     private final Time time;
 
-    public CaseData buildCaseData(CaseData.CaseDataBuilder dataBuilder, CaseData caseData, UserDetails userDetails,
+
+    public CaseData buildCaseData(CaseData.CaseDataBuilder<?, ?> dataBuilder, CaseData caseData, UserDetails userDetails,
                                   String authToken) {
         GeneralApplication generalApplication = buildApplication(caseData, userDetails, authToken);
         List<Element<GeneralApplication>> applications = addApplication(generalApplication, caseData.getGeneralApplications());
         return populateGeneralApplicationData(dataBuilder, applications);
     }
 
-    private CaseData populateGeneralApplicationData(CaseData.CaseDataBuilder dataBuilder, List<Element<GeneralApplication>> applications) {
+    private CaseData populateGeneralApplicationData(CaseData.CaseDataBuilder<?, ?> dataBuilder, List<Element<GeneralApplication>> applications) {
         return dataBuilder
             .generalApplications(applications)
             .generalAppType(GAApplicationType.builder().build())
@@ -186,6 +193,16 @@ public class InitiateGeneralApplicationService implements InitiateGeneralApplica
     private String getClaimTrackForTaskName(CaseData caseData) {
         String taskTrackName = determineTaskTrackName(caseData);
         return mapTaskTrackNameToLabel(taskTrackName);
+    }
+
+    private String mapTaskTrackNameToLabel(String taskTrackName) {
+        return switch (taskTrackName) {
+            case "MULTI_CLAIM" -> MULTI_CLAIM_TRACK;
+            case "INTERMEDIATE_CLAIM" -> INTERMEDIATE_CLAIM_TRACK;
+            case "SMALL_CLAIM" -> SMALL_CLAIM_TRACK;
+            case "FAST_CLAIM" -> FAST_CLAIM_TRACK;
+            default -> " ";
+        };
     }
 
     private String determineTaskTrackName(CaseData caseData) {

@@ -19,13 +19,5 @@ public interface InitiateGeneralApplicationServiceConstants {
     String SMALL_CLAIM_TRACK = " - Small Claims";
     String FAST_CLAIM_TRACK = " - Fast Track";
 
-    default String mapTaskTrackNameToLabel(String taskTrackName) {
-        return switch (taskTrackName) {
-            case "MULTI_CLAIM" -> MULTI_CLAIM_TRACK;
-            case "INTERMEDIATE_CLAIM" -> INTERMEDIATE_CLAIM_TRACK;
-            case "SMALL_CLAIM" -> SMALL_CLAIM_TRACK;
-            case "FAST_CLAIM" -> FAST_CLAIM_TRACK;
-            default -> " ";
-        };
-    }
+
 }

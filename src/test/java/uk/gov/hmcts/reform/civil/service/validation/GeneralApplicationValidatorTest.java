@@ -16,7 +16,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_UNAVAILABILITY_RANGE;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.INVALID_UNAVAILABILITY_RANGE;
 import static uk.gov.hmcts.reform.civil.service.validation.GeneralApplicationValidatorConstants.INVALID_TRIAL_DATE_RANGE;
 import static uk.gov.hmcts.reform.civil.service.validation.GeneralApplicationValidatorConstants.TRIAL_DATE_FROM_REQUIRED;
 import static uk.gov.hmcts.reform.civil.service.validation.GeneralApplicationValidatorConstants.UNAVAILABLE_DATE_RANGE_MISSING;
@@ -44,8 +44,7 @@ class GeneralApplicationValidatorTest extends LocationRefSampleDataBuilder {
 
         List<String> errors = service.validateUrgencyDates(urgencyRequirement);
 
-        assertThat(errors).isNotEmpty();
-        assertThat(errors).contains(URGENCY_DATE_REQUIRED);
+        assertThat(errors).isNotEmpty().contains(URGENCY_DATE_REQUIRED);
     }
 
     @Test
@@ -57,8 +56,7 @@ class GeneralApplicationValidatorTest extends LocationRefSampleDataBuilder {
 
         List<String> errors = service.validateUrgencyDates(urgencyRequirement);
 
-        assertThat(errors).isNotEmpty();
-        assertThat(errors).contains(URGENCY_DATE_SHOULD_NOT_BE_PROVIDED);
+        assertThat(errors).isNotEmpty().contains(URGENCY_DATE_SHOULD_NOT_BE_PROVIDED);
     }
 
     @Test
@@ -70,8 +68,7 @@ class GeneralApplicationValidatorTest extends LocationRefSampleDataBuilder {
 
         List<String> errors = service.validateUrgencyDates(urgencyRequirement);
 
-        assertThat(errors).isNotEmpty();
-        assertThat(errors).contains(URGENCY_DATE_CANNOT_BE_IN_PAST);
+        assertThat(errors).isNotEmpty().contains(URGENCY_DATE_CANNOT_BE_IN_PAST);
     }
 
     @Test
@@ -111,8 +108,7 @@ class GeneralApplicationValidatorTest extends LocationRefSampleDataBuilder {
 
         List<String> errors = service.validateHearingScreen(hearingDetails);
 
-        assertThat(errors).isNotEmpty();
-        assertThat(errors).contains(TRIAL_DATE_FROM_REQUIRED);
+        assertThat(errors).isNotEmpty().contains(TRIAL_DATE_FROM_REQUIRED);
     }
 
     @Test
@@ -127,8 +123,7 @@ class GeneralApplicationValidatorTest extends LocationRefSampleDataBuilder {
 
         List<String> errors = service.validateHearingScreen(hearingDetails);
 
-        assertThat(errors).isNotEmpty();
-        assertThat(errors).contains(INVALID_TRIAL_DATE_RANGE);
+        assertThat(errors).isNotEmpty().contains(INVALID_TRIAL_DATE_RANGE);
     }
 
     @Test
@@ -203,8 +198,7 @@ class GeneralApplicationValidatorTest extends LocationRefSampleDataBuilder {
 
         List<String> errors = service.validateHearingScreen(hearingDetails);
 
-        assertThat(errors).isNotEmpty();
-        assertThat(errors).contains(UNAVAILABLE_DATE_RANGE_MISSING);
+        assertThat(errors).isNotEmpty().contains(UNAVAILABLE_DATE_RANGE_MISSING);
     }
 
     @Test
@@ -224,8 +218,7 @@ class GeneralApplicationValidatorTest extends LocationRefSampleDataBuilder {
 
         List<String> errors = service.validateHearingScreen(hearingDetails);
 
-        assertThat(errors).isNotEmpty();
-        assertThat(errors).contains(UNAVAILABLE_FROM_MUST_BE_PROVIDED);
+        assertThat(errors).isNotEmpty().contains(UNAVAILABLE_FROM_MUST_BE_PROVIDED);
     }
 
     @Test
@@ -245,8 +238,7 @@ class GeneralApplicationValidatorTest extends LocationRefSampleDataBuilder {
 
         List<String> errors = service.validateHearingScreen(hearingDetails);
 
-        assertThat(errors).isNotEmpty();
-        assertThat(errors).contains(INVALID_UNAVAILABILITY_RANGE);
+        assertThat(errors).isNotEmpty().contains(INVALID_UNAVAILABILITY_RANGE);
     }
 
     @Test
@@ -322,6 +314,7 @@ class GeneralApplicationValidatorTest extends LocationRefSampleDataBuilder {
         assertThat(errors).isEmpty();
     }
 
+    @Override
     protected List<LocationRefData> getSampleCourLocationsRefObject() {
         return new ArrayList<>(List.of(
             LocationRefData.builder()
