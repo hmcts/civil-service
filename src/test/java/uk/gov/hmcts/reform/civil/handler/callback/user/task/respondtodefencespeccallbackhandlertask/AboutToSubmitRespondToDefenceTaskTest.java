@@ -168,7 +168,6 @@ class AboutToSubmitRespondToDefenceTaskTest {
 
     @Test
     void shouldAddEventAndDateToApplicantExperts() {
-
         CaseData fullDefenceData = CaseDataBuilder.builder().atState(FULL_DEFENCE_PROCEED).build();
         CaseData caseData = fullDefenceData.toBuilder()
             .applicant1DQ(fullDefenceData.getApplicant1DQ().toBuilder()
@@ -178,13 +177,10 @@ class AboutToSubmitRespondToDefenceTaskTest {
             .applicant1ResponseDate(LocalDateTime.now())
             .build();
 
-        when(featureToggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
-
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) task.execute(callbackParams(caseData));
 
         assertNotNull(response);
-        verify(featureToggleService, times(2)).isUpdateContactDetailsEnabled();
     }
 
     @Test
@@ -202,13 +198,10 @@ class AboutToSubmitRespondToDefenceTaskTest {
             .applicant1ResponseDate(LocalDateTime.now())
             .build();
 
-        when(featureToggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
-
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) task.execute(callbackParams(caseData));
 
         assertNotNull(response);
-        verify(featureToggleService, times(2)).isUpdateContactDetailsEnabled();
     }
 
     @Test
