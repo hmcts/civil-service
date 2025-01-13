@@ -46,11 +46,11 @@ public class ClaimantIntendsToProceedMultiIntDefendantScenarioTest extends Dashb
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Wait for the court to review the case"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">${applicant1PartyName} has responded, the court will now review the case. You will be contacted if a hearing is needed in this case.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View your response</a> <br> <a target=\"_blank\" href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View the claimant's hearing requirements</a></p>"
+                    "<p class=\"govuk-body\">Mr. John Rambo has responded, the court will now review the case. You will be contacted if a hearing is needed in this case.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View your response</a> <br> <a target=\"_blank\" href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View the claimant's hearing requirements</a></p>"
                 ),
                 jsonPath("$[0].titleCy").value("Aros i'r llys adolygu'r achos"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Mae ${applicant1PartyName} wedi ymateb, bydd y llys nawr yn adolygu'r achos. Cysylltir â chi os oes angen gwrandawiad yn yr achos hwn.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld eich ymateb</a> <br> <a target=\"_blank\" href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld gofynion gwrandawiad yr hawlydd</a></p>")
+                    "<p class=\"govuk-body\">Mae Mr. John Rambo wedi ymateb, bydd y llys nawr yn adolygu'r achos. Cysylltir â chi os oes angen gwrandawiad yn yr achos hwn.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld eich ymateb</a> <br> <a target=\"_blank\" href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld gofynion gwrandawiad yr hawlydd</a></p>")
             );
     }
 
@@ -79,11 +79,11 @@ public class ClaimantIntendsToProceedMultiIntDefendantScenarioTest extends Dashb
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Wait for the court to review the case"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">${applicant1PartyName} has responded, the court will now review the case. You will be contacted if a hearing is needed in this case.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View your response</a> <br> <a target=\"_blank\" href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View the claimant's hearing requirements</a></p>"
+                    "<p class=\"govuk-body\">Mr. John Rambo has responded, the court will now review the case. You will be contacted if a hearing is needed in this case.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View your response</a> <br> <a target=\"_blank\" href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View the claimant's hearing requirements</a></p>"
                 ),
                 jsonPath("$[0].titleCy").value("Aros i'r llys adolygu'r achos"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Mae ${applicant1PartyName} wedi ymateb, bydd y llys nawr yn adolygu'r achos. Cysylltir â chi os oes angen gwrandawiad yn yr achos hwn.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld eich ymateb</a> <br> <a target=\"_blank\" href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld gofynion gwrandawiad yr hawlydd</a></p>")
+                    "<p class=\"govuk-body\">Mae Mr. John Rambo wedi ymateb, bydd y llys nawr yn adolygu'r achos. Cysylltir â chi os oes angen gwrandawiad yn yr achos hwn.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld eich ymateb</a> <br> <a target=\"_blank\" href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld gofynion gwrandawiad yr hawlydd</a></p>")
             );
     }
 }
