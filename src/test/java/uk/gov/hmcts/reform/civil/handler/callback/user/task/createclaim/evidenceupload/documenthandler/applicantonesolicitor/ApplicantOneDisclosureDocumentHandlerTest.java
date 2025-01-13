@@ -15,12 +15,9 @@ import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentTyp
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ApplicantOneDisclosureDocumentHandlerTest {

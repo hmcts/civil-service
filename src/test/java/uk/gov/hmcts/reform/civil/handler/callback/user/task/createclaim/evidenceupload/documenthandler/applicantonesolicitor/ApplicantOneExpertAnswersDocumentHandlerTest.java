@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
