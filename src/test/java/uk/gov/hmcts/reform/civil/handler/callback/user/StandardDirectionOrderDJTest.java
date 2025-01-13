@@ -1004,6 +1004,44 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         assertThat(responseCaseData.getHmcEaCourtLocation()).isNull();
     }
 
+    @Test
+    void shouldPopulateHmcEarlyAdoptersFlag_whenLiPAndHmcLipEnabled() {
+
+        when(featureToggleService.isHmcForLipEnabled()).thenReturn(true);
+        when(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).thenReturn(true);
+        DynamicList options = DynamicList.builder()
+            .listItems(List.of(
+                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
+                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
+                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
+                       )
+            )
+            .value(DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build())
+            .build();
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
+            .toBuilder()
+            .disposalHearingMethodInPersonDJ(options)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(options.getValue().getCode()).build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData.toBuilder()
+                                                     .applicant1Represented(YesOrNo.NO)
+                                                     .build(), ABOUT_TO_SUBMIT);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+
+        assertEquals(YES, responseCaseData.getHmcEaCourtLocation());
+
+        params = callbackParamsOf(caseData.toBuilder()
+                                      .respondent1Represented(YesOrNo.NO)
+                                      .build(), ABOUT_TO_SUBMIT);
+        response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+
+        assertEquals(YES, responseCaseData.getHmcEaCourtLocation());
+    }
+
     @ParameterizedTest
     @CsvSource({
         "true, NO, NO, YES",
