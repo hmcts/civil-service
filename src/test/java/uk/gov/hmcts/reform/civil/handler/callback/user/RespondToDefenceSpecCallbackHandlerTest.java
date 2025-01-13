@@ -1276,6 +1276,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent2(PartyBuilder.builder().individual().build())
                     .atStateApplicantRespondToDefenceAndProceed()
                     .applicant2DQSmallClaimExperts(experts, YES)
+                    .applicant2ResponseDate(LocalDateTime.now())
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1328,7 +1329,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .respondent1(PartyBuilder.builder().individual().build())
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .applicant2DQSmallClaimExperts(null, NO)
+                    .noApplicant2DQSmallClaimExperts()
                     .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
                     .build();
 
