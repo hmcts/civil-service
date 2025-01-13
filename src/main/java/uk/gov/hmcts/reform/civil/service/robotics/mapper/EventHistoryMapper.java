@@ -373,7 +373,7 @@ public class EventHistoryMapper {
             .eventDetails(EventDetails.builder()
                               .miscText("")
                               .amountOfJudgment(amountClaimedWithInterest.setScale(2))
-                              .amountOfCosts((caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled())
+                              .amountOfCosts((caseData.isApplicantLipOneVOne() && featureToggleService.isLipVLipEnabled())
                                                  ? MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
                                                  : JudgmentsOnlineHelper.getCostOfJudgmentForDJ(caseData))
                               .amountPaidBeforeJudgment((caseData.getPartialPayment() == YesOrNo.YES) ? partialPaymentPounds : ZERO)
