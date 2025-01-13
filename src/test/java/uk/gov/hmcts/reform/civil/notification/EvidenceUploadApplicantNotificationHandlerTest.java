@@ -15,14 +15,20 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+
 import static org.mockito.Mockito.verify;
 
 import java.util.Map;
 
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.UPLOADED_DOCUMENTS;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
 class EvidenceUploadApplicantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -37,6 +43,9 @@ class EvidenceUploadApplicantNotificationHandlerTest extends BaseCallbackHandler
     private NotificationService notificationService;
     @Mock
     private NotificationsProperties notificationsProperties;
+    @Mock
+    private OrganisationService organisationService;
+
     @InjectMocks
     private EvidenceUploadApplicantNotificationHandler handler;
 
@@ -118,15 +127,24 @@ class EvidenceUploadApplicantNotificationHandlerTest extends BaseCallbackHandler
             return CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .notificationText(notificationText)
                 .applicant1Represented(YesOrNo.NO)
-                .applicant1(Party.builder().partyName("Billy").partyEmail(APPLICANT_LIP_EMAIL).build())
+                .applicant1(Party.builder()
+                                .individualFirstName("John")
+                                .individualLastName("Doe")
+                                .type(Party.Type.INDIVIDUAL)
+                                .partyName("Billy").partyEmail(APPLICANT_LIP_EMAIL).build())
                 .build();
         }
 
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                UPLOADED_DOCUMENTS, caseData.getNotificationText()
+                CLAIM_REFERENCE_NUMBER, YesOrNo.NO.equals(caseData.getApplicant1Represented())
+                    ? caseData.getLegacyCaseReference() : caseData.getCcdCaseReference().toString(),
+                UPLOADED_DOCUMENTS, caseData.getNotificationText(),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                CLAIM_LEGAL_ORG_NAME_SPEC, YesOrNo.NO.equals(caseData.getApplicant1Represented())
+                    ? "John Doe" : "Signer Name",
+                CASEMAN_REF, "000DC001"
             );
         }
     }

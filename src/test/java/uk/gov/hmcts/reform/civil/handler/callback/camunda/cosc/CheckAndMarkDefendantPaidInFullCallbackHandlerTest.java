@@ -16,15 +16,18 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
-
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import java.time.LocalDate;
-
+import java.time.LocalDateTime;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static uk.gov.hmcts.reform.civil.enums.cosc.CoscRPAStatus.SATISFIED;
+import static uk.gov.hmcts.reform.civil.enums.cosc.CoscRPAStatus.CANCELLED;
 
 @ExtendWith(MockitoExtension.class)
 class CheckAndMarkDefendantPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -39,6 +42,7 @@ class CheckAndMarkDefendantPaidInFullCallbackHandlerTest extends BaseCallbackHan
     private static final String PROCESS_INSTANCE_ID = "process-instance-id";
     private static final String SEND_DETAILS_CJES = "sendDetailsToCJES";
     private static ObjectMapper objectMapper;
+    private final LocalDateTime nowMock = LocalDateTime.of(2024, 10, 8, 0, 0, 0);
 
     @BeforeEach
     void setup() {
@@ -90,6 +94,7 @@ class CheckAndMarkDefendantPaidInFullCallbackHandlerTest extends BaseCallbackHan
 
         JudgmentDetails expected = caseData.getActiveJudgment().toBuilder()
             .fullyPaymentMadeDate(markedPaymentDate)
+            .state(JudgmentState.SATISFIED)
             .build();
 
         when(paidInFullJudgmentOnlineMapper.addUpdateActiveJudgment(caseData, markedPaymentDate)).thenReturn(expected);
@@ -100,7 +105,40 @@ class CheckAndMarkDefendantPaidInFullCallbackHandlerTest extends BaseCallbackHan
         CaseData updatedData = objectMapper.convertValue(result.getData(), CaseData.class);
 
         assertEquals(expected, updatedData.getActiveJudgment());
+        assertThat(updatedData.getJoCoscRpaStatus()).isEqualTo(SATISFIED);
         verify(runtimeService, times(1)).setVariable(PROCESS_INSTANCE_ID, SEND_DETAILS_CJES, true);
+        assertThat(updatedData.getJoDefendantMarkedPaidInFullIssueDate()).isNotNull();
     }
 
+    @Test
+    void shouldSetJudgementStateAsCancelled() {
+        LocalDate markedPaymentDate = LocalDate.of(2024, 9, 20);
+        JudgmentDetails activeJudgementWithoutPayment = JudgmentDetails.builder()
+            .issueDate(LocalDate.of(2024, 9, 9))
+            .totalAmount("900000")
+            .orderedAmount("900000")
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
+            .certOfSC(CertOfSC.builder()
+                                    .defendantFinalPaymentDate(markedPaymentDate)
+                                    .build())
+            .activeJudgment(activeJudgementWithoutPayment)
+            .build();
+
+        JudgmentDetails expected = caseData.getActiveJudgment().toBuilder()
+            .fullyPaymentMadeDate(markedPaymentDate)
+            .state(JudgmentState.CANCELLED)
+            .build();
+
+        when(paidInFullJudgmentOnlineMapper.addUpdateActiveJudgment(caseData, markedPaymentDate)).thenReturn(expected);
+
+        var params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
+
+        var result = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = objectMapper.convertValue(result.getData(), CaseData.class);
+
+        assertThat(updatedData.getJoCoscRpaStatus()).isEqualTo(CANCELLED);
+    }
 }

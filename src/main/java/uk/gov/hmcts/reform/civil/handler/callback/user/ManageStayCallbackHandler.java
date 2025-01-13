@@ -54,7 +54,7 @@ public class ManageStayCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+            callbackKey(ABOUT_TO_START), this::handleAboutToStart,
             callbackKey(ABOUT_TO_SUBMIT), this::handleAboutToSubmit,
             callbackKey(SUBMITTED), this::handleSubmitted
         );
@@ -66,6 +66,17 @@ public class ManageStayCallbackHandler extends CallbackHandler {
 
     private CallbackResponse handleSubmitted(CallbackParams params) {
         return featureToggleService.isCaseEventsEnabled() ? addConfirmationScreen(params) : emptyCallbackResponse(params);
+    }
+
+    private CallbackResponse handleAboutToStart(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        caseDataBuilder.manageStayOption(null);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(mapper))
+            .build();
     }
 
     private CallbackResponse manageStay(CallbackParams callbackParams) {

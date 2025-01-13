@@ -1480,6 +1480,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder noApplicant2DQSmallClaimExperts() {
+        var applicant2DQBuilder = applicant2DQ != null
+            ? applicant2DQ.toBuilder() : applicant2DQ().build().getApplicant2DQ().toBuilder();
+        applicant2DQ = applicant2DQBuilder
+            .applicant2DQExperts(Experts.builder().expertRequired(NO).build()
+            ).build();
+        this.applicantMPClaimExpertSpecRequired(NO);
+        return this;
+    }
+
     public CaseDataBuilder applicant1DQWithLocation() {
         applicant1DQ = Applicant1DQ.builder()
             .applicant1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
@@ -6309,7 +6319,7 @@ public class CaseDataBuilder {
             .defendant1Name("Test name")
             .defendant1Address(JudgmentAddress.builder().build())
             .fullyPaymentMadeDate(LocalDate.now().plusDays(15))
-            .state(JudgmentState.CANCELLED)
+            .state(JudgmentState.SATISFIED)
             .totalAmount("90000")
             .issueDate(LocalDate.now())
             .issueDate(LocalDate.now()).build();
@@ -6322,7 +6332,7 @@ public class CaseDataBuilder {
         JudgmentDetails activeJudgment = JudgmentDetails.builder()
             .defendant1Name("Test name")
             .defendant1Address(JudgmentAddress.builder().build())
-            .fullyPaymentMadeDate(LocalDate.now().plusDays(15))
+            .fullyPaymentMadeDate(null)
             .state(JudgmentState.CANCELLED)
             .totalAmount("90000")
             .issueDate(LocalDate.now()).build();

@@ -88,6 +88,7 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
         caseData.setJoSetAsideOrderDate(null);
+        caseData.setJoSetAsideApplicationDate(null);
         caseData.setJoSetAsideDefenceReceivedDate(null);
         caseData.setJoSetAsideOrderType(null);
         caseData.setJoSetAsideReason(null);

@@ -14,19 +14,26 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
+import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HEARING_DATE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
@@ -43,12 +50,17 @@ class TrialReadyApplicantNotificationHandlerTest {
     @Mock
     private NotificationsProperties notificationsProperties;
 
+    @Mock
+    private OrganisationService organisationService;
+
     @Nested
     class AboutToSubmitCallback {
 
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked() {
             when(notificationsProperties.getSolicitorTrialReady()).thenReturn("template-id");
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -107,7 +119,8 @@ class TrialReadyApplicantNotificationHandlerTest {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 PARTY_NAME, caseData.getApplicant1().getPartyName(),
-                CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
+                CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
+                CASEMAN_REF, "000DC001"
             );
         }
 
@@ -115,7 +128,10 @@ class TrialReadyApplicantNotificationHandlerTest {
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
                 HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
+                CASEMAN_REF, "000DC001"
             );
         }
     }
