@@ -75,7 +75,6 @@ public class InitiateGeneralApplicationService {
 
     private final Time time;
 
-
     public CaseData buildCaseData(CaseData.CaseDataBuilder<?, ?> dataBuilder, CaseData caseData, UserDetails userDetails,
                                   String authToken) {
         GeneralApplication generalApplication = buildApplication(caseData, userDetails, authToken);
