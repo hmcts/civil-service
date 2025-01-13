@@ -430,7 +430,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         result.getGeneralApplications().forEach(generalApplicationElement -> {
             assertCaseManagementCategoryPopulated(generalApplicationElement.getValue().getCaseManagementCategory());
         });
-        assertThat(result.getGeneralApplications().get(0).getValue().getGaWaTrackLabel()).isEqualTo(MULTI_CLAIM_TRACK);
+        assertThat(result.getGeneralApplications().get(0).getValue().getGaWaTrackLabel()).isEqualTo(MULTI_CLAIM_TRACK.getValue());
     }
 
     @Test
@@ -582,7 +582,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .isNull();
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppStatementOfTruth().getRole())
             .isNull();
-        assertThat(result.getGeneralApplications().get(0).getValue().getGaWaTrackLabel()).isEqualTo(INTERMEDIATE_CLAIM_TRACK);
+        assertThat(result.getGeneralApplications().get(0).getValue().getGaWaTrackLabel()).isEqualTo(INTERMEDIATE_CLAIM_TRACK.getValue());
     }
 
     @Test
@@ -661,7 +661,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         assertThat(result.getGeneralApplications().get(0).getValue().getDefendant1PartyName()).isEqualTo("Respondent1");
         assertThat(result.getGeneralApplications().get(0).getValue().getDefendant2PartyName()).isEqualTo("Respondent2");
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseNameGaInternal()).isEqualTo("Internal caseName");
-        assertThat(result.getGeneralApplications().get(0).getValue().getGaWaTrackLabel()).isEqualTo(FAST_CLAIM_TRACK);
+        assertThat(result.getGeneralApplications().get(0).getValue().getGaWaTrackLabel()).isEqualTo(FAST_CLAIM_TRACK.getValue());
     }
 
     @Test
@@ -939,8 +939,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                        .getValue().getGeneralAppEvidenceDocument()).hasSize(2);
         assertThat(result.getGeneralApplications().get(0)
                        .getValue().getGeneralAppEvidenceDocument().get(1).getValue().getCategoryID())
-            .isEqualTo(GA_DOC_CATEGORY_ID);
-        assertThat(result.getGeneralApplications().get(0).getValue().getGaWaTrackLabel()).isEqualTo(SMALL_CLAIM_TRACK);
+            .isEqualTo(GA_DOC_CATEGORY_ID.getValue());
+        assertThat(result.getGeneralApplications().get(0).getValue().getGaWaTrackLabel()).isEqualTo(SMALL_CLAIM_TRACK.getValue());
 
     }
 

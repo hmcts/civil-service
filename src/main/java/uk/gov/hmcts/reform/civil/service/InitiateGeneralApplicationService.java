@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -52,9 +53,7 @@ import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServic
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.GA_DOC_CATEGORY_ID;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.INTERMEDIATE_CLAIM_TRACK;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.MULTI_CLAIM_TRACK;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.NUMBER_OF_DEADLINE_DAYS;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.SMALL_CLAIM_TRACK;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.lipCaseRole;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -72,8 +71,8 @@ public class InitiateGeneralApplicationService {
     private final AuthTokenGenerator authTokenGenerator;
     private final LocationService locationService;
     private final GeneralAppFeesService feesService;
-
     private final Time time;
+    private final List<String> lipCaseRole = Arrays.asList("[DEFENDANT]", "[CLAIMANT]");
 
     public CaseData buildCaseData(CaseData.CaseDataBuilder<?, ?> dataBuilder, CaseData caseData, UserDetails userDetails,
                                   String authToken) {
@@ -196,10 +195,10 @@ public class InitiateGeneralApplicationService {
 
     private String mapTaskTrackNameToLabel(String taskTrackName) {
         return switch (taskTrackName) {
-            case "MULTI_CLAIM" -> MULTI_CLAIM_TRACK;
-            case "INTERMEDIATE_CLAIM" -> INTERMEDIATE_CLAIM_TRACK;
-            case "SMALL_CLAIM" -> SMALL_CLAIM_TRACK;
-            case "FAST_CLAIM" -> FAST_CLAIM_TRACK;
+            case "MULTI_CLAIM" -> MULTI_CLAIM_TRACK.getValue();
+            case "INTERMEDIATE_CLAIM" -> INTERMEDIATE_CLAIM_TRACK.getValue();
+            case "SMALL_CLAIM" -> SMALL_CLAIM_TRACK.getValue();
+            case "FAST_CLAIM" -> FAST_CLAIM_TRACK.getValue();
             default -> " ";
         };
     }
@@ -328,7 +327,7 @@ public class InitiateGeneralApplicationService {
         if (caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)
             && !Objects.isNull(caseData.getGeneralAppN245FormUpload())) {
             if (Objects.isNull(caseData.getGeneralAppN245FormUpload().getCategoryID())) {
-                caseData.getGeneralAppN245FormUpload().setCategoryID(GA_DOC_CATEGORY_ID);
+                caseData.getGeneralAppN245FormUpload().setCategoryID(GA_DOC_CATEGORY_ID.getValue());
             }
             applicationBuilder.generalAppN245FormUpload(caseData.getGeneralAppN245FormUpload());
             List<Element<Document>> gaEvidenceDoc = ofNullable(caseData.getGeneralAppEvidenceDocument()).orElse(newArrayList());
@@ -338,7 +337,8 @@ public class InitiateGeneralApplicationService {
     }
 
     private void setBusinessProcess(CaseData caseData, UserDetails userDetails, GeneralApplication.GeneralApplicationBuilder applicationBuilder) {
-        LocalDateTime deadline = deadlinesCalculator.calculateApplicantResponseDeadline(LocalDateTime.now(), NUMBER_OF_DEADLINE_DAYS);
+        int numberOfDeadlineDays = 5;
+        LocalDateTime deadline = deadlinesCalculator.calculateApplicantResponseDeadline(LocalDateTime.now(), numberOfDeadlineDays);
         applicationBuilder
             .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
             .generalAppType(caseData.getGeneralAppType())

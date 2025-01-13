@@ -238,7 +238,7 @@ class GeneralApplicationValidatorTest extends LocationRefSampleDataBuilder {
 
         List<String> errors = service.validateHearingScreen(hearingDetails);
 
-        assertThat(errors).isNotEmpty().contains(INVALID_UNAVAILABILITY_RANGE);
+        assertThat(errors).isNotEmpty().contains(INVALID_UNAVAILABILITY_RANGE.getValue());
     }
 
     @Test

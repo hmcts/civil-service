@@ -536,7 +536,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNotEmpty();
-            assertThat(response.getErrors()).contains(INVALID_SETTLE_BY_CONSENT);
+            assertThat(response.getErrors()).contains(INVALID_SETTLE_BY_CONSENT.getValue());
         }
 
         @Test
@@ -615,7 +615,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isNotEmpty();
-            assertThat(response.getErrors()).contains(INVALID_SETTLE_BY_CONSENT);
+            assertThat(response.getErrors()).contains(INVALID_SETTLE_BY_CONSENT.getValue());
         }
     }
 
@@ -756,7 +756,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isNotEmpty();
-            assertThat(response.getErrors()).contains(INVALID_UNAVAILABILITY_RANGE);
+            assertThat(response.getErrors()).contains(INVALID_UNAVAILABILITY_RANGE.getValue());
         }
 
         @Test

@@ -160,7 +160,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         if (generalAppTypes.size() == 1
                 && generalAppTypes.contains(GeneralApplicationTypes.SETTLE_BY_CONSENT)
                 && !consent) {
-            errors.add(INVALID_SETTLE_BY_CONSENT);
+            errors.add(INVALID_SETTLE_BY_CONSENT.getValue());
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseDataBuilder.build().toMap(objectMapper))
