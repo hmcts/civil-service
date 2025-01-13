@@ -1996,6 +1996,7 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
                 CONFIRM_ORDER_REVIEW,
+                COURT_OFFICER_ORDER,
                 ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
