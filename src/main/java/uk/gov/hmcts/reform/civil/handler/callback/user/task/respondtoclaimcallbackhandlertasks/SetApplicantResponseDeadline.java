@@ -119,24 +119,15 @@ public class SetApplicantResponseDeadline implements CaseTask {
             .assembleResponseDocuments(caseData, updatedData);
         frcDocumentsUtils.assembleDefendantsFRCDocuments(caseData);
 
-        if (toggleService.isUpdateContactDetailsEnabled()) {
-            addEventAndDateAddedToRespondentExperts(updatedData);
-            addEventAndDateAddedToRespondentWitnesses(updatedData);
-        }
-
+        addEventAndDateAddedToRespondentExperts(updatedData);
+        addEventAndDateAddedToRespondentWitnesses(updatedData);
         retainSolicitorReferences(callbackParams.getRequest().getCaseDetailsBefore().getData(), updatedData, caseData);
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(
-            updatedData,
-            toggleService.isUpdateContactDetailsEnabled()
-        );
-
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(updatedData);
         updateClaimsDetailsForClaimDetailsTab(updatedData, caseData);
-
-        updateDQPartyIdsIfHmcEnabled(updatedData);
+        populateDQPartyIds(updatedData);
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE, updatedData);
-
         updateDocumentGenerationRespondent2(callbackParams, updatedData, caseData);
 
         if (isMultipartyScenario1v2With2LegalRep(caseData)) {
@@ -162,12 +153,6 @@ public class SetApplicantResponseDeadline implements CaseTask {
         updatedData.respondent1DetailsForClaimDetailsTab(updatedData.build().getRespondent1().toBuilder().flags(null).build());
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             updatedData.respondent2DetailsForClaimDetailsTab(updatedData.build().getRespondent2().toBuilder().flags(null).build());
-        }
-    }
-
-    private void updateDQPartyIdsIfHmcEnabled(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        if (toggleService.isHmcEnabled()) {
-            populateDQPartyIds(updatedData);
         }
     }
 

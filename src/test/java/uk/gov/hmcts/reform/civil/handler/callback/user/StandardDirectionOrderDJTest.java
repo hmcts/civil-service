@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,6 +41,7 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -61,6 +63,8 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -103,6 +107,10 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     private FeatureToggleService featureToggleService;
     @MockBean
     private CategoryService categoryService;
+    @MockBean
+    private UpdateWaCourtLocationsService updateWaCourtLocationsService;
+    @Mock
+    private LocationHelper locationHelper;
 
     @Nested
     class AboutToStartCallback {
@@ -951,7 +959,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation(options.getValue().getCode()).build())
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isHmcEnabled()).thenReturn(true);
+
         when(featureToggleService.isLocationWhiteListedForCaseProgression(eq(options.getValue().getCode()))).thenReturn(
             isLocationWhiteListed);
 
@@ -978,7 +986,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             .disposalHearingMethodInPersonDJ(options)
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation(options.getValue().getCode()).build())
             .build();
-        when(featureToggleService.isHmcEnabled()).thenReturn(true);
 
         CallbackParams params = callbackParamsOf(caseData.toBuilder()
                                                      .applicant1Represented(YesOrNo.NO)
@@ -1018,6 +1025,38 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
         assertEquals(expectedEaCourtLocation, responseCaseData.getEaCourtLocation());
+    }
+
+    @Test
+    void shouldNotCallUpdateWaCourtLocationsServiceWhenNotPresent_AndMintiEnabled() {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+        handler = new StandardDirectionOrderDJ(mapper, defaultJudgmentOrderFormGenerator, locationRefDataService, featureToggleService,
+                                               userService, assignCategoryId, categoryService, locationHelper,
+                                               Optional.empty(), deadlinesCalculator, workingDayIndicator);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").build())
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        verifyNoInteractions(updateWaCourtLocationsService);
+    }
+
+    @Test
+    void shouldCallUpdateWaCourtLocationsServiceWhenPresent_AndMintiEnabled() {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").build())
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        verify(updateWaCourtLocationsService).updateCourtListingWALocations(any(), any());
     }
 
     @Nested

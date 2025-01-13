@@ -79,22 +79,15 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         CaseData caseData = getUpdatedCaseData(callbackParams);
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
-        if (featureToggleService.isHmcEnabled()) {
-            populateDQPartyIds(builder);
-        }
-
-        if (featureToggleService.isUpdateContactDetailsEnabled()) {
-            addEventAndDateAddedToRespondentExperts(builder);
-            addEventAndDateAddedToRespondentWitnesses(builder);
-        }
+        populateDQPartyIds(builder);
+        addEventAndDateAddedToRespondentExperts(builder);
+        addEventAndDateAddedToRespondentWitnesses(builder);
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_CUI, builder);
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(
-            builder, featureToggleService.isUpdateContactDetailsEnabled());
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(builder);
 
-        updateCaseManagementLocationDetailsService.updateRespondent1RequestedCourtDetails(caseData, builder,
-                                                                                          updateCaseManagementLocationDetailsService
-                                                                                              .fetchLocationData(callbackParams));
+        updateCaseManagementLocationDetailsService.updateRespondent1RequestedCourtDetails(
+            caseData, builder, updateCaseManagementLocationDetailsService.fetchLocationData(callbackParams));
 
         CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =

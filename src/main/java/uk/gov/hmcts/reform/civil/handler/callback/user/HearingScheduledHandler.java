@@ -1,14 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +23,15 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.HearingReferenceNumber;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -224,6 +224,7 @@ public class HearingScheduledHandler extends CallbackHandler {
         }
 
         caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
+        caseDataBuilder.trialReadyNotified(null);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .state(caseState.name())
             .data(caseDataBuilder.build().toMap(objectMapper))

@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -483,6 +484,8 @@ public class GeneralApplicationDetailsBuilder {
         CaseLocationCivil caseManagementLoc = CaseLocationCivil.builder().region("1").baseLocation("22222").build();
         return caseData.toBuilder()
             .ccdCaseReference(1234L)
+            .caseAccessCategory(SPEC_CLAIM)
+            .responseClaimTrack("MULTI_CLAIM")
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
                                                .organisation(Organisation.builder()
                                                                  .organisationID(STRING_CONSTANT).build())
@@ -586,6 +589,7 @@ public class GeneralApplicationDetailsBuilder {
     public CaseData getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement respondentOrderAgreement) {
         return CaseData.builder()
             .caseAccessCategory(UNSPEC_CLAIM)
+            .allocatedTrack(AllocatedTrack.FAST_CLAIM)
             .ccdState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
             .ccdCaseReference(1234L)
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
@@ -799,6 +803,7 @@ public class GeneralApplicationDetailsBuilder {
     public CaseData getTestCaseDataForStatementOfTruthCheck(GARespondentOrderAgreement respondentOrderAgreement) {
         return CaseData.builder()
             .caseAccessCategory(UNSPEC_CLAIM)
+            .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
             .ccdState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
             .ccdCaseReference(1234L)
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
@@ -1778,6 +1783,8 @@ public class GeneralApplicationDetailsBuilder {
         return CaseData
                 .builder()
                 .ccdCaseReference(1L)
+                .caseAccessCategory(SPEC_CLAIM)
+                .responseClaimTrack("SMALL_CLAIM")
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant1").build())
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent1").build())
                 .addRespondent2(NO)

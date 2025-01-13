@@ -12,6 +12,7 @@ import java.time.format.DateTimeFormatter;
 
 import static java.util.Collections.emptyList;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
@@ -47,9 +48,23 @@ public class MediationCasesSearchService extends ElasticSearchService {
     }
 
     @Override
-    Query queryInMediationCases(int startIndex, LocalDate claimMovedDate, boolean carmEnabled) {
+    Query queryInMediationCases(int startIndex, LocalDate claimMovedDate, boolean carmEnabled, boolean initialSearch,
+                                String searchAfterValue) {
         String targetDateString =
             claimMovedDate.format(DateTimeFormatter.ISO_DATE);
+        if (carmEnabled) {
+            return new Query(
+                boolQuery()
+                    .must(matchAllQuery())
+                    .must(beState(IN_MEDIATION))
+                    .must(submittedDate(carmEnabled))
+                    .must(matchQuery("data.claimMovedToMediationOn", targetDateString)),
+                emptyList(),
+                startIndex,
+                initialSearch,
+                searchAfterValue
+            );
+        }
         return new Query(
             boolQuery()
                 .minimumShouldMatch(1)

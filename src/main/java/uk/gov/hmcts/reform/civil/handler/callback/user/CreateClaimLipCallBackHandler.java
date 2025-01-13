@@ -107,9 +107,8 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
         addOrginsationPoliciesforClaimantLip(caseDataBuilder);
         caseDataBuilder.caseNameHmctsInternal(buildCaseName(caseData));
         caseDataBuilder.caseNamePublic(buildCaseName(caseData));
-        if (featureToggleService.isHmcEnabled()) {
-            populateWithPartyIds(caseDataBuilder);
-        }
+        populateWithPartyIds(caseDataBuilder);
+
         if (featureToggleService.isCaseEventsEnabled()) {
             caseDataBuilder.anyRepresented(NO);
         }

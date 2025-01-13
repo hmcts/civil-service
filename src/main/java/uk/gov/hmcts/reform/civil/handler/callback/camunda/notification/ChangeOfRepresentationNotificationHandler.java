@@ -26,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_OTHER_SOLICITO
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_OTHER_SOLICITOR_2;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service
 @Slf4j
@@ -139,7 +140,9 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
             CCD_REF, caseData.getCcdCaseReference().toString(),
             FORMER_SOL, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToRemoveID()),
             NEW_SOL, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID()),
-            OTHER_SOL_NAME, getOtherSolicitorOrganisationName(caseData, event));
+            OTHER_SOL_NAME, getOtherSolicitorOrganisationName(caseData, event),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference());
     }
 
     private String getOrganisationName(String orgToName) {
