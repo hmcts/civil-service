@@ -244,11 +244,13 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private CallbackResponse assignTrackToggle(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.responseClaimTrack(callbackParams.getCaseDataBefore().getResponseClaimTrack());
+        caseDataBuilder.allocatedTrack((callbackParams.getCaseDataBefore().getAllocatedTrack()));
 
         if (featureToggleService.isMintiEnabled()
             && caseData.getFinalOrderAllocateToTrack().equals(NO)
             && isJudicialReferral(callbackParams)
-            && isSmallOrFastTrack(caseData)) {
+            && isSmallOrFastTrack(caseDataBuilder.build())) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(NOT_ALLOWED_FOR_TRACK))
                 .build();
@@ -259,7 +261,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         if (caseData.getFinalOrderAllocateToTrack().equals(YES)) {
             caseDataBuilder.finalOrderTrackToggle(caseData.getFinalOrderTrackAllocation().name());
         } else {
-            populateTrackToggle(caseData, caseDataBuilder);
+            populateTrackToggle(caseDataBuilder.build(), caseDataBuilder);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

@@ -644,7 +644,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.FAST_CLAIM)
                 .finalOrderAllocateToTrack(NO).build();
-            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, MID, PAGE_ID, JUDICIAL_REFERRAL);
+            CallbackParams params = callbackParamsOf(caseData, caseData, MID, PAGE_ID, JUDICIAL_REFERRAL);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).hasSize(1);
@@ -660,7 +660,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                 .finalOrderAllocateToTrack(NO).build();
-            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, MID, PAGE_ID, JUDICIAL_REFERRAL);
+            CallbackParams params = callbackParamsOf(caseData, caseData, MID, PAGE_ID, JUDICIAL_REFERRAL);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).hasSize(1);
@@ -675,7 +675,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                 .finalOrderAllocateToTrack(NO).build();
-            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, MID, PAGE_ID, JUDICIAL_REFERRAL);
+            CallbackParams params = callbackParamsOf(caseData, caseData, MID, PAGE_ID, JUDICIAL_REFERRAL);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -690,7 +690,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                 .finalOrderTrackAllocation(AllocatedTrack.INTERMEDIATE_CLAIM)
                 .finalOrderAllocateToTrack(YES).build();
-            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, MID, PAGE_ID, JUDICIAL_REFERRAL);
+            CallbackParams params = callbackParamsOf(caseData, caseData, MID, PAGE_ID, JUDICIAL_REFERRAL);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -704,7 +704,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                 .finalOrderAllocateToTrack(NO).build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            CallbackParams params = callbackParamsOf(caseData, caseData, MID, PAGE_ID);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -719,7 +719,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .allocatedTrack(AllocatedTrack.FAST_CLAIM)
                 .finalOrderTrackAllocation(AllocatedTrack.INTERMEDIATE_CLAIM)
                 .finalOrderAllocateToTrack(YES).build();
-            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, MID, PAGE_ID, JUDICIAL_REFERRAL);
+            CallbackParams params = callbackParamsOf(caseData, caseData, MID, PAGE_ID, JUDICIAL_REFERRAL);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -735,7 +735,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .allocatedTrack(AllocatedTrack.FAST_CLAIM)
                 .finalOrderTrackAllocation(AllocatedTrack.INTERMEDIATE_CLAIM)
                 .finalOrderAllocateToTrack(YES).build();
-            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, MID, PAGE_ID, JUDICIAL_REFERRAL);
+            CallbackParams params = callbackParamsOf(caseData, caseData, MID, PAGE_ID, JUDICIAL_REFERRAL);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -750,7 +750,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .allocatedTrack(AllocatedTrack.FAST_CLAIM)
                 .finalOrderTrackAllocation(AllocatedTrack.INTERMEDIATE_CLAIM)
                 .finalOrderAllocateToTrack(YES).build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            CallbackParams params = callbackParamsOf(caseData, caseData, MID, PAGE_ID);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -766,7 +766,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .allocatedTrack(AllocatedTrack.FAST_CLAIM)
                 .finalOrderTrackAllocation(AllocatedTrack.INTERMEDIATE_CLAIM)
                 .finalOrderAllocateToTrack(YES).build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            CallbackParams params = callbackParamsOf(caseData, caseData, MID, PAGE_ID);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -780,7 +780,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.FAST_CLAIM)
                 .finalOrderAllocateToTrack(NO).build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            CallbackParams params = callbackParamsOf(caseData, caseData, MID, PAGE_ID);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -795,7 +795,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
                 .finalOrderAllocateToTrack(NO).build();
-            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, MID, PAGE_ID, JUDICIAL_REFERRAL);
+            CallbackParams params = callbackParamsOf(caseData, caseData, MID, PAGE_ID, JUDICIAL_REFERRAL);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -810,7 +810,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
                 .finalOrderTrackAllocation(AllocatedTrack.INTERMEDIATE_CLAIM)
                 .finalOrderAllocateToTrack(YES).build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            CallbackParams params = callbackParamsOf(caseData, caseData, MID, PAGE_ID);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -827,7 +827,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                     .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
                     .finalOrderAllocateToTrack(NO).build();
-                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                CallbackParams params = callbackParamsOf(caseData, caseData, MID, PAGE_ID);
                 // When
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -849,7 +849,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                     .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
                     .finalOrderAllocateToTrack(NO).build();
-                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                CallbackParams params = callbackParamsOf(caseData, caseData, MID, PAGE_ID);
                 // When
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -873,7 +873,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                     .responseClaimTrack(AllocatedTrack.INTERMEDIATE_CLAIM.name())
                     .finalOrderAllocateToTrack(NO).build();
-                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                CallbackParams params = callbackParamsOf(caseData, caseData, MID, PAGE_ID);
                 // When
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -895,7 +895,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                     .responseClaimTrack(AllocatedTrack.MULTI_CLAIM.name())
                     .finalOrderAllocateToTrack(NO).build();
-                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                CallbackParams params = callbackParamsOf(caseData, caseData, MID, PAGE_ID);
                 // When
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -925,7 +925,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                     .finalOrderAllocateToTrack(YES)
                     .finalOrderTrackAllocation(AllocatedTrack.INTERMEDIATE_CLAIM).build();
-                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                CallbackParams params = callbackParamsOf(caseData, caseData, MID, PAGE_ID);
                 // When
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -948,7 +948,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                     .finalOrderAllocateToTrack(YES)
                     .finalOrderTrackAllocation(AllocatedTrack.MULTI_CLAIM).build();
-                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                CallbackParams params = callbackParamsOf(caseData, caseData, MID, PAGE_ID);
                 // When
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -973,7 +973,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                     .finalOrderAllocateToTrack(YES)
                     .finalOrderTrackAllocation(AllocatedTrack.INTERMEDIATE_CLAIM).build();
-                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                CallbackParams params = callbackParamsOf(caseData, caseData, MID, PAGE_ID);
                 // When
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -996,7 +996,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
                     .finalOrderAllocateToTrack(YES)
                     .finalOrderTrackAllocation(AllocatedTrack.MULTI_CLAIM).build();
-                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                CallbackParams params = callbackParamsOf(caseData, caseData, MID, PAGE_ID);
                 // When
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);

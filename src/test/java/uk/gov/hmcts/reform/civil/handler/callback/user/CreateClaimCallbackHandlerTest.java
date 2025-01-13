@@ -886,7 +886,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAddClaimStartedFlagToData_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            CallbackParams params = callbackParamsOf(null, caseData, MID, PAGE_ID);
+            CallbackParams params = callbackParamsOf(caseData, caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())

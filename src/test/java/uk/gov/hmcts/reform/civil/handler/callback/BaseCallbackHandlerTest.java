@@ -81,8 +81,20 @@ public abstract class BaseCallbackHandlerTest {
         return callbackParamsOf(caseData, type, null, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
     }
 
+    public CallbackParams callbackParamsOf(CaseData caseData, CaseData caseDataBefore, CallbackType type, CaseState state) {
+        return callbackParamsOf(caseData, caseDataBefore, type, null, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"), state);
+    }
+
+    public CallbackParams callbackParamsOf(CaseData caseData, CaseData caseDataBefore, CallbackType type, String pageId, CaseState state) {
+        return callbackParamsOf(caseData, caseDataBefore, type, null, pageId, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"), state);
+    }
+
+    public CallbackParams callbackParamsOf(CaseData caseData, CaseData caseDataBefore, CallbackType type, String pageId) {
+        return callbackParamsOf(caseData, caseDataBefore, type, null, pageId, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"), null);
+    }
+
     public CallbackParams callbackParamsOf(CaseData caseData, CaseData caseDataBefore, CallbackType type) {
-        return callbackParamsOf(caseData, caseDataBefore, type, null, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
+        return callbackParamsOf(caseData, caseDataBefore, type, null, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"), null);
     }
 
     public CallbackParams callbackParamsOf(CaseData caseData, CallbackType type, CaseState previousState) {
@@ -173,13 +185,14 @@ public abstract class BaseCallbackHandlerTest {
                                            CallbackType type,
                                            CallbackVersion version,
                                            String pageId,
-                                           Map<Params, Object> params
+                                           Map<Params, Object> params,
+                                           CaseState state
     ) {
         return CallbackParams.builder()
             .type(type)
             .pageId(pageId)
             .request(CallbackRequest.builder()
-                .caseDetails(CaseDetails.builder().data(new HashMap<>()).id(CASE_ID).build())
+                .caseDetails(CaseDetails.builder().state(state != null ? state.toString() : null).data(new HashMap<>()).id(CASE_ID).build())
                 .caseDetailsBefore(CaseDetails.builder().data(new HashMap<>()).id(CASE_ID).build())
                 .build())
             .caseData(caseData)
