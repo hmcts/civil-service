@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.validation;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -18,9 +17,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings("unchecked")
 public class GeneralApplicationValidator implements GeneralApplicationValidatorConstants {
 
     public List<String> validateUrgencyDates(GAUrgencyRequirement generalAppUrgencyRequirement) {
@@ -62,7 +59,7 @@ public class GeneralApplicationValidator implements GeneralApplicationValidatorC
         if (YES.equals(isTrialScheduled)) {
             if (trialDateFrom == null) {
                 errors.add(TRIAL_DATE_FROM_REQUIRED);
-            } else if (trialDateTo != null && trialDateFrom.compareTo(trialDateTo) > 0) {
+            } else if (trialDateTo != null && trialDateFrom.isAfter(trialDateTo)) {
                 errors.add(INVALID_TRIAL_DATE_RANGE);
             }
         }
@@ -80,7 +77,7 @@ public class GeneralApplicationValidator implements GeneralApplicationValidatorC
                     LocalDate dateTo = dateRange.getValue().getUnavailableTrialDateTo();
                     if (dateFrom == null) {
                         errors.add(UNAVAILABLE_FROM_MUST_BE_PROVIDED);
-                    } else if (dateTo != null && dateFrom.compareTo(dateTo) > 0) {
+                    } else if (dateTo != null && dateFrom.isAfter(dateTo)) {
                         errors.add(INVALID_UNAVAILABILITY_RANGE);
                     }
                 });

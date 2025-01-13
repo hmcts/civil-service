@@ -135,12 +135,7 @@ public class InitiateGeneralApplicationService implements InitiateGeneralApplica
         String caseId = caseData.getCcdCaseReference().toString();
         CaseAssignmentUserRolesResource userRoles = getUserRolesOnCase(caseId);
         List<String> respondentCaseRoles = getRespondentCaseRoles(caseData);
-
-        if (isLipCase(caseData, userRoles)) {
-            return true;
-        }
-
-        return areRespondentRolesAssigned(userRoles, respondentCaseRoles);
+        return isLipCase(caseData, userRoles) || areRespondentRolesAssigned(userRoles, respondentCaseRoles);
     }
 
     private boolean isLipCase(CaseData caseData, CaseAssignmentUserRolesResource userRoles) {

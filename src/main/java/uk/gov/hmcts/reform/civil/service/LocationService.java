@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
@@ -16,6 +17,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRANSFER_ONLINE_CASE;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class LocationService {
 
     private final LocationReferenceDataService locationRefDataService;
