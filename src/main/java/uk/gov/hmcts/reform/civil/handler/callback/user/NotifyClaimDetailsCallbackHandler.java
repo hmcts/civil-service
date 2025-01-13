@@ -340,14 +340,14 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     private CallbackResponse prepareDefendantSolicitorOptions(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        String caseId = caseData.getCcdCaseReference().toString();
+
 
         log.info("GET ROLES");
         List<String> roleType = new ArrayList<>();
         List<String> roleName = new ArrayList<>();
         roleType.add("CASE");
         roleName.add("allocated-judge");
-
+        String caseId = caseData.getCcdCaseReference().toString();
         var roleAssignmentResponse = roleAssignmentsService.queryRoleAssignmentsByCaseIdAndRole(caseId,
                                                                                                  roleType,
                                                                                                  roleName,
