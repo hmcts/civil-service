@@ -30,7 +30,7 @@ public class ClaimantIntendsToProceedMultIntClaimantScenarioTest extends Dashboa
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
-            .respondent1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.NO)
             .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
             .responseClaimTrack(AllocatedTrack.INTERMEDIATE_CLAIM.name())
             .build();
@@ -63,7 +63,7 @@ public class ClaimantIntendsToProceedMultIntClaimantScenarioTest extends Dashboa
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
-            .respondent1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.NO)
             .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
             .responseClaimTrack(AllocatedTrack.MULTI_CLAIM.name())
             .build();
