@@ -102,7 +102,7 @@ class SdoCoverLetterAppendServiceTest {
 
         specClaimTimelineDocuments = List.of(
             new DocumentMetaData(caseDocument.getDocumentLink(), "Cover letter", LocalDate.now().toString()),
-            new DocumentMetaData(caseDocument.getDocumentLink(), "Document to attach", LocalDate.now().toString())
+            new DocumentMetaData(caseDocument.getDocumentLink(), "SDO Document to attach", LocalDate.now().toString())
         );
     }
 

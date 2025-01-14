@@ -35,19 +35,12 @@ public class SdoCoverLetterAppendService {
     private final DocumentManagementService documentManagementService;
     private final DocumentDownloadService documentDownloadService;
 
-    private DocmosisDocument generate(Party recipient, String caseReference) {
-        return documentGeneratorService.generateDocmosisDocument(
-            getTemplateData(recipient, caseReference),
-            SDO_COVER_LETTER
-        );
-    }
-
     public byte[] makeSdoDocumentMailable(CaseData caseData, String authorisation,
                                        Party recipient, DocumentType documentType, CaseDocument... caseDocuments) {
         Long caseId = caseData.getCcdCaseReference();
         log.info("Generating mailable document for caseId {}", caseId);
 
-        DocmosisDocument coverLetter = generate(recipient, caseData.getLegacyCaseReference());
+        DocmosisDocument coverLetter = generateSDOCoverDoc(recipient, caseData.getLegacyCaseReference());
         CaseDocument coverLetterCaseDocument =  documentManagementService.uploadDocument(
             authorisation,
             new PDF(
@@ -60,27 +53,13 @@ public class SdoCoverLetterAppendService {
         List<DocumentMetaData> documentMetaDataList = appendSdoCoverToDocument(coverLetterCaseDocument, caseDocuments);
         String bundleFileName = Arrays.stream(caseDocuments).findFirst().get().getDocumentName().replace('/', '-').replace(' ', '-');
 
-        log.info("Calling civil stitch service from cover letter for caseId {}", caseId);
-        CaseDocument mailableDocument =
-            civilStitchService.generateStitchedCaseDocument(documentMetaDataList,
-                                                            bundleFileName,
-                                                            caseId,
-                                                            documentType,
-                                                            authorisation);
+        log.info("Calling civil stitch service from sdo cover letter for caseId {}", caseId);
+        CaseDocument mailableSdoDocument =
+                getMailableStitchedDocument(documentMetaDataList, bundleFileName, caseId, documentType, authorisation);
 
-        log.info("Civil stitch service cover letter response {} for caseId {}", mailableDocument, caseId);
+        log.info("Civil stitch service sdo cover letter response {} for caseId {}", mailableSdoDocument, caseId);
 
-        byte[] letterContent;
-
-        try {
-            String documentUrl = mailableDocument.getDocumentLink().getDocumentUrl();
-            String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
-            letterContent = documentDownloadService.downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
-        } catch (Exception e) {
-            log.error("Failed getting letter content for document to mail for caseId {}", caseId, e);
-            throw new DocumentDownloadException(mailableDocument.getDocumentLink().getDocumentFileName(), e);
-        }
-        return letterContent;
+        return getLetterContent(mailableSdoDocument, authorisation, caseId);
     }
 
     private List<DocumentMetaData> appendSdoCoverToDocument(CaseDocument coverLetter, CaseDocument... caseDocuments) {
@@ -92,7 +71,7 @@ public class SdoCoverLetterAppendService {
 
         Arrays.stream(caseDocuments).forEach(caseDocument -> documentMetaDataList.add(new DocumentMetaData(
             caseDocument.getDocumentLink(),
-            "Document to attach",
+            "SDO Document to attach",
             LocalDate.now().toString()
         )));
 
@@ -100,11 +79,40 @@ public class SdoCoverLetterAppendService {
 
     }
 
+    private DocmosisDocument generateSDOCoverDoc(Party recipient, String caseReference) {
+        return documentGeneratorService.generateDocmosisDocument(getTemplateData(recipient, caseReference),
+                SDO_COVER_LETTER);
+    }
+
     private SdoCoverLetter getTemplateData(Party recipient, String caseReference) {
         return SdoCoverLetter
-            .builder()
-            .party(recipient)
-            .claimReferenceNumber(caseReference)
-            .build();
+                .builder()
+                .party(recipient)
+                .claimReferenceNumber(caseReference)
+                .build();
+    }
+
+    private CaseDocument getMailableStitchedDocument(List<DocumentMetaData> documentMetaDataList,
+                                                     String bundleFileName,
+                                                     Long caseId, DocumentType documentType,
+                                                     String authorisation) {
+        return civilStitchService.generateStitchedCaseDocument(documentMetaDataList,
+                bundleFileName,
+                caseId,
+                documentType,
+                authorisation);
+    }
+
+    private byte[] getLetterContent(CaseDocument mailableSdoDocument, String authorisation, Long caseId) {
+        byte[] letterContent;
+        try {
+            String documentUrl = mailableSdoDocument.getDocumentLink().getDocumentUrl();
+            String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
+            letterContent = documentDownloadService.downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
+        } catch (Exception e) {
+            log.error("Failed getting letter content for document to mail for caseId {}", caseId, e);
+            throw new DocumentDownloadException(mailableSdoDocument.getDocumentLink().getDocumentFileName(), e);
+        }
+        return letterContent;
     }
 }
