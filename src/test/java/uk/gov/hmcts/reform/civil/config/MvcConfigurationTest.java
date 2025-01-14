@@ -28,6 +28,6 @@ class MvcConfigurationTest {
         when(interceptorRegistry.addInterceptor(any(RequestInterceptor.class))).thenReturn(interceptorRegistration);
         mvcConfiguration.addInterceptors(interceptorRegistry);
         verify(interceptorRegistry).addInterceptor(any(RequestInterceptor.class));
-        verify(interceptorRegistration).addPathPatterns("/cases/callbacks/**");
+        verify(interceptorRegistration).addPathPatterns("/**");
     }
 }

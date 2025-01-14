@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.service.FeesPaymentService;
+
+import java.util.Objects;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -37,7 +40,7 @@ public class FeesPaymentController {
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
         @PathVariable("feeType") FeeType feeType,
         @PathVariable("caseReference") String caseReference) {
-
+        MDC.put("caseId", Objects.toString(caseReference, ""));
         return new ResponseEntity<>(
             feesPaymentService.createGovPaymentRequest(feeType, caseReference, authorization),
             HttpStatus.OK
@@ -54,6 +57,7 @@ public class FeesPaymentController {
         @PathVariable("feeType") FeeType feeType,
         @PathVariable("caseReference") String caseReference,
         @PathVariable("paymentReference") String paymentReference) {
+        MDC.put("caseId", Objects.toString(caseReference, ""));
         return new ResponseEntity<>(
             feesPaymentService.getGovPaymentRequestStatus(feeType, caseReference, paymentReference, authorization),
             HttpStatus.OK

@@ -10,6 +10,6 @@ public class MvcConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new RequestInterceptor()).addPathPatterns("/cases/callbacks/**");
+        registry.addInterceptor(new RequestInterceptor()).addPathPatterns("/**");
     }
 }

@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -14,6 +15,8 @@ import uk.gov.hmcts.reform.civil.exceptions.InternalServerErrorException;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
 import uk.gov.hmcts.reform.civil.service.AuthorisationService;
 import uk.gov.hmcts.reform.civil.service.PaymentRequestUpdateCallbackService;
+
+import java.util.Objects;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -36,6 +39,7 @@ public class ServiceRequestUpdateCallbackController {
     public void serviceRequestUpdate(
         @RequestHeader("ServiceAuthorization") String s2sToken,
         @RequestBody ServiceRequestUpdateDto serviceRequestUpdateDto) {
+        MDC.put("caseId", Objects.toString(serviceRequestUpdateDto.getCcdCaseNumber(), ""));
         try {
             if (authorisationService.isServiceAuthorized(s2sToken)) {
                 requestUpdateCallbackService.processCallback(serviceRequestUpdateDto, FeeType.HEARING.name());
