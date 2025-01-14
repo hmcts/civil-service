@@ -125,8 +125,8 @@ genApp:
     ccmcc:
 #      claims with value under this amount in pounds are assigned to CCMCC
       amountPounds: 1000
-      epimsId: 420219
-      regionId: 2
+      epimsId: 192280
+      regionId: 4
   jrd:
     endpoint: /refdata/judicial/users/search
 
