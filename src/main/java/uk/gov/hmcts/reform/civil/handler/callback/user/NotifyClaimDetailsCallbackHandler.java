@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
+import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -24,6 +25,12 @@ import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.ras.model.GrantType;
+import uk.gov.hmcts.reform.civil.ras.model.RoleAssignment;
+import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentRequest;
+import uk.gov.hmcts.reform.civil.ras.model.RoleCategory;
+import uk.gov.hmcts.reform.civil.ras.model.RoleRequest;
+import uk.gov.hmcts.reform.civil.ras.model.RoleType;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -39,6 +46,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -109,6 +117,9 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     private final CaseAssignmentApi caseAssignmentApi;
     private final AuthTokenGenerator authTokenGenerator;
     private final RoleAssignmentsService roleAssignmentsService;
+    private final SystemUpdateUserConfiguration systemUserConfig;
+    private static final String HEARINGS_SYSTEM_USER_REFERENCE = "civil-hearings-system-user";
+    private static final String SYSTEM_USER_PROCESS = "civil-system-user";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -338,13 +349,17 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     }
 
     private CallbackResponse prepareDefendantSolicitorOptions(CallbackParams callbackParams) {
+
+        log.info("ATTEMPT MAKE ROLE ASSIGNMENT");
+        CaseData caseData = callbackParams.getCaseData();
+        String caseId = caseData.getCcdCaseReference().toString();
+        assignHearingRoles(getSystemUserToken(), caseId);
+
         log.info("GET ROLES");
         List<String> roleType = new ArrayList<>();
         List<String> roleName = new ArrayList<>();
         roleType.add("CASE");
-        roleName.add("[APPLICANTSOLICITORONE]");
-        CaseData caseData = callbackParams.getCaseData();
-        String caseId = caseData.getCcdCaseReference().toString();
+        roleName.add("allocated-judge");
         var roleAssignmentResponse = roleAssignmentsService.queryRoleAssignmentsByCaseIdAndRole(caseId,
                                                                                                  roleType,
                                                                                                  roleName,
@@ -365,6 +380,42 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseDataBuilder.build().toMap(objectMapper))
                 .build();
+    }
+
+    private void assignHearingRoles(String userAuth, String caseId) {
+        log.info("Attempting to assign hearing roles");
+        String userId = userService.getUserInfo(userAuth).getUid();
+        roleAssignmentsService.assignUserRoles(
+            userId,
+            userAuth,
+            RoleAssignmentRequest.builder()
+                .roleRequest(RoleRequest.builder()
+                                 .assignerId(userId)
+                                 .reference(HEARINGS_SYSTEM_USER_REFERENCE)
+                                 .process(SYSTEM_USER_PROCESS)
+                                 .replaceExisting(true)
+                                 .build())
+                .requestedRoles(createCivilSystemRoles(caseId, "1c8ae5a0-70f9-49e8-a197-3afe6ccf3dc6", "allocated-judge")).build()
+        );
+        log.info("Assigned roles successfully");
+    }
+
+    private List<RoleAssignment> createCivilSystemRoles(String caseId, String userId, String... roleNames) {
+        return Arrays.asList(roleNames).stream().map(roleName -> RoleAssignment.builder()
+            .actorId(userId)
+            .actorIdType("IDAM")
+            .roleType(RoleType.CASE)
+            .classification("PUBLIC")
+            .grantType(GrantType.STANDARD)
+            .roleCategory(RoleCategory.JUDICIAL)
+            .roleName(roleName)
+            .attributes(Map.of("jurisdiction", "CIVIL", "caseType", "CIVIL", "caseId", List.of(caseId)))
+            .readOnly(false)
+            .build()).toList();
+    }
+
+    private String getSystemUserToken() {
+        return userService.getAccessToken(systemUserConfig.getUserName(), systemUserConfig.getPassword());
     }
 
     private CallbackResponse validateNotificationOption(CallbackParams callbackParams) {
