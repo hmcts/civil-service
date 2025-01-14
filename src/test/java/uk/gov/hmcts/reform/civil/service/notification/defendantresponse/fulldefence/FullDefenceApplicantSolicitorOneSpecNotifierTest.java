@@ -8,6 +8,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -24,6 +26,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CASE_ID;
@@ -151,6 +154,61 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
     }
 
     @Test
+    void shouldNotifyApplicantLipSpecFullDefence_whenInvoked() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledged()
+            .build().toBuilder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .applicant1Represented(YesOrNo.NO)
+            .build();
+        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
+
+        when(notificationsProperties.getClaimantLipClaimUpdatedTemplate()).thenReturn(
+            "templateImm-id");
+
+        notifier.notifySolicitorForDefendantResponse(caseData);
+
+        verify(notificationService).sendMail(
+            ArgumentMatchers.eq("rambo@email.com"),
+            ArgumentMatchers.eq("templateImm-id"),
+            ArgumentMatchers.argThat(map -> {
+                Map<String, String> expected = getNotificationDataMapSpec();
+                return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))
+                    && map.get(CLAIMANT_NAME).equals(expected.get(CLAIMANT_NAME));
+            }),
+            ArgumentMatchers.eq("defendant-response-applicant-notification-000DC001")
+        );
+    }
+
+    @Test
+    void shouldNotifyApplicantLipSpecFullDefenceForBilingual_whenInvoked() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledged()
+            .build().toBuilder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .applicant1Represented(YesOrNo.NO)
+            .claimantBilingualLanguagePreference(Language.BOTH.toString())
+            .build();
+        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
+
+        when(notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate()).thenReturn(
+            "templateImm-bilingual-id");
+
+        notifier.notifySolicitorForDefendantResponse(caseData);
+
+        verify(notificationService).sendMail(
+            ArgumentMatchers.eq("rambo@email.com"),
+            ArgumentMatchers.eq("templateImm-bilingual-id"),
+            ArgumentMatchers.argThat(map -> {
+                Map<String, String> expected = getNotificationDataMapSpec();
+                return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))
+                    && map.get(CLAIMANT_NAME).equals(expected.get(CLAIMANT_NAME));
+            }),
+            ArgumentMatchers.eq("defendant-response-applicant-notification-000DC001")
+        );
+    }
+
+    @Test
     void shouldNotifyApplicantSolicitorSpecImmediatelyScenerio3_whenInvoked() {
 
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -188,7 +246,8 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
             "defendantName", "Mr. Sole Trader",
-            CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name"
+            CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
+            "claimantName", "Mr. John Rambo"
         );
     }
 }

@@ -1480,6 +1480,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder noApplicant2DQSmallClaimExperts() {
+        var applicant2DQBuilder = applicant2DQ != null
+            ? applicant2DQ.toBuilder() : applicant2DQ().build().getApplicant2DQ().toBuilder();
+        applicant2DQ = applicant2DQBuilder
+            .applicant2DQExperts(Experts.builder().expertRequired(NO).build()
+            ).build();
+        this.applicantMPClaimExpertSpecRequired(NO);
+        return this;
+    }
+
     public CaseDataBuilder applicant1DQWithLocation() {
         applicant1DQ = Applicant1DQ.builder()
             .applicant1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
@@ -7048,6 +7058,13 @@ public class CaseDataBuilder {
     public CaseDataBuilder specClaim1v1LrVsLip() {
         this.caseAccessCategory = SPEC_CLAIM;
         this.respondent1Represented = NO;
+        return this;
+    }
+
+    public CaseDataBuilder specClaim1v1LipvLr() {
+        this.caseAccessCategory = SPEC_CLAIM;
+        this.respondent1Represented = YES;
+        this.applicant1Represented = NO;
         return this;
     }
 

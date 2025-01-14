@@ -253,6 +253,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final YesOrNo respondentSolicitor2ServiceAddressRequired;
     private final Address respondentSolicitor2ServiceAddress;
     private final StatementOfTruth applicant1ServiceStatementOfTruthToRespondentSolicitor1;
+    private final RespondentSolicitorDetails respondentSolicitorDetails;
 
     @Builder.Default
     private final List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
@@ -758,9 +759,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo obligationDatePresent;
     private CourtStaffNextSteps courtStaffNextSteps;
     private List<Element<ObligationData>> obligationData;
-    private List<Element<ObligationData>> storedObligationData;
+    private List<Element<StoredObligationData>> storedObligationData;
     private YesOrNo isFinalOrder;
-
     private SendAndReplyOption sendAndReplyOption;
     private SendMessageMetadata sendMessageMetadata;
     private String sendMessageContent;
@@ -768,10 +768,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private String messageHistory;
     private DynamicList messagesToReplyTo;
     private List<Element<Message>> messages;
+    private ObligationWAFlag obligationWAFlag;
     private Message lastMessage;
     private String lastMessageAllocatedTrack;
     private String lastMessageJudgeLabel;
-
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
@@ -1058,6 +1058,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return isRespondent1LiP()
             && isApplicant1NotRepresented()
             && isOneVOne(this);
+    }
+
+    @JsonIgnore
+    public boolean isApplicantLipOneVOne() {
+        return isApplicant1NotRepresented() && isOneVOne(this);
     }
 
     @JsonIgnore
