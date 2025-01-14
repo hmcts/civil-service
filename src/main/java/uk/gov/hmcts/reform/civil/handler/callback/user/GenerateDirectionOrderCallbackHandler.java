@@ -651,6 +651,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             && caseData.getFinalOrderFurtherHearingToggle() != null)
             || isJudicialReferral(callbackParams)) {
             state = CASE_PROGRESSION;
+        } else {
+            caseDataBuilder.finalOrderFurtherHearingToggle(null);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
