@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
+import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -92,6 +93,8 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
     private CaseAssignmentApi caseAssignmentApi;
     @MockBean
     private RoleAssignmentsService roleAssignmentsService;
+    @MockBean
+    private SystemUpdateUserConfiguration systemUpdateUserConfiguration;
 
     @Autowired
     private NotifyClaimDetailsCallbackHandler handler;
