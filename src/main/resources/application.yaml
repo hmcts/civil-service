@@ -492,8 +492,8 @@ court-location:
     region-id: "2"
     epimms-id: "420219"
   unspecified-claim:
-    region-id: "2"
-    epimms-id: "420219"
+    region-id: "4"
+    epimms-id: "192280"
 
 role-initialisation:
   enabled: ${ASSIGN_ROLES_ON_STARTUP:false}
