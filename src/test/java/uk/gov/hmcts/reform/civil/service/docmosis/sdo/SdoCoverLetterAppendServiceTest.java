@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResp
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoCoverLetter;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -67,15 +67,12 @@ class SdoCoverLetterAppendServiceTest {
                 .postTown("London")
                 .postCode("EX12RT")
                 .build())
-        .type(Party.Type.INDIVIDUAL)
-        .individualTitle("Mr.")
-        .individualFirstName("John")
-        .individualLastName("White")
+        .name("Mr.John White")
         .build();
 
     private static final SdoCoverLetter PARTY_LETTER_TEMPLATE_DATA = SdoCoverLetter.builder()
         .party(partyDetails)
-            .claimReferenceNumber("MC0001")
+        .claimReferenceNumber("MC0001")
         .build();
 
     private static final CaseDocument caseDocument = CaseDocument.builder()

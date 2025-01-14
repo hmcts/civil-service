@@ -7,7 +7,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoCoverLetterAppendService;
-import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,9 +29,9 @@ public class SendSDOBulkPrintService {
 
             if (caseDocument.isPresent()) {
                 byte[] letterContent;
-                Party recipient = getPartyDetails(taskId, caseData);
+                Party recipientDetails = getPartyDetails(taskId, caseData);
 
-                letterContent = sdoCoverLetterAppendService.makeSdoDocumentMailable(caseData, authorisation, recipient, SDO_ORDER, caseDocument.get().getValue());
+                letterContent = sdoCoverLetterAppendService.makeSdoDocumentMailable(caseData, authorisation, recipientDetails, SDO_ORDER, caseDocument.get().getValue());
 
                 List<String> recipients = getRecipientsList(caseData, taskId);
                 bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
@@ -46,6 +46,13 @@ public class SendSDOBulkPrintService {
     }
 
     private Party getPartyDetails(String taskId, CaseData caseData) {
-        return TASK_ID_DEFENDANT.equals(taskId) ? caseData.getRespondent1() : caseData.getApplicant1();
+        return TASK_ID_DEFENDANT.equals(taskId) ? getPartyDetails(caseData.getRespondent1()) : getPartyDetails(caseData.getApplicant1());
+    }
+
+    private Party getPartyDetails(uk.gov.hmcts.reform.civil.model.Party party) {
+        return Party.builder()
+            .name(party.getPartyName())
+            .primaryAddress(party.getPrimaryAddress())
+            .build();
     }
 }
