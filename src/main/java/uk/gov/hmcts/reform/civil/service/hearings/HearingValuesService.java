@@ -159,8 +159,7 @@ public class HearingValuesService {
     private void populateMissingFields(Long caseId, CaseData caseData) throws Exception {
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         boolean partyIdsUpdated = populateMissingPartyIds(builder, caseData);
-        boolean unavailableDatesUpdated = featuretoggleService.isUpdateContactDetailsEnabled()
-            ? populateMissingUnavailableDatesFields(builder) : false;
+        boolean unavailableDatesUpdated = populateMissingUnavailableDatesFields(builder);
         boolean caseFlagsUpdated = initialiseMissingCaseFlags(builder);
 
         if (partyIdsUpdated || unavailableDatesUpdated || caseFlagsUpdated) {
@@ -216,8 +215,8 @@ public class HearingValuesService {
             || shouldUpdateApplicant2UnavailableDates(caseData)
             || shouldUpdateRespondent1UnavailableDates(caseData)
             || shouldUpdateRespondent2UnavailableDates(caseData)) {
-            updateMissingUnavailableDatesForApplicants(caseData, builder, true);
-            rollUpUnavailabilityDatesForRespondent(builder, true);
+            updateMissingUnavailableDatesForApplicants(caseData, builder);
+            rollUpUnavailabilityDatesForRespondent(builder);
             copyDatesIntoListingTabFields(builder.build(), builder);
             return true;
         }
