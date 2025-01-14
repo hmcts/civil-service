@@ -342,7 +342,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         List<String> roleType = new ArrayList<>();
         List<String> roleName = new ArrayList<>();
         roleType.add("CASE");
-        roleName.add("allocated-judge");
+        roleName.add("[APPLICANTSOLICITORONE]");
         CaseData caseData = callbackParams.getCaseData();
         String caseId = caseData.getCcdCaseReference().toString();
         var roleAssignmentResponse = roleAssignmentsService.queryRoleAssignmentsByCaseIdAndRole(caseId,
