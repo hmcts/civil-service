@@ -32,6 +32,9 @@ public abstract class ElasticSearchService {
             caseDetails.addAll(result.getCases());
         }
 
+        List<Long> ids = caseDetails.stream().map(CaseDetails::getId).sorted().toList();
+        log.info("Found {} case(s) with ids {}", ids.size(), ids);
+
         return caseDetails;
     }
 

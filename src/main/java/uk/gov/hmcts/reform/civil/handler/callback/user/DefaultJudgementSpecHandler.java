@@ -183,15 +183,18 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         }
 
         List<String> listData = new ArrayList<>();
-
-        listData.add(getPartyNameBasedOnType(caseData.getRespondent1()));
+        String respondent1Name = getPartyNameBasedOnType(caseData.getRespondent1());
+        listData.add(respondent1Name);
         if (nonNull(caseData.getRespondent2())) {
             listData.add(getPartyNameBasedOnType(caseData.getRespondent2()));
             listData.add("Both Defendants");
             caseDataBuilder.defendantDetailsSpec(DynamicList.fromList(listData));
         }
 
-        caseDataBuilder.defendantDetailsSpec(DynamicList.fromList(listData));
+        caseDataBuilder.defendantDetailsSpec(DynamicList.fromList(listData,
+                                                                  null,
+                                                                  this::getPartNameForLabel, respondent1Name, false
+        ));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(errors.isEmpty()
@@ -520,6 +523,10 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         BigDecimal subTotal = caseData.getTotalClaimAmount().add(interest);
         BigDecimal partialPaymentPounds = getPartialPayment(caseData);
         return calculateOverallTotal(partialPaymentPounds, subTotal);
+    }
+
+    private String getPartNameForLabel(String name) {
+        return name;
     }
 }
 

@@ -61,13 +61,25 @@ public class ManageStayCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_WhenAboutToStartIsInvoked() {
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateDecisionOutcome().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseDetails).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        void shouldSetManageStayOptionToNull_WhenAboutToStartIsInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build();
+            caseData.toBuilder().manageStayOption("LIFT_STAY").build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedCaseData.getManageStayOption()).isNull();
         }
     }
 
