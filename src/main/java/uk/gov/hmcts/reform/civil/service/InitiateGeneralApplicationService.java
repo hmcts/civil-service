@@ -54,6 +54,7 @@ import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServic
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.INTERMEDIATE_CLAIM_TRACK;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.MULTI_CLAIM_TRACK;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.SMALL_CLAIM_TRACK;
+import static uk.gov.hmcts.reform.civil.service.LocationService.statesBeforeSDO;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -225,7 +226,7 @@ public class InitiateGeneralApplicationService {
     }
 
     private boolean hasSDOBeenMade(CaseState state) {
-        return !CaseState.statesBeforeSDO.contains(state);
+        return !statesBeforeSDO.contains(state);
     }
 
     private void setGeneralAppEvidenceDocument(CaseData caseData, GeneralApplication.GeneralApplicationBuilder applicationBuilder) {

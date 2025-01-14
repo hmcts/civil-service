@@ -11,9 +11,17 @@ import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRANSFER_ONLINE_CASE;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +30,12 @@ public class LocationService {
 
     private final LocationReferenceDataService locationRefDataService;
     private final CoreCaseEventDataService coreCaseEventDataService;
+
+    public static final Set<CaseState> statesBeforeSDO = EnumSet.of(PENDING_CASE_ISSUED, CASE_ISSUED,
+                                                                    AWAITING_CASE_DETAILS_NOTIFICATION,
+                                                                    AWAITING_RESPONDENT_ACKNOWLEDGEMENT,
+                                                                    IN_MEDIATION,
+                                                                    AWAITING_APPLICANT_INTENTION);
 
     public Pair<CaseLocationCivil, Boolean> getWorkAllocationLocation(CaseData caseData, String authToken) {
         if (hasSDOBeenMade(caseData.getCcdState())) {
@@ -52,7 +66,7 @@ public class LocationService {
     }
 
     private boolean hasSDOBeenMade(CaseState state) {
-        return !CaseState.statesBeforeSDO.contains(state);
+        return !statesBeforeSDO.contains(state);
     }
 
     public LocationRefData getWorkAllocationLocationDetails(String baseLocation, String authToken) {
