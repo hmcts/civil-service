@@ -38,7 +38,7 @@ public enum DocmosisTemplates {
     SDO_FAST_TRACK_NIHL("CV-UNS-STD-ENG-01387.docx", "fast_track_nihl_sdo_%s.pdf"),
     SDO_FAST_FAST_TRACK_INT("CV-UNS-STD-ENG-01378.docx", "fast_track_sdo_%s.pdf"),
     SDO_FAST_FAST_TRACK_INT_R2("CV-UNS-STD-ENG-01378_13066.docx", "fast_track_sdo_%s.pdf"),
-    DEFENDANT_RESPONSE_LIP_SPEC("CV-SPC-CLM-ENG-01065-LIP.docx", "response_sealed_form_%s.pdf"),
+    DEFENDANT_RESPONSE_LIP_SPEC("CV-SPC-CLM-ENG-01065-LIP-DTSCCI-1039.docx", "response_sealed_form_%s.pdf"),
     PIN_IN_THE_POST_LETTER("CV-CMC-LET-ENG-PIP0001.docx", "PIP_letter.pdf"),
     SET_ASIDE_JUDGMENT_IN_ERROR_LIP_DEFENDANT_LETTER("CV-CMC-LET-ENG-LIP-JO0001.docx", "set_aside_letter.pdf"),
     JUDGMENT_BY_ADMISSION_PIN_IN_POST_LIP_DEFENDANT_LETTER("CV-CMC-LET-ENG-PIP-0002.docx", "judgment_by_admission_non_divergent_spec_pip_letter.pdf"),
