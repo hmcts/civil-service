@@ -8,7 +8,7 @@ import uk.gov.hmcts.contino.GithubAPI
 def type = "java"
 def product = "civil"
 def component = "service"
-def ccdBranch = "master"
+def ccdBranch = "add-minti-lrvlip-api-tests"
 def camundaBranch = "master"
 def dmnBranch = "master"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
