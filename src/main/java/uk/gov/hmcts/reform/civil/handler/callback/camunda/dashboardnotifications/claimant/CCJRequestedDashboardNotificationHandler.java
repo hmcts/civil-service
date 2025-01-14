@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static java.util.Objects.nonNull;
@@ -65,8 +66,9 @@ public class CCJRequestedDashboardNotificationHandler extends DashboardCallbackH
         return (nonNull(whenWillThisAmountBePaid)
             && whenWillThisAmountBePaid.isBefore(LocalDate.now())
             && caseData.isFullAdmitPayImmediatelyClaimSpec())
-            || (!caseData.getDefaultJudgmentDocuments().isEmpty() && caseData.getDefaultJudgmentDocuments().stream()
+            || ((!caseData.getDefaultJudgmentDocuments().isEmpty() && caseData.getDefaultJudgmentDocuments().stream()
             .map(el -> el.getValue())
-            .anyMatch(doc -> doc.getDocumentType().equals(DocumentType.DEFAULT_JUDGMENT)));
+            .anyMatch(doc -> doc.getDocumentType().equals(DocumentType.DEFAULT_JUDGMENT)))
+            || (Objects.nonNull(caseData.getRepaymentSummaryObject())));
     }
 }
