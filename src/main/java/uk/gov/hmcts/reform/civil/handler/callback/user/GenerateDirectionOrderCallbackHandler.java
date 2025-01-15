@@ -57,6 +57,7 @@ import java.util.Optional;
 
 import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static java.lang.String.format;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -83,6 +84,7 @@ import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderDownload
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderDownloadTemplateOptions.FIX_DATE_CCMC;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderDownloadTemplateOptions.FIX_DATE_CMC;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.ASSISTED_ORDER;
+import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.FREE_FORM_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.CLAIMANT;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.STANDARD_BASIS;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.SUBJECT_DETAILED_ASSESSMENT;
@@ -607,11 +609,6 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
         caseDataBuilder.businessProcess(BusinessProcess.ready(GENERATE_ORDER_NOTIFICATION));
 
-        CaseState state = All_FINAL_ORDERS_ISSUED;
-        if (caseData.getFinalOrderFurtherHearingToggle() != null || isJudicialReferral(callbackParams)) {
-            state = CASE_PROGRESSION;
-        }
-
         if (nonNull(caseData.getFinalOrderSelection())) {
             // populate hearing notes in listing tab with hearing notes from either assisted or freeform order, if either exist.
             if (caseData.getFinalOrderSelection().equals(ASSISTED_ORDER)) {
@@ -636,8 +633,24 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                 caseDataBuilder
             ));
         }
-
         nullPreviousSelections(caseDataBuilder);
+
+        if (featureToggleService.isCaseEventsEnabled()
+            && !JUDICIAL_REFERRAL.toString().equals(callbackParams.getRequest().getCaseDetails().getState())
+            && ((ASSISTED_ORDER.equals(caseData.getFinalOrderSelection())
+            && isNull(caseData.getFinalOrderFurtherHearingToggle()))
+            || FREE_FORM_ORDER.equals(caseData.getFinalOrderSelection())
+            || isMultiOrIntTrack(caseData))) {
+
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseDataBuilder.build().toMap(objectMapper))
+                .build();
+        }
+        CaseState state = All_FINAL_ORDERS_ISSUED;
+        if (caseData.getFinalOrderFurtherHearingToggle() != null || isJudicialReferral(callbackParams)) {
+            state = CASE_PROGRESSION;
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(state.name())

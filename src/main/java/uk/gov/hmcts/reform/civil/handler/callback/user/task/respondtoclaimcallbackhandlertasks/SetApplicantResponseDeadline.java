@@ -119,24 +119,15 @@ public class SetApplicantResponseDeadline implements CaseTask {
             .assembleResponseDocuments(caseData, updatedData);
         frcDocumentsUtils.assembleDefendantsFRCDocuments(caseData);
 
-        if (toggleService.isUpdateContactDetailsEnabled()) {
-            addEventAndDateAddedToRespondentExperts(updatedData);
-            addEventAndDateAddedToRespondentWitnesses(updatedData);
-        }
-
+        addEventAndDateAddedToRespondentExperts(updatedData);
+        addEventAndDateAddedToRespondentWitnesses(updatedData);
         retainSolicitorReferences(callbackParams.getRequest().getCaseDetailsBefore().getData(), updatedData, caseData);
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(
-            updatedData,
-            toggleService.isUpdateContactDetailsEnabled()
-        );
-
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(updatedData);
         updateClaimsDetailsForClaimDetailsTab(updatedData, caseData);
-
         populateDQPartyIds(updatedData);
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE, updatedData);
-
         updateDocumentGenerationRespondent2(callbackParams, updatedData, caseData);
 
         if (isMultipartyScenario1v2With2LegalRep(caseData)) {
