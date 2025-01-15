@@ -642,6 +642,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             || FREE_FORM_ORDER.equals(caseData.getFinalOrderSelection())
             || isMultiOrIntTrack(caseData))) {
 
+            caseDataBuilder.finalOrderFurtherHearingToggle(null);
+
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseDataBuilder.build().toMap(objectMapper))
                 .build();
