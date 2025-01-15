@@ -116,16 +116,12 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         }
         updateCcjRequestPaymentDetails(builder, caseData);
         populateDQPartyIds(builder);
-
-        if (featureToggleService.isUpdateContactDetailsEnabled()) {
-            addEventAndDateAddedToApplicantExperts(builder);
-            addEventAndDateAddedToApplicantWitnesses(builder);
-        }
+        addEventAndDateAddedToApplicantExperts(builder);
+        addEventAndDateAddedToApplicantWitnesses(builder);
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_CUI, builder);
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(
-            builder, featureToggleService.isUpdateContactDetailsEnabled());
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
 
         if (featureToggleService.isJudgmentOnlineLive() && JudgmentAdmissionUtils.getLIPJudgmentAdmission(caseData)) {
             CaseData updatedCaseData = builder.build();
