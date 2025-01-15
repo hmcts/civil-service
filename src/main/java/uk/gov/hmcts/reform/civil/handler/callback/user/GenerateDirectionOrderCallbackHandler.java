@@ -652,7 +652,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             || isJudicialReferral(callbackParams)) {
             state = CASE_PROGRESSION;
         }
-        if (!ASSISTED_ORDER.equals(caseData.getFinalOrderSelection())){
+        if (!ASSISTED_ORDER.equals(caseData.getFinalOrderSelection())) {
             caseDataBuilder.finalOrderFurtherHearingToggle(null);
         }
 
