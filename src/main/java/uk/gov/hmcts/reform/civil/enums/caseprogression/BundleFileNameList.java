@@ -28,7 +28,12 @@ public enum BundleFileNameList {
     REPLIES_FROM("Replies from %s %s"),
     JOINT_STATEMENTS_OF_EXPERTS("Joint statement of experts %s %s %s"),
     SKELETON_ARGUMENT("%s Skeleton argument %s"),
-    PARTICULARS_OF_CLAIM("Particulars Of Claim %s");
+    PARTICULARS_OF_CLAIM("Particulars Of Claim %s"),
+    CERTIFICATE_OF_SUITABILITY("Certificate Of Suitability %s"),
+    SCHEDULE_OF_LOSS("Schedule Of Loss %s"),
+    OTHER("Other %s"),
+    MEDICAL_REPORT("Medical Report %s");
+
     String displayName;
 
     public String getDisplayName() {
