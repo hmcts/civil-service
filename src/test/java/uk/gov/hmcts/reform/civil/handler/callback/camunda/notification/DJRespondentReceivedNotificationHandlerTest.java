@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DJ
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.APPLICANT_ONE_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_EMAIL;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_NUMBER_INTERIM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_EMAIL;
@@ -117,7 +118,8 @@ class DJRespondentReceivedNotificationHandlerTest {
                     "claimnumber", "1594901956117591",
                     "casemanRef", "000DC001",
                     "DefendantLegalOrgName", "Signer Name",
-                    "DefendantName", "Company ltd"
+                    "DefendantName", "Company ltd",
+                    CLAIMANT_NAME, "Company ltd"
                 ),
                 "default-judgment-respondent-received-notification-000DC001"
             );
@@ -243,7 +245,8 @@ class DJRespondentReceivedNotificationHandlerTest {
                 CLAIM_NUMBER, CASE_ID.toString(),
                 DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                CASEMAN_REF, "000DC001"
+                CASEMAN_REF, "000DC001",
+                CLAIMANT_NAME, "Mr. John Rambo"
             );
         }
 
