@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -34,6 +35,7 @@ public class DefendantResponseFullPartAdmitAfterNocClaimantScenarioTest extends 
         LocalDate responseDeadline = OffsetDateTime.now().toLocalDate();
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
             .toBuilder()
+            .applicant1ResponseDeadline(LocalDateTime.of(2025, 5, 13, 16, 0))
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .changeOfRepresentation(ChangeOfRepresentation.builder().build())
             .legacyCaseReference("reference")
@@ -55,8 +57,8 @@ public class DefendantResponseFullPartAdmitAfterNocClaimantScenarioTest extends 
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("defendant person has asked for a legal representative to act on their behalf"),
                 jsonPath("$[0].titleCy").value("Mae defendant person wedi gofyn i gynrychiolydd cyfreithiol weithredu ar eu rhanh"),
-                jsonPath("$[0].descriptionEn").value("<p class=\"govuk-body\">defendant person has asked for a legal representative to act on their behalf. From now on you will need to liaise with their representative.<br><a href=\"{VIEW_INFO_ABOUT_DEFENDANT}\" class=\"govuk-link\">View the contact details of the defendant’s legal representative.</a><br>This claim will now move offline and you must submit your intention to proceed by using form <a href=\"https://www.gov.uk/government/publications/form-n225-request-for-judgment-and-reply-to-admission-specified-amount\" class=\"govuk-link\">N225</a> (for a full admission) or <a href=\"https://www.gov.uk/government/publications/form-n225a-notice-of-part-admission-specified-amount\" class=\"govuk-link\">N225A</a> (for a partial admission) by 13 May 2025.</p>"),
-                jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">Mae defendant person wedi gofyn i gynrychiolydd cyfreithiol weithredu ar eu rhan.  O hyn ymlaen bydd angen i chi gysylltu â'u cynrychiolydd.<br><a href=\"{VIEW_INFO_ABOUT_DEFENDANT}\" class=\"govuk-link\">Gweld manylion cyswllt cynrychiolydd cyfreithiol y diffynnydd.</a><br>Bydd yr hawliad hwn bellach yn symud all-lein ac mae'n rhaid i chi gyflwyno eich bwriad i fwrw ymlaen trwy ddefnyddio ffurflen <a href=\"https://www.gov.uk/government/publications/form-n225-request-for-judgment-and-reply-to-admission-specified-amount\" class=\"govuk-link\">N225</a> (ar gyfer addefiad llawn) neu <a href=\"https://www.gov.uk/government/publications/form-n225a-notice-of-part-admission-specified-amount\" class=\"govuk-link\">N225A</a> (ar gyfer addefiad rhannol) erbyn 13 Mai 2025.</p>")
+                jsonPath("$[0].descriptionEn").value("<p class=\"govuk-body\">defendant person has asked for a legal representative to act on their behalf. From now on you will need to liaise with their representative.<br><a href=\"{VIEW_INFO_ABOUT_DEFENDANT}\" class=\"govuk-link\">View the contact details of the defendant’s legal representative.</a><br>This claim will now move offline and you must submit your intention to proceed by using form <a href=\"https://www.gov.uk/government/publications/form-n225-request-for-judgment-and-reply-to-admission-specified-amount\" target=\"_blank\" class=\"govuk-link\">N225</a> (for a full admission) or <a href=\"https://www.gov.uk/government/publications/form-n225a-notice-of-part-admission-specified-amount\" target=\"_blank\" class=\"govuk-link\">N225A</a> (for a partial admission) by 13 May 2025.</p>"),
+                jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">Mae defendant person wedi gofyn i gynrychiolydd cyfreithiol weithredu ar eu rhan.  O hyn ymlaen bydd angen i chi gysylltu â'u cynrychiolydd.<br><a href=\"{VIEW_INFO_ABOUT_DEFENDANT}\" class=\"govuk-link\">Gweld manylion cyswllt cynrychiolydd cyfreithiol y diffynnydd.</a><br>Bydd yr hawliad hwn bellach yn symud all-lein ac mae'n rhaid i chi gyflwyno eich bwriad i fwrw ymlaen trwy ddefnyddio ffurflen <a href=\"https://www.gov.uk/government/publications/form-n225-request-for-judgment-and-reply-to-admission-specified-amount\" target=\"_blank\" class=\"govuk-link\">N225</a> (ar gyfer addefiad llawn) neu <a href=\"https://www.gov.uk/government/publications/form-n225a-notice-of-part-admission-specified-amount\" target=\"_blank\" class=\"govuk-link\">N225A</a> (ar gyfer addefiad rhannol) erbyn 13 Mai 2025.</p>")
             );
 
         //Verify task Item is created
@@ -66,7 +68,15 @@ public class DefendantResponseFullPartAdmitAfterNocClaimantScenarioTest extends 
                 jsonPath("$[0].reference").value(caseId),
                 jsonPath("$[0].taskNameEn").value(
                     "<a href={VIEW_RESPONSE_TO_CLAIM} rel=\"noopener noreferrer\" class=\"govuk-link\">View the response to the claim</a>"),
-                jsonPath("$[0].currentStatusEn").value(TaskStatus.AVAILABLE.getName())
+                jsonPath("$[0].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
+                jsonPath("$[1].reference").value(caseId),
+                jsonPath("$[1].taskNameEn").value(
+                    "<a>Contact the court to request a change to my case</a>"),
+                jsonPath("$[1].currentStatusEn").value(TaskStatus.INACTIVE.getName()),
+                jsonPath("$[2].reference").value(caseId),
+                jsonPath("$[2].taskNameEn").value(
+                    "<a>View applications</a>"),
+                jsonPath("$[2].currentStatusEn").value(TaskStatus.INACTIVE.getName())
             );
     }
 }
