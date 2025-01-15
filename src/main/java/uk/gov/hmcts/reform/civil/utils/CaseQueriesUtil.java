@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
 import java.util.Comparator;
 import java.util.List;
 
-import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 public class CaseQueriesUtil {
