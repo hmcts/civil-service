@@ -84,7 +84,10 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
             emailTemplate.template = notificationsProperties.getRespondentSolicitor1DefaultJudgmentRequested();
             emailTemplate.templateReference = REFERENCE_TEMPLATE_REQUESTED;
         }
-        if (ofNullable(caseData.getRespondent2()).isEmpty()) {
+        if (caseData.isApplicantLipOneVOne()) {
+            emailTemplate.template = notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceivedForLipVSLR();
+            emailTemplate.templateReference = REFERENCE_TEMPLATE_RECEIVED;
+        } else if (ofNullable(caseData.getRespondent2()).isEmpty()) {
             emailTemplate.template = notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceived();
             emailTemplate.templateReference = REFERENCE_TEMPLATE_RECEIVED;
         }
