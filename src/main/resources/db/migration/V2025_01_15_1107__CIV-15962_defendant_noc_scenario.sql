@@ -50,4 +50,6 @@ values ('<a href={VIEW_RESPONSE_TO_CLAIM} rel="noopener noreferrer" class="govuk
         '<a>Contact the court to request a change to my case</a>',
         'Ceisiadau', 'Application.Create', 'Scenario.AAA6.DefendantNoticeOfChange.ClaimMovesOffline.Claimant', '{2, 2}', 'CLAIMANT', 16),
        ('<a>View applications</a>', 'Applications' ,'<a>Gweld y cais i gyd</a>',
-        'Ceisiadau', 'Application.View', 'Scenario.AAA6.DefendantNoticeOfChange.ClaimMovesOffline.Claimant', '{2, 2}', 'CLAIMANT', 17);
+        'Ceisiadau', 'Application.View', 'Scenario.AAA6.DefendantNoticeOfChange.ClaimMovesOffline.Claimant', '{2, 2}', 'CLAIMANT', 17),
+       ('<a>View applications</a>', 'Applications' ,'<a>Gweld y cais i gyd</a>',
+        'Ceisiadau', 'Application.View', 'Scenario.AAA6.DefendantNoticeOfChange.Claimant', '{2, 2}', 'CLAIMANT', 17);
