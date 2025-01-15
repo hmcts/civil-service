@@ -75,7 +75,7 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
     public String getScenario(CaseData caseData) {
         if (isCaseStateSettled(caseData)) {
             return getCaseSettledScenarios(caseData);
-        } else if (caseData.isPartAdmitImmediatePaymentClaimSettled()) {
+        } else if (caseData.isPartAdmitImmediatePaymentClaimSettled() || isLrvLipFullAdmitImmediatePayClaimSettled(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT.getScenario();
         } else if (isCourtDecisionRejected(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_CCJ_CLAIMANT_REJECTS_DEF_PLAN_CLAIMANT_DISAGREES_COURT_PLAN_DEFENDANT.getScenario();
@@ -226,5 +226,12 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
             && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
             && NO.equals(caseData.getApplicant1ProceedWithClaim())
             && HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired());
+    }
+
+    private boolean isLrvLipFullAdmitImmediatePayClaimSettled(CaseData caseData) {
+        return featureToggleService.isJudgmentOnlineLive()
+            && !caseData.isApplicantLiP()
+            && caseData.isFullAdmitPayImmediatelyClaimSpec()
+            && caseData.getApplicant1ProceedWithClaim() == null;
     }
 }
