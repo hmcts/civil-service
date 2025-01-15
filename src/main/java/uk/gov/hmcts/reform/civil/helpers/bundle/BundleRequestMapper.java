@@ -141,15 +141,6 @@ public class BundleRequestMapper {
                             poc.getValue().getDocument(), ""
                         )));
             }
-
-            List<Element<DocumentWithRegex>> other = caseData.getServedDocumentFiles().getOther();
-            if (Objects.nonNull(other)) {
-                other.forEach(poc -> bundlingRequestDocuments.add(
-                    buildBundlingRequestDoc(
-                        bundleDocumentsRetrieval.getParticularsOfClaimName(caseData, BundleFileNameList.OTHER),
-                        poc.getValue().getDocument(), ""
-                    )));
-            }
         }
         return bundlingRequestDocuments;
     }

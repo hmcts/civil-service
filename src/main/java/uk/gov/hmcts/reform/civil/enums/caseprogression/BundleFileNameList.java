@@ -31,7 +31,6 @@ public enum BundleFileNameList {
     PARTICULARS_OF_CLAIM("Particulars Of Claim %s"),
     CERTIFICATE_OF_SUITABILITY("Certificate Of Suitability %s"),
     SCHEDULE_OF_LOSS("Schedule Of Loss %s"),
-    OTHER("Other %s"),
     MEDICAL_REPORT("Medical Report %s");
 
     String displayName;

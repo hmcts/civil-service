@@ -61,8 +61,6 @@ class BundleDocumentsRetrievalTest {
         assertEquals("Schedule Of Loss 04/12/2023", result);
         result = bundleDocumentsRetrieval.getParticularsOfClaimName(caseData, BundleFileNameList.CERTIFICATE_OF_SUITABILITY);
         assertEquals("Certificate Of Suitability 04/12/2023", result);
-        result = bundleDocumentsRetrieval.getParticularsOfClaimName(caseData, BundleFileNameList.OTHER);
-        assertEquals("Other 04/12/2023", result);
     }
 
     @Test
