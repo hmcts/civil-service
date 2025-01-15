@@ -58,7 +58,6 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataServ
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
-import uk.gov.hmcts.reform.civil.utils.CaseQueriesInitializer;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
@@ -168,9 +167,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private CaseFlagsInitialiser caseFlagInitialiser;
-
-    @MockBean
-    CaseQueriesInitializer caseQueriesInitializer;
 
     @Autowired
     private AssignCategoryId assignCategoryId;

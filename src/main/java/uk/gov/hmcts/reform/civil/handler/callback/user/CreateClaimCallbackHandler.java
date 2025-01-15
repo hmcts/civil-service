@@ -50,7 +50,6 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
-import uk.gov.hmcts.reform.civil.utils.CaseQueriesInitializer;
 import uk.gov.hmcts.reform.civil.utils.CaseNameUtils;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
@@ -145,7 +144,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final CourtLocationUtils courtLocationUtils;
     private final AssignCategoryId assignCategoryId;
     private final CaseFlagsInitialiser caseFlagInitialiser;
-    private final CaseQueriesInitializer caseQueriesInitializer;
     private final ToggleConfiguration toggleConfiguration;
     private final String caseDocLocation = "/cases/case-details/%s#CaseDocuments";
     private final PartyValidator partyValidator;
@@ -564,7 +562,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         dataBuilder.caseNamePublic(CaseNameUtils.buildCaseName(caseData));
 
         caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM, dataBuilder);
-        caseQueriesInitializer.initialiseCaseQueries(dataBuilder);
 
         dataBuilder.ccdState(CaseState.PENDING_CASE_ISSUED);
 
