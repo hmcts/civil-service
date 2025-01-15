@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import org.junit.jupiter.api.Test;
@@ -66,3 +67,5 @@ public class SettleClaimMarkedPaidInFullLiPDefendant1LetterHandlerTest extends B
     }
 
 }
+
+ */

@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.settleanddiscontinue.SettleClaimMarkedPaidInFullDefendantLiPLetter;
-import uk.gov.hmcts.reform.civil.service.BulkPrintService;
+//import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
@@ -21,7 +21,6 @@ import java.time.LocalDate;
 import java.util.List;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingDetailsMapper.isWelshHearingSelected;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER_BILINGUAL;
 import static uk.gov.hmcts.reform.civil.utils.DateUtils.formatDateInWelsh;
 
 @Slf4j
@@ -32,21 +31,31 @@ public class SettleClaimMarkedPaidInFullDefendantLiPLetterGenerator {
     private final DocumentGeneratorService documentGeneratorService;
     private final DocumentManagementService documentManagementService;
     private final DocumentDownloadService documentDownloadService;
-    private final BulkPrintService bulkPrintService;
+    //    private final BulkPrintService bulkPrintService;
     public static final String TASK_ID = "SendSettleClaimPaidInFullLetterLipDef";
-    private static final String SETTLE_CLAIM_PAID_IN_FULL_LETTER = "settle-claim-paid-in-full-letter";
+    //    private static final String SETTLE_CLAIM_PAID_IN_FULL_LETTER = "settle-claim-paid-in-full-letter";
 
-    public byte[] generateAndPrintSettleClaimPaidInFullLetter(CaseData caseData, String authorisation) {
-        DocmosisDocument settleClaimPaidInFullLetter = generate(caseData);
-        CaseDocument settleClaimPaidInFullLetterCaseDocument =  documentManagementService.uploadDocument(
+    public CaseDocument generateAndPrintSettleClaimPaidInFullLetter(CaseData caseData, String authorisation, DocmosisTemplates template) {
+        DocmosisDocument settleClaimPaidInFullLetter = generate(caseData, template);
+
+        CaseDocument doc1 =  documentManagementService.uploadDocument(
             authorisation,
             new PDF(
                 SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER.getDocumentTitle(),
                 settleClaimPaidInFullLetter.getBytes(),
-                DocumentType.SETTLE_CLAIM_PAID_IN_FULL_LETTER
+                //                DocumentType.SETTLE_CLAIM_PAID_IN_FULL_LETTER
+                DocumentType.NOTICE_OF_DISCONTINUANCE
             )
         );
-        String documentUrl = settleClaimPaidInFullLetterCaseDocument.getDocumentLink().getDocumentUrl();
+        return doc1;
+
+        //        List<String> recipients = getRecipientsList(caseData);
+        //        bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
+        //                                     caseData.getLegacyCaseReference(), SETTLE_CLAIM_PAID_IN_FULL_LETTER, recipients);
+    }
+
+    public byte[] convertToByte(CaseDocument caseDocument, String authorisation) {
+        String documentUrl = caseDocument.getDocumentLink().getDocumentUrl();
         String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
 
         byte[] letterContent;
@@ -54,12 +63,8 @@ public class SettleClaimMarkedPaidInFullDefendantLiPLetterGenerator {
             letterContent = documentDownloadService.downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
         } catch (IOException e) {
             log.error("Failed getting letter content for Settle Claim Paid In Full LiP Letter ");
-            throw new DocumentDownloadException(settleClaimPaidInFullLetterCaseDocument.getDocumentLink().getDocumentFileName(), e);
+            throw new DocumentDownloadException(caseDocument.getDocumentLink().getDocumentFileName(), e);
         }
-
-        List<String> recipients = getRecipientsList(caseData);
-        bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
-                                     caseData.getLegacyCaseReference(), SETTLE_CLAIM_PAID_IN_FULL_LETTER, recipients);
         return letterContent;
     }
 
@@ -67,10 +72,10 @@ public class SettleClaimMarkedPaidInFullDefendantLiPLetterGenerator {
         return List.of(caseData.getRespondent1().getPartyName());
     }
 
-    private DocmosisDocument generate(CaseData caseData) {
-        DocmosisTemplates template = isBilingual(caseData)
-            ? SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER_BILINGUAL
-            : SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER;
+    private DocmosisDocument generate(CaseData caseData, DocmosisTemplates template) {
+        //        DocmosisTemplates template = isBilingual(caseData)
+        //            ? SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER_BILINGUAL
+        //            : SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER;
 
         return documentGeneratorService.generateDocmosisDocument(getTemplateData(caseData), template);
     }
