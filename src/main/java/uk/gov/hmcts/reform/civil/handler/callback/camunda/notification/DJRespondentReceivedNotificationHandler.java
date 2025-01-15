@@ -158,7 +158,8 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
             CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            CASEMAN_REF, caseData.getLegacyCaseReference()
+            CASEMAN_REF, caseData.getLegacyCaseReference(),
+            CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
         );
     }
 
