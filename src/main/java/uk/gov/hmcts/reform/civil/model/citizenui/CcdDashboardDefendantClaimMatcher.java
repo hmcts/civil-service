@@ -428,7 +428,8 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         return caseData.isFastTrackClaim()
             && caseData.getTrialReadyRespondent1() != null
             && (CaseState.HEARING_READINESS.equals(caseData.getCcdState()) || CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.equals(caseData.getCcdState()))
-            && ((nonNull(caseData.getListingOrRelisting()) && !ListingOrRelisting.RELISTING.equals(caseData.getListingOrRelisting())) || isAutomaticHearingNotModifiedAfterTrialNotified())
+            && ((nonNull(caseData.getListingOrRelisting()) && !ListingOrRelisting.RELISTING.equals(
+                caseData.getListingOrRelisting())) || isAutomaticHearingNotModifiedAfterTrialNotified())
             && !isBundleCreatedStatusActive()
             && isHearingLessThanDaysAway(DAY_LIMIT)
             && (eventTime.isPresent())
@@ -454,6 +455,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
             && YesOrNo.YES.equals(caseData.getTrialReadyNotified())
             && isHearingLessThanDaysAway(DAY_LIMIT)
             && !isBundleCreatedStatusActive()
+            && Objects.isNull(caseData.getTrialReadyChecked())
             && caseData.getTrialReadyRespondent1() == null) {
             Optional<LocalDateTime> lastOrder = getTimeOfLastNonSDOOrder();
             return lastOrder.isEmpty()
