@@ -26,7 +26,6 @@ class CourtLocationFieldUpdaterTest {
 
     @Test
     void shouldUpdateEaCourtLocationToYesWhenCaseIsWhitelisted() {
-        when(featureToggleService.isHmcEnabled()).thenReturn(true);
         when(featureToggleService.isLocationWhiteListedForCaseProgression("1010101")).thenReturn(true);
 
         CaseData caseData = CaseData.builder()

@@ -20,13 +20,12 @@ public class CourtLocationFieldUpdater implements SdoCaseDataFieldUpdater {
     @Override
     public void update(CaseData caseData, CaseData.CaseDataBuilder<?, ?> dataBuilder) {
         boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
-        boolean isHmcEnabled = featureToggleService.isHmcEnabled();
         boolean isLocationWhiteListed = featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation());
 
         if (!isLipCase) {
             log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
             dataBuilder.eaCourtLocation(YES);
-            dataBuilder.hmcEaCourtLocation(isHmcEnabled && !isLipCase && isLocationWhiteListed ? YES : NO);
+            dataBuilder.hmcEaCourtLocation(!isLipCase && isLocationWhiteListed ? YES : NO);
         } else if (isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData)) {
             dataBuilder.eaCourtLocation(YesOrNo.YES);
         } else {

@@ -47,6 +47,10 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOp
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.SetOrderDetailsFlags;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.generatesdoorder.GenerateSdoOrder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.prepopulateorderdetailspages.PrePopulateOrderDetailsPages;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.submitsdo.SubmitSDO;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandlertests.CreateSDOCallbackHandlerTestConfig;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
@@ -245,6 +249,18 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
     private LocationHelper locationHelper;
+
+    @Mock
+    private GenerateSdoOrder generateSdoOrder;
+
+    @Mock
+    private PrePopulateOrderDetailsPages prePopulateOrderDetailsPages;
+
+    @Mock
+    private SubmitSDO submitSDO;
+
+    @Mock
+    private SetOrderDetailsFlags setOrderDetailsFlags;
 
     @MockBean
     private UpdateWaCourtLocationsService updateWaCourtLocationsService;
@@ -1142,18 +1158,25 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     void shouldNotCallUpdateWaCourtLocationsServiceWhenNotPresent_AndMintiEnabled() {
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
-        handler = new CreateSDOCallbackHandler(objectMapper, locationRefDataService, workingDayIndicator,
-                                               deadlinesCalculator, sdoGeneratorService, featureToggleService, locationHelper,
-                                                        assignCategoryId, categoryService,
-                                                        Optional.empty());
+        CreateSDOCallbackHandler handler =
+                new CreateSDOCallbackHandler(
+                        generateSdoOrder,
+                        prePopulateOrderDetailsPages,
+                        new SubmitSDO(objectMapper, List.of(), featureToggleService, Optional.empty()),
+                        setOrderDetailsFlags
+                );
 
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").build())
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").build())
+                .build();
 
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+        CallbackParams params = callbackParamsOf(caseData, CREATE_SDO, ABOUT_TO_SUBMIT);
+
+        AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         verifyNoInteractions(updateWaCourtLocationsService);
     }
