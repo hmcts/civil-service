@@ -109,7 +109,6 @@ import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapp
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_REASON_JUDGMENT_BY_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RECORD_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_RECORD_JUDGMENT_REASON;
-import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_RECORD_JUDGMENT_OFFLINE;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_REASON_MANUAL_DETERMINATION;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -8625,7 +8624,6 @@ class EventHistoryMapperTest {
                 .respondent1Represented(YesOrNo.YES)
                 .specRespondent1Represented(YesOrNo.YES)
                 .applicant1Represented(YesOrNo.YES)
-                .isTakenOfflineAfterJBA(YesOrNo.YES)
                 .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
                 .build();
             when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
@@ -8639,7 +8637,7 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventDetails").extracting("miscText").asString().contains(RECORD_JUDGMENT);
             assertThat(eventHistory).extracting("miscellaneous").asList()
-                .extracting("eventDetailsText").asString().contains(RPA_RECORD_JUDGMENT_OFFLINE);
+                .extracting("eventDetailsText").asString().contains(RPA_RECORD_JUDGMENT_REASON);
         }
 
         @Test
