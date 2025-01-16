@@ -42,7 +42,8 @@ import static uk.gov.hmcts.reform.civil.service.GenAppStateHelperService.Require
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
-    GenAppStateHelperService.class, JacksonAutoConfiguration.class,
+    GenAppStateHelperService.class,
+    JacksonAutoConfiguration.class,
     CaseDetailsConverter.class
 })
 class GenAppStateHelperServiceTest {
@@ -57,6 +58,9 @@ class GenAppStateHelperServiceTest {
     private CoreCaseDataService coreCaseDataService;
     @MockBean
     private InitiateGeneralApplicationService genAppService;
+
+    @MockBean
+    private LocationService locationService;
 
     @Autowired
     private CaseDetailsConverter caseDetailsConverter;
@@ -406,7 +410,7 @@ class GenAppStateHelperServiceTest {
          void updateApplicationLocationDetailsLists() {
             when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any()))
                 .thenReturn(getSampleCourLocationsRefObject());
-            when(genAppService.getWorkAllocationLocationDetails(any(), any()))
+            when(locationService.getWorkAllocationLocationDetails(any(), any()))
                 .thenReturn(getSampleCourLocationsRefObject1());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getTestCaseDataWithDetails(CaseData.builder().build(),

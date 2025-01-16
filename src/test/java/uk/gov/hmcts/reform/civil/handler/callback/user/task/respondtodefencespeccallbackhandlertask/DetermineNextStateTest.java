@@ -272,6 +272,37 @@ class DetermineNextStateTest {
         assertEquals(CASE_STAYED.name(), resultState);
     }
 
+    @Test
+    void shouldSetProceedsInHeritageSystemWhenApplicantAcceptedRepaymentPlanAndNotLrVLip() {
+
+        CaseData.CaseDataBuilder<?, ?> builder = mock(CaseData.CaseDataBuilder.class);
+        BusinessProcess businessProcess = BusinessProcess.builder().build();
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1AcceptPartAdmitPaymentPlanSpec(YES)
+            .respondent1Represented(YES)
+            .applicant1Represented(YES)
+            .build();
+        JudgmentDetails activeJudgment = mock(JudgmentDetails.class);
+        
+        when(activeJudgment.getTotalAmount()).thenReturn("1000");
+        when(activeJudgment.getOrderedAmount()).thenReturn("500");
+        when(activeJudgment.getCosts()).thenReturn("150");
+        when(activeJudgment.getClaimFeeAmount()).thenReturn("50");
+        when(activeJudgment.getAmountAlreadyPaid()).thenReturn("200");
+        when(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData)).thenReturn(activeJudgment);
+        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+        String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
+                                                                   builder, "", businessProcess);
+
+        assertNotNull(resultState);
+        assertEquals(PROCEEDS_IN_HERITAGE_SYSTEM.name(), resultState);
+        verify(builder).activeJudgment(activeJudgment);
+        verify(builder).joIsLiveJudgmentExists(YesOrNo.YES);
+    }
+
     private CallbackParams callbackParams(CaseData caseData) {
 
         return CallbackParams.builder()

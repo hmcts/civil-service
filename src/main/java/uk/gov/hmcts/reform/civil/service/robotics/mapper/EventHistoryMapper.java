@@ -33,6 +33,10 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.SetAsideApplicantTypeForRPA;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.SetAsideResultTypeForRPA;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -95,6 +99,7 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MENTAL_HEALTH_B
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.SET_ASIDE_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.STATES_PAID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
@@ -127,7 +132,8 @@ public class EventHistoryMapper {
     public static final String BS_END_DATE = "actual end date";
     public static final String RPA_REASON_MANUAL_DETERMINATION = "RPA Reason: Manual Determination Required.";
     public static final String RPA_REASON_JUDGMENT_BY_ADMISSION = "RPA Reason: Judgment by Admission requested and claim moved offline.";
-    public static final String RPA_RECORD_JUDGMENT = "Judgment recorded.";
+    public static final String RECORD_JUDGMENT = "Judgment recorded.";
+    public static final String RPA_RECORD_JUDGMENT_REASON = "RPA Reason: Judgment recorded.";
     public static final String RPA_IN_MEDIATION = "IN MEDIATION";
     static final String ENTER = "Enter";
     static final String LIFTED = "Lifted";
@@ -286,6 +292,7 @@ public class EventHistoryMapper {
         buildInformAgreedExtensionDateForSpec(builder, caseData);
         buildClaimTakenOfflineAfterDJ(builder, caseData);
         buildCcjEvent(builder, caseData);
+        buildSetAsideJudgment(builder, caseData);
         buildCoscEvent(builder, caseData);
         return eventHistorySequencer.sortEvents(builder.build());
     }
@@ -365,7 +372,7 @@ public class EventHistoryMapper {
             .eventDetails(EventDetails.builder()
                               .miscText("")
                               .amountOfJudgment(amountClaimedWithInterest.setScale(2))
-                              .amountOfCosts((caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled())
+                              .amountOfCosts((caseData.isApplicantLipOneVOne() && featureToggleService.isLipVLipEnabled())
                                                  ? MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
                                                  : JudgmentsOnlineHelper.getCostOfJudgmentForDJ(caseData))
                               .amountPaidBeforeJudgment((caseData.getPartialPayment() == YesOrNo.YES) ? partialPaymentPounds : ZERO)
@@ -531,20 +538,68 @@ public class EventHistoryMapper {
             buildJudgmentByAdmissionEventDetails(builder, caseData);
 
             String miscTextRequested = RPA_REASON_JUDGMENT_BY_ADMISSION;
+            String detailsTextRequested = RPA_REASON_JUDGMENT_BY_ADMISSION;
             if (featureToggleService.isJOLiveFeedActive()) {
-                miscTextRequested = RPA_RECORD_JUDGMENT;
+                miscTextRequested = RECORD_JUDGMENT;
+                detailsTextRequested = RPA_RECORD_JUDGMENT_REASON;
             }
 
             builder.miscellaneous((Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
                 .eventCode(MISCELLANEOUS.getCode())
                 .dateReceived(setApplicant1ResponseDate(caseData))
-                .eventDetailsText(miscTextRequested)
+                .eventDetailsText(detailsTextRequested)
                 .eventDetails(EventDetails.builder()
                                   .miscText(miscTextRequested)
                                   .build())
                 .build()));
         }
+    }
+
+    private void buildSetAsideJudgment(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        if (featureToggleService.isJOLiveFeedActive() && caseData.getJoSetAsideReason() != null) {
+            List<Event> events = new ArrayList<>();
+            events.add(buildSetAsideJudgmentEvent(builder, caseData, RESPONDENT_ID));
+            if (null != caseData.getRespondent2()) {
+                events.add(buildSetAsideJudgmentEvent(builder, caseData, RESPONDENT2_ID));
+            }
+            builder.setAsideJudgment(events);
+        }
+    }
+
+    private Event buildSetAsideJudgmentEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData, String litigiousPartyID) {
+        return Event.builder()
+            .eventSequence(prepareEventSequence(builder.build()))
+            .litigiousPartyID(litigiousPartyID)
+            .eventCode(SET_ASIDE_JUDGMENT.getCode())
+            .dateReceived(caseData.getJoSetAsideCreatedDate())
+            .eventDetails(getSetAsideEventDetails(caseData))
+            .eventDetailsText("")
+            .build();
+    }
+
+    private EventDetails getSetAsideEventDetails(CaseData caseData) {
+        String applicant = null;
+        LocalDate appDate = null;
+        LocalDate resultDate = null;
+        if (JudgmentSetAsideReason.JUDGE_ORDER.equals(caseData.getJoSetAsideReason())) {
+            if (JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION.equals(caseData.getJoSetAsideOrderType())) {
+                appDate = caseData.getJoSetAsideApplicationDate();
+            } else if (JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE.equals(caseData.getJoSetAsideOrderType())) {
+                appDate = caseData.getJoSetAsideDefenceReceivedDate();
+            }
+            applicant = SetAsideApplicantTypeForRPA.PARTY_AGAINST.getValue();
+            resultDate = caseData.getJoSetAsideOrderDate();
+
+        } else if (JudgmentSetAsideReason.JUDGMENT_ERROR.equals(caseData.getJoSetAsideReason())) {
+            applicant = SetAsideApplicantTypeForRPA.PROPER_OFFICER.getValue();
+        }
+        return EventDetails.builder()
+            .result(SetAsideResultTypeForRPA.GRANTED.name())
+            .applicant(applicant)
+            .applicationDate(appDate)
+            .resultDate(resultDate)
+            .build();
     }
 
     private void buildJudgmentByAdmissionEventDetails(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
@@ -2286,7 +2341,7 @@ public class EventHistoryMapper {
 
         if (featureToggleService.isJOLiveFeedActive()
             && caseData.getCcdState() == CaseState.All_FINAL_ORDERS_ISSUED) {
-            miscTextGranted = RPA_RECORD_JUDGMENT;
+            miscTextGranted = RECORD_JUDGMENT;
         }
 
         if (caseData.getDefendantDetailsSpec() != null) {
