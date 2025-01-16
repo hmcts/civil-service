@@ -139,7 +139,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             updatedCaseData.setActiveJudgment(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(updatedCaseData));
             updatedCaseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
             updatedCaseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(updatedCaseData.getActiveJudgment()));
-            updatedCaseData.setIsTakenOfflineAfterJBA(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name().equals(nextState) ? YesOrNo.YES : YesOrNo.NO);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
