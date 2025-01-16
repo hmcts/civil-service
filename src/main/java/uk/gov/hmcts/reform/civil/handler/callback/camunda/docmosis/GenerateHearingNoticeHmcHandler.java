@@ -120,7 +120,7 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
                       .hearingFee(featureToggleService.isCaseProgressionEnabled()
                                       ? calculateAndApplyFee(hearingFeesService, caseData, claimTrack)
                                       : null)
-                      .hearingDurationInMinutesAHN(totalDurationInMinutes)
+                      .hearingDurationInMinutesAHN(totalDurationInMinutes.toString())
                       .hearingRequestedAHN(LocalDateTime.now())
                       .trialReadyNotified(null)
                       .build().toMap(objectMapper))
