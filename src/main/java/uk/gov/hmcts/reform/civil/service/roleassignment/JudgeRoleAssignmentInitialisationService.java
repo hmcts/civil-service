@@ -30,9 +30,9 @@ public class JudgeRoleAssignmentInitialisationService {
     private final UserService userService;
 
     public void assignJudgeRoles(String caseId, String userId, String judgeRole, ZonedDateTime beginTime, ZonedDateTime endTime) {
+        log.info("Attempting to assign judge roles");
         List<String> userList = new ArrayList<>();
         String userAuth = getSystemUserToken();
-        log.info("Attempting to assign judge roles");
         String systemUserId = userService.getUserInfo(userAuth).getUid();
         log.info("userAuth token {}", userAuth);
         log.info("userAuth id {}", systemUserId);
