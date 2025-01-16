@@ -34,6 +34,8 @@ public class JudgeRoleAssignmentInitialisationService {
         String userAuth = getSystemUserToken();
         log.info("Attempting to assign judge roles");
         String systemUserId = userService.getUserInfo(userAuth).getUid();
+        log.info("userAuth token {}", userAuth);
+        log.info("userAuth id {}", systemUserId);
         userList.add(systemUserId);
         roleAssignmentService.assignUserRoles(
             systemUserId,
