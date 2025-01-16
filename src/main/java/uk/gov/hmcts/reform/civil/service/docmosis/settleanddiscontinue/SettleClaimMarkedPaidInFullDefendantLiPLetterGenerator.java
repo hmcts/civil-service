@@ -56,7 +56,7 @@ public class SettleClaimMarkedPaidInFullDefendantLiPLetterGenerator {
             log.info("Calling civil stitch service to combine bilingual settle claim marked paid in full lip defendant letter for caseId {}", caseId);
             CaseDocument stitchedCaseDocument = civilStitchService.generateStitchedCaseDocument(
                 documentMetaDataList,
-                SETTLE_CLAIM_PAID_IN_FULL_LETTER_TITLE,
+                welshDoc.getDocumentName(),
                 caseId,
                 SETTLE_CLAIM_PAID_IN_FULL_LETTER,
                 auth

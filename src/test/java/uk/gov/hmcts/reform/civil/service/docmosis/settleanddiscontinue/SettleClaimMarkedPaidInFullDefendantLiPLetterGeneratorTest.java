@@ -162,7 +162,7 @@ class SettleClaimMarkedPaidInFullDefendantLiPLetterGeneratorTest {
                  ))
             .thenReturn(SETTLE_CLAIM);
 
-        when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(SETTLE_CLAIM_PAID_IN_FULL_LETTER),
+        when(civilStitchService.generateStitchedCaseDocument(anyList(), any(), anyLong(), eq(SETTLE_CLAIM_PAID_IN_FULL_LETTER),
                                                              anyString())).thenReturn(STITCHED_DOC);
 
         given(documentDownloadService.downloadDocument(any(), any())).willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
