@@ -453,8 +453,8 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     }
 
     private boolean isAutomaticHearingNotModifiedAfterTrialNotified() {
-        Optional<LocalDateTime> automaticHearingRequested = Optional.of(caseData.getHearingRequestedAHN());
-        Optional<LocalDateTime> trialReadyDocumentCreated = Optional.of(caseData.getClaimantTrialReadyDocumentCreated());
+        Optional<LocalDateTime> automaticHearingRequested = Optional.ofNullable(caseData.getHearingRequestedAHN());
+        Optional<LocalDateTime> trialReadyDocumentCreated = Optional.ofNullable(caseData.getClaimantTrialReadyDocumentCreated());
 
         return isNull(caseData.getListingOrRelisting())
             && automaticHearingRequested.isPresent()
