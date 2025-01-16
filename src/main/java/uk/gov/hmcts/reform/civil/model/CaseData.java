@@ -335,7 +335,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<TimelineOfEvents> specResponseTimelineOfEvents;
     private final List<TimelineOfEvents> specResponseTimelineOfEvents2;
     private final TimelineUploadTypeSpec specClaimResponseTimelineList;
-    private final ResponseDocument specResponseTimelineDocumentFiles;
+    private final Document specResponseTimelineDocumentFiles;
     private final List<Evidence> specResponselistYourEvidenceList;
     private final List<Evidence> specResponselistYourEvidenceList2;
 
