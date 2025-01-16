@@ -72,6 +72,6 @@ public class JudgeRoleAssignmentInitialisationService {
     }
 
     private String getSystemUserToken() {
-        return userService.getAccessToken("4917924EMP-@ejudiciary.net", "Password12!");
+        return userService.getAccessToken("4917924EMP-@ejudiciary.net", "Hmcts1234");
     }
 }
