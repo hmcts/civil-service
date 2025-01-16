@@ -53,7 +53,7 @@ public class JudgeRoleAssignmentInitialisationService {
     public static RoleAssignment buildRoleAssignment(String caseId, String userId, String role) {
         return RoleAssignment.builder()
             .actorId(userId)
-            .attributes(Map.of("caseId", caseId.toString(),
+            .attributes(Map.of("caseId", caseId,
                                "caseType", "CIVIL",
                                "jurisdiction", "CIVIL",
                                "substantive", "Y"))

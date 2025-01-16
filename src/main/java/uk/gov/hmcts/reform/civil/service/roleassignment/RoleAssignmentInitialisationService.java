@@ -45,6 +45,7 @@ public class RoleAssignmentInitialisationService {
     private void assignHearingRoles(String userAuth) {
         log.info("Attempting to assign hearing roles");
         String userId = userService.getUserInfo(userAuth).getUid();
+        log.info("Assigned hearing roles to {}", userId);
         roleAssignmentService.assignUserRoles(
             userId,
             userAuth,
@@ -75,6 +76,8 @@ public class RoleAssignmentInitialisationService {
     }
 
     private String getSystemUserToken() {
+        log.info("Username, {}", systemUserConfig.getUserName());
+        log.info("Username pass, {}", systemUserConfig.getPassword());
         return userService.getAccessToken(systemUserConfig.getUserName(), systemUserConfig.getPassword());
     }
 }
