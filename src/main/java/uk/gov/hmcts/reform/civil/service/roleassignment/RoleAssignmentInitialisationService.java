@@ -59,19 +59,7 @@ public class RoleAssignmentInitialisationService {
                                  .build())
                 .requestedRoles(createCivilSystemRoles(userId, "hearing-manager", "hearing-viewer")).build()
         );
-        log.info("Assigned hearing roles successfully");
-        log.info("Attempting to assign case-allocator");
-        roleAssignmentService.assignUserRoles(
-            userId,
-            userAuth,
-            RoleAssignmentRequest.builder()
-                .roleRequest(RoleRequest.builder()
-                                 .assignerId(userId)
-                                 .replaceExisting(false)
-                                 .build())
-                .requestedRoles(createCivilSystemRoles2(userId, "case-allocator")).build()
-        );
-        log.info("Assigned case-allocator roles successfully");
+        log.info("Assigned roles successfully");
     }
 
     private List<RoleAssignment> createCivilSystemRoles(String userId, String... roleNames) {
@@ -82,20 +70,6 @@ public class RoleAssignmentInitialisationService {
             .classification("PUBLIC")
             .grantType(GrantType.STANDARD)
             .roleCategory(RoleCategory.SYSTEM)
-            .roleName(roleName)
-            .attributes(Map.of("jurisdiction", "CIVIL", "caseType", "CIVIL"))
-            .readOnly(false)
-            .build()).toList();
-    }
-
-    private List<RoleAssignment> createCivilSystemRoles2(String userId, String... roleNames) {
-        return Arrays.asList(roleNames).stream().map(roleName -> RoleAssignment.builder()
-            .actorId(userId)
-            .actorIdType("IDAM")
-            .roleType(RoleType.ORGANISATION)
-            .classification("PUBLIC")
-            .grantType(GrantType.STANDARD)
-            .roleCategory(RoleCategory.JUDICIAL)
             .roleName(roleName)
             .attributes(Map.of("jurisdiction", "CIVIL", "caseType", "CIVIL"))
             .readOnly(false)
