@@ -440,14 +440,25 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         Optional<LocalDateTime> eventTime = getTimeOfMostRecentEventOfType(
             EnumSet.of(CaseEvent.GENERATE_TRIAL_READY_FORM_APPLICANT));
         Optional<LocalDateTime> orderTime = getTimeOfLastNonSDOOrder();
+
+
         return caseData.isFastTrackClaim()
             && caseData.getTrialReadyApplicant() != null
-            && !ListingOrRelisting.RELISTING.equals(caseData.getListingOrRelisting())
+            && ((nonNull(caseData.getListingOrRelisting()) && !ListingOrRelisting.RELISTING.equals(caseData.getListingOrRelisting())) || isAutomaticHearingNotModifiedAfterTrialNotified())
             && (CaseState.HEARING_READINESS.equals(caseData.getCcdState()) || CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.equals(caseData.getCcdState()))
             && !isBundleCreatedStatusActive()
             && isHearingLessThanDaysAway(DAY_LIMIT)
             && (eventTime.isPresent())
             && (orderTime.isEmpty() || eventTime.get().isAfter(orderTime.get()));
+    }
+
+    private boolean isAutomaticHearingNotModifiedAfterTrialNotified() {
+        Optional<LocalDateTime> automaticHearingRequested = caseData.getHearingRequestedAHN();
+        Optional<LocalDateTime> trialReadyDocumentCreated = caseData.getClaimantTrialReadyDocumentCreated();
+
+        return isNull(caseData.getListingOrRelistng())
+            && automaticHearingRequested.isPresent()
+            && (trialReadyDocumentCreated.isEmpty() || trialReadyDocumentCreated.get().isAfter(automaticHearingRequested.get()));
     }
 
     @Override
@@ -458,5 +469,24 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         return caseData.isHWFTypeHearing() && caseData.getHwFEvent() == null
             && (eventTime.isPresent())
             && (orderTime.isEmpty() || eventTime.get().isAfter(orderTime.get()));
+    }
+
+    @Override
+    public boolean isTrialArrangementStatusActive() {
+        Optional<LocalDate> hearingDate = getHearingDate();
+        if (caseData.isFastTrackClaim()
+            && (CaseState.HEARING_READINESS.equals(caseData.getCcdState()) || CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.equals(caseData.getCcdState()))
+            && hearingDate.isPresent()
+            && YesOrNo.YES.equals(caseData.getTrialReadyNotified())
+            && isHearingLessThanDaysAway(DAY_LIMIT)
+            && !isBundleCreatedStatusActive()
+            && caseData.getTrialReadyApplicant() == null) {
+            Optional<LocalDateTime> lastOrder = getTimeOfLastNonSDOOrder();
+            return lastOrder.isEmpty()
+                || hearingDate.get().minusDays(DAY_LIMIT)
+                .isAfter(lastOrder.get().toLocalDate());
+        } else {
+            return false;
+        }
     }
 }

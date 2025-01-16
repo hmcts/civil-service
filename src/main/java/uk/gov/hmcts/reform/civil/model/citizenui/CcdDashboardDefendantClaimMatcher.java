@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -427,9 +428,39 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         return caseData.isFastTrackClaim()
             && caseData.getTrialReadyRespondent1() != null
             && (CaseState.HEARING_READINESS.equals(caseData.getCcdState()) || CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.equals(caseData.getCcdState()))
+            && ((nonNull(caseData.getListingOrRelisting()) && !ListingOrRelisting.RELISTING.equals(caseData.getListingOrRelisting())) || isAutomaticHearingNotModifiedAfterTrialNotified())
             && !isBundleCreatedStatusActive()
             && isHearingLessThanDaysAway(DAY_LIMIT)
             && (eventTime.isPresent())
             && (orderTime.isEmpty() || eventTime.get().isAfter(orderTime.get()));
+    }
+
+    private boolean isAutomaticHearingNotModifiedAfterTrialNotified() {
+        Optional<LocalDateTime> automaticHearingRequested = caseData.getHearingRequestedAHN();
+        Optional<LocalDateTime> trialReadyDocumentCreated = caseData.getClaimantTrialReadyDocumentCreated();
+
+        return isNull(caseData.getListingOrRelistng())
+            && automaticHearingRequested.isPresent()
+            && (trialReadyDocumentCreated.isEmpty() || trialReadyDocumentCreated.get().isAfter(automaticHearingRequested.get()));
+    }
+
+    @Override
+    public boolean isTrialArrangementStatusActive() {
+        Optional<LocalDate> hearingDate = getHearingDate();
+        if (caseData.isFastTrackClaim()
+            && (CaseState.HEARING_READINESS.equals(caseData.getCcdState()) || CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.equals(caseData.getCcdState()))
+            && !ListingOrRelisting.RELISTING.equals(caseData.getListingOrRelisting())
+            && hearingDate.isPresent()
+            && YesOrNo.YES.equals(caseData.getTrialReadyNotified())
+            && isHearingLessThanDaysAway(DAY_LIMIT)
+            && !isBundleCreatedStatusActive()
+            && caseData.getTrialReadyRespondent1() == null) {
+            Optional<LocalDateTime> lastOrder = getTimeOfLastNonSDOOrder();
+            return lastOrder.isEmpty()
+                || hearingDate.get().minusDays(DAY_LIMIT)
+                .isAfter(lastOrder.get().toLocalDate());
+        } else {
+            return false;
+        }
     }
 }

@@ -237,6 +237,9 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     @Override
     public boolean isTrialScheduledNoPaymentStatusActive() {
         Optional<LocalDateTime> hearingScheduledDate = getWhenWasHearingScheduled();
+        if (hearingScheduledDate.isEmpty()) {
+            hearingScheduledDate = caseData.getHearingRequestedAHN();
+        }
         Optional<LocalDateTime> orderDate = getTimeOfLastNonSDOOrder();
         return CaseState.HEARING_READINESS.equals(caseData.getCcdState())
             && (hearingScheduledDate.isPresent())
@@ -248,6 +251,9 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     @Override
     public boolean isTrialScheduledPaymentPaidStatusActive() {
         Optional<LocalDateTime> hearingScheduledDate = getWhenWasHearingScheduled();
+        if (hearingScheduledDate.isEmpty()) {
+            hearingScheduledDate = caseData.getHearingRequestedAHN();
+        }
         Optional<LocalDateTime> orderDate = getTimeOfLastNonSDOOrder();
         return CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.equals(caseData.getCcdState())
             && (hearingScheduledDate.isPresent())
@@ -255,25 +261,6 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
             && !isBundleCreatedStatusActive()
             && (orderDate.isEmpty()
             || orderDate.get().isBefore(hearingScheduledDate.get()));
-    }
-
-    @Override
-    public boolean isTrialArrangementStatusActive() {
-        Optional<LocalDate> hearingDate = getHearingDate();
-        if (caseData.isFastTrackClaim()
-            && (CaseState.HEARING_READINESS.equals(caseData.getCcdState()) || CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.equals(caseData.getCcdState()))
-            && !ListingOrRelisting.RELISTING.equals(caseData.getListingOrRelisting())
-            && hearingDate.isPresent()
-            && YesOrNo.YES.equals(caseData.getTrialReadyNotified())
-            && isHearingLessThanDaysAway(DAY_LIMIT)
-            && !isBundleCreatedStatusActive()) {
-            Optional<LocalDateTime> lastOrder = getTimeOfLastNonSDOOrder();
-            return lastOrder.isEmpty()
-                || hearingDate.get().minusDays(DAY_LIMIT)
-                .isAfter(lastOrder.get().toLocalDate());
-        } else {
-            return false;
-        }
     }
 
     @Override

@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateAndApplyFee;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getHearingDays;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getLocationRefData;
+import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getTotalHearingDurationInMinutes;
 
 @Service
 @RequiredArgsConstructor
@@ -107,7 +109,7 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
         );
 
         String claimTrack = determineClaimTrack(caseData);
-
+        Integer totalDurationInMinutes = getTotalHearingDurationInMinutes(hearing);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder
                       .hearingDate(hearingStartDate.toLocalDate())
@@ -118,6 +120,9 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
                       .hearingFee(featureToggleService.isCaseProgressionEnabled()
                                       ? calculateAndApplyFee(hearingFeesService, caseData, claimTrack)
                                       : null)
+                      .hearingDurationInMinutesAHN(totalDurationInMinutes)
+                      .hearingRequestedAHN(LocalDateTime.now())
+                      .trialReadyNotified(null)
                       .build().toMap(objectMapper))
             .build();
     }

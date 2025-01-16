@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.docmosis.trialready.TrialReadyFormGenerator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -93,6 +94,15 @@ public class GenerateTrialReadyFormHandler extends CallbackHandler {
         var documents = caseData.getTrialReadyDocuments();
         documents.add(element(caseDocument));
         caseDataBuilder.trialReadyDocuments(documents);
+        addDocumentCreatedDate(role, caseDataBuilder);
+    }
+
+    private void addDocumentCreatedDate(CaseRole role, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+        if (role == CaseRole.CLAIMANT) {
+            caseDataBuilder.claimantTrialReadyDocumentCreated(LocalDateTime.now());
+        } else if (role == CaseRole.DEFENDANT) {
+            caseDataBuilder.defendantTrialReadyDocumentCreated(LocalDateTime.now());
+        }
     }
 
 }
