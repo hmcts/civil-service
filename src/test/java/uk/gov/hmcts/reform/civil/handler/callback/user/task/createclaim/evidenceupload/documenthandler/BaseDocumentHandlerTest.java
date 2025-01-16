@@ -119,16 +119,16 @@ public abstract class BaseDocumentHandlerTest {
     }
 
     protected UploadEvidenceDocumentType createDocumentType(String bundleName, String typeOfDocument) {
-        UploadEvidenceDocumentType.UploadEvidenceDocumentTypeBuilder builder = UploadEvidenceDocumentType.builder()
+        UploadEvidenceDocumentType.UploadEvidenceDocumentTypeBuilder documentBuilder = UploadEvidenceDocumentType.builder()
                 .documentIssuedDate(DomainConstants.ISSUE_DATE)
                 .bundleName(bundleName)
                 .documentUpload(document);
 
         if (typeOfDocument != null) {
-            builder.typeOfDocument(typeOfDocument);
+            documentBuilder.typeOfDocument(typeOfDocument);
         }
 
-        return builder.build();
+        return documentBuilder.build();
     }
 
     protected UploadEvidenceExpert createExpert(String name) {
