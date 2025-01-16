@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
-import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -103,10 +102,8 @@ public class BundleUpdatedClaimantScenarioTest extends CaseProgressionDashboardB
         if (isFastTrack) {
             taskListResultActions.andExpectAll(
                 status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].taskNameEn").value("<a>Add the trial arrangements</a>"),
-                jsonPath("$[0].currentStatusEn").value(TaskStatus.INACTIVE.getName()),
-                jsonPath("$[1].reference").value(caseId.toString()),
-                jsonPath("$[1].taskNameEn").value(
+                jsonPath("$[0].reference").value(caseId.toString()),
+                jsonPath("$[0].taskNameEn").value(
                     "<a href={VIEW_BUNDLE} class=\"govuk-link\">View the bundle</a>")
             );
         }
