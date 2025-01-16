@@ -55,13 +55,14 @@ public class JudgeRoleAssignmentInitialisationService {
             .actorId(userId)
             .attributes(Map.of("caseId", caseId,
                                "caseType", "CIVIL",
-                               "jurisdiction", "CIVIL",
-                               "substantive", "Y"))
+                               "jurisdiction", "CIVIL"
+            ))
             .grantType(GrantType.SPECIFIC)
             .roleCategory(RoleCategory.JUDICIAL)
             .roleType(RoleType.CASE)
-            .beginTime(ZonedDateTime.now())
-            .endTime(ZonedDateTime.now().plusDays(1))
+            .classification("RESTRICTED")
+//            .beginTime(ZonedDateTime.now())
+//            .endTime(ZonedDateTime.now().plusDays(1))
             .roleName(role)
             .readOnly(false)
             .build();
