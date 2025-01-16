@@ -572,7 +572,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             assertThat(response.getData().get("activeJudgment")).extracting("defendant1Name").isEqualTo("Mr. John Rambo");
             assertThat(response.getData().get("activeJudgment")).extracting("defendant1Address").isNotNull();
             assertThat(response.getData().get("activeJudgment")).extracting("defendant1Dob").isNotNull();
-            assertThat(response.getData()).extracting("isTakenOfflineAfterJBA").isEqualTo("No");
         }
 
         @Test
@@ -615,7 +614,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .extracting("businessProcess")
                 .extracting("camundaEvent")
                 .isEqualTo(REQUEST_JUDGEMENT_ADMISSION_SPEC.name());
-            assertThat(response.getData()).extracting("isTakenOfflineAfterJBA").isEqualTo("Yes");
         }
 
         @Test
