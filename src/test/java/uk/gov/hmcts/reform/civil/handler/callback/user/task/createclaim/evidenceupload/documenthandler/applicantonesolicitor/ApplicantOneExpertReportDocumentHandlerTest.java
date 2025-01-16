@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.evidenceupload.documenthandler.BaseDocumentHandlerTest.DomainConstants.APPLICANT;
 
 @ExtendWith(MockitoExtension.class)
-public class ApplicantOneExpertReportDocumentHandlerTest extends BaseDocumentHandlerTest {
+class ApplicantOneExpertReportDocumentHandlerTest extends BaseDocumentHandlerTest {
 
     @InjectMocks
     private ApplicantOneExpertReportDocumentHandler handler;

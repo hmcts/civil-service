@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.evidenceupload.documenthandler.BaseDocumentHandlerTest.DomainConstants.RESPONDENT;
 
 @ExtendWith(MockitoExtension.class)
-public class RespondentOneBundleDocumentHandlerTest extends BaseDocumentHandlerTest {
+class RespondentOneBundleDocumentHandlerTest extends BaseDocumentHandlerTest {
 
     @InjectMocks
     private RespondentOneBundleDocumentHandler handler;

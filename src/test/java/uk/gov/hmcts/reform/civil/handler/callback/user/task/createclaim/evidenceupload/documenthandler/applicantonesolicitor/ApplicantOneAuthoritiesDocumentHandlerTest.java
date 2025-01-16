@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.evidenceupload.documenthandler.BaseDocumentHandlerTest.DomainConstants.APPLICANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.evidenceupload.documenthandler.BaseDocumentHandlerTest.DomainConstants.ORIGINAL_FILE_NAME;
 
-public class ApplicantOneAuthoritiesDocumentHandlerTest extends BaseDocumentHandlerTest {
+class ApplicantOneAuthoritiesDocumentHandlerTest extends BaseDocumentHandlerTest {
 
     @InjectMocks
     private ApplicantOneAuthoritiesDocumentHandler handler;

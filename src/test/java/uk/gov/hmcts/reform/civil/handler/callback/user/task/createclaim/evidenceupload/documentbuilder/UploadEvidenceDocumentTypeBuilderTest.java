@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
-public class UploadEvidenceDocumentTypeBuilderTest {
+class UploadEvidenceDocumentTypeBuilderTest {
 
     @InjectMocks
     private UploadEvidenceDocumentTypeBuilder uploadEvidenceDocumentTypeBuilder;

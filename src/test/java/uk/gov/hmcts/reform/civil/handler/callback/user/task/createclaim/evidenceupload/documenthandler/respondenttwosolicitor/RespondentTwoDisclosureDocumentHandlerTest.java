@@ -14,7 +14,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.e
 
 @ExtendWith(MockitoExtension.class)
 @Slf4j
-public class RespondentTwoDisclosureDocumentHandlerTest extends BaseDocumentHandlerTest {
+class RespondentTwoDisclosureDocumentHandlerTest extends BaseDocumentHandlerTest {
 
     @InjectMocks
     private RespondentTwoDisclosureDocumentHandler handler;

@@ -13,7 +13,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.e
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.evidenceupload.documenthandler.BaseDocumentHandlerTest.DomainConstants.ORIGINAL_FILE_NAME;
 
 @ExtendWith(MockitoExtension.class)
-public class ApplicantOnePreTrialSummaryDocumentHandlerTest extends BaseDocumentHandlerTest {
+class ApplicantOnePreTrialSummaryDocumentHandlerTest extends BaseDocumentHandlerTest {
 
     @InjectMocks
     private ApplicantOnePreTrialSummaryDocumentHandler handler;

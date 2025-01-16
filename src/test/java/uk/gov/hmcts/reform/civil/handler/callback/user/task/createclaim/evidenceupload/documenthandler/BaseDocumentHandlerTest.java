@@ -119,7 +119,7 @@ public abstract class BaseDocumentHandlerTest {
     }
 
     protected UploadEvidenceDocumentType createDocumentType(String bundleName, String typeOfDocument) {
-        var builder = UploadEvidenceDocumentType.builder()
+        UploadEvidenceDocumentType.UploadEvidenceDocumentTypeBuilder builder = UploadEvidenceDocumentType.builder()
                 .documentIssuedDate(DomainConstants.ISSUE_DATE)
                 .bundleName(bundleName)
                 .documentUpload(document);
