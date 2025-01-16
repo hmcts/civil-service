@@ -52,7 +52,7 @@ public class JudgeRoleAssignmentInitialisationService {
 
     public static RoleAssignment buildRoleAssignment(String caseId, String userId, String role) {
         return RoleAssignment.builder()
-            .actorId(userId)
+            .actorId("5ae1103a-7998-47d5-9ec4-ed9d5ab0ce45")
             .attributes(Map.of("caseId", caseId,
                                "caseType", "CIVIL",
                                "jurisdiction", "CIVIL"
@@ -61,8 +61,6 @@ public class JudgeRoleAssignmentInitialisationService {
             .roleCategory(RoleCategory.JUDICIAL)
             .roleType(RoleType.CASE)
             .classification("RESTRICTED")
-//            .beginTime(ZonedDateTime.now())
-//            .endTime(ZonedDateTime.now().plusDays(1))
             .roleName(role)
             .readOnly(false)
             .build();
@@ -75,6 +73,7 @@ public class JudgeRoleAssignmentInitialisationService {
     }
 
     private String getSystemUserToken() {
-        return userService.getAccessToken("4917924EMP-@ejudiciary.net", "Hmcts1234");
+        return userService.getAccessToken(systemUserConfig.getUserName(), systemUserConfig.getPassword());
+        //return userService.getAccessToken("4917924EMP-@ejudiciary.net", "Hmcts1234");
     }
 }
