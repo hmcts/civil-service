@@ -26,7 +26,10 @@ import static org.mockito.Mockito.lenient;
 @ExtendWith(MockitoExtension.class)
 public abstract class BaseDocumentHandlerTest {
 
-    protected static final class DomainConstants {
+    public static final class DomainConstants {
+        public static final String APPLICANT = "Applicant";
+        public static final String RESPONDENT = "Respondent";
+
         public static final String ORIGINAL_FILE_NAME = "OriginalName.pdf";
         public static final LocalDate ISSUE_DATE = LocalDate.of(2022, 2, 10);
 

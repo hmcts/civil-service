@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.evidence
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.applicanttwosolicitor.ApplicantTwoWitnessHearsayDocumentHandler;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.evidenceupload.documenthandler.BaseDocumentHandlerTest.DomainConstants.APPLICANT;
 
 @ExtendWith(MockitoExtension.class)
 public class ApplicantTwoWitnessHearsayDocumentHandlerTest extends BaseDocumentHandlerTest {
@@ -23,7 +24,7 @@ public class ApplicantTwoWitnessHearsayDocumentHandlerTest extends BaseDocumentH
 
     @Test
     void shouldNotRenameDocuments() {
-        handler.handleDocuments(caseData, "Applicant", new StringBuilder());
+        handler.handleDocuments(caseData, APPLICANT, new StringBuilder());
 
         assertEquals("Hearsay evidence WitnessHearsayBundle 10-02-2022.pdf",
                 caseData.getDocumentHearsayNoticeApp2().get(0).getValue().getWitnessOptionDocument().getDocumentFileName());

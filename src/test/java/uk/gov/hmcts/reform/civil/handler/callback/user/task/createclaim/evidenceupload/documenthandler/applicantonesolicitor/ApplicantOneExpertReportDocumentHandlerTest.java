@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.evidence
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.applicantonesolcitor.ApplicantOneExpertReportDocumentHandler;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.evidenceupload.documenthandler.BaseDocumentHandlerTest.DomainConstants.APPLICANT;
 
 @ExtendWith(MockitoExtension.class)
 public class ApplicantOneExpertReportDocumentHandlerTest extends BaseDocumentHandlerTest {
@@ -31,7 +32,7 @@ public class ApplicantOneExpertReportDocumentHandlerTest extends BaseDocumentHan
     @Test
     void shouldRenameDocuments() {
         StringBuilder notificationBuilder = new StringBuilder();
-        handler.handleDocuments(caseData, "Applicant", notificationBuilder);
+        handler.handleDocuments(caseData, APPLICANT, notificationBuilder);
 
         String expectedDocumentName = "Experts report test expertise 10-02-2022.pdf";
         assertEquals(expectedDocumentName, caseData.getDocumentExpertReport().get(0).getValue().getExpertDocument().getDocumentFileName());

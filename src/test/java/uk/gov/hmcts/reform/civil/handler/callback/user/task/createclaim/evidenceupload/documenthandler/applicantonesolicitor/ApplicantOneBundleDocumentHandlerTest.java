@@ -12,6 +12,7 @@ import java.time.format.DateTimeFormatter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.evidenceupload.documenthandler.BaseDocumentHandlerTest.DomainConstants.APPLICANT;
 
 @ExtendWith(MockitoExtension.class)
 public class ApplicantOneBundleDocumentHandlerTest extends BaseDocumentHandlerTest {
@@ -35,7 +36,7 @@ public class ApplicantOneBundleDocumentHandlerTest extends BaseDocumentHandlerTe
     @Test
     void shouldRenameDocuments() {
         StringBuilder notificationBuilder = new StringBuilder();
-        handler.handleDocuments(caseData, "Applicant", notificationBuilder);
+        handler.handleDocuments(caseData, APPLICANT, notificationBuilder);
 
         String expectedDocumentName = mockDateTime.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "-test.pdf";
         assertEquals(expectedDocumentName, caseData.getBundleEvidence().get(0).getValue().getDocumentUpload().getDocumentFileName());
