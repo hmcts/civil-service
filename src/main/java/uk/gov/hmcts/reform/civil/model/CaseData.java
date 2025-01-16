@@ -685,7 +685,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo joShowRegisteredWithRTLOption;
     private JudgmentDetails activeJudgment;
     private List<Element<JudgmentDetails>> historicJudgment;
-    private YesOrNo isTakenOfflineAfterJBA;
     private LocalDateTime joSetAsideCreatedDate;
 
     private String joDefendantName1;
