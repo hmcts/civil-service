@@ -30,6 +30,14 @@ public class JudgeRoleAssignmentInitialisationService {
     private final UserService userService;
 
     public void assignJudgeRoles(String caseId, String userId, String judgeRole, ZonedDateTime beginTime, ZonedDateTime endTime) {
+        try {
+            buildAssignJudgeRoles(caseId, userId, judgeRole, beginTime, endTime);
+        } catch (Exception e) {
+            log.error("Could not automatically create judge role assignment", e);
+        }
+    }
+
+    public void buildAssignJudgeRoles(String caseId, String userId, String judgeRole, ZonedDateTime beginTime, ZonedDateTime endTime) {
         log.info("Attempting to assign judge roles");
         List<String> userList = new ArrayList<>();
         String userAuth = getSystemUserToken();
