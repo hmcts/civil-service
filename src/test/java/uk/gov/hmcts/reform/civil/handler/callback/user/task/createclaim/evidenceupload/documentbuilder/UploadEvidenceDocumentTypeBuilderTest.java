@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.evidenceupload.documentbuilder;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documentbuilder.UploadEvidenceDocumentTypeBuilder;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
@@ -11,14 +13,11 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@ExtendWith(MockitoExtension.class)
 public class UploadEvidenceDocumentTypeBuilderTest {
 
+    @InjectMocks
     private UploadEvidenceDocumentTypeBuilder uploadEvidenceDocumentTypeBuilder;
-
-    @BeforeEach
-    void setUp() {
-        uploadEvidenceDocumentTypeBuilder = new UploadEvidenceDocumentTypeBuilder();
-    }
 
     @Test
     void shouldBuildElementTypeWithDocumentCopy() {

@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.evidenceupload.documenthandler.retriever;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.retriever.UploadEvidenceWitnessRetriever;
@@ -16,12 +16,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(MockitoExtension.class)
 public class UploadEvidenceWitnessRetrieverTest {
 
+    @InjectMocks
     private UploadEvidenceWitnessRetriever uploadEvidenceWitnessRetriever;
-
-    @BeforeEach
-    void setUp() {
-        uploadEvidenceWitnessRetriever = new UploadEvidenceWitnessRetriever();
-    }
 
     @Test
     void shouldReturnDocument() {
