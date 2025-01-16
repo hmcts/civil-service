@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -39,15 +40,18 @@ import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetailsOrderWithoutNotice;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeFinalOrderGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeOrderDownloadGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.service.roleassignment.JudgeRoleAssignmentInitialisationService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -92,6 +96,7 @@ import static uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderRepresentati
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
@@ -154,6 +159,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private final WorkingDayIndicator workingDayIndicator;
     private final FeatureToggleService featureToggleService;
     private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
+    private final JudgeRoleAssignmentInitialisationService judgeRoleAssignmentInitialisationService;
+    private final RoleAssignmentsService roleAssignmentsService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -178,7 +185,22 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
     private CallbackResponse nullPreviousSelections(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        String caseId = caseData.getCcdCaseReference().toString();
+        log.info("ATTEMPT MAKE ROLE ASSIGNMENT");
+        judgeRoleAssignmentInitialisationService.assignJudgeRoles(caseId, null, "allocated-judge", ZonedDateTime.now(), null);
+
+        log.info("GET ROLES");
+        List<String> roleType = new ArrayList<>();
+        List<String> roleName = new ArrayList<>();
+        roleType.add("CASE");
+        roleName.add("allocated-judge");
+        var roleAssignmentResponse = roleAssignmentsService.queryRoleAssignmentsByCaseIdAndRole(caseId,
+                                                                                                roleType,
+                                                                                                roleName,
+                                                                                                callbackParams.getParams().get(BEARER_TOKEN).toString());
+
+        log.info("GET ROLES case id roleAssignmentResponse:  {}", roleAssignmentResponse.getRoleAssignmentResponse());
+
         if (featureToggleService.isMintiEnabled()
             && isJudicialReferral(callbackParams)
             && caseData.isLipCase()) {
@@ -186,6 +208,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                 .errors(List.of(NOT_ALLOWED_FOR_CITIZEN))
                 .build();
         }
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (featureToggleService.isMintiEnabled()) {
             if (isJudicialReferral(callbackParams) || isMultiOrIntTrack(caseData)) {

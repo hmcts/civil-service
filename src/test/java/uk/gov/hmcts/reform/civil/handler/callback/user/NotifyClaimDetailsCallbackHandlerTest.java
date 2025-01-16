@@ -11,14 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import uk.gov.hmcts.reform.ccd.client.CaseAssignmentApi;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
-import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -32,7 +29,6 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.ServiceOfDateValidationMessageUtils;
@@ -46,10 +42,11 @@ import java.util.stream.Stream;
 import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
-
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -87,15 +84,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
-    private CrossAccessUserConfiguration crossAccessUserConfiguration;
-    @MockBean
-    private CaseAssignmentApi caseAssignmentApi;
-    @MockBean
-    private RoleAssignmentsService roleAssignmentsService;
-    @MockBean
-    private SystemUpdateUserConfiguration systemUpdateUserConfiguration;
-
     @Autowired
     private NotifyClaimDetailsCallbackHandler handler;
 
@@ -107,6 +95,23 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private AssignCategoryId assignCategoryId;
+
+    @Nested
+    class AboutToStartCallback {
+
+        @Test
+        void shouldPrepopulateDynamicListWithOptions_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertTrue(response.getData().containsKey("defendantSolicitorNotifyClaimDetailsOptions"));
+        }
+    }
 
     @Nested
     class MidEventValidateOptionsCallback {
@@ -272,9 +277,9 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(false);
 
             CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
-                    .setCoSClaimDetailsWithDate(true, false, cosDate, deemedDate, null,  null, true, false)
-                    .build();
+                .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
+                .setCoSClaimDetailsWithDate(true, false, cosDate, deemedDate, null,  null, true, false)
+                .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -302,9 +307,9 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(false);
 
             CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
-                    .setCoSClaimDetailsWithDate(false, true, null, null, cosDate, deemedDate, false, true)
-                    .build();
+                .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
+                .setCoSClaimDetailsWithDate(false, true, null, null, cosDate, deemedDate, false, true)
+                .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -325,14 +330,14 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocalDate deemed2Date = localDateTime.minusDays(3).toLocalDate();
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
             when(deadlinesCalculator.plus14DaysDeadline(deemed1Date.atTime(15, 05)))
-                    .thenReturn(newDate.minusDays(2));
+                .thenReturn(newDate.minusDays(2));
             when(deadlinesCalculator.plus14DaysDeadline(deemed2Date.atTime(15, 05)))
-                    .thenReturn(newDate.minusDays(3));
+                .thenReturn(newDate.minusDays(3));
 
             CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
-                    .setCoSClaimDetailsWithDate(true, true, cos1Date, deemed1Date, cos2Date, deemed2Date, true, true)
-                    .build();
+                .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
+                .setCoSClaimDetailsWithDate(true, true, cos1Date, deemed1Date, cos2Date, deemed2Date, true, true)
+                .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -356,14 +361,14 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(deadlinesCalculator.plus14DaysDeadline(cos2Date.atTime(15, 05)))
                 .thenReturn(newDate.minusDays(2));
             when(deadlinesCalculator.plus14DaysDeadline(cos1Date.atTime(15, 05)))
-                    .thenReturn(newDate.minusDays(3));
+                .thenReturn(newDate.minusDays(3));
             when(deadlinesCalculator.plus14DaysDeadline(cos2Date.atTime(15, 05)))
-                    .thenReturn(newDate.minusDays(2));
+                .thenReturn(newDate.minusDays(2));
 
             CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
-                    .setCoSClaimDetailsWithDate(true, true, cos1Date, deemed1Date, cos2Date, deemed2Date, true, true)
-                    .build();
+                .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
+                .setCoSClaimDetailsWithDate(true, true, cos1Date, deemed1Date, cos2Date, deemed2Date, true, true)
+                .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -464,13 +469,13 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             String formattedDeadline = formatLocalDateTime(RESPONSE_DEADLINE, DATE_TIME_AT);
             String confirmationBody = format(CONFIRMATION_SUMMARY, formattedDeadline)
-                    + exitSurveyContentService.applicantSurvey();
+                + exitSurveyContentService.applicantSurvey();
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
-                    SubmittedCallbackResponse.builder()
-                            .confirmationHeader(format("# Defendant notified%n## Claim number: 000DC001"))
-                            .confirmationBody(confirmationBody)
-                            .build());
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(format("# Defendant notified%n## Claim number: 000DC001"))
+                    .confirmationBody(confirmationBody)
+                    .build());
         }
 
         @Test
