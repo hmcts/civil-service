@@ -71,7 +71,7 @@ public class DashboardNotificationService {
             "saveOrUpdate dashboard notification reference= {}, citizenRole = {}, templateId = {}",
             notification.getReference(),
             notification.getCitizenRole(),
-            notification.getDashboardNotificationsTemplates()!=null ? notification.getDashboardNotificationsTemplates().getId(): null
+            notification.getDashboardNotificationsTemplates() != null ? notification.getDashboardNotificationsTemplates().getId() : null
         );
         Optional<DashboardNotificationsEntity> existingNotification = dashboardNotificationsRepository
             .findByReferenceAndCitizenRoleAndDashboardNotificationsTemplatesId(
