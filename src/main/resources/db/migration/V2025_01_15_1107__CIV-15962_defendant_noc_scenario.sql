@@ -29,7 +29,7 @@ INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, titl
                                                   ,notification_role)
 VALUES ('Notice.AAA6.DefendantNoticeOfChange.ClaimMovesOffline.Claimant',
         '${respondent1PartyName} has asked for a legal representative to act on their behalf',
-        'Mae ${respondent1PartyName} wedi gofyn i gynrychiolydd cyfreithiol weithredu ar eu rhanh',
+        'Mae ${respondent1PartyName} wedi gofyn i gynrychiolydd cyfreithiol weithredu ar eu rhan',
         '<p class="govuk-body">${respondent1PartyName} has asked for a legal representative to act on their behalf. From now on you will need to liaise with their representative.<br>'
         '<a href="{VIEW_INFO_ABOUT_DEFENDANT}" class="govuk-link">View the contact details of the defendant’s legal representative.</a><br>'
         'This claim will now move offline and you must submit your intention to proceed by using form <a href="https://www.gov.uk/government/publications/form-n225-request-for-judgment-and-reply-to-admission-specified-amount" target="_blank" class="govuk-link">N225</a> (for a full admission) or <a href="https://www.gov.uk/government/publications/form-n225a-notice-of-part-admission-specified-amount" target="_blank" class="govuk-link">N225A</a> (for a partial admission) by ${applicant1ResponseDeadlineEn}.</p>',
