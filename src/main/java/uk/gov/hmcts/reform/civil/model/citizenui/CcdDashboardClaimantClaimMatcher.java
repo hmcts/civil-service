@@ -79,7 +79,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayImmediately() {
-        if (isClaimProceedInCaseMan()) {
+        if (isClaimProceedInCaseMan() || isPaperResponse()) {
             return false;
         }
         return hasResponseFullAdmit() && isPayImmediately();
@@ -87,7 +87,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayBySetDate() {
-        if (isClaimProceedInCaseMan()) {
+        if (isClaimProceedInCaseMan() || isPaperResponse()) {
             return false;
         }
         return hasResponseFullAdmit() && caseData.isPayBySetDate()
@@ -96,7 +96,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayByInstallments() {
-        if (isClaimProceedInCaseMan()) {
+        if (isClaimProceedInCaseMan() || isPaperResponse()) {
             return false;
         }
         return hasResponseFullAdmit() && caseData.isPayByInstallment()
@@ -199,7 +199,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean defendantRespondedWithPartAdmit() {
-        if (isClaimProceedInCaseMan()) {
+        if (isClaimProceedInCaseMan() || isPaperResponse()) {
             return false;
         }
         return RespondentResponseTypeSpec.PART_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec()
