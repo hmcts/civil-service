@@ -157,11 +157,13 @@ public class PaymentsService {
     private CreateServiceRequestDTO buildServiceRequest(CaseData caseData) {
         String siteId = null;
 
+        log.info("CaseAccessCategory: {}", caseData.getCaseAccessCategory());
         if (!SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             siteId = paymentsConfiguration.getSiteId();
         } else if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             siteId = paymentsConfiguration.getSpecSiteId();
         }
+        log.info("SiteId: {}", siteId);
 
         String callbackURLUsed = null;
         FeeDto feeResponse = null;
@@ -178,6 +180,7 @@ public class PaymentsService {
                     hearingFeesService, caseData, caseData.getAssignedTrack()).toFeeDto();
             }
         }
+        log.info("CallbackURLUsed: {}", callbackURLUsed);
 
         if (callbackURLUsed != null) {
             return CreateServiceRequestDTO.builder()
