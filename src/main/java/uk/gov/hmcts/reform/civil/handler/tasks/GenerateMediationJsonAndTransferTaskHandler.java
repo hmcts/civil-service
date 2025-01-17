@@ -76,7 +76,7 @@ public class GenerateMediationJsonAndTransferTaskHandler extends BaseExternalTas
 
                 if (externalTask.getVariable("dontSendEmail") == null) {
                     emailData.ifPresent(data -> sendGridClient.sendEmail(
-                        mediationCSVEmailConfiguration.getSender(),
+                        "kiyrean.dyer-allen@HMCTS.net",
                         data
                     ));
                 }
