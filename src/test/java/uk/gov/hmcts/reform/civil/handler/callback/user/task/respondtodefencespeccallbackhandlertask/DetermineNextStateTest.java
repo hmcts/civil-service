@@ -136,7 +136,6 @@ class DetermineNextStateTest {
         assertEquals(All_FINAL_ORDERS_ISSUED.name(), resultState);
         verify(builder).activeJudgment(activeJudgment);
         verify(builder).joIsLiveJudgmentExists(YesOrNo.YES);
-        verify(builder).isTakenOfflineAfterJBA(NO);
     }
 
     @Test
@@ -303,7 +302,6 @@ class DetermineNextStateTest {
         assertEquals(PROCEEDS_IN_HERITAGE_SYSTEM.name(), resultState);
         verify(builder).activeJudgment(activeJudgment);
         verify(builder).joIsLiveJudgmentExists(YesOrNo.YES);
-        verify(builder).isTakenOfflineAfterJBA(YES);
     }
 
     @Test
