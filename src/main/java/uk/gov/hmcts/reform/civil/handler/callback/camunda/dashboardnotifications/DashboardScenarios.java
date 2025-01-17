@@ -222,7 +222,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_HEARING_FEE_CLAIMANT("Scenario.AAA6.CP.Court.Officer.Order.HearingFee.Claimant"),
     SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_TRIAL_READY_CLAIMANT("Scenario.AAA6.CP.Court.Officer.Order.TrialReady.Claimant"),
     SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_DEFENDANT("Scenario.AAA6.CP.Court.Officer.Order.Defendant"),
-    SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_TRIAL_READY_DEFENDANT("Scenario.AAA6.CP.Court.Officer.Order.TrialReady.Defendant");
+    SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_TRIAL_READY_DEFENDANT("Scenario.AAA6.CP.Court.Officer.Order.TrialReady.Defendant"),
+    SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT("Scenario.AAA6.DefendantNoticeOfChange.ClaimMovesOffline.Claimant");
 
     private final String scenario;
 
