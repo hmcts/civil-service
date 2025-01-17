@@ -91,7 +91,7 @@ public class UpdateWaCourtLocationsService {
                                                                                   .locationName(trialListing.getSiteName())
                                                                                   .build())
                                                         .build());
-
+            log.info("ATTEMPT TO POPULATE SUMMARY TAB");
             populateSummaryTab(caseDataBuilder, locationRefDataList);
 
         } catch (NullPointerException e) {
@@ -108,11 +108,13 @@ public class UpdateWaCourtLocationsService {
             .trialListingLocation(caseData.getTaskManagementLocations().getTrialListingLocation().getLocationName())
             .build();
 
+        log.info("ATTEMPT TO POPULATE SUMMARY TAB: INTERMEDIATE: TAB CONTENT: {}", tabContent);
+
         String claimTrack = getClaimTrack(caseData);
         if ("MULTI_CLAIM".equals(claimTrack)) {
             tabContent.setCcmcListingLocation(caseData.getTaskManagementLocations().getCcmcListingLocation().getLocationName());
+            log.info("ATTEMPT TO POPULATE SUMMARY TAB: MULTI: TAB CONTENT: {}", tabContent);
         }
-
         LocationRefData caseManagementLocationName = courtLocationDetails(locationRefDataList,
                                                                           caseData.getCaseManagementLocation().getBaseLocation(),
                                                                           "CML location");
@@ -122,6 +124,7 @@ public class UpdateWaCourtLocationsService {
                                                       .build());
 
         caseDataBuilder.taskManagementLocationsTab(tabContent).build();
+        log.info("SUMMARY TAB CONTENT: {}", tabContent);
     }
 
     private LocationRefData courtLocationDetails(List<LocationRefData> locationRefDataList, String court, String courtType) {
