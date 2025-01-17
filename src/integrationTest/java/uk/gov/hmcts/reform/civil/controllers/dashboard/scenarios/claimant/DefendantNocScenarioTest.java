@@ -124,7 +124,11 @@ public class DefendantNocScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[1].taskNameEn").value("<a>Contact the court to request a change to my case</a>"),
                 jsonPath("$[1].currentStatusEn").value(TaskStatus.INACTIVE.getName()),
                 jsonPath("$[1].taskNameCy").value("<a>Cysylltu â’r llys i wneud cais am newid i fy achos</a>"),
-                jsonPath("$[1].currentStatusCy").value(TaskStatus.INACTIVE.getWelshName())
+                jsonPath("$[1].currentStatusCy").value(TaskStatus.INACTIVE.getWelshName()),
+                jsonPath("$[2].taskNameEn").value("<a>View applications</a>"),
+                jsonPath("$[2].currentStatusEn").value(TaskStatus.INACTIVE.getName()),
+                jsonPath("$[2].taskNameCy").value("<a>Gweld y cais i gyd</a>"),
+                jsonPath("$[2].currentStatusCy").value(TaskStatus.INACTIVE.getWelshName())
             );
     }
 
@@ -146,7 +150,11 @@ public class DefendantNocScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[2].taskNameEn").value("<a>Contact the court to request a change to my case</a>"),
                 jsonPath("$[2].currentStatusEn").value(TaskStatus.INACTIVE.getName()),
                 jsonPath("$[2].taskNameCy").value("<a>Cysylltu â’r llys i wneud cais am newid i fy achos</a>"),
-                jsonPath("$[2].currentStatusCy").value(TaskStatus.INACTIVE.getWelshName())
+                jsonPath("$[2].currentStatusCy").value(TaskStatus.INACTIVE.getWelshName()),
+                jsonPath("$[3].taskNameEn").value("<a>View applications</a>"),
+                jsonPath("$[3].currentStatusEn").value(TaskStatus.INACTIVE.getName()),
+                jsonPath("$[3].taskNameCy").value("<a>Gweld y cais i gyd</a>"),
+                jsonPath("$[3].currentStatusCy").value(TaskStatus.INACTIVE.getWelshName())
             );
     }
 
@@ -173,7 +181,11 @@ public class DefendantNocScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[3].taskNameEn").value("<a>Contact the court to request a change to my case</a>"),
                 jsonPath("$[3].currentStatusEn").value(TaskStatus.INACTIVE.getName()),
                 jsonPath("$[3].taskNameCy").value("<a>Cysylltu â’r llys i wneud cais am newid i fy achos</a>"),
-                jsonPath("$[3].currentStatusCy").value(TaskStatus.INACTIVE.getWelshName())
+                jsonPath("$[3].currentStatusCy").value(TaskStatus.INACTIVE.getWelshName()),
+                jsonPath("$[4].taskNameEn").value("<a>View applications</a>"),
+                jsonPath("$[4].currentStatusEn").value(TaskStatus.INACTIVE.getName()),
+                jsonPath("$[4].taskNameCy").value("<a>Gweld y cais i gyd</a>"),
+                jsonPath("$[4].currentStatusCy").value(TaskStatus.INACTIVE.getWelshName())
 
             );
     }
