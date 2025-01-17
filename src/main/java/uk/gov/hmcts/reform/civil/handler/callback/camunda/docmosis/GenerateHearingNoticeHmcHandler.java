@@ -110,6 +110,10 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
 
         String claimTrack = determineClaimTrack(caseData);
         Integer totalDurationInMinutes = getTotalHearingDurationInMinutes(hearing);
+        if (featureToggleService.isHmcForLipEnabled()) {
+            caseDataBuilder.hearingDurationInMinutesAHN(totalDurationInMinutes.toString())
+                .trialReadyNotified(null);
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder
                       .hearingDate(hearingStartDate.toLocalDate())
@@ -120,9 +124,6 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
                       .hearingFee(featureToggleService.isCaseProgressionEnabled()
                                       ? calculateAndApplyFee(hearingFeesService, caseData, claimTrack)
                                       : null)
-                      .hearingDurationInMinutesAHN(totalDurationInMinutes.toString())
-                      .hearingRequestedAHN(LocalDateTime.now())
-                      .trialReadyNotified(null)
                       .build().toMap(objectMapper))
             .build();
     }

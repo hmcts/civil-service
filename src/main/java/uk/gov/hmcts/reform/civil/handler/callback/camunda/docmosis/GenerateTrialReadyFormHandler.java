@@ -94,7 +94,9 @@ public class GenerateTrialReadyFormHandler extends CallbackHandler {
         var documents = caseData.getTrialReadyDocuments();
         documents.add(element(caseDocument));
         caseDataBuilder.trialReadyDocuments(documents);
-        addDocumentCreatedDate(role, caseDataBuilder);
+        if (featureToggleService.isHmcForLipEnabled()) {
+            addDocumentCreatedDate(role, caseDataBuilder);
+        }
     }
 
     private void addDocumentCreatedDate(CaseRole role, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {

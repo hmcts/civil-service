@@ -235,9 +235,6 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     @Override
     public boolean isTrialScheduledNoPaymentStatusActive() {
         Optional<LocalDateTime> hearingScheduledDate = getWhenWasHearingScheduled();
-        if (hearingScheduledDate.isEmpty()) {
-            hearingScheduledDate = Optional.ofNullable(caseData.getHearingRequestedAHN());
-        }
         Optional<LocalDateTime> orderDate = getTimeOfLastNonSDOOrder();
         return CaseState.HEARING_READINESS.equals(caseData.getCcdState())
             && (hearingScheduledDate.isPresent())
@@ -249,9 +246,6 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     @Override
     public boolean isTrialScheduledPaymentPaidStatusActive() {
         Optional<LocalDateTime> hearingScheduledDate = getWhenWasHearingScheduled();
-        if (hearingScheduledDate.isEmpty()) {
-            hearingScheduledDate = Optional.ofNullable(caseData.getHearingRequestedAHN());
-        }
         Optional<LocalDateTime> orderDate = getTimeOfLastNonSDOOrder();
         return CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.equals(caseData.getCcdState())
             && (hearingScheduledDate.isPresent())

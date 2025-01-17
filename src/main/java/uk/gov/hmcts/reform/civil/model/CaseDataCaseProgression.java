@@ -213,7 +213,6 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private String hearingNoticeListOther;
     private LocalDateTime caseDismissedHearingFeeDueDate;
     private String hearingDurationInMinutesAHN;
-    private LocalDateTime hearingRequestedAHN;
     private LocalDateTime claimantTrialReadyDocumentCreated;
     private LocalDateTime defendantTrialReadyDocumentCreated;
 
