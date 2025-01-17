@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.trialready.TrialReadyFormGenerator;
 
 import java.time.LocalDateTime;
@@ -40,7 +41,7 @@ public class GenerateTrialReadyFormHandler extends CallbackHandler {
     private static final String TASK_ID_RESPONDENT2 = "GenerateTrialReadyFormRespondent2";
 
     private final TrialReadyFormGenerator trialReadyFormGenerator;
-
+    private final FeatureToggleService featureToggleService;
     private final ObjectMapper objectMapper;
 
     @Override

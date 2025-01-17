@@ -18,6 +18,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.trialready.TrialReadyFormGenerator;
 
 import java.time.LocalDateTime;
@@ -46,11 +47,13 @@ class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
     private GenerateTrialReadyFormHandler handler;
     @Mock
     private TrialReadyFormGenerator trialReadyFormGenerator;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @BeforeEach
     void setUp() {
         mapper = new ObjectMapper();
-        handler = new GenerateTrialReadyFormHandler(trialReadyFormGenerator, mapper);
+        handler = new GenerateTrialReadyFormHandler(trialReadyFormGenerator, featureToggleService, mapper);
         mapper.registerModule(new JavaTimeModule());
     }
 
@@ -72,6 +75,7 @@ class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
 
         when(trialReadyFormGenerator.generate(any(CaseData.class), anyString(), anyString(), any(CaseRole.class)))
             .thenReturn(document);
+        when(featureToggleService.isHmcForLipEnabled()).thenReturn(false);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_TRIAL_READY_FORM_APPLICANT.name());
@@ -105,6 +109,7 @@ class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
 
         when(trialReadyFormGenerator.generate(any(CaseData.class), anyString(), anyString(), any(CaseRole.class)))
             .thenReturn(document);
+        when(featureToggleService.isHmcForLipEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_TRIAL_READY_FORM_RESPONDENT1.name());
@@ -140,6 +145,7 @@ class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
 
         when(trialReadyFormGenerator.generate(any(CaseData.class), anyString(), anyString(), any(CaseRole.class)))
             .thenReturn(document);
+        when(featureToggleService.isHmcForLipEnabled()).thenReturn(false);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .trialReadyDocuments(systemGeneratedCaseDocuments).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
