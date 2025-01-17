@@ -66,7 +66,7 @@ public class PaymentsService {
     }
 
     private CreditAccountPaymentRequest getCreditAccountPaymentRequest(CaseData caseData, FeeDto claimFee, String customerReference,
-                                                                      String organisationName) {
+                                                                       String organisationName) {
         CreditAccountPaymentRequest creditAccountPaymentRequest;
         creditAccountPaymentRequest = CreditAccountPaymentRequest.builder()
             .accountNumber(caseData.getApplicantSolicitor1PbaAccounts().getValue().getLabel())
@@ -177,7 +177,7 @@ public class PaymentsService {
                     hearingFeesService, caseData, caseData.getAssignedTrack()).toFeeDto();
             }
         }
-        log.info("Payment callbackURLUsed: {}, siteId{} and  for caseId {} ", callbackURLUsed, caseData.getCcdCaseReference());
+        log.info("Payment callbackURLUsed: {}, siteId{} and  for caseId {} ", callbackURLUsed, siteId, caseData.getCcdCaseReference());
 
         if (callbackURLUsed != null) {
             return CreateServiceRequestDTO.builder()
