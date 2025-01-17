@@ -218,7 +218,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public Optional<LocalDateTime> getWhenWasHearingScheduled() {
-        return getMostRecentEventOfType(EnumSet.of(CaseEvent.HEARING_SCHEDULED, CaseEvent.GENERATE_HEARING_NOTICE_HMC))
+        return getMostRecentEventOfType(EnumSet.of(CaseEvent.HEARING_SCHEDULED))
             .map(CaseEventDetail::getCreatedDate);
     }
 
