@@ -49,6 +49,8 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
     public static final String INTERMEDIATE_NO_BAND_WITH_REASON = "This case is allocated to the Intermediate Track and is not allocated a complexity band because %s.";
     public static final String INTERMEDIATE_WITH_BAND_NO_REASON = "This case is allocated to the Intermediate Track and is allocated to complexity band %s.";
     public static final String INTERMEDIATE_WITH_BAND_WITH_REASON = "This case is allocated to the Intermediate Track and is allocated to complexity band %s because %s.";
+    public static final String ORDER_AFTER_HEARING_ON = "This order is made following a hearing on %s.";
+    public static final String ORDER_AFTER_HEARING_BETWEEN = "This order is made following a hearing between %s and %s.";
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
 
     public JudgeOrderDownloadGenerator(DocumentManagementService documentManagementService, DocumentGeneratorService documentGeneratorService,
@@ -103,7 +105,9 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
     }
 
     public JudgeFinalOrderForm getBlankAfterHearing(CaseData caseData, String authorisation) {
-        return getBaseTemplateData(caseData, authorisation).build();
+        return getBaseTemplateData(caseData, authorisation)
+            .orderAfterHearingDate(getOrderAfterHearingDateText(caseData))
+            .build();
     }
 
     public JudgeFinalOrderForm getBlankBeforeHearing(CaseData caseData, String authorisation) {
@@ -182,4 +186,11 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
         return null;
     }
 
+    private String getOrderAfterHearingDateText(CaseData caseData) {
+        return switch (caseData.getOrderAfterHearingDate().getDateType()) {
+            case SINGLE_DATE -> format(ORDER_AFTER_HEARING_ON, caseData.getOrderAfterHearingDate().getDate());
+            case DATE_RANGE -> format(ORDER_AFTER_HEARING_BETWEEN, caseData.getOrderAfterHearingDate().getFromDate(), caseData.getOrderAfterHearingDate().getToDate());
+            case BESPOKE_RANGE -> format(ORDER_AFTER_HEARING_ON, caseData.getOrderAfterHearingDate().getBespokeDates());
+        };
+    }
 }

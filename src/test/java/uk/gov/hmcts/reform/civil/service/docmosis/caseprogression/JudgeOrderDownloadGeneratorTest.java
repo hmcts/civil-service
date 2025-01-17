@@ -24,6 +24,8 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrdersComplexityBand;
+import uk.gov.hmcts.reform.civil.model.finalorders.OrderAfterHearingDate;
+import uk.gov.hmcts.reform.civil.model.finalorders.OrderAfterHearingDateType;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
@@ -126,12 +128,25 @@ class JudgeOrderDownloadGeneratorTest {
         FIX_A_DATE_FOR_CMC
     })
     void getDownloadTemplate(String templateToUse) {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                   .value(DynamicListElement.dynamicElement(templateToUse))
-                                                   .build())
-            .build();
-        judgeOrderDownloadGenerator.getDownloadTemplate(caseData, "auth");
+        if (templateToUse.equals(BLANK_TEMPLATE_TO_BE_USED_AFTER_A_HEARING)) {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                       .value(DynamicListElement.dynamicElement(templateToUse))
+                                                       .build())
+                .orderAfterHearingDate(OrderAfterHearingDate.builder()
+                                           .dateType(OrderAfterHearingDateType.BESPOKE_RANGE)
+                                           .bespokeDates("12-01-2025, 14-12-2024 to 19-12-2024")
+                                           .build())
+                .build();
+            judgeOrderDownloadGenerator.getDownloadTemplate(caseData, "auth");
+        } else {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                       .value(DynamicListElement.dynamicElement(templateToUse))
+                                                       .build())
+                .build();
+            judgeOrderDownloadGenerator.getDownloadTemplate(caseData, "auth");
+        }
 
         switch (templateToUse) {
             case BLANK_TEMPLATE_TO_BE_USED_AFTER_A_HEARING:
@@ -319,6 +334,10 @@ class JudgeOrderDownloadGeneratorTest {
                                                    .value(DynamicListElement
                                                               .dynamicElement("Blank template to be used after a hearing"))
                                                    .build())
+            .orderAfterHearingDate(OrderAfterHearingDate.builder()
+                                       .dateType(OrderAfterHearingDateType.BESPOKE_RANGE)
+                                       .bespokeDates("12-01-2025, 14-12-2024 to 19-12-2024")
+                                       .build())
             .caseManagementLocation(caseManagementLocation)
             .build();
         CaseDocument caseDocument = judgeOrderDownloadGenerator.generate(caseData, BEARER_TOKEN);
