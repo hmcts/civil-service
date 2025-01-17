@@ -75,7 +75,7 @@ class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
 
         when(trialReadyFormGenerator.generate(any(CaseData.class), anyString(), anyString(), any(CaseRole.class)))
             .thenReturn(document);
-        when(featureToggleService.isHmcForLipEnabled()).thenReturn(false);
+        when(featureToggleService.isHmcForLipEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_TRIAL_READY_FORM_APPLICANT.name());
