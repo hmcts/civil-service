@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.citizenui.AdditionalLipPartyDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.EvidenceTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Timeline;
 import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormParty;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
@@ -85,6 +86,12 @@ public class ClaimFormMapper {
             .claimIssuedDate(caseData.getIssueDate())
             .claimNumber(caseData.getLegacyCaseReference())
             .flightDelayDetails(getFlightDelayDetails(caseData))
+            .evidenceList(Optional.ofNullable(caseData.getSpeclistYourEvidenceList())
+                              .map(Collection::stream)
+                              .map(evidenceStream -> evidenceStream
+                                  .map(EvidenceTemplateData::toEvidenceTemplateData)
+                                  .toList())
+                              .orElse(Collections.emptyList()))
             .build();
     }
 

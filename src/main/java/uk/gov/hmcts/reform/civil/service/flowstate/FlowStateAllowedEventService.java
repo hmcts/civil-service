@@ -13,6 +13,7 @@ import java.util.Map;
 
 import static java.util.Collections.emptyList;
 import static java.util.Map.entry;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_CLAIM_ISSUE_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISPATCH_BUSINESS_PROCESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
@@ -51,6 +52,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFT
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ORDER_REVIEW_OBLIGATION_CHECK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DECISION_ON_RECONSIDERATION_REQUEST;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
@@ -310,7 +312,8 @@ public class FlowStateAllowedEventService {
                 EDIT_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
                 SET_ASIDE_JUDGMENT,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -343,7 +346,8 @@ public class FlowStateAllowedEventService {
                 SETTLE_CLAIM_MARK_PAID_FULL,
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -396,7 +400,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -438,7 +443,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -480,7 +486,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -531,7 +538,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -564,7 +572,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -597,7 +606,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -630,7 +640,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -660,7 +671,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -690,7 +702,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -715,7 +728,8 @@ public class FlowStateAllowedEventService {
                 SETTLE_CLAIM_MARK_PAID_FULL,
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -780,7 +794,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -808,7 +823,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
         entry(
@@ -1029,7 +1045,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
         entry(
@@ -1078,7 +1095,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
         entry(
@@ -1086,7 +1104,8 @@ public class FlowStateAllowedEventService {
             List.of(
                 INITIATE_GENERAL_APPLICATION,
                 ADD_UNAVAILABLE_DATES,
-                CHANGE_SOLICITOR_EMAIL
+                CHANGE_SOLICITOR_EMAIL,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         )
     );
@@ -1218,7 +1237,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
         entry(
@@ -1268,7 +1288,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
         entry(
@@ -1299,7 +1320,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -1346,7 +1368,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -1382,7 +1405,8 @@ public class FlowStateAllowedEventService {
                 DISMISS_CASE,
                 MANAGE_STAY,
                 ADD_CASE_NOTE,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -1420,7 +1444,8 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 CONFIRM_ORDER_REVIEW,
                 NOC_REQUEST,
-                APPLY_NOC_DECISION
+                APPLY_NOC_DECISION,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
         entry(
@@ -1465,7 +1490,8 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 CONFIRM_ORDER_REVIEW,
                 NOC_REQUEST,
-                APPLY_NOC_DECISION
+                APPLY_NOC_DECISION,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -1501,7 +1527,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 CONFIRM_ORDER_REVIEW,
                 NOC_REQUEST,
-                APPLY_NOC_DECISION
+                APPLY_NOC_DECISION,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
         entry(
@@ -1540,7 +1567,8 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 CONFIRM_ORDER_REVIEW,
                 NOC_REQUEST,
-                APPLY_NOC_DECISION
+                APPLY_NOC_DECISION,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
         entry(
@@ -1651,7 +1679,8 @@ public class FlowStateAllowedEventService {
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
                 MEDIATION_SUCCESSFUL,
-                MEDIATION_UNSUCCESSFUL
+                MEDIATION_UNSUCCESSFUL,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -1681,7 +1710,8 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 CONFIRM_ORDER_REVIEW,
                 NOC_REQUEST,
-                APPLY_NOC_DECISION
+                APPLY_NOC_DECISION,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
         entry(
@@ -1776,7 +1806,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
         entry(
@@ -1795,7 +1826,8 @@ public class FlowStateAllowedEventService {
                 DISMISS_CASE,
                 MANAGE_STAY,
                 ADD_CASE_NOTE,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
         entry(
@@ -1818,7 +1850,8 @@ public class FlowStateAllowedEventService {
                 MANAGE_STAY,
                 CONFIRM_ORDER_REVIEW,
                 NOC_REQUEST,
-                APPLY_NOC_DECISION
+                APPLY_NOC_DECISION,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
         entry(
@@ -1879,7 +1912,8 @@ public class FlowStateAllowedEventService {
                 MANAGE_STAY,
                 CONFIRM_ORDER_REVIEW,
                 NOC_REQUEST,
-                APPLY_NOC_DECISION
+                APPLY_NOC_DECISION,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
         entry(
@@ -1940,7 +1974,8 @@ public class FlowStateAllowedEventService {
                 AMEND_RESTITCH_BUNDLE,
                 CONFIRM_ORDER_REVIEW,
                 NOC_REQUEST,
-                APPLY_NOC_DECISION
+                APPLY_NOC_DECISION,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
         entry(
@@ -1959,7 +1994,9 @@ public class FlowStateAllowedEventService {
                 MANAGE_STAY,
                 ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                COURT_OFFICER_ORDER,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
         entry(
@@ -2012,7 +2049,8 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                CONFIRM_ORDER_REVIEW
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
         entry(
@@ -2033,7 +2071,8 @@ public class FlowStateAllowedEventService {
                 MANAGE_STAY,
                 CONFIRM_ORDER_REVIEW,
                 NOC_REQUEST,
-                APPLY_NOC_DECISION
+                APPLY_NOC_DECISION,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
         entry(
@@ -2153,7 +2192,8 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 CONFIRM_ORDER_REVIEW,
                 NOC_REQUEST,
-                APPLY_NOC_DECISION
+                APPLY_NOC_DECISION,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
         entry(
@@ -2168,7 +2208,8 @@ public class FlowStateAllowedEventService {
                 INVALID_HWF_REFERENCE,
                 NO_REMISSION_HWF,
                 LIP_CLAIM_SETTLED,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                CITIZEN_CLAIM_ISSUE_PAYMENT
             )
         ),
         entry(
@@ -2179,7 +2220,8 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 ADD_CASE_NOTE,
                 NOC_REQUEST,
-                APPLY_NOC_DECISION
+                APPLY_NOC_DECISION,
+            ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
         entry(
