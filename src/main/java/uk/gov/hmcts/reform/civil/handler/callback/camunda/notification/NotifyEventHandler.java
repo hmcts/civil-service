@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
@@ -60,7 +61,10 @@ public class NotifyEventHandler extends CallbackHandler implements NotificationD
 
     private CallbackResponse notifyForLitigationFriendAdded(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        log.info("Entering notifyForLitigationFriendAdded. Case id: {}", callbackParams.getCaseData().getCcdCaseReference());
+        log.info(
+            "Entering notifyForLitigationFriendAdded. Case id: {}",
+            callbackParams.getCaseData().getCcdCaseReference()
+        );
 
         notifyApplicants(caseData);
         notifyRespondents(caseData);
@@ -79,7 +83,10 @@ public class NotifyEventHandler extends CallbackHandler implements NotificationD
     private void notifyRespondents(final CaseData caseData) {
 
         Map<String, String> properties = addProperties(caseData);
-        properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent( caseData, true, organisationService));
+        properties.put(
+            CLAIM_LEGAL_ORG_NAME_SPEC,
+            getLegalOrganizationNameForRespondent(caseData, true, organisationService)
+        );
 
         notificationService.sendMail(
             caseData.getRespondentSolicitor1EmailAddress(),
@@ -88,8 +95,11 @@ public class NotifyEventHandler extends CallbackHandler implements NotificationD
             String.format(REFERENCE_TEMPLATE_RESPONDENT, caseData.getLegacyCaseReference())
         );
 
-        if( stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)){
-            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent( caseData, false, organisationService));
+        if (stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)) {
+            properties.put(
+                CLAIM_LEGAL_ORG_NAME_SPEC,
+                getLegalOrganizationNameForRespondent(caseData, false, organisationService)
+            );
             notificationService.sendMail(
                 caseData.getRespondentSolicitor2EmailAddress(),
                 notificationsProperties.getSolicitorLitigationFriendAdded(),
@@ -98,8 +108,7 @@ public class NotifyEventHandler extends CallbackHandler implements NotificationD
             );
         }
     }
-
-
+    
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
