@@ -125,7 +125,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         if (caseData.getSpecResponseTimelineDocumentFiles() != null) {
             builder.timelineUploaded(true)
                 .specResponseTimelineDocumentFiles(caseData.getSpecResponseTimelineDocumentFiles()
-                                                       .getFile().getDocumentFileName());
+                                                       .getDocumentFileName());
         } else {
             builder.timelineUploaded(false)
                 .timeline(getTimeLine(caseData));

@@ -52,14 +52,13 @@ import uk.gov.hmcts.reform.civil.model.hearingvalues.VocabularyModel;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.EarlyAdoptersService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
-
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -72,12 +71,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
-
-import java.time.LocalDate;
-
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType.SINGLE_DATE;
@@ -132,7 +127,6 @@ public class HearingValuesServiceTest {
     void prepare() {
         ReflectionTestUtils.setField(hearingValuesService, "mapper", mapper);
         when(earlyAdoptersService.isPartOfHmcEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
-        when(featuretoggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
         when(featuretoggleService.isHmcNroEnabled()).thenReturn(false);
         when(featuretoggleService.isHmcForLipEnabled()).thenReturn(false);
     }
@@ -177,6 +171,7 @@ public class HearingValuesServiceTest {
         Category video = Category.builder().categoryKey("HearingChannel").key("VID").valueEn("Video").activeFlag("Y").build();
         Category telephone = Category.builder().categoryKey("HearingChannel").key("TEL").valueEn("Telephone").activeFlag("Y").build();
         CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(inPerson, video, telephone)).build();
+
         when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), eq("HearingChannel"), anyString())).thenReturn(
             Optional.of(categorySearchResult));
 
@@ -307,48 +302,6 @@ public class HearingValuesServiceTest {
         });
 
         verify(caseDataService).triggerEvent(eq(caseId), eq(CaseEvent.UPDATE_MISSING_FIELDS), any());
-    }
-
-    @Test
-    void shouldNotTriggerEvent_ifUnavailableDatesNeedUpdating_butMCIToggleIsOff() throws Exception {
-        Long caseId = 1L;
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssued()
-            .caseReference(caseId)
-            .applicant1(PartyBuilder.builder().individual().build().toBuilder()
-                            .partyID("party-id")
-                            .flags(Flags.builder().partyName("party name").build())
-                            .unavailableDates(wrapElements(List.of(UnavailableDate.builder()
-                                                                       .unavailableDateType(SINGLE_DATE)
-                                                                       .date(LocalDate.of(2023, 10, 5))
-                                                                       .build())))
-                            .build())
-            .respondent1(PartyBuilder.builder().company().build())
-            .respondent2(PartyBuilder.builder().company().build())
-            .multiPartyClaimTwoDefendantSolicitors()
-            .caseAccessCategory(UNSPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
-                                        .region(WELSH_REGION_ID).build())
-            .build();
-        CaseDetails caseDetails = CaseDetails.builder()
-            .data(caseData.toMap(mapper))
-            .id(caseId).build();
-
-        when(featuretoggleService.isUpdateContactDetailsEnabled()).thenReturn(false);
-        when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
-        when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(APPLICANT_LR_ORG_NAME)
-                                        .build()));
-        when(organisationService.findOrganisationById(RESPONDENT_ONE_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(RESPONDENT_ONE_LR_ORG_NAME)
-                                        .build()));
-        given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
-        given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
-
-        verifyNoInteractions(caseDataService);
     }
 
     @SneakyThrows

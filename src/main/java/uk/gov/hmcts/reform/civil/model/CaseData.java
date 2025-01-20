@@ -252,6 +252,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final YesOrNo respondentSolicitor2ServiceAddressRequired;
     private final Address respondentSolicitor2ServiceAddress;
     private final StatementOfTruth applicant1ServiceStatementOfTruthToRespondentSolicitor1;
+    private final RespondentSolicitorDetails respondentSolicitorDetails;
 
     @Builder.Default
     private final List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
@@ -334,7 +335,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<TimelineOfEvents> specResponseTimelineOfEvents;
     private final List<TimelineOfEvents> specResponseTimelineOfEvents2;
     private final TimelineUploadTypeSpec specClaimResponseTimelineList;
-    private final ResponseDocument specResponseTimelineDocumentFiles;
+    private final Document specResponseTimelineDocumentFiles;
     private final List<Evidence> specResponselistYourEvidenceList;
     private final List<Evidence> specResponselistYourEvidenceList2;
 
@@ -684,7 +685,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo joShowRegisteredWithRTLOption;
     private JudgmentDetails activeJudgment;
     private List<Element<JudgmentDetails>> historicJudgment;
-    private YesOrNo isTakenOfflineAfterJBA;
     private LocalDateTime joSetAsideCreatedDate;
 
     private String joDefendantName1;
@@ -1056,6 +1056,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return isRespondent1LiP()
             && isApplicant1NotRepresented()
             && isOneVOne(this);
+    }
+
+    @JsonIgnore
+    public boolean isApplicantLipOneVOne() {
+        return isApplicant1NotRepresented() && isOneVOne(this);
     }
 
     @JsonIgnore
