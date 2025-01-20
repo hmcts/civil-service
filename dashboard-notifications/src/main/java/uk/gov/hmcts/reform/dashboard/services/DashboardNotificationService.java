@@ -68,29 +68,30 @@ public class DashboardNotificationService {
     }
 
     public DashboardNotificationsEntity saveOrUpdate(DashboardNotificationsEntity notification) {
-        log.info(
-            "saveOrUpdate dashboard notification reference= {}, citizenRole = {}, templateId = {}",
-            notification.getReference(),
-            notification.getCitizenRole(),
-            notification.getDashboardNotificationsTemplates() != null ? notification.getDashboardNotificationsTemplates().getId() : null
-        );
-        List<DashboardNotificationsEntity> existingNotification = dashboardNotificationsRepository
-            .findByReferenceAndCitizenRoleAndDashboardNotificationsTemplatesId(
-                notification.getReference(), notification.getCitizenRole(),
-                notification.getDashboardNotificationsTemplates().getId()
-            );
 
         DashboardNotificationsEntity updated = notification;
-        if (existingNotification.isPresent()) {
-            updated = notification.toBuilder().id(existingNotification.get().getId()).build();
-            notificationActionRepository.deleteByDashboardNotificationAndActionPerformed(existingNotification.get(),
+        if (nonNull(notification.getDashboardNotificationsTemplates())) {
+            log.info("Query for dashboard notifications using notification reference= {}, citizenRole = {}, templateId = {}",
+                      notification.getReference(),
+                      notification.getCitizenRole(),
+                      notification.getDashboardNotificationsTemplates().getId()
+            );
+            List<DashboardNotificationsEntity> existingNotification = dashboardNotificationsRepository
+                .findByReferenceAndCitizenRoleAndDashboardNotificationsTemplatesId(
+                    notification.getReference(), notification.getCitizenRole(),
+                    notification.getDashboardNotificationsTemplates().getId()
+                );
+
+        DashboardNotificationsEntity updated = notification;
+        if (nonNull(existingNotification) && !existingNotification.isEmpty()) {
+            updated = notification.toBuilder().id(existingNotification.get(0).getId()).build();
+            notificationActionRepository.deleteByDashboardNotificationAndActionPerformed(existingNotification.get(0),
                                                                                          clickAction
             );
             log.info("Existing notification deleted reference = {}, id = {}", notification.getReference(), existingNotification.get().getId());
         } else {
             log.info("Existing notification not present reference = {}", notification.getReference());
         }
-
         return dashboardNotificationsRepository.save(updated);
     }
 
