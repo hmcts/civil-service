@@ -51,6 +51,7 @@
           "type": "string",
           "enum": [
             "PERSONAL INJURY",
+            "Claim - Unspec only",
             "CLAIM - SPEC ONLY"
           ],
           "description": ""
