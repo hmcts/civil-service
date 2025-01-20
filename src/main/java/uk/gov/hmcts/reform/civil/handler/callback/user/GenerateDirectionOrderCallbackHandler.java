@@ -40,18 +40,16 @@ import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetailsOrderWithoutNotice;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeFinalOrderGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeOrderDownloadGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
-import uk.gov.hmcts.reform.civil.service.roleassignment.JudgeRoleAssignmentInitialisationService;
+import uk.gov.hmcts.reform.civil.service.roleassignment.RolesAndAccessAssignmentService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -159,8 +157,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private final WorkingDayIndicator workingDayIndicator;
     private final FeatureToggleService featureToggleService;
     private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
-    private final JudgeRoleAssignmentInitialisationService judgeRoleAssignmentInitialisationService;
-    private final RoleAssignmentsService roleAssignmentsService;
+    private final RolesAndAccessAssignmentService rolesAndAccessAssignmentService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -186,20 +183,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private CallbackResponse nullPreviousSelections(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String caseId = caseData.getCcdCaseReference().toString();
-        log.info("ATTEMPT MAKE ROLE ASSIGNMENT");
-        judgeRoleAssignmentInitialisationService.assignJudgeRoles(caseId, null, "allocated-judge", ZonedDateTime.now(), null);
-
-        log.info("GET ROLES");
-        List<String> roleType = new ArrayList<>();
-        List<String> roleName = new ArrayList<>();
-        roleType.add("CASE");
-        roleName.add("allocated-judge");
-        var roleAssignmentResponse = roleAssignmentsService.queryRoleAssignmentsByCaseIdAndRole(caseId,
-                                                                                                roleType,
-                                                                                                roleName,
-                                                                                                callbackParams.getParams().get(BEARER_TOKEN).toString());
-
-        log.info("GET ROLES case id roleAssignmentResponse:  {}", roleAssignmentResponse.getRoleAssignmentResponse());
+        log.info("ATTEMPT GET AND MAKE ROLE ASSIGNMENT");
+        rolesAndAccessAssignmentService.copyAllocatedRolesFromRolesAndAccess(caseId, callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         if (featureToggleService.isMintiEnabled()
             && isJudicialReferral(callbackParams)
