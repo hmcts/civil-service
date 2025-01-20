@@ -74,7 +74,7 @@ public class DashboardNotificationService {
             notification.getCitizenRole(),
             notification.getDashboardNotificationsTemplates() != null ? notification.getDashboardNotificationsTemplates().getId() : null
         );
-        Optional<DashboardNotificationsEntity> existingNotification = dashboardNotificationsRepository
+        List<DashboardNotificationsEntity> existingNotification = dashboardNotificationsRepository
             .findByReferenceAndCitizenRoleAndDashboardNotificationsTemplatesId(
                 notification.getReference(), notification.getCitizenRole(),
                 notification.getDashboardNotificationsTemplates().getId()
@@ -82,7 +82,6 @@ public class DashboardNotificationService {
 
         DashboardNotificationsEntity updated = notification;
         if (existingNotification.isPresent()) {
-            log.info("Existing notification present reference = {}, id = {}", notification.getReference(), existingNotification.get().getId());
             updated = notification.toBuilder().id(existingNotification.get().getId()).build();
             notificationActionRepository.deleteByDashboardNotificationAndActionPerformed(existingNotification.get(),
                                                                                          clickAction
