@@ -82,7 +82,7 @@ public class RolesAndAccessAssignmentService {
             .beginTime(roleToAssign.getBeginTime())
             .endTime(roleToAssign.getEndTime())
             .readOnly(false)
-            .attributes(Map.of("caseId", caseId,
+            .attributes(Map.of("caseId", "1737393393405565",
                                "caseType", "CIVIL",
                                "jurisdiction", "CIVIL",
                                "contractType", roleToAssign.getAttributes().getContractType(),
@@ -98,7 +98,7 @@ public class RolesAndAccessAssignmentService {
     }
 
     private String getSystemUserToken() {
-        return userService.getAccessToken("leadership-judge-01@example.com", "Password12!");
+        return userService.getAccessToken("4917924EMP-@ejudiciary.net", "Hmcts1234");
     }
 
 }
