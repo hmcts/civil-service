@@ -407,11 +407,10 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         BigDecimal fixedCost = BigDecimal.valueOf(0);
         if (caseData.getFixedCosts() == null) {
             fixedCost = calculateFixedCosts(caseData);
-        } else {
-            if (caseData.getFixedCosts() != null && caseData.getFixedCosts().getFixedCostAmount() != null) {
-                fixedCost = calculateFixedCostsOnEntry(caseData, JudgmentsOnlineHelper.getJudgmentAmount(caseData, interestCalculator));
-            }
+        } else if (caseData.getFixedCosts() != null && caseData.getFixedCosts().getFixedCostAmount() != null) {
+            fixedCost = calculateFixedCostsOnEntry(caseData, JudgmentsOnlineHelper.getJudgmentAmount(caseData, interestCalculator));
         }
+
         return fixedCost;
     }
 
