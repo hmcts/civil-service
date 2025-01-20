@@ -13,6 +13,7 @@ import java.util.Map;
 
 import static java.util.Collections.emptyList;
 import static java.util.Map.entry;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_CLAIM_ISSUE_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISPATCH_BUSINESS_PROCESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
@@ -2209,7 +2210,8 @@ public class FlowStateAllowedEventService {
                 INVALID_HWF_REFERENCE,
                 NO_REMISSION_HWF,
                 LIP_CLAIM_SETTLED,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                CITIZEN_CLAIM_ISSUE_PAYMENT
             )
         ),
         entry(
