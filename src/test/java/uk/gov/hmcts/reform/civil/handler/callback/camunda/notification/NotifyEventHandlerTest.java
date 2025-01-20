@@ -16,15 +16,20 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
 import java.util.Map;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 
 @ExtendWith(MockitoExtension.class)
 class NotifyEventHandlerTest extends BaseCallbackHandlerTest {
@@ -38,6 +43,9 @@ class NotifyEventHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private OrganisationService organisationService;
 
+    @Mock
+    private SimpleStateFlowEngine stateFlowEngine;
+
     @InjectMocks
     private NotifyEventHandler handler;
 
@@ -47,6 +55,9 @@ class NotifyEventHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             when(notificationsProperties.getSolicitorLitigationFriendAdded()).thenReturn("template-id");
+            StateFlow stateFlow = mock(StateFlow.class);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
+            when(stateFlow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(true);
         }
 
         @Test

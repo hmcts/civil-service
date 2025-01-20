@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -108,13 +109,13 @@ public class NotifyEventHandler extends CallbackHandler implements NotificationD
             );
         }
     }
-    
+
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
+        return new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService)
-        );
+        ));
     }
 }
