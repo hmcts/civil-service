@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.FixedCosts;
@@ -52,6 +53,7 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DE
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFAULT_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC_CLAIMANT_WELSH;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC_DEFENDANT;
 
 @ExtendWith(SpringExtension.class)
@@ -418,6 +420,40 @@ public class DefaultJudgmentFormGeneratorTest {
             .repaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_WEEK)
             .repaymentDate(LocalDate.now().plusMonths(4))
             .repaymentSuggestion("200")
+            .build();
+        List<CaseDocument> caseDocuments = generator.generateNonDivergentDocs(caseData, BEARER_TOKEN,
+                                                                              GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT.name());
+        verify(assignCategoryId)
+            .assignCategoryIdToCaseDocument(CASE_DOCUMENT, "judgments");
+        assertThat(caseDocuments).hasSize(1);
+    }
+
+    @Test
+    void shouldGenerateClaimantDocsNonDivergentWelsh_whenValidDataIsProvidedLip() {
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N121_SPEC_CLAIMANT_WELSH)))
+            .thenReturn(new DocmosisDocument(N121_SPEC_CLAIMANT_WELSH.getDocumentTitle(), bytes));
+
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT_CLAIMANT1)))
+            .thenReturn(CASE_DOCUMENT);
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT_CLAIMANT2)))
+            .thenReturn(CASE_DOCUMENT);
+
+        when(interestCalculator.calculateInterest(any(CaseData.class)))
+            .thenReturn(new BigDecimal(10));
+
+        when(feesService.getFeeDataByTotalClaimAmount(new BigDecimal(2000)))
+            .thenReturn(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build());
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
+            .totalClaimAmount(new BigDecimal(2000))
+            .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
+            .repaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_WEEK)
+            .repaymentDate(LocalDate.now().plusMonths(4))
+            .repaymentSuggestion("200")
+            .claimantBilingualLanguagePreference(Language.ENGLISH.toString())
             .build();
         List<CaseDocument> caseDocuments = generator.generateNonDivergentDocs(caseData, BEARER_TOKEN,
                                                                               GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT.name());

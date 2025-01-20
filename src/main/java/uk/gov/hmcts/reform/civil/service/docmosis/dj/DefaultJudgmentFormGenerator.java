@@ -42,6 +42,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_DJ_FORM_NON_DIVER
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC_CLAIMANT_WELSH;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.utils.DefaultJudgmentUtils.calculateFixedCosts;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicant;
@@ -69,7 +70,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
         List<CaseDocument> caseDocuments = new ArrayList<>();
         DocmosisDocument docmosisDocument2;
         List<DefaultJudgmentForm> templateData = getDefaultJudgmentForms(caseData, event);
-        DocmosisTemplates docmosisTemplate = getDocmosisTemplate(event);
+        DocmosisTemplates docmosisTemplate = getDocmosisTemplate(event, caseData.isClaimantBilingual());
         DocmosisDocument docmosisDocument1 =
             documentGeneratorService.generateDocmosisDocument(templateData.get(0), docmosisTemplate);
         caseDocuments.add(documentManagementService.uploadDocument(
@@ -234,11 +235,11 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
         }
     }
 
-    private DocmosisTemplates getDocmosisTemplate(String event) {
+    private DocmosisTemplates getDocmosisTemplate(String event, boolean claimantBilingual) {
         if (event.equals(GENERATE_DJ_FORM_SPEC.name())) {
             return N121_SPEC;
         } else if (event.equals(GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT.name())) {
-            return N121_SPEC_CLAIMANT;
+            return claimantBilingual == true ? N121_SPEC_CLAIMANT_WELSH : N121_SPEC_CLAIMANT;
         } else if (event.equals(GEN_DJ_FORM_NON_DIVERGENT_SPEC_DEFENDANT.name())) {
             return N121_SPEC_DEFENDANT;
         } else {
@@ -328,7 +329,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
         for (int i = 0; i < defaultJudgmentForms.size(); i++) {
             DefaultJudgmentForm defaultJudgmentForm = defaultJudgmentForms.get(i);
             DocumentType documentType = getDocumentTypeBasedOnEvent(i, event);
-            DocmosisTemplates docmosisTemplate = getDocmosisTemplate(event);
+            DocmosisTemplates docmosisTemplate = getDocmosisTemplate(event, caseData.isClaimantBilingual());
             DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(defaultJudgmentForm,
                                                                                                   docmosisTemplate);
             CaseDocument caseDocument = documentManagementService.uploadDocument(
