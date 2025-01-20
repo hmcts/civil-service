@@ -27,11 +27,12 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_BUNDLE_CREATED_FOR_CLAIMANT1;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_BUNDLE_CREATED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,14 +52,13 @@ public class BundleCreationClaimantNotificationHandlerTest extends BaseCallbackH
 
         @BeforeEach
         void setup() {
+            when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
+                Optional.empty()));
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
         }
 
         @Test
         void shouldRecordScenario_whenInvokedWhenNotTrialReady() {
-            when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
-                Optional.empty()));
-
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .applicant1Represented(YesOrNo.NO)
                 .drawDirectionsOrderRequired(YesOrNo.YES)
@@ -78,7 +78,7 @@ public class BundleCreationClaimantNotificationHandlerTest extends BaseCallbackH
 
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_CLAIMANT.getScenario(),
+                SCENARIO_AAA6_BUNDLE_CREATED_CLAIMANT.getScenario(),
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
@@ -86,7 +86,6 @@ public class BundleCreationClaimantNotificationHandlerTest extends BaseCallbackH
 
         @Test
         void shouldRecordScenarioTrialReady_whenInvokedWhenSmallClaimsCase() {
-
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().applicant1Represented(YesOrNo.NO).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_BUNDLE_CREATED_FOR_CLAIMANT1.name()).build()

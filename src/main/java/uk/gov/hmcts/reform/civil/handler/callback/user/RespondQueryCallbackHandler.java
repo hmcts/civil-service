@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -20,13 +19,13 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.queryManagementRespondQuery;
 
 @Service
 @RequiredArgsConstructor
-public class TrialReadyNotificationCallbackHandler extends CallbackHandler {
+public class RespondQueryCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(TRIAL_READY_NOTIFICATION);
+    private static final List<CaseEvent> EVENTS = List.of(queryManagementRespondQuery);
 
     private final ObjectMapper mapper;
     private final Time time;
@@ -35,7 +34,7 @@ public class TrialReadyNotificationCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-            callbackKey(ABOUT_TO_SUBMIT), this::setTrialReadyNotified,
+            callbackKey(ABOUT_TO_SUBMIT), this::setManagementQuery,
             callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
         );
     }
@@ -45,14 +44,15 @@ public class TrialReadyNotificationCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse setTrialReadyNotified(CallbackParams callbackParams) {
+    private CallbackResponse setManagementQuery(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData().toBuilder()
-            .businessProcess(BusinessProcess.ready(TRIAL_READY_NOTIFICATION))
-            .trialReadyNotified(YesOrNo.YES)
+            .businessProcess(BusinessProcess.ready(queryManagementRespondQuery))
+            .takenOfflineDate(time.now())
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(mapper))
             .build();
+
     }
 }

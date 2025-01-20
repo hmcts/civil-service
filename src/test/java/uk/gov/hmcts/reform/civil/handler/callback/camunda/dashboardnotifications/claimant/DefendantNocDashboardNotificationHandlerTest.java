@@ -40,7 +40,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_TRIAL_ARRANGEMENTS_TASK_LIST;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
 public class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -317,29 +316,6 @@ public class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHa
             verify(dashboardApiClient, never()).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST.getScenario(),
-                "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
-            );
-        }
-
-        @Test
-        void shouldRecordDefendantNocMovesOfflineScenarioWhenDefendantNocOnline() {
-            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(toggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
-
-            CaseData caseData = CaseData.builder()
-                .ccdCaseReference(123455L)
-                .build();
-
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_NOC.name()).build()
-            ).build();
-
-            handler.handle(params);
-
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT.getScenario(),
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );

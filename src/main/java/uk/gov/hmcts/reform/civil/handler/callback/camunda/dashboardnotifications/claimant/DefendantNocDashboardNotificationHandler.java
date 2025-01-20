@@ -27,7 +27,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHB
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_TRIAL_ARRANGEMENTS_TASK_LIST;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +38,7 @@ public class DefendantNocDashboardNotificationHandler extends CallbackHandler {
 
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper mapper;
-    private final FeatureToggleService featureToggleService;
+    private final FeatureToggleService toggleService;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -50,7 +49,7 @@ public class DefendantNocDashboardNotificationHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_SUBMIT),
-            callbackParams -> featureToggleService.isLipVLipEnabled() ? configureScenarioForDefendantNoc(callbackParams) : emptyCallbackResponse(
+            callbackParams -> toggleService.isLipVLipEnabled() ? configureScenarioForDefendantNoc(callbackParams) : emptyCallbackResponse(
                 callbackParams)
         );
     }
@@ -59,27 +58,19 @@ public class DefendantNocDashboardNotificationHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         ScenarioRequestParams params = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
-        if (!featureToggleService.isDefendantNoCOnlineForCase(caseData)) {
-            dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
-                caseData.getCcdCaseReference().toString(),
-                CLAIMANT_ROLE,
-                authToken
-            );
 
-            dashboardApiClient.recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT.getScenario(),
-                authToken,
-                params
-            );
-        } else {
-            dashboardApiClient.recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT.getScenario(),
-                authToken,
-                params
-            );
-        }
+        dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            CLAIMANT_ROLE,
+            authToken
+        );
+
+        dashboardApiClient.recordScenario(
+            caseData.getCcdCaseReference().toString(),
+            SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT.getScenario(),
+            authToken,
+            params
+        );
 
         if (isNull(caseData.getTrialReadyApplicant()) && SdoHelper.isFastTrack(caseData)) {
             dashboardApiClient.recordScenario(

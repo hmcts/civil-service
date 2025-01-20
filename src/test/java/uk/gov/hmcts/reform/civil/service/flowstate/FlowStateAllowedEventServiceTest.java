@@ -43,7 +43,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.BUNDLE_CREATION_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAIL;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_CLAIM_ISSUE_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
@@ -2218,8 +2217,7 @@ class FlowStateAllowedEventServiceTest {
                         INVALID_HWF_REFERENCE,
                         NO_REMISSION_HWF,
                         LIP_CLAIM_SETTLED,
-                        ADD_CASE_NOTE,
-                        CITIZEN_CLAIM_ISSUE_PAYMENT
+                        ADD_CASE_NOTE
                     }
                 ),
                 of(

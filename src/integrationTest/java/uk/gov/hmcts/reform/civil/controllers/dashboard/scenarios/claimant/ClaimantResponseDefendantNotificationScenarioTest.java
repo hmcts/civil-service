@@ -5,24 +5,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.ClaimantResponseDefendantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.utils.DateUtils;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 public class ClaimantResponseDefendantNotificationScenarioTest extends DashboardBaseIntegrationTest {
 
@@ -101,48 +92,5 @@ public class ClaimantResponseDefendantNotificationScenarioTest extends Dashboard
                             "<a href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\" " +
                             "target=\"_blank\">Gallwch weld eu gofynion ar gyfer y gwrandawiad yma (yn agor mewn tab newydd)</a>.</p>")
             );
-    }
-
-    @Test
-    void shouldCreateNotification_forDefendantWhenLRvLipFullAdmitPayImmediately() throws Exception {
-        String caseId = String.valueOf(System.currentTimeMillis());
-        LocalDate whenWillThisAmountBePaid = LocalDate.now().plusDays(5);
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
-            .toBuilder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(Long.valueOf(caseId))
-            .totalClaimAmount(BigDecimal.valueOf(9000))
-            .respondent1Represented(NO)
-            .applicant1Represented(YES)
-            .applicant1ProceedWithClaim(null)
-            .applicant1(Party.builder().individualFirstName("John").individualLastName("White").type(Party.Type.INDIVIDUAL).build())
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                               .whenWillThisAmountBePaid(whenWillThisAmountBePaid)
-                                               .build())
-            .build();
-
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-
-        handler.handle(callbackParams(caseData));
-
-        //Verify Notification is created
-        doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
-            .andExpect(status().isOk())
-            .andExpectAll(
-                status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].titleEn").value("Immediate payment"),
-                jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">John White has accepted your offer to pay £9001 immediately" +
-                        " in full and final settlement of the claim. Funds must be received in <a href={VIEW_INFO_ABOUT_CLAIMANT} class=\"govuk-link\">their account</a>" +
-                        " by " + DateUtils.formatDate(whenWillThisAmountBePaid) + ".</p><p class=\"govuk-body\">If they don't receive the money by then," +
-                        " they can request a County Court Judgment (CCJ).</p>"),
-                jsonPath("$[0].titleCy").value("Talu ar unwaith"),
-                jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Mae John White wedi derbyn eich cynnig i dalu £9001 " +
-                        "yn llawn ar unwaith fel setliad llawn a therfynol o’r hawliad.  Rhaid i’r arian fod yn <a href={VIEW_INFO_ABOUT_CLAIMANT} class=\"govuk-link\">ei g/chyfrif</a> erbyn "
-                        + DateUtils.formatDateInWelsh(whenWillThisAmountBePaid) + ".</p><p class=\"govuk-body\"> Os na fydd yr arian wedi cyrraedd erbyn hynny," +
-                        " gallant ofyn am Ddyfarniad Llys Sirol (CCJ).</p>"));
     }
 }

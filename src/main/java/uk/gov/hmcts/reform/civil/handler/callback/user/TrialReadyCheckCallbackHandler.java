@@ -9,14 +9,12 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_CHECK;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -30,15 +28,13 @@ public class TrialReadyCheckCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::setTrialReadyChecked,
-            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
+            callbackKey(ABOUT_TO_SUBMIT), this::setTrialReadyChecked
         );
     }
 
     private CallbackResponse setTrialReadyChecked(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData().toBuilder()
             .trialReadyChecked(YES)
-            .businessProcess(BusinessProcess.ready(TRIAL_READY_CHECK))
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()

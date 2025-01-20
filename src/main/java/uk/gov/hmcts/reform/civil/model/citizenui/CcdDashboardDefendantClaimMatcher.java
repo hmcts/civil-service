@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -23,7 +22,6 @@ import java.util.Optional;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType.DEFAULT_JUDGMENT;
 
@@ -240,21 +238,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         return (!hasSdoBeenDrawn()
             && caseData.isRespondentResponseFullDefence()
             && caseData.getCcdState().equals(CaseState.JUDICIAL_REFERRAL))
-            || (caseData.hasApplicantRejectedRepaymentPlan())
-            || (CaseState.AWAITING_APPLICANT_INTENTION.equals(caseData.getCcdState())
-            && isMintiClaim(caseData) && isClaimantProceeding(caseData));
-    }
-
-    private boolean isMintiClaim(CaseData caseData) {
-        return featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
-            && (AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
-            || AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack()));
-    }
-
-    private boolean isClaimantProceeding(CaseData caseData) {
-        return (caseData.getCaseDataLiP() != null
-            && NO.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim()))
-            || YES.equals(caseData.getApplicant1ProceedWithClaim());
+            || (caseData.hasApplicantRejectedRepaymentPlan());
     }
 
     @Override

@@ -17,14 +17,12 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
@@ -57,7 +55,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_ADMIT_PAY_IMMEDIATELY_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULLDISPUTE_MULTI_INT_FAST_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_ALREADY_PAID_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_CLAIMANT_CARM;
@@ -471,84 +468,6 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
         verify(dashboardApiClient, times(1)).recordScenario(
             caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_ALREADY_PAID_CLAIMANT.getScenario(),
-            "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(params).build()
-        );
-    }
-
-    @Test
-    void configureDashboardNotificationsForDefendantResponseForPartAdmitAfterNocClaimant() {
-
-        HashMap<String, Object> params = new HashMap<>();
-
-        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
-            Optional.empty()));
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
-            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
-            .changeOfRepresentation(ChangeOfRepresentation.builder().build())
-            .legacyCaseReference("reference")
-            .ccdCaseReference(Long.valueOf(1234L))
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
-            .responseClaimTrack(SMALL_CLAIM.name())
-            .respondToClaim(RespondToClaim.builder()
-                                .howMuchWasPaid(new BigDecimal(100000))
-                                .build())
-            .totalClaimAmount(new BigDecimal(1000))
-            .build();
-
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, caseData)
-            .build();
-
-        handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT.getScenario(),
-            "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(params).build()
-        );
-    }
-
-    @Test
-    void configureDashboardNotificationsForDefendantResponseForFullAdmitAfterNocClaimant() {
-
-        HashMap<String, Object> params = new HashMap<>();
-
-        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
-            Optional.empty()));
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
-            .toBuilder()
-            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
-            .changeOfRepresentation(ChangeOfRepresentation.builder().build())
-            .legacyCaseReference("reference")
-            .ccdCaseReference(Long.valueOf(1234L))
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
-            .responseClaimTrack(SMALL_CLAIM.name())
-            .respondToClaim(RespondToClaim.builder()
-                                .howMuchWasPaid(new BigDecimal(100000))
-                                .build())
-            .totalClaimAmount(new BigDecimal(1000))
-            .build();
-
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, caseData)
-            .build();
-
-        handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT.getScenario(),
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );

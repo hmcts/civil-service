@@ -132,7 +132,7 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
         ));
         if (caseData.getSpecResponseTimelineDocumentFiles() != null) {
             documents.add(new DocumentMetaData(
-                caseData.getSpecResponseTimelineDocumentFiles(),
+                caseData.getSpecResponseTimelineDocumentFiles().getFile(),
                 "Claim timeline",
                 LocalDate.now().toString()
             ));

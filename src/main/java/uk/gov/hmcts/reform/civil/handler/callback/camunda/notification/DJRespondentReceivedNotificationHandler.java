@@ -84,10 +84,7 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
             emailTemplate.template = notificationsProperties.getRespondentSolicitor1DefaultJudgmentRequested();
             emailTemplate.templateReference = REFERENCE_TEMPLATE_REQUESTED;
         }
-        if (caseData.isApplicantLipOneVOne()) {
-            emailTemplate.template = notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceivedForLipVSLR();
-            emailTemplate.templateReference = REFERENCE_TEMPLATE_RECEIVED;
-        } else if (ofNullable(caseData.getRespondent2()).isEmpty()) {
+        if (ofNullable(caseData.getRespondent2()).isEmpty()) {
             emailTemplate.template = notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceived();
             emailTemplate.templateReference = REFERENCE_TEMPLATE_RECEIVED;
         }
@@ -158,8 +155,7 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
             CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            CASEMAN_REF, caseData.getLegacyCaseReference(),
-            CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 

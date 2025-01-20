@@ -5,7 +5,7 @@
     "local>hmcts/.github//renovate/automerge-minor"
   ],
   "automergeSchedule": ["after 8am and before 11am every weekday"],
-  "schedule": ["after 8am and before 11am every weekday"],
+  "schedule": ["after 8am and before 5pm every weekday"],
   "packageRules": [
     {
       "matchPackagePatterns": ["pact"],

@@ -134,6 +134,7 @@ public class EventHistoryMapper {
     public static final String RPA_REASON_JUDGMENT_BY_ADMISSION = "RPA Reason: Judgment by Admission requested and claim moved offline.";
     public static final String RECORD_JUDGMENT = "Judgment recorded.";
     public static final String RPA_RECORD_JUDGMENT_REASON = "RPA Reason: Judgment recorded.";
+    public static final String RPA_RECORD_JUDGMENT_OFFLINE = "RPA Reason: Judgment recorded and claim moved offline";
     public static final String RPA_IN_MEDIATION = "IN MEDIATION";
     static final String ENTER = "Enter";
     static final String LIFTED = "Lifted";
@@ -542,6 +543,9 @@ public class EventHistoryMapper {
             if (featureToggleService.isJOLiveFeedActive()) {
                 miscTextRequested = RECORD_JUDGMENT;
                 detailsTextRequested = RPA_RECORD_JUDGMENT_REASON;
+                if (Objects.nonNull(caseData.getIsTakenOfflineAfterJBA()) && YesOrNo.YES.equals(caseData.getIsTakenOfflineAfterJBA())) {
+                    detailsTextRequested = RPA_RECORD_JUDGMENT_OFFLINE;
+                }
             }
 
             builder.miscellaneous((Event.builder()
