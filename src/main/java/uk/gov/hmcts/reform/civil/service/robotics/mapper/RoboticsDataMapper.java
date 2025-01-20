@@ -105,8 +105,7 @@ public class RoboticsDataMapper {
     }
 
     private String getCaseType(CaseData caseData) {
-        if (caseData.getClaimTypeUnSpec() != null
-            && caseData.getClaimTypeUnSpec().name().equals(ClaimTypeUnspec.PERSONAL_INJURY.name())) {
+        if (ClaimTypeUnspec.PERSONAL_INJURY.equals(caseData.getClaimTypeUnSpec())) {
             return "PERSONAL INJURY";
         }
         return "Claim - Unspec only";
