@@ -86,7 +86,7 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator imple
         if (caseEvent.name().equals(CaseEvent.GEN_JUDGMENT_BY_ADMISSION_DOC_CLAIMANT.name())) {
             return isBilingual ? DocmosisTemplates.JUDGMENT_BY_ADMISSION_CLAIMANT_BILINGUAL : DocmosisTemplates.JUDGMENT_BY_ADMISSION_CLAIMANT;
         } else {
-            return isBilingual ? DocmosisTemplates.JUDGMENT_BY_ADMISSION_DEFENDANT_BILINGUAL : DocmosisTemplates.JUDGMENT_BY_ADMISSION_DEFENDANT;
+            return DocmosisTemplates.JUDGMENT_BY_ADMISSION_DEFENDANT;
         }
     }
 
