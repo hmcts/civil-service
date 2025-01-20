@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -187,9 +188,11 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
     }
 
     private String getOrderAfterHearingDateText(CaseData caseData) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
         return switch (caseData.getOrderAfterHearingDate().getDateType()) {
-            case SINGLE_DATE -> format(ORDER_AFTER_HEARING_ON, caseData.getOrderAfterHearingDate().getDate());
-            case DATE_RANGE -> format(ORDER_AFTER_HEARING_BETWEEN, caseData.getOrderAfterHearingDate().getFromDate(), caseData.getOrderAfterHearingDate().getToDate());
+            case SINGLE_DATE -> format(ORDER_AFTER_HEARING_ON, caseData.getOrderAfterHearingDate().getDate().format(formatter));
+            case DATE_RANGE -> format(ORDER_AFTER_HEARING_BETWEEN, caseData.getOrderAfterHearingDate().getFromDate().format(formatter),
+                                      caseData.getOrderAfterHearingDate().getToDate().format(formatter));
             case BESPOKE_RANGE -> format(ORDER_AFTER_HEARING_ON, caseData.getOrderAfterHearingDate().getBespokeDates());
         };
     }
