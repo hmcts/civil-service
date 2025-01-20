@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -97,10 +98,18 @@ public class RoboticsDataMapper {
             .caseNumber(caseData.getLegacyCaseReference())
             .owningCourtCode("807")
             .owningCourtName("CCMCC")
-            .caseType("PERSONAL INJURY")
+            .caseType(getCaseType(caseData))
             .preferredCourtCode(locationRefDataUtil.getPreferredCourtData(caseData, authToken, true))
             .caseAllocatedTo(buildAllocatedTrack(caseData.getAllocatedTrack()))
             .build();
+    }
+
+    private String getCaseType(CaseData caseData) {
+        if (caseData.getClaimTypeUnSpec() != null
+            && caseData.getClaimTypeUnSpec().name().equals(ClaimTypeUnspec.PERSONAL_INJURY.name())) {
+            return "PERSONAL INJURY";
+        }
+        return "Claim - Unspec only";
     }
 
     private String buildAllocatedTrack(AllocatedTrack allocatedTrack) {

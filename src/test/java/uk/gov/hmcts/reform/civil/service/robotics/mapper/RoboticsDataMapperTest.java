@@ -16,6 +16,8 @@ import uk.gov.hmcts.reform.ccd.model.PreviousOrganisationCollectionItem;
 import uk.gov.hmcts.reform.civil.assertion.CustomAssertions;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.ClaimType;
+import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -137,6 +139,26 @@ class RoboticsDataMapperTest {
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+    }
+
+    @Test
+    void shouldMapToRoboticsCaseData_whenDefendantIsNotRegistered_DtsCci_1478() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePaymentSuccessful()
+            .respondentSolicitor1OrganisationDetails(SolicitorOrganisationDetails.builder()
+                                                         .organisationName("My Organisation")
+                                                         .email("me@server.net")
+                                                         .phoneNumber("0123456789")
+                                                         .fax("9999999999")
+                                                         .dx("Dx")
+                                                         .address(Address.builder().build())
+                                                         .build())
+            .build();
+        CaseData modifiedData = caseData.toBuilder().claimTypeUnSpec(ClaimTypeUnspec.CLINICAL_NEGLIGENCE)
+            .claimType(ClaimType.PERSONAL_INJURY).build();
+
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(modifiedData, BEARER_TOKEN);
+        assertThat(roboticsCaseData.getHeader().getCaseType()).isEqualTo("Claim - Unspec only");
     }
 
     @Test
