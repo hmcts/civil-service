@@ -453,7 +453,7 @@ public class DefaultJudgmentFormGeneratorTest {
             .repaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_WEEK)
             .repaymentDate(LocalDate.now().plusMonths(4))
             .repaymentSuggestion("200")
-            .claimantBilingualLanguagePreference(Language.ENGLISH.toString())
+            .claimantBilingualLanguagePreference(Language.WELSH.toString())
             .build();
         List<CaseDocument> caseDocuments = generator.generateNonDivergentDocs(caseData, BEARER_TOKEN,
                                                                               GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT.name());
