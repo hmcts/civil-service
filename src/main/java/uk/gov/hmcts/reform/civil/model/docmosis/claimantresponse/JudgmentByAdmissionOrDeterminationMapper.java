@@ -29,6 +29,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.utils.DateUtils.formatDateInWelsh;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicant;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicantSolicitorRef;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getOrgDetails;
@@ -246,6 +247,33 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .ccjSubtotal(judgementService.ccjJudgementSubTotal(caseData).setScale(2).toString())
             .ccjFinalTotal(judgementService.ccjJudgmentFinalTotal(caseData).setScale(2).toString())
             .build();
+    }
+
+    public JudgmentByAdmissionOrDetermination toNonDivergentWelshDocs(CaseData caseData, JudgmentByAdmissionOrDetermination builder) {
+        return builder.toBuilder()
+            .welshDate(formatDateInWelsh(LocalDate.now()))
+            .welshPayByDate(getWelshPayByDate(caseData))
+            .welshRepaymentDate(getWelshRepaymentDate(caseData))
+            .welshRepaymentFrequency(caseData.isPayByInstallment()
+                                         ? getRepaymentFrequency(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null)
+            .welshPaymentStr(caseData.isPayByInstallment() ? getRepaymentString(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null)
+            .build();
+    }
+
+    private String getWelshPayByDate(CaseData caseData) {
+        return caseData.getRespondToClaimAdmitPartLRspec() != null
+            ? formatDateInWelsh(LocalDate.parse(DateFormatHelper.formatLocalDate(
+            caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid(),
+            DateFormatHelper.DATE
+        ))) : null;
+    }
+
+    private String getWelshRepaymentDate(CaseData caseData) {
+        return caseData.isPayByInstallment()
+            ? formatDateInWelsh(LocalDate.parse(DateFormatHelper.formatLocalDate(
+            caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate(),
+            DateFormatHelper.DATE
+        ))) : null;
     }
 
     private String getRepaymentString(PaymentFrequencyLRspec repaymentFrequency) {
