@@ -95,7 +95,6 @@ public enum DocmosisTemplates {
     JUDGMENT_BY_ADMISSION_DEFENDANT("CV-SPC-DEC-ENG-00915.docx", "Judgment_by_admission_defendant.pdf"),
     JUDGMENT_BY_ADMISSION_CLAIMANT_BILINGUAL("CV-SPC-DEC-WEL-00916.docx", "Judgment_by_admission_claimant.pdf"),
     JUDGMENT_BY_ADMISSION_CLAIMANT_BILINGUAL_1("CV-SPC-DEC-WEL-00916-1.docx", "%s-Judgment_by_admission_claimant.pdf"),
-    JUDGMENT_BY_ADMISSION_DEFENDANT_BILINGUAL("CV-SPC-DEC-WEL-00915.docx", "Judgment_by_admission_defendant.pdf"),
     JUDGMENT_BY_DETERMINATION_CLAIMANT("CV-SPC-DEC-ENG-00982.docx", "Judgment_by_determination_claimant.pdf"),
     JUDGMENT_BY_DETERMINATION_DEFENDANT("CV-SPC-DEC-ENG-00981.docx", "Judgment_by_determination_defendant.pdf"),
     NOTICE_OF_DISCONTINUANCE_PDF("CV-SPC-GNO-ENG-SD0002.docx", "notice_of_discontinuance_%s.pdf"),

@@ -92,7 +92,7 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator imple
 
     public List<CaseDocument> generateNonDivergentDocs(CaseData caseData, String authorisation, CaseEvent caseEvent) {
         List<CaseDocument> list = new ArrayList<>();
-        if(caseData.isClaimantBilingual() || isWelshHearingSelected(caseData) || caseData.isRespondentResponseBilingual()) {
+        if (caseData.isClaimantBilingual() || isWelshHearingSelected(caseData) || caseData.isRespondentResponseBilingual()) {
             JudgmentByAdmissionOrDetermination templateData = getTemplateDataForNonDivergentDocs(caseData);
             JudgmentByAdmissionOrDetermination welshTemplateData =
                 judgmentByAdmissionOrDeterminationMapper.toNonDivergentWelshDocs(caseData, templateData);
@@ -126,8 +126,14 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator imple
             )
         );
 
-        if(caseData.isClaimantBilingual() || isWelshHearingSelected(caseData) || caseData.isRespondentResponseBilingual()) {
-            CaseDocument stitchedDocument = generateNonDivergentWelshDocs(caseData, authorisation, caseEvent,templateData,uploadedDocument);
+        if (caseData.isClaimantBilingual() || isWelshHearingSelected(caseData) || caseData.isRespondentResponseBilingual()) {
+            CaseDocument stitchedDocument = generateNonDivergentWelshDocs(
+                caseData,
+                authorisation,
+                caseEvent,
+                templateData,
+                uploadedDocument
+            );
             assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, "judgments");
             list.add(stitchedDocument);
         } else {
