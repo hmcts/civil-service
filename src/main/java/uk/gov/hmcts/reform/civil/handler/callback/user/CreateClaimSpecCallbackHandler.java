@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -15,7 +14,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
-import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.CalculateFeeTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.CalculateSpecFeeTask;
@@ -31,24 +29,13 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
-import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
-import uk.gov.hmcts.reform.civil.service.AirlineEpimsDataLoader;
-import uk.gov.hmcts.reform.civil.service.AirlineEpimsService;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.FeesService;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
-import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
-import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.OrgPolicyValidator;
-import uk.gov.hmcts.reform.civil.validation.PartyValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ParticularsOfClaimValidator;
@@ -82,12 +69,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private static final List<CaseEvent> EVENTS = Collections.singletonList(
         CaseEvent.CREATE_CLAIM_SPEC
     );
-    public static final String CONFIRMATION_SUMMARY = "<br/>[Download the sealed claim form](%s)"
-        + "%n%nYour claim will not be issued until payment is confirmed. Once payment is confirmed you will "
-        + "receive an email. The email will also include the date when you eed to notify the Defendant legal "
-        + "representative of the claim.%n%nYou must notify the Defendant legal representative of the claim within 4 "
-        + "months of the claim being issued. The exact date when you must notify the claim details will be provided "
-        + "when you first notify the Defendant legal representative of the claim.";
 
     public static final String CONFIRMATION_SUMMARY_PBA_V3 = "<br/>"
         + "%n%nYour claim will not be issued until payment is confirmed. Once payment is "
@@ -104,26 +85,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         + "%n%nOnce you have served the claim, send the Certificate of Service and supporting documents to the County"
         + " Court Claims Centre.";
 
-    public static final String SPEC_CONFIRMATION_SUMMARY = "<br/>[Download the sealed claim form](%s)"
-        + "%n%nYour claim will not be issued until payment is confirmed. Once payment is confirmed you will "
-        + "receive an email. The email will also include the date that the defendants have to respond.";
-
     public static final String SPEC_CONFIRMATION_SUMMARY_PBA_V3 = "<br/>"
         + "%n%nYour claim will not be issued until payment is confirmed. Once payment is "
         + "confirmed you will receive an email. The email will also include the date that the defendants have to " +
         "respond. <br/>[Pay your claim fee](%s)";
-
-    public static final String SPEC_LIP_CONFIRMATION_BODY = "<br />When the payment is confirmed your claim will be issued "
-        + "and you'll be notified by email. The claim will then progress offline."
-        + "%n%nOnce the claim has been issued, you will need to serve the claim upon the "
-        + "defendant which must include a response pack"
-        + "%n%nYou will need to send the following:<ul style=\"margin-bottom : 0px;\"> <li> <a href=\"%s\" target=\"_blank\">sealed claim form</a> "
-        + "</li><li><a href=\"%s\" target=\"_blank\">response pack</a></li><ul style=\"list-style-type:circle\"><li><a href=\"%s\" target=\"_blank\">N9A</a></li>"
-        + "<li><a href=\"%s\" target=\"_blank\">N9B</a></li></ul><li>and any supporting documents</li></ul>"
-        + "to the defendant within 4 months."
-        + "%n%nFollowing this, you will need to file a Certificate of Service and supporting documents "
-        + "to : <a href=\"mailto:OCMCNton@justice.gov.uk\">OCMCNton@justice.gov.uk</a>. The Certificate of Service form can be found here:"
-        + "%n%n<ul><li><a href=\"%s\" target=\"_blank\">N215</a></li></ul>";
 
     public static final String SPEC_LIP_CONFIRMATION_BODY_PBAV3 = "<br />Your claim will not be issued until payment " +
         "is confirmed. [Pay your claim fee](%s) <br/>When the payment is confirmed your claim " +
@@ -132,42 +97,28 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         + "%n%nOnce the claim has been issued, you will need to serve the claim upon the "
         + "defendant which must include a response pack"
         + "%n%nYou will need to send the following:<ul style=\"margin-bottom : 0px;\"> <li> <a href=\"%s\" target=\"_blank\">sealed claim form</a> "
-        + "</li><li><a href=\"%s\" target=\"_blank\">response pack</a></li><ul style=\"list-style-type:circle\"><li><a href=\"%s\" target=\"_blank\">N9A</a></li>"
+        +
+        "</li><li><a href=\"%s\" target=\"_blank\">response pack</a></li><ul style=\"list-style-type:circle\"><li><a href=\"%s\" target=\"_blank\">N9A</a></li>"
         + "<li><a href=\"%s\" target=\"_blank\">N9B</a></li></ul><li>and any supporting documents</li></ul>"
         + "to the defendant within 4 months."
         + "%n%nFollowing this, you will need to file a Certificate of Service and supporting documents "
         + "to : <a href=\"mailto:OCMCNton@justice.gov.uk\">OCMCNton@justice.gov.uk</a>. The Certificate of Service form can be found here:"
         + "%n%n<ul><li><a href=\"%s\" target=\"_blank\">N215</a></li></ul>";
 
-    private static final String ERROR_MESSAGE_SCHEDULED_DATE_OF_FLIGHT_MUST_BE_TODAY_OR_IN_THE_PAST = "Scheduled date of flight must be today or in the past";
-
-    private static final String LOCATION_NOT_FOUND_MESSAGE = "Location not found for ePIMS_ID: %s";
+    private static final String ERROR_MESSAGE_SCHEDULED_DATE_OF_FLIGHT_MUST_BE_TODAY_OR_IN_THE_PAST =
+        "Scheduled date of flight must be today or in the past";
+    protected static final String INTEREST_FROM_PAGE_ID = "interest-from";
 
     private final ClaimUrlsConfiguration claimUrlsConfiguration;
     private final ExitSurveyContentService exitSurveyContentService;
-    private final ReferenceNumberRepository referenceNumberRepository;
-    private final SpecReferenceNumberRepository specReferenceNumberRepository;
-    private final DateOfBirthValidator dateOfBirthValidator;
-    private final FeesService feesService;
-    private final FeatureToggleService featureToggleService;
-    private final OrganisationService organisationService;
-    private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
     private final UserService userService;
     private final OrgPolicyValidator orgPolicyValidator;
     private final ObjectMapper objectMapper;
-    private final Time time;
     private final ValidateEmailService validateEmailService;
     private final PostcodeValidator postcodeValidator;
     private final InterestCalculator interestCalculator;
     private final FeatureToggleService toggleService;
-    private final IStateFlowEngine stateFlowEngine;
-    private final CaseFlagsInitialiser caseFlagInitialiser;
-    private final ToggleConfiguration toggleConfiguration;
-    private final LocationReferenceDataService locationRefDataService;
     private static final String CASE_DOC_LOCATION = "/cases/case-details/%s#CaseDocuments";
-    private final AirlineEpimsDataLoader airlineEpimsDataLoader;
-    private final AirlineEpimsService airlineEpimsService;
-    private final PartyValidator partyValidator;
     private final ValidateClaimantDetailsTask validateClaimantDetailsTask;
     private final SubmitClaimTask submitClaimTask;
     private final SpecValidateClaimInterestDateTask specValidateClaimInterestDateTask;
@@ -177,11 +128,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final CalculateSpecFeeTask calculateSpecFeeTask;
     private final GetAirlineListTask getAirlineListTask;
     private final ValidateRespondentDetailsTask validateRespondentDetailsTask;
-
-    @Value("${court-location.specified-claim.region-id}")
-    private String regionId;
-    @Value("${court-location.specified-claim.epimms-id}")
-    private String epimmsId;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -207,6 +153,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .put(callbackKey(MID, "respondentSolicitor1"), this::validateRespondentSolicitorAddress)
             .put(callbackKey(MID, "respondentSolicitor2"), this::validateRespondentSolicitor2Address)
             .put(callbackKey(MID, "interest-calc"), this::calculateInterest)
+            .put(callbackKey(MID, INTEREST_FROM_PAGE_ID), this::interestFromDefault)
             .put(callbackKey(MID, "ClaimInterest"), this::specCalculateInterest)
             .put(callbackKey(MID, "spec-fee"), this::calculateSpecFee)
             .put(callbackKey(MID, "ValidateClaimInterestDate"), this::specValidateClaimInterestDate)
@@ -233,6 +180,21 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .put(callbackKey(MID, "validate-spec-defendant2-legal-rep-email"), this::validateSpecRespondent2RepEmail)
             .put(callbackKey(MID, "get-airline-list"), this::getAirlineList)
             .put(callbackKey(MID, "validateFlightDelayDate"), this::validateFlightDelayDate)
+            .build();
+    }
+
+    private CallbackResponse interestFromDefault(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        if (InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE.equals(caseData.getInterestClaimFrom())) {
+            caseData = caseData.toBuilder()
+                .interestClaimUntil(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE)
+                .build();
+            CallbackParams callbackParamsWithUpdatedCaseData = callbackParams.toBuilder()
+                .caseData(caseData)
+                .build();
+            return calculateInterest(callbackParamsWithUpdatedCaseData);
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
     }
 
@@ -284,7 +246,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private CallbackResponse specValidateClaimInterestDate(CallbackParams callbackParams) {
-        return specValidateClaimInterestDateTask.specValidateClaimInterestDate(callbackParams.getCaseData(), callbackParams.getRequest().getEventId());
+        return specValidateClaimInterestDateTask.specValidateClaimInterestDate(callbackParams.getCaseData(),
+            callbackParams.getRequest().getEventId());
     }
 
     private CallbackResponse specValidateClaimTimelineDate(CallbackParams callbackParams) {
@@ -361,9 +324,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
         return submitClaimTask.submitClaim(callbackParams.getCaseData(), callbackParams.getRequest().getEventId(),
-                                           callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                                           callbackParams.getCaseData().getIsFlightDelayClaim(),
-                                           callbackParams.getCaseData().getFlightDelayDetails());
+            callbackParams.getParams().get(BEARER_TOKEN).toString(),
+            callbackParams.getCaseData().getIsFlightDelayClaim(),
+            callbackParams.getCaseData().getFlightDelayDetails());
     }
 
     //--------v1 callback overloaded, return to single param
@@ -404,11 +367,11 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                 || isPinInPostCaseMatched(caseData))
                 ? getConfirmationSummary(caseData)
                 : format(LIP_CONFIRMATION_BODY, format(
-                             CASE_DOC_LOCATION,
-                             caseData.getCcdCaseReference()
-                         ),
-                         claimUrlsConfiguration.getResponsePackLink(),
-                         formattedServiceDeadline
+                    CASE_DOC_LOCATION,
+                    caseData.getCcdCaseReference()
+                ),
+                claimUrlsConfiguration.getResponsePackLink(),
+                formattedServiceDeadline
             ))
                 + exitSurveyContentService.applicantSurvey();
     }
@@ -431,7 +394,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private CallbackResponse validateRespondentDetails(CallbackParams callbackParams,
-                                                     Function<CaseData, Party> getRespondent) {
+                                                       Function<CaseData, Party> getRespondent) {
         validateRespondentDetailsTask.setGetRespondent(getRespondent);
         return validateRespondentDetailsTask.validateRespondentDetails(callbackParams.getCaseData());
     }

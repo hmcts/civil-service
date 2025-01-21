@@ -99,6 +99,8 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         BusinessProcess businessProcess = BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC);
         nextState = determineNextState.determineNextState(caseData, callbackParams, builder, nextState, businessProcess);
 
+        is1v1RespondImmediately(caseData, builder);
+
         frcDocumentsUtils.assembleClaimantsFRCDocuments(caseData);
 
         builder.claimantResponseDocuments(
@@ -315,5 +317,15 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
+    }
+
+    private void is1v1RespondImmediately(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+        if (featureToggleService.isJudgmentOnlineLive()
+            && isOneVOne(caseData)
+            && caseData.isPayImmediately()
+            && ((caseData.isFullAdmitClaimSpec() && caseData.getApplicant1ProceedWithClaim() == null)
+            || caseData.isPartAdmitImmediatePaymentClaimSettled())) {
+            builder.respondForImmediateOption(YesOrNo.YES);
+        }
     }
 }
