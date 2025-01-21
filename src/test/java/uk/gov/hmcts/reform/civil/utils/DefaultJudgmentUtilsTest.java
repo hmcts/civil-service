@@ -29,7 +29,7 @@ public class DefaultJudgmentUtilsTest {
             .addRespondent2(YesOrNo.NO)
             .totalClaimAmount(new BigDecimal(30)).build();
         BigDecimal result = calculateFixedCosts(caseData);
-        assertThat(result).isEqualTo(new BigDecimal(82));
+        assertThat(result).isEqualTo(new BigDecimal(72));
     }
 
     @Test
@@ -38,7 +38,7 @@ public class DefaultJudgmentUtilsTest {
             .addRespondent2(YesOrNo.NO)
             .totalClaimAmount(new BigDecimal(560)).build();
         BigDecimal result = calculateFixedCosts(caseData);
-        assertThat(result).isEqualTo(new BigDecimal(102));
+        assertThat(result).isEqualTo(new BigDecimal(92));
     }
 
     @Test
@@ -47,7 +47,7 @@ public class DefaultJudgmentUtilsTest {
             .addRespondent2(YesOrNo.NO)
             .totalClaimAmount(new BigDecimal(2000)).build();
         BigDecimal result = calculateFixedCosts(caseData);
-        assertThat(result).isEqualTo(new BigDecimal(112));
+        assertThat(result).isEqualTo(new BigDecimal(102));
     }
 
     @Test
@@ -56,7 +56,25 @@ public class DefaultJudgmentUtilsTest {
             .addRespondent2(YesOrNo.NO)
             .totalClaimAmount(new BigDecimal(8000)).build();
         BigDecimal result = calculateFixedCosts(caseData);
-        assertThat(result).isEqualTo(new BigDecimal(140));
+        assertThat(result).isEqualTo(new BigDecimal(130));
+    }
+
+    @Test
+    void shouldReturnFixedCost_whenClaimAmountIsBetween25And26() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .addRespondent2(YesOrNo.NO)
+            .totalClaimAmount(new BigDecimal("25.50")).build();
+        BigDecimal result = calculateFixedCosts(caseData);
+        assertThat(result).isEqualTo(new BigDecimal(72));
+    }
+
+    @Test
+    void shouldReturnFixedCost_whenClaimAmountIsBetween5kAnd5001() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .addRespondent2(YesOrNo.NO)
+            .totalClaimAmount(new BigDecimal("5000.50")).build();
+        BigDecimal result = calculateFixedCosts(caseData);
+        assertThat(result).isEqualTo(new BigDecimal(130));
     }
 
     @Test

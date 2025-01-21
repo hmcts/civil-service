@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.utils.JudgmentAdmissionUtils;
 import java.util.List;
 import java.util.function.Predicate;
 
+import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -42,7 +43,7 @@ public class FullAdmissionTransitionBuilder extends MidTransitionBuilder {
 
     @Override
     void setUpTransitions(List<Transition> transitions) {
-        this.moveTo(FULL_ADMIT_PAY_IMMEDIATELY, transitions).onlyWhen(fullAdmitPayImmediately, transitions)
+        this.moveTo(FULL_ADMIT_PAY_IMMEDIATELY, transitions).onlyWhen(fullAdmitPayImmediately.and(not(ccjRequestJudgmentByAdmission)), transitions)
             .moveTo(FULL_ADMIT_PROCEED, transitions).onlyWhen(fullDefenceProceed, transitions)
             .moveTo(FULL_ADMIT_NOT_PROCEED, transitions).onlyWhen(fullDefenceNotProceed, transitions)
             .moveTo(FULL_ADMIT_AGREE_REPAYMENT, transitions).onlyWhen(acceptRepaymentPlan, transitions)
