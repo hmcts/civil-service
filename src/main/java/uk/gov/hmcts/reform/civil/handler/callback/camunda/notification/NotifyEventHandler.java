@@ -85,10 +85,10 @@ public class NotifyEventHandler extends NotificationHandler {
     protected void notifyRespondents(final CaseData caseData) {
 
         Map<String, String> properties = addProperties(caseData);
-        notifyRespondent(caseData.getRespondentSolicitor1EmailAddress(), true, properties);
+        notifyRespondent(caseData.getRespondentSolicitor1EmailAddress(), true, properties, caseData);
 
         if (stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)) {
-            notifyRespondent(caseData.getRespondentSolicitor2EmailAddress(), false, properties);
+            notifyRespondent(caseData.getRespondentSolicitor2EmailAddress(), false, properties, caseData);
         }
     }
 
