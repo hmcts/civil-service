@@ -7,12 +7,11 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
-import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 
@@ -30,7 +29,8 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganiza
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class NotifyEventHandler extends CallbackHandler implements NotificationData {
+public class NotifyEventHandler extends NotificationHandler {
+    //TODO: Rename NotifyEventHandler to NotifyLitigationFriendAddedHandler
 
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_EVENT);
 
@@ -46,7 +46,7 @@ public class NotifyEventHandler extends CallbackHandler implements NotificationD
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyForLitigationFriendAdded
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyParties
         );
     }
 
@@ -60,7 +60,8 @@ public class NotifyEventHandler extends CallbackHandler implements NotificationD
         return EVENTS;
     }
 
-    private CallbackResponse notifyForLitigationFriendAdded(CallbackParams callbackParams) {
+    @Override
+    protected CallbackResponse notifyParties(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         log.info(
             "Entering notifyForLitigationFriendAdded. Case id: {}",
@@ -72,7 +73,7 @@ public class NotifyEventHandler extends CallbackHandler implements NotificationD
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    private void notifyApplicants(final CaseData caseData) {
+    protected void notifyApplicants(final CaseData caseData) {
         notificationService.sendMail(
             caseData.getApplicantSolicitor1UserDetails().getEmail(),
             notificationsProperties.getSolicitorLitigationFriendAdded(),
@@ -81,7 +82,7 @@ public class NotifyEventHandler extends CallbackHandler implements NotificationD
         );
     }
 
-    private void notifyRespondents(final CaseData caseData) {
+    protected void notifyRespondents(final CaseData caseData) {
 
         Map<String, String> properties = addProperties(caseData);
         properties.put(
