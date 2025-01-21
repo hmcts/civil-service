@@ -88,7 +88,7 @@ public class NotifyEventHandler extends NotificationHandler {
         notifyRespondent(caseData.getRespondentSolicitor1EmailAddress(), true, properties);
 
         if (stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)) {
-            notifyRespondent(caseData.getRespondentSolicitor2EmailAddress(), true, properties);
+            notifyRespondent(caseData.getRespondentSolicitor2EmailAddress(), false, properties);
         }
     }
 
