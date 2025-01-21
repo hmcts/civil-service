@@ -8,7 +8,7 @@ import uk.gov.hmcts.contino.GithubAPI
 def type = "java"
 def product = "civil"
 def component = "service"
-def ccdBranch = "feat/civ-16434"
+def ccdBranch = "feat/hmc-nro-release"
 def camundaBranch = "master"
 def dmnBranch = "master"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
