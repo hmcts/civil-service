@@ -84,7 +84,6 @@ public class RoleAssignmentInitialisationService {
         log.info("Assigned case allocator roles successfully");
     }
 
-
     private List<RoleAssignment> createCivilSystemRoles(String userId, String... roleNames) {
         return Arrays.asList(roleNames).stream().map(roleName -> RoleAssignment.builder()
             .actorId(userId)
