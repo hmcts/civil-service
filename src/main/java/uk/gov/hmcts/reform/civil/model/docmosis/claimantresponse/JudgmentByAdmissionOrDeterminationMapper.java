@@ -275,7 +275,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             ? formatDateInWelsh(LocalDate.parse(DateFormatHelper.formatLocalDate(
             caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate(),
             DateFormatHelper.DATE
-        ),dateTimeFormatter)) : null;
+        ), dateTimeFormatter)) : null;
     }
 
     private String getRepaymentString(PaymentFrequencyLRspec repaymentFrequency) {
