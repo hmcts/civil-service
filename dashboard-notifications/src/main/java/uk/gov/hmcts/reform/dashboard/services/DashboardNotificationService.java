@@ -82,7 +82,7 @@ public class DashboardNotificationService {
                     notification.getDashboardNotificationsTemplates().getId()
                 );
 
-        DashboardNotificationsEntity updated = notification;
+
         if (nonNull(existingNotification) && !existingNotification.isEmpty()) {
             updated = notification.toBuilder().id(existingNotification.get(0).getId()).build();
             notificationActionRepository.deleteByDashboardNotificationAndActionPerformed(existingNotification.get(0),
