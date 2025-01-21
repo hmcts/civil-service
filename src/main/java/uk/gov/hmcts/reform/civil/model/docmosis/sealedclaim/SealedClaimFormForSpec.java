@@ -42,6 +42,7 @@ public class SealedClaimFormForSpec implements MappableObject {
     private final List<ClaimAmountBreakupDetails> claimAmount;
     private final String sameInterestRate;
     private final String breakdownInterestRate;
+    private final String interestPerDayBreakdown;
     private final String totalInterestAmount;
     private final String howTheInterestWasCalculated;
     private final String interestRate;
