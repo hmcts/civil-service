@@ -91,4 +91,33 @@ class RoleInitialisationServiceTest {
             .assignUserRoles(eq(USER_ID), eq(USER_AUTH), eq(expected));
     }
 
+    @Test
+    void shouldCallRoleAssignmentServiceWithExpectedRequest_caseAllocator() {
+        RoleAssignmentRequest expected = RoleAssignmentRequest.builder()
+            .roleRequest(RoleRequest.builder()
+                             .assignerId(USER_ID)
+                             .reference("civil-case-allocator-system-user")
+                             .process("civil-system-user")
+                             .replaceExisting(true)
+                             .build())
+            .requestedRoles(List.of(
+                RoleAssignment.builder()
+                    .actorId(USER_ID)
+                    .actorIdType("IDAM")
+                    .roleType(RoleType.ORGANISATION)
+                    .classification("PUBLIC")
+                    .grantType(GrantType.STANDARD)
+                    .roleCategory(RoleCategory.SYSTEM)
+                    .roleName("case-allocator")
+                    .attributes(Map.of("jurisdiction", "CIVIL", "caseType", "CIVIL"))
+                    .readOnly(false)
+                    .build()
+            )).build();
+
+        roleInitialisationService.initialiseUserRolesOnStartUp();
+
+        verify(roleAssignmentService, times(1))
+            .assignUserRoles(eq(USER_ID), eq(USER_AUTH), eq(expected));
+    }
+
 }

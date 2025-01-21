@@ -499,7 +499,7 @@ court-location:
     epimms-id: "192280"
 
 role-initialisation:
-  enabled: ${ASSIGN_ROLES_ON_STARTUP:false}
+  enabled: ${ASSIGN_ROLES_ON_STARTUP:true}
 
 launchdarkly:
   sdk-key: ${LAUNCH_DARKLY_SDK_KEY:}
