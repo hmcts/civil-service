@@ -34,6 +34,8 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.CC
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.CCJ_REQUEST_DETERMINATION;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_ADMISSION_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_ADMISSION_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_ADMISSION_CLAIMANT_BILINGUAL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_ADMISSION_DEFENDANT_BILINGUAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_ADMISSION_OR_DETERMINATION;
 
 @ExtendWith(MockitoExtension.class)
@@ -191,6 +193,72 @@ class RequestJudgmentByAdmissionOrDeterminationResponseDocGeneratorTest {
         // When
         List<CaseDocument> actual = generator.generateNonDivergentDocs(caseData, BEARER_TOKEN,
                                                                   GEN_JUDGMENT_BY_ADMISSION_DOC_DEFENDANT);
+
+        // Then
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DocumentType.JUDGMENT_BY_ADMISSION_DEFENDANT));
+        assertThat(actual).contains(caseDocument);
+    }
+
+    @Test
+    void shouldGenerateClaimantJudgementByAdmissionWelshDocument() {
+        // Given
+        String fileName = String.format(JUDGMENT_BY_ADMISSION_CLAIMANT.getDocumentTitle(), REFERENCE_NUMBER, "admission");
+        CaseDocument caseDocument = CaseDocumentBuilder.builder()
+            .documentName(fileName)
+            .documentType(DocumentType.JUDGMENT_BY_ADMISSION_CLAIMANT)
+            .build();
+        JudgmentByAdmissionOrDetermination builder = JudgmentByAdmissionOrDetermination.builder().build();
+        when(documentGeneratorService.generateDocmosisDocument(any(JudgmentByAdmissionOrDetermination.class),
+                                                               eq(JUDGMENT_BY_ADMISSION_CLAIMANT_BILINGUAL)))
+            .thenReturn(new DocmosisDocument(JUDGMENT_BY_ADMISSION_CLAIMANT_BILINGUAL.getDocumentTitle(), bytes));
+        when(documentManagementService.uploadDocument(
+            BEARER_TOKEN, new PDF(fileName, bytes, DocumentType.JUDGMENT_BY_ADMISSION_CLAIMANT))
+        ).thenReturn(caseDocument);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .claimantBilingualLanguagePreference("BOTH")
+            .build();
+        when(judgmentByAdmissionOrDeterminationMapper.toNonDivergentDocs(caseData))
+            .thenReturn(builder);
+        when(judgmentByAdmissionOrDeterminationMapper.toNonDivergentWelshDocs(caseData, builder))
+            .thenReturn(JudgmentByAdmissionOrDetermination.builder().build());
+        // When
+        List<CaseDocument> actual = generator.generateNonDivergentDocs(caseData, BEARER_TOKEN,
+                                                                       GEN_JUDGMENT_BY_ADMISSION_DOC_CLAIMANT);
+
+        // Then
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DocumentType.JUDGMENT_BY_ADMISSION_CLAIMANT));
+        verify(assignCategoryId)
+            .assignCategoryIdToCaseDocument(caseDocument, "judgments");
+        assertThat(actual).contains(caseDocument);
+    }
+
+    @Test
+    void shouldGenerateDefendantJudgementByAdmissionWelshDocument() {
+        // Given
+        String fileName = String.format(JUDGMENT_BY_ADMISSION_DEFENDANT.getDocumentTitle(), REFERENCE_NUMBER, "admission");
+        CaseDocument caseDocument = CaseDocumentBuilder.builder()
+            .documentName(fileName)
+            .documentType(DocumentType.JUDGMENT_BY_ADMISSION_DEFENDANT)
+            .build();
+        JudgmentByAdmissionOrDetermination builder = JudgmentByAdmissionOrDetermination.builder().build();
+        when(documentGeneratorService.generateDocmosisDocument(any(JudgmentByAdmissionOrDetermination.class), eq(JUDGMENT_BY_ADMISSION_DEFENDANT_BILINGUAL)))
+            .thenReturn(new DocmosisDocument(JUDGMENT_BY_ADMISSION_DEFENDANT_BILINGUAL.getDocumentTitle(), bytes));
+        when(documentManagementService.uploadDocument(
+            BEARER_TOKEN, new PDF(fileName, bytes, DocumentType.JUDGMENT_BY_ADMISSION_DEFENDANT))
+        ).thenReturn(caseDocument);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .claimantBilingualLanguagePreference("BOTH")
+            .build();
+        when(judgmentByAdmissionOrDeterminationMapper.toNonDivergentDocs(caseData))
+            .thenReturn(JudgmentByAdmissionOrDetermination.builder().build());
+        when(judgmentByAdmissionOrDeterminationMapper.toNonDivergentWelshDocs(caseData, builder))
+            .thenReturn(JudgmentByAdmissionOrDetermination.builder().build());
+
+        // When
+        List<CaseDocument> actual = generator.generateNonDivergentDocs(caseData, BEARER_TOKEN,
+                                                                       GEN_JUDGMENT_BY_ADMISSION_DOC_DEFENDANT);
 
         // Then
         verify(documentManagementService)

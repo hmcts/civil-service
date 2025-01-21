@@ -86,7 +86,7 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator imple
         if (caseEvent.name().equals(CaseEvent.GEN_JUDGMENT_BY_ADMISSION_DOC_CLAIMANT.name())) {
             return isBilingual ? DocmosisTemplates.JUDGMENT_BY_ADMISSION_CLAIMANT_BILINGUAL : DocmosisTemplates.JUDGMENT_BY_ADMISSION_CLAIMANT;
         } else {
-            return DocmosisTemplates.JUDGMENT_BY_ADMISSION_DEFENDANT;
+            return isBilingual ? DocmosisTemplates.JUDGMENT_BY_ADMISSION_DEFENDANT_BILINGUAL : DocmosisTemplates.JUDGMENT_BY_ADMISSION_DEFENDANT;
         }
     }
 
@@ -96,47 +96,34 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator imple
             JudgmentByAdmissionOrDetermination templateData = getTemplateDataForNonDivergentDocs(caseData);
             JudgmentByAdmissionOrDetermination welshTemplateData =
                 judgmentByAdmissionOrDeterminationMapper.toNonDivergentWelshDocs(caseData, templateData);
-            DocmosisDocument docmosisWelshDocument = documentGeneratorService.generateDocmosisDocument(
+            DocmosisDocument englishWelshDocument = documentGeneratorService.generateDocmosisDocument(
                 welshTemplateData,
-                DocmosisTemplates.JUDGMENT_BY_ADMISSION_CLAIMANT_BILINGUAL_1
+                getTemplateName(caseEvent, true)
             );
             CaseDocument uploadedWelshDocument = documentManagementService.uploadDocument(
                 authorisation,
                 new PDF(
-                    DocmosisTemplates.JUDGMENT_BY_ADMISSION_CLAIMANT_BILINGUAL_1.getDocumentTitle(),
-                    docmosisWelshDocument.getBytes(),
+                    getTemplateName(caseEvent, true).getDocumentTitle(),
+                    englishWelshDocument.getBytes(),
                     getDocumentType(caseEvent)
                 )
             );
             assignCategoryId.assignCategoryIdToCaseDocument(uploadedWelshDocument, "judgments");
             list.add(uploadedWelshDocument);
-        }
-
-        JudgmentByAdmissionOrDetermination templateData = getTemplateDataForNonDivergentDocs(caseData);
-        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
-            templateData,
-            getTemplateName(caseEvent, false)
-        );
-        CaseDocument uploadedDocument = documentManagementService.uploadDocument(
-            authorisation,
-            new PDF(
-                getTemplateName(caseEvent, false).getDocumentTitle(),
-                docmosisDocument.getBytes(),
-                getDocumentType(caseEvent)
-            )
-        );
-
-        if (caseData.isClaimantBilingual() || isWelshHearingSelected(caseData) || caseData.isRespondentResponseBilingual()) {
-            CaseDocument stitchedDocument = generateNonDivergentWelshDocs(
-                caseData,
-                authorisation,
-                caseEvent,
-                templateData,
-                uploadedDocument
-            );
-            assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, "judgments");
-            list.add(stitchedDocument);
         } else {
+            JudgmentByAdmissionOrDetermination templateData = getTemplateDataForNonDivergentDocs(caseData);
+            DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
+                templateData,
+                getTemplateName(caseEvent, false)
+            );
+            CaseDocument uploadedDocument = documentManagementService.uploadDocument(
+                authorisation,
+                new PDF(
+                    getTemplateName(caseEvent, false).getDocumentTitle(),
+                    docmosisDocument.getBytes(),
+                    getDocumentType(caseEvent)
+                )
+            );
             assignCategoryId.assignCategoryIdToCaseDocument(uploadedDocument, "judgments");
             list.add(uploadedDocument);
         }

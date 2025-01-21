@@ -45,6 +45,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
     private final JudgementService judgementService;
     private final OrganisationService organisationService;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy 'at' h:mma");
+    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
 
     public JudgmentByAdmissionOrDetermination toClaimantResponseForm(CaseData caseData, CaseEvent caseEvent) {
         Optional<CaseDataLiP> caseDataLip = Optional.ofNullable(caseData.getCaseDataLiP());
@@ -255,17 +256,18 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .welshPayByDate(getWelshPayByDate(caseData))
             .welshRepaymentDate(getWelshRepaymentDate(caseData))
             .welshRepaymentFrequency(caseData.isPayByInstallment()
-                                         ? getRepaymentFrequency(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null)
-            .welshPaymentStr(caseData.isPayByInstallment() ? getRepaymentString(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null)
+                                         ? getRepaymentFrequencyInWelsh(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null)
+            .welshPaymentStr(caseData.isPayByInstallment() ? getRepaymentWelshString(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null)
             .build();
     }
 
     private String getWelshPayByDate(CaseData caseData) {
         return caseData.getRespondToClaimAdmitPartLRspec() != null
-            ? formatDateInWelsh(LocalDate.parse(DateFormatHelper.formatLocalDate(
-            caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid(),
-            DateFormatHelper.DATE
-        ))) : null;
+            ? formatDateInWelsh(LocalDate.parse(
+            DateFormatHelper.formatLocalDate(
+                caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid(),
+                DateFormatHelper.DATE
+            ), dateTimeFormatter)) : null;
     }
 
     private String getWelshRepaymentDate(CaseData caseData) {
@@ -273,7 +275,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             ? formatDateInWelsh(LocalDate.parse(DateFormatHelper.formatLocalDate(
             caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate(),
             DateFormatHelper.DATE
-        ))) : null;
+        ),dateTimeFormatter)) : null;
     }
 
     private String getRepaymentString(PaymentFrequencyLRspec repaymentFrequency) {
@@ -285,11 +287,29 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         }
     }
 
+    private String getRepaymentWelshString(PaymentFrequencyLRspec repaymentFrequency) {
+        switch (repaymentFrequency) {
+            case ONCE_ONE_WEEK : return "pob mis";
+            case ONCE_ONE_MONTH: return "pob mis";
+            case ONCE_TWO_WEEKS: return "pob 2 wythnos";
+            default: return null;
+        }
+    }
+
     private String getRepaymentFrequency(PaymentFrequencyLRspec repaymentFrequency) {
         switch (repaymentFrequency) {
             case ONCE_ONE_WEEK : return "per week";
             case ONCE_ONE_MONTH: return "per month";
             case ONCE_TWO_WEEKS: return "every 2 weeks";
+            default: return null;
+        }
+    }
+
+    private String getRepaymentFrequencyInWelsh(PaymentFrequencyLRspec repaymentFrequency) {
+        switch (repaymentFrequency) {
+            case ONCE_ONE_WEEK : return "yr wythnos";
+            case ONCE_ONE_MONTH: return "y mis";
+            case ONCE_TWO_WEEKS: return "bob pythefnos";
             default: return null;
         }
     }
