@@ -85,30 +85,26 @@ public class NotifyEventHandler extends NotificationHandler {
     protected void notifyRespondents(final CaseData caseData) {
 
         Map<String, String> properties = addProperties(caseData);
+        notifyRespondent(caseData.getRespondentSolicitor1EmailAddress(), true, properties);
+
+        if (stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)) {
+            notifyRespondent(caseData.getRespondentSolicitor2EmailAddress(), true, properties);
+        }
+    }
+
+    protected void notifyRespondent(final String email, final boolean isRespondent1,
+                                    final Map<String, String> properties, final CaseData caseData) {
         properties.put(
             CLAIM_LEGAL_ORG_NAME_SPEC,
-            getLegalOrganizationNameForRespondent(caseData, true, organisationService)
+            getLegalOrganizationNameForRespondent(caseData, isRespondent1, organisationService)
         );
 
         notificationService.sendMail(
-            caseData.getRespondentSolicitor1EmailAddress(),
+            email,
             notificationsProperties.getSolicitorLitigationFriendAdded(),
             properties,
             String.format(REFERENCE_TEMPLATE_RESPONDENT, caseData.getLegacyCaseReference())
         );
-
-        if (stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)) {
-            properties.put(
-                CLAIM_LEGAL_ORG_NAME_SPEC,
-                getLegalOrganizationNameForRespondent(caseData, false, organisationService)
-            );
-            notificationService.sendMail(
-                caseData.getRespondentSolicitor2EmailAddress(),
-                notificationsProperties.getSolicitorLitigationFriendAdded(),
-                properties,
-                String.format(REFERENCE_TEMPLATE_RESPONDENT, caseData.getLegacyCaseReference())
-            );
-        }
     }
 
     @Override
