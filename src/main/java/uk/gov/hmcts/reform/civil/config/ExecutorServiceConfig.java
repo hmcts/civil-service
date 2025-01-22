@@ -12,7 +12,7 @@ import java.util.concurrent.Executors;
 @Profile("!functional & !local")
 public class ExecutorServiceConfig {
 
-    @Value("${azure.servicebus.threads}")
+    @Value("${azure.service-bus.ccd-events-topic.threads}")
     private int concurrentSessions;
 
     @Bean("ccdCaseEventExecutorService")

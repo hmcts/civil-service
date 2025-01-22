@@ -16,12 +16,12 @@ import java.util.stream.IntStream;
 
 @Slf4j
 @Component
-@ConditionalOnProperty("azure.servicebus.enableASB-DLQ")
+@ConditionalOnProperty("azure.service-bus.ccd-events-topic.enabled")
 @Profile("!functional & !local")
 @RequiredArgsConstructor
 public class CcdCaseEventsExecutor {
 
-    @Value("${azure.servicebus.threads}")
+    @Value("${azure.service-bus.ccd-events-topic.threads}")
     private int concurrentSessions;
 
     private final CcdCaseEventsConsumer serviceBusTask;
