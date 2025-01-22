@@ -114,6 +114,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -1179,6 +1180,13 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         verifyNoInteractions(updateWaCourtLocationsService);
+
+        assertThat(response.getData()).doesNotContainKey("sdoOrderDocument");
+        assertThat(response.getData()).containsEntry("businessProcess", Map.of(
+                "camundaEvent", CREATE_SDO.name(),
+                "status", "READY",
+                "readyOn", ((Map<?, ?>) response.getData().get("businessProcess")).get("readyOn")
+        ));
     }
 
     @Test
@@ -1186,14 +1194,18 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").build())
-            .build();
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").build())
+                .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
         verify(updateWaCourtLocationsService).updateCourtListingWALocations(any(), any());
+
+        assertThat(responseCaseData.getCaseManagementLocation().getBaseLocation()).isEqualTo("123456");
+        assertThat(responseCaseData.getBusinessProcess().getCamundaEvent()).isEqualTo(CREATE_SDO.name());
+        assertThat(responseCaseData.getBusinessProcess().getStatus().toString()).isEqualTo("READY");
     }
 
     @Nested

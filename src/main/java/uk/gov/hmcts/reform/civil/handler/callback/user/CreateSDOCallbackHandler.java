@@ -47,7 +47,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final SetOrderDetailsFlags setOrderDetailsFlags;
 
     @Value("${court-location.unspecified-claim.epimms-id}")
-    String ccmccEpimsId;
+    public String ccmccEpimsId;
 
     @Override
     protected Map<String, Callback> callbacks() {
