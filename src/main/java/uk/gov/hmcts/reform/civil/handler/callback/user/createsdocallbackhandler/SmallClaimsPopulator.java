@@ -140,24 +140,33 @@ public class SmallClaimsPopulator {
                 .input2("2")
                 .input3("2")
                 .input4("For this limitation, a party is counted as a witness.")
-                .text("A witness statement must: \na) Start with the name of the case and the claim number;"
-                        + "\nb) State the full name and address of the witness; "
-                        + "\nc) Set out the witness's evidence clearly in numbered paragraphs on numbered pages;"
-                        + "\nd) End with this paragraph: 'I believe that the facts stated in this witness "
-                        + "statement are true. I understand that proceedings for contempt of court may be "
-                        + "brought against anyone who makes, or causes to be made, a false statement in a "
-                        + "document verified by a statement of truth without an honest belief in its truth'."
-                        + "\ne) be signed by the witness and dated."
-                        + "\nf) If a witness is unable to read the statement there must be a certificate that "
-                        + "it has been read or interpreted to the witness by a suitably qualified person and "
-                        + "at the final hearing there must be an independent interpreter who will not be "
-                        + "provided by the Court."
-                        + "\n\nThe judge may refuse to allow a witness to give evidence or consider any "
-                        + "statement of any witness whose statement has not been uploaded to the Digital Portal in "
-                        + "accordance with the paragraphs above."
-                        + "\n\nA witness whose statement has been uploaded in accordance with the above must attend "
-                        + "the hearing. If they do not attend, it will be for the court to decide how much "
-                        + "reliance, if any, to place on their evidence.")
+                .text("""
+                        A witness statement must:\s
+                        a) Start with the name of the case and the claim number;\
+                        \s
+                        b) State the full name and address of the witness; \
+                        \s
+                        c) Set out the witness's evidence clearly in numbered paragraphs on numbered pages;\
+                        \s
+                        d) End with this paragraph: 'I believe that the facts stated in this witness \
+                        statement are true. I understand that proceedings for contempt of court may be \
+                        brought against anyone who makes, or causes to be made, a false statement in a \
+                        document verified by a statement of truth without an honest belief in its truth'.\
+                        \s
+                        e) be signed by the witness and dated.\
+                        \s
+                        f) If a witness is unable to read the statement there must be a certificate that \
+                        it has been read or interpreted to the witness by a suitably qualified person and \
+                        at the final hearing there must be an independent interpreter who will not be \
+                        provided by the Court.\
+                        \s
+                        The judge may refuse to allow a witness to give evidence or consider any \
+                        statement of any witness whose statement has not been uploaded to the Digital Portal in \
+                        accordance with the paragraphs above.\
+                        \s
+                        A witness whose statement has been uploaded in accordance with the above must attend \
+                        the hearing. If they do not attend, it will be for the court to decide how much \
+                        reliance, if any, to place on their evidence.""")
                 .build();
     }
 

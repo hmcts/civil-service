@@ -63,7 +63,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     AssignCategoryId.class,
     CreateSDOCallbackHandlerTestConfig.class},
     properties = {"reference.database.enabled=false"})
-public class CreateSDOMidEventNegativeNumberOfWitnessTest extends BaseCallbackHandlerTest {
+class CreateSDOMidEventNegativeNumberOfWitnessTest extends BaseCallbackHandlerTest {
 
     private static final String PAGE_ID = "generate-sdo-order";
 

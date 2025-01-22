@@ -52,7 +52,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
     AssignCategoryId.class,
     CreateSDOCallbackHandlerTestConfig.class},
     properties = {"reference.database.enabled=false"})
-public class CreateSDOMidEventSetOrderDetailsFlagsTest extends BaseCallbackHandlerTest {
+class CreateSDOMidEventSetOrderDetailsFlagsTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private FeatureToggleService featureToggleService;

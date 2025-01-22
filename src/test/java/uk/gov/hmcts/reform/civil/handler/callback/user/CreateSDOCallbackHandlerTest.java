@@ -1159,7 +1159,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     void shouldNotCallUpdateWaCourtLocationsServiceWhenNotPresent_AndMintiEnabled() {
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
-        CreateSDOCallbackHandler handler =
+        CreateSDOCallbackHandler createSDOCallbackHandler =
                 new CreateSDOCallbackHandler(
                         generateSdoOrder,
                         prePopulateOrderDetailsPages,
@@ -1177,7 +1177,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, CREATE_SDO, ABOUT_TO_SUBMIT);
 
         AboutToStartOrSubmitCallbackResponse response =
-                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                (AboutToStartOrSubmitCallbackResponse) createSDOCallbackHandler.handle(params);
 
         verifyNoInteractions(updateWaCourtLocationsService);
 
@@ -1205,7 +1205,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         assertThat(responseCaseData.getCaseManagementLocation().getBaseLocation()).isEqualTo("123456");
         assertThat(responseCaseData.getBusinessProcess().getCamundaEvent()).isEqualTo(CREATE_SDO.name());
-        assertThat(responseCaseData.getBusinessProcess().getStatus().toString()).isEqualTo("READY");
+        assertThat(responseCaseData.getBusinessProcess().getStatus()).hasToString("READY");
     }
 
     @Nested

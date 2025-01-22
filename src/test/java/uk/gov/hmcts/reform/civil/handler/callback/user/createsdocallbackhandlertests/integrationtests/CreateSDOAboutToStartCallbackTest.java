@@ -109,7 +109,7 @@ import static uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions.OPEN_DATE;
     AssignCategoryId.class,
     CreateSDOCallbackHandlerTestConfig.class},
     properties = {"reference.database.enabled=false"})
-public class CreateSDOAboutToStartCallbackTest extends BaseCallbackHandlerTest {
+class CreateSDOAboutToStartCallbackTest extends BaseCallbackHandlerTest {
 
     @MockBean
     protected LocationReferenceDataService locationRefDataService;
@@ -328,6 +328,14 @@ public class CreateSDOAboutToStartCallbackTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = handleCallback(caseData);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
+            assertTrialDetails(responseCaseData);
+            assertHearingCourtLocation(responseCaseData);
+            assertDisclosureOfDocuments(responseCaseData);
+            assertWitnessesOfFact(responseCaseData);
+            assertScheduleOfLoss(responseCaseData);
+        }
+
+        private void assertTrialDetails(CaseData responseCaseData) {
             assertThat(responseCaseData.getSdoR2Trial().getTrialOnOptions()).isEqualTo(OPEN_DATE);
             assertThat(responseCaseData.getSdoR2Trial().getLengthList()).isEqualTo(FIVE_HOURS);
             assertThat(responseCaseData.getSdoR2Trial().getMethodOfHearing().getValue().getLabel()).isEqualTo(HearingMethod.IN_PERSON.getLabel());
@@ -335,32 +343,44 @@ public class CreateSDOAboutToStartCallbackTest extends BaseCallbackHandlerTest {
             assertThat(responseCaseData.getSdoR2Trial().getSdoR2TrialFirstOpenDateAfter().getListFrom()).isEqualTo(trialFirstOpenDateAfter);
             assertThat(responseCaseData.getSdoR2Trial().getSdoR2TrialWindow().getListFrom()).isEqualTo(trialWindowFrom);
             assertThat(responseCaseData.getSdoR2Trial().getSdoR2TrialWindow().getDateTo()).isEqualTo(trialWindowTo);
-            assertThat(responseCaseData.getSdoR2Trial().getHearingCourtLocationList()).isEqualTo(buildExpectedHearingCourtLocationList());
-            assertThat(responseCaseData.getSdoR2Trial().getAltHearingCourtLocationList()).isEqualTo(buildExpectedAltHearingCourtLocationList());
             assertThat(responseCaseData.getSdoR2Trial().getPhysicalBundlePartyTxt()).isEqualTo(PHYSICAL_TRIAL_BUNDLE);
             assertThat(responseCaseData.getSdoR2ImportantNotesTxt()).isEqualTo(IMPORTANT_NOTES);
             assertThat(responseCaseData.getSdoR2ImportantNotesDate()).isEqualTo(importantNotesDate);
+        }
+
+        private void assertHearingCourtLocation(CaseData responseCaseData) {
+            assertThat(responseCaseData.getSdoR2Trial().getHearingCourtLocationList()).isEqualTo(buildExpectedHearingCourtLocationList());
+            assertThat(responseCaseData.getSdoR2Trial().getAltHearingCourtLocationList()).isEqualTo(buildExpectedAltHearingCourtLocationList());
+        }
+
+        private void assertDisclosureOfDocuments(CaseData responseCaseData) {
             assertThat(responseCaseData.getSdoR2DisclosureOfDocuments().getStandardDisclosureTxt()).isEqualTo(STANDARD_DISCLOSURE);
             assertThat(responseCaseData.getSdoR2DisclosureOfDocuments().getStandardDisclosureDate()).isEqualTo(disclosureStandardDate);
             assertThat(responseCaseData.getSdoR2DisclosureOfDocuments().getInspectionTxt()).isEqualTo(INSPECTION);
             assertThat(responseCaseData.getSdoR2DisclosureOfDocuments().getInspectionDate()).isEqualTo(disclosureInspectionDate);
             assertThat(responseCaseData.getSdoR2DisclosureOfDocuments().getRequestsWillBeCompiledLabel()).isEqualTo(REQUEST_COMPILED_WITH);
+        }
+
+        private void assertWitnessesOfFact(CaseData responseCaseData) {
             assertThat(responseCaseData.getSdoR2WitnessesOfFact().getSdoStatementOfWitness()).isEqualTo(STATEMENT_WITNESS);
-            assertThat(responseCaseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness().getIsRestrictWitness().toString()).isEqualTo("NO");
-            assertThat(responseCaseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails().getNoOfWitnessClaimant().toString()).isEqualTo("3");
-            assertThat(responseCaseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails().getNoOfWitnessDefendant().toString()).isEqualTo("3");
+            assertThat(responseCaseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness().getIsRestrictWitness()).hasToString("NO");
+            assertThat(responseCaseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails().getNoOfWitnessClaimant()).hasToString("3");
+            assertThat(responseCaseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails().getNoOfWitnessDefendant()).hasToString("3");
             assertThat(responseCaseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails()
                     .getPartyIsCountedAsWitnessTxt()).isEqualTo(RESTRICT_WITNESS_TEXT);
-            assertThat(responseCaseData.getSdoR2WitnessesOfFact().getSdoRestrictPages().getIsRestrictPages().toString()).isEqualTo("NO");
+            assertThat(responseCaseData.getSdoR2WitnessesOfFact().getSdoRestrictPages().getIsRestrictPages()).hasToString("NO");
             assertThat(responseCaseData.getSdoR2WitnessesOfFact().getSdoRestrictPages().getRestrictNoOfPagesDetails()
                     .getWitnessShouldNotMoreThanTxt()).isEqualTo(RESTRICT_NUMBER_PAGES_TEXT1);
-            assertThat(responseCaseData.getSdoR2WitnessesOfFact().getSdoRestrictPages().getRestrictNoOfPagesDetails().getNoOfPages().toString()).isEqualTo("12");
+            assertThat(responseCaseData.getSdoR2WitnessesOfFact().getSdoRestrictPages().getRestrictNoOfPagesDetails().getNoOfPages()).hasToString("12");
             assertThat(responseCaseData.getSdoR2WitnessesOfFact().getSdoRestrictPages().getRestrictNoOfPagesDetails().getFontDetails()).isEqualTo(RESTRICT_NUMBER_PAGES_TEXT2);
             assertThat(responseCaseData.getSdoR2WitnessesOfFact().getSdoWitnessDeadline()).isEqualTo(DEADLINE);
             assertThat(responseCaseData.getSdoR2WitnessesOfFact().getSdoWitnessDeadlineDate()).isEqualTo(LocalDate.now().plusDays(70).toString());
             assertThat(responseCaseData.getSdoR2WitnessesOfFact().getSdoWitnessDeadlineText()).isEqualTo(DEADLINE_EVIDENCE);
+        }
+
+        private void assertScheduleOfLoss(CaseData responseCaseData) {
             assertThat(responseCaseData.getSdoR2ScheduleOfLoss().getSdoR2ScheduleOfLossClaimantText()).isEqualTo(SCHEDULE_OF_LOSS_CLAIMANT);
-            assertThat(responseCaseData.getSdoR2ScheduleOfLoss().getIsClaimForPecuniaryLoss().toString()).isEqualTo("NO");
+            assertThat(responseCaseData.getSdoR2ScheduleOfLoss().getIsClaimForPecuniaryLoss()).hasToString("NO");
             assertThat(responseCaseData.getSdoR2ScheduleOfLoss().getSdoR2ScheduleOfLossClaimantDate()).isEqualTo(LocalDate.now().plusDays(364).toString());
             assertThat(responseCaseData.getSdoR2ScheduleOfLoss().getSdoR2ScheduleOfLossDefendantText()).isEqualTo(SCHEDULE_OF_LOSS_DEFENDANT);
             assertThat(responseCaseData.getSdoR2ScheduleOfLoss().getSdoR2ScheduleOfLossDefendantDate()).isEqualTo(LocalDate.now().plusDays(378).toString());

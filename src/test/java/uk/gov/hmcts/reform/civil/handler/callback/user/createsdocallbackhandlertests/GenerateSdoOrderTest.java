@@ -23,9 +23,8 @@ import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDate;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -62,7 +61,7 @@ class GenerateSdoOrderTest {
     @Test
     void shouldNotReturnErrorsWhenCaseDataIsEmpty() {
         CaseData caseData = CaseData.builder().build();
-        Map<CallbackParams.Params, Object> params = new HashMap<>();
+        EnumMap<CallbackParams.Params, Object> params = new EnumMap<>(CallbackParams.Params.class);
         params.put(BEARER_TOKEN, "testToken");
         CallbackParams callbackParams = CallbackParams.builder()
                 .caseData(caseData)
@@ -84,7 +83,7 @@ class GenerateSdoOrderTest {
                         .input3("1")
                         .build())
                 .build();
-        Map<CallbackParams.Params, Object> params = new HashMap<>();
+        EnumMap<CallbackParams.Params, Object> params = new EnumMap<>(CallbackParams.Params.class);
         params.put(BEARER_TOKEN, "testToken");
         CallbackParams callbackParams = CallbackParams.builder()
                 .caseData(caseData)
@@ -104,7 +103,7 @@ class GenerateSdoOrderTest {
                         .ppiDate(LocalDate.now().plusDays(1))
                         .build())
                 .build();
-        Map<CallbackParams.Params, Object> params = new HashMap<>();
+        EnumMap<CallbackParams.Params, Object> params = new EnumMap<>(CallbackParams.Params.class);
         params.put(BEARER_TOKEN, "testToken");
         CallbackParams callbackParams = CallbackParams.builder()
                 .caseData(caseData)
@@ -120,7 +119,7 @@ class GenerateSdoOrderTest {
     @Test
     void shouldGenerateAndSaveSdoOrderDocument() {
         CaseData caseData = CaseData.builder().build();
-        Map<CallbackParams.Params, Object> params = new HashMap<>();
+        EnumMap<CallbackParams.Params, Object> params = new EnumMap<>(CallbackParams.Params.class);
         params.put(BEARER_TOKEN, "testToken");
         CallbackParams callbackParams = CallbackParams.builder()
                 .caseData(caseData)
@@ -148,7 +147,7 @@ class GenerateSdoOrderTest {
                         .build())
                 .build();
 
-        Map<CallbackParams.Params, Object> params = new HashMap<>();
+        EnumMap<CallbackParams.Params, Object> params = new EnumMap<>(CallbackParams.Params.class);
         params.put(BEARER_TOKEN, "testToken");
         CallbackParams callbackParams = CallbackParams.builder()
                 .caseData(caseData)

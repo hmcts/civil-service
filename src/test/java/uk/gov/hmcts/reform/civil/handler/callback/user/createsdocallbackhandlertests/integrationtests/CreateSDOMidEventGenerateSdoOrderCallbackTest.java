@@ -79,7 +79,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
     AssignCategoryId.class,
     CreateSDOCallbackHandlerTestConfig.class},
     properties = {"reference.database.enabled=false"})
-public class CreateSDOMidEventGenerateSdoOrderCallbackTest extends BaseCallbackHandlerTest {
+class CreateSDOMidEventGenerateSdoOrderCallbackTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private SdoGeneratorService sdoGeneratorService;

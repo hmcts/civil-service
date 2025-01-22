@@ -51,7 +51,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
     AssignCategoryId.class,
     CreateSDOCallbackHandlerTestConfig.class},
     properties = {"reference.database.enabled=false"})
-public class CreateSDOAboutToSubmitCallbackVariableCaseTest extends BaseCallbackHandlerTest {
+class CreateSDOAboutToSubmitCallbackVariableCaseTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private Time time;

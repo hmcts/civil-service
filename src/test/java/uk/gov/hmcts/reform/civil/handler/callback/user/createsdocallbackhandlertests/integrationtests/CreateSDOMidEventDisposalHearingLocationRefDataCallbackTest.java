@@ -60,7 +60,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
     AssignCategoryId.class,
     CreateSDOCallbackHandlerTestConfig.class},
     properties = {"reference.database.enabled=false"})
-public class CreateSDOMidEventDisposalHearingLocationRefDataCallbackTest extends BaseCallbackHandlerTest {
+class CreateSDOMidEventDisposalHearingLocationRefDataCallbackTest extends BaseCallbackHandlerTest {
 
     @MockBean
     protected LocationReferenceDataService locationRefDataService;

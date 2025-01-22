@@ -49,7 +49,7 @@ import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.FEEDBACK_LINK;
     AssignCategoryId.class,
     CreateSDOCallbackHandlerTestConfig.class},
     properties = {"reference.database.enabled=false"})
-public class CreateSDOSubmittedCallbackTest extends BaseCallbackHandlerTest {
+class CreateSDOSubmittedCallbackTest extends BaseCallbackHandlerTest {
 
     public static final String REFERENCE_NUMBER = "000DC001";
 

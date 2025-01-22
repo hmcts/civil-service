@@ -56,7 +56,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     AssignCategoryId.class,
     CreateSDOCallbackHandlerTestConfig.class},
     properties = {"reference.database.enabled=false"})
-public class CreateSDOAboutToSubmitCallbackTest extends BaseCallbackHandlerTest {
+class CreateSDOAboutToSubmitCallbackTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private Time time;

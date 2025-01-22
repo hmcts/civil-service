@@ -6,6 +6,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
@@ -23,9 +24,8 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
 
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -113,8 +113,8 @@ class CreateSDOCallbackHandlerUtilsTest {
     @Test
     void shouldReturnDynamicHearingMethodListWhenCategorySearchResultIsPresent() {
         CaseData caseData = CaseData.builder().caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
-        Map<CallbackParams.Params, Object> params = new HashMap<>();
-        params.put(BEARER_TOKEN, "testToken");
+        EnumMap<CallbackParams.Params, Object> params = new EnumMap<>(CallbackParams.Params.class);
+        params.put(CallbackParams.Params.BEARER_TOKEN, "testToken");
         CallbackParams callbackParams = CallbackParams.builder()
                 .caseData(caseData)
                 .params(params)
@@ -127,7 +127,7 @@ class CreateSDOCallbackHandlerUtilsTest {
         when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), anyString(), anyString()))
                 .thenReturn(Optional.of(categorySearchResult));
 
-        try (var mockedHearingMethodUtils = mockStatic(HearingMethodUtils.class)) {
+        try (MockedStatic<HearingMethodUtils> mockedHearingMethodUtils = mockStatic(HearingMethodUtils.class)) {
             mockedHearingMethodUtils.when(() -> HearingMethodUtils.getHearingMethodList(categorySearchResult))
                     .thenReturn(dynamicList);
 
@@ -140,7 +140,7 @@ class CreateSDOCallbackHandlerUtilsTest {
     @Test
     void shouldReturnDynamicHearingMethodListWhenCategorySearchResultIsEmpty() {
         CaseData caseData = CaseData.builder().caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
-        Map<CallbackParams.Params, Object> params = new HashMap<>();
+        EnumMap<CallbackParams.Params, Object> params = new EnumMap<>(CallbackParams.Params.class);
         params.put(BEARER_TOKEN, "testToken");
         CallbackParams callbackParams = CallbackParams.builder()
                 .caseData(caseData)
@@ -152,7 +152,7 @@ class CreateSDOCallbackHandlerUtilsTest {
         when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), anyString(), anyString()))
                 .thenReturn(Optional.empty());
 
-        try (var mockedHearingMethodUtils = mockStatic(HearingMethodUtils.class)) {
+        try (MockedStatic<HearingMethodUtils> mockedHearingMethodUtils = mockStatic(HearingMethodUtils.class)) {
             mockedHearingMethodUtils.when(() -> HearingMethodUtils.getHearingMethodList(null))
                     .thenReturn(dynamicList);
 

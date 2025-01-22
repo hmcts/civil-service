@@ -55,7 +55,6 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -79,7 +78,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     AssignCategoryId.class,
     CreateSDOCallbackHandlerTestConfig.class},
     properties = {"reference.database.enabled=false"})
-public class CreateSDOCallbackHandlerIntegrationTest extends BaseCallbackHandlerTest {
+class CreateSDOCallbackHandlerIntegrationTest extends BaseCallbackHandlerTest {
 
     public static final String REFERENCE_NUMBER = "000DC001";
 
@@ -160,8 +159,7 @@ public class CreateSDOCallbackHandlerIntegrationTest extends BaseCallbackHandler
     private void setupLocationMock(String code, boolean isWhiteListed, CallbackParams params) {
         when(featureToggleService.isLocationWhiteListedForCaseProgression(code))
                 .thenReturn(isWhiteListed);
-        when(locationRefDataService.getLocationMatchingLabel(eq(code), eq(params.getParams().get(
-                CallbackParams.Params.BEARER_TOKEN).toString())))
+        when(locationRefDataService.getLocationMatchingLabel(getSelectedCourt().getCode(), params.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString()))
                 .thenReturn(Optional.of(LocationRefData.builder()
                         .regionId("region id")
                         .epimmsId("epimms id")
@@ -290,7 +288,7 @@ public class CreateSDOCallbackHandlerIntegrationTest extends BaseCallbackHandler
 
         assertThat(responseCaseData.getCaseManagementLocation().getBaseLocation()).isEqualTo("123456");
         assertThat(responseCaseData.getBusinessProcess().getCamundaEvent()).isEqualTo(CREATE_SDO.name());
-        assertThat(responseCaseData.getBusinessProcess().getStatus().toString()).isEqualTo("READY");
+        assertThat(responseCaseData.getBusinessProcess().getStatus()).hasToString("READY");
     }
 
     @ParameterizedTest

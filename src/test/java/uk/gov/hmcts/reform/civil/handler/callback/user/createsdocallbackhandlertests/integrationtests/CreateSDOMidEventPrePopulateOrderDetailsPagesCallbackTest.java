@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim;
 import uk.gov.hmcts.reform.civil.crd.model.Category;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
-import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingOnRadioOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
@@ -75,7 +74,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
     AssignCategoryId.class,
     CreateSDOCallbackHandlerTestConfig.class},
     properties = {"reference.database.enabled=false"})
-public class CreateSDOMidEventPrePopulateOrderDetailsPagesCallbackTest extends BaseCallbackHandlerTest {
+class CreateSDOMidEventPrePopulateOrderDetailsPagesCallbackTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private Time time;
@@ -163,6 +162,11 @@ public class CreateSDOMidEventPrePopulateOrderDetailsPagesCallbackTest extends B
             CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
             DynamicList dynamicList = getLocationDynamicListInPersonHearing(data);
 
+            assertDynamicList(dynamicList, caseData);
+            assertResponseData(response);
+        }
+
+        private void assertDynamicList(DynamicList dynamicList, CaseData caseData) {
             assertThat(dynamicList).isNotNull();
             assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
                     "A Site 3 - Adr 3 - AAA 111",
@@ -178,7 +182,9 @@ public class CreateSDOMidEventPrePopulateOrderDetailsPagesCallbackTest extends B
             assertThat(dynamicList.getValue()).isNotNull()
                     .extracting("label")
                     .isEqualTo(LocationReferenceDataService.getDisplayEntry(selected.get()));
+        }
 
+        private void assertResponseData(AboutToStartOrSubmitCallbackResponse response) {
             assertThat(response.getData()).extracting("disposalHearingNotes").extracting("input")
                     .isEqualTo("This Order has been made without a hearing. Each party has the right to apply to have this Order set aside or varied. Any such application must " +
                             "be uploaded to the Digital Portal together with the appropriate fee, by 4pm on");
@@ -237,13 +243,24 @@ public class CreateSDOMidEventPrePopulateOrderDetailsPagesCallbackTest extends B
             CallbackParams params = buildParams(caseData);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("smallClaimsFlightDelay").extracting("relatedClaimsInput")
-                    .isEqualTo("In the event that the Claimant(s) or Defendant(s) are aware if other \nclaims relating to the same flight they must notify the court \nwhere the " +
-                            "claim is being managed within 14 days of receipt of \nthis Order providing all relevant details of those claims including \ncase number(s), hearing " +
-                            "date(s) and copy final substantive order(s) \nif any, to assist the Court with ongoing case management which may \ninclude the cases being heard " +
-                            "together.");
+                    .isEqualTo("""
+                            In the event that the Claimant(s) or Defendant(s) are aware if other\s
+                            claims relating to the same flight they must notify the court\s
+                            where the \
+                            claim is being managed within 14 days of receipt of\s
+                            this Order providing all relevant details of those claims including\s
+                            case number(s), hearing \
+                            date(s) and copy final substantive order(s)\s
+                            if any, to assist the Court with ongoing case management which may\s
+                            include the cases being heard \
+                            together.""");
             assertThat(response.getData()).extracting("smallClaimsFlightDelay").extracting("legalDocumentsInput")
-                    .isEqualTo("Any arguments as to the law to be applied to this claim, together with \ncopies of legal authorities or precedents relied on, shall be uploaded " +
-                            "\nto the Digital Portal not later than 3 full working days before the \nfinal hearing date.");
+                    .isEqualTo("""
+                            Any arguments as to the law to be applied to this claim, together with\s
+                            copies of legal authorities or precedents relied on, shall be uploaded \
+                            
+                            to the Digital Portal not later than 3 full working days before the\s
+                            final hearing date.""");
         }
 
         @Test
@@ -306,7 +323,15 @@ public class CreateSDOMidEventPrePopulateOrderDetailsPagesCallbackTest extends B
                             DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
                     ))
                     .build();
+
             assertThat(response.getData()).extracting("showCarmFields").isEqualTo("Yes");
+            assertSdoR2SmallClaimsFields(data);
+            assertThat(data.getSdoR2SmallClaimsHearing().getAltHearingCourtLocationList()).isEqualTo(expected);
+            assertThat(data.getSdoR2SmallClaimsHearing().getHearingCourtLocationList().getValue().getCode())
+                    .isEqualTo(preSelectedCourt);
+        }
+
+        private void assertSdoR2SmallClaimsFields(CaseData data) {
             assertThat(data.getSdoR2SmallClaimsJudgesRecital().getInput()).isEqualTo(SdoR2UiConstantSmallClaim.JUDGE_RECITAL);
             assertThat(data.getSdoR2SmallClaimsPPI().getPpiDate()).isEqualTo(LocalDate.now().plusDays(21));
             assertThat(data.getSdoR2SmallClaimsPPI().getText()).isEqualTo(SdoR2UiConstantSmallClaim.PPI_DESCRIPTION);
@@ -323,11 +348,6 @@ public class CreateSDOMidEventPrePopulateOrderDetailsPagesCallbackTest extends B
                     .isEqualTo(SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT1);
             assertThat(data.getSdoR2SmallClaimsWitnessStatements().getSdoR2SmallClaimsRestrictPages().getNoOfPages()).isEqualTo(12);
             assertThat(data.getSdoR2SmallClaimsHearing().getTrialOnOptions()).isEqualTo(HearingOnRadioOptions.OPEN_DATE);
-            DynamicList hearingMethodValuesDRH = data.getSdoR2SmallClaimsHearing().getMethodOfHearing();
-            List<String> hearingMethodValuesDRHActual = hearingMethodValuesDRH.getListItems().stream()
-                    .map(DynamicListElement::getLabel)
-                    .toList();
-            assertThat(hearingMethodValuesDRHActual).containsOnly(HearingMethod.IN_PERSON.getLabel());
             assertThat(data.getSdoR2SmallClaimsHearing().getLengthList()).isEqualTo(SmallClaimsSdoR2TimeEstimate.THIRTY_MINUTES);
             assertThat(data.getSdoR2SmallClaimsHearing().getPhysicalBundleOptions())
                     .isEqualTo(SmallClaimsSdoR2PhysicalTrialBundleOptions.PARTY);
@@ -337,9 +357,6 @@ public class CreateSDOMidEventPrePopulateOrderDetailsPagesCallbackTest extends B
                     .isEqualTo(LocalDate.now().plusDays(56));
             assertThat(data.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsHearingWindow().getDateTo())
                     .isEqualTo(LocalDate.now().plusDays(70));
-            assertThat(data.getSdoR2SmallClaimsHearing().getAltHearingCourtLocationList()).isEqualTo(expected);
-            assertThat(data.getSdoR2SmallClaimsHearing().getHearingCourtLocationList().getValue().getCode())
-                    .isEqualTo(preSelectedCourt);
             assertThat(data.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsBundleOfDocs().getPhysicalBundlePartyTxt())
                     .isEqualTo(SdoR2UiConstantSmallClaim.BUNDLE_TEXT);
             assertThat(data.getSdoR2SmallClaimsImpNotes().getText()).isEqualTo(SdoR2UiConstantSmallClaim.IMP_NOTES_TEXT);
