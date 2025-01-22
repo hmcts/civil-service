@@ -2,9 +2,7 @@ package uk.gov.hmcts.reform.civil.config;
 
 import com.azure.core.amqp.AmqpRetryOptions;
 import com.azure.messaging.servicebus.ServiceBusClientBuilder;
-import com.azure.messaging.servicebus.ServiceBusReceiverClient;
 import com.azure.messaging.servicebus.ServiceBusSessionReceiverClient;
-import com.azure.messaging.servicebus.models.SubQueue;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -17,7 +15,7 @@ import java.time.Duration;
 @Slf4j
 @Component
 @Scope("prototype")
-@ConditionalOnExpression("${azure.servicebus.enableASB-DLQ:true}")
+@ConditionalOnExpression("${azure.servicebus.ccd-events-topic.enabled:true}")
 public class CcdEventServiceBusConfiguration {
 
     @Value("${azure.servicebus.ccd-events-topic.connection-string}")
@@ -40,21 +38,6 @@ public class CcdEventServiceBusConfiguration {
             .buildClient();
 
         log.info("CCD Case Events Session receiver created successfully");
-        return client;
-    }
-
-    public ServiceBusReceiverClient createCcdCaseEventsDeadLetterQueueSessionReceiver() {
-        log.info("Creating CCD Case Events Dead Letter Queue Session receiver");
-        ServiceBusReceiverClient client = new ServiceBusClientBuilder()
-            .connectionString(connectionString)
-            .retryOptions(retryOptions())
-            .receiver()
-            .topicName(topicName)
-            .subQueue(SubQueue.DEAD_LETTER_QUEUE)
-            .subscriptionName(ccdCaseEventsSubscriptionName)
-            .buildClient();
-
-        log.info("CCD Case Events Dead Letter Queue Session receiver created successfully");
         return client;
     }
 

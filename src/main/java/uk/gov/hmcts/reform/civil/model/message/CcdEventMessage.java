@@ -9,7 +9,6 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.util.Locale;
 
@@ -18,37 +17,30 @@ import java.util.Locale;
 @SuppressWarnings("PMD.ExcessiveParameterList")
 public final class CcdEventMessage {
 
-    @NotEmpty
     private final String eventInstanceId;
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private final LocalDateTime eventTimeStamp;
-    @NotEmpty
     private final String caseId;
-    @NotEmpty
     private final String jurisdictionId;
-    @NotEmpty
     private final String caseTypeId;
-    @NotEmpty
     private final String eventId;
     private final String previousStateId;
     private final String newStateId;
-    @NotEmpty
     private final String userId;
-
     private final AdditionalData additionalData;
 
     @JsonCreator
     public CcdEventMessage(@JsonProperty("EventInstanceId") String eventInstanceId,
-                            @JsonProperty("EventTimeStamp") LocalDateTime eventTimeStamp,
-                            @JsonProperty("CaseId") String caseId,
-                            @JsonProperty("JurisdictionId") String jurisdictionId,
-                            @JsonProperty("CaseTypeId") String caseTypeId,
-                            @JsonProperty("EventId") String eventId,
-                            @JsonProperty("PreviousStateId") String previousStateId,
-                            @JsonProperty("NewStateId") String newStateId,
-                            @JsonProperty("UserId") String userId,
-                            @JsonProperty("AdditionalData") AdditionalData additionalData) {
+                           @JsonProperty("EventTimeStamp") LocalDateTime eventTimeStamp,
+                           @JsonProperty("CaseId") String caseId,
+                           @JsonProperty("JurisdictionId") String jurisdictionId,
+                           @JsonProperty("CaseTypeId") String caseTypeId,
+                           @JsonProperty("EventId") String eventId,
+                           @JsonProperty("PreviousStateId") String previousStateId,
+                           @JsonProperty("NewStateId") String newStateId,
+                           @JsonProperty("UserId") String userId,
+                           @JsonProperty("AdditionalData") AdditionalData additionalData) {
         this.eventInstanceId = eventInstanceId;
         this.eventTimeStamp = eventTimeStamp;
         this.caseId = caseId;

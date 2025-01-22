@@ -28,6 +28,7 @@ java:
     ROLE_INITIALISATION_ENABLED: true
     CASE_FLAGS_LOGGING_ENABLED: true
     COURT_LOCATION_WA_DMN_ENABLED: true
+    CCD_EVENTS_SERVICE_BUS_CONCURRENT_SESSIONS: 1
   keyVaults:
     civil:
       resourceGroup: civil

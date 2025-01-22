@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.message;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.message.CcdEventMessage;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
@@ -15,8 +14,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RPA_ON_CONTINU
 @RequiredArgsConstructor
 public class AddCaseNoteMessageHandler implements CcdEventMessageHandler {
 
-    private static final CaseEvent NOTIFY_ROBOTICS = NOTIFY_RPA_ON_CONTINUOUS_FEED;
-
     private final CoreCaseDataService coreCaseDataService;
 
     @Override
@@ -26,10 +23,12 @@ public class AddCaseNoteMessageHandler implements CcdEventMessageHandler {
 
     @Override
     public void handle(CcdEventMessage message) {
-        try {
-            coreCaseDataService.triggerEvent(Long.parseLong(message.getCaseId()), NOTIFY_ROBOTICS);
-        } catch (Exception e) {
+        log.info("Handling Add Case Note Message for case {}", message.getCaseId());
 
+        try {
+            coreCaseDataService.triggerEvent(Long.parseLong(message.getCaseId()), NOTIFY_RPA_ON_CONTINUOUS_FEED);
+        } catch (Exception e) {
+            log.error("Failed to trigger robotics for case {}", message.getCaseId());
         }
     }
 }
