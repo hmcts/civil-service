@@ -249,6 +249,7 @@ public class CaseDataCaseSdo implements MappableObject {
     private CaseDocument sdoOrderDocument;
     private final YesOrNo eaCourtLocation;
     private final YesOrNo hmcEaCourtLocation;
+    private final YesOrNo hmcLipEnabled;
 
     // sdo ui flags
     private final YesOrNo setSmallClaimsFlag;
