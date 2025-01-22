@@ -18,7 +18,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-
 @ExtendWith(MockitoExtension.class)
 class CcdEventMessageReceiverServiceTest {
 
@@ -32,7 +31,6 @@ class CcdEventMessageReceiverServiceTest {
 
     @Spy
     private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-
 
     @BeforeEach
     public void setUp() {
@@ -51,7 +49,7 @@ class CcdEventMessageReceiverServiceTest {
 
         String message = "{\"JurisdictionId\":\"civil\",\"CaseTypeId\":\"CIVIL\",\"EventId\":\"TEST_CASE_EVENT\"}";
 
-        ccdEventMessageReceiverService.handleCcdCaseEventAsbMessage("1","1", message);
+        ccdEventMessageReceiverService.handleCcdCaseEventAsbMessage("1", "1", message);
 
         verify(messageHandler2, times(1)).handle(any());
         verify(messageHandler1, times(0)).handle(any());

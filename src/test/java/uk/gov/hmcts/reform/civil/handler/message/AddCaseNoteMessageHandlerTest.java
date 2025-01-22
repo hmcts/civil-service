@@ -13,7 +13,6 @@ import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_CASE_NOTE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RPA_ON_CONTINUOUS_FEED;
 
-
 @ExtendWith(MockitoExtension.class)
 class AddCaseNoteMessageHandlerTest {
 

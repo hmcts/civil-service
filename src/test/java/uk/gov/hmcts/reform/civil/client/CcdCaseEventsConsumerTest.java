@@ -88,7 +88,6 @@ public class CcdCaseEventsConsumerTest {
         doThrow(new ServiceBusException(new Exception(), ServiceBusErrorSource.UNKNOWN))
             .when(receiverClient).abandon(receivedMessage);
 
-
         ccdCaseEventsConsumer.consumeMessage(sessionReceiverClient);
 
         verify(receiverClient, Mockito.times(1)).complete(receivedMessage);
