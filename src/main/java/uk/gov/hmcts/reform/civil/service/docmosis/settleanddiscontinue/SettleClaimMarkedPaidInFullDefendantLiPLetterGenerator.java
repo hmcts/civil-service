@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.docmosis.settleanddiscontinue;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
@@ -66,7 +65,8 @@ public class SettleClaimMarkedPaidInFullDefendantLiPLetterGenerator {
             settleClaimDoc = stitchedCaseDocument;
         }
 
-        byte[] letterContent = getLetterContent(settleClaimDoc, auth, caseId);
+        String errorMessage = "Failed getting welsh settle claim marked paid in full letter for caseId {}";
+        byte[] letterContent = documentDownloadService.downloadDocument(settleClaimDoc, auth, caseId.toString(), errorMessage);
 
         List<String> recipients = getRecipientsList(caseData);
         bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
@@ -121,19 +121,6 @@ public class SettleClaimMarkedPaidInFullDefendantLiPLetterGenerator {
         )));
 
         return documentMetaDataList;
-    }
-
-    private byte[] getLetterContent(CaseDocument mailableSdoDocument, String authorisation, Long caseId) {
-        byte[] letterContent;
-        try {
-            String documentUrl = mailableSdoDocument.getDocumentLink().getDocumentUrl();
-            String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
-            letterContent = documentDownloadService.downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
-        } catch (Exception e) {
-            log.error("Failed getting letter content for document to mail for caseId {}", caseId, e);
-            throw new DocumentDownloadException(mailableSdoDocument.getDocumentLink().getDocumentFileName(), e);
-        }
-        return letterContent;
     }
 
     private boolean isBilingual(CaseData caseData) {

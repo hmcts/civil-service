@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -92,8 +91,10 @@ class SdoCoverLetterAppendServiceTest {
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
                 .willReturn(DocmosisDocument.builder().bytes(new byte[]{1, 2, 3, 4, 5, 6}).build());
         given(documentManagementService.uploadDocument(any(), any(PDF.class))).willReturn(caseDocument);
-        given(documentDownloadService.downloadDocument(any(), any()))
-            .willReturn(new DownloadedDocumentResponse(new ByteArrayResource(STITCHED_DOC_BYTES), "test", "test"));
+        byte[] bytes = new ByteArrayResource(STITCHED_DOC_BYTES).getByteArray();
+        given(documentDownloadService.downloadDocument(
+            any(), any(), anyString(), anyString()
+        )).willReturn(bytes);
         when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(SDO_ORDER),
                                                              anyString())).thenReturn(buildStitchedDocument());
 
@@ -118,19 +119,6 @@ class SdoCoverLetterAppendServiceTest {
         verify(documentGeneratorService).generateDocmosisDocument(PARTY_LETTER_TEMPLATE_DATA, SDO_COVER_LETTER);
         verify(civilStitchService).generateStitchedCaseDocument(specClaimTimelineDocuments, "DocumentName.pdf", 1L,
             SDO_ORDER, BEARER_TOKEN);
-    }
-
-    @Test
-    void shouldThrowExceptionWhenDownloadIsEmpty() {
-        // Given
-        given(documentDownloadService.downloadDocument(any(), any()))
-            .willReturn(new DownloadedDocumentResponse(null, null, null));
-        CaseData caseData = CaseData.builder().ccdCaseReference(1L).build();
-
-        // Then
-        assertThrows(DocumentDownloadException.class, () ->
-            coverLetterAppendService.makeSdoDocumentMailable(caseData, BEARER_TOKEN, partyDetails, SDO_ORDER,
-                                                          caseDocument));
     }
 
     private CaseDocument buildStitchedDocument() {
