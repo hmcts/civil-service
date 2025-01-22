@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service.docmosis.claimantresponse;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
@@ -28,7 +27,6 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JU
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingDetailsMapper.isWelshHearingSelected;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_ADMISSION_OR_DETERMINATION;
 
-@Slf4j
 @Service
 @Getter
 @RequiredArgsConstructor
@@ -119,18 +117,11 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator imple
         JudgmentByAdmissionOrDetermination templateData = getTemplateDataForNonDivergentDocs(caseData);
         JudgmentByAdmissionOrDetermination welshTemplateData =
             judgmentByAdmissionOrDeterminationMapper.toNonDivergentWelshDocs(caseData, templateData);
-        log.info("generateDocmosisDocument---- data for case {}", caseData.getCcdCaseReference());
-        log.info("welsh template name for case {}", getTemplateName(caseEvent, true).getDocumentTitle());
-        log.info("welsh template data for case {}", welshTemplateData.toString());
 
         DocmosisDocument welshDocument = documentGeneratorService.generateDocmosisDocument(
             welshTemplateData,
             getTemplateName(caseEvent, true)
         );
-        log.info("uploadDocument -----data for case {}", caseData.getCcdCaseReference());
-        log.info("template tittle for case {}", getTemplateName(caseEvent, true).getDocumentTitle());
-        log.info("welshDocument for case {}", welshDocument.toString());
-        log.info("DocumentType name for case {}", getDocumentType(caseEvent));
 
         return documentManagementService.uploadDocument(
             authorisation,
