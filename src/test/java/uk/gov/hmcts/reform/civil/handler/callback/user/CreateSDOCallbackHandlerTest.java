@@ -175,6 +175,7 @@ import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.WRITT
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate.FIVE_HOURS;
@@ -2510,11 +2511,13 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimDraft()
                 .build().toBuilder()
                 .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
+                .orderType(OrderType.DISPOSAL)
+                .ccdState(JUDICIAL_REFERRAL)
                 .build();
 
             when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
 
-            CallbackParams params = callbackParamsOf(caseData.toMap(objectMapper), caseData, MID, PAGE_ID, CaseState.JUDICIAL_REFERRAL);
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -2528,11 +2531,13 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimDraft()
                 .build().toBuilder()
                 .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
+                .orderType(OrderType.DISPOSAL)
+                .ccdState(JUDICIAL_REFERRAL)
                 .build();
 
             when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
 
-            CallbackParams params = callbackParamsOf(caseData.toMap(objectMapper), caseData, MID, PAGE_ID, CaseState.JUDICIAL_REFERRAL);
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -2547,11 +2552,13 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .setClaimTypeToSpecClaim()
                 .build().toBuilder()
                 .responseClaimTrack(AllocatedTrack.INTERMEDIATE_CLAIM.name())
+                .orderType(OrderType.DISPOSAL)
+                .ccdState(JUDICIAL_REFERRAL)
                 .build();
 
             when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
 
-            CallbackParams params = callbackParamsOf(caseData.toMap(objectMapper), caseData, MID, PAGE_ID, CaseState.JUDICIAL_REFERRAL);
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -2566,11 +2573,13 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .setClaimTypeToSpecClaim()
                 .build().toBuilder()
                 .responseClaimTrack(AllocatedTrack.MULTI_CLAIM.name())
+                .orderType(OrderType.DISPOSAL)
+                .ccdState(JUDICIAL_REFERRAL)
                 .build();
 
             when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
 
-            CallbackParams params = callbackParamsOf(caseData.toMap(objectMapper), caseData, MID, PAGE_ID, CaseState.JUDICIAL_REFERRAL);
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
