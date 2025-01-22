@@ -1601,7 +1601,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         } else {
             boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
             dataBuilder.eaCourtLocation(isHmcNroEnabled || isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
-            dataBuilder.hmcLipEnabled(isHmcLipEnabled ? YES : NO);
+            dataBuilder.hmcLipEnabled(isHmcLipEnabled && isLipCaseEaCourt ? YES : NO);
         }
 
         dataBuilder.disposalHearingMethodInPerson(deleteLocationList(

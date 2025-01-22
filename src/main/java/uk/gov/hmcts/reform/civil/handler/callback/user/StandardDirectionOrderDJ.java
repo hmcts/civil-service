@@ -787,7 +787,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         } else {
             boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
             caseDataBuilder.eaCourtLocation(isHmcNroEnabled || isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
-            caseDataBuilder.hmcLipEnabled(isHmcLipEnabled ? YES : NO);
+            caseDataBuilder.hmcLipEnabled(isHmcLipEnabled && isLipCaseEaCourt ? YES : NO);
         }
 
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {

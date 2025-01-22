@@ -250,26 +250,26 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
             "false, true, false, YES, YES, YES, YES, ",
             "true, true, false, YES, YES, YES, YES, ",
             //LiP cases trigger hmcLipEnabled and ignore hmcEaCourt
-            "true, true, true, NO, YES, YES, , YES",
+            "true, true, true, NO, YES, YES, , NO",
             "true, true, true, YES, NO, YES, , YES",
             "true, true, true, NO, NO, YES, , YES",
             // LiP vs LR - should work with NRO
             "false, true, true, NO, YES, YES, , NO",
-            "true, false, true, NO, YES, YES, , YES",
-            "true, true, false, NO, YES, NO, , YES",
-            "true, false, false, NO, YES, NO, , YES",
+            "true, false, true, NO, YES, YES, , NO",
+            "true, true, false, NO, YES, NO, , NO",
+            "true, false, false, NO, YES, NO, , NO",
             "false, false, false, NO, YES, NO, , NO",
             //LR vs LiP
             "false, true, true, YES, NO, YES, , NO",
-            "true, false, true, YES, NO, YES, , YES",
+            "true, false, true, YES, NO, YES, , NO",
             "true, true, false, YES, NO, YES, , YES",
-            "true, false, false, YES, NO, NO, , YES",
+            "true, false, false, YES, NO, NO, , NO",
             "false, false, false, YES, NO, NO, , NO",
             //LiP vs LiP
             "false, true, true, NO, NO, YES, , NO",
-            "true, false, true, NO, NO, YES, , YES",
+            "true, false, true, NO, NO, YES, , NO",
             "true, true, false, NO, NO, YES, , YES",
-            "true, false, false, NO, NO, NO, , YES",
+            "true, false, false, NO, NO, NO, , NO",
             "false, false, false, NO, NO, NO, , NO"
         })
         void shouldPopulateHmcLipEnabled_whenLiPAndHmcLipEnabled(boolean isHmcForLipEnabled, boolean isCPAndWhitelisted,
