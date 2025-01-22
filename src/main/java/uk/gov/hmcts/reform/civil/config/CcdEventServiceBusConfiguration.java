@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 
-
 @Slf4j
 @Component
 @Scope("prototype")

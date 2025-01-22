@@ -31,7 +31,6 @@ public class CaseEventMessageEntity implements Serializable {
     private static final String RETRY_COUNT = "retry_count";
     private static final long serialVersionUID = 6682644496535002875L;
 
-
     @Column(name = MESSAGE_ID, nullable = false)
     private String messageId;
 
@@ -101,8 +100,6 @@ public class CaseEventMessageEntity implements Serializable {
     public LocalDateTime getEventTimestamp() {
         return eventTimestamp;
     }
-
-
 
     public void setEventTimestamp(LocalDateTime eventTimestamp) {
         this.eventTimestamp = eventTimestamp;
