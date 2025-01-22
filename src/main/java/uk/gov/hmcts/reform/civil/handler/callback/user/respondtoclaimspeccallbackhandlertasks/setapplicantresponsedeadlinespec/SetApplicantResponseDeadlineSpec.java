@@ -83,15 +83,18 @@ public class SetApplicantResponseDeadlineSpec implements CaseTask {
         setApplicantResponseDeadlineCaseDataUpdaters.forEach(updater -> updater.update(caseData, updatedData));
         handleSolicitorRepresentation(callbackParams, caseData, updatedData, responseDate);
         handleExpertsAndWitnesses(caseData, updatedData);
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(updatedData, toggleService.isUpdateContactDetailsEnabled());
-        clearFlagsInDetails(updatedData, caseData);
-        if (toggleService.isUpdateContactDetailsEnabled()) {
-            addEventAndDateAddedToRespondentExperts(updatedData);
-            addEventAndDateAddedToRespondentWitnesses(updatedData);
+
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(updatedData);
+
+        updatedData.respondent1DetailsForClaimDetailsTab(updatedData.build().getRespondent1().toBuilder().flags(null).build());
+        if (ofNullable(caseData.getRespondent2()).isPresent()) {
+            updatedData.respondent2DetailsForClaimDetailsTab(updatedData.build().getRespondent2().toBuilder().flags(null).build());
         }
-        if (toggleService.isHmcEnabled()) {
-            populateDQPartyIds(updatedData);
-        }
+
+        addEventAndDateAddedToRespondentExperts(updatedData);
+        addEventAndDateAddedToRespondentWitnesses(updatedData);
+        populateDQPartyIds(updatedData);
+
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_SPEC, updatedData);
         handleDocumentGeneration(callbackParams, updatedData, caseData);
         updateCorrespondenceAddresses(callbackParams, updatedData, caseData);
