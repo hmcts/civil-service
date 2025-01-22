@@ -4,10 +4,14 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
@@ -30,6 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC;
@@ -353,6 +358,65 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
                 getNotificationDataMap(caseData),
                 "claimant-confirms-to-proceed-respondent-notification-000DC001"
             );
+        }
+
+        @Test
+        void shouldNotifyRespondent2_whenMultiTrack() {
+            when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn("offline-template-id");
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                                     .organisationID("Resp_2_Org_Id")
+                                                                     .build()).build())
+                .respondentSolicitor2EmailAddress("resp2_sol_email")
+                .setMultiTrackClaim()
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_RES_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK")
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                caseData.getRespondentSolicitor2EmailAddress(),
+                "offline-template-id",
+                getNotificationDataMap(caseData),
+                "claimant-confirms-to-proceed-respondent-notification-000DC001"
+            );
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = CaseEvent.class, names = {"NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED",
+            "NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED",
+            "NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC",
+            "NOTIFY_RES_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK",
+            "NOTIFY_RES_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK",
+            "NOTIFY_APP_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC_MULTITRACK"})
+        void shouldNotNotify_whenLip(CaseEvent notificationEvent) {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
+                .respondent2Represented(YesOrNo.NO)
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder().build())
+                .respondent2OrganisationPolicy(OrganisationPolicy.builder().build())
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder().build())
+                .setMultiTrackClaim()
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(notificationEvent.name())
+                    .build()).build();
+
+            var response = handler.handle(params);
+
+            assertThat(response).isEqualTo(AboutToStartOrSubmitCallbackResponse.builder().build());
+            verifyNoInteractions(notificationService);
         }
 
         @NotNull

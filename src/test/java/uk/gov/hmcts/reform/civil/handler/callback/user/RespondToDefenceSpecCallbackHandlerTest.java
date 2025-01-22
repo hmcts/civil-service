@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -87,6 +85,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.citizenui.RespondentMediationService;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
@@ -241,6 +240,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private RoboticsAddressMapper addressMapper;
     @Autowired
     private AddressLinesMapper linesMapper;
+    @MockBean
+    private UpdateWaCourtLocationsService updateWaCourtLocationsService;
 
     @Nested
     class AboutToStart {
@@ -948,34 +949,10 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 ABOUT_TO_SUBMIT
             );
 
-            when(featureToggleService.isHmcEnabled()).thenReturn(true);
-
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("applicant1").hasFieldOrProperty("partyID");
             assertThat(response.getData()).extracting("respondent1").hasFieldOrProperty("partyID");
-        }
-
-        @Test
-        void shouldNotAddPartyIdsToPartyFields_whenInvokedWithHMCToggleOff() {
-            var objectMapper = new ObjectMapper();
-            objectMapper.findAndRegisterModules();
-            objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-
-            var caseData = CaseDataBuilder.builder().atState(FlowState.Main.FULL_DEFENCE).build();
-            when(featureToggleService.isHmcEnabled()).thenReturn(false);
-
-            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("applicant1").extracting("individualFirstName")
-                .isEqualTo(caseData.getApplicant1().getIndividualFirstName());
-            assertThat(response.getData()).extracting("respondent1").doesNotHaveToString("individualFirstName");
-
-            assertThat(response.getData()).extracting("applicant1").extracting("individualLastName")
-                .isEqualTo(caseData.getApplicant1().getIndividualLastName());
-            assertThat(response.getData()).extracting("respondent1").doesNotHaveToString("individualLastName");
         }
 
         @ParameterizedTest
@@ -1299,6 +1276,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent2(PartyBuilder.builder().individual().build())
                     .atStateApplicantRespondToDefenceAndProceed()
                     .applicant2DQSmallClaimExperts(experts, YES)
+                    .applicant2ResponseDate(LocalDateTime.now())
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1351,7 +1329,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .respondent1(PartyBuilder.builder().individual().build())
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .applicant2DQSmallClaimExperts(null, NO)
+                    .noApplicant2DQSmallClaimExperts()
                     .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
                     .build();
 
@@ -1427,7 +1405,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             assertThat(response.getState())
-                .isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+                .isEqualTo(All_FINAL_ORDERS_ISSUED.name());
         }
 
         @Test

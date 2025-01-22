@@ -6,12 +6,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Evidence;
+import uk.gov.hmcts.reform.civil.model.EvidenceDetails;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
+import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.citizenui.AdditionalLipPartyDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
@@ -58,6 +60,18 @@ class ClaimFormMapperTest {
     @Test
     void should_displayIndividualName_whenPartiesIndividual() {
         //Given
+        List<Evidence> evidenceList = List.of(
+            Evidence.builder().id("0").value(EvidenceDetails.builder()
+                                                 .evidenceType("EXPERT_WITNESS")
+                                                 .expertWitnessEvidence("This is an expert")
+                                                 .build())
+                .build(),
+            Evidence.builder().id("0").value(EvidenceDetails.builder()
+                                                 .evidenceType("LETTERS_EMAILS_AND_OTHER_CORRESPONDENCE")
+                                                 .lettersEmailsAndOtherCorrespondenceEvidence("This is Letter")
+                                                 .build())
+                .build()
+        );
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder()
                             .individualLastName(INDIVIDUAL_LAST_NAME)
@@ -80,12 +94,20 @@ class ClaimFormMapperTest {
                              .partyEmail(EMAIL)
                              .type(Party.Type.INDIVIDUAL)
                              .build())
+            .speclistYourEvidenceList(evidenceList)
             .build();
         //When
         ClaimForm form = claimFormMapper.toClaimForm(caseData);
         //Then
         assertThat(form.getClaimant().name()).isEqualTo(caseData.getApplicant1().getPartyName());
         assertThat(form.getDefendant().name()).isEqualTo(caseData.getRespondent1().getPartyName());
+        assertThat(form.getEvidenceList()).hasSize(2);
+        assertThat(form.getEvidenceList().get(0).getType()).isEqualTo("EXPERT_WITNESS");
+        assertThat(form.getEvidenceList().get(0).getDisplayTypeValue()).isEqualTo("Expert witness");
+        assertThat(form.getEvidenceList().get(0).getExplanation()).isEqualTo("This is an expert");
+        assertThat(form.getEvidenceList().get(1).getType()).isEqualTo("LETTERS_EMAILS_AND_OTHER_CORRESPONDENCE");
+        assertThat(form.getEvidenceList().get(1).getDisplayTypeValue()).isEqualTo("Letters, emails and other correspondence");
+        assertThat(form.getEvidenceList().get(1).getExplanation()).isEqualTo("This is Letter");
     }
 
     @Test
@@ -299,7 +321,7 @@ class ClaimFormMapperTest {
     void shouldReturnInterestFromClaimIssueDate_whenInterestFromSpecificDateIsNull() {
         //Given
         CaseData caseData = getCaseData().toBuilder()
-            .submittedDate(SUBMITTED_DATE)
+            .issueDate(SUBMITTED_DATE.toLocalDate())
             .build();
         when(interestCalculator.calculateInterest(any())).thenReturn(INTEREST);
         //When
@@ -336,7 +358,7 @@ class ClaimFormMapperTest {
         ClaimForm form = claimFormMapper.toClaimForm(caseData);
         //Then
         assertThat(form.getWhenAreYouClaimingInterestFrom())
-            .isEqualTo(ClaimFormMapper.INTEREST_START_FROM_CLAIM_ISSUED_DATE);
+            .isEqualTo(ClaimFormMapper.INTEREST_START_FROM_CLAIM_SUBMITTED_DATE);
     }
 
     @Test
@@ -485,7 +507,7 @@ class ClaimFormMapperTest {
     }
 
     private static CaseData getCaseData() {
-        CaseData caseData = CaseData.builder()
+        return CaseData.builder()
             .legacyCaseReference("000MC038")
             .applicant1(Party.builder()
                             .companyName(ORGANISATION)
@@ -508,6 +530,5 @@ class ClaimFormMapperTest {
                              .build())
             .issueDate(LocalDate.now())
             .build();
-        return caseData;
     }
 }

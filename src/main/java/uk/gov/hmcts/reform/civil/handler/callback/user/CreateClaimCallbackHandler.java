@@ -569,9 +569,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             dataBuilder.anyRepresented(YES);
         }
 
-        if (toggleService.isHmcEnabled()) {
-            populateWithPartyIds(dataBuilder);
-        }
+        populateWithPartyIds(dataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))

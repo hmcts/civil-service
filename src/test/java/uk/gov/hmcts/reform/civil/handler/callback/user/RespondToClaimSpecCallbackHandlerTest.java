@@ -191,10 +191,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private StateFlow mockedStateFlow;
     @MockBean
     private SimpleStateFlowEngine stateFlowEngine;
-
     @MockBean
     private SimpleStateFlowBuilder simpleStateFlowBuilder;
-
     @Mock
     private DateOfBirthValidator dateOfBirthValidator;
     @MockBean
@@ -209,7 +207,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
     @MockBean
     private DQResponseDocumentUtils dqResponseDocumentUtils;
-
     @Autowired
     private FrcDocumentsUtils frcDocumentsUtils;
 
@@ -234,14 +231,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @BeforeEach
     public void setup() {
-        ReflectionTestUtils.setField(handler, "objectMapper", new ObjectMapper().registerModule(new JavaTimeModule())
+        ReflectionTestUtils.setField(handler, "objectMapper", new ObjectMapper()
+            .registerModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS));
-        ReflectionTestUtils.setField(handler, "confirmationTextSpecGenerators",
-                                     confirmationTextGenerators
-        );
-        ReflectionTestUtils.setField(handler, "confirmationHeaderGenerators",
-                                     confirmationHeaderSpecGenerators
-        );
+        ReflectionTestUtils.setField(handler, "confirmationTextSpecGenerators", confirmationTextGenerators);
+        ReflectionTestUtils.setField(handler, "confirmationHeaderGenerators", confirmationHeaderSpecGenerators);
 
         when(dqResponseDocumentUtils.buildClaimantResponseDocuments(any(CaseData.class))).thenReturn(new ArrayList<>());
     }
@@ -835,6 +829,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
                 when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
                 when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+                when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
 
                 ExpertDetails experts = ExpertDetails.builder()
                     .expertName("Mr Expert Defendant")
@@ -903,6 +898,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
                 when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
                 when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+                when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
+                when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
 
                 ExpertDetails experts = ExpertDetails.builder()
                     .expertName("Mr Expert Defendant")
@@ -916,6 +913,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .respondent2(PartyBuilder.builder().individual().build())
+                    .multiPartyClaimTwoDefendantSolicitors()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .respondent2DQSmallClaimExperts(experts, YES)
                     .atSpecAoSApplicantCorrespondenceAddressRequired(NO)
@@ -1097,7 +1095,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
         when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
-        when(toggleService.isHmcEnabled()).thenReturn(true);
 
         Witnesses res1witnesses = Witnesses.builder().details(
             wrapElements(

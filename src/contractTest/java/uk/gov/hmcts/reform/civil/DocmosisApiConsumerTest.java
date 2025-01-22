@@ -30,7 +30,7 @@ public class DocmosisApiConsumerTest extends BaseContractTest {
     @Autowired
     private DocmosisApiClient docmosisApiClient;
 
-    @Pact(consumer = "civil-service")
+    @Pact(consumer = "civil_service")
     public RequestResponsePact postCreateDocumentRequest(PactDslWithProvider builder)
         throws JSONException, IOException {
         return buildCreateDocumentResponsePact(builder);
@@ -73,7 +73,4 @@ public class DocmosisApiConsumerTest extends BaseContractTest {
             .build();
     }
 
-    private String createJsonObject(Object obj) throws JSONException, IOException {
-        return objectMapper.writeValueAsString(obj);
-    }
 }

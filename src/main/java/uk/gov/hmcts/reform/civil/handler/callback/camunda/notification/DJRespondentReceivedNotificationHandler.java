@@ -24,6 +24,7 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR_DJ_RECEIVED;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -83,7 +84,10 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
             emailTemplate.template = notificationsProperties.getRespondentSolicitor1DefaultJudgmentRequested();
             emailTemplate.templateReference = REFERENCE_TEMPLATE_REQUESTED;
         }
-        if (ofNullable(caseData.getRespondent2()).isEmpty()) {
+        if (caseData.isApplicantLipOneVOne()) {
+            emailTemplate.template = notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceivedForLipVSLR();
+            emailTemplate.templateReference = REFERENCE_TEMPLATE_RECEIVED;
+        } else if (ofNullable(caseData.getRespondent2()).isEmpty()) {
             emailTemplate.template = notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceived();
             emailTemplate.templateReference = REFERENCE_TEMPLATE_RECEIVED;
         }
@@ -151,8 +155,11 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
             DEFENDANT_EMAIL, getLegalOrganizationName(caseData.getRespondent1OrganisationPolicy()
                                                           .getOrganisation()
                                                           .getOrganisationID(), caseData),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+            CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
+            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference(),
+            CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
         );
     }
 
@@ -161,11 +168,13 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
             DEFENDANT_EMAIL, getLegalOrganizationName(caseData.getRespondent1OrganisationPolicy()
                                                           .getOrganisation()
                                                           .getOrganisationID(), caseData),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
             DEFENDANT_NAME, caseData.getDefendantDetailsSpec().getValue().getLabel(),
             CLAIMANT_EMAIL, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                          .getOrganisation()
-                                                         .getOrganisationID(), caseData)
+                                                         .getOrganisationID(), caseData),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
@@ -174,11 +183,13 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
             DEFENDANT_EMAIL, getLegalOrganizationName(caseData.getRespondent1OrganisationPolicy()
                                                           .getOrganisation()
                                                           .getOrganisationID(), caseData),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             CLAIMANT_EMAIL, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                           .getOrganisation()
-                                                          .getOrganisationID(), caseData)
+                                                          .getOrganisationID(), caseData),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
@@ -187,19 +198,23 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
             DEFENDANT_EMAIL, getLegalOrganizationName(caseData.getRespondent1OrganisationPolicy()
                                                               .getOrganisation()
                                                               .getOrganisationID(), caseData),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
             CLAIMANT_EMAIL, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                           .getOrganisation()
-                                                          .getOrganisationID(), caseData)
+                                                          .getOrganisationID(), caseData),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
     public Map<String, String> addProperties1v1LRvLip(CaseData caseData) {
         return Map.of(
-            CLAIM_NUMBER_INTERIM, caseData.getLegacyCaseReference(),
+            CLAIM_NUMBER_INTERIM, caseData.getCcdCaseReference().toString(),
             DEFENDANT_NAME_INTERIM, getPartyNameBasedOnType(caseData.getRespondent1()),
-            APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
+            APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 

@@ -19,12 +19,15 @@ import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Map;
 
 import static java.lang.String.format;
@@ -71,6 +74,16 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         ArrayList<String> errors = new ArrayList<>();
         if (caseData.isJudgementDateNotPermitted()) {
             errors.add(format(NOT_VALID_DJ_BY_ADMISSION, caseData.setUpJudgementFormattedPermittedDate(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())));
+        } else {
+            LocalDate whenWillThisAmountBePaid =
+                Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec()).map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(
+                    null);
+            if (featureToggleService.isJudgmentOnlineLive()
+                && whenWillThisAmountBePaid != null
+                && caseData.isDateAfterToday(whenWillThisAmountBePaid)
+                && caseData.isPartAdmitPayImmediatelyClaimSpec()) {
+                errors.add(format(NOT_VALID_DJ_BY_ADMISSION, caseData.getFormattedJudgementPermittedDate(whenWillThisAmountBePaid)));
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -107,7 +120,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             data.getCcjPaymentDetails();
 
         if (featureToggleService.isJudgmentOnlineLive()
-            && isOneVOne(data)
+            && (isOneVOne(data))
             && data.isPayImmediately()) {
 
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();

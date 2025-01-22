@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -34,8 +35,10 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTI
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting.LISTING;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.DefaultJudgementHandler.checkLocation;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.hearingFeeRequired;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isEvent;
@@ -116,6 +119,22 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
                                               ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
             );
         }
+
+        if (caseData.isApplicant1NotRepresented()) {
+            if (AllocatedTrack.FAST_CLAIM.name().equals(caseData.getAssignedTrack())
+                && isNull(caseData.getTrialReadyApplicant())) {
+                dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
+                                                  SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_CLAIMANT.getScenario(), authToken,
+                                                  ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
+                );
+            }
+
+            dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
+                                              SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT.getScenario(), authToken,
+                                              ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
+            );
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 

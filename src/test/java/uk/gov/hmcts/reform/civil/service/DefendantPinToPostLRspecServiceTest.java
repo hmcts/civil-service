@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
@@ -149,7 +150,7 @@ class DefendantPinToPostLRspecServiceTest {
         }
 
         @Test
-        void shouldReturnTrueIfDefendantIsLinked() {
+        void shouldReturnTrueIfOcmcDefendantIsLinked() {
             when(claimStoreService.isOcmcDefendantLinked("620MC123")).thenReturn(createDefendantLinkStatus(true));
 
             boolean status = defendantPinToPostLRspecService.isOcmcDefendantLinked("620MC123");
@@ -158,10 +159,58 @@ class DefendantPinToPostLRspecServiceTest {
         }
 
         @Test
-        void shouldReturnFalseIfDefendantIsNotLinked() {
+        void shouldReturnFalseIfOcmcDefendantIsNotLinked() {
             when(claimStoreService.isOcmcDefendantLinked("620MC123")).thenReturn(createDefendantLinkStatus(false));
 
             boolean status = defendantPinToPostLRspecService.isOcmcDefendantLinked("620MC123");
+
+            assertFalse(status);
+        }
+
+        @Test
+        void shouldReturnTrueIfDefendantIsLinked() {
+            CaseData caseData = new CaseDataBuilder()
+                .defendantUserDetails(
+                    IdamUserDetails.builder()
+                        .id("1234")
+                        .email("partyemail@gmail.com")
+                        .build())
+                .build();
+            CaseDetails caseDetails = createCaseDetails(caseData);
+            when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+            boolean status = defendantPinToPostLRspecService.isDefendantLinked(caseDetails);
+
+            assertTrue(status);
+        }
+
+        @Test
+        void shouldReturnFalseIfDefendantIsNotLinked() {
+            CaseData caseData = new CaseDataBuilder().defendantUserDetails(null).build();
+            CaseDetails caseDetails = createCaseDetails(caseData);
+            when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+            boolean status = defendantPinToPostLRspecService.isDefendantLinked(caseDetails);
+
+            assertFalse(status);
+        }
+
+        @Test
+        void shouldReturnFalseIfUserDetailsEmailIsEmpty() {
+            CaseData caseData = new CaseDataBuilder().defendantUserDetails(IdamUserDetails.builder().id("1234").build()).build();
+            CaseDetails caseDetails = createCaseDetails(caseData);
+            when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+            boolean status = defendantPinToPostLRspecService.isDefendantLinked(caseDetails);
+
+            assertFalse(status);
+        }
+
+        @Test
+        void shouldReturnFalseIfUserDetailsIdIsEmpty() {
+            CaseData caseData = new CaseDataBuilder().defendantUserDetails(
+                IdamUserDetails.builder().email("test@test.com").build()
+            ).build();
+            CaseDetails caseDetails = createCaseDetails(caseData);
+            when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+            boolean status = defendantPinToPostLRspecService.isDefendantLinked(caseDetails);
 
             assertFalse(status);
         }

@@ -11,9 +11,9 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
+import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypesLR;
 import uk.gov.hmcts.reform.civil.helpers.GATypeHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -31,14 +31,13 @@ import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
-import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
+import uk.gov.hmcts.reform.civil.service.validation.GeneralApplicationValidator;
 import uk.gov.hmcts.reform.civil.utils.UserRoleUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -51,17 +50,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_SETTLE_BY_CONSENT;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.INVALID_SETTLE_BY_CONSENT;
 
 @Service
 @RequiredArgsConstructor
@@ -84,16 +75,13 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     public static final String NOT_IN_EA_REGION = "Sorry this service is not available in the current case management location, please raise an application manually.";
     private static final String LR_VS_LIP = "Sorry this service is not available, please raise an application manually.";
     private final InitiateGeneralApplicationService initiateGeneralApplicationService;
+    private final GeneralApplicationValidator generalApplicationValidator;
     private final ObjectMapper objectMapper;
     private final UserService userService;
-    private final UserRoleCaching userRoleCaching;
     private final GeneralAppFeesService feesService;
     private final LocationReferenceDataService locationRefDataService;
     private final FeatureToggleService featureToggleService;
     private final CoreCaseUserService coreCaseUserService;
-    private static final List<CaseState> stateAfterJudicialReferral = Arrays.asList(PENDING_CASE_ISSUED, CASE_ISSUED,
-                                                                         AWAITING_CASE_DETAILS_NOTIFICATION, AWAITING_RESPONDENT_ACKNOWLEDGEMENT, CASE_DISMISSED,
-                                                                         AWAITING_APPLICANT_INTENTION, PROCEEDS_IN_HERITAGE_SYSTEM, IN_MEDIATION);
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -125,8 +113,12 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (initiateGeneralApplicationService.caseContainsLiP(caseData)) {
-            if (!featureToggleService.isGaForLipsEnabled()) {
+            if (!featureToggleService.isGaForLipsEnabled()
+                || caseData.isRespondentResponseBilingual()) {
                 errors.add(LR_VS_LIP);
+            } else if (!(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData
+                                                              .getCaseManagementLocation().getBaseLocation()))) {
+                errors.add(NOT_IN_EA_REGION);
             } else {
                 /*
                  * General Application can only be initiated if Defendant is assigned to the case
@@ -169,7 +161,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         if (generalAppTypes.size() == 1
                 && generalAppTypes.contains(GeneralApplicationTypes.SETTLE_BY_CONSENT)
                 && !consent) {
-            errors.add(INVALID_SETTLE_BY_CONSENT);
+            errors.add(INVALID_SETTLE_BY_CONSENT.getValue());
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseDataBuilder.build().toMap(objectMapper))
@@ -256,7 +248,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         GAUrgencyRequirement generalAppUrgencyRequirement = caseData.getGeneralAppUrgencyRequirement();
         List<String> errors = generalAppUrgencyRequirement != null
-            ? initiateGeneralApplicationService.validateUrgencyDates(generalAppUrgencyRequirement)
+            ? generalApplicationValidator.validateUrgencyDates(generalAppUrgencyRequirement)
             : Collections.emptyList();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -268,7 +260,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         GAHearingDetails hearingDetails = caseData.getGeneralAppHearingDetails();
         List<String> errors = hearingDetails != null
-            ? initiateGeneralApplicationService.validateHearingScreen(hearingDetails)
+            ? generalApplicationValidator.validateHearingScreen(hearingDetails)
             : Collections.emptyList();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -357,7 +349,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
         Map<String, Object> data = initiateGeneralApplicationService
                 .buildCaseData(dataBuilder, caseData, userDetails, callbackParams.getParams().get(BEARER_TOKEN)
-                        .toString(), feesService).toMap(objectMapper);
+                        .toString()).toMap(objectMapper);
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(data).build();
     }
@@ -375,18 +367,21 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     }
 
     private CaseData setWithNoticeByType(CaseData caseData) {
-        if (Objects.nonNull(caseData.getGeneralAppType())
-                && caseData.getGeneralAppType().getTypes().size() == 1
-                && caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {
-            caseData = caseData.toBuilder()
+        if (isSingleAppTypeVaryJudgment(caseData)) {
+            return caseData.toBuilder()
                     .generalAppInformOtherParty(
                             GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build()).build();
         }
         return caseData;
     }
 
-    private boolean inStateAfterJudicialReferral(CaseState state) {
-        return !stateAfterJudicialReferral.contains(state);
+    private boolean isSingleAppTypeVaryJudgment(CaseData caseData) {
+        if (Objects.nonNull(caseData.getGeneralAppType())) {
+            return caseData.getGeneralAppType().getTypes().size() == 1
+                && caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT);
+        }
+        return Objects.nonNull(caseData.getGeneralAppTypeLR())
+            && caseData.getGeneralAppTypeLR().getTypes().size() == 1
+            && caseData.getGeneralAppTypeLR().getTypes().contains(GeneralApplicationTypesLR.VARY_PAYMENT_TERMS_OF_JUDGMENT);
     }
-
 }

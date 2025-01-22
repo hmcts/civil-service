@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
@@ -69,49 +70,36 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     private final FrcDocumentsUtils frcDocumentsUtils;
     private final DQResponseDocumentUtils dqResponseDocumentUtils;
     private final DetermineNextState determineNextState;
-
+    private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
     @Value("${court-location.specified-claim.epimms-id}") String cnbcEpimsId;
 
     public CallbackResponse execute(CallbackParams callbackParams) {
 
         CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
-
         CaseData caseData = persistPartyAddress(oldCaseData, callbackParams.getCaseData());
-
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-            .applicant1ResponseDate(time.now());
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder().applicant1ResponseDate(time.now());
 
         persistFlagsForParties(oldCaseData, caseData, builder);
-
         setResponseDocumentNull(builder);
-
         updateCaselocationDetails(callbackParams, caseData, builder);
-
         updateApplicant1DQ(callbackParams, caseData, builder);
-
         assignApplicant1DQExpertsIfPresent(caseData, builder);
-
         assignApplicant2DQExpertsIfPresent(caseData, builder);
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder,
-                                                                       featureToggleService.isUpdateContactDetailsEnabled());
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
 
-        if (featureToggleService.isUpdateContactDetailsEnabled()) {
-            addEventAndDateAddedToApplicantExperts(builder);
-            addEventAndDateAddedToApplicantWitnesses(builder);
-        }
-
-        if (featureToggleService.isHmcEnabled()) {
-            populateDQPartyIds(builder);
-        }
+        addEventAndDateAddedToApplicantExperts(builder);
+        addEventAndDateAddedToApplicantWitnesses(builder);
+        populateDQPartyIds(builder);
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, builder);
         moveClaimToMediation(callbackParams, caseData, builder);
 
         String nextState = putCaseStateInJudicialReferral(caseData);
         BusinessProcess businessProcess = BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC);
-
         nextState = determineNextState.determineNextState(caseData, callbackParams, builder, nextState, businessProcess);
+
+        is1v1RespondImmediately(caseData, builder);
 
         frcDocumentsUtils.assembleClaimantsFRCDocuments(caseData);
 
@@ -119,6 +107,13 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             dqResponseDocumentUtils.buildClaimantResponseDocuments(builder.build()));
 
         clearTempDocuments(builder);
+
+        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+            updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
+                callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
+                builder
+            ));
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
@@ -322,5 +317,15 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
+    }
+
+    private void is1v1RespondImmediately(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+        if (featureToggleService.isJudgmentOnlineLive()
+            && isOneVOne(caseData)
+            && caseData.isPayImmediately()
+            && ((caseData.isFullAdmitClaimSpec() && caseData.getApplicant1ProceedWithClaim() == null)
+            || caseData.isPartAdmitImmediatePaymentClaimSettled())) {
+            builder.respondForImmediateOption(YesOrNo.YES);
+        }
     }
 }

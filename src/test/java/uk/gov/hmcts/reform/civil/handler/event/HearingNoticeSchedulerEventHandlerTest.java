@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.event.HearingNoticeSchedulerTaskEvent;
 import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeMessageVars;
 import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeSchedulerVars;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.hmc.exception.HmcException;
 import uk.gov.hmcts.reform.hmc.model.hearing.CaseDetailsHearing;
@@ -69,9 +68,6 @@ class HearingNoticeSchedulerEventHandlerTest {
     @Mock
     private SystemUpdateUserConfiguration userConfig;
 
-    @Mock
-    private FeatureToggleService featureToggleService;
-
     @InjectMocks
     private HearingNoticeSchedulerEventHandler handler;
 
@@ -88,7 +84,6 @@ class HearingNoticeSchedulerEventHandlerTest {
 
     @BeforeEach
     void init() {
-        when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(true);
         when(runtimeService.createMessageCorrelation(any())).thenReturn(messageCorrelationBuilder);
         when(messageCorrelationBuilder.setVariables(any())).thenReturn(messageCorrelationBuilder);
         when(mockTask.getVariable(SERVICE_ID_KEY)).thenReturn(SERVICE_ID);

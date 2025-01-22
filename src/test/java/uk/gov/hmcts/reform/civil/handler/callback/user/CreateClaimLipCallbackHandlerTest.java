@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseEventDataService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -88,6 +89,9 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private HelpWithFeesForTabService hwfForTabService;
 
+    @MockBean
+    CoreCaseEventDataService coreCaseEventDataService;
+
     @Autowired
     private CreateClaimLipCallBackHandler handler;
 
@@ -132,12 +136,10 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(time.now()).willReturn(submittedDate);
             given(specReferenceNumberRepository.getSpecReferenceNumber()).willReturn(REFERENCE_NUMBER);
             given(deadlinesCalculator.plus28DaysAt4pmDeadline(any())).willReturn(submittedDate);
-            when(toggleService.isHmcEnabled()).thenReturn(false);
         }
 
         @Test
         void shouldInitializePartyID_whenInvoked() {
-            when(toggleService.isHmcEnabled()).thenReturn(true);
             caseData = CaseDataBuilder.builder()
                 .respondent1(Party.builder()
                     .type(Party.Type.INDIVIDUAL)

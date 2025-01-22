@@ -11,20 +11,18 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.SetAsideJudgmentOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -41,7 +39,10 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
     protected final ObjectMapper objectMapper;
     private final SetAsideJudgmentOnlineMapper setAsideJudgmentOnlineMapper;
     private static final String ERROR_MESSAGE_DATE_ORDER_MUST_BE_IN_PAST = "Date must be in the past";
-    private final DeadlinesCalculator deadlinesCalculator;
+    private static final String ERROR_MESSAGE_APPLICATION_DATE =
+        "Application date to set aside judgment must be on or before the date of the order setting aside judgment";
+    private static final String ERROR_MESSAGE_DEFENCE_DATE =
+        "Date the defence was received must be on or before the date of the order setting aside judgment";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -62,10 +63,18 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 
-        if (JudgmentsOnlineHelper.validateIfFutureDate(caseData.getJoSetAsideOrderType().equals(
-            JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION) ? caseData.getJoSetAsideOrderDate() : caseData.getJoSetAsideDefenceReceivedDate())) {
+        if (JudgmentsOnlineHelper.validateIfFutureDate(caseData.getJoSetAsideOrderDate())) {
             errors.add(ERROR_MESSAGE_DATE_ORDER_MUST_BE_IN_PAST);
         }
+        if (JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION.equals(caseData.getJoSetAsideOrderType())
+            && caseData.getJoSetAsideApplicationDate().isAfter(caseData.getJoSetAsideOrderDate())) {
+            errors.add(ERROR_MESSAGE_APPLICATION_DATE);
+        }
+        if (JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE.equals(caseData.getJoSetAsideOrderType())
+            && caseData.getJoSetAsideDefenceReceivedDate().isAfter(caseData.getJoSetAsideOrderDate())) {
+            errors.add(ERROR_MESSAGE_DEFENCE_DATE);
+        }
+
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -87,20 +96,11 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
         setAsideJudgmentOnlineMapper.moveToHistoricJudgment(caseData);
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.businessProcess(BusinessProcess.ready(SET_ASIDE_JUDGMENT));
-        String nextState;
-        if (Objects.nonNull(caseData.getJoSetAsideOrderType()) && caseData.getJoSetAsideOrderType().equals(
-            JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION)) {
-            nextState = CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name();
-            caseDataBuilder.respondent1ResponseDeadline(deadlinesCalculator.plus28DaysAt4pmDeadline(
-                caseData.getJoSetAsideOrderDate().atTime(0, 0)));
-        } else {
-            nextState = caseData.getCcdState().name();
-        }
+        caseDataBuilder.businessProcess(BusinessProcess.ready(SET_ASIDE_JUDGMENT))
+            .joSetAsideCreatedDate(LocalDateTime.now());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
-            .state(nextState)
             .build();
     }
 }

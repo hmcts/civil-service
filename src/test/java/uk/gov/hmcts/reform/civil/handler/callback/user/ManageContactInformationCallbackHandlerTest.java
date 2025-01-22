@@ -131,10 +131,6 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
     @Autowired
     private ObjectMapper mapper;
-
-    @Autowired
-    private PartyValidator partyValidator;
-
     @MockBean
     private PartyDetailsChangedUtil partyDetailsChangedUtil;
 
@@ -1050,8 +1046,6 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .build();
 
             when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
-            when(partyDetailsChangedUtil.buildChangesEvent(any(CaseData.class), any(CaseData.class))).thenReturn(
-                    EVENT);
 
             CallbackParams params = callbackParamsOf(updated, ABOUT_TO_SUBMIT);
 
@@ -1101,8 +1095,6 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .build();
 
             when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
-            when(partyDetailsChangedUtil.buildChangesEvent(any(CaseData.class), any(CaseData.class))).thenReturn(
-                    EVENT);
 
             CallbackParams params = callbackParamsOf(updated, ABOUT_TO_SUBMIT);
 
@@ -1152,8 +1144,6 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .build();
 
             when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
-            when(partyDetailsChangedUtil.buildChangesEvent(any(CaseData.class), any(CaseData.class))).thenReturn(
-                    EVENT);
 
             CallbackParams params = callbackParamsOf(updated, ABOUT_TO_SUBMIT);
 
@@ -1203,8 +1193,6 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .build();
 
             when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
-            when(partyDetailsChangedUtil.buildChangesEvent(any(CaseData.class), any(CaseData.class))).thenReturn(
-                    EVENT);
 
             CallbackParams params = callbackParamsOf(updated, ABOUT_TO_SUBMIT);
 
@@ -1254,8 +1242,6 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .build();
 
             when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
-            when(partyDetailsChangedUtil.buildChangesEvent(any(CaseData.class), any(CaseData.class))).thenReturn(
-                    EVENT);
 
             CallbackParams params = callbackParamsOf(updated, ABOUT_TO_SUBMIT);
 
@@ -1305,8 +1291,6 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .build();
 
             when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
-            when(partyDetailsChangedUtil.buildChangesEvent(any(CaseData.class), any(CaseData.class))).thenReturn(
-                    EVENT);
 
             CallbackParams params = callbackParamsOf(updated, ABOUT_TO_SUBMIT);
 
@@ -1356,8 +1340,6 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .build();
 
             when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
-            when(partyDetailsChangedUtil.buildChangesEvent(any(CaseData.class), any(CaseData.class))).thenReturn(
-                    EVENT);
 
             CallbackParams params = callbackParamsOf(updated, ABOUT_TO_SUBMIT);
 
@@ -1441,8 +1423,6 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
             when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseDataBefore);
             when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
-            when(partyDetailsChangedUtil.buildChangesEvent(any(CaseData.class), any(CaseData.class)))
-                .thenReturn(null);
 
             CallbackParams params = callbackParamsOf(updated, ABOUT_TO_SUBMIT, caseDataBefore.toMap(mapper));
 

@@ -30,7 +30,8 @@ public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
         List<CaseDetails> cases = bundleCreationTriggerService.getCases();
-        log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
+        List<Long> ids = cases.stream().map(CaseDetails::getId).sorted().toList();
+        log.info("Job '{}' found {} case(s) with ids {}", externalTask.getTopicName(), cases.size(), ids);
 
         cases.forEach(caseDetails -> {
             try {

@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -32,12 +33,16 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -174,6 +179,52 @@ class DetermineNextStateTest {
     }
 
     @Test
+    void shouldNotSetStateWhenMultiClaimIsNotSettled() {
+
+        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+        BusinessProcess businessProcess = BusinessProcess.builder().build();
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1AcceptAdmitAmountPaidSpec(NO)
+            .applicant1ProceedWithClaim(YES)
+            .respondent1Represented(NO)
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .responseClaimTrack(MULTI_CLAIM.name())
+            .build();
+
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+        String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
+                                                                   builder, "", businessProcess);
+
+        assertNotNull(resultState);
+        assertEquals(AWAITING_APPLICANT_INTENTION.name(), resultState);
+    }
+
+    @Test
+    void shouldNotSetStateWhenIntermediateClaimIsNotSettled() {
+
+        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+        BusinessProcess businessProcess = BusinessProcess.builder().build();
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1ProceedWithClaim(YES)
+            .applicant1AcceptAdmitAmountPaidSpec(NO)
+            .respondent1Represented(NO)
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .responseClaimTrack(INTERMEDIATE_CLAIM.name())
+            .build();
+
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+        String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
+                                                                   builder, "", businessProcess);
+
+        assertNotNull(resultState);
+        assertEquals(AWAITING_APPLICANT_INTENTION.name(), resultState);
+    }
+
+    @Test
     void shouldSetStateCaseSettledWhenClaimIsPartAdmitSettled() {
 
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
@@ -220,6 +271,81 @@ class DetermineNextStateTest {
 
         assertNotNull(resultState);
         assertEquals(CASE_STAYED.name(), resultState);
+    }
+
+    @Test
+    void shouldSetProceedsInHeritageSystemWhenApplicantAcceptedRepaymentPlanAndNotLrVLip() {
+
+        CaseData.CaseDataBuilder<?, ?> builder = mock(CaseData.CaseDataBuilder.class);
+        BusinessProcess businessProcess = BusinessProcess.builder().build();
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1AcceptPartAdmitPaymentPlanSpec(YES)
+            .respondent1Represented(YES)
+            .applicant1Represented(YES)
+            .build();
+        JudgmentDetails activeJudgment = mock(JudgmentDetails.class);
+
+        when(activeJudgment.getTotalAmount()).thenReturn("1000");
+        when(activeJudgment.getOrderedAmount()).thenReturn("500");
+        when(activeJudgment.getCosts()).thenReturn("150");
+        when(activeJudgment.getClaimFeeAmount()).thenReturn("50");
+        when(activeJudgment.getAmountAlreadyPaid()).thenReturn("200");
+        when(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData)).thenReturn(activeJudgment);
+        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+        String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
+                                                                   builder, "", businessProcess);
+
+        assertNotNull(resultState);
+        assertEquals(PROCEEDS_IN_HERITAGE_SYSTEM.name(), resultState);
+        verify(builder).activeJudgment(activeJudgment);
+        verify(builder).joIsLiveJudgmentExists(YesOrNo.YES);
+    }
+
+    @Test
+    void shouldSetAwaitingApplicantIntentionWhenApplicantAcceptedImmediatePaymentPlanFor1V1() {
+
+        CaseData.CaseDataBuilder<?, ?> builder = mock(CaseData.CaseDataBuilder.class);
+        BusinessProcess businessProcess = BusinessProcess.builder().build();
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1AcceptAdmitAmountPaidSpec(YES)
+            .respondent1Represented(YES)
+            .applicant1Represented(YES)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
+            .build();
+
+        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+        String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
+                                                                   builder, "", businessProcess);
+        assertNotNull(resultState);
+        assertEquals(AWAITING_APPLICANT_INTENTION.name(), resultState);
+    }
+
+    @Test
+    void shouldSetAwaitingApplicantIntentionWhenApplicantWantToProceedImmediatePaymentPlanFor1V1() {
+
+        CaseData.CaseDataBuilder<?, ?> builder = mock(CaseData.CaseDataBuilder.class);
+        BusinessProcess businessProcess = BusinessProcess.builder().build();
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1AcceptAdmitAmountPaidSpec(NO)
+            .respondent1Represented(YES)
+            .applicant1Represented(YES)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
+            .build();
+
+        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+        String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
+                                                                   builder, "", businessProcess);
+        assertNotNull(resultState);
+        assertEquals(All_FINAL_ORDERS_ISSUED.name(), resultState);
     }
 
     private CallbackParams callbackParams(CaseData caseData) {

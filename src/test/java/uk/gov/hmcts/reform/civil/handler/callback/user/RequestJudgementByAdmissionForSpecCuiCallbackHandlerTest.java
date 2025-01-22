@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -112,6 +114,39 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .respondent1ResponseDate(LocalDateTime.now().minusDays(15))
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .ccdState(AWAITING_APPLICANT_INTENTION)
+                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(whenWillPay).build())
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnError_WhenAboutToStartIsInvokedForPAPayImmediately() {
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .ccdState(AWAITING_APPLICANT_INTENTION)
+                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(whenWillPay).build())
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getErrors()).isNotEmpty();
+        }
+
+        @ParameterizedTest
+        @CsvSource({"true,IMMEDIATELY", "true,BY_SET_DATE", "false,IMMEDIATELY"})
+        void shouldNotReturnError_WhenAboutToStartIsInvokedForPAPayImmediately(boolean toggleState, RespondentResponsePartAdmissionPaymentTimeLRspec paymentOption) {
+            LocalDate whenWillPay = LocalDate.of(2024, 11, 11);
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(toggleState);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .defenceAdmitPartPaymentTimeRouteRequired(paymentOption)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .ccdState(AWAITING_APPLICANT_INTENTION)
                 .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(whenWillPay).build())
                 .build();
@@ -663,6 +698,39 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             assertThat(stillOwed).isEqualTo(ccjResponseForJudgement.getCcjJudgmentTotalStillOwed());
 
         }
+
+        @Test
+        void shouldSetUpBusinessProcessAndContinueOnlineAndCaseState_whenIsJudgmentOnlineLiveEnabledLRvLR1V1() {
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeOption(YesOrNo.YES)
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0))
+                .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
+                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
+                .build();
+            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+                .respondent1Represented(YES)
+                .specRespondent1Represented(YES)
+                .applicant1Represented(YES)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .respondent1(PartyBuilder.builder().individual().build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getState())
+                .isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent")
+                .isEqualTo(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC.name());
+        }
+
     }
 
     @Nested
