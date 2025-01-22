@@ -169,8 +169,8 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
             .applicantDetails(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
             .paymentPlan(caseData.getPaymentTypeSelection().name())
             .payByDate(Objects.isNull(caseData.getPaymentSetDate()) ? null : DateFormatHelper.formatLocalDate(caseData.getPaymentSetDate(), DateFormatHelper.DATE))
-            .repaymentFrequency(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentFrequency(caseData.getRepaymentFrequency()))
-            .paymentStr(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentString(caseData.getRepaymentFrequency()))
+            .repaymentFrequency(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentFrequency(caseData.getRepaymentFrequency(), caseData.isClaimantBilingual()))
+            .paymentStr(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentString(caseData.getRepaymentFrequency(), caseData.isClaimantBilingual()))
             .installmentAmount(Objects.isNull(caseData.getRepaymentSuggestion()) ? null : getInstallmentAmount(caseData.getRepaymentSuggestion()))
             .repaymentDate(Objects.isNull(caseData.getRepaymentDate()) ? null : DateFormatHelper.formatLocalDate(caseData.getRepaymentDate(), DateFormatHelper.DATE));
         return builder.build();
@@ -181,20 +181,20 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
         return String.valueOf(MonetaryConversions.penniesToPounds(regularRepaymentAmountPennies));
     }
 
-    private String getRepaymentString(RepaymentFrequencyDJ repaymentFrequency) {
+    private String getRepaymentString(RepaymentFrequencyDJ repaymentFrequency, boolean bilingual) {
         switch (repaymentFrequency) {
-            case ONCE_ONE_WEEK : return "each week";
-            case ONCE_ONE_MONTH: return "each month";
-            case ONCE_TWO_WEEKS: return "every 2 weeks";
+            case ONCE_ONE_WEEK : return bilingual == true ? "pob wythnos" : "each week";
+            case ONCE_ONE_MONTH: return bilingual == true ? "pob mis" : "each month";
+            case ONCE_TWO_WEEKS: return bilingual == true ? "pob 2 wythnos" : "every 2 weeks";
             default: return null;
         }
     }
 
-    private String getRepaymentFrequency(RepaymentFrequencyDJ repaymentFrequencyDJ) {
+    private String getRepaymentFrequency(RepaymentFrequencyDJ repaymentFrequencyDJ, boolean bilingual) {
         switch (repaymentFrequencyDJ) {
-            case ONCE_ONE_WEEK : return "per week";
-            case ONCE_ONE_MONTH: return "per month";
-            case ONCE_TWO_WEEKS: return "every 2 weeks";
+            case ONCE_ONE_WEEK : return bilingual == true ?  "yr wythnos" : "per week";
+            case ONCE_ONE_MONTH: return bilingual == true ?  "y mis" : "per month";
+            case ONCE_TWO_WEEKS: return bilingual == true ?  "pob 2 wythnos" : "every 2 weeks";
             default: return null;
         }
     }
