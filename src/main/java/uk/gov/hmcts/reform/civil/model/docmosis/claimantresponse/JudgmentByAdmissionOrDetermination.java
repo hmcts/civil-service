@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.Builder;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -19,6 +20,7 @@ import java.util.List;
 @Builder(toBuilder = true)
 @Getter
 @EqualsAndHashCode
+@Data
 public class JudgmentByAdmissionOrDetermination implements MappableObject {
 
     private final String formHeader;
