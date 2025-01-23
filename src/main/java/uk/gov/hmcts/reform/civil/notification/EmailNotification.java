@@ -6,17 +6,17 @@ public abstract class EmailNotification {
 
     protected NotificationService notificationService;
 
-    public abstract void notifyParties(EmailTO emailTO);
-
     public void notifyApplicantSolicitor1(EmailTO emailTO) {
-        if (emailTO.getCaseData().getApplicantSolicitor1CheckEmail().isCorrect())
+        if (emailTO.getCaseData().getApplicantSolicitor1CheckEmail().isCorrect()) {
             notificationService.sendMail(emailTO.getApplicantSol1Email(), emailTO.getEmailTemplate(), emailTO.getApplicantSol1Params(),
                     emailTO.getApplicantRef());
+        }
     }
 
     public void notifyRespondentSolicitor1(EmailTO emailTO) {
-        if (!emailTO.getCaseData().getRespondentSolicitor1EmailAddress().isBlank())
+        if (!emailTO.getCaseData().getRespondentSolicitor1EmailAddress().isBlank()) {
             notificationService.sendMail(emailTO.getApplicantSol1Email(), emailTO.getEmailTemplate(), emailTO.getApplicantSol1Params(),
                     emailTO.getApplicantRef());
+        }
     }
 }
