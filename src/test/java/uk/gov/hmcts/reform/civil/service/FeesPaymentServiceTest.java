@@ -13,7 +13,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.client.CardPaymentClient;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.exceptions.PaymentsApiException;
@@ -21,9 +23,10 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
+import uk.gov.hmcts.reform.civil.model.payments.CurrencyCode;
+import uk.gov.hmcts.reform.civil.model.payments.PaymentDto;
+import uk.gov.hmcts.reform.civil.model.payments.StatusHistoryDto;
 import uk.gov.hmcts.reform.payments.client.PaymentsClient;
-import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
-import uk.gov.hmcts.reform.payments.client.models.StatusHistoryDto;
 import uk.gov.hmcts.reform.payments.request.CardPaymentServiceRequestDTO;
 import uk.gov.hmcts.reform.payments.response.CardPaymentServiceRequestResponse;
 
@@ -83,6 +86,13 @@ class FeesPaymentServiceTest {
     @MockBean
     private UpdatePaymentStatusService updatePaymentStatusService;
 
+    @MockBean
+    private CardPaymentClient cardPaymentClient;
+    @MockBean
+    private AuthTokenGenerator authTokenGenerator;
+
+    private final String SERVICE_AUTH_TOKEN = "serviceAuthToken";
+
     @BeforeEach
     void before() {
         CaseDetails expectedCaseDetails = CaseDetails.builder().id(1701090368574910L)
@@ -97,6 +107,7 @@ class FeesPaymentServiceTest {
 
         when(coreCaseDataService.getCase(1701090368574910L)).thenReturn(expectedCaseDetails);
         when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("http://localhost:3001");
+        when(authTokenGenerator.generate()).thenReturn(SERVICE_AUTH_TOKEN);
     }
 
     @Test
@@ -227,8 +238,9 @@ class FeesPaymentServiceTest {
     @CsvSource({"Success", "Failed", "Pending", "Declined"})
     @SneakyThrows
     void shouldReturnServiceRequestPaymentStatus(String status) {
+
         PaymentDto response = buildGovPayCardPaymentStatusResponse(status);
-        when(paymentsClient.getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN))
+        when(cardPaymentClient.retrieveCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN, SERVICE_AUTH_TOKEN))
             .thenReturn(response);
         CardPaymentStatusResponse govPaymentRequestStatus = feesPaymentService.getGovPaymentRequestStatus(
             HEARING,
@@ -243,7 +255,7 @@ class FeesPaymentServiceTest {
 
     @Test
     void shouldRetryPaymentsApiWhenInternalServerErrorThrown() {
-        when(paymentsClient.getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN))
+        when(cardPaymentClient.retrieveCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN, SERVICE_AUTH_TOKEN))
             .thenThrow(FeignException.InternalServerError.class);
 
         assertThrows(
@@ -251,12 +263,12 @@ class FeesPaymentServiceTest {
             () -> feesPaymentService.getGovPaymentRequestStatus(FeeType.HEARING, "123", "RC-1701-0909-0602-0418", BEARER_TOKEN)
         );
 
-        verify(paymentsClient, times(5)).getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN);
+        verify(cardPaymentClient, times(5)).retrieveCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN, SERVICE_AUTH_TOKEN);
     }
 
     @Test
     void shouldNotRetryPaymentsApiWhenExceptionOtherThanInternalServerIsThrown() {
-        when(paymentsClient.getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN))
+        when(cardPaymentClient.retrieveCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN, SERVICE_AUTH_TOKEN))
             .thenThrow(FeignException.NotImplemented.class);
 
         assertThrows(
@@ -265,20 +277,20 @@ class FeesPaymentServiceTest {
             )
         );
 
-        verify(paymentsClient).getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN);
+        verify(cardPaymentClient).retrieveCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN, SERVICE_AUTH_TOKEN);
     }
 
     @Test
     void shouldFailOnPaymentsApiTwiceThenHaveSuccessfulRetry() {
-        when(paymentsClient.getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN))
+        when(cardPaymentClient.retrieveCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN, SERVICE_AUTH_TOKEN))
             .thenThrow(FeignException.InternalServerError.class)
             .thenThrow(FeignException.InternalServerError.class)
             .thenReturn(buildGovPayCardPaymentStatusResponse("Success"));
 
         feesPaymentService.getGovPaymentRequestStatus(FeeType.HEARING, "123", "RC-1701-0909-0602-0418", BEARER_TOKEN);
 
-        verify(paymentsClient, times(3))
-            .getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN);
+        verify(cardPaymentClient, times(3))
+            .retrieveCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN, SERVICE_AUTH_TOKEN);
     }
 
     private PaymentDto buildGovPayCardPaymentStatusResponse(String status) {
@@ -287,12 +299,12 @@ class FeesPaymentServiceTest {
             .reference("RC-1701-0909-0602-0418")
             .status(status)
             .amount(new BigDecimal(200))
-            .currency("GBP")
+            .currency(CurrencyCode.GBP)
             .statusHistories(getStatusHistories(status))
             .build();
     }
 
-    private StatusHistoryDto[] getStatusHistories(String status) {
+    private List<StatusHistoryDto> getStatusHistories(String status) {
 
         StatusHistoryDto initiatedHistory = StatusHistoryDto.builder().status("Initiated").build();
         StatusHistoryDto failedHistory = StatusHistoryDto.builder().status("Failed")
@@ -305,8 +317,7 @@ class FeesPaymentServiceTest {
         } else {
             histories.add(StatusHistoryDto.builder().status(status).build());
         }
-        StatusHistoryDto[] result = new StatusHistoryDto[histories.size()];
-        return histories.toArray(result);
+        return histories;
     }
 
     private CardPaymentStatusResponse expectedResponse(String status) {

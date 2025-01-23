@@ -10,13 +10,12 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
-import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
+import uk.gov.hmcts.reform.civil.model.payments.PaymentDto;
 import uk.gov.hmcts.reform.payments.request.CardPaymentServiceRequestDTO;
 import uk.gov.hmcts.reform.payments.response.CardPaymentServiceRequestResponse;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Arrays;
 
 import static java.util.Objects.requireNonNull;
 
@@ -50,7 +49,7 @@ public class FeesPaymentService {
 
         CardPaymentServiceRequestDTO requestDto = CardPaymentServiceRequestDTO.builder()
             .amount(feePaymentDetails.getFee().getCalculatedAmountInPence()
-                        .divide(BigDecimal.valueOf(100), 2, RoundingMode.UNNECESSARY))
+                .divide(BigDecimal.valueOf(100), 2, RoundingMode.UNNECESSARY))
             .currency("GBP")
             .language(caseData.isClaimantBilingual() ? "cy" : "En")
             .returnUrl(pinInPostConfiguration.getCuiFrontEndUrl() + returnUrlSubPath + caseReference)
@@ -78,7 +77,7 @@ public class FeesPaymentService {
             .paymentAmount(cardPaymentDetails.getAmount());
 
         if (paymentStatus.equals("Failed")) {
-            Arrays.asList(cardPaymentDetails.getStatusHistories()).stream()
+            cardPaymentDetails.getStatusHistories().stream()
                 .filter(h -> h.getStatus().equals(paymentStatus))
                 .findFirst()
                 .ifPresent(h -> response.errorCode(h.getErrorCode()).errorDescription(h.getErrorMessage()));
