@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.notification.handlers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.HashMap;
@@ -10,9 +11,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
@@ -21,7 +19,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganiza
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class AddDefendantLitigationFriendNotificationHandler extends NotificationHandler {
+public class AddDefendantLitigationFriendNotificationHandler extends NotificationHandler implements NotificationData {
 
     protected static final String REFERENCE_TEMPLATE_APPLICANT = "litigation-friend-added-applicant-notification-%s";
     protected static final String REFERENCE_TEMPLATE_RESPONDENT = "litigation-friend-added-respondent-notification-%s";
@@ -35,11 +33,11 @@ public class AddDefendantLitigationFriendNotificationHandler extends Notificatio
         sendNotification(partiesToEmail);
     }
 
-    protected Set<EmailDTO> getApplicants(CaseData caseData) {
+    private Set<EmailDTO> getApplicants(CaseData caseData) {
         return new HashSet<>(Set.of(getApplicant1(caseData)));
     }
 
-    protected EmailDTO getApplicant1(CaseData caseData) {
+    private EmailDTO getApplicant1(CaseData caseData) {
         Map<String, String> properties = addProperties(caseData);
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
         return EmailDTO.builder()
@@ -74,7 +72,7 @@ public class AddDefendantLitigationFriendNotificationHandler extends Notificatio
     }
 
     @Override
-    protected Map<String, String> addProperties(CaseData caseData) {
+    public Map<String, String> addProperties(CaseData caseData) {
         return new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
