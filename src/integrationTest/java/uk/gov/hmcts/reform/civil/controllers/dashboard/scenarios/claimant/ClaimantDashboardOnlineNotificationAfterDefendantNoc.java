@@ -46,13 +46,13 @@ public class ClaimantDashboardOnlineNotificationAfterDefendantNoc extends Dashbo
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT").andExpect(status().isOk()).andExpectAll(
             status().is(HttpStatus.OK.value()),
             jsonPath("$[0].titleEn").value(
-                "Your help with fees application has been approved"),
+                "mr defendant has assigned a legal representative to act on their behalf"),
             jsonPath("$[0].descriptionEn").value(
-                "<p class=\"govuk-body\">The full claim fee of £455 will be covered by fee remission. You do not need to make a payment.</p>"),
+                "<p class=\"govuk-body\">You will now need to liaise with their legal representation.</p><p class=\"govuk-body\"><a href=\"{VIEW_INFO_ABOUT_DEFENDANT}\" class=\"govuk-link\">View the defendant legal representative contact details</a>. </p>"),
             jsonPath("$[0].titleCy").value(
-                "Mae eich cais am help i dalu ffioedd wedi cael ei gymeradwyo"),
+                "Mae mr defendant wedi neilltuo cynrychiolydd cyfreithiol i weithredu ar ei ran"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">Bydd ffi lawn yr hawliad o £455 yn cael ei ddileu. Nid oes angen i chi wneud taliad.</p>")
+                "<p class=\"govuk-body\">Bydd angen i chi nawr gysylltu â''u cynrychiolaeth gyfreithiol.</p><p class=\"govuk-body\"><a href=\"{VIEW_INFO_ABOUT_DEFENDANT}\" class=\"govuk-link\">Gweld manylion cyswllt cynrychiolydd cyfreithiol y diffynnydd</a>.</p>")
         );
     }
 }
