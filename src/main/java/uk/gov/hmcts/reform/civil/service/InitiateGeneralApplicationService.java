@@ -57,6 +57,7 @@ import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServic
 import static uk.gov.hmcts.reform.civil.service.LocationService.statesBeforeSDO;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service
 @RequiredArgsConstructor
@@ -240,6 +241,7 @@ public class InitiateGeneralApplicationService {
     }
 
     private void setPartyNames(CaseData caseData, GeneralApplication.GeneralApplicationBuilder applicationBuilder) {
+        applicationBuilder.emailPartyReference(buildPartiesReferencesEmailSubject(caseData));
         applicationBuilder.claimant1PartyName(getPartyNameBasedOnType(caseData.getApplicant1()));
         applicationBuilder.defendant1PartyName(getPartyNameBasedOnType(caseData.getRespondent1()));
         if (YES.equals(caseData.getAddApplicant2())) {
