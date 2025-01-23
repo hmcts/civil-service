@@ -3,16 +3,16 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notification.EmailNotification1V2;
+import uk.gov.hmcts.reform.civil.notification.EmailTO;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 
@@ -30,7 +30,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganiza
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class NotifyEventHandler extends CallbackHandler implements NotificationData {
+public class LitigationFriendAddedNotificationHandler extends CallbackHandler implements NotificationData {
 
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_EVENT);
 
@@ -38,7 +38,7 @@ public class NotifyEventHandler extends CallbackHandler implements NotificationD
     private static final String REFERENCE_TEMPLATE_APPLICANT = "litigation-friend-added-applicant-notification-%s";
     private static final String REFERENCE_TEMPLATE_RESPONDENT = "litigation-friend-added-respondent-notification-%s";
 
-    private final NotificationService notificationService;
+    private final EmailNotification1V2 emailNotification1V2;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
     private final IStateFlowEngine stateFlowEngine;
@@ -67,55 +67,43 @@ public class NotifyEventHandler extends CallbackHandler implements NotificationD
             callbackParams.getCaseData().getCcdCaseReference()
         );
 
-        notifyApplicants(caseData);
-        notifyRespondents(caseData);
+        emailNotification1V2.notifyParties(getEmailTO(caseData));
+
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    private void notifyApplicants(final CaseData caseData) {
-        notificationService.sendMail(
-            caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            notificationsProperties.getSolicitorLitigationFriendAdded(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE_APPLICANT, caseData.getLegacyCaseReference())
-        );
-    }
+    protected EmailTO getEmailTO(CaseData caseData) {
 
-    private void notifyRespondents(final CaseData caseData) {
+        Map<String, String> applicantSol1Props = new HashMap<>(addProperties(caseData));
+        applicantSol1Props.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
 
-        Map<String, String> properties = addProperties(caseData);
-        properties.put(
-            CLAIM_LEGAL_ORG_NAME_SPEC,
-            getLegalOrganizationNameForRespondent(caseData, true, organisationService)
-        );
+        Map<String, String> respondentSol1Props = new HashMap<>(addProperties(caseData));
+        respondentSol1Props.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData,
+                true, organisationService));
 
-        notificationService.sendMail(
-            caseData.getRespondentSolicitor1EmailAddress(),
-            notificationsProperties.getSolicitorLitigationFriendAdded(),
-            properties,
-            String.format(REFERENCE_TEMPLATE_RESPONDENT, caseData.getLegacyCaseReference())
-        );
+        Map<String, String> respondentSol2Props = new HashMap<>(addProperties(caseData));
+        respondentSol1Props.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData,
+                false, organisationService));
 
-        if (stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)) {
-            properties.put(
-                CLAIM_LEGAL_ORG_NAME_SPEC,
-                getLegalOrganizationNameForRespondent(caseData, false, organisationService)
-            );
-            notificationService.sendMail(
-                caseData.getRespondentSolicitor2EmailAddress(),
-                notificationsProperties.getSolicitorLitigationFriendAdded(),
-                properties,
-                String.format(REFERENCE_TEMPLATE_RESPONDENT, caseData.getLegacyCaseReference())
-            );
-        }
+        return EmailTO.builder()
+                .emailTemplate(notificationsProperties.getSolicitorLitigationFriendAdded())
+                .applicantSol1Email(caseData.getApplicantSolicitor1UserDetails().getEmail())
+                .applicantSol1Params(applicantSol1Props)
+                .applicantRef(String.format(REFERENCE_TEMPLATE_APPLICANT, caseData.getLegacyCaseReference()))
+                .respondentSol1Email(caseData.getRespondentSolicitor1EmailAddress())
+                .respondentSol1Params(respondentSol1Props)
+                .respondentRef(String.format(REFERENCE_TEMPLATE_RESPONDENT, caseData.getLegacyCaseReference()))
+                .respondentSol2Email(caseData.getRespondentSolicitor2EmailAddress())
+                .respondentSol2Params(respondentSol2Props)
+                .canSendEmailToRespondentSol2(stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES))
+                .build();
     }
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         ));
     }
 }
