@@ -691,6 +691,8 @@ public class CaseDataBuilder {
     private JudgmentPaidInFull judgmentPaidInFull;
     private YesOrNo anyRepresented;
 
+    private String partialPaymentAmount;
+
     public CaseDataBuilder claimantBilingualLanguagePreference(String claimantBilingualLanguagePreference) {
         this.claimantBilingualLanguagePreference = claimantBilingualLanguagePreference;
         return this;
@@ -773,6 +775,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder totalClaimAmount(BigDecimal totalClaimAmount) {
         this.totalClaimAmount = totalClaimAmount;
+        return this;
+    }
+
+    public CaseDataBuilder partialPaymentAmount(String partialPaymentAmount) {
+        this.partialPaymentAmount = partialPaymentAmount;
         return this;
     }
 
@@ -7944,6 +7951,7 @@ public class CaseDataBuilder {
             .repaymentDate(repaymentDate)
             .joJudgmentPaidInFull(judgmentPaidInFull)
             .anyRepresented(anyRepresented)
+            .partialPaymentAmount(partialPaymentAmount)
             .build();
     }
 

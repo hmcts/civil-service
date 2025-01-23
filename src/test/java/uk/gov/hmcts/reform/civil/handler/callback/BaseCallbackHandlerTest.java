@@ -85,8 +85,8 @@ public abstract class BaseCallbackHandlerTest {
         return callbackParamsOf(caseData, caseDataBefore, type, null, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
     }
 
-    public CallbackParams callbackParamsOf(CaseData caseData, CallbackType type, CaseState previousState) {
-        return callbackParamsOf(caseData, type, null, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"), previousState);
+    public CallbackParams callbackParamsOf(CaseData caseData, CallbackType type, CaseState currentState) {
+        return callbackParamsOf(caseData, type, null, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"), currentState);
     }
 
     public CallbackParams callbackParamsOf(CaseData caseData, CaseEvent event, CallbackType type) {
@@ -194,14 +194,14 @@ public abstract class BaseCallbackHandlerTest {
                                            CallbackVersion version,
                                            String pageId,
                                            Map<Params, Object> params,
-                                           CaseState previousState
+                                           CaseState currentState
     ) {
         return CallbackParams.builder()
             .type(type)
             .pageId(pageId)
             .request(CallbackRequest.builder()
-                         .caseDetails(CaseDetails.builder().data(new HashMap<>()).id(CASE_ID).build())
-                         .caseDetailsBefore(CaseDetails.builder().data(new HashMap<>()).id(CASE_ID).state(previousState.name()).build())
+                         .caseDetails(CaseDetails.builder().data(new HashMap<>()).state(currentState.name()).id(CASE_ID).build())
+                         .caseDetailsBefore(CaseDetails.builder().data(new HashMap<>()).id(CASE_ID).build())
                          .build())
             .caseData(caseData)
             .version(version)
