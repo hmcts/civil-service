@@ -154,6 +154,54 @@ public class InterimJudgmentDefendantNotificationHandlerTest extends BaseCallbac
             assertThat(response.getState()).isEqualTo("JUDICIAL_REFERRAL");
         }
 
+        @Test
+        public void shouldNotNotifyRespondent2WhenLip() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("hmcts")
+                                 .individualTitle("Mr.")
+                                 .individualFirstName("Don")
+                                 .individualLastName("Smith")
+                                 .build())
+                .respondent2(Party.builder().type(Party.Type.INDIVIDUAL).partyName("hmcts")
+                                 .individualTitle("Mrs.")
+                                 .individualFirstName("Donna")
+                                 .individualLastName("Smith")
+                                 .build())
+                .respondent1OrganisationPolicy(null)
+                .legacyCaseReference("12DC910")
+                .respondent2OrganisationPolicy(null)
+                .respondent1Represented(YesOrNo.NO)
+                .addRespondent2(YesOrNo.YES)
+                .respondent2Represented(YesOrNo.NO)
+                .ccdCaseReference(1594901956117591L).build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            verifyNoInteractions(notificationService);
+            assertThat(response.getState()).isEqualTo("JUDICIAL_REFERRAL");
+        }
+
+        @Test
+        public void shouldNotifyRespondent2SolWhenRespondent1Lip() {
+            when(notificationsProperties.getInterimJudgmentApprovalDefendant()).thenReturn("template-id-app");
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
+                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+                .respondent1Represented(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            handler.handle(params);
+
+            verify(notificationService, times(1)).sendMail(
+                anyString(),
+                eq("template-id-app"), anyMap(),
+                eq("interim-judgment-approval-notification-def-000DC001"));
+        }
+
         private Map<String, String> getNotificationDataMap() {
             return Map.of(
                 "Defendant LegalOrg Name", "Test Org Name",
