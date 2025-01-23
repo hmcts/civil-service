@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentRequest;
 import uk.gov.hmcts.reform.civil.ras.model.RoleCategory;
 import uk.gov.hmcts.reform.civil.ras.model.RoleRequest;
 import uk.gov.hmcts.reform.civil.ras.model.RoleType;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.roleassignment.RoleAssignmentInitialisationService;
@@ -40,6 +41,8 @@ class RoleInitialisationServiceTest {
     private RoleAssignmentsService roleAssignmentService;
     @Mock
     private UserService userService;
+    @Mock
+    private FeatureToggleService featureToggleService;
     @InjectMocks
     private RoleAssignmentInitialisationService roleInitialisationService;
 
@@ -93,6 +96,8 @@ class RoleInitialisationServiceTest {
 
     @Test
     void shouldCallRoleAssignmentServiceWithExpectedRequest_caseAllocator() {
+        when(featureToggleService.isMintiEnabled()).thenReturn(true);
+
         RoleAssignmentRequest expected = RoleAssignmentRequest.builder()
             .roleRequest(RoleRequest.builder()
                              .assignerId(USER_ID)
@@ -110,6 +115,17 @@ class RoleInitialisationServiceTest {
                     .roleCategory(RoleCategory.SYSTEM)
                     .roleName("case-allocator")
                     .attributes(Map.of("jurisdiction", "CIVIL", "caseType", "CIVIL"))
+                    .readOnly(false)
+                    .build(),
+                RoleAssignment.builder()
+                    .actorId(USER_ID)
+                    .actorIdType("IDAM")
+                    .roleType(RoleType.ORGANISATION)
+                    .classification("PUBLIC")
+                    .grantType(GrantType.STANDARD)
+                    .roleCategory(RoleCategory.SYSTEM)
+                    .roleName("case-allocator")
+                    .attributes(Map.of("jurisdiction", "CIVIL", "caseType", "GENERALAPPLICATION"))
                     .readOnly(false)
                     .build()
             )).build();

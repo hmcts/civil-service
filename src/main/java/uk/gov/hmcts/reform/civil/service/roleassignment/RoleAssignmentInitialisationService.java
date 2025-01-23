@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentRequest;
 import uk.gov.hmcts.reform.civil.ras.model.RoleCategory;
 import uk.gov.hmcts.reform.civil.ras.model.RoleRequest;
 import uk.gov.hmcts.reform.civil.ras.model.RoleType;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 
@@ -33,6 +34,7 @@ public class RoleAssignmentInitialisationService {
     private final SystemUpdateUserConfiguration systemUserConfig;
     private final RoleAssignmentsService roleAssignmentService;
     private final UserService userService;
+    private final FeatureToggleService featureToggleService;
 
     @PostConstruct
     public void initialiseUserRolesOnStartUp() {
@@ -41,10 +43,12 @@ public class RoleAssignmentInitialisationService {
         } catch (Exception e) {
             log.error("Could not automatically create user role assignment", e);
         }
-        try {
-            assignCaseAllocatorToSystemUser(getSystemUserToken());
-        } catch (Exception e) {
-            log.error("Could not automatically create case allocator role assignment", e);
+        if (featureToggleService.isMintiEnabled()) {
+            try {
+                assignCaseAllocatorToSystemUser(getSystemUserToken());
+            } catch (Exception e) {
+                log.error("Could not automatically create case allocator role assignment", e);
+            }
         }
     }
 
@@ -79,7 +83,7 @@ public class RoleAssignmentInitialisationService {
                                  .process(SYSTEM_USER_PROCESS)
                                  .replaceExisting(true)
                                  .build())
-                .requestedRoles(createCivilSystemRoles(userId, "case-allocator")).build()
+                .requestedRoles(createAllocatedSystemRoles(userId, "CIVIL", "GENERALAPPLICATION")).build()
         );
         log.info("Assigned case allocator roles successfully");
     }
@@ -94,6 +98,20 @@ public class RoleAssignmentInitialisationService {
             .roleCategory(RoleCategory.SYSTEM)
             .roleName(roleName)
             .attributes(Map.of("jurisdiction", "CIVIL", "caseType", "CIVIL"))
+            .readOnly(false)
+            .build()).toList();
+    }
+
+    private List<RoleAssignment> createAllocatedSystemRoles(String userId, String... caseTypes) {
+        return Arrays.asList(caseTypes).stream().map(caseType -> RoleAssignment.builder()
+            .actorId(userId)
+            .actorIdType("IDAM")
+            .roleType(RoleType.ORGANISATION)
+            .classification("PUBLIC")
+            .grantType(GrantType.STANDARD)
+            .roleCategory(RoleCategory.SYSTEM)
+            .roleName("case-allocator")
+            .attributes(Map.of("jurisdiction", "CIVIL", "caseType", caseType))
             .readOnly(false)
             .build()).toList();
     }
