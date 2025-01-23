@@ -56,7 +56,6 @@ public class ClaimantNocOnlineDashboardNotificationHandler extends CallbackHandl
         ScenarioRequestParams params =
             ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
 
-
         dashboardApiClient.recordScenario(
             caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA6_DEFENDANT_NOTICE_OF_CHANGE_CLAIM_REMAINS_ONLINE_CLAIMANT.getScenario(),
