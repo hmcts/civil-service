@@ -55,6 +55,7 @@ public class LitigationFriendAddedNotificationHandler extends CallbackHandler im
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
+
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return new HashMap<>(Map.of(
