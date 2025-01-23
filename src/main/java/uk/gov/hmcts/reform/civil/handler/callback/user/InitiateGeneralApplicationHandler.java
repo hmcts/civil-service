@@ -113,7 +113,8 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (initiateGeneralApplicationService.caseContainsLiP(caseData)) {
-            if (!featureToggleService.isGaForLipsEnabled()) {
+            if (!featureToggleService.isGaForLipsEnabled()
+                || caseData.isRespondentResponseBilingual()) {
                 errors.add(LR_VS_LIP);
             } else if (!(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData
                                                               .getCaseManagementLocation().getBaseLocation()))) {
