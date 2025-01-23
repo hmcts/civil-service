@@ -91,7 +91,7 @@ class FeesPaymentServiceTest {
     @MockBean
     private AuthTokenGenerator authTokenGenerator;
 
-    private final String SERVICE_AUTH_TOKEN = "serviceAuthToken";
+    private static final String SERVICE_AUTH_TOKEN = "serviceAuthToken";
 
     @BeforeEach
     void before() {
