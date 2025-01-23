@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.docmosis.sdo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
@@ -59,7 +58,8 @@ public class SdoCoverLetterAppendService {
 
         log.info("Civil stitch service sdo cover letter response {} for caseId {}", mailableSdoDocument, caseId);
 
-        return getLetterContent(mailableSdoDocument, authorisation, caseId);
+        String errorMessage = "Failed getting letter content for document to mail for caseId {}";
+        return documentDownloadService.downloadDocument(mailableSdoDocument, authorisation, caseId.toString(), errorMessage);
     }
 
     private List<DocumentMetaData> appendSdoCoverToDocument(CaseDocument coverLetter, CaseDocument... caseDocuments) {
@@ -101,18 +101,5 @@ public class SdoCoverLetterAppendService {
                 caseId,
                 documentType,
                 authorisation);
-    }
-
-    private byte[] getLetterContent(CaseDocument mailableSdoDocument, String authorisation, Long caseId) {
-        byte[] letterContent;
-        try {
-            String documentUrl = mailableSdoDocument.getDocumentLink().getDocumentUrl();
-            String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
-            letterContent = documentDownloadService.downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
-        } catch (Exception e) {
-            log.error("Failed getting letter content for document to mail for caseId {}", caseId, e);
-            throw new DocumentDownloadException(mailableSdoDocument.getDocumentLink().getDocumentFileName(), e);
-        }
-        return letterContent;
     }
 }
