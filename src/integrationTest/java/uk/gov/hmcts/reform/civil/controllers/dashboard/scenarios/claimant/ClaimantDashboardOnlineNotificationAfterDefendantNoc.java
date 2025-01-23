@@ -46,13 +46,13 @@ public class ClaimantDashboardOnlineNotificationAfterDefendantNoc extends Dashbo
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT").andExpect(status().isOk()).andExpectAll(
             status().is(HttpStatus.OK.value()),
             jsonPath("$[0].titleEn").value(
-                "mr defendant has assigned a legal representative to act on their behalf"),
+                "Mr. Sole Trader has assigned a legal representative to act on their behalf"),
             jsonPath("$[0].descriptionEn").value(
                 "<p class=\"govuk-body\">You will now need to liaise with their legal representation.</p><p class=\"govuk-body\"><a href=\"{VIEW_INFO_ABOUT_DEFENDANT}\" class=\"govuk-link\">View the defendant legal representative contact details</a>. </p>"),
             jsonPath("$[0].titleCy").value(
-                "Mae mr defendant wedi neilltuo cynrychiolydd cyfreithiol i weithredu ar ei ran"),
+                "Mae Mr. Sole Trader wedi neilltuo cynrychiolydd cyfreithiol i weithredu ar ei ran"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">Bydd angen i chi nawr gysylltu â''u cynrychiolaeth gyfreithiol.</p><p class=\"govuk-body\"><a href=\"{VIEW_INFO_ABOUT_DEFENDANT}\" class=\"govuk-link\">Gweld manylion cyswllt cynrychiolydd cyfreithiol y diffynnydd</a>.</p>")
+                "<p class=\"govuk-body\">Bydd angen i chi nawr gysylltu â'u cynrychiolaeth gyfreithiol.</p><p class=\"govuk-body\"><a href=\"{VIEW_INFO_ABOUT_DEFENDANT}\" class=\"govuk-link\">Gweld manylion cyswllt cynrychiolydd cyfreithiol y diffynnydd</a>.</p>")
         );
     }
 }
