@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
@@ -286,6 +287,24 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @Test
+    void given_hearingNoticeDocumentIssuedForAutoHearingNotice_whenGetStatus_thenReturnHearingFormGenerated() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .hearingDate(LocalDate.now().plusDays(6 * 7 + 1))
+            .ccdState(CaseState.HEARING_READINESS)
+            .hearingDocuments(List.of(Element.<CaseDocument>builder().value(CaseDocument.builder()
+                                                                                .documentName("testDoc")
+                                                                                .build()).build()))
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+            claim, featureToggleService, Collections.singletonList(CaseEventDetail.builder()
+                                                                       .id(CaseEvent.GENERATE_HEARING_NOTICE_HMC.name())
+                                                                       .createdDate(LocalDateTime.now())
+                                                                       .build())));
+        assertThat(status).isEqualTo(DashboardClaimStatus.HEARING_FORM_GENERATED);
+    }
+
+    @Test
     void given_hearingNoticeDocumentIssuedAndRelisted_whenGetStatus_thenReturnHearingFormGeneratedRelisting() {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())
@@ -357,6 +376,22 @@ class CcdClaimStatusDashboardFactoryTest {
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .applicant1ResponseDate(LocalDateTime.now())
             .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+            claim, featureToggleService, Collections.emptyList()));
+        assertThat(status).isEqualTo(DashboardClaimStatus.WAITING_COURT_REVIEW);
+    }
+
+    @Test
+    void given_court_whenGetStatus_courtReview_when_claimantIntendsToProceedMinti() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .applicant1ResponseDate(LocalDateTime.now())
+            .responseClaimTrack(AllocatedTrack.INTERMEDIATE_CLAIM.name())
+            .applicant1ProceedWithClaim(YesOrNo.YES)
+            .build();
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService, Collections.emptyList()));
         assertThat(status).isEqualTo(DashboardClaimStatus.WAITING_COURT_REVIEW);
