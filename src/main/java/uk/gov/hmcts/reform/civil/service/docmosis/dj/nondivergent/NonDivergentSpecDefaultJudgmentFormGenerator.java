@@ -20,6 +20,7 @@ import java.util.List;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC_CLAIMANT_BILINGUAL;
 
 @Component
 @Slf4j
@@ -39,9 +40,9 @@ public class NonDivergentSpecDefaultJudgmentFormGenerator {
         return String.format(docmosisTemplate.getDocumentTitle(), caseData.getLegacyCaseReference());
     }
 
-    private DocmosisTemplates getDocmosisTemplate(String event) {
+    private DocmosisTemplates getDocmosisTemplate(String event, boolean isClaimantBilingual) {
         if (event.equals(GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT.name())) {
-            return N121_SPEC_CLAIMANT;
+            return isClaimantBilingual == true ? N121_SPEC_CLAIMANT_BILINGUAL : N121_SPEC_CLAIMANT;
         } else {
             return N121_SPEC_DEFENDANT;
         }
@@ -71,7 +72,7 @@ public class NonDivergentSpecDefaultJudgmentFormGenerator {
         for (int i = 0; i < defaultJudgmentForms.size(); i++) {
             DefaultJudgmentForm defaultJudgmentForm = defaultJudgmentForms.get(i);
             DocumentType documentType = getDocumentTypeBasedOnEvent(i, event);
-            DocmosisTemplates docmosisTemplate = getDocmosisTemplate(event);
+            DocmosisTemplates docmosisTemplate = getDocmosisTemplate(event, caseData.isClaimantBilingual());
             DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(defaultJudgmentForm,
                 docmosisTemplate);
             CaseDocument caseDocument = documentManagementService.uploadDocument(

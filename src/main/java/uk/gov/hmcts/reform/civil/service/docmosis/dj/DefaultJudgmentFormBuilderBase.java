@@ -51,27 +51,21 @@ public abstract class DefaultJudgmentFormBuilderBase {
         return debtAmount;
     }
 
-    protected String getRepaymentString(RepaymentFrequencyDJ repaymentFrequency) {
+    protected String getRepaymentString(RepaymentFrequencyDJ repaymentFrequency, boolean bilingual ) {
         switch (repaymentFrequency) {
-            case ONCE_ONE_WEEK:
-                return "each week";
-            case ONCE_ONE_MONTH:
-                return "each month";
-            case ONCE_TWO_WEEKS:
-                return "every 2 weeks";
+            case ONCE_ONE_WEEK : return bilingual ? "pob wythnos" : "each week";
+            case ONCE_ONE_MONTH: return bilingual ? "pob mis" : "each month";
+            case ONCE_TWO_WEEKS: return bilingual  ? "pob 2 wythnos" : "every 2 weeks";
             default:
                 return null;
         }
     }
 
-    protected String getRepaymentFrequency(RepaymentFrequencyDJ repaymentFrequencyDJ) {
+    protected String getRepaymentFrequency(RepaymentFrequencyDJ repaymentFrequencyDJ, boolean bilingual) {
         switch (repaymentFrequencyDJ) {
-            case ONCE_ONE_WEEK:
-                return "per week";
-            case ONCE_ONE_MONTH:
-                return "per month";
-            case ONCE_TWO_WEEKS:
-                return "every 2 weeks";
+            case ONCE_ONE_WEEK : return bilingual ?  "yr wythnos" : "per week";
+            case ONCE_ONE_MONTH: return bilingual ?  "y mis" : "per month";
+            case ONCE_TWO_WEEKS: return bilingual ?  "pob 2 wythnos" : "every 2 weeks";
             default:
                 return null;
         }

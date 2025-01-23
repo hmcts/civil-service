@@ -55,8 +55,10 @@ public class NonDivergentSpecDefaultJudgementFormBuilder extends DefaultJudgment
             .paymentPlan(caseData.getPaymentTypeSelection().name())
             .payByDate(Objects.isNull(caseData.getPaymentSetDate()) ? null :
                 DateFormatHelper.formatLocalDate(caseData.getPaymentSetDate(), DateFormatHelper.DATE))
-            .repaymentFrequency(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentFrequency(caseData.getRepaymentFrequency()))
-            .paymentStr(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentString(caseData.getRepaymentFrequency()))
+            .repaymentFrequency(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentFrequency(
+                caseData.getRepaymentFrequency(),caseData.isClaimantBilingual()))
+            .paymentStr(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentString(
+                caseData.getRepaymentFrequency(),caseData.isClaimantBilingual()))
             .installmentAmount(Objects.isNull(caseData.getRepaymentSuggestion()) ? null : getInstallmentAmount(caseData.getRepaymentSuggestion()))
             .repaymentDate(Objects.isNull(caseData.getRepaymentDate()) ? null :
                 DateFormatHelper.formatLocalDate(caseData.getRepaymentDate(), DateFormatHelper.DATE));
