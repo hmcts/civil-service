@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.math.BigDecimal;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -26,7 +27,6 @@ public class ClaimantDashboardOnlineNotificationAfterDefendantNoc extends Dashbo
     @Test
     void should_create_online_notification_after_defendant_noc() throws Exception {
         String caseId = "15673456";
-
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
             .toBuilder()
@@ -38,7 +38,7 @@ public class ClaimantDashboardOnlineNotificationAfterDefendantNoc extends Dashbo
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.YES)
             .build();
-
+        when(featureToggleService.isDefendantNoCOnlineForCase(caseData)).thenReturn(true);
         //When
         claimantNocOnlineDashboardNotificationHandler.handle(callbackParams(caseData));
 
