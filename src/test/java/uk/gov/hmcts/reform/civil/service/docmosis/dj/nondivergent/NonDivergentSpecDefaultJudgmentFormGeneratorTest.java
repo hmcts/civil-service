@@ -257,7 +257,6 @@ class NonDivergentSpecDefaultJudgmentFormGeneratorTest {
         when(interestCalculator.calculateInterest(any(CaseData.class)))
             .thenReturn(new BigDecimal(10));
 
-
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
             .totalClaimAmount(new BigDecimal(2000))
             .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)

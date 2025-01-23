@@ -51,7 +51,7 @@ public abstract class DefaultJudgmentFormBuilderBase {
         return debtAmount;
     }
 
-    protected String getRepaymentString(RepaymentFrequencyDJ repaymentFrequency, boolean bilingual ) {
+    protected String getRepaymentString(RepaymentFrequencyDJ repaymentFrequency, boolean bilingual) {
         switch (repaymentFrequency) {
             case ONCE_ONE_WEEK : return bilingual ? "pob wythnos" : "each week";
             case ONCE_ONE_MONTH: return bilingual ? "pob mis" : "each month";
