@@ -14,9 +14,9 @@ public abstract class EmailNotification {
                     emailTO.getApplicantRef());
     }
 
-    public void notifyRespondentSolicitor1(EmailTO emailOneVOneTO) {
-        if (!emailOneVOneTO.getCaseData().getRespondentSolicitor1EmailAddress().isBlank())
-            notificationService.sendMail(emailOneVOneTO.getApplicantSol1Email(), emailOneVOneTO.getEmailTemplate(), emailOneVOneTO.getApplicantSol1Params(),
-                    emailOneVOneTO.getApplicantRef());
+    public void notifyRespondentSolicitor1(EmailTO emailTO) {
+        if (!emailTO.getCaseData().getRespondentSolicitor1EmailAddress().isBlank())
+            notificationService.sendMail(emailTO.getApplicantSol1Email(), emailTO.getEmailTemplate(), emailTO.getApplicantSol1Params(),
+                    emailTO.getApplicantRef());
     }
 }
