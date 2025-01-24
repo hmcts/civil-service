@@ -272,6 +272,42 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldPopulateHmcEaCourtLocation_whenLiPAndHmcLipEnabled() {
+
+            when(featureToggleService.isHmcForLipEnabled()).thenReturn(true);
+            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
+            when(courtLocationUtils.findPreferredLocationData(any(), any()))
+                .thenReturn(LocationRefData.builder().siteName("")
+                                .epimmsId("222")
+                                .siteName("Site 2").courtAddress("Adr 2").postcode("BBB 222")
+                                .courtLocationCode("other code").build());
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .caseManagementLocation(CaseLocationCivil.builder()
+                                            .region("2")
+                                            .baseLocation("111")
+                                            .build())
+                .transferCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
+                                                                           .label("Site 1 - Adr 1 - AAA 111").build()).build()).build();
+
+            CallbackParams params = callbackParamsOf(caseData.toBuilder()
+                                                         .applicant1Represented(YesOrNo.NO)
+                                                         .respondent1Represented(YesOrNo.NO)
+                                                         .build(), ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            assertEquals(YES, responseCaseData.getHmcEaCourtLocation());
+
+            params = callbackParamsOf(caseData.toBuilder()
+                                          .respondent1Represented(YesOrNo.NO)
+                                          .build(), ABOUT_TO_SUBMIT);
+            response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            assertEquals(YES, responseCaseData.getHmcEaCourtLocation());
+        }
+
+        @Test
         void shouldPopulateWhiteListing_whenNationalRolloutEnabled() {
             given(courtLocationUtils.findPreferredLocationData(any(), any()))
                 .willReturn(LocationRefData.builder().siteName("")
