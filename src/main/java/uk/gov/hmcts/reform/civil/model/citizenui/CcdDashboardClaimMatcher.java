@@ -218,7 +218,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public Optional<LocalDateTime> getWhenWasHearingScheduled() {
-        return getMostRecentEventOfType(EnumSet.of(CaseEvent.HEARING_SCHEDULED))
+        return getMostRecentEventOfType(EnumSet.of(CaseEvent.HEARING_SCHEDULED, CaseEvent.GENERATE_HEARING_NOTICE_HMC))
             .map(CaseEventDetail::getCreatedDate);
     }
 
@@ -266,6 +266,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
             && hearingDate.isPresent()
             && YesOrNo.YES.equals(caseData.getTrialReadyNotified())
             && isHearingLessThanDaysAway(DAY_LIMIT)
+            && Objects.isNull(caseData.getTrialReadyChecked())
             && !isBundleCreatedStatusActive()) {
             Optional<LocalDateTime> lastOrder = getTimeOfLastNonSDOOrder();
             return lastOrder.isEmpty()

@@ -98,6 +98,9 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
+import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
+import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
+import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
 import uk.gov.hmcts.reform.civil.model.sendandreply.MessageReply;
@@ -335,7 +338,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<TimelineOfEvents> specResponseTimelineOfEvents;
     private final List<TimelineOfEvents> specResponseTimelineOfEvents2;
     private final TimelineUploadTypeSpec specClaimResponseTimelineList;
-    private final ResponseDocument specResponseTimelineDocumentFiles;
+    private final Document specResponseTimelineDocumentFiles;
     private final List<Evidence> specResponselistYourEvidenceList;
     private final List<Evidence> specResponselistYourEvidenceList2;
 
@@ -685,7 +688,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo joShowRegisteredWithRTLOption;
     private JudgmentDetails activeJudgment;
     private List<Element<JudgmentDetails>> historicJudgment;
-    private YesOrNo isTakenOfflineAfterJBA;
     private LocalDateTime joSetAsideCreatedDate;
 
     private String joDefendantName1;
@@ -705,6 +707,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private String joTotalAmount;
     private YesOrNo joIsDisplayInJudgmentTab;
     private String joRepaymentSummaryObject;
+    private YesOrNo respondForImmediateOption;
 
     private final TransferCaseDetails transferCaseDetails;
 
@@ -771,6 +774,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private Message lastMessage;
     private String lastMessageAllocatedTrack;
     private String lastMessageJudgeLabel;
+
+    //QueryManagement
+    private final CaseQueriesCollection qmApplicantSolicitorQueries;
+    private final CaseQueriesCollection qmRespondentSolicitor1Queries;
+    private final CaseQueriesCollection qmRespondentSolicitor2Queries;
+    private final CaseMessage caseMessage;
+    private final LatestQuery qmLatestQuery;
+
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
