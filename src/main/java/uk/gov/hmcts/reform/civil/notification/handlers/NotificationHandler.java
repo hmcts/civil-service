@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
-import lombok.NoArgsConstructor;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import java.util.Map;
 import java.util.Set;
 
-@NoArgsConstructor(force = true)
+@Component
 public abstract class NotificationHandler {
 
     protected static final String REFERENCE_TEMPLATE_APPLICANT = "litigation-friend-added-applicant-notification-%s";
@@ -19,6 +19,14 @@ public abstract class NotificationHandler {
     protected final NotificationsProperties notificationsProperties;
     protected final OrganisationService organisationService;
     protected final SimpleStateFlowEngine stateFlowEngine;
+
+    protected NotificationHandler(NotificationService notificationService, NotificationsProperties notificationsProperties,
+                               OrganisationService organisationService, SimpleStateFlowEngine stateFlowEngine) {
+        this.notificationService = notificationService;
+        this.notificationsProperties = notificationsProperties;
+        this.organisationService = organisationService;
+        this.stateFlowEngine = stateFlowEngine;
+    }
 
     protected void sendNotification(Set<EmailDTO> recipients) {
         for (EmailDTO recipient : recipients) {
