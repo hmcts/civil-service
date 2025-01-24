@@ -51,21 +51,21 @@ public abstract class DefaultJudgmentFormBuilderBase {
         return debtAmount;
     }
 
-    protected String getRepaymentString(RepaymentFrequencyDJ repaymentFrequency, boolean bilingual) {
+    protected String getRepaymentString(RepaymentFrequencyDJ repaymentFrequency, boolean isWelsh) {
         switch (repaymentFrequency) {
-            case ONCE_ONE_WEEK : return bilingual ? "pob wythnos" : "each week";
-            case ONCE_ONE_MONTH: return bilingual ? "pob mis" : "each month";
-            case ONCE_TWO_WEEKS: return bilingual  ? "pob 2 wythnos" : "every 2 weeks";
+            case ONCE_ONE_WEEK : return isWelsh ? "pob wythnos" : "each week";
+            case ONCE_ONE_MONTH: return isWelsh ? "pob mis" : "each month";
+            case ONCE_TWO_WEEKS: return isWelsh  ? "pob 2 wythnos" : "every 2 weeks";
             default:
                 return null;
         }
     }
 
-    protected String getRepaymentFrequency(RepaymentFrequencyDJ repaymentFrequencyDJ, boolean bilingual) {
+    protected String getRepaymentFrequency(RepaymentFrequencyDJ repaymentFrequencyDJ, boolean isWelsh) {
         switch (repaymentFrequencyDJ) {
-            case ONCE_ONE_WEEK : return bilingual ?  "yr wythnos" : "per week";
-            case ONCE_ONE_MONTH: return bilingual ?  "y mis" : "per month";
-            case ONCE_TWO_WEEKS: return bilingual ?  "pob 2 wythnos" : "every 2 weeks";
+            case ONCE_ONE_WEEK : return isWelsh ?  "yr wythnos" : "per week";
+            case ONCE_ONE_MONTH: return isWelsh ?  "y mis" : "per month";
+            case ONCE_TWO_WEEKS: return isWelsh ?  "pob 2 wythnos" : "every 2 weeks";
             default:
                 return null;
         }

@@ -30,9 +30,9 @@ public class NonImmediatePaymentTypeDefaultJudgmentFormBuilder extends DefaultJu
             .payByDate(Objects.isNull(caseData.getPaymentSetDate()) ? null :
                 DateFormatHelper.formatLocalDate(caseData.getPaymentSetDate(), DateFormatHelper.DATE))
             .repaymentFrequency(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentFrequency(caseData.getRepaymentFrequency(),
-                                                                                                                caseData.isClaimantBilingual()))
+                                                                                                                false))
             .paymentStr(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentString(caseData.getRepaymentFrequency(),
-                                                                                                     caseData.isClaimantBilingual()))
+                                                                                                     false))
             .installmentAmount(Objects.isNull(caseData.getRepaymentSuggestion()) ? null : getInstallmentAmount(caseData.getRepaymentSuggestion()))
             .repaymentDate(Objects.isNull(caseData.getRepaymentDate()) ? null :
                 DateFormatHelper.formatLocalDate(caseData.getRepaymentDate(), DateFormatHelper.DATE))
