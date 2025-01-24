@@ -12,18 +12,19 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.claimantresponse.JudgmentByAdmissionOrDetermination;
 import uk.gov.hmcts.reform.civil.model.docmosis.claimantresponse.JudgmentByAdmissionOrDeterminationMapper;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
+import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.CCJ_REQUEST_ADMISSION;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.CCJ_REQUEST_DETERMINATION;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGMENT_BY_ADMISSION_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGMENT_BY_ADMISSION_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.*;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingDetailsMapper.isWelshHearingSelected;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_ADMISSION_OR_DETERMINATION;
 
@@ -35,6 +36,7 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator imple
     private final JudgmentByAdmissionOrDeterminationMapper judgmentByAdmissionOrDeterminationMapper;
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
+    private final CivilStitchService civilStitchService;
     private final AssignCategoryId assignCategoryId;
 
     public CaseDocument generate(CaseEvent caseEvent, CaseData caseData, String authorisation) {
@@ -86,26 +88,33 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator imple
 
     public List<CaseDocument> generateNonDivergentDocs(CaseData caseData, String authorisation, CaseEvent caseEvent) {
         List<CaseDocument> list = new ArrayList<>();
+
+        JudgmentByAdmissionOrDetermination templateData = getTemplateDataForNonDivergentDocs(caseData);
+        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
+            templateData,
+            getTemplateName(caseEvent, false)
+        );
+        CaseDocument engDocument = documentManagementService.uploadDocument(
+            authorisation,
+            new PDF(
+                getTemplateName(caseEvent, false).getDocumentTitle(),
+                docmosisDocument.getBytes(),
+                getDocumentType(caseEvent)
+            )
+        );
+        CaseDocument uploadedDocument = engDocument;
         if (caseData.isClaimantBilingual() || isWelshHearingSelected(caseData) || caseData.isRespondentResponseBilingual()) {
-            CaseDocument uploadedWelshDocument = generateNonDivergentWelshDocs(caseData, authorisation, caseEvent);
-            assignCategoryId.assignCategoryIdToCaseDocument(uploadedWelshDocument, "judgments");
-            list.add(uploadedWelshDocument);
-        } else {
-            DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
-                getTemplateDataForNonDivergentDocs(caseData),
-                getTemplateName(caseEvent, false)
-            );
-            CaseDocument uploadedDocument = documentManagementService.uploadDocument(
+            uploadedDocument = generateNonDivergentWelshDocs(
+                caseData,
                 authorisation,
-                new PDF(
-                    getTemplateName(caseEvent, false).getDocumentTitle(),
-                    docmosisDocument.getBytes(),
-                    getDocumentType(caseEvent)
-                )
+                caseEvent,
+                templateData,
+                engDocument
             );
-            assignCategoryId.assignCategoryIdToCaseDocument(uploadedDocument, "judgments");
-            list.add(uploadedDocument);
         }
+        assignCategoryId.assignCategoryIdToCaseDocument(uploadedDocument, "judgments");
+        list.add(uploadedDocument);
+
         return list;
     }
 
@@ -113,8 +122,8 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator imple
         return judgmentByAdmissionOrDeterminationMapper.toNonDivergentDocs(caseData);
     }
 
-    private CaseDocument generateNonDivergentWelshDocs(CaseData caseData, String authorisation, CaseEvent caseEvent) {
-        JudgmentByAdmissionOrDetermination templateData = getTemplateDataForNonDivergentDocs(caseData);
+    private CaseDocument generateNonDivergentWelshDocs(CaseData caseData, String auth, CaseEvent caseEvent,
+                                                       JudgmentByAdmissionOrDetermination templateData, CaseDocument englishDoc) {
         JudgmentByAdmissionOrDetermination welshTemplateData =
             judgmentByAdmissionOrDeterminationMapper.toNonDivergentWelshDocs(caseData, templateData);
 
@@ -123,13 +132,41 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator imple
             getTemplateName(caseEvent, true)
         );
 
-        return documentManagementService.uploadDocument(
-            authorisation,
+        CaseDocument welshCaseDoc = documentManagementService.uploadDocument(
+            auth,
             new PDF(
                 getTemplateName(caseEvent, true).getDocumentTitle(),
                 welshDocument.getBytes(),
                 getDocumentType(caseEvent)
             )
         );
+
+        List<DocumentMetaData> documentMetaDataList = appendWelshDocToDocument(englishDoc, welshCaseDoc);
+        Long caseId = caseData.getCcdCaseReference();
+        return civilStitchService.generateStitchedCaseDocument(
+            documentMetaDataList,
+            welshCaseDoc.getDocumentName(),
+            caseId,
+            getDocumentType(caseEvent),
+            auth
+        );
+    }
+
+    private List<DocumentMetaData> appendWelshDocToDocument(CaseDocument englishDoc, CaseDocument... welshDocuments) {
+        List<DocumentMetaData> documentMetaDataList = new ArrayList<>();
+
+        documentMetaDataList.add(new DocumentMetaData(
+            englishDoc.getDocumentLink(),
+            "Welsh Document",
+            LocalDate.now().toString()
+        ));
+
+        Arrays.stream(welshDocuments).forEach(caseDocument -> documentMetaDataList.add(new DocumentMetaData(
+            caseDocument.getDocumentLink(),
+            "Welsh Doc to attach",
+            LocalDate.now().toString()
+        )));
+
+        return documentMetaDataList;
     }
 }
