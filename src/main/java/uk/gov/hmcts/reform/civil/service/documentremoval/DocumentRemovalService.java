@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocumentToKeep;
@@ -36,6 +37,9 @@ public class DocumentRemovalService {
     private final ObjectMapper objectMapper;
     private final DocumentManagementService documentManagementService;
 
+    @Value("${docStore.doc.removal.enabled:false}")
+    private final  Boolean docStoreRemovalEnabled;
+
     public List<DocumentToKeepCollection> getCaseDocumentsList(CaseData caseData) {
         JsonNode root = objectMapper.valueToTree(caseData);
         List<JsonNode> documentNodes = new ArrayList<>();
@@ -55,9 +59,11 @@ public class DocumentRemovalService {
 
         log.info(format("Beginning removal of %s document from Case ID %s", documentsUserWantsDeletedList.size(), caseId));
 
-        documentsUserWantsDeletedList.forEach(documentToDeleteCollection ->
-            deleteDocument(
-                documentToDeleteCollection.getValue(), userAuthorisation));
+        if (docStoreRemovalEnabled) {
+            documentsUserWantsDeletedList.forEach(documentToDeleteCollection ->
+                deleteDocument(
+                    documentToDeleteCollection.getValue(), userAuthorisation));
+        }
 
         JsonNode caseDataJson = objectMapper.valueToTree(caseData);
 
@@ -102,12 +108,12 @@ public class DocumentRemovalService {
                     .value(DocumentToKeep.builder()
                         .documentId(docId)
                         .caseDocumentToKeep(CaseDocumentToKeep.builder()
-                                .documentFilename(documentNode.get(DOCUMENT_FILENAME).asText())
-                                .documentUrl(documentNode.get(DOCUMENT_URL).asText())
-                                .documentBinaryUrl(documentNode.get(DOCUMENT_BINARY_URL).asText())
-                                .uploadTimestamp(getUploadTimestampFromDocumentNode(documentNode))
-                                .build())
+                            .documentFilename(documentNode.get(DOCUMENT_FILENAME).asText())
+                            .documentUrl(documentNode.get(DOCUMENT_URL).asText())
+                            .documentBinaryUrl(documentNode.get(DOCUMENT_BINARY_URL).asText())
+                            .uploadTimestamp(getUploadTimestampFromDocumentNode(documentNode))
                             .build())
+                        .build())
                     .build());
         }
 
@@ -206,7 +212,6 @@ public class DocumentRemovalService {
         try {
             log.info(String.format("Deleting doc from DocStore with url %s",
                 documentUrl));
-
             documentManagementService.deleteDocument(authorisationToken, documentUrl);
         } catch (Exception e) {
             log.error(format(

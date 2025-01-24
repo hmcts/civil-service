@@ -60,7 +60,7 @@ class DocumentRemovalServiceTest {
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .build();
-        documentRemovalService = new DocumentRemovalService(objectMapper, documentManagementService);
+        documentRemovalService = new DocumentRemovalService(objectMapper, documentManagementService, false);
     }
 
     private CaseDocument buildCaseDocument(String url, String fileName, String binaryUrl, String uploadTimeStamp) {

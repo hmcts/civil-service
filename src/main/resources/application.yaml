@@ -215,6 +215,11 @@ dashboard:
   api:
     url: http://localhost:4000
 
+docStore:
+  doc:
+    removal:
+      enabled: ${DOCSTORE_DOC_REMOVAL_ENABLED:false}
+
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
   breathingSpaceEnterApplicantEmailTemplate: "d89ce52e-c943-4bee-aa2e-24ff05d7d1e5"
