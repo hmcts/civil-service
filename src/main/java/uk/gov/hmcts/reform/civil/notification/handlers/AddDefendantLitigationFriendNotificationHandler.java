@@ -57,7 +57,7 @@ public class AddDefendantLitigationFriendNotificationHandler extends Notificatio
         return EmailDTO.builder()
                 .targetEmail(caseData.getApplicantSolicitor1UserDetails().getEmail())
                 .emailTemplate(notificationsProperties.getSolicitorLitigationFriendAdded())
-                .parameters(addProperties(caseData))
+                .parameters(properties)
                 .reference(String.format(REFERENCE_TEMPLATE_APPLICANT, caseData.getLegacyCaseReference()))
                 .build();
     }
@@ -80,7 +80,7 @@ public class AddDefendantLitigationFriendNotificationHandler extends Notificatio
         return EmailDTO.builder()
                         .targetEmail(caseData.getRespondentSolicitor1EmailAddress())
                         .emailTemplate(notificationsProperties.getSolicitorLitigationFriendAdded())
-                        .parameters(addProperties(caseData))
+                        .parameters(properties)
                         .reference(String.format(REFERENCE_TEMPLATE_RESPONDENT, caseData.getLegacyCaseReference()))
                         .build();
     }
