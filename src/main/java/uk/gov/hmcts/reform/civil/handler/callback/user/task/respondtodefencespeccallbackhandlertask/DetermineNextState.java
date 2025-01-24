@@ -51,7 +51,7 @@ public class DetermineNextState  {
                 nextState = result.getLeft();
                 businessProcess = result.getRight();
             } else if (isDefenceAdmitPayImmediately(caseData)) {
-                nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
+                nextState = getNextState(caseData);
             } else if (caseData.hasApplicantRejectedRepaymentPlan()) {
                 nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
             } else if (isClaimNotSettled(caseData)) {
@@ -100,6 +100,14 @@ public class DetermineNextState  {
             && IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
     }
 
+    private String getNextState(CaseData caseData) {
+        if ((caseData.isFullAdmitClaimSpec() && caseData.getApplicant1ProceedWithClaim() == null)
+            || (caseData.isPartAdmitImmediatePaymentClaimSettled())) {
+            return CaseState.AWAITING_APPLICANT_INTENTION.name();
+        }
+        return CaseState.All_FINAL_ORDERS_ISSUED.name();
+    }
+
     private static boolean isClaimNotSettled(CaseData caseData) {
         return caseData.isClaimantNotSettlePartAdmitClaim()
             && ((caseData.hasClaimantNotAgreedToFreeMediation()
@@ -118,8 +126,7 @@ public class DetermineNextState  {
                                                BusinessProcess businessProcess) {
         String nextState;
         if (featureToggleService.isJudgmentOnlineLive()
-            && (caseData.isPayByInstallment() || caseData.isPayBySetDate())
-            && caseData.isLRvLipOneVOne()) {
+            && (caseData.isPayByInstallment() || caseData.isPayBySetDate())) {
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             businessProcess = BusinessProcess.ready(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC);
         } else {
@@ -130,7 +137,6 @@ public class DetermineNextState  {
             builder.activeJudgment(activeJudgment);
             builder.joIsLiveJudgmentExists(YesOrNo.YES);
             builder.joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment));
-            builder.isTakenOfflineAfterJBA(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name().equals(nextState) ? YesOrNo.YES : YesOrNo.NO);
         }
 
         return Pair.of(nextState, businessProcess);
