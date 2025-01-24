@@ -364,7 +364,7 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
     }
 
     @Nested
-    class SkipEmailNotification {
+    class SkipNotifyParties {
 
         @Test
         void shouldNotSendEmailWhenNotifyingFormerSolForLip() {

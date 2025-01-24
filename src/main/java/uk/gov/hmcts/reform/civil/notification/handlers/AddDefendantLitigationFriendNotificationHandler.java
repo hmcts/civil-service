@@ -5,6 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,8 +25,29 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganiza
 @RequiredArgsConstructor
 public class AddDefendantLitigationFriendNotificationHandler extends NotificationHandler implements NotificationData {
 
+    protected NotificationService notificationService;
+    protected NotificationsProperties notificationsProperties;
+    protected OrganisationService organisationService;
+    protected IStateFlowEngine stateFlowEngine;
+
     protected static final String REFERENCE_TEMPLATE_APPLICANT = "litigation-friend-added-applicant-notification-%s";
     protected static final String REFERENCE_TEMPLATE_RESPONDENT = "litigation-friend-added-respondent-notification-%s";
+
+    @Override
+    protected void sendNotification(Set<EmailDTO> recipients) {
+        for (EmailDTO recipient : recipients) {
+            notificationService.sendMail(recipient.getTargetEmail(), recipient.getEmailTemplate(), recipient.getParameters(),
+                    recipient.getReference());
+        }
+    }
+
+    @Override
+    public Map<String, String> addProperties(CaseData caseData) {
+        return new HashMap<>(Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+        ));
+    }
 
     @Override
     public void notifyParties(CaseData caseData) {
@@ -69,13 +94,5 @@ public class AddDefendantLitigationFriendNotificationHandler extends Notificatio
                         .parameters(addProperties(caseData))
                         .reference(String.format(REFERENCE_TEMPLATE_RESPONDENT, caseData.getLegacyCaseReference()))
                         .build();
-    }
-
-    @Override
-    public Map<String, String> addProperties(CaseData caseData) {
-        return new HashMap<>(Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
-        ));
     }
 }
