@@ -81,7 +81,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private final FeatureToggleService toggleService;
     private final DefaultJudgmentOnlineMapper djOnlineMapper;
     private final CaseDetailsConverter caseDetailsConverter;
-    BigDecimal theOverallTotal;
     private final Time time;
     private final FeatureToggleService featureToggleService;
 
@@ -341,9 +340,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
-        StringBuilder repaymentBreakdown = buildRepaymentBreakdown(
-            caseData,
-            callbackParams);
+        StringBuilder repaymentBreakdown = buildRepaymentBreakdown(caseData, callbackParams);
 
         caseDataBuilder.repaymentSummaryObject(repaymentBreakdown.toString());
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -352,17 +349,17 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     @NotNull
-    private StringBuilder buildRepaymentBreakdown(CaseData caseData, CallbackParams callbackParams) {
+    private StringBuilder buildRepaymentBreakdown(CaseData caseData,
+                                                  CallbackParams callbackParams) {
 
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         Fee claimfee = caseData.getClaimFee();
         BigDecimal claimFeePounds = JudgmentsOnlineHelper.getClaimFeePounds(caseData, claimfee);
         BigDecimal fixedCost = getFixedCosts(caseData, interestCalculator);
-        BigDecimal partialPaymentPounds = getPartialPayment(caseData);
         //calculate the relevant total, total claim value + interest if any, claim fee for case,
         // and subtract any partial payment
-        BigDecimal subTotal = getSubTotal(caseData, interest, claimFeePounds, fixedCost);
-        theOverallTotal = calculateOverallTotal(partialPaymentPounds, subTotal);
+        BigDecimal theOverallTotal = calculateOverallTotal(caseData, interest, claimFeePounds, fixedCost);
+
         //creates  the text on the page, based on calculated values
         StringBuilder repaymentBreakdown = new StringBuilder();
         if (caseData.isLRvLipOneVOne()
@@ -394,16 +391,38 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             repaymentBreakdown.append("\n ### Fixed cost amount \n").append("£").append(fixedCost.setScale(2));
         }
         repaymentBreakdown.append("\n").append("### Claim fee amount \n £").append(claimFeePounds.setScale(2)).append(
-                "\n ## Subtotal \n £").append(subTotal.setScale(2))
+                "\n ## Subtotal \n £").append(getSubTotal(caseData, interest, claimFeePounds, fixedCost).setScale(2))
             .append("\n");
 
         if (caseData.getPartialPayment() == YesOrNo.YES) {
             repaymentBreakdown.append("\n ### Amount already paid \n").append("£").append(
-                partialPaymentPounds.setScale(2));
+                getPartialPayment(caseData).setScale(2));
         }
 
         repaymentBreakdown.append("\n ## Total still owed \n £").append(theOverallTotal.setScale(2));
         return repaymentBreakdown;
+    }
+
+    private BigDecimal calculateOverallTotal(CaseData caseData,
+                                             BigDecimal interest,
+                                             BigDecimal claimFeePounds,
+                                             BigDecimal fixedCost) {
+
+        BigDecimal partialPaymentPounds = getPartialPayment(caseData);
+        //calculate the relevant total, total claim value + interest if any, claim fee for case,
+        // and subtract any partial payment
+        var subTotal = caseData.getTotalClaimAmount()
+            .add(interest)
+            .add(claimFeePounds);
+        if (caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.YES) {
+            subTotal = subTotal.add(fixedCost);
+        }
+        BigDecimal theOverallTotal = subTotal.subtract(partialPaymentPounds);
+        return theOverallTotal;
+    }
+
+    private BigDecimal calculateOverallTotal(BigDecimal partialPaymentPounds, BigDecimal subTotal) {
+        return subTotal.subtract(partialPaymentPounds);
     }
 
     private BigDecimal getFixedCosts(CaseData caseData, InterestCalculator interestCalculator) {
@@ -449,10 +468,23 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         String formattedDeadline = formatLocalDateTime(LocalDateTime.now().plusDays(30), DATE);
         caseDataBuilder.currentDatebox(formattedDeadline);
         //set the calculated repayment owed
+        BigDecimal theOverallTotal = getOverallTotal(caseData);
         caseDataBuilder.repaymentDue(theOverallTotal.toString());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    @NotNull
+    private BigDecimal getOverallTotal(CaseData caseData) {
+        BigDecimal interest = interestCalculator.calculateInterest(caseData);
+        Fee claimfee = caseData.getClaimFee();
+        BigDecimal claimFeePounds = JudgmentsOnlineHelper.getClaimFeePounds(caseData, claimfee);
+        BigDecimal fixedCost = getFixedCosts(caseData, interestCalculator);
+        //calculate the relevant total, total claim value + interest if any, claim fee for case,
+        // and subtract any partial payment
+        BigDecimal theOverallTotal = calculateOverallTotal(caseData, interest, claimFeePounds, fixedCost);
+        return theOverallTotal;
     }
 
     private CallbackResponse repaymentValidate(CallbackParams callbackParams) {
@@ -508,10 +540,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(nextState)
             .build();
-    }
-
-    private BigDecimal calculateOverallTotal(BigDecimal partialPaymentPounds, BigDecimal subTotal) {
-        return subTotal.subtract(partialPaymentPounds);
     }
 
     private BigDecimal calculateJudgmentAmountForFixedCosts(CaseData caseData) {
