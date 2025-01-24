@@ -1,10 +1,13 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,10 +19,16 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesRefe
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
-@Service
+@Component
 @Slf4j
-@RequiredArgsConstructor
 public class AddDefendantLitigationFriendNotificationHandler extends NotificationHandler implements NotificationData {
+
+    public AddDefendantLitigationFriendNotificationHandler(NotificationService notificationService,
+                                                           NotificationsProperties notificationsProperties,
+                                                           OrganisationService organisationService,
+                                                           SimpleStateFlowEngine stateFlowEngine) {
+        super(notificationService, notificationsProperties, organisationService, stateFlowEngine);
+    }
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
