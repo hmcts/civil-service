@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseDataParent;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -156,6 +157,14 @@ public class FlowPredicate {
         if (scenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
             return respondent1ResponseReceived && caseData.getRespondent2ResponseDate() != null;
         }
+
+        //to protect against NoC scenarios where defendant solicitor is initially only representing one def when
+        //responding to defence then becomes solicitor to both defs
+        //respondentResponseIsSame is mandatory in 1v2 1 legal rep scenarios and can't be written otherwise
+        if (scenario == MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP && caseData.getRespondentResponseIsSame() == null) {
+            return respondent1ResponseReceived && caseData.getRespondent2ResponseDate() != null;
+        }
+
         return respondent1ResponseReceived;
     }
 
