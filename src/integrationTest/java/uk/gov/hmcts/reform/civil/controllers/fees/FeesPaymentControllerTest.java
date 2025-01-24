@@ -6,17 +6,20 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.client.CardPaymentClient;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
+import uk.gov.hmcts.reform.civil.model.payments.CurrencyCode;
+import uk.gov.hmcts.reform.civil.model.payments.PaymentDto;
+import uk.gov.hmcts.reform.civil.model.payments.StatusHistoryDto;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.UpdatePaymentStatusService;
 import uk.gov.hmcts.reform.payments.client.PaymentsClient;
-import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
-import uk.gov.hmcts.reform.payments.client.models.StatusHistoryDto;
 import uk.gov.hmcts.reform.payments.request.CardPaymentServiceRequestDTO;
 import uk.gov.hmcts.reform.payments.response.CardPaymentServiceRequestResponse;
 
@@ -42,13 +45,18 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
         .returnUrl("http://localhost:3001/hearing-payment-confirmation/1701090368574910")
         .language("En")
         .amount(new BigDecimal("232.00")).currency("GBP").build();
+    protected static final String SERVICE_AUTH_TOKEN = "serviceAuthToken";
 
     @MockBean
     private PaymentsClient paymentsClient;
     @MockBean
+    private CardPaymentClient cardPaymentClient;
+    @MockBean
     private CoreCaseDataService coreCaseDataService;
     @MockBean
     private UpdatePaymentStatusService updatePaymentStatusService;
+    @MockBean
+    private AuthTokenGenerator authTokenGenerator;
 
     @BeforeEach
     void before() {
@@ -63,6 +71,7 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
             )).build();
 
         when(coreCaseDataService.getCase(1701090368574910L)).thenReturn(expectedCaseDetails);
+        when(authTokenGenerator.generate()).thenReturn(SERVICE_AUTH_TOKEN);
     }
 
     @Test
@@ -86,7 +95,7 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     void shouldReturnServiceRequestPaymentStatus(String status) {
         PaymentDto response = buildGovPayCardPaymentStatusResponse(status);
-        when(paymentsClient.getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN))
+        when(cardPaymentClient.retrieveCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN, SERVICE_AUTH_TOKEN))
             .thenReturn(response);
         doGet(BEARER_TOKEN, FEES_PAYMENT_STATUS_URL, HEARING.name(), "123", "RC-1701-0909-0602-0418")
             .andExpect(content().json(toJson(expectedResponse(status))))
@@ -98,7 +107,7 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     void shouldReturnServiceRequestPaymentStatusWhenExceptionInCaseDataUpdate(String status) {
         PaymentDto response = buildGovPayCardPaymentStatusResponse(status);
-        when(paymentsClient.getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN))
+        when(cardPaymentClient.retrieveCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN, SERVICE_AUTH_TOKEN))
             .thenReturn(response);
         doThrow(new CaseDataUpdateException()).when(updatePaymentStatusService).updatePaymentStatus(any(), any(), any());
         doGet(BEARER_TOKEN, FEES_PAYMENT_STATUS_URL, HEARING.name(), "123", "RC-1701-0909-0602-0418")
@@ -111,8 +120,8 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
             .externalReference("lbh2ogknloh9p3b4lchngdfg63")
             .reference("RC-1701-0909-0602-0418")
             .status(status)
-            .currency("GBP")
             .amount(new BigDecimal(200))
+            .currency(CurrencyCode.GBP)
             .statusHistories(getStatusHistories(status))
             .build();
     }
@@ -131,21 +140,22 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
         return payment.build();
     }
 
-    private StatusHistoryDto[] getStatusHistories(String status) {
+    private List<uk.gov.hmcts.reform.civil.model.payments.StatusHistoryDto> getStatusHistories(String status) {
 
-        StatusHistoryDto initiatedHistory = StatusHistoryDto.builder().status("Initiated").build();
-        StatusHistoryDto failedHistory = StatusHistoryDto.builder().status("Failed")
-            .errorCode("P0030")
-            .errorMessage("Payment was cancelled by the user").build();
-        List<StatusHistoryDto> histories = new ArrayList<>();
+        uk.gov.hmcts.reform.civil.model.payments.StatusHistoryDto
+            initiatedHistory = uk.gov.hmcts.reform.civil.model.payments.StatusHistoryDto.builder().status("Initiated").build();
+        uk.gov.hmcts.reform.civil.model.payments.StatusHistoryDto failedHistory =
+            uk.gov.hmcts.reform.civil.model.payments.StatusHistoryDto.builder().status("Failed")
+                .errorCode("P0030")
+                .errorMessage("Payment was cancelled by the user").build();
+        List<uk.gov.hmcts.reform.civil.model.payments.StatusHistoryDto> histories = new ArrayList<>();
         histories.add(initiatedHistory);
         if (status.equals("Failed")) {
             histories.add(failedHistory);
         } else {
             histories.add(StatusHistoryDto.builder().status(status).build());
         }
-        StatusHistoryDto[] result = new StatusHistoryDto[histories.size()];
-        return histories.toArray(result);
+        return histories;
     }
 
     private CardPaymentServiceRequestResponse buildServiceRequestResponse() {
