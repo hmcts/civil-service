@@ -25,10 +25,10 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganiza
 @RequiredArgsConstructor
 public class AddDefendantLitigationFriendNotificationHandler extends NotificationHandler implements NotificationData {
 
-    protected NotificationService notificationService;
-    protected NotificationsProperties notificationsProperties;
-    protected OrganisationService organisationService;
-    protected IStateFlowEngine stateFlowEngine;
+    protected final NotificationService notificationService;
+    protected final NotificationsProperties notificationsProperties;
+    protected final OrganisationService organisationService;
+    protected final IStateFlowEngine stateFlowEngine;
 
     protected static final String REFERENCE_TEMPLATE_APPLICANT = "litigation-friend-added-applicant-notification-%s";
     protected static final String REFERENCE_TEMPLATE_RESPONDENT = "litigation-friend-added-respondent-notification-%s";
