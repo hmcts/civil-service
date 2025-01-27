@@ -106,10 +106,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CallbackResponse aboutToStartValidationAndSetup(CallbackParams callbackParams) {
         List<String> errors = new ArrayList<>();
         CaseData caseData = callbackParams.getCaseData();
-
-        if (!caseData.isLipvLROneVOne()) {
-            errors.add(RESP_NOT_ASSIGNED_ERROR);
-        }
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (initiateGeneralApplicationService.caseContainsLiP(caseData)) {
