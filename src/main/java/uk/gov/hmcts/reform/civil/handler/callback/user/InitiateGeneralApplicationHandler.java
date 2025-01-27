@@ -106,6 +106,10 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CallbackResponse aboutToStartValidationAndSetup(CallbackParams callbackParams) {
         List<String> errors = new ArrayList<>();
         CaseData caseData = callbackParams.getCaseData();
+
+        if (caseData.isLipvLipOneVOne() && !initiateGeneralApplicationService.respondentAssigned(caseData)) {
+            errors.add(RESP_NOT_ASSIGNED_ERROR);
+        }        
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (initiateGeneralApplicationService.caseContainsLiP(caseData)) {
@@ -119,7 +123,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 /*
                  * General Application can only be initiated if Defendant is assigned to the case
                  * */
-                if (!caseData.isLipvLROneVOne() && Objects.isNull(caseData.getDefendantUserDetails())) {
+                if (caseData.isLipvLiPOneVOne() && Objects.isNull(caseData.getDefendantUserDetails())) {
                     errors.add(RESP_NOT_ASSIGNED_ERROR_LIP);
                 }
             }
