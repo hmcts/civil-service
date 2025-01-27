@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallb
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -23,6 +22,7 @@ import java.util.Optional;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -263,7 +263,7 @@ public class UpdateDataRespondentDeadlineResponse {
             .applicant1ResponseDeadline(applicant1Deadline);
 
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-        if (caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)) {
+        if (FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())) {
             Respondent1DQ.Respondent1DQBuilder dq = caseData.getRespondent1DQ().toBuilder()
                 .respondent1DQStatementOfTruth(statementOfTruth);
             handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
@@ -273,7 +273,7 @@ public class UpdateDataRespondentDeadlineResponse {
             updatedData.respondent1DQ(null);
         }
 
-        if (caseData.getRespondent2ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)) {
+        if (FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType())) {
 
             Respondent2DQ.Respondent2DQBuilder dq2 = caseData.getRespondent2DQ().toBuilder()
                 .respondent2DQStatementOfTruth(statementOfTruth);
